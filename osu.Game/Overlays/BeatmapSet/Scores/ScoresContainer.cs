@@ -3,15 +3,13 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
@@ -25,29 +23,36 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly DrawableTopScore topScore;
         private readonly LoadingAnimation loadingAnimation;
         private readonly Box foreground;
-        private GetScoresRequest request;
-        private APIAccess api;
 
-        private bool isLoading
+        private bool isLoading;
+        public bool IsLoading
         {
             set
             {
-                foreground.FadeTo(value ? 1 : 0, fade_duration);
-                loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
+                if (isLoading == value) return;
+                isLoading = value;
+
+                foreground.FadeTo(isLoading ? 1 : 0, fade_duration);
+                loadingAnimation.FadeTo(isLoading ? 1 : 0, fade_duration);
             }
+            get { return isLoading; }
         }
 
-        private BeatmapInfo beatmap;
-        public BeatmapInfo Beatmap
+        private IEnumerable<OnlineScore> scores;
+        public IEnumerable<OnlineScore> Scores
         {
             set
             {
-                if (beatmap == value) return;
-                beatmap = value;
+                if (scores == value)
+                {
+                    IsLoading = false;
+                    return;
+                }
+                scores = value;
 
                 updateScores();
             }
-            get { return beatmap; }
+            get { return scores; }
         }
 
         public ScoresContainer()
@@ -95,58 +100,37 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api)
-        {
-            this.api = api;
-        }
-
         private void updateScores()
         {
-            request?.Cancel();
-
-            if (!beatmap?.OnlineBeatmapID.HasValue ?? true)
+            var scoresAmount = scores.Count();
+            if (scoresAmount == 0)
             {
-                clearAllScores();
+                CleanAllScores();
                 return;
             }
 
-            isLoading = true;
+            topScore.Score = scores.FirstOrDefault();
+            topScore.Show();
 
-            request = new GetScoresRequest(beatmap);
-            request.Success += scores =>
+            flow.Clear();
+
+            if (scoresAmount < 2)
             {
-                var scoresAmount = scores.Scores.Count();
-                if (scoresAmount == 0)
-                {
-                    clearAllScores();
-                    return;
-                }
+                IsLoading = false;
+                return;
+            }
 
-                topScore.Score = scores.Scores.FirstOrDefault();
-                topScore.Show();
+            for (int i = 1; i < scoresAmount; i++)
+                flow.Add(new DrawableScore(i, scores.ElementAt(i)));
 
-                flow.Clear();
-
-                if (scoresAmount < 2)
-                {
-                    isLoading = false;
-                    return;
-                }
-
-                for (int i = 1; i < scoresAmount; i++)
-                    flow.Add(new DrawableScore(i, scores.Scores.ElementAt(i)));
-
-                isLoading = false;
-            };
-            api.Queue(request);
+            IsLoading = false;
         }
 
-        private void clearAllScores()
+        public void CleanAllScores()
         {
             topScore.Hide();
             flow.Clear();
-            isLoading = false;
+            IsLoading = false;
         }
     }
 }

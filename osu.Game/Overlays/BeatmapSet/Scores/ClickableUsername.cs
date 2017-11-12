@@ -14,7 +14,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class ClickableUsername : OsuHoverContainer
     {
         private readonly OsuSpriteText text;
-        private Action clickAction;
         private UserProfileOverlay profile;
 
         private User user;
@@ -57,7 +56,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         protected override bool OnClick(InputState state)
         {
-            profile.ShowUser(user);
+            profile?.ShowUser(user);
             return base.OnClick(state);
         }
     }

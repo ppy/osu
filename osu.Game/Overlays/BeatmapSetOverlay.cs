@@ -27,17 +27,17 @@ namespace osu.Game.Overlays
 
         private readonly Header header;
         private readonly Info info;
+        private readonly ScoresContainer scores;
 
         private APIAccess api;
         private RulesetStore rulesets;
+        private GetScoresRequest getScoresRequest;
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
         {
-            ScoresContainer scores;
-
             FirstWaveColour = OsuColour.Gray(0.4f);
             SecondWaveColour = OsuColour.Gray(0.3f);
             ThirdWaveColour = OsuColour.Gray(0.2f);
@@ -83,7 +83,29 @@ namespace osu.Game.Overlays
                 },
             };
 
-            header.Picker.Beatmap.ValueChanged += b => info.Beatmap = scores.Beatmap = b;
+            header.Picker.Beatmap.ValueChanged += b =>
+            {
+                info.Beatmap = b;
+                updateScores(b);
+            };
+        }
+
+        private void updateScores(BeatmapInfo beatmap)
+        {
+            scores.IsLoading = true;
+
+            getScoresRequest?.Cancel();
+
+            if (!beatmap.OnlineBeatmapID.HasValue)
+            {
+                scores.CleanAllScores();
+                return;
+            }
+
+            getScoresRequest = new GetScoresRequest(beatmap);
+            getScoresRequest.Success += r => scores.Scores = r.Scores;
+
+            api.Queue(getScoresRequest);
         }
 
         [BackgroundDependencyLoader]
