@@ -86,9 +86,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 loadingAnimation = new LoadingAnimation
                 {
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(20),
-                    Margin = new MarginPadding { Top = 115 },
+                    Origin = Anchor.TopCentre,
+                    Margin = new MarginPadding { Top = 105 },
                     Alpha = 0,
                 },
             };
