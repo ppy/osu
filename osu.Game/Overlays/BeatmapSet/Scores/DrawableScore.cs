@@ -22,6 +22,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private const int fade_duration = 100;
         private const float height = 30;
+        private const float side_margin = 20;
+        private const float flag_margin = 60;
+        private const float username_margin = 100;
 
         private readonly Box background;
 
@@ -46,8 +49,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Origin = Anchor.CentreLeft,
                     Text = $"#{index + 1}",
                     Font = @"Exo2.0-RegularItalic",
-                    RelativePositionAxes = Axes.X,
-                    X = 0.02f
+                    Margin = new MarginPadding { Left = side_margin }
                 },
                 new DrawableFlag(score.User.Country?.FlagName)
                 {
@@ -55,23 +57,22 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Origin = Anchor.CentreLeft,
                     Width = 30,
                     Height = 20,
-                    RelativePositionAxes = Axes.X,
-                    X = 0.06f
+                    Margin = new MarginPadding { Left = flag_margin }
                 },
                 new ClickableUsername
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     User = score.User,
-                    RelativePositionAxes = Axes.X,
-                    X = 0.1f
+                    Margin = new MarginPadding { Left = username_margin }
                 },
                 modsContainer = new ScoreModsContainer
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     AutoSizeAxes = Axes.Y,
-                    Width = 60,
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.05f,
                     RelativePositionAxes = Axes.X,
                     X = 0.45f
                 },
@@ -105,12 +106,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 new OsuSpriteText
                 {
-                    Anchor = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Text = $"{score.Statistics["300"]}/{score.Statistics["100"]}/{score.Statistics["50"]}",
                     Font = @"Exo2.0-RegularItalic",
-                    RelativePositionAxes = Axes.X,
-                    X = 0.98f
+                    Margin = new MarginPadding { Right = side_margin }
                 },
             };
 
