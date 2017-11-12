@@ -14,10 +14,13 @@ namespace osu.Game.Overlays.Notifications
 {
     public class ProgressNotification : Notification, IHasCompletionTarget
     {
+        private string text;
+
         public string Text
         {
             set
             {
+                text = value;
                 Schedule(() => textDrawable.Text = value);
             }
         }
@@ -87,7 +90,8 @@ namespace osu.Game.Overlays.Notifications
         protected virtual Notification CreateCompletionNotification() => new ProgressCompletionNotification
         {
             Activated = CompletionClickAction,
-            Text = "Task has completed!"
+            Text = "Task has completed!",
+            SubText = text
         };
 
         protected virtual void Completed()

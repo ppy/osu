@@ -2,8 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 
 
 namespace osu.Game.Overlays.Notifications
@@ -13,7 +15,22 @@ namespace osu.Game.Overlays.Notifications
         public ProgressCompletionNotification()
         {
             Icon = FontAwesome.fa_check;
+
+            Content.Add(subTextDrawable = new TextFlowContainer(t => t.TextSize = 16)
+            {
+                Colour = OsuColour.Gray(128),
+                Origin = Anchor.BottomLeft,
+                Anchor = Anchor.BottomLeft,
+                RelativeSizeAxes = Axes.X,
+            });
         }
+
+        public string SubText
+        {
+            set { Schedule(() => subTextDrawable.Text = value); }
+        }
+
+        private readonly TextFlowContainer subTextDrawable;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
