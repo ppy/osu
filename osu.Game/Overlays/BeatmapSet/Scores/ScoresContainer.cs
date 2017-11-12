@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Width = 0.95f,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, spacing),
-                    Margin = new MarginPadding { Top = spacing },
+                    Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
                         topScore = new DrawableTopScore(),
@@ -85,9 +85,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 loadingAnimation = new LoadingAnimation
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Margin = new MarginPadding { Top = 105 },
                     Alpha = 0,
                 },
             };
