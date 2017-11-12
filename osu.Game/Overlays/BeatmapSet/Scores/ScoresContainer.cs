@@ -43,13 +43,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             set
             {
-                if (scores == value)
-                {
-                    IsLoading = false;
-                    return;
-                }
                 scores = value;
-
                 updateScores();
             }
             get { return scores; }
@@ -92,9 +86,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 loadingAnimation = new LoadingAnimation
                 {
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
+                    Origin = Anchor.Centre,
                     Size = new Vector2(20),
-                    Margin = new MarginPadding { Top = 10 },
+                    Margin = new MarginPadding { Top = 115 },
                     Alpha = 0,
                 },
             };

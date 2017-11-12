@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
-using System;
 using osu.Framework.Input;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
