@@ -25,10 +25,10 @@ namespace osu.Game.Tests.Visual
         private readonly IEnumerable<OnlineScore> anotherScores;
         private readonly OnlineScore topScore;
         private readonly Box background;
-        private readonly Container container;
 
         public TestCaseBeatmapScoresContainer()
         {
+            Container container;
             ScoresContainer scoresContainer;
 
             Child = container = new Container
@@ -47,14 +47,14 @@ namespace osu.Game.Tests.Visual
 
             AddStep("scores pack 1", () => scoresContainer.Scores = scores);
             AddStep("scores pack 2", () => scoresContainer.Scores = anotherScores);
-            AddStep("only top score", () => scoresContainer.Scores = new OnlineScore[] { topScore });
+            AddStep("only top score", () => scoresContainer.Scores = new[] { topScore });
             AddStep("remove scores", scoresContainer.CleanAllScores);
             AddStep("turn on loading", () => scoresContainer.IsLoading = true);
             AddStep("turn off loading", () => scoresContainer.IsLoading = false);
             AddStep("resize to big", () => container.ResizeWidthTo(1, 300));
             AddStep("resize to normal", () => container.ResizeWidthTo(0.8f, 300));
 
-            scores = new OnlineScore[]
+            scores = new[]
             {
                 new OnlineScore
                 {
@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Visual
                 s.Statistics.Add("50", RNG.Next(2000));
             }
 
-            anotherScores = new OnlineScore[]
+            anotherScores = new[]
             {
                 new OnlineScore
                 {
