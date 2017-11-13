@@ -112,9 +112,6 @@ namespace osu.Game.Screens.Menu
 
             buttons.SetOsuLogo(logo);
 
-            logo.Triangles = true;
-            logo.Ripple = false;
-
             logo.FadeColour(Color4.White, 100, Easing.OutQuint);
             logo.FadeIn(100, Easing.OutQuint);
 
