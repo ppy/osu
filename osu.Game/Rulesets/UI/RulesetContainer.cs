@@ -242,7 +242,7 @@ namespace osu.Game.Rulesets.UI
                     OnJudgement?.Invoke(j);
                 };
 
-                drawableObject.OnJudgementRemoved += (d, j) => { OnJudgementRemoved?.Invoke(j); };
+                drawableObject.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(j);
 
                 Playfield.Add(drawableObject);
             }
