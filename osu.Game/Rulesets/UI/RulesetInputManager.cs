@@ -76,6 +76,8 @@ namespace osu.Game.Rulesets.UI
 
         #region Clock control
 
+        protected override bool ShouldProcessClock => false; // We handle processing the clock ourselves
+
         private ManualClock clock;
         private IFrameBasedClock parentClock;
 
@@ -148,10 +150,15 @@ namespace osu.Game.Rulesets.UI
                 }
 
                 clock.CurrentTime = newTime.Value;
-                Clock.ProcessFrame();
             }
 
             requireMoreUpdateLoops = clock.CurrentTime != parentClock.CurrentTime;
+
+            // The manual clock time has changed in the above code. The framed clock now needs to be updated
+            // to ensure that the its time is valid for our children before input is processed
+            Clock.ProcessFrame();
+
+            // Process input
             base.Update();
         }
 
