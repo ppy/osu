@@ -24,7 +24,6 @@ namespace osu.Game.Screens
         {
             base.LogoArriving(logo, resuming);
 
-            logo.RelativePositionAxes = Axes.None;
             logo.Triangles = false;
             logo.Origin = Anchor.BottomRight;
             logo.Anchor = Anchor.BottomRight;
@@ -47,11 +46,7 @@ namespace osu.Game.Screens
         protected override void LogoSuspending(OsuLogo logo)
         {
             base.LogoSuspending(logo);
-            logo.FadeOut(100).OnComplete(l =>
-            {
-                l.Anchor = Anchor.TopLeft;
-                l.Origin = Anchor.Centre;
-            });
+            logo.FadeOut(100);
         }
 
         [BackgroundDependencyLoader]
