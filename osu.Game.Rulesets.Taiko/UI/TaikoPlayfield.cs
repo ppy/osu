@@ -244,7 +244,12 @@ namespace osu.Game.Rulesets.Taiko.UI
                 if (judgedObject.X >= -0.05f && judgedObject is DrawableHit)
                 {
                     // If we're far enough away from the left stage, we should bring outselves in front of it
-                    topLevelHitContainer.Add(judgedObject.CreateProxy());
+                    // Todo: The following try-catch is temporary for replay rewinding support
+                    try
+                    {
+                        topLevelHitContainer.Add(judgedObject.CreateProxy());
+                    }
+                    catch { }
                 }
 
                 hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));

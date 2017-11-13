@@ -96,7 +96,7 @@ namespace osu.Game.Overlays
                 new RanksSection(),
                 //new MedalsSection(),
                 new HistoricalSection(),
-                //new BeatmapsSection(),
+                new BeatmapsSection(),
                 //new KudosuSection()
             };
             tabs = new ProfileTabControl
