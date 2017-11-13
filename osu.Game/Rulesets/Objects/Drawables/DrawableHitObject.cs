@@ -212,6 +212,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 nestedHitObjects = new List<DrawableHitObject<TObject>>();
 
             h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
+            h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
             nestedHitObjects.Add(h);
         }
 
