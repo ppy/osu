@@ -3,6 +3,9 @@
 
 using osu.Framework.Timing;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.ReplaySettings
 {
@@ -13,19 +16,43 @@ namespace osu.Game.Screens.Play.ReplaySettings
         public IAdjustableClock AdjustableClock { set; get; }
 
         private readonly ReplaySliderBar<double> sliderbar;
+        private readonly OsuSpriteText multiplierText;
 
         public PlaybackSettings()
         {
-            Child = sliderbar = new ReplaySliderBar<double>
+            Children = new Drawable[]
             {
-                LabelText = "Playback speed",
-                Bindable = new BindableDouble(1)
+                new Container
                 {
-                    Default = 1,
-                    MinValue = 0.5,
-                    MaxValue = 2,
-                    Precision = 0.01,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Text = "Playback speed",
+                        },
+                        multiplierText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Text = "1x",
+                            Font = @"Exo2.0-Bold",
+                        }
+                    },
                 },
+                sliderbar = new ReplaySliderBar<double>
+                {
+                    Bindable = new BindableDouble(1)
+                    {
+                        Default = 1,
+                        MinValue = 0.5,
+                        MaxValue = 2,
+                        Precision = 0.01,
+                    },
+                }
             };
         }
 
@@ -37,7 +64,11 @@ namespace osu.Game.Screens.Play.ReplaySettings
                 return;
 
             var clockRate = AdjustableClock.Rate;
-            sliderbar.Bindable.ValueChanged += rateMultiplier => AdjustableClock.Rate = clockRate * rateMultiplier;
+            sliderbar.Bindable.ValueChanged += rateMultiplier =>
+            {
+                AdjustableClock.Rate = clockRate * rateMultiplier;
+                multiplierText.Text = $"{rateMultiplier}x";
+            };
         }
     }
 }
