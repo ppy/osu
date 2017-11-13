@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         }
 
         [BackgroundDependencyLoader]
-        private new void load(OsuColour colour)
+        private void load(OsuColour colour)
         {
             double pp = Score.PP ?? 0;
             Stats.Add(new OsuSpriteText
