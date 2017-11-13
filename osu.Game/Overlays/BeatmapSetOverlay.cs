@@ -92,8 +92,6 @@ namespace osu.Game.Overlays
 
         private void updateScores(BeatmapInfo beatmap)
         {
-            scores.IsLoading = true;
-
             getScoresRequest?.Cancel();
 
             if (!beatmap.OnlineBeatmapID.HasValue)
@@ -102,9 +100,14 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            getScoresRequest = new GetScoresRequest(beatmap);
-            getScoresRequest.Success += r => scores.Scores = r.Scores;
+            scores.IsLoading = true;
 
+            getScoresRequest = new GetScoresRequest(beatmap);
+            getScoresRequest.Success += r =>
+            {
+                scores.Scores = r.Scores;
+                scores.IsLoading = false;
+            };
             api.Queue(getScoresRequest);
         }
 

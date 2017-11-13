@@ -105,22 +105,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             flow.Clear();
 
             if (scoresAmount < 2)
-            {
-                IsLoading = false;
                 return;
-            }
 
             for (int i = 1; i < scoresAmount; i++)
                 flow.Add(new DrawableScore(i, scores.ElementAt(i)));
-
-            IsLoading = false;
         }
 
         public void CleanAllScores()
         {
             topScore.Hide();
             flow.Clear();
-            IsLoading = false;
         }
     }
 }
