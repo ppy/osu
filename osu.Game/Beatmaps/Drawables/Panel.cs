@@ -12,7 +12,7 @@ using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class Panel : Container, IStateful<PanelSelectedState>, IHandleMouseButtons
+    public class Panel : Container, IStateful<PanelSelectedState>, IHandleMouseButtons, IHandleClicks
     {
         public const float MAX_HEIGHT = 80;
 
@@ -125,8 +125,6 @@ namespace osu.Game.Beatmaps.Drawables
             State = PanelSelectedState.Selected;
             return true;
         }
-
-        public virtual bool OnDoubleClick(InputState state) => false;
     }
 
     public enum PanelSelectedState

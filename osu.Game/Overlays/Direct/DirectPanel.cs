@@ -25,7 +25,7 @@ using osu.Framework.Audio.Track;
 
 namespace osu.Game.Overlays.Direct
 {
-    public abstract class DirectPanel : Container, IHandleHover, IHandleMouseButtons
+    public abstract class DirectPanel : Container, IHandleHover, IHandleMouseButtons, IHandleClicks
     {
         public readonly BeatmapSetInfo SetInfo;
 
@@ -148,8 +148,6 @@ namespace osu.Game.Overlays.Direct
             PreviewPlaying.Value = false;
             return true;
         }
-
-        public virtual bool OnDoubleClick(InputState state) => false;
 
         protected void ShowInformation() => beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
 

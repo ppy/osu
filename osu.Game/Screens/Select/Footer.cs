@@ -16,7 +16,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
-    public class Footer : Container, IHandleMouseButtons, IHandleDrag
+    public class Footer : Container, IHandleMouseButtons, IHandleClicks, IHandleDrag
     {
         private readonly Box modeLight;
 
@@ -136,8 +136,6 @@ namespace osu.Game.Screens.Select
         public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
 
         public virtual bool OnClick(InputState state) => false;
-
-        public virtual bool OnDoubleClick(InputState state) => false;
 
         public virtual bool OnDragStart(InputState state) => true;
         public virtual bool OnDrag(InputState state) => false;

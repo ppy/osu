@@ -15,7 +15,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class PlayButton : Container, IHandleMouseButtons, IHandleHover
+    public class PlayButton : Container, IHandleMouseButtons, IHandleHover, IHandleClicks
     {
         public readonly Bindable<bool> Playing = new Bindable<bool>();
         public Track Preview { get; private set; }
@@ -97,8 +97,6 @@ namespace osu.Game.Overlays.Direct
             Playing.Value = !Playing.Value;
             return true;
         }
-
-        public virtual bool OnDoubleClick(InputState state) => false;
 
         public virtual bool OnHover(InputState state)
         {

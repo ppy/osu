@@ -23,7 +23,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class LoginSettings : FillFlowContainer, IOnlineComponent, IHandleMouseButtons, IHandleFocus
+    public class LoginSettings : FillFlowContainer, IOnlineComponent, IHandleMouseButtons, IHandleClicks, IHandleFocus
     {
         private bool bounding = true;
         private LoginForm form;
@@ -181,7 +181,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
         public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
 
         public virtual bool OnClick(InputState state) => true;
-        public virtual bool OnDoubleClick(InputState state) => false;
 
         public virtual void OnFocus(InputState state)
         {
@@ -192,7 +191,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
         }
 
-        private class LoginForm : FillFlowContainer, IHandleMouseButtons, IHandleFocus
+        private class LoginForm : FillFlowContainer, IHandleMouseButtons, IHandleClicks, IHandleFocus
         {
             private TextBox username;
             private TextBox password;
@@ -258,7 +257,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
             public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
 
             public virtual bool OnClick(InputState state) => true;
-            public virtual bool OnDoubleClick(InputState state) => false;
 
             public virtual void OnFocus(InputState state)
             {

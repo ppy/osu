@@ -16,7 +16,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public abstract class Notification : Container, IHandleHover, IHandleMouseButtons
+    public abstract class Notification : Container, IHandleHover, IHandleMouseButtons, IHandleClicks
     {
         /// <summary>
         /// User requested close.
@@ -136,8 +136,6 @@ namespace osu.Game.Overlays.Notifications
 
             return true;
         }
-
-        public virtual bool OnDoubleClick(InputState state) => false;
 
         protected override void LoadComplete()
         {

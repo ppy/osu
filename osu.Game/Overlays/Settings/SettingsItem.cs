@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        private class RestoreDefaultValueButton<T> : Box, IHasTooltip, IHandleMouseButtons, IHandleHover
+        private class RestoreDefaultValueButton<T> : Box, IHasTooltip, IHandleMouseButtons, IHandleClicks, IHandleHover
         {
             private Bindable<T> bindable;
             internal Bindable<T> Bindable
@@ -171,8 +171,6 @@ namespace osu.Game.Overlays.Settings
                     bindable.SetDefault();
                 return true;
             }
-
-            public bool OnDoubleClick(InputState state) => false;
 
             public virtual bool OnHover(InputState state)
             {

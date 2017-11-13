@@ -43,9 +43,5 @@ namespace osu.Game.Screens.Play
             if (args.Button == Button) IsLit = false;
             return false;
         }
-
-        public virtual bool OnClick(InputState state) => false;
-
-        public virtual bool OnDoubleClick(InputState state) => false;
     }
 }

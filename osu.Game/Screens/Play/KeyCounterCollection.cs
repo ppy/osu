@@ -150,9 +150,6 @@ namespace osu.Game.Screens.Play
             public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseDown(state, args));
 
             public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseUp(state, args));
-            public virtual bool OnClick(InputState state) => false;
-
-            public virtual bool OnDoubleClick(InputState state) => false;
         }
     }
 }

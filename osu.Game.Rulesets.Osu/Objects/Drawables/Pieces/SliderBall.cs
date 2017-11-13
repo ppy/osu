@@ -92,10 +92,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return false;
         }
 
-        public virtual bool OnClick(InputState state) => false;
-
-        public virtual bool OnDoubleClick(InputState state) => false;
-
         public virtual bool OnMouseMove(InputState state)
         {
             lastState = state;

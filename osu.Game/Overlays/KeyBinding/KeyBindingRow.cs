@@ -19,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Overlays.KeyBinding
 {
-    internal class KeyBindingRow : Container, IFilterable, IHandleHover, IHandleMouseButtons, IHandleWheel, IHandleKeys, IHandleFocus
+    internal class KeyBindingRow : Container, IFilterable, IHandleHover, IHandleMouseButtons, IHandleClicks, IHandleWheel, IHandleKeys, IHandleFocus
     {
         private readonly object action;
         private readonly IEnumerable<Framework.Input.Bindings.KeyBinding> bindings;
@@ -143,7 +143,6 @@ namespace osu.Game.Overlays.KeyBinding
         private bool isModifier(Key k) => k < Key.F1;
 
         public virtual bool OnClick(InputState state) => true;
-        public bool OnDoubleClick(InputState state) => false;
 
         public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
