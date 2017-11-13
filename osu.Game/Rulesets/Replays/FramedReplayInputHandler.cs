@@ -104,7 +104,13 @@ namespace osu.Game.Rulesets.Replays
             {
                 //if we changed frames, we want to execute once *exactly* on the frame's time.
                 if (currentDirection == time.CompareTo(NextFrame.Time) && advanceFrame())
+                {
+                    // If going backwards, we need to execute once _before_ the frame time to reverse any judgements
+                    // that would occur as a result of this frame in forward playback
+                    if (currentDirection == -1)
+                        return currentTime = CurrentFrame.Time - 1;
                     return currentTime = CurrentFrame.Time;
+                }
 
                 //if we didn't change frames, we need to ensure we are allowed to run frames in between, else return null.
                 if (inImportantSection)
