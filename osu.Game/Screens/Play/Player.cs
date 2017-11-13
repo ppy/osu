@@ -17,6 +17,8 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -142,14 +144,20 @@ namespace osu.Game.Screens.Play
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
-            Schedule(() =>
+            Task.Run(() =>
             {
                 adjustableSourceClock.Reset();
 
-                foreach (var mod in working.Mods.Value.OfType<IApplicableToClock>())
-                    mod.ApplyToClock(adjustableSourceClock);
+                // this is temporary until we have blocking (async.Wait()) audio component methods.
+                // then we can call ResetAsync().Wait() or the blocking version above.
+                while (adjustableSourceClock.IsRunning)
+                    Thread.Sleep(1);
 
-                decoupledClock.ChangeSource(adjustableSourceClock);
+                Schedule(() =>
+                {
+                    decoupledClock.ChangeSource(adjustableSourceClock);
+                    applyRateFromMods();
+                });
             });
 
             Children = new Drawable[]
@@ -230,9 +238,18 @@ namespace osu.Game.Screens.Play
 
             breakOverlay.BindProcessor(scoreProcessor);
 
+            hudOverlay.ReplaySettingsOverlay.PlaybackSettings.AdjustableClock = adjustableSourceClock;
+
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;
+        }
+
+        private void applyRateFromMods()
+        {
+            adjustableSourceClock.Rate = 1;
+            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
+                mod.ApplyToClock(adjustableSourceClock);
         }
 
         private void initializeStoryboard(bool asyncLoad)
@@ -332,6 +349,9 @@ namespace osu.Game.Screens.Play
         {
             if (HasFailed || !ValidForResume || pauseContainer?.AllowExit != false || RulesetContainer?.HasReplayLoaded != false)
             {
+                // In the case of replays, we may have changed the playback rate.
+                applyRateFromMods();
+
                 fadeOut();
                 return base.OnExiting(next);
             }

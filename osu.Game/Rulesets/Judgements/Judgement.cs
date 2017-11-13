@@ -17,7 +17,25 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         public virtual HitResult MaxResult => HitResult.Perfect;
 
+        /// <summary>
+        /// The combo prior to this judgement occurring.
+        /// </summary>
+        internal int ComboAtJudgement;
+
+        /// <summary>
+        /// The highest combo achieved prior to this judgement occurring.
+        /// </summary>
+        internal int HighestComboAtJudgement;
+
+        /// <summary>
+        /// Whether a successful hit occurred.
+        /// </summary>
         public bool IsHit => Result > HitResult.Miss;
+
+        /// <summary>
+        /// Whether this judgement is the final judgement for the hit object.
+        /// </summary>
+        public bool Final = true;
 
         /// <summary>
         /// The offset from a perfect hit at which this judgement occurred.
