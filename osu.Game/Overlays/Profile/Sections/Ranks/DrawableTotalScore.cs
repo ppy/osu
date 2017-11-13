@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         }
 
         [BackgroundDependencyLoader]
-        private new void load()
+        private void load()
         {
             Stats.Add(new OsuSpriteText
             {
