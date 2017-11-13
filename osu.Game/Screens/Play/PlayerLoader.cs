@@ -99,7 +99,6 @@ namespace osu.Game.Screens.Play
         {
             base.LogoArriving(logo, resuming);
 
-            logo.ClearTransforms(targetMember: nameof(Position));
             logo.RelativePositionAxes = Axes.Both;
 
             logo.ScaleTo(new Vector2(0.15f), 300, Easing.In);
