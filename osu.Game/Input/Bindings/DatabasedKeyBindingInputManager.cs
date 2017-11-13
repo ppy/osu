@@ -51,7 +51,9 @@ namespace osu.Game.Input.Bindings
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            store.KeyBindingChanged -= ReloadMappings;
+
+            if (store != null)
+                store.KeyBindingChanged -= ReloadMappings;
         }
 
         protected override void ReloadMappings() => KeyBindings = store.Query(ruleset?.ID, variant).ToList();
