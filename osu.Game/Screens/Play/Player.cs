@@ -144,22 +144,6 @@ namespace osu.Game.Screens.Play
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
-            Task.Run(() =>
-            {
-                adjustableSourceClock.Reset();
-
-                // this is temporary until we have blocking (async.Wait()) audio component methods.
-                // then we can call ResetAsync().Wait() or the blocking version above.
-                while (adjustableSourceClock.IsRunning)
-                    Thread.Sleep(1);
-
-                Schedule(() =>
-                {
-                    decoupledClock.ChangeSource(adjustableSourceClock);
-                    applyRateFromMods();
-                });
-            });
-
             Children = new Drawable[]
             {
                 storyboardContainer = new Container
@@ -329,10 +313,26 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            this.Delay(750).Schedule(() =>
+            Task.Run(() =>
             {
-                if (!pauseContainer.IsPaused)
-                    decoupledClock.Start();
+                adjustableSourceClock.Reset();
+
+                // this is temporary until we have blocking (async.Wait()) audio component methods.
+                // then we can call ResetAsync().Wait() or the blocking version above.
+                while (adjustableSourceClock.IsRunning)
+                    Thread.Sleep(1);
+
+                Schedule(() =>
+                {
+                    decoupledClock.ChangeSource(adjustableSourceClock);
+                    applyRateFromMods();
+
+                    this.Delay(750).Schedule(() =>
+                    {
+                        if (!pauseContainer.IsPaused)
+                            decoupledClock.Start();
+                    });
+                });
             });
 
             pauseContainer.Alpha = 0;
