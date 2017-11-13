@@ -148,6 +148,7 @@ namespace osu.Game.Rulesets.UI
                 }
 
                 clock.CurrentTime = newTime.Value;
+                Clock.ProcessFrame();
             }
 
             requireMoreUpdateLoops = clock.CurrentTime != parentClock.CurrentTime;
