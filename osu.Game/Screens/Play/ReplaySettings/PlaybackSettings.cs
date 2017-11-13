@@ -18,10 +18,11 @@ namespace osu.Game.Screens.Play.ReplaySettings
         public IAdjustableClock AdjustableClock { set; get; }
 
         private readonly ReplaySliderBar<double> sliderbar;
-        private readonly OsuSpriteText multiplierText;
 
         public PlaybackSettings()
         {
+            OsuSpriteText multiplierText;
+
             Children = new Drawable[]
             {
                 new Container
