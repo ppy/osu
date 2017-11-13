@@ -127,8 +127,6 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                logo.Triangles = true;
-
                 logo.ScaleTo(1);
                 logo.FadeIn();
                 logo.PlayIntro();
