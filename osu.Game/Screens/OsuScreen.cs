@@ -118,7 +118,7 @@ namespace osu.Game.Screens
             }
 
             if ((logo = lastOsu?.logo) == null)
-                AddInternal(logo = new OsuLogo());
+                LoadComponentAsync(logo = new OsuLogo(), AddInternal);
 
             base.OnEntering(last);
 
