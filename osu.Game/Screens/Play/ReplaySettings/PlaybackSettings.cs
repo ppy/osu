@@ -11,6 +11,8 @@ namespace osu.Game.Screens.Play.ReplaySettings
 {
     public class PlaybackSettings : ReplayGroup
     {
+        private const int padding = 10;
+
         protected override string Title => @"playback";
 
         public IAdjustableClock AdjustableClock { set; get; }
@@ -26,6 +28,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Horizontal = padding },
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
@@ -54,6 +57,8 @@ namespace osu.Game.Screens.Play.ReplaySettings
                     },
                 }
             };
+
+            sliderbar.Bindable.ValueChanged += rateMultiplier => multiplierText.Text = $"{rateMultiplier}x";
         }
 
         protected override void LoadComplete()
@@ -64,11 +69,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
                 return;
 
             var clockRate = AdjustableClock.Rate;
-            sliderbar.Bindable.ValueChanged += rateMultiplier =>
-            {
-                AdjustableClock.Rate = clockRate * rateMultiplier;
-                multiplierText.Text = $"{rateMultiplier}x";
-            };
+            sliderbar.Bindable.ValueChanged += rateMultiplier => AdjustableClock.Rate = clockRate * rateMultiplier;
         }
     }
 }
