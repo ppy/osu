@@ -11,8 +11,8 @@
     <Company>ppy Pty Ltd</Company>
     <Copyright>ppy Pty Ltd 2007-2017</Copyright>
     <Version>1.0.0.0</Version>
-    <!-- TEMPORARY - Should be removed with .NET Core (removal of Squirrel)
-         Required to stop generation of System.Net.Http bindings for now. -->
+    <!-- HACK HACK - EF copies System.Net.Http locally, and we need to rewrite the bindings
+         to reference System.Net.Http 4.0.0.0 for Squirrel. -->
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
