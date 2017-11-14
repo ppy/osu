@@ -10,9 +10,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Menu;
 using OpenTK;
 using osu.Framework.Localisation;
+using osu.Game.Screens.Menu;
 
 namespace osu.Game.Screens.Play
 {
@@ -20,13 +20,12 @@ namespace osu.Game.Screens.Play
     {
         private Player player;
 
-        private readonly OsuLogo logo;
         private BeatmapMetadataDisplay info;
 
         private bool showOverlays = true;
-        internal override bool ShowOverlays => showOverlays;
+        public override bool ShowOverlays => showOverlays;
 
-        internal override bool AllowBeatmapRulesetChange => false;
+        public override bool AllowBeatmapRulesetChange => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
@@ -38,15 +37,6 @@ namespace osu.Game.Screens.Play
             {
                 showOverlays = false;
                 ValidForResume = true;
-            };
-
-            Children = new Drawable[]
-            {
-                logo = new OsuLogo
-                {
-                    Scale = new Vector2(0.15f),
-                    Interactive = false,
-                },
             };
         }
 
@@ -101,9 +91,21 @@ namespace osu.Game.Screens.Play
 
             contentIn();
 
-            logo.Delay(500).MoveToOffset(new Vector2(0, -180), 500, Easing.InOutExpo);
             info.Delay(750).FadeIn(500);
             this.Delay(2150).Schedule(pushWhenLoaded);
+        }
+
+        protected override void LogoArriving(OsuLogo logo, bool resuming)
+        {
+            base.LogoArriving(logo, resuming);
+
+            logo.RelativePositionAxes = Axes.Both;
+
+            logo.ScaleTo(new Vector2(0.15f), 300, Easing.In);
+            logo.MoveTo(new Vector2(0.5f), 300, Easing.In);
+            logo.FadeIn(350);
+
+            logo.Delay(resuming ? 0 : 500).MoveToOffset(new Vector2(0, -0.24f), 500, Easing.InOutExpo);
         }
 
         private void pushWhenLoaded()
