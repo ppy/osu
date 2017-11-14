@@ -17,9 +17,9 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         private readonly BeatmapSetType type;
 
-        private DirectPanel playing;
+        private DirectPanel currentlyPlaying;
 
-        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing)
+        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
             : base(user, header, missing)
         {
             this.type = type;
@@ -27,7 +27,6 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             ItemsPerPage = 6;
 
             ItemsContainer.Spacing = new Vector2(panel_padding);
-            ItemsContainer.Margin = new MarginPadding { Bottom = panel_padding };
         }
 
         protected override void ShowMore()
@@ -52,24 +51,18 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     if (!s.OnlineBeatmapSetID.HasValue)
                         continue;
 
-                    var subReq = new GetBeatmapSetRequest(s.OnlineBeatmapSetID.Value);
-                    subReq.Success += b =>
+                    var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets));
+                    ItemsContainer.Add(panel);
+
+                    panel.PreviewPlaying.ValueChanged += isPlaying =>
                     {
-                        var panel = new DirectGridPanel(b.ToBeatmapSet(Rulesets)) { Width = 400 };
-                        ItemsContainer.Add(panel);
+                        if (!isPlaying) return;
 
-                        panel.PreviewPlaying.ValueChanged += newValue =>
-                        {
-                            if (newValue)
-                            {
-                                if (playing != null && playing != panel)
-                                    playing.PreviewPlaying.Value = false;
-                                playing = panel;
-                            }
-                        };
+                        if (currentlyPlaying != null && currentlyPlaying != panel)
+                            currentlyPlaying.PreviewPlaying.Value = false;
+
+                        currentlyPlaying = panel;
                     };
-
-                    Api.Queue(subReq);
                 }
             };
 
