@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         private readonly BeatmapSetType type;
 
-        private DirectPanel playing;
+        private DirectPanel currentlyPlaying;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing)
             : base(user, header, missing)
@@ -55,14 +55,14 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets)) { Width = 400 };
                     ItemsContainer.Add(panel);
 
-                    panel.PreviewPlaying.ValueChanged += newValue =>
+                    panel.PreviewPlaying.ValueChanged += isPlaying =>
                     {
-                        if (newValue)
-                        {
-                            if (playing != null && playing != panel)
-                                playing.PreviewPlaying.Value = false;
-                            playing = panel;
-                        }
+                        if (!isPlaying) return;
+
+                        if (currentlyPlaying != null && currentlyPlaying != panel)
+                            currentlyPlaying.PreviewPlaying.Value = false;
+
+                        currentlyPlaying = panel;
                     };
                 }
             };
