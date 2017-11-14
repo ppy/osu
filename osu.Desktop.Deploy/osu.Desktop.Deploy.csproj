@@ -15,6 +15,13 @@
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="squirrel.windows" Version="1.7.8" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\osu.licenseheader">
       <Link>osu.licenseheader</Link>
     </None>
