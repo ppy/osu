@@ -222,7 +222,7 @@ namespace osu.Game.Overlays
                     switch (displayStyle)
                     {
                         case PanelDisplayStyle.Grid:
-                            return new DirectGridPanel(b) { Width = 400 };
+                            return new DirectGridPanel(b);
                         default:
                             return new DirectListPanel(b);
                     }
