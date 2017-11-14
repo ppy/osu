@@ -26,6 +26,8 @@ namespace osu.Game.Online.API.Requests
     {
         MostPlayed,
         Favourite,
-        RankedAndApproved
+        RankedAndApproved,
+        Unranked,
+        Graveyard
     }
 }
