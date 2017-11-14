@@ -13,6 +13,7 @@ using OpenTK.Graphics;
 using osu.Game.Audio;
 using System.Linq;
 using osu.Game.Graphics;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -30,6 +31,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public virtual bool DisplayJudgement => true;
 
+        public override bool RemoveCompletedTransforms => false;
+        public override bool RemoveWhenNotAlive => false;
+
         protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
@@ -40,6 +44,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         where TObject : HitObject
     {
         public event Action<DrawableHitObject, Judgement> OnJudgement;
+        public event Action<DrawableHitObject, Judgement> OnJudgementRemoved;
 
         public new readonly TObject HitObject;
 
@@ -56,31 +61,42 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected List<SampleChannel> Samples = new List<SampleChannel>();
 
+        public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
+
         protected DrawableHitObject(TObject hitObject)
             : base(hitObject)
         {
             HitObject = hitObject;
         }
 
-        private ArmedState state;
-        public ArmedState State
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
         {
-            get { return state; }
-
-            set
+            foreach (SampleInfo sample in HitObject.Samples)
             {
-                if (state == value)
-                    return;
-                state = value;
+                SampleChannel channel = audio.Sample.Get($@"Gameplay/{sample.Bank}-{sample.Name}");
 
-                if (!IsLoaded)
-                    return;
+                if (channel == null)
+                    continue;
 
+                channel.Volume.Value = sample.Volume;
+                Samples.Add(channel);
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            State.ValueChanged += state =>
+            {
                 UpdateState(state);
 
                 if (State == ArmedState.Hit)
                     PlaySamples();
-            }
+            };
+
+            State.TriggerChange();
         }
 
         protected void PlaySamples()
@@ -88,21 +104,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Samples.ForEach(s => s?.Play());
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            //force application of the state that was set before we loaded.
-            UpdateState(State);
-        }
-
-        private bool hasJudgementResult;
         private bool judgementOccurred;
+        private bool judgementFinalized => judgements.LastOrDefault()?.Final == true;
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public virtual bool AllJudged => (!ProvidesJudgement || hasJudgementResult) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
+        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
 
         /// <summary>
         /// Notifies that a new judgement has occurred for this <see cref="DrawableHitObject"/>.
@@ -110,7 +118,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="judgement">The <see cref="Judgement"/>.</param>
         protected void AddJudgement(Judgement judgement)
         {
-            hasJudgementResult = judgement.Result >= HitResult.Miss;
             judgementOccurred = true;
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
@@ -124,10 +131,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 case HitResult.None:
                     break;
                 case HitResult.Miss:
-                    State = ArmedState.Miss;
+                    State.Value = ArmedState.Miss;
                     break;
                 default:
-                    State = ArmedState.Hit;
+                    State.Value = ArmedState.Hit;
                     break;
             }
 
@@ -152,7 +159,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     judgementOccurred |= d.UpdateJudgement(userTriggered);
             }
 
-            if (!ProvidesJudgement || hasJudgementResult || judgementOccurred)
+            if (!ProvidesJudgement || judgementFinalized || judgementOccurred)
                 return judgementOccurred;
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
@@ -170,26 +177,30 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// implies that this check occurred after the end time of <see cref="HitObject"/>. </param>
         protected virtual void CheckForJudgements(bool userTriggered, double timeOffset) { }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+
+            while (judgements.Count > 0)
+            {
+                var lastJudgement = judgements[judgements.Count - 1];
+                if (lastJudgement.TimeOffset + endTime <= Time.Current)
+                    break;
+
+                judgements.RemoveAt(judgements.Count - 1);
+                State.Value = ArmedState.Idle;
+
+                OnJudgementRemoved?.Invoke(this, lastJudgement);
+            }
+        }
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
             UpdateJudgement(false);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            foreach (SampleInfo sample in HitObject.Samples)
-            {
-                SampleChannel channel = audio.Sample.Get($@"Gameplay/{sample.Bank}-{sample.Name}");
-
-                if (channel == null)
-                    continue;
-
-                channel.Volume.Value = sample.Volume;
-                Samples.Add(channel);
-            }
         }
 
         private List<DrawableHitObject<TObject>> nestedHitObjects;
@@ -201,6 +212,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 nestedHitObjects = new List<DrawableHitObject<TObject>>();
 
             h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
+            h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
             nestedHitObjects.Add(h);
         }
 

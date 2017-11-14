@@ -18,9 +18,12 @@ namespace osu.Desktop
 {
     internal class OsuGameDesktop : OsuGame
     {
+        private readonly bool noVersionOverlay;
+
         public OsuGameDesktop(string[] args = null)
             : base(args)
         {
+            noVersionOverlay = args?.Any(a => a == "--no-version-overlay") ?? false;
         }
 
         public override Storage GetStorageForStableInstall()
@@ -79,11 +82,14 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            LoadComponentAsync(new VersionManager { Depth = int.MinValue }, v =>
+            if (!noVersionOverlay)
             {
-                Add(v);
-                v.State = Visibility.Visible;
-            });
+                LoadComponentAsync(new VersionManager { Depth = int.MinValue }, v =>
+                {
+                    Add(v);
+                    v.State = Visibility.Visible;
+                });
+            }
         }
 
         public override void SetHost(GameHost host)

@@ -29,7 +29,10 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmap) return;
                 beatmap = value;
 
-                var rate = (float)beatmap.OnlineInfo.PassCount / beatmap.OnlineInfo.PlayCount;
+                int passCount = beatmap.OnlineInfo.PassCount;
+                int playCount = beatmap.OnlineInfo.PlayCount;
+
+                var rate = playCount != 0 ? (float)passCount / playCount : 0;
                 successPercent.Text = rate.ToString("P0");
                 successRate.Length = rate;
                 percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
