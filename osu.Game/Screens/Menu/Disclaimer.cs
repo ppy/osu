@@ -12,15 +12,15 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    internal class Disclaimer : OsuScreen
+    public class Disclaimer : OsuScreen
     {
         private Intro intro;
         private readonly SpriteIcon icon;
         private Color4 iconColour;
 
-        internal override bool ShowOverlays => false;
+        public override bool ShowOverlays => false;
 
-        internal override bool HasLocalCursorDisplayed => true;
+        public override bool HasLocalCursorDisplayed => true;
 
         public Disclaimer()
         {
