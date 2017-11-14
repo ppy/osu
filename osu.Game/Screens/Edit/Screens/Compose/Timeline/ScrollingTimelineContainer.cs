@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         }
 
         /// <summary>
-        /// Zoom target as a relative position in the <see cref="Content"/> space.
+        /// Zoom target as a relative position in the <see cref="ScrollingTimelineContainer.Content"/> space.
         /// </summary>
         private float? relativeContentZoomTarget;
 

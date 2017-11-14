@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -24,27 +25,25 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
         }
 
-        private bool processedSecondHit;
-        public override bool AllJudged => processedSecondHit && base.AllJudged;
-
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (!base.AllJudged)
+            if (!SecondHitAllowed)
             {
                 base.CheckForJudgements(userTriggered, timeOffset);
                 return;
             }
 
             if (!userTriggered)
+            {
+                if (timeOffset > second_hit_window)
+                    AddJudgement(new TaikoStrongHitJudgement { Result = HitResult.Miss });
                 return;
+            }
 
             // If we get here, we're assured that the key pressed is the correct secondary key
 
             if (Math.Abs(firstHitTime - Time.Current) < second_hit_window)
-            {
-                AddJudgement(new TaikoStrongHitJudgement());
-                processedSecondHit = true;
-            }
+                AddJudgement(new TaikoStrongHitJudgement { Result = HitResult.Great });
         }
 
         public override bool OnReleased(TaikoAction action)
@@ -56,8 +55,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(TaikoAction action)
         {
+            if (AllJudged)
+                return false;
+
             // Check if we've handled the first key
-            if (!base.AllJudged)
+            if (!SecondHitAllowed)
             {
                 // First key hasn't been handled yet, attempt to handle it
                 bool handled = base.OnPressed(action);
@@ -71,10 +73,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 return handled;
             }
-
-            // If we've already hit the second key, don't handle this object any further
-            if (processedSecondHit)
-                return false;
 
             // Don't handle represses of the first key
             if (firstHitAction == action)

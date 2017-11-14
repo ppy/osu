@@ -144,23 +144,6 @@ namespace osu.Game.Screens.Play
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
-            Task.Run(() =>
-            {
-                adjustableSourceClock.Reset();
-
-                // this is temporary until we have blocking (async.Wait()) audio component methods.
-                // then we can call ResetAsync().Wait() or the blocking version above.
-                while (adjustableSourceClock.IsRunning)
-                    Thread.Sleep(1);
-
-                Schedule(() =>
-                {
-                    decoupledClock.ChangeSource(adjustableSourceClock);
-                    foreach (var mod in working.Mods.Value.OfType<IApplicableToClock>())
-                        mod.ApplyToClock(adjustableSourceClock);
-                });
-            });
-
             Children = new Drawable[]
             {
                 storyboardContainer = new Container
@@ -239,9 +222,18 @@ namespace osu.Game.Screens.Play
 
             breakOverlay.BindProcessor(scoreProcessor);
 
+            hudOverlay.ReplaySettingsOverlay.PlaybackSettings.AdjustableClock = adjustableSourceClock;
+
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;
+        }
+
+        private void applyRateFromMods()
+        {
+            adjustableSourceClock.Rate = 1;
+            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
+                mod.ApplyToClock(adjustableSourceClock);
         }
 
         private void initializeStoryboard(bool asyncLoad)
@@ -321,10 +313,26 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            this.Delay(750).Schedule(() =>
+            Task.Run(() =>
             {
-                if (!pauseContainer.IsPaused)
-                    decoupledClock.Start();
+                adjustableSourceClock.Reset();
+
+                // this is temporary until we have blocking (async.Wait()) audio component methods.
+                // then we can call ResetAsync().Wait() or the blocking version above.
+                while (adjustableSourceClock.IsRunning)
+                    Thread.Sleep(1);
+
+                Schedule(() =>
+                {
+                    decoupledClock.ChangeSource(adjustableSourceClock);
+                    applyRateFromMods();
+
+                    this.Delay(750).Schedule(() =>
+                    {
+                        if (!pauseContainer.IsPaused)
+                            decoupledClock.Start();
+                    });
+                });
             });
 
             pauseContainer.Alpha = 0;
@@ -341,6 +349,9 @@ namespace osu.Game.Screens.Play
         {
             if (HasFailed || !ValidForResume || pauseContainer?.AllowExit != false || RulesetContainer?.HasReplayLoaded != false)
             {
+                // In the case of replays, we may have changed the playback rate.
+                applyRateFromMods();
+
                 fadeOut();
                 return base.OnExiting(next);
             }

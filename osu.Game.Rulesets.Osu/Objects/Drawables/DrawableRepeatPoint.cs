@@ -18,9 +18,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public double FadeInTime;
         public double FadeOutTime;
 
-        public override bool RemoveWhenNotAlive => false;
-
-        public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider) : base(repeatPoint)
+        public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
+            : base(repeatPoint)
         {
             this.repeatPoint = repeatPoint;
             this.drawableSlider = drawableSlider;
@@ -28,6 +27,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AutoSizeAxes = Axes.Both;
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
+            Scale = new Vector2(0.5f);
 
             Children = new Drawable[]
             {
@@ -51,12 +51,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             var animIn = Math.Min(150, repeatPoint.StartTime - FadeInTime);
 
-            this.Animate(
-                d => d.FadeIn(animIn),
-                d => d.ScaleTo(0.5f).ScaleTo(1.2f, animIn)
-            ).Then(
-                d => d.ScaleTo(1, 150, Easing.Out)
-            );
+            this.FadeIn(animIn).ScaleTo(1.2f, animIn)
+                .Then()
+                .ScaleTo(1, 150, Easing.Out);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
