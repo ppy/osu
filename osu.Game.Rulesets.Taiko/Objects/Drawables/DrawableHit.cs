@@ -18,6 +18,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected abstract TaikoAction[] HitActions { get; }
 
         /// <summary>
+        /// Whether a second hit is allowed to be processed. This occurs once this hit object has been hit successfully.
+        /// </summary>
+        protected bool SecondHitAllowed { get; private set; }
+
+        /// <summary>
         /// Whether the last key pressed is a valid hit key.
         /// </summary>
         private bool validKeyPressed;
@@ -45,7 +50,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!validKeyPressed)
                 AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
             else if (hitOffset < HitObject.HitWindowGood)
-                AddJudgement(new TaikoJudgement { Result = hitOffset < HitObject.HitWindowGreat ? HitResult.Great : HitResult.Good });
+            {
+                AddJudgement(new TaikoJudgement
+                {
+                    Result = hitOffset < HitObject.HitWindowGreat ? HitResult.Great : HitResult.Good,
+                    Final = !HitObject.IsStrong
+                });
+
+                SecondHitAllowed = true;
+            }
             else
                 AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
         }
@@ -72,7 +85,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             var offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
             using (BeginDelayedSequence(HitObject.StartTime - Time.Current + offset, true))
             {
-                switch (State)
+                switch (State.Value)
                 {
                     case ArmedState.Idle:
                         this.Delay(HitObject.HitWindowMiss).Expire();

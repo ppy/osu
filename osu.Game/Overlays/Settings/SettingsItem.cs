@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Settings
                 controlWithCurrent?.Current.BindTo(bindable);
                 if (ShowsDefaultIndicator)
                 {
-                    restoreDefaultValueButton.Bindable.BindTo(bindable);
+                    restoreDefaultValueButton.Bindable = bindable.GetBoundCopy();
                     restoreDefaultValueButton.Bindable.TriggerChange();
                 }
             }
@@ -134,7 +134,17 @@ namespace osu.Game.Overlays.Settings
 
         private class RestoreDefaultValueButton<T> : Box, IHasTooltip
         {
-            internal readonly Bindable<T> Bindable = new Bindable<T>();
+            private Bindable<T> bindable;
+            internal Bindable<T> Bindable
+            {
+                get { return bindable; }
+                set
+                {
+                    bindable = value;
+                    bindable.ValueChanged += newValue => UpdateState();
+                    bindable.DisabledChanged += disabled => UpdateState();
+                }
+            }
 
             private Color4 buttonColour;
 
@@ -142,9 +152,6 @@ namespace osu.Game.Overlays.Settings
 
             public RestoreDefaultValueButton()
             {
-                Bindable.ValueChanged += value => UpdateState();
-                Bindable.DisabledChanged += disabled => UpdateState();
-
                 RelativeSizeAxes = Axes.Y;
                 Width = SettingsOverlay.CONTENT_MARGINS;
                 Alpha = 0f;
@@ -160,8 +167,8 @@ namespace osu.Game.Overlays.Settings
 
             protected override bool OnClick(InputState state)
             {
-                if (!Bindable.Disabled)
-                    Bindable.SetDefault();
+                if (bindable != null && !bindable.Disabled)
+                    bindable.SetDefault();
                 return true;
             }
 
@@ -186,8 +193,10 @@ namespace osu.Game.Overlays.Settings
 
             internal void UpdateState()
             {
-                var colour = Bindable.Disabled ? Color4.Gray : buttonColour;
-                this.FadeTo(Bindable.IsDefault ? 0f : hovering && !Bindable.Disabled ? 1f : 0.5f, 200, Easing.OutQuint);
+                if (bindable == null)
+                    return;
+                var colour = bindable.Disabled ? Color4.Gray : buttonColour;
+                this.FadeTo(bindable.IsDefault ? 0f : hovering && !bindable.Disabled ? 1f : 0.5f, 200, Easing.OutQuint);
                 this.FadeColour(ColourInfo.GradientHorizontal(colour.Opacity(0.8f), colour.Opacity(0)), 200, Easing.OutQuint);
             }
         }
