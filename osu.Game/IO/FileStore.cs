@@ -19,7 +19,7 @@ namespace osu.Game.IO
     {
         public readonly IResourceStore<byte[]> Store;
 
-        public Storage Storage => base.Storage;
+        public new Storage Storage => base.Storage;
 
         public FileStore(Func<OsuDbContext> createContext, Storage storage) : base(createContext, storage.GetStorageForDirectory(@"files"))
         {
