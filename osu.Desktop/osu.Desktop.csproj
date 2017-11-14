@@ -5,12 +5,12 @@
     <OutputType>WinExe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Company>ppy Pty Ltd</Company>
-    <Version>1.0.0.0</Version>
-    <Copyright>ppy Pty Ltd 2007-2017</Copyright>
-    <AssemblyTitle>osu!lazer</AssemblyTitle>
-    <Description>click the circles. to the beat.</Description>
+    <AssemblyName>osu!</AssemblyName>
     <Product>osu!lazer</Product>
+    <Description>click the circles. to the beat.</Description>
+    <Company>ppy Pty Ltd</Company>
+    <Copyright>ppy Pty Ltd 2007-2017</Copyright>
+    <Version>1.0.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
