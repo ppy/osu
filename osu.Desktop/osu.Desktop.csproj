@@ -11,6 +11,9 @@
     <Company>ppy Pty Ltd</Company>
     <Copyright>ppy Pty Ltd 2007-2017</Copyright>
     <Version>1.0.0.0</Version>
+    <!-- TEMPORARY - Should be removed with .NET Core (removal of Squirrel)
+         Required to stop generation of System.Net.Http bindings for now. -->
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />

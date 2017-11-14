@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using osu.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
@@ -17,6 +18,12 @@ namespace osu.Desktop
         {
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
+
+            // TEMPORARY - Should be removed with .NET Core (removal of Squirrel)
+            // See: https://github.com/dotnet/corefx/issues/19914#issuecomment-302327100
+            var netHttp = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "System.Net.Http.dll");
+            if (RuntimeInfo.IsMono && File.Exists(netHttp))
+                File.Delete(netHttp);
 
             using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
