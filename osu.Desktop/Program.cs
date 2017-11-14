@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using osu.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
