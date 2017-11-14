@@ -37,5 +37,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.0" PrivateAssets="contentfiles;analyzers" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.0" PrivateAssets="contentfiles;analyzers" />
     <PackageReference Include="SharpCompress" Version="0.18.1" />
+    <PackageReference Include="Humanizer" Version="2.0.0" />
   </ItemGroup>
 </Project>
