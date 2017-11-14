@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     if (!s.OnlineBeatmapSetID.HasValue)
                         continue;
 
-                    var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets)) { Width = 400 };
+                    var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets));
                     ItemsContainer.Add(panel);
 
                     panel.PreviewPlaying.ValueChanged += isPlaying =>
