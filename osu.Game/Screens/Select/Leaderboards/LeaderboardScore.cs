@@ -264,11 +264,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             foreach (Mod mod in Score.Mods)
             {
-                modsContainer.Add(new ModIcon(mod)
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Scale = new Vector2(0.375f)
-                });
+                modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.375f) });
             }
         }
 

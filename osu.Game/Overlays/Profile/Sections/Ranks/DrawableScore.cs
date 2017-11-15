@@ -163,11 +163,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             });
 
             foreach (Mod mod in Score.Mods)
-                modsContainer.Add(new ModIcon(mod)
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Scale = new Vector2(0.5f),
-                });
+                modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.5f) });
         }
 
         protected override bool OnClick(InputState state) => true;
