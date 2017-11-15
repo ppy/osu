@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using Newtonsoft.Json;
 
 namespace osu.Game.Beatmaps
 {
@@ -60,14 +61,17 @@ namespace osu.Game.Beatmaps
     {
         public string CoverLowRes { get; set; }
 
+        [JsonProperty(@"cover@2x")]
         public string Cover { get; set; }
 
         public string CardLowRes { get; set; }
 
+        [JsonProperty(@"card@2x")]
         public string Card { get; set; }
 
         public string ListLowRes { get; set; }
 
+        [JsonProperty(@"list@2x")]
         public string List { get; set; }
     }
 }
