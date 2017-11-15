@@ -93,6 +93,7 @@
     <Compile Include="Visual\TestCaseBeatmapDetailArea.cs" />
     <Compile Include="Visual\TestCaseBeatmapDetails.cs" />
     <Compile Include="Visual\TestCaseBeatmapOptionsOverlay.cs" />
+    <Compile Include="Visual\TestCaseBeatmapScoresContainer.cs" />
     <Compile Include="Visual\TestCaseBeatmapSetOverlay.cs" />
     <Compile Include="Visual\TestCaseBeatSyncedContainer.cs" />
     <Compile Include="Visual\TestCaseBreadcrumbs.cs" />

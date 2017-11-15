@@ -55,11 +55,7 @@ namespace osu.Game.Screens.Play.HUD
                 iconsContainer.Clear();
                 foreach (Mod mod in mods)
                 {
-                    iconsContainer.Add(new ModIcon(mod)
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Scale = new Vector2(0.6f),
-                    });
+                    iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
                 }
 
                 if (IsLoaded)

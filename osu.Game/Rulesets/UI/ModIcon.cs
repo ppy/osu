@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.UI
         private readonly SpriteIcon modIcon;
         private readonly SpriteIcon background;
 
-        private const float background_size = 80;
+        private const float size = 80;
 
         public FontAwesome Icon
         {
@@ -38,23 +38,25 @@ namespace osu.Game.Rulesets.UI
 
             TooltipText = mod.Name;
 
+            Size = new Vector2(size);
+
             Children = new Drawable[]
             {
                 background = new SpriteIcon
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Size = new Vector2(background_size),
+                    Size = new Vector2(size),
                     Icon = FontAwesome.fa_osu_mod_bg,
+                    Y = -6.5f,
                     Shadow = true,
                 },
                 modIcon = new SpriteIcon
                 {
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
                     Colour = OsuColour.Gray(84),
-                    Size = new Vector2(background_size - 35),
-                    Y = 25,
+                    Size = new Vector2(size - 35),
                     Icon = mod.Icon
                 },
             };
