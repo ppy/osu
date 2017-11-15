@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     {
         private const float width = 8;
 
+        public override bool RemoveWhenNotAlive => false;
+
         public FollowPoint()
         {
             Origin = Anchor.Centre;

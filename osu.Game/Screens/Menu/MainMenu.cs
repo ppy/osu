@@ -112,14 +112,20 @@ namespace osu.Game.Screens.Menu
 
             buttons.SetOsuLogo(logo);
 
-            logo.Triangles = true;
-            logo.Ripple = false;
-
             logo.FadeColour(Color4.White, 100, Easing.OutQuint);
             logo.FadeIn(100, Easing.OutQuint);
 
             if (resuming)
+            {
                 buttons.State = MenuState.TopLevel;
+
+                const float length = 300;
+
+                Content.FadeIn(length, Easing.OutQuint);
+                Content.MoveTo(new Vector2(0, 0), length, Easing.OutQuint);
+
+                sideFlashes.Delay(length).FadeIn(64, Easing.InQuint);
+            }
         }
 
         protected override void LogoSuspending(OsuLogo logo)
@@ -148,7 +154,7 @@ namespace osu.Game.Screens.Menu
             Content.FadeOut(length, Easing.InSine);
             Content.MoveTo(new Vector2(-800, 0), length, Easing.InSine);
 
-            sideFlashes.FadeOut(length / 4, Easing.OutQuint);
+            sideFlashes.FadeOut(64, Easing.OutQuint);
         }
 
         protected override void OnResuming(Screen last)
@@ -159,13 +165,6 @@ namespace osu.Game.Screens.Menu
 
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
-
-            const float length = 300;
-
-            Content.FadeIn(length, Easing.OutQuint);
-            Content.MoveTo(new Vector2(0, 0), length, Easing.OutQuint);
-
-            sideFlashes.FadeIn(length / 4, Easing.InQuint);
         }
 
         protected override bool OnExiting(Screen next)
