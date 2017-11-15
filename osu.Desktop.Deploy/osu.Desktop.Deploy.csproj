@@ -2,7 +2,7 @@
   <Import Project="..\LangVer.props" />
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
-    <OutputType>Library</OutputType>
+    <OutputType>WinExe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Company>ppy Pty Ltd</Company>

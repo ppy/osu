@@ -61,6 +61,34 @@
             "runtimeExecutable": null,
             "env": {},
             "console": "internalConsole"
+        },
+        {
+            "name": "Deploy (Debug)",
+            "windows": {
+                "type": "clr"
+            },
+            "type": "mono",
+            "request": "launch",
+            "program": "${workspaceRoot}/osu.Desktop.Deploy/bin/Debug/net461/osu.Desktop.Deploy.exe",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Debug)",
+            "runtimeExecutable": null,
+            "env": {},
+            "console": "internalConsole"
+        },
+        {
+            "name": "Deploy (Release)",
+            "windows": {
+                "type": "clr"
+            },
+            "type": "mono",
+            "request": "launch",
+            "program": "${workspaceRoot}/osu.Desktop.Deploy/bin/Release/net461/osu.Desktop.Deploy.exe",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Release)",
+            "runtimeExecutable": null,
+            "env": {},
+            "console": "internalConsole"
         }
     ]
 }

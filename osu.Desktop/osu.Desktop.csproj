@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\LangVer.props" />
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
@@ -10,7 +10,8 @@
     <Description>click the circles. to the beat.</Description>
     <Company>ppy Pty Ltd</Company>
     <Copyright>ppy Pty Ltd 2007-2017</Copyright>
-    <Version>1.0.0.0</Version>
+    <Version>0.0.0</Version>
+    <FileVersion>0.0.0</FileVersion>
     <!-- HACK HACK - EF copies System.Net.Http locally, and we need to rewrite the bindings
          to reference System.Net.Http 4.0.0.0 for Squirrel. -->
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

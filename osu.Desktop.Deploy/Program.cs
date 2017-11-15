@@ -95,8 +95,8 @@ namespace osu.Desktop.Deploy
             write("Restoring NuGet packages...");
             runCommand(nuget_path, "restore " + solutionPath);
 
-            write("Updating AssemblyInfo...");
-            updateAssemblyInfo(version);
+            write("Updating csproj versions...");
+            updateProjectVersion(version);
 
             write("Running build process...");
             foreach (string targetName in TargetNames.Split(','))
@@ -123,7 +123,7 @@ namespace osu.Desktop.Deploy
             uploadBuild(version);
 
             //reset assemblyinfo.
-            updateAssemblyInfo("0.0.0");
+            updateProjectVersion("0.0.0");
 
             write("Done!", ConsoleColor.White);
             Console.ReadLine();
@@ -297,23 +297,36 @@ namespace osu.Desktop.Deploy
             Directory.CreateDirectory(directory);
         }
 
-        private static void updateAssemblyInfo(string version)
+        private static void updateProjectVersion(string version)
         {
-            string file = Path.Combine(ProjectName, "Properties", "AssemblyInfo.cs");
+            var toReplace = new[] { "<Version>", "<FileVersion>" };
+            var projectFile = Path.Combine(ProjectName, ProjectName + ".csproj");
 
-            var l1 = File.ReadAllLines(file);
-            List<string> l2 = new List<string>();
+            var l1 = File.ReadAllLines(projectFile);
+            var l2 = new List<string>();
             foreach (var l in l1)
             {
-                if (l.StartsWith("[assembly: AssemblyVersion("))
-                    l2.Add($"[assembly: AssemblyVersion(\"{version}\")]");
-                else if (l.StartsWith("[assembly: AssemblyFileVersion("))
-                    l2.Add($"[assembly: AssemblyFileVersion(\"{version}\")]");
-                else
-                    l2.Add(l);
+                string line = l;
+
+                // Replace versions
+                foreach (var search in toReplace)
+                {
+                    int startIndex = line.IndexOf(search);
+                    if (startIndex == -1)
+                        continue;
+                    startIndex += search.Length;
+                    int endIndex = line.IndexOf("<", startIndex);
+
+                    line = line.Substring(0, startIndex)
+                            + version
+                            + line.Substring(endIndex);
+                    break;
+                }
+
+                l2.Add(line);
             }
 
-            File.WriteAllLines(file, l2);
+            File.WriteAllLines(projectFile, l2);
         }
 
         /// <summary>
@@ -327,8 +340,8 @@ namespace osu.Desktop.Deploy
                 path = Environment.CurrentDirectory;
 
             while (!File.Exists(Path.Combine(path, $"{SolutionName}.sln")))
-                path = path.Remove(path.LastIndexOf('\\'));
-            path += "\\";
+                path = path.Remove(path.LastIndexOf(Path.DirectorySeparatorChar));
+            path += Path.DirectorySeparatorChar;
 
             Environment.CurrentDirectory = path;
         }
