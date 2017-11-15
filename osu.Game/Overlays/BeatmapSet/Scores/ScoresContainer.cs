@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private bool isLoading;
         public bool IsLoading
         {
+            get { return isLoading; }
             set
             {
                 if (isLoading == value) return;
@@ -35,18 +36,33 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 foreground.FadeTo(isLoading ? 1 : 0, fade_duration);
                 loadingAnimation.FadeTo(isLoading ? 1 : 0, fade_duration);
             }
-            get { return isLoading; }
         }
 
         private IEnumerable<OnlineScore> scores;
         public IEnumerable<OnlineScore> Scores
         {
+            get { return scores; }
             set
             {
                 scores = value;
-                updateScores();
+                var scoresAmount = scores.Count();
+                if (scoresAmount == 0)
+                {
+                    CleanAllScores();
+                    return;
+                }
+
+                topScore.Score = scores.FirstOrDefault();
+                topScore.Show();
+
+                flow.Clear();
+
+                if (scoresAmount < 2)
+                    return;
+
+                for (int i = 1; i < scoresAmount; i++)
+                    flow.Add(new DrawableScore(i, scores.ElementAt(i)));
             }
-            get { return scores; }
         }
 
         public ScoresContainer()
@@ -88,27 +104,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Alpha = 0,
                 },
             };
-        }
-
-        private void updateScores()
-        {
-            var scoresAmount = scores.Count();
-            if (scoresAmount == 0)
-            {
-                CleanAllScores();
-                return;
-            }
-
-            topScore.Score = scores.FirstOrDefault();
-            topScore.Show();
-
-            flow.Clear();
-
-            if (scoresAmount < 2)
-                return;
-
-            for (int i = 1; i < scoresAmount; i++)
-                flow.Add(new DrawableScore(i, scores.ElementAt(i)));
         }
 
         public void CleanAllScores()

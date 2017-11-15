@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private User user;
         public User User
         {
+            get { return user; }
             set
             {
                 if (user == value) return;
@@ -25,7 +26,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 text.Text = user.Username;
             }
-            get { return user; }
         }
 
         public float TextSize
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         protected override bool OnClick(InputState state)
         {
             profile?.ShowUser(user);
-            return base.OnClick(state);
+            return true;
         }
     }
 }
