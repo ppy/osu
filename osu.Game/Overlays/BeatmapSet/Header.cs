@@ -38,8 +38,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public readonly BeatmapPicker Picker;
 
-        private bool isDownloading => beatmaps.GetExistingDownload(BeatmapSet) != null;
-
         private BeatmapSetInfo beatmapSet;
         public BeatmapSetInfo BeatmapSet
         {
