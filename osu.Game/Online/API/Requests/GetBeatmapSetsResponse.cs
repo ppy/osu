@@ -15,7 +15,7 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty(@"covers")]
         private BeatmapSetOnlineCovers covers { get; set; }
 
-        [JsonProperty(@"previewUrl")]
+        [JsonProperty(@"preview_url")]
         private string preview { get; set; }
 
         [JsonProperty(@"play_count")]
