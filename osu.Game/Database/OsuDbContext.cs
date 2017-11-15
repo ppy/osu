@@ -102,7 +102,7 @@ namespace osu.Game.Database
             return null;
         }
 
-        public new int SaveChanges(IDbContextTransaction transaction = null)
+        public int SaveChanges(IDbContextTransaction transaction = null)
         {
             var ret = base.SaveChanges();
             transaction?.Commit();
@@ -262,7 +262,7 @@ namespace osu.Game.Database
                         throw new MigrationFailedException(e);
                     }
                 }
-                catch (MigrationFailedException e)
+                catch (MigrationFailedException)
                 {
                     throw;
                 }

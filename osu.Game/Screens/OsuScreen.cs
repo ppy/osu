@@ -76,7 +76,7 @@ namespace osu.Game.Screens
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
-            logo.DelayUntilTransformsFinished().Schedule(() => LogoArriving(logo, true));
+            logo.AppendAnimatingAction(() => LogoArriving(logo, true), true);
             sampleExit?.Play();
         }
 
@@ -118,11 +118,11 @@ namespace osu.Game.Screens
             }
 
             if ((logo = lastOsu?.logo) == null)
-                AddInternal(logo = new OsuLogo());
+                LoadComponentAsync(logo = new OsuLogo { Alpha = 0 }, AddInternal);
+
+            logo.AppendAnimatingAction(() => LogoArriving(logo, false), true);
 
             base.OnEntering(last);
-
-            logo.DelayUntilTransformsFinished().Schedule(() => LogoArriving(logo, false));
         }
 
         protected override bool OnExiting(Screen next)
@@ -155,12 +155,16 @@ namespace osu.Game.Screens
         {
             logo.Action = null;
             logo.FadeOut(300, Easing.OutQuint);
+            logo.Anchor = Anchor.TopLeft;
+            logo.Origin = Anchor.Centre;
+            logo.RelativePositionAxes = Axes.None;
+            logo.Triangles = true;
+            logo.Ripple = true;
         }
 
         private void onExitingLogo()
         {
-            logo.ClearTransforms();
-            LogoExiting(logo);
+            logo.AppendAnimatingAction(() => { LogoExiting(logo); }, false);
         }
 
         /// <summary>
@@ -172,8 +176,7 @@ namespace osu.Game.Screens
 
         private void onSuspendingLogo()
         {
-            logo.ClearTransforms();
-            LogoSuspending(logo);
+            logo.AppendAnimatingAction(() => { LogoSuspending(logo); }, false);
         }
 
         /// <summary>
