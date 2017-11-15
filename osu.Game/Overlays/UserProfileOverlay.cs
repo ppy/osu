@@ -164,6 +164,7 @@ namespace osu.Game.Overlays
             }
 
             Show();
+            sectionsContainer.ScrollToTop();
         }
 
         private void userLoadComplete(User user)
