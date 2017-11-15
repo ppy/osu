@@ -26,6 +26,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box tabsBg;
         private readonly Container coverContainer;
         private readonly OsuSpriteText title, artist;
+        private readonly Container noVideoButtons;
+        private readonly FillFlowContainer videoButtons;
         private readonly AuthorInfo author;
         public Details Details;
 
@@ -45,6 +47,9 @@ namespace osu.Game.Overlays.BeatmapSet
                 Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = BeatmapSet;
                 title.Text = BeatmapSet.Metadata.Title;
                 artist.Text = BeatmapSet.Metadata.Artist;
+
+                noVideoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 0 : 1, transition_duration);
+                videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
 
                 cover?.FadeOut(400, Easing.Out);
                 coverContainer.Add(cover = new DelayedLoadWrapper(new BeatmapSetCover(BeatmapSet)
@@ -77,9 +82,6 @@ namespace osu.Game.Overlays.BeatmapSet
                 Radius = 3,
                 Offset = new Vector2(0f, 1f),
             };
-
-            Container noVideoButtons;
-            FillFlowContainer videoButtons;
             Children = new Drawable[]
             {
                 new Container
@@ -202,21 +204,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
             };
 
-            Picker.Beatmap.ValueChanged += b =>
-            {
-                Details.Beatmap = b;
-
-                if (b.OnlineInfo.HasVideo)
-                {
-                    noVideoButtons.FadeOut(transition_duration);
-                    videoButtons.FadeIn(transition_duration);
-                }
-                else
-                {
-                    noVideoButtons.FadeIn(transition_duration);
-                    videoButtons.FadeOut(transition_duration);
-                }
-            };
+            Picker.Beatmap.ValueChanged += b => Details.Beatmap = b;
         }
 
         [BackgroundDependencyLoader]
