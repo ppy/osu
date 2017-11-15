@@ -341,6 +341,8 @@ namespace osu.Game.Beatmaps
         /// Returns a <see cref="BeatmapSetInfo"/> to a usable state if it has previously been deleted but not yet purged.
         /// Is a no-op for already usable beatmaps.
         /// </summary>
+        /// <param name="beatmaps">The store to restore beatmaps from.</param>
+        /// <param name="files">The store to restore beatmap files from.</param>
         /// <param name="beatmapSet">The beatmap to restore.</param>
         private void undelete(BeatmapStore beatmaps, FileStore files, BeatmapSetInfo beatmapSet)
         {
@@ -426,6 +428,8 @@ namespace osu.Game.Beatmaps
         /// Import a beamap into our local <see cref="FileStore"/> storage.
         /// If the beatmap is already imported, the existing instance will be returned.
         /// </summary>
+        /// <param name="files">The store to import beatmap files to.</param>
+        /// <param name="beatmaps">The store to import beatmaps to.</param>
         /// <param name="reader">The beatmap archive to be read.</param>
         /// <returns>The imported beatmap, or an existing instance if it is already present.</returns>
         private BeatmapSetInfo importToStorage(FileStore files, BeatmapStore beatmaps, ArchiveReader reader)

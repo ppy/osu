@@ -20,6 +20,12 @@ namespace osu.Desktop
 
             using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
+                // HACK HACK - EF copies System.Net.Http locally and mono fails to prioitize
+                // system assemblies over local assemblies causing Squirrel to fail
+                // See: https://github.com/dotnet/corefx/issues/19914#issuecomment-302327100
+                if (RuntimeInfo.IsMono)
+                    File.Delete("System.Net.Http.dll");
+
                 if (!host.IsPrimaryInstance)
                 {
                     var importer = new BeatmapIPCChannel(host);

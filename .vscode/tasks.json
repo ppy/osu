@@ -9,7 +9,8 @@
         "/property:GenerateFullPaths=true",
         "/property:DebugType=portable",
         "/verbosity:minimal",
-        "/m" //parallel compiling support.
+        "/m", //parallel compiling support.
+        "/nowarn:MSB3276" // Ignore binding redirect warning (see hacks in osu.Desktop.csproj)
     ],
     "tasks": [{
             "taskName": "Build (Debug)",
