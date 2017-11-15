@@ -282,12 +282,17 @@
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
+    <Compile Include="Overlays\BeatmapSet\Scores\ClickableUsername.cs" />
+    <Compile Include="Overlays\BeatmapSet\Scores\DrawableScore.cs" />
+    <Compile Include="Overlays\BeatmapSet\Scores\DrawableTopScore.cs" />
+    <Compile Include="Overlays\BeatmapSet\Scores\ScoresContainer.cs" />
     <Compile Include="Online\API\Requests\GetUserBeatmapsRequest.cs" />
     <Compile Include="Overlays\Profile\Sections\Beatmaps\PaginatedBeatmapContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\PaginatedContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawablePerformanceScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\PaginatedScoreContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
