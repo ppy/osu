@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Judgements
                     break;
             }
 
-            Expire();
+            Expire(true);
         }
     }
 }

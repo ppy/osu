@@ -221,6 +221,30 @@ namespace osu.Game.Screens.Menu
             };
         }
 
+        /// <summary>
+        /// Schedule a new extenral animation. Handled queueing and finishing previous animations in a sane way.
+        /// </summary>
+        /// <param name="action">The animation to be performed</param>
+        /// <param name="waitForPrevious">If true, the new animation is delayed until all previous transforms finish. If false, existing transformed are cleared.</param>
+        internal void AppendAnimatingAction(Action action, bool waitForPrevious)
+        {
+            Action runnableAction = () =>
+            {
+                if (waitForPrevious)
+                    this.DelayUntilTransformsFinished().Schedule(action);
+                else
+                {
+                    ClearTransforms();
+                    action();
+                }
+            };
+
+            if (IsLoaded)
+                runnableAction();
+            else
+                Schedule(() => runnableAction());
+        }
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, AudioManager audio)
         {
