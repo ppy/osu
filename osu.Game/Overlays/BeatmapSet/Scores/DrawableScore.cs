@@ -21,10 +21,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class DrawableScore : Container
     {
         private const int fade_duration = 100;
-        private const float height = 30;
         private const float side_margin = 20;
-        private const float flag_margin = 60;
-        private const float username_margin = 100;
 
         private readonly Box background;
 
@@ -33,7 +30,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             ScoreModsContainer modsContainer;
 
             RelativeSizeAxes = Axes.X;
-            Height = height;
+            Height = 30;
             CornerRadius = 3;
             Masking = true;
             Children = new Drawable[]
@@ -55,16 +52,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Width = 30,
-                    Height = 20,
-                    Margin = new MarginPadding { Left = flag_margin }
+                    Size = new Vector2(30, 20),
+                    Margin = new MarginPadding { Left = 60 }
                 },
                 new ClickableUsername
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     User = score.User,
-                    Margin = new MarginPadding { Left = username_margin }
+                    Margin = new MarginPadding { Left = 100 }
                 },
                 modsContainer = new ScoreModsContainer
                 {
@@ -72,16 +68,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Origin = Anchor.CentreLeft,
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Width = 0.05f,
+                    Width = 0.06f,
                     RelativePositionAxes = Axes.X,
-                    X = 0.45f
+                    X = 0.42f
                 },
                 new DrawableRank(score.Rank)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Width = 30,
-                    Height = 20,
+                    Size = new Vector2(30, 20),
                     FillMode = FillMode.Fit,
                     RelativePositionAxes = Axes.X,
                     X = 0.55f
@@ -90,10 +85,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
-                    Text = $@"{score.TotalScore}",
-                    Font = @"Exo2.0-MediumItalic",
+                    Text = $@"{score.TotalScore:N0}",
+                    Font = @"Venera",
                     RelativePositionAxes = Axes.X,
-                    X = 0.7f
+                    X = 0.75f,
+                    FixedWidth = true,
                 },
                 new OsuSpriteText
                 {
@@ -102,7 +98,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Text = $@"{score.Accuracy:P2}",
                     Font = @"Exo2.0-RegularItalic",
                     RelativePositionAxes = Axes.X,
-                    X = 0.8f
+                    X = 0.85f
                 },
                 new OsuSpriteText
                 {

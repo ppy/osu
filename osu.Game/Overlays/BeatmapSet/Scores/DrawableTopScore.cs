@@ -45,14 +45,29 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private OnlineScore score;
         public OnlineScore Score
         {
+            get { return score; }
             set
             {
                 if (score == value) return;
                 score = value;
 
-                setScore();
+                avatar.User = username.User = score.User;
+                flag.FlagName = score.User.Country?.FlagName;
+                date.Text = $@"achieved {score.Date:MMM d, yyyy}";
+                rank.UpdateRank(score.Rank);
+
+                totalScore.Value = $@"{score.TotalScore:N0}";
+                accuracy.Value = $@"{score.Accuracy:P2}";
+                statistics.Value = $"{score.Statistics["300"]}/{score.Statistics["100"]}/{score.Statistics["50"]}";
+
+                modsContainer.Clear();
+                foreach (Mod mod in score.Mods)
+                    modsContainer.Add(new ModIcon(mod)
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.45f),
+                    });
             }
-            get { return score; }
         }
 
         public DrawableTopScore()
@@ -86,18 +101,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 flag = new DrawableFlag
                 {
-                    Width = 30,
-                    Height = 20,
-                    Y = height / 4,
-                    X = height / 2,
+                    Size = new Vector2(30, 20),
+                    Position = new Vector2(height / 2, height / 4),
                 },
                 username = new ClickableUsername
                 {
                     Origin = Anchor.BottomLeft,
                     TextSize = 30,
-                    Y = height / 4,
-                    X = height / 2,
-                    Margin = new MarginPadding { Bottom = 4 },
+                    Position = new Vector2(height / 2, avatar_size / 2),
                 },
                 rankText = new OsuSpriteText
                 {
@@ -133,8 +144,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         rank = new DrawableRank(ScoreRank.F)
                         {
                             Origin = Anchor.BottomLeft,
-                            Width = avatar_size,
-                            Height = 40,
+                            Size = new Vector2(avatar_size, 40),
                             FillMode = FillMode.Fit,
                             Y = height / 4,
                             Margin = new MarginPadding { Left = margin }
@@ -143,8 +153,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             Origin = Anchor.BottomLeft,
                             AutoSizeAxes = Axes.Both,
-                            X = height / 2,
-                            Y = height / 4,
+                            Position = new Vector2(height / 2, height / 4),
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(15, 0),
                             Children = new[]
@@ -158,8 +167,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             AutoSizeAxes = Axes.Y,
                             Width = 80,
-                            X = height / 2,
-                            Y = height / 4,
+                            Position = new Vector2(height / 2, height / 4),
                         }
                     }
                 },
@@ -173,26 +181,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             middleLine.Colour = colours.Gray2;
             date.Colour = colours.Gray9;
             BorderColour = rankText.Colour = colours.Yellow;
-        }
-
-        private void setScore()
-        {
-            avatar.User = username.User = score.User;
-            flag.FlagName = score.User.Country?.FlagName;
-            date.Text = $@"achieved {score.Date:MMM d, yyyy}";
-            rank.UpdateRank(score.Rank);
-
-            totalScore.Value = $@"{score.TotalScore}";
-            accuracy.Value = $@"{score.Accuracy:P2}";
-            statistics.Value = $"{score.Statistics["300"]}/{score.Statistics["100"]}/{score.Statistics["50"]}";
-
-            modsContainer.Clear();
-            foreach (Mod mod in score.Mods)
-                modsContainer.Add(new ModIcon(mod)
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Scale = new Vector2(0.45f),
-                });
         }
 
         protected override bool OnHover(InputState state)
