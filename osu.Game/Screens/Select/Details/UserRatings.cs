@@ -30,9 +30,9 @@ namespace osu.Game.Screens.Select.Details
                 metrics = value;
 
                 var ratings = Metrics.Ratings.ToList();
-                negativeRatings.Text = ratings.GetRange(0, ratings.Count / 2).Sum().ToString();
-                positiveRatings.Text = ratings.GetRange(ratings.Count / 2, ratings.Count / 2).Sum().ToString();
-                ratingsBar.Length = (float)ratings.GetRange(0, ratings.Count / 2).Sum() / ratings.Sum();
+                negativeRatings.Text = ratings.GetRange(0, ratings.Count / 2 + 1).Sum().ToString();
+                positiveRatings.Text = ratings.GetRange(ratings.Count / 2 + 1, ratings.Count / 2).Sum().ToString();
+                ratingsBar.Length = (float)ratings.GetRange(0, ratings.Count / 2 + 1).Sum() / ratings.Sum();
                 graph.Values = Metrics.Ratings.Select(r => (float)r);
             }
         }
