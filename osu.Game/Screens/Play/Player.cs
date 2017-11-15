@@ -231,6 +231,8 @@ namespace osu.Game.Screens.Play
 
         private void applyRateFromMods()
         {
+            if (adjustableSourceClock == null) return;
+
             adjustableSourceClock.Rate = 1;
             foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(adjustableSourceClock);
