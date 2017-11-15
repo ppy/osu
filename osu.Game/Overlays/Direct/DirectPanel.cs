@@ -16,7 +16,6 @@ using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Framework.Logging;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Configuration;
@@ -34,10 +33,8 @@ namespace osu.Game.Overlays.Direct
 
         private Container content;
 
-        private APIAccess api;
         private ProgressBar progressBar;
         private BeatmapManager beatmaps;
-        private NotificationOverlay notifications;
         private BeatmapSetOverlay beatmapSetOverlay;
 
         public Track Preview => PlayButton.Preview;
@@ -70,11 +67,9 @@ namespace osu.Game.Overlays.Direct
 
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api, BeatmapManager beatmaps, OsuColour colours, NotificationOverlay notifications, BeatmapSetOverlay beatmapSetOverlay)
+        private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay)
         {
-            this.api = api;
             this.beatmaps = beatmaps;
-            this.notifications = notifications;
             this.beatmapSetOverlay = beatmapSetOverlay;
 
             AddInternal(content = new Container

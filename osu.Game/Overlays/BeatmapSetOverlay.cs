@@ -31,7 +31,6 @@ namespace osu.Game.Overlays
 
         private APIAccess api;
         private RulesetStore rulesets;
-        private BeatmapManager manager;
 
         private readonly ScrollContainer scroll;
 
@@ -92,7 +91,6 @@ namespace osu.Game.Overlays
         {
             this.api = api;
             this.rulesets = rulesets;
-            this.manager = manager;
 
             manager.BeatmapSetAdded += beatmap =>
             {
