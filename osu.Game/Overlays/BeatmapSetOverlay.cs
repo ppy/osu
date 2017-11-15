@@ -16,6 +16,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
+using osu.Game.Overlays.BeatmapSet.Scores;
 
 namespace osu.Game.Overlays
 {
@@ -26,9 +27,11 @@ namespace osu.Game.Overlays
 
         private readonly Header header;
         private readonly Info info;
+        private readonly ScoresContainer scores;
 
         private APIAccess api;
         private RulesetStore rulesets;
+        private GetScoresRequest getScoresRequest;
 
         private readonly ScrollContainer scroll;
 
@@ -76,12 +79,38 @@ namespace osu.Game.Overlays
                         {
                             header = new Header(),
                             info = new Info(),
+                            scores = new ScoresContainer(),
                         },
                     },
                 },
             };
 
-            header.Picker.Beatmap.ValueChanged += b => info.Beatmap = b;
+            header.Picker.Beatmap.ValueChanged += b =>
+            {
+                info.Beatmap = b;
+                updateScores(b);
+            };
+        }
+
+        private void updateScores(BeatmapInfo beatmap)
+        {
+            getScoresRequest?.Cancel();
+
+            if (!beatmap.OnlineBeatmapID.HasValue)
+            {
+                scores.CleanAllScores();
+                return;
+            }
+
+            scores.IsLoading = true;
+
+            getScoresRequest = new GetScoresRequest(beatmap);
+            getScoresRequest.Success += r =>
+            {
+                scores.Scores = r.Scores;
+                scores.IsLoading = false;
+            };
+            api.Queue(getScoresRequest);
         }
 
         [BackgroundDependencyLoader]
