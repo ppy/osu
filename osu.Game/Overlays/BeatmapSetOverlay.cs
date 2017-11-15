@@ -30,6 +30,8 @@ namespace osu.Game.Overlays
         private APIAccess api;
         private RulesetStore rulesets;
 
+        private readonly ScrollContainer scroll;
+
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
@@ -61,7 +63,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
-                new ScrollContainer
+                scroll = new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -120,6 +122,7 @@ namespace osu.Game.Overlays
         {
             header.BeatmapSet = info.BeatmapSet = set;
             Show();
+            scroll.ScrollTo(0);
         }
     }
 }
