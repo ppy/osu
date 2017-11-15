@@ -12,7 +12,6 @@ using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
@@ -21,8 +20,6 @@ namespace osu.Game.Screens.Menu
 {
     public class Intro : OsuScreen
     {
-        private readonly IntroSequence introSequence;
-
         private const string menu_music_beatmap_hash = "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 
         /// <summary>
@@ -43,7 +40,6 @@ namespace osu.Game.Screens.Menu
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
         private Track track;
-        private readonly ParallaxContainer parallax;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
@@ -127,8 +123,6 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                logo.Triangles = true;
-
                 logo.ScaleTo(1);
                 logo.FadeIn();
                 logo.PlayIntro();

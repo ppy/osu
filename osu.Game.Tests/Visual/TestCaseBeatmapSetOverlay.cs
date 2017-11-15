@@ -53,6 +53,7 @@ namespace osu.Game.Tests.Visual
                         Submitted = new DateTime(2016, 2, 10),
                         Ranked = new DateTime(2016, 6, 19),
                         BPM = 236,
+                        HasVideo = true,
                         Covers = new BeatmapSetOnlineCovers
                         {
                             Cover = @"https://assets.ppy.sh/beatmaps/415886/covers/cover.jpg?1465651778",
@@ -75,7 +76,6 @@ namespace osu.Game.Tests.Visual
                             OnlineInfo = new BeatmapOnlineInfo
                             {
                                 Length = 115000,
-                                HasVideo = false,
                                 CircleCount = 265,
                                 SliderCount = 71,
                                 PlayCount = 47906,
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 10),
+                                Ratings = Enumerable.Range(0, 11),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
@@ -103,7 +103,6 @@ namespace osu.Game.Tests.Visual
                             OnlineInfo = new BeatmapOnlineInfo
                             {
                                 Length = 118000,
-                                HasVideo = true,
                                 CircleCount = 592,
                                 SliderCount = 62,
                                 PlayCount = 162021,
@@ -111,7 +110,7 @@ namespace osu.Game.Tests.Visual
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 10),
+                                Ratings = Enumerable.Range(0, 11),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
@@ -131,7 +130,6 @@ namespace osu.Game.Tests.Visual
                             OnlineInfo = new BeatmapOnlineInfo
                             {
                                 Length = 118000,
-                                HasVideo = false,
                                 CircleCount = 1042,
                                 SliderCount = 79,
                                 PlayCount = 225178,
@@ -139,7 +137,7 @@ namespace osu.Game.Tests.Visual
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 10),
+                                Ratings = Enumerable.Range(0, 11),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
@@ -159,7 +157,6 @@ namespace osu.Game.Tests.Visual
                             OnlineInfo = new BeatmapOnlineInfo
                             {
                                 Length = 118000,
-                                HasVideo = false,
                                 CircleCount = 1352,
                                 SliderCount = 69,
                                 PlayCount = 131545,
@@ -167,7 +164,7 @@ namespace osu.Game.Tests.Visual
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 10),
+                                Ratings = Enumerable.Range(0, 11),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
@@ -187,7 +184,6 @@ namespace osu.Game.Tests.Visual
                             OnlineInfo = new BeatmapOnlineInfo
                             {
                                 Length = 118000,
-                                HasVideo = false,
                                 CircleCount = 1730,
                                 SliderCount = 115,
                                 PlayCount = 117673,
@@ -195,7 +191,7 @@ namespace osu.Game.Tests.Visual
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 10),
+                                Ratings = Enumerable.Range(0, 11),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
@@ -227,6 +223,7 @@ namespace osu.Game.Tests.Visual
                         Submitted = new DateTime(2016, 6, 11),
                         Ranked = new DateTime(2016, 7, 12),
                         BPM = 160,
+                        HasVideo = false,
                         Covers = new BeatmapSetOnlineCovers
                         {
                             Cover = @"https://assets.ppy.sh/beatmaps/625493/covers/cover.jpg?1499167472",
@@ -249,7 +246,6 @@ namespace osu.Game.Tests.Visual
                             OnlineInfo = new BeatmapOnlineInfo
                             {
                                 Length = 193000,
-                                HasVideo = false,
                                 CircleCount = 262,
                                 SliderCount = 0,
                                 PlayCount = 3952,
@@ -257,7 +253,7 @@ namespace osu.Game.Tests.Visual
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 10),
+                                Ratings = Enumerable.Range(0, 11),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
@@ -277,7 +273,6 @@ namespace osu.Game.Tests.Visual
                             OnlineInfo = new BeatmapOnlineInfo
                             {
                                 Length = 193000,
-                                HasVideo = false,
                                 CircleCount = 464,
                                 SliderCount = 0,
                                 PlayCount = 4833,
@@ -285,7 +280,7 @@ namespace osu.Game.Tests.Visual
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 10),
+                                Ratings = Enumerable.Range(0, 11),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
@@ -305,7 +300,6 @@ namespace osu.Game.Tests.Visual
                             OnlineInfo = new BeatmapOnlineInfo
                             {
                                 Length = 193000,
-                                HasVideo = false,
                                 CircleCount = 712,
                                 SliderCount = 0,
                                 PlayCount = 4405,
@@ -313,7 +307,7 @@ namespace osu.Game.Tests.Visual
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 10),
+                                Ratings = Enumerable.Range(0, 11),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
@@ -333,7 +327,6 @@ namespace osu.Game.Tests.Visual
                             OnlineInfo = new BeatmapOnlineInfo
                             {
                                 Length = 193000,
-                                HasVideo = false,
                                 CircleCount = 943,
                                 SliderCount = 0,
                                 PlayCount = 3950,
@@ -341,7 +334,7 @@ namespace osu.Game.Tests.Visual
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 10),
+                                Ratings = Enumerable.Range(0, 11),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
@@ -361,7 +354,6 @@ namespace osu.Game.Tests.Visual
                             OnlineInfo = new BeatmapOnlineInfo
                             {
                                 Length = 193000,
-                                HasVideo = false,
                                 CircleCount = 1068,
                                 SliderCount = 0,
                                 PlayCount = 5856,
@@ -369,7 +361,7 @@ namespace osu.Game.Tests.Visual
                             },
                             Metrics = new BeatmapMetrics
                             {
-                                Ratings = Enumerable.Range(0, 10),
+                                Ratings = Enumerable.Range(0, 11),
                                 Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
                                 Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
