@@ -228,7 +228,7 @@ namespace osu.Game.Overlays.BeatmapSet
             this.beatmaps = beatmaps;
         }
 
-        private void download(bool video)
+        private void download(bool noVideo)
         {
             if (beatmaps.GetExistingDownload(BeatmapSet) != null)
             {
@@ -240,7 +240,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 return;
             }
 
-            beatmaps.Download(BeatmapSet);
+            beatmaps.Download(BeatmapSet, noVideo);
         }
     }
 }
