@@ -102,13 +102,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 flag = new DrawableFlag
                 {
                     Size = new Vector2(30, 20),
-                    Position = new Vector2(height / 2, height / 4),
+                    Position = new Vector2(margin * 2 + avatar_size, height / 4),
                 },
                 username = new ClickableUsername
                 {
                     Origin = Anchor.BottomLeft,
                     TextSize = 30,
-                    Position = new Vector2(height / 2, avatar_size / 2),
+                    Position = new Vector2(margin * 2 + avatar_size, height / 4),
+                    Margin = new MarginPadding { Bottom = 4 }
                 },
                 rankText = new OsuSpriteText
                 {
