@@ -16,10 +16,7 @@ namespace osu.Game.Rulesets.Mania
         {
         }
 
-        protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
-        {
-            return 0;
-        }
+        public override double Calculate(Dictionary<string, string> categoryDifficulty) => 0;
 
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter(true, (int)Math.Max(1, Math.Round(Beatmap.BeatmapInfo.BaseDifficulty.CircleSize)));
     }
