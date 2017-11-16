@@ -51,6 +51,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 title.Text = BeatmapSet.Metadata.Title;
                 artist.Text = BeatmapSet.Metadata.Artist;
 
+                downloadButtonsContainer.FadeIn();
                 noVideoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 0 : 1, transition_duration);
                 videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
 
@@ -224,6 +225,20 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             tabsBg.Colour = colours.Gray3;
             this.beatmaps = beatmaps;
+
+            beatmaps.BeatmapSetAdded += handleBeatmapAdd;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmaps.BeatmapSetAdded -= handleBeatmapAdd;
+        }
+
+        private void handleBeatmapAdd(BeatmapSetInfo beatmap)
+        {
+            if (beatmap.OnlineBeatmapSetID == BeatmapSet.OnlineBeatmapSetID)
+                downloadButtonsContainer.FadeOut(transition_duration);
         }
 
         private void download(bool noVideo)

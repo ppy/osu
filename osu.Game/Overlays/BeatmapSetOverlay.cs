@@ -24,8 +24,6 @@ namespace osu.Game.Overlays
         public const float X_PADDING = 40;
         public const float RIGHT_WIDTH = 275;
 
-        private BeatmapSetInfo currentBeatmap;
-
         private readonly Header header;
         private readonly Info info;
 
@@ -87,16 +85,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, RulesetStore rulesets, BeatmapManager manager)
+        private void load(APIAccess api, RulesetStore rulesets)
         {
             this.api = api;
             this.rulesets = rulesets;
-
-            manager.BeatmapSetAdded += beatmap =>
-            {
-                if (beatmap.OnlineBeatmapSetID == currentBeatmap.OnlineBeatmapSetID)
-                    Hide();
-            };
         }
 
         protected override void PopIn()
@@ -128,7 +120,7 @@ namespace osu.Game.Overlays
 
         public void ShowBeatmapSet(BeatmapSetInfo set)
         {
-            currentBeatmap = header.BeatmapSet = info.BeatmapSet = set;
+            header.BeatmapSet = info.BeatmapSet = set;
             Show();
             scroll.ScrollTo(0);
         }
