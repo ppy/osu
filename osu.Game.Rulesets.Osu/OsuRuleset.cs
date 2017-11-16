@@ -14,6 +14,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -112,7 +113,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_osu_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new OsuDifficultyCalculator(beatmap);
 
         public override string Description => "osu!";
 

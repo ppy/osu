@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko
         {
         }
 
-        protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
+        public override double Calculate(Dictionary<string, string> categoryDifficulty)
         {
             // Fill our custom DifficultyHitObject class, that carries additional information
             difficultyHitObjects.Clear();
