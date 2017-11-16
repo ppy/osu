@@ -83,6 +83,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scoring\TaikoScoreProcessor.cs" />
     <Compile Include="TaikoInputManager.cs" />
+    <Compile Include="Tests\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\TestCaseTaikoPlayfield.cs" />
     <Compile Include="UI\HitTarget.cs" />
     <Compile Include="UI\InputDrum.cs" />
