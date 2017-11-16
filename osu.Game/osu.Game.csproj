@@ -549,9 +549,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rulesets\Judgements\DrawableJudgement.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
-    <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToClock.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToHitObject.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToRulesetContainer.cs" />
     <Compile Include="Rulesets\Mods\Mod.cs" />
     <Compile Include="Rulesets\Mods\ModAutoplay.cs" />
     <Compile Include="Rulesets\Mods\ModCinema.cs" />
