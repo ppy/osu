@@ -107,6 +107,12 @@ namespace osu.Game.Overlays.Direct
             beatmaps.BeatmapDownloadBegan += attachDownload;
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmaps.BeatmapDownloadBegan -= attachDownload;
+        }
+
         protected override void Update()
         {
             base.Update();
