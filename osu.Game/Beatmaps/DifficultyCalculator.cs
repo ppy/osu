@@ -48,12 +48,11 @@ namespace osu.Game.Beatmaps
         {
             var clock = new StopwatchClock();
             mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
+            TimeRate = clock.Rate;
 
             foreach (var mod in mods.OfType<IApplicableToHitObject<T>>())
                 foreach (var obj in Objects)
                     mod.ApplyToHitObject(obj);
-
-            TimeRate = clock.Rate;
         }
 
         protected virtual void PreprocessHitObjects()
