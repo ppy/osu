@@ -18,7 +18,7 @@ using System.ComponentModel;
 using osu.Game.Graphics;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
-
+using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Settings.Sections.General
