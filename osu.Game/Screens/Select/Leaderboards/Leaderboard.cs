@@ -17,19 +17,21 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using System.Linq;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
     public class Leaderboard : Container
     {
         private readonly ScrollContainer scrollContainer;
-        private readonly FillFlowContainer<LeaderboardScore> scrollFlow;
+        private FillFlowContainer<LeaderboardScore> scrollFlow;
 
         public Action<Score> ScoreSelected;
 
         private readonly LoadingAnimation loading;
 
         private IEnumerable<Score> scores;
+
         public IEnumerable<Score> Scores
         {
             get { return scores; }
@@ -41,33 +43,43 @@ namespace osu.Game.Screens.Select.Leaderboards
                 int i = 150;
                 if (scores == null)
                 {
-                    foreach (var c in scrollFlow.Children)
-                        c.FadeOut(i += 10);
+                    if (scrollFlow != null)
+                    {
+                        foreach (var c in scrollFlow.Children)
+                            c.FadeOut(i += 10);
 
-                    foreach (var c in scrollFlow.Children)
-                        c.LifetimeEnd = Time.Current + i;
+                        foreach (var c in scrollFlow.Children)
+                            c.LifetimeEnd = Time.Current + i;
+                    }
 
                     return;
                 }
 
-                scrollFlow.Clear();
-
-                i = 0;
-                foreach (var s in scores)
+                // schedule because we may not be loaded yet (LoadComponentAsync complains).
+                Schedule(() =>
                 {
-                    var ls = new LeaderboardScore(s, 1 + i)
+                    LoadComponentAsync(new FillFlowContainer<LeaderboardScore>
                     {
-                        AlwaysPresent = true,
-                        Action = () => ScoreSelected?.Invoke(s),
-                        State = Visibility.Hidden,
-                    };
-                    scrollFlow.Add(ls);
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(0f, 5f),
+                        Padding = new MarginPadding { Top = 10, Bottom = 5 },
+                        ChildrenEnumerable = scores.Select(s => new LeaderboardScore(s, 1 + i) { Action = () => ScoreSelected?.Invoke(s) })
+                    }, f =>
+                    {
+                        scrollFlow?.Expire();
+                        scrollContainer.Add(scrollFlow = f);
 
-                    using (BeginDelayedSequence(i++ * 50, true))
-                        ls.Show();
-                }
+                        i = 0;
+                        foreach (var s in f.Children)
+                        {
+                            using (s.BeginDelayedSequence(i++ * 50, true))
+                                s.Show();
+                        }
 
-                scrollContainer.ScrollTo(0f, false);
+                        scrollContainer.ScrollTo(0f, false);
+                    });
+                });
             }
         }
 
@@ -79,16 +91,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
-                    Children = new Drawable[]
-                    {
-                        scrollFlow = new FillFlowContainer<LeaderboardScore>
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Spacing = new Vector2(0f, 5f),
-                            Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                        },
-                    },
                 },
                 loading = new LoadingAnimation()
             };
@@ -151,6 +153,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (!scrollContainer.IsScrolledToEnd())
                 fadeStart -= LeaderboardScore.HEIGHT;
+
+            if (scrollFlow == null) return;
 
             foreach (var c in scrollFlow.Children)
             {
