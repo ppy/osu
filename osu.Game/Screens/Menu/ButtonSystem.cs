@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Menu
 
                 // osuLogo.SizeForFlow relies on loading to be complete.
                 buttonFlow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + this.logo.SizeForFlow / 4), 0);
+
+                updateLogoState();
             }
         }
 
@@ -217,6 +219,8 @@ namespace osu.Game.Screens.Menu
                 if (state == MenuState.TopLevel)
                     buttonArea.FinishTransforms(true);
 
+                updateLogoState(lastState);
+
                 using (buttonArea.BeginDelayedSequence(lastState == MenuState.Initial ? 150 : 0, true))
                 {
                     switch (state)
@@ -317,6 +321,62 @@ namespace osu.Game.Screens.Menu
                 }
 
                 StateChanged?.Invoke(State);
+            }
+        }
+
+        private void updateLogoState(MenuState lastState = MenuState.Initial)
+        {
+            switch (state)
+            {
+                case MenuState.Exit:
+                case MenuState.Initial:
+                    trackingPosition = false;
+
+                    logo?.Delay(150)
+                        .Schedule(() =>
+                        {
+                            toolbar?.Hide();
+
+                            logo.ClearTransforms(targetMember: nameof(Position));
+                            logo.RelativePositionAxes = Axes.Both;
+
+                            logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                            logo.ScaleTo(1, 800, Easing.OutExpo);
+                        });
+
+                    break;
+                case MenuState.TopLevel:
+                case MenuState.Play:
+                    logo.ClearTransforms(targetMember: nameof(Position));
+                    logo.RelativePositionAxes = Axes.None;
+
+                    trackingPosition = true;
+
+                    switch (lastState)
+                    {
+                        case MenuState.Initial:
+                            logo.ScaleTo(0.5f, 200, Easing.In);
+
+                            trackingPosition = false;
+
+                            logo
+                                .MoveTo(iconTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In)
+                                .OnComplete(o =>
+                                {
+                                    trackingPosition = true;
+
+                                    o.Impact();
+                                    toolbar?.Show();
+                                });
+                            break;
+                        default:
+                            logo.ScaleTo(0.5f, 200, Easing.OutQuint);
+                            break;
+                    }
+                    break;
+                case MenuState.EnteringMode:
+                    trackingPosition = true;
+                    break;
             }
         }
 
