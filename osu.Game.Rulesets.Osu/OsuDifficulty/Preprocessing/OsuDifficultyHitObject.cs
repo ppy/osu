@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         private void setTimingValues()
         {
             // Every timing inverval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure.
-            DeltaTime = Math.Max(40, t[0].StartTime - t[1].StartTime) / timeRate;
+            DeltaTime = Math.Max(40, (t[0].StartTime - t[1].StartTime) / timeRate);
             TimeUntilHit = 450; // BaseObject.PreEmpt;
         }
     }
