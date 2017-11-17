@@ -87,30 +87,38 @@ namespace osu.Game.Screens.Edit
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
-                            Children = new Drawable[]
+                            Child = new GridContainer
                             {
-                                timeInfo = new TimeInfoContainer
+                                RelativeSizeAxes = Axes.Both,
+                                ColumnDimensions = new Dimension[]
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Width = 0.17f
+                                    new Dimension(GridSizeMode.Auto),
+                                    new Dimension(GridSizeMode.Relative, 0.67f),
+                                    new Dimension(GridSizeMode.Auto),
                                 },
-                                timeline = new SummaryTimeline
+                                Content = new Drawable[][]
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Width = 0.65f
-                                },
-                                playback = new PlaybackContainer
-                                {
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Width = 0.17f
-                                },
-                            }
+                                    new Drawable[]
+                                    {
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Right = 10 },
+                                            Child = timeInfo = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
+                                        },                                        
+                                        timeline = new SummaryTimeline
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Left = 10 },
+                                            Child = playback = new PlaybackContainer { RelativeSizeAxes = Axes.Both },
+                                        }
+                                    },
+                                }
+                            },
                         }
                     }
                 },
