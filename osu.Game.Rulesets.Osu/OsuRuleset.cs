@@ -15,6 +15,7 @@ using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Osu.Scoring;
 
 namespace osu.Game.Rulesets.Osu
 {
