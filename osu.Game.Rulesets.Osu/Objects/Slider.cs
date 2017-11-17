@@ -45,6 +45,12 @@ namespace osu.Game.Rulesets.Osu.Objects
             set { Curve.Distance = value; }
         }
 
+        /// <summary>
+        /// The position of the cursor at the point of completion of this <see cref="OsuHitObject"/>.
+        /// This is set and used by difficulty calculation.
+        /// </summary>
+        internal Vector2? CursorPosition;
+
         public List<SampleInfoList> RepeatSamples { get; set; } = new List<SampleInfoList>();
         public int RepeatCount { get; set; } = 1;
 
