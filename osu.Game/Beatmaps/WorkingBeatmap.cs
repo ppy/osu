@@ -32,6 +32,7 @@ namespace osu.Game.Beatmaps
             beatmap = new Lazy<Beatmap>(populateBeatmap);
             background = new Lazy<Texture>(populateBackground);
             track = new Lazy<Track>(populateTrack);
+            waveform = new Lazy<Waveform>(populateWaveform);
         }
 
         protected abstract Beatmap GetBeatmap();
@@ -73,7 +74,7 @@ namespace osu.Game.Beatmaps
 
         public bool WaveformLoaded => waveform.IsValueCreated;
         public Waveform Waveform => waveform.Value;
-        private Lazy<Waveform> waveform;
+        private readonly Lazy<Waveform> waveform;
 
         private Waveform populateWaveform() => GetWaveform();
 
