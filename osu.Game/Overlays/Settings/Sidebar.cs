@@ -15,7 +15,7 @@ using osu.Game.Overlays.Toolbar;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class Sidebar : Container<SidebarButton>, IStateful<ExpandedState>
+    public class Sidebar : Container<SidebarButton>, IStateful<ExpandedState>, IHandleHover, IHandleMouseMove
     {
         private readonly FillFlowContainer<SidebarButton> content;
         internal const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
@@ -55,25 +55,23 @@ namespace osu.Game.Overlays.Settings
         private ScheduledDelegate expandEvent;
         private ExpandedState state;
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             queueExpandIfHovering();
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             expandEvent?.Cancel();
             lastHoveredButton = null;
             State = ExpandedState.Contracted;
-
-            base.OnHoverLost(state);
         }
 
-        protected override bool OnMouseMove(InputState state)
+        public virtual bool OnMouseMove(InputState state)
         {
             queueExpandIfHovering();
-            return base.OnMouseMove(state);
+            return false;
         }
 
         private class SidebarScrollContainer : ScrollContainer

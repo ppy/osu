@@ -11,7 +11,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SliderBall : CircularContainer, ISliderProgress
+    public class SliderBall : CircularContainer, ISliderProgress, IHandleMouseButtons, IHandleMouseMove
     {
         private const float width = 128;
 
@@ -80,22 +80,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private InputState lastState;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             lastState = state;
-            return base.OnMouseDown(state, args);
+            return false;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             lastState = state;
-            return base.OnMouseUp(state, args);
+            return false;
         }
 
-        protected override bool OnMouseMove(InputState state)
+        public virtual bool OnMouseMove(InputState state)
         {
             lastState = state;
-            return base.OnMouseMove(state);
+            return false;
         }
 
         // If the current time is between the start and end of the slider, we should track mouse input regardless of the cursor position.

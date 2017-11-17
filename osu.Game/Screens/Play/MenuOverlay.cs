@@ -16,7 +16,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class MenuOverlay : OverlayContainer, IRequireHighFrequencyMousePosition
+    public abstract class MenuOverlay : OverlayContainer, IRequireHighFrequencyMousePosition, IHandleMouseButtons, IHandleMouseMove
     {
         private const int transition_duration = 200;
         private const int button_height = 70;
@@ -78,11 +78,11 @@ namespace osu.Game.Screens.Play
         protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);
 
         // Don't let mouse down events through the overlay or people can click circles while paused.
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        public override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
 
-        protected override bool OnMouseMove(InputState state) => true;
+        public virtual bool OnMouseMove(InputState state) => true;
 
         protected void AddButton(string text, Color4 colour, Action action)
         {

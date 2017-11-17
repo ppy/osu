@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuCheckbox : Checkbox
+    public class OsuCheckbox : Checkbox, IHandleHover
     {
         private Bindable<bool> bindable;
 
@@ -89,18 +89,17 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             Nub.Glowing = true;
             Nub.Expanded = true;
-            return base.OnHover(state);
+            return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             Nub.Glowing = false;
             Nub.Expanded = false;
-            base.OnHoverLost(state);
         }
 
         [BackgroundDependencyLoader]

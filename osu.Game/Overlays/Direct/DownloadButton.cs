@@ -9,7 +9,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class DownloadButton : OsuClickableContainer
+    public class DownloadButton : OsuClickableContainer, IHandleMouseButtons, IHandleHover
     {
         private readonly SpriteIcon icon;
 
@@ -27,25 +27,25 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             icon.ScaleTo(0.9f, 1000, Easing.Out);
-            return base.OnMouseDown(state, args);
+            return false;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             icon.ScaleTo(1f, 500, Easing.OutElastic);
-            return base.OnMouseUp(state, args);
+            return false;
         }
 
-        protected override bool OnHover(InputState state)
+        public override bool OnHover(InputState state)
         {
             icon.ScaleTo(1.1f, 500, Easing.OutElastic);
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             icon.ScaleTo(1f, 500, Easing.OutElastic);
         }

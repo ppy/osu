@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// osu! logo and its attachments (pulsing, visualiser etc.)
     /// </summary>
-    public class OsuLogo : BeatSyncedContainer
+    public class OsuLogo : BeatSyncedContainer, IHandleMouseButtons, IHandleClicks, IHandleHover
     {
         public readonly Color4 OsuPink = OsuColour.FromHex(@"e967a1");
 
@@ -336,7 +336,7 @@ namespace osu.Game.Screens.Menu
 
         private bool interactive => Action != null && Alpha > 0.2f;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             if (!interactive) return false;
 
@@ -344,13 +344,13 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             logoBounceContainer.ScaleTo(1f, 500, Easing.OutElastic);
             return true;
         }
 
-        protected override bool OnClick(InputState state)
+        public virtual bool OnClick(InputState state)
         {
             if (!interactive) return false;
 
@@ -364,7 +364,7 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             if (!interactive) return false;
 
@@ -372,7 +372,7 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             logoHoverContainer.ScaleTo(1, 500, Easing.OutElastic);
         }

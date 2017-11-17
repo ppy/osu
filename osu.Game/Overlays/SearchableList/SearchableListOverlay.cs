@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.SearchableList
         public static readonly float WIDTH_PADDING = 80;
     }
 
-    public abstract class SearchableListOverlay<T, U, S> : SearchableListOverlay
+    public abstract class SearchableListOverlay<T, U, S> : SearchableListOverlay, IHandleFocus
     {
         private readonly Container scrollContainer;
 
@@ -101,9 +101,10 @@ namespace osu.Game.Overlays.SearchableList
             scrollContainer.Padding = new MarginPadding { Top = Header.Height + Filter.Height };
         }
 
-        protected override void OnFocus(InputState state)
+        public virtual void OnFocus(InputState state) => GetContainingInputManager().ChangeFocus(Filter.Search);
+
+        public void OnFocusLost(InputState state)
         {
-            GetContainingInputManager().ChangeFocus(Filter.Search);
         }
 
         protected override void PopIn()

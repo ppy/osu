@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play
             AddButton("Quit", new Color4(170, 27, 39, 255), OnQuit);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (!args.Repeat && args.Key == Key.Escape)
             {

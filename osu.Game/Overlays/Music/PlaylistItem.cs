@@ -17,7 +17,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {
-    internal class PlaylistItem : Container, IFilterable, IDraggable
+    internal class PlaylistItem : Container, IFilterable, IDraggable, IHandleHover, IHandleMouseButtons, IHandleClicks
     {
         private const float fade_duration = 100;
 
@@ -111,19 +111,23 @@ namespace osu.Game.Overlays.Music
             });
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             handle.FadeIn(fade_duration);
 
-            return base.OnHover(state);
+            return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             handle.FadeOut(fade_duration);
         }
 
-        protected override bool OnClick(InputState state)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => false;
+
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
+
+        public virtual bool OnClick(InputState state)
         {
             OnSelect?.Invoke(BeatmapSetInfo);
             return true;

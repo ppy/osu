@@ -37,7 +37,7 @@ namespace osu.Game.Overlays
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
-        protected override bool OnClick(InputState state)
+        public override bool OnClick(InputState state)
         {
             State = Visibility.Hidden;
             return true;

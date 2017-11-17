@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Menu
     /// Button designed specifically for the osu!next main menu.
     /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
     /// </summary>
-    public class Button : BeatSyncedContainer, IStateful<ButtonState>
+    public class Button : BeatSyncedContainer, IStateful<ButtonState>, IHandleHover, IHandleMouseButtons, IHandleClicks, IHandleKeys
     {
         public event Action<ButtonState> StateChanged;
 
@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Menu
             rightward = !rightward;
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             if (State != ButtonState.Expanded) return true;
 
@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             icon.ClearTransforms();
             icon.RotateTo(0, 500, Easing.Out);
@@ -179,25 +179,25 @@ namespace osu.Game.Screens.Menu
                 sampleClick = audio.Sample.Get($@"Menu/{sampleName}");
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             boxHoverLayer.FadeTo(0.1f, 1000, Easing.OutQuint);
-            return base.OnMouseDown(state, args);
+            return false;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             boxHoverLayer.FadeTo(0, 1000, Easing.OutQuint);
-            return base.OnMouseUp(state, args);
+            return false;
         }
 
-        protected override bool OnClick(InputState state)
+        public virtual bool OnClick(InputState state)
         {
             trigger();
             return true;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat || state.Keyboard.ControlPressed || state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
                 return false;
@@ -210,6 +210,8 @@ namespace osu.Game.Screens.Menu
 
             return false;
         }
+
+        public virtual bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
 
         private void trigger()
         {

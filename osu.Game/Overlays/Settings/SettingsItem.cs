@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        private class RestoreDefaultValueButton : Box, IHasTooltip
+        private class RestoreDefaultValueButton : Box, IHasTooltip, IHandleMouseButtons, IHandleClicks, IHandleHover
         {
             private Bindable<T> bindable;
             internal Bindable<T> Bindable
@@ -161,25 +161,25 @@ namespace osu.Game.Overlays.Settings
 
             public override bool HandleInput => true;
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+            public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
+            public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
 
-            protected override bool OnClick(InputState state)
+            public virtual bool OnClick(InputState state)
             {
                 if (bindable != null && !bindable.Disabled)
                     bindable.SetDefault();
                 return true;
             }
 
-            protected override bool OnHover(InputState state)
+            public virtual bool OnHover(InputState state)
             {
                 hovering = true;
                 UpdateState();
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 hovering = false;
                 UpdateState();

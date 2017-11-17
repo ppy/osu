@@ -96,7 +96,7 @@ namespace osu.Game.Overlays
             });
         }
 
-        private class BackButton : OsuClickableContainer
+        private class BackButton : OsuClickableContainer, IHandleMouseButtons
         {
             private AspectContainer aspect;
 
@@ -135,16 +135,16 @@ namespace osu.Game.Overlays
                 };
             }
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
                 aspect.ScaleTo(0.75f, 2000, Easing.OutQuint);
-                return base.OnMouseDown(state, args);
+                return false;
             }
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
                 aspect.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(state, args);
+                return false;
             }
         }
     }

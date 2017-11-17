@@ -17,7 +17,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChannelListItem : OsuClickableContainer, IFilterable
+    public class ChannelListItem : OsuClickableContainer, IFilterable, IHandleHover
     {
         private const float width_padding = 5;
         private const float channel_width = 150;
@@ -155,7 +155,7 @@ namespace osu.Game.Overlays.Chat
             FinishTransforms(true);
         }
 
-        protected override bool OnHover(InputState state)
+        public override bool OnHover(InputState state)
         {
             if (!channel.Joined.Value)
                 name.FadeColour(hoverColour, 50, Easing.OutQuint);
@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.Chat
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             if (!channel.Joined.Value)
                 name.FadeColour(Color4.White, transition_duration);

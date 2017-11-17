@@ -16,7 +16,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
+    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour, IHandleHover, IHandleMouseButtons
         where T : struct, IEquatable<T>
     {
         private SampleChannel sample;
@@ -104,16 +104,15 @@ namespace osu.Game.Graphics.UserInterface
             AccentColour = colours.Pink;
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             Nub.Glowing = true;
-            return base.OnHover(state);
+            return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             Nub.Glowing = false;
-            base.OnHoverLost(state);
         }
 
         protected override void OnUserChange()
@@ -143,16 +142,16 @@ namespace osu.Game.Graphics.UserInterface
             sample.Play();
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             Nub.Current.Value = true;
-            return base.OnMouseDown(state, args);
+            return false;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             Nub.Current.Value = false;
-            return base.OnMouseUp(state, args);
+            return false;
         }
 
         protected override void UpdateAfterChildren()

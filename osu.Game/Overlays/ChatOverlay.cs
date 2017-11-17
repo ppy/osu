@@ -28,7 +28,7 @@ using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer, IOnlineComponent
+    public class ChatOverlay : OsuFocusedOverlayContainer, IOnlineComponent, IHandleDrag, IHandleFocus
     {
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
@@ -190,7 +190,7 @@ namespace osu.Game.Overlays
         private double startDragChatHeight;
         private bool isDragging;
 
-        protected override bool OnDragStart(InputState state)
+        public override bool OnDragStart(InputState state)
         {
             isDragging = tabsArea.IsHovered;
 
@@ -201,7 +201,7 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDrag(InputState state)
+        public virtual bool OnDrag(InputState state)
         {
             if (isDragging)
             {
@@ -219,10 +219,10 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDragEnd(InputState state)
+        public virtual bool OnDragEnd(InputState state)
         {
             isDragging = false;
-            return base.OnDragEnd(state);
+            return false;
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -240,13 +240,16 @@ namespace osu.Game.Overlays
 
         public override bool AcceptsFocus => true;
 
-        protected override bool OnClick(InputState state) => true;
+        public override bool OnClick(InputState state) => true;
 
-        protected override void OnFocus(InputState state)
+        public virtual void OnFocus(InputState state)
         {
             //this is necessary as textbox is masked away and therefore can't get focus :(
             GetContainingInputManager().ChangeFocus(textbox);
-            base.OnFocus(state);
+        }
+
+        public void OnFocusLost(InputState state)
+        {
         }
 
         protected override void PopIn()

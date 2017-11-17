@@ -171,14 +171,14 @@ namespace osu.Game.Screens.Edit.Menus
                 {
                 }
 
-                protected override bool OnHover(InputState state)
+                public override bool OnHover(InputState state)
                 {
                     if (Item is EditorMenuItemSpacer)
                         return true;
                     return base.OnHover(state);
                 }
 
-                protected override bool OnClick(InputState state)
+                public override bool OnClick(InputState state)
                 {
                     if (Item is EditorMenuItemSpacer)
                         return true;

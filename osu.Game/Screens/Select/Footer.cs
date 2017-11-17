@@ -16,7 +16,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
-    public class Footer : Container
+    public class Footer : Container, IHandleMouseButtons, IHandleClicks, IHandleDrag
     {
         private readonly Box modeLight;
 
@@ -132,10 +132,14 @@ namespace osu.Game.Screens.Select
             updateModeLight();
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
 
-        protected override bool OnClick(InputState state) => true;
+        public virtual bool OnClick(InputState state) => false;
 
-        protected override bool OnDragStart(InputState state) => true;
+        public virtual bool OnDragStart(InputState state) => true;
+        public virtual bool OnDrag(InputState state) => false;
+
+        public virtual bool OnDragEnd(InputState state) => false;
     }
 }

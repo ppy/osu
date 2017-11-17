@@ -14,7 +14,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButton : OsuClickableContainer
+    public class FooterButton : OsuClickableContainer, IHandleHover, IHandleMouseButtons, IHandleKeys
     {
         private static readonly Vector2 shearing = new Vector2(0.15f, 0);
 
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Select
         public Action HoverLost;
         public Key? Hotkey;
 
-        protected override bool OnHover(InputState state)
+        public override bool OnHover(InputState state)
         {
             Hovered?.Invoke();
             light.ScaleTo(new Vector2(1, 2), Footer.TRANSITION_LENGTH, Easing.OutQuint);
@@ -94,26 +94,26 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             HoverLost?.Invoke();
             light.ScaleTo(new Vector2(1, 1), Footer.TRANSITION_LENGTH, Easing.OutQuint);
             light.FadeColour(DeselectedColour, Footer.TRANSITION_LENGTH, Easing.OutQuint);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             box.FadeTo(0.3f, Footer.TRANSITION_LENGTH * 2, Easing.OutQuint);
-            return base.OnMouseDown(state, args);
+            return false;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             box.FadeOut(Footer.TRANSITION_LENGTH, Easing.OutQuint);
-            return base.OnMouseUp(state, args);
+            return false;
         }
 
-        protected override bool OnClick(InputState state)
+        public override bool OnClick(InputState state)
         {
             box.ClearTransforms();
             box.Alpha = 1;
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Select
             return base.OnClick(state);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (!args.Repeat && args.Key == Hotkey)
             {
@@ -129,7 +129,9 @@ namespace osu.Game.Screens.Select
                 return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
+
+        public bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
     }
 }

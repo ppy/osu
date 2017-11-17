@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsButton : OsuClickableContainer
+    public class BeatmapOptionsButton : OsuClickableContainer, IHandleMouseButtons, IHandleKeys
     {
         private const float width = 130;
 
@@ -52,19 +52,19 @@ namespace osu.Game.Screens.Select.Options
 
         public Key? HotKey;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             flash.FadeTo(0.1f, 1000, Easing.OutQuint);
-            return base.OnMouseDown(state, args);
+            return false;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             flash.FadeTo(0, 1000, Easing.OutQuint);
-            return base.OnMouseUp(state, args);
+            return false;
         }
 
-        protected override bool OnClick(InputState state)
+        public override bool OnClick(InputState state)
         {
             flash.ClearTransforms();
             flash.Alpha = 0.9f;
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Select.Options
             return base.OnClick(state);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (!args.Repeat && args.Key == HotKey)
             {
@@ -83,6 +83,8 @@ namespace osu.Game.Screens.Select.Options
 
             return false;
         }
+
+        public bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
 

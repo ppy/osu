@@ -17,7 +17,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class RankChart : Container
+    public class RankChart : Container, IHandleHover, IHandleMouseMove
     {
         private readonly SpriteText rankText, performanceText, relativeText;
         private readonly RankChartLineGraph graph;
@@ -116,27 +116,26 @@ namespace osu.Game.Overlays.Profile
             return base.Invalidate(invalidation, source, shallPropagate);
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             graph?.UpdateBallPosition(state.Mouse.Position.X);
             graph?.ShowBall();
-            return base.OnHover(state);
+            return false;
         }
 
-        protected override bool OnMouseMove(InputState state)
+        public virtual bool OnMouseMove(InputState state)
         {
             graph?.UpdateBallPosition(state.Mouse.Position.X);
-            return base.OnMouseMove(state);
+            return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             if (graph != null)
             {
                 graph.HideBall();
                 updateRankTexts();
             }
-            base.OnHoverLost(state);
         }
 
         private class RankChartLineGraph : LineGraph

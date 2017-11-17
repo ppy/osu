@@ -8,20 +8,19 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuHoverContainer : OsuClickableContainer
+    public class OsuHoverContainer : OsuClickableContainer, IHandleHover
     {
         private Color4 hoverColour;
 
-        protected override bool OnHover(InputState state)
+        public override bool OnHover(InputState state)
         {
             this.FadeColour(hoverColour, 500, Easing.OutQuint);
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             this.FadeColour(Color4.White, 500, Easing.OutQuint);
-            base.OnHoverLost(state);
         }
 
         [BackgroundDependencyLoader]

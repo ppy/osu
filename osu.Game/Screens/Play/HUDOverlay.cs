@@ -19,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
-    public class HUDOverlay : Container
+    public class HUDOverlay : Container, IHandleKeys
     {
         private const int duration = 100;
 
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
 
@@ -121,8 +121,10 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
+
+        public bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
 
         protected virtual RollingCounter<double> CreateAccuracyCounter() => new PercentageCounter
         {

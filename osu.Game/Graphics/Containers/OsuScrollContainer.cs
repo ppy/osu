@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool IsDragging => base.IsDragging || mouseScrollBarDragging;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             if (shouldPerformRightMouseScroll(state))
             {
@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.Containers
             return base.OnMouseDown(state, args);
         }
 
-        protected override bool OnDrag(InputState state)
+        public override bool OnDrag(InputState state)
         {
             if (mouseScrollBarDragging)
             {
@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.Containers
             return base.OnDrag(state);
         }
 
-        protected override bool OnDragStart(InputState state)
+        public override bool OnDragStart(InputState state)
         {
             if (shouldPerformRightMouseScroll(state))
             {
@@ -61,7 +61,7 @@ namespace osu.Game.Graphics.Containers
             return base.OnDragStart(state);
         }
 
-        protected override bool OnDragEnd(InputState state)
+        public override bool OnDragEnd(InputState state)
         {
             if (mouseScrollBarDragging)
             {

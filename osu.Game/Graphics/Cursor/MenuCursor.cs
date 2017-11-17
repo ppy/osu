@@ -16,7 +16,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class MenuCursor : CursorContainer
+    public class MenuCursor : CursorContainer, IHandleMouseButtons
     {
         protected override Drawable CreateCursor() => new Cursor();
 
@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.Cursor
 
         private bool startRotation;
 
-        protected override bool OnMouseMove(InputState state)
+        public override bool OnMouseMove(InputState state)
         {
             if (cursorRotate && dragging)
             {
@@ -53,13 +53,13 @@ namespace osu.Game.Graphics.Cursor
             return base.OnMouseMove(state);
         }
 
-        protected override bool OnDragStart(InputState state)
+        public override bool OnDragStart(InputState state)
         {
             dragging = true;
             return base.OnDragStart(state);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             ActiveCursor.Scale = new Vector2(1);
             ActiveCursor.ScaleTo(0.90f, 800, Easing.OutQuint);
@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.Cursor
             return base.OnMouseDown(state, args);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             if (!state.Mouse.HasMainButtonPressed)
             {
@@ -81,10 +81,10 @@ namespace osu.Game.Graphics.Cursor
                 ActiveCursor.ScaleTo(1, 500, Easing.OutElastic);
             }
 
-            return base.OnMouseUp(state, args);
+            return false;
         }
 
-        protected override bool OnClick(InputState state)
+        public override bool OnClick(InputState state)
         {
             ((Cursor)ActiveCursor).AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
 

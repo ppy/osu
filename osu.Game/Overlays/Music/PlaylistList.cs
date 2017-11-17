@@ -128,14 +128,14 @@ namespace osu.Game.Overlays.Music
             private Vector2 nativeDragPosition;
             private PlaylistItem draggedItem;
 
-            protected override bool OnDragStart(InputState state)
+            public override bool OnDragStart(InputState state)
             {
                 nativeDragPosition = state.Mouse.NativeState.Position;
                 draggedItem = items.FirstOrDefault(d => d.IsDraggable);
                 return draggedItem != null || base.OnDragStart(state);
             }
 
-            protected override bool OnDrag(InputState state)
+            public override bool OnDrag(InputState state)
             {
                 nativeDragPosition = state.Mouse.NativeState.Position;
                 if (draggedItem == null)
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Music
                 return true;
             }
 
-            protected override bool OnDragEnd(InputState state)
+            public override bool OnDragEnd(InputState state)
             {
                 nativeDragPosition = state.Mouse.NativeState.Position;
                 var handled = draggedItem != null || base.OnDragEnd(state);

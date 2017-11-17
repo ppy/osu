@@ -18,7 +18,7 @@ using OpenTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    internal class CursorTrail : Drawable
+    internal class CursorTrail : Drawable, IHandleMouseMove
     {
         public override bool HandleInput => true;
 
@@ -115,13 +115,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             timeOffset = Time.Current;
         }
 
-        protected override bool OnMouseMove(InputState state)
+        public virtual bool OnMouseMove(InputState state)
         {
             if (lastPosition == null)
             {
                 lastPosition = state.Mouse.NativeState.Position;
                 resampler.AddPosition(lastPosition.Value);
-                return base.OnMouseMove(state);
+                return false;
             }
 
             foreach (Vector2 pos2 in resampler.AddPosition(state.Mouse.NativeState.Position))
@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 }
             }
 
-            return base.OnMouseMove(state);
+            return false;
         }
 
         private void addPosition(Vector2 pos)

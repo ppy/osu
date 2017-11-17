@@ -56,7 +56,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public class OsuTabItem : TabItem<T>, IHasAccentColour
+        public class OsuTabItem : TabItem<T>, IHasAccentColour, IHandleHover
         {
             protected readonly SpriteText Text;
             protected readonly Box Bar;
@@ -87,14 +87,14 @@ namespace osu.Game.Graphics.UserInterface
                 Text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
             }
 
-            protected override bool OnHover(InputState state)
+            public virtual bool OnHover(InputState state)
             {
                 if (!Active)
                     fadeActive();
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 if (!Active)
                     fadeInactive();
@@ -226,13 +226,13 @@ namespace osu.Game.Graphics.UserInterface
                     Padding = new MarginPadding { Left = 5, Right = 5 };
                 }
 
-                protected override bool OnHover(InputState state)
+                public override bool OnHover(InputState state)
                 {
                     Foreground.Colour = BackgroundColour;
                     return base.OnHover(state);
                 }
 
-                protected override void OnHoverLost(InputState state)
+                public override void OnHoverLost(InputState state)
                 {
                     Foreground.Colour = BackgroundColourHover;
                     base.OnHoverLost(state);

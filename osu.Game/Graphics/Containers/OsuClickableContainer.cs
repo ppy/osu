@@ -4,12 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuClickableContainer : ClickableContainer
+    public class OsuClickableContainer : ClickableContainer, IHandleHover
     {
         protected SampleChannel SampleClick, SampleHover;
 
@@ -20,13 +21,17 @@ namespace osu.Game.Graphics.Containers
             SampleClick = audio.Sample.Get(@"UI/generic-click");
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             SampleHover?.Play();
-            return base.OnHover(state);
+            return false;
         }
 
-        protected override bool OnClick(InputState state)
+        public void OnHoverLost(InputState state)
+        {
+        }
+
+        public override bool OnClick(InputState state)
         {
             SampleClick?.Play();
             return base.OnClick(state);

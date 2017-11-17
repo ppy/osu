@@ -20,7 +20,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipButton : Container
+    public class SkipButton : Container, IHandleMouseMove, IHandleKeys
     {
         private readonly double startTime;
         public IAdjustableClock AudioClock;
@@ -44,10 +44,10 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.Centre;
         }
 
-        protected override bool OnMouseMove(InputState state)
+        public virtual bool OnMouseMove(InputState state)
         {
             fadeContainer.State = Visibility.Visible;
-            return base.OnMouseMove(state);
+            return false;
         }
 
         [BackgroundDependencyLoader]
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Play
             remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, Easing.OutQuint);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
 
@@ -128,8 +128,10 @@ namespace osu.Game.Screens.Play
                     return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
+
+        public bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
 
         private class FadeContainer : Container, IStateful<Visibility>
         {
@@ -180,7 +182,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class Button : OsuClickableContainer
+        private class Button : OsuClickableContainer, IHandleHover, IHandleMouseButtons
         {
             private Color4 colourNormal;
             private Color4 colourHover;
@@ -253,7 +255,7 @@ namespace osu.Game.Screens.Play
                 };
             }
 
-            protected override bool OnHover(InputState state)
+            public override bool OnHover(InputState state)
             {
                 flow.TransformSpacingTo(new Vector2(5), 500, Easing.OutQuint);
                 box.FadeColour(colourHover, 500, Easing.OutQuint);
@@ -261,27 +263,26 @@ namespace osu.Game.Screens.Play
                 return base.OnHover(state);
             }
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 flow.TransformSpacingTo(new Vector2(0), 500, Easing.OutQuint);
                 box.FadeColour(colourNormal, 500, Easing.OutQuint);
                 background.FadeTo(0.2f, 500, Easing.OutQuint);
-                base.OnHoverLost(state);
             }
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
                 aspect.ScaleTo(0.75f, 2000, Easing.OutQuint);
-                return base.OnMouseDown(state, args);
+                return false;
             }
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
                 aspect.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(state, args);
+                return false;
             }
 
-            protected override bool OnClick(InputState state)
+            public override bool OnClick(InputState state)
             {
                 if (!Enabled)
                     return false;

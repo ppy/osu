@@ -133,7 +133,7 @@ namespace osu.Game.Overlays
             FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
         }
 
-        protected override bool OnClick(InputState state)
+        public override bool OnClick(InputState state)
         {
             State = Visibility.Hidden;
             return true;

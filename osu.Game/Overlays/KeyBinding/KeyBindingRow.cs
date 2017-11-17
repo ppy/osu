@@ -19,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Overlays.KeyBinding
 {
-    internal class KeyBindingRow : Container, IFilterable
+    internal class KeyBindingRow : Container, IFilterable, IHandleHover, IHandleMouseButtons, IHandleClicks, IHandleWheel, IHandleKeys, IHandleFocus
     {
         private readonly object action;
         private readonly IEnumerable<Framework.Input.Bindings.KeyBinding> bindings;
@@ -120,18 +120,16 @@ namespace osu.Game.Overlays.KeyBinding
             }
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             FadeEdgeEffectTo(1, transition_time, Easing.OutQuint);
 
-            return base.OnHover(state);
+            return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             FadeEdgeEffectTo(0, transition_time, Easing.OutQuint);
-
-            base.OnHoverLost(state);
         }
 
         public override bool AcceptsFocus => bindTarget == null;
@@ -144,12 +142,12 @@ namespace osu.Game.Overlays.KeyBinding
 
         private bool isModifier(Key k) => k < Key.F1;
 
-        protected override bool OnClick(InputState state) => true;
+        public virtual bool OnClick(InputState state) => true;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             if (!HasFocus || !bindTarget.IsHovered)
-                return base.OnMouseDown(state, args);
+                return false;
 
             if (!AllowMainMouseButtons)
             {
@@ -165,11 +163,11 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             // don't do anything until the last button is released.
             if (!HasFocus || state.Mouse.Buttons.Any())
-                return base.OnMouseUp(state, args);
+                return false;
 
             if (bindTarget.IsHovered)
                 finalise();
@@ -178,7 +176,7 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnWheel(InputState state)
+        public virtual bool OnWheel(InputState state)
         {
             if (HasFocus)
             {
@@ -190,10 +188,10 @@ namespace osu.Game.Overlays.KeyBinding
                 }
             }
 
-            return base.OnWheel(state);
+            return false;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (!HasFocus)
                 return false;
@@ -215,9 +213,9 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        public virtual bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
-            if (!HasFocus) return base.OnKeyUp(state, args);
+            if (!HasFocus) return false;
 
             finalise();
             return true;
@@ -244,7 +242,7 @@ namespace osu.Game.Overlays.KeyBinding
             pressAKey.Padding = new MarginPadding { Bottom = -pressAKey.DrawHeight };
         }
 
-        protected override void OnFocus(InputState state)
+        public virtual void OnFocus(InputState state)
         {
             AutoSizeDuration = 500;
             AutoSizeEasing = Easing.OutQuint;
@@ -253,13 +251,11 @@ namespace osu.Game.Overlays.KeyBinding
             pressAKey.Padding = new MarginPadding();
 
             updateBindTarget();
-            base.OnFocus(state);
         }
 
-        protected override void OnFocusLost(InputState state)
+        public virtual void OnFocusLost(InputState state)
         {
             finalise();
-            base.OnFocusLost(state);
         }
 
         private void updateBindTarget()
@@ -269,7 +265,7 @@ namespace osu.Game.Overlays.KeyBinding
             if (bindTarget != null) bindTarget.IsBinding = true;
         }
 
-        private class KeyButton : Container
+        private class KeyButton : Container, IHandleHover
         {
             public readonly Framework.Input.Bindings.KeyBinding KeyBinding;
 
@@ -338,16 +334,15 @@ namespace osu.Game.Overlays.KeyBinding
                 hoverColour = colours.YellowDark;
             }
 
-            protected override bool OnHover(InputState state)
+            public virtual bool OnHover(InputState state)
             {
                 updateHoverState();
-                return base.OnHover(state);
+                return false;
             }
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 updateHoverState();
-                base.OnHoverLost(state);
             }
 
             private void updateHoverState()

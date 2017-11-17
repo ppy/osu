@@ -16,7 +16,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public abstract class Notification : Container
+    public abstract class Notification : Container, IHandleHover, IHandleMouseButtons, IHandleClicks
     {
         /// <summary>
         /// User requested close.
@@ -114,19 +114,22 @@ namespace osu.Game.Overlays.Notifications
             });
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             closeButton.FadeIn(75);
-            return base.OnHover(state);
+            return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             closeButton.FadeOut(75);
-            base.OnHoverLost(state);
         }
 
-        protected override bool OnClick(InputState state)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => false;
+
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
+
+        public virtual bool OnClick(InputState state)
         {
             if (Activated?.Invoke() ?? true)
                 Close();
@@ -154,7 +157,7 @@ namespace osu.Game.Overlays.Notifications
             Expire();
         }
 
-        private class CloseButton : OsuClickableContainer
+        private class CloseButton : OsuClickableContainer, IHandleHover
         {
             private Color4 hoverColour;
 
@@ -181,16 +184,15 @@ namespace osu.Game.Overlays.Notifications
                 hoverColour = colours.Yellow;
             }
 
-            protected override bool OnHover(InputState state)
+            public override bool OnHover(InputState state)
             {
                 this.FadeColour(hoverColour, 200);
                 return base.OnHover(state);
             }
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 this.FadeColour(OsuColour.Gray(0.2f), 200);
-                base.OnHoverLost(state);
             }
         }
 

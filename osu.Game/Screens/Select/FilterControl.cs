@@ -19,7 +19,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select
 {
-    public class FilterControl : Container
+    public class FilterControl : Container, IHandleMouseButtons, IHandleClicks, IHandleDrag, IHandleMouseMove
     {
         public Action<FilterCriteria> FilterChanged;
 
@@ -174,12 +174,16 @@ namespace osu.Game.Screens.Select
             ruleset.TriggerChange();
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
 
-        protected override bool OnMouseMove(InputState state) => true;
+        public virtual bool OnMouseMove(InputState state) => true;
 
-        protected override bool OnClick(InputState state) => true;
+        public virtual bool OnClick(InputState state) => true;
 
-        protected override bool OnDragStart(InputState state) => true;
+        public virtual bool OnDragStart(InputState state) => true;
+        public virtual bool OnDrag(InputState state) => false;
+
+        public virtual bool OnDragEnd(InputState state) => false;
     }
 }
