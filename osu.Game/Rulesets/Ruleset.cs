@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null);
 
+        public virtual PerformanceCalculator CreatePerformanceCalculator(Beatmap beatmap, Score score) => null;
+
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_question_circle };
 
         public abstract string Description { get; }

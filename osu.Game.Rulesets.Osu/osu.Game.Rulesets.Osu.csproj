@@ -89,6 +89,7 @@
     <Compile Include="UI\Cursor\CursorTrail.cs" />
     <Compile Include="UI\Cursor\GameplayCursor.cs" />
     <Compile Include="UI\OsuSettings.cs" />
+    <Compile Include="Scoring\OsuPerformanceCalculator.cs" />
     <Compile Include="Scoring\OsuScoreProcessor.cs" />
     <Compile Include="UI\OsuRulesetContainer.cs" />
     <Compile Include="UI\OsuPlayfield.cs" />

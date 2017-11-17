@@ -14,9 +14,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Music;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Tests.Visual
 {
@@ -24,30 +27,51 @@ namespace osu.Game.Tests.Visual
     {
         public TestCasePerformancePoints(Ruleset ruleset)
         {
-            Children = new Drawable[]
+            Child = new FillFlowContainer
             {
-                new Container
+                RelativeSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 300,
-                    Children = new Drawable[]
+                    new Container
                     {
-                        new Box
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 0.25f,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                            Alpha = 0.5f,
-                        },
-                        new ScrollContainer(Direction.Vertical)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = new BeatmapList(ruleset)
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.Black,
+                                Alpha = 0.5f,
+                            },
+                            new ScrollContainer(Direction.Vertical)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = new BeatmapList(ruleset)
+                            }
                         }
-                    }
-                },
-                new PpDisplay(ruleset)
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 0.75f,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.Black,
+                                Alpha = 0.5f,
+                            },
+                            new ScrollContainer(Direction.Vertical)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = new ScoreList { RelativeSizeAxes = Axes.Both }
+                            }
+                        }
+                    },
+                }
             };
         }
 
@@ -144,70 +168,84 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        private class PpDisplay : CompositeDrawable
+        private class ScoreList : CompositeDrawable
         {
-            private readonly Container<OsuSpriteText> strainsContainer;
-            private readonly OsuSpriteText totalPp;
+            private readonly FillFlowContainer<ScoreDisplay> scores;
+            private APIAccess api;
 
-            private readonly Ruleset ruleset;
-
-            public PpDisplay(Ruleset ruleset)
+            public ScoreList()
             {
-                this.ruleset = ruleset;
-
-                RelativeSizeAxes = Axes.Y;
-                Width = 400;
-
-                InternalChildren = new Drawable[]
+                InternalChild = scores = new FillFlowContainer<ScoreDisplay>
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                        Alpha = 0.2f
-                    },
-                    totalPp = new OsuSpriteText { TextSize = 18 },
-                    new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Y = 26,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Black,
-                                Alpha = 0.2f,
-                            },
-                            strainsContainer = new FillFlowContainer<OsuSpriteText>
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Vertical,
-                                Spacing = new Vector2(0, 5)
-                            }
-                        }
-                    }
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 4)
                 };
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuGameBase osuGame)
+            private void load(OsuGameBase osuGame, APIAccess api)
             {
+                this.api = api;
                 osuGame.Beatmap.ValueChanged += beatmapChanged;
             }
 
-            private void beatmapChanged(WorkingBeatmap beatmap)
+            private GetScoresRequest lastRequest;
+            private void beatmapChanged(WorkingBeatmap newBeatmap)
             {
-                var diffCalculator = ruleset.CreateDifficultyCalculator(beatmap.Beatmap);
+                lastRequest?.Cancel();
+                scores.Clear();
 
-                var strains = new Dictionary<string, string>();
-                double pp = diffCalculator.Calculate(strains);
+                lastRequest = new GetScoresRequest(newBeatmap.BeatmapInfo);
+                lastRequest.Success += res => res.Scores.ForEach(s => scores.Add(new ScoreDisplay(s, newBeatmap.Beatmap)));
+                api.Queue(lastRequest);
+            }
 
-                totalPp.Text = $"Total PP: {pp.ToString("n2")}";
+            private class ScoreDisplay : CompositeDrawable
+            {
+                private readonly OsuSpriteText playerName;
+                private readonly GridContainer attributeGrid;
 
-                strainsContainer.Clear();
-                foreach (var kvp in strains)
-                    strainsContainer.Add(new OsuSpriteText { Text = $"{kvp.Key} : {kvp.Value}" });
+                private readonly Score score;
+                private readonly Beatmap beatmap;
+
+                public ScoreDisplay(Score score, Beatmap beatmap)
+                {
+                    this.score = score;
+                    this.beatmap = beatmap;
+
+                    RelativeSizeAxes = Axes.X;
+                    Height = 16;
+                    InternalChild = new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Content = new[]
+                        {
+                            new Drawable[] { playerName = new OsuSpriteText() },
+                            new Drawable[] { attributeGrid = new GridContainer { RelativeSizeAxes = Axes.Both } }
+                        },
+                        RowDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.Relative, 0.75f),
+                            new Dimension(GridSizeMode.Relative, 0.25f)
+                        }
+                    };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    var ruleset = beatmap.BeatmapInfo.Ruleset.CreateInstance();
+                    var calculator = ruleset.CreatePerformanceCalculator(beatmap, score);
+                    if (calculator == null)
+                        return;
+
+                    var attributes = new Dictionary<string, string>();
+                    double performance = calculator.Calculate(attributes);
+
+                    playerName.Text = $"{score.PP} | {performance.ToString("0.00")} | {score.PP / performance}";
+                    // var attributeRow =
+                }
             }
         }
     }

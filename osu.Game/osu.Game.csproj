@@ -620,6 +620,7 @@
     <Compile Include="Rulesets\Ruleset.cs" />
     <Compile Include="Rulesets\RulesetInfo.cs" />
     <Compile Include="Rulesets\RulesetStore.cs" />
+    <Compile Include="Rulesets\Scoring\PerformanceCalculator.cs" />
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
     <Compile Include="Rulesets\Scoring\ScoreRank.cs" />
