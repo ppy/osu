@@ -10,7 +10,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModAutoplay<T> : ModAutoplay, IApplicableMod<T>
+    public abstract class ModAutoplay<T> : ModAutoplay, IApplicableToRulesetContainer<T>
         where T : HitObject
     {
         protected abstract Score CreateReplayScore(Beatmap<T> beatmap);
