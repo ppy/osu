@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Scoring
             Beatmap = CreateBeatmapConverter().Convert(beatmap);
             Score = score;
 
-            var diffCalc = ruleset.CreateDifficultyCalculator(beatmap);
+            var diffCalc = ruleset.CreateDifficultyCalculator(beatmap, score.Mods);
             diffCalc.Calculate(attributes);
         }
 
