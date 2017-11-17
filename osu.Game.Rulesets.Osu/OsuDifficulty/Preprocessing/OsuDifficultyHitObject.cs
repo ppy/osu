@@ -64,15 +64,17 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
             }
 
             Vector2 lastCursorPosition = t[1].StackedPosition;
+            float lastTravelDistance = 0;
 
             var lastSlider = t[1] as Slider;
             if (lastSlider != null)
             {
                 computeSliderCursorPosition(lastSlider);
-                lastCursorPosition = lastSlider.CursorPosition ?? lastCursorPosition;
+                lastCursorPosition = lastSlider.LazyEndPosition ?? lastCursorPosition;
+                lastTravelDistance = lastSlider.LazyTravelDistance;
             }
 
-            Distance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
+            Distance = (lastTravelDistance + (BaseObject.StackedPosition - lastCursorPosition).Length) * scalingFactor;
         }
 
         private void setTimingValues()
@@ -84,14 +86,14 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 
         private void computeSliderCursorPosition(Slider slider)
         {
-            if (slider.CursorPosition != null)
+            if (slider.LazyEndPosition != null)
                 return;
-            slider.CursorPosition = slider.StackedPosition;
+            slider.LazyEndPosition = slider.StackedPosition;
 
             float approxFollowCircleRadius = (float)(slider.Radius * 3);
             var computeVertex = new Action<double>(t =>
             {
-                var diff = slider.PositionAt(t) - slider.CursorPosition.Value;
+                var diff = slider.PositionAt(t) - slider.LazyEndPosition.Value;
                 float dist = diff.Length;
 
                 if (dist > approxFollowCircleRadius)
@@ -99,7 +101,8 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
                     // The cursor would be outside the follow circle, we need to move it
                     diff.Normalize(); // Obtain direction of diff
                     dist -= approxFollowCircleRadius;
-                    slider.CursorPosition += diff * dist;
+                    slider.LazyEndPosition += diff * dist;
+                    slider.LazyTravelDistance += dist;
                 }
             });
 
