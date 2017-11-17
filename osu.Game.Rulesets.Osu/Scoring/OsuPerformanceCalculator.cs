@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -32,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
 
-            beatmapMaxCombo = Beatmap.HitObjects.Count();
+            beatmapMaxCombo = Beatmap.HitObjects.Count;
             beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.RepeatCount + s.Ticks.Count());
         }
 
@@ -84,10 +83,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
             double aimValue = Math.Pow(5.0f * Math.Max(1.0f, double.Parse(Attributes["Aim"]) / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
-            double LengthBonus = 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
+            double lengthBonus = 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0f) * 0.5f : 0.0f);
 
-            aimValue *= LengthBonus;
+            aimValue *= lengthBonus;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             aimValue *= Math.Pow(0.97f, countMiss);
@@ -117,13 +116,13 @@ namespace osu.Game.Rulesets.Osu.Scoring
             if (mods.Any(h => h is OsuModFlashlight))
             {
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
-                aimValue *= 1.45f * LengthBonus;
+                aimValue *= 1.45f * lengthBonus;
             }
 
             // Scale the aim value with accuracy _slightly_
             aimValue *= 0.5f + accuracy / 2.0f;
             // It is important to also consider accuracy difficulty when doing that
-            aimValue *= 0.98f + (Math.Pow(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 2) / 2500);
+            aimValue *= 0.98f + Math.Pow(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 2) / 2500;
 
             return aimValue;
         }
@@ -146,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             // Scale the speed value with accuracy _slightly_
             speedValue *= 0.5f + accuracy / 2.0f;
             // It is important to also consider accuracy difficulty when doing that
-            speedValue *= 0.98f + (Math.Pow(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 2) / 2500);
+            speedValue *= 0.98f + Math.Pow(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 2) / 2500;
 
             return speedValue;
         }
@@ -154,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private double computeAccuracyValue()
         {
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window
-            double betterAccuracyPercentage = 0;
+            double betterAccuracyPercentage;
             int amountHitObjectsWithAccuracy = countHitCircles;
 
             if (amountHitObjectsWithAccuracy > 0)

@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Scoring
         protected readonly Beatmap<TObject> Beatmap;
         protected readonly Score Score;
 
-        public PerformanceCalculator(Ruleset ruleset, Beatmap beatmap, Score score)
+        protected PerformanceCalculator(Ruleset ruleset, Beatmap beatmap, Score score)
         {
             Beatmap = CreateBeatmapConverter().Convert(beatmap);
             Score = score;

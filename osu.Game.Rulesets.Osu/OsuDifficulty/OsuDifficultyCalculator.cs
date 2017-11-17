@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
                 }
 
                 foreach (Skill s in skills)
-                    s.Process(h);
+                    s.Process(h, TimeRate);
             }
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
