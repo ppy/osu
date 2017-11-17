@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
                 (h as Slider)?.Curve?.Calculate();
         }
 
-        public override double Calculate(Dictionary<string, string> categoryDifficulty)
+        public override double Calculate(Dictionary<string, string> categoryDifficulty = null)
         {
             OsuDifficultyBeatmap beatmap = new OsuDifficultyBeatmap(Beatmap.HitObjects);
             Skill[] skills =

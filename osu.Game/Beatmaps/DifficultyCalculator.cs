@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps
         {
         }
 
-        protected DifficultyCalculator(Beatmap beatmap, Mod[] mods)
+        protected DifficultyCalculator(Beatmap beatmap, Mod[] mods = null)
         {
             Beatmap = CreateBeatmapConverter().Convert(beatmap);
             Mods = mods ?? new Mod[0];
