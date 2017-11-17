@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps
             foreach (var h in Objects)
                 h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
 
-            ApplyMods(mods);
+            ApplyMods(Mods);
 
             PreprocessHitObjects();
         }
