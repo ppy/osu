@@ -117,7 +117,9 @@ namespace osu.Game.Screens.Edit
                 },
             };
 
+            timeInfo.Beatmap.BindTo(Beatmap);
             timeline.Beatmap.BindTo(Beatmap);
+            playback.Beatmap.BindTo(Beatmap);
             menuBar.Mode.ValueChanged += onModeChanged;
         }
 
