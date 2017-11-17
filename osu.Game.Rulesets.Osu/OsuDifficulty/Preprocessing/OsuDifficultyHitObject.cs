@@ -68,31 +68,8 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
             var lastSlider = t[1] as Slider;
             if (lastSlider != null)
             {
-                if (lastSlider.CursorPosition == null)
-                {
-                    float approxFollowCircleRadius = (float)(lastSlider.Radius * scalingFactor * 3);
-
-                    var computeVertex = new Action<double>(t =>
-                    {
-                        var diff = lastSlider.PositionAt(t) - lastCursorPosition;
-                        float dist = diff.Length;
-
-                        if (dist > approxFollowCircleRadius)
-                        {
-                            // The cursor would be outside the follow circle, we need to move it
-                            diff.Normalize(); // Obtain direction of diff
-                            dist -= approxFollowCircleRadius;
-                            lastCursorPosition += diff * dist;
-                        }
-                    });
-
-                    var scoringTimes = lastSlider.Ticks.Select(t => t.StartTime).Concat(lastSlider.RepeatPoints.Select(r => r.StartTime)).OrderBy(t => t);
-                    foreach (var time in scoringTimes)
-                        computeVertex(time);
-                    computeVertex(lastSlider.EndTime);
-
-                    lastSlider.CursorPosition = lastCursorPosition;
-                }
+                computeSliderCursorPosition(lastSlider);
+                lastCursorPosition = lastSlider.CursorPosition ?? lastCursorPosition;
             }
 
             Distance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
@@ -103,6 +80,33 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
             // Every timing inverval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure.
             DeltaTime = Math.Max(40, (t[0].StartTime - t[1].StartTime) / timeRate);
             TimeUntilHit = 450; // BaseObject.PreEmpt;
+        }
+
+        private void computeSliderCursorPosition(Slider slider)
+        {
+            if (slider.CursorPosition != null)
+                return;
+            slider.CursorPosition = slider.StackedPosition;
+
+            float approxFollowCircleRadius = (float)(slider.Radius * 3);
+            var computeVertex = new Action<double>(t =>
+            {
+                var diff = slider.PositionAt(t) - slider.CursorPosition.Value;
+                float dist = diff.Length;
+
+                if (dist > approxFollowCircleRadius)
+                {
+                    // The cursor would be outside the follow circle, we need to move it
+                    diff.Normalize(); // Obtain direction of diff
+                    dist -= approxFollowCircleRadius;
+                    slider.CursorPosition += diff * dist;
+                }
+            });
+
+            var scoringTimes = slider.Ticks.Select(t => t.StartTime).Concat(slider.RepeatPoints.Select(r => r.StartTime)).OrderBy(t => t);
+            foreach (var time in scoringTimes)
+                computeVertex(time);
+            computeVertex(slider.EndTime);
         }
     }
 }
