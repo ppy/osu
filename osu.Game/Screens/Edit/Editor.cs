@@ -92,9 +92,9 @@ namespace osu.Game.Screens.Edit
                                 RelativeSizeAxes = Axes.Both,
                                 ColumnDimensions = new Dimension[]
                                 {
-                                    new Dimension(GridSizeMode.Auto),
+                                    new Dimension(),
                                     new Dimension(GridSizeMode.Relative, 0.67f),
-                                    new Dimension(GridSizeMode.Auto),
+                                    new Dimension(),
                                 },
                                 Content = new Drawable[][]
                                 {
