@@ -20,12 +20,12 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         /// Creates an enumerator, which preprocesses a list of <see cref="OsuHitObject"/>s recieved as input, wrapping them as
         /// <see cref="OsuDifficultyHitObject"/> which contains extra data required for difficulty calculation.
         /// </summary>
-        public OsuDifficultyBeatmap(List<OsuHitObject> objects)
+        public OsuDifficultyBeatmap(List<OsuHitObject> objects, double timeRate)
         {
             // Sort OsuHitObjects by StartTime - they are not correctly ordered in some cases.
             // This should probably happen before the objects reach the difficulty calculator.
             objects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
-            difficultyObjects = createDifficultyObjectEnumerator(objects);
+            difficultyObjects = createDifficultyObjectEnumerator(objects, timeRate);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        private IEnumerator<OsuDifficultyHitObject> createDifficultyObjectEnumerator(List<OsuHitObject> objects)
+        private IEnumerator<OsuDifficultyHitObject> createDifficultyObjectEnumerator(List<OsuHitObject> objects, double timeRate)
         {
             // We will process OsuHitObjects in groups of three to form a triangle, so we can calculate an angle for each object.
             OsuHitObject[] triangle = new OsuHitObject[3];
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
                 triangle[1] = triangle[0];
                 triangle[0] = objects[i];
 
-                yield return new OsuDifficultyHitObject(triangle);
+                yield return new OsuDifficultyHitObject(triangle, timeRate);
             }
         }
     }

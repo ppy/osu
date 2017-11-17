@@ -183,7 +183,8 @@ namespace osu.Game.Tests.Visual
                     this.osuGame = osuGame;
                     this.beatmaps = beatmaps;
 
-                    text.Text = $"{beatmap.Metadata.Artist} - {beatmap.Metadata.Title} ({beatmap.Metadata.AuthorString}) [{beatmap.Version}]";
+                    var working = beatmaps.GetWorkingBeatmap(beatmap);
+                    text.Text = $"{working.Metadata.Artist} - {working.Metadata.Title} ({working.Metadata.AuthorString}) [{working.BeatmapInfo.Version}]";
 
                     osuGame.Beatmap.ValueChanged += beatmapChanged;
                 }

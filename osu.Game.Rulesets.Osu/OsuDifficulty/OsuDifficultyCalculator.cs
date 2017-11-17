@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
 
         public override double Calculate(Dictionary<string, string> categoryDifficulty = null)
         {
-            OsuDifficultyBeatmap beatmap = new OsuDifficultyBeatmap(Beatmap.HitObjects);
+            OsuDifficultyBeatmap beatmap = new OsuDifficultyBeatmap(Beatmap.HitObjects, TimeRate);
             Skill[] skills =
             {
                 new Aim(),
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
                 }
 
                 foreach (Skill s in skills)
-                    s.Process(h, TimeRate);
+                    s.Process(h);
             }
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
