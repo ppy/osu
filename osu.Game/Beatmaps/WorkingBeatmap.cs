@@ -80,10 +80,10 @@ namespace osu.Game.Beatmaps
 
         public void TransferTo(WorkingBeatmap other)
         {
-            if (track.IsValueCreated && track.Value != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
+            if (track.IsValueCreated && Track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
                 other.track = track;
 
-            if (background.IsValueCreated && background.Value != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
+            if (background.IsValueCreated && Background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
                 other.background = background;
         }
 
@@ -95,15 +95,12 @@ namespace osu.Game.Beatmaps
 
         public void DisposeTrack()
         {
-            if (!track.IsValueCreated) return;
-
-            track.Value?.Dispose();
-            track = null;
+            if (TrackLoaded) Track.Dispose();
         }
 
         private void applyRateAdjustments(Track t = null)
         {
-            if (t == null && track.IsValueCreated) t = track.Value;
+            if (t == null && track.IsValueCreated) t = Track;
             if (t == null) return;
 
             t.ResetSpeedAdjustments();
