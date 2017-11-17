@@ -19,10 +19,8 @@ namespace osu.Game.Beatmaps
 
     public abstract class DifficultyCalculator<T> : DifficultyCalculator where T : HitObject
     {
-        protected readonly Beatmap Beatmap;
+        protected readonly Beatmap<T> Beatmap;
         protected readonly Mod[] Mods;
-
-        protected List<T> Objects;
 
         protected DifficultyCalculator(Beatmap beatmap)
             : this(beatmap, null)
@@ -31,13 +29,9 @@ namespace osu.Game.Beatmaps
 
         protected DifficultyCalculator(Beatmap beatmap, Mod[] mods)
         {
-            Beatmap = beatmap;
+            Beatmap = CreateBeatmapConverter().Convert(beatmap);
             Mods = mods ?? new Mod[0];
 
-            Objects = CreateBeatmapConverter().Convert(beatmap).HitObjects;
-
-            foreach (var h in Objects)
-                h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
 
             ApplyMods(Mods);
 
@@ -50,9 +44,15 @@ namespace osu.Game.Beatmaps
             mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
             TimeRate = clock.Rate;
 
+            foreach (var mod in Mods.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(Beatmap.BeatmapInfo.BaseDifficulty);
+
             foreach (var mod in mods.OfType<IApplicableToHitObject<T>>())
-                foreach (var obj in Objects)
+                foreach (var obj in Beatmap.HitObjects)
                     mod.ApplyToHitObject(obj);
+
+            foreach (var h in Beatmap.HitObjects)
+                h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
         }
 
         protected virtual void PreprocessHitObjects()
