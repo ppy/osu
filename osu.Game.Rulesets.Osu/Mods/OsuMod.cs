@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
