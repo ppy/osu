@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko
             // Fill our custom DifficultyHitObject class, that carries additional information
             difficultyHitObjects.Clear();
 
-            foreach (var hitObject in Objects)
+            foreach (var hitObject in Beatmap.HitObjects)
                 difficultyHitObjects.Add(new TaikoHitObjectDifficulty(hitObject));
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
