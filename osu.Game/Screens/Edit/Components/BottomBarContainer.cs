@@ -2,9 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Components
@@ -13,6 +15,8 @@ namespace osu.Game.Screens.Edit.Components
     {
         private const float corner_radius = 5;
         private const float contents_padding = 15;
+
+        public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private readonly Drawable background;
         private readonly Container content;

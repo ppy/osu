@@ -3,11 +3,9 @@
 
 using OpenTK;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 
@@ -18,8 +16,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
     /// </summary>
     public class SummaryTimeline : BottomBarContainer
     {
-        public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
-
         private readonly Drawable timelineBar;
 
         public SummaryTimeline()
