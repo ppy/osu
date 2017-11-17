@@ -16,6 +16,6 @@ namespace osu.Game.Rulesets.Catch
 
         public override double Calculate(Dictionary<string, string> categoryDifficulty = null) => 0;
 
-        protected override BeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
+        protected override BeatmapConverter<CatchBaseHit> CreateBeatmapConverter(Beatmap beatmap) => new CatchBeatmapConverter();
     }
 }

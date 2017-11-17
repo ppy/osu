@@ -74,6 +74,6 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
             return starRating;
         }
 
-        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
+        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter(Beatmap beatmap) => new OsuBeatmapConverter();
     }
 }
