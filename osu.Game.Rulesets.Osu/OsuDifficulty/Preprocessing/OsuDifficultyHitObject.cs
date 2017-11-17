@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
+using OpenTK;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
@@ -61,7 +63,39 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
-            Distance = (t[0].StackedPosition - t[1].StackedPosition).Length * scalingFactor;
+            Vector2 lastCursorPosition = t[1].StackedPosition;
+
+            var lastSlider = t[1] as Slider;
+            if (lastSlider != null)
+            {
+                if (lastSlider.CursorPosition == null)
+                {
+                    float approxFollowCircleRadius = (float)(lastSlider.Radius * scalingFactor * 3);
+
+                    var computeVertex = new Action<double>(t =>
+                    {
+                        var diff = lastSlider.PositionAt(t) - lastCursorPosition;
+                        float dist = diff.Length;
+
+                        if (dist > approxFollowCircleRadius)
+                        {
+                            // The cursor would be outside the follow circle, we need to move it
+                            diff.Normalize(); // Obtain direction of diff
+                            dist -= approxFollowCircleRadius;
+                            lastCursorPosition += diff * dist;
+                        }
+                    });
+
+                    var scoringTimes = lastSlider.Ticks.Select(t => t.StartTime).Concat(lastSlider.RepeatPoints.Select(r => r.StartTime)).OrderBy(t => t);
+                    foreach (var time in scoringTimes)
+                        computeVertex(time);
+                    computeVertex(lastSlider.EndTime);
+
+                    lastSlider.CursorPosition = lastCursorPosition;
+                }
+            }
+
+            Distance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
         }
 
         private void setTimingValues()
