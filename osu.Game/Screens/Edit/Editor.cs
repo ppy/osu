@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Design;
+using osu.Game.Screens.Edit.Components;
 
 namespace osu.Game.Screens.Edit
 {
@@ -34,7 +35,9 @@ namespace osu.Game.Screens.Edit
         public Editor()
         {
             EditorMenuBar menuBar;
+            TimeInfoContainer timeInfo;
             SummaryTimeline timeline;
+            PlaybackContainer playback;
 
             Children = new[]
             {
@@ -84,23 +87,30 @@ namespace osu.Game.Screens.Edit
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 10 },
-                            Child = new FillFlowContainer
+                            Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
+                            Children = new Drawable[]
                             {
-                                Name = "Bottom bar",
-                                RelativeSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(10, 0),
-                                Children = new[]
+                                timeInfo = new TimeInfoContainer
                                 {
-                                    timeline = new SummaryTimeline
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        RelativeSizeAxes = Axes.Both,
-                                        Width = 0.65f
-                                    }
-                                }
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.17f
+                                },
+                                timeline = new SummaryTimeline
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.65f
+                                },
+                                playback = new PlaybackContainer
+                                {
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.17f
+                                },
                             }
                         }
                     }
