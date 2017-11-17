@@ -89,13 +89,13 @@ namespace osu.Game.Beatmaps
 
         public virtual void Dispose()
         {
-            if (BackgroundLoaded) Background.Dispose();
-            if (WaveformLoaded) Waveform.Dispose();
+            if (BackgroundLoaded) Background?.Dispose();
+            if (WaveformLoaded) Waveform?.Dispose();
         }
 
         public void DisposeTrack()
         {
-            if (TrackLoaded) Track.Dispose();
+            if (TrackLoaded) Track?.Dispose();
         }
 
         private void applyRateAdjustments(Track t = null)
