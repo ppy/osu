@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TestCasePerformancePoints : osu.Game.Tests.Visual.TestCasePerformancePoints
+    public class TestCasePerformancePoints : Game.Tests.Visual.TestCasePerformancePoints
     {
         public TestCasePerformancePoints()
             : base(new TaikoRuleset(new RulesetInfo()))

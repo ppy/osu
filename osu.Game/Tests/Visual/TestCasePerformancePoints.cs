@@ -12,15 +12,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays;
-using osu.Game.Overlays.Music;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -29,7 +26,7 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class TestCasePerformancePoints : OsuTestCase
     {
-        public TestCasePerformancePoints(Ruleset ruleset)
+        protected TestCasePerformancePoints(Ruleset ruleset)
         {
             Child = new GridContainer
             {
@@ -49,7 +46,7 @@ namespace osu.Game.Tests.Visual
                                     Colour = Color4.Black,
                                     Alpha = 0.5f,
                                 },
-                                new ScrollContainer(Direction.Vertical)
+                                new ScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Child = new BeatmapList(ruleset)
@@ -68,7 +65,7 @@ namespace osu.Game.Tests.Visual
                                     Colour = Color4.Black,
                                     Alpha = 0.5f,
                                 },
-                                new ScrollContainer(Direction.Vertical)
+                                new ScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Child = new StarRatingGrid()
@@ -87,7 +84,7 @@ namespace osu.Game.Tests.Visual
                                     Colour = Color4.Black,
                                     Alpha = 0.5f,
                                 },
-                                new ScrollContainer(Direction.Vertical)
+                                new ScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Child = new PerformanceList()
@@ -127,7 +124,7 @@ namespace osu.Game.Tests.Visual
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuGameBase osuGame, BeatmapManager beatmaps)
+            private void load(BeatmapManager beatmaps)
             {
                 var sets = beatmaps.GetAllUsableBeatmapSets();
                 var allBeatmaps = sets.SelectMany(s => s.Beatmaps).Where(b => ruleset.LegacyID < 0 || b.RulesetID == ruleset.LegacyID);
@@ -186,7 +183,6 @@ namespace osu.Game.Tests.Visual
                     this.osuGame = osuGame;
                     this.beatmaps = beatmaps;
 
-                    var working = beatmaps.GetWorkingBeatmap(beatmap);
                     text.Text = $"{beatmap.Metadata.Artist} - {beatmap.Metadata.Title} ({beatmap.Metadata.AuthorString}) [{beatmap.Version}]";
 
                     osuGame.Beatmap.ValueChanged += beatmapChanged;
@@ -372,7 +368,7 @@ namespace osu.Game.Tests.Visual
 
                         totalText.Text = $"Star rating: {totalSr:n2}";
                         foreach (var kvp in categories)
-                            categoryTexts.Add(new OsuSpriteText { Text = $"{kvp.Key}: {kvp.Value:n2}" });
+                            categoryTexts.Add(new OsuSpriteText { Text = $"{kvp.Key}: {kvp.Value}" });
                     }
 
                     informationCache.Validate();

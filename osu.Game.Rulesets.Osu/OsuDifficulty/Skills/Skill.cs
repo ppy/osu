@@ -38,9 +38,9 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
         /// <summary>
         /// Process an <see cref="OsuDifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        public void Process(OsuDifficultyHitObject current)
+        public void Process(OsuDifficultyHitObject current, double timeRate)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
+            currentStrain *= strainDecay(current.DeltaTime / timeRate);
             if (!(current.BaseObject is Spinner))
                 currentStrain += StrainValueOf(current) * SkillMultiplier;
 
