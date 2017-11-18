@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(0f, 5f),
                         Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                        ChildrenEnumerable = scores.Select(s => new LeaderboardScore(s, 1 + i) { Action = () => ScoreSelected?.Invoke(s) })
+                        ChildrenEnumerable = scores.Select((s, index) => new LeaderboardScore(s, index + 1) { Action = () => ScoreSelected?.Invoke(s) })
                     }, f =>
                     {
                         scrollFlow?.Expire();
