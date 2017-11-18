@@ -315,6 +315,7 @@ namespace osu.Game.Screens.Menu
 
                     switch (lastState)
                     {
+                        case MenuState.TopLevel: // coming from toplevel to play
                         case MenuState.Initial:
                             logoTracking = false;
                             logo.ScaleTo(0.5f, 200, Easing.In);
