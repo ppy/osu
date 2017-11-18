@@ -17,26 +17,24 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
     public class KudosuInfo : Container
     {
-        private const int content_text_size = 19;
-
-        protected readonly Bindable<User> User = new Bindable<User>();
+        private readonly Bindable<User> user = new Bindable<User>();
 
         public KudosuInfo(Bindable<User> user)
         {
-            User.BindTo(user);
+            this.user.BindTo(user);
 
             SubSection total;
             SubSection avaliable;
 
             RelativeSizeAxes = Axes.X;
-            Height = 130;
+            AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 3;
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(0f, 1f),
-                Radius = 2.5f,
+                Radius = 3f,
                 Colour = Color4.Black.Opacity(0.2f),
             };
             Children = new Drawable[]
@@ -46,18 +44,12 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
-                new GridContainer
+                total = new SubSection("Total Kudosu Earned"),
+                avaliable = new SubSection("Kudosu Avaliable")
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            total = new SubSection("Total Kudosu Earned"),
-                            avaliable = new SubSection("Kudosu Avaliable"),
-                        }
-                    }
-                }
+                    RelativePositionAxes = Axes.X,
+                    X = 0.5f,
+                },
             };
 
             total.TextFlow.Text = "Based on how much of a contribution the user has made to " +
@@ -66,7 +58,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             avaliable.TextFlow.Text = "Kudosu can be traded for kudosu stars, which will help your beatmap get " +
                 "more attention. This is the number of kudosu you haven't traded in yet.";
             
-            User.ValueChanged += newUser =>
+            this.user.ValueChanged += newUser =>
             {
                 total.KudosuValue = newUser == null ? 0 : newUser.Kudosu.Total;
                 avaliable.KudosuValue = newUser == null ? 0 : newUser.Kudosu.Available;
@@ -97,8 +89,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
             public SubSection(string header)
             {
-                RelativeSizeAxes = Axes.Both;
-                Padding = new MarginPadding { Horizontal = 10, Top = 10 };
+                RelativeSizeAxes = Axes.X;
+                Width = 0.5f;
+                AutoSizeAxes = Axes.Y;
+                Padding = new MarginPadding { Horizontal = 10, Top = 10, Bottom = 20 };
                 Child = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
