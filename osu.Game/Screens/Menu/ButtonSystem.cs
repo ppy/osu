@@ -227,22 +227,8 @@ namespace osu.Game.Screens.Menu
                     {
                         case MenuState.Exit:
                         case MenuState.Initial:
-                            trackingPosition = false;
-
                             buttonAreaBackground.ScaleTo(Vector2.One, 500, Easing.Out);
                             buttonArea.FadeOut(300);
-
-                            logo?.Delay(150)
-                                .Schedule(() =>
-                                {
-                                    toolbar?.Hide();
-
-                                    logo.ClearTransforms(targetMember: nameof(Position));
-                                    logo.RelativePositionAxes = Axes.Both;
-
-                                    logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                                    logo.ScaleTo(1, 800, Easing.OutExpo);
-                                });
 
                             foreach (Button b in buttonsTopLevel)
                                 b.State = ButtonState.Contracted;
@@ -255,33 +241,6 @@ namespace osu.Game.Screens.Menu
                             break;
                         case MenuState.TopLevel:
                             buttonAreaBackground.ScaleTo(Vector2.One, 200, Easing.Out);
-
-                            logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.RelativePositionAxes = Axes.None;
-
-                            trackingPosition = true;
-
-                            switch (lastState)
-                            {
-                                case MenuState.Initial:
-                                    logo.ScaleTo(0.5f, 200, Easing.In);
-
-                                    trackingPosition = false;
-
-                                    logo
-                                        .MoveTo(iconTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In)
-                                        .OnComplete(o =>
-                                        {
-                                            trackingPosition = true;
-
-                                            o.Impact();
-                                            toolbar?.Show();
-                                        });
-                                    break;
-                                default:
-                                    logo.ScaleTo(0.5f, 200, Easing.OutQuint);
-                                    break;
-                            }
 
                             buttonArea.FadeIn(300);
 
@@ -300,8 +259,6 @@ namespace osu.Game.Screens.Menu
                             break;
                         case MenuState.EnteringMode:
                             buttonAreaBackground.ScaleTo(new Vector2(2, 0), 300, Easing.InSine);
-
-                            trackingPosition = true;
 
                             buttonsTopLevel.ForEach(b => b.ContractStyle = 1);
                             buttonsPlay.ForEach(b => b.ContractStyle = 1);
