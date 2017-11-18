@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,6 +18,7 @@ namespace osu.Game.Screens.Edit.Components
         private const float contents_padding = 15;
 
         public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        protected Track Track => Beatmap.Value.Track;
 
         private readonly Drawable background;
         private readonly Container content;

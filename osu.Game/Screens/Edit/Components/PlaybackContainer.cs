@@ -19,7 +19,6 @@ namespace osu.Game.Screens.Edit.Components
         private readonly IconButton playButton;
 
         private bool lastTrackState;
-        private Track track => Beatmap.Value.Track;
 
         public PlaybackContainer()
         {
@@ -60,22 +59,22 @@ namespace osu.Game.Screens.Edit.Components
             tabs.AddItem(0.75);
             tabs.AddItem(1);
 
-            tabs.Current.ValueChanged += newValue => track.Tempo.Value = newValue;
+            tabs.Current.ValueChanged += newValue => Track.Tempo.Value = newValue;
         }
 
         private void play()
         {
-            if (track.IsRunning)
-                track.Stop();
+            if (Track.IsRunning)
+                Track.Stop();
             else
-                track.Start();
+                Track.Start();
         }
 
         protected override void Update()
         {
             base.Update();
 
-            var currentTrackState = track.IsRunning;
+            var currentTrackState = Track.IsRunning;
             if (currentTrackState == lastTrackState)
                 return;
 
