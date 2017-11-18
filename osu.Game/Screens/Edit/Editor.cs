@@ -90,13 +90,13 @@ namespace osu.Game.Screens.Edit
                             Child = new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new Dimension[]
+                                ColumnDimensions = new[]
                                 {
                                     new Dimension(),
                                     new Dimension(GridSizeMode.Relative, 0.67f),
                                     new Dimension(),
                                 },
-                                Content = new Drawable[][]
+                                Content = new[]
                                 {
                                     new Drawable[]
                                     {
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding { Right = 10 },
                                             Child = timeInfo = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
-                                        },                                        
+                                        },
                                         timeline = new SummaryTimeline
                                         {
                                             RelativeSizeAxes = Axes.Both,
