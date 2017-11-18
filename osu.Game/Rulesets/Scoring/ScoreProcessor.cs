@@ -66,6 +66,8 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual bool HasCompleted => false;
 
+        public int strictFail = 0;
+
         /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
         /// </summary>
@@ -75,6 +77,16 @@ namespace osu.Game.Rulesets.Scoring
         /// The conditions for failing.
         /// </summary>
         protected virtual bool FailCondition => Health.Value == Health.MinValue;
+
+        /// <summary>
+        /// The conditions for failing if the Sudden Death mod is enabled.
+        /// </summary>
+        protected virtual bool SuddenDeathFailCondition => Combo.Value != HighestCombo.Value;
+
+        /// <summary>
+        /// The conditions for failing if the Perfect mod is enabled.
+        /// </summary>
+        protected virtual bool PerfectFailCondition => Accuracy.Value != 1;
 
         protected ScoreProcessor()
         {
@@ -121,11 +133,16 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected void UpdateFailed()
         {
-            if (HasFailed || !FailCondition)
+            if (HasFailed)
                 return;
 
-            if (Failed?.Invoke() != false)
-                HasFailed = true;
+            if(FailCondition ||
+                (strictFail==1 && SuddenDeathFailCondition) ||
+                (strictFail==2 && PerfectFailCondition))
+            {
+                if (Failed?.Invoke() != false)
+                    HasFailed = true;
+            }
         }
 
         /// <summary>
