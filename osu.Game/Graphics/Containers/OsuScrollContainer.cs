@@ -7,7 +7,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-    internal class OsuScrollContainer : ScrollContainer
+    public class OsuScrollContainer : ScrollContainer
     {
         /// <summary>
         /// Allows controlling the scroll bar from any position in the container using the right mouse button.
