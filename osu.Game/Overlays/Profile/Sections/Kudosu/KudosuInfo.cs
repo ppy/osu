@@ -57,11 +57,11 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
             avaliable.TextFlow.Text = "Kudosu can be traded for kudosu stars, which will help your beatmap get " +
                 "more attention. This is the number of kudosu you haven't traded in yet.";
-            
+
             this.user.ValueChanged += newUser =>
             {
-                total.KudosuValue = newUser == null ? 0 : newUser.Kudosu.Total;
-                avaliable.KudosuValue = newUser == null ? 0 : newUser.Kudosu.Available;
+                total.KudosuValue = newUser?.Kudosu.Total ?? 0;
+                avaliable.KudosuValue = newUser?.Kudosu.Available ?? 0;
             };
         }
 
