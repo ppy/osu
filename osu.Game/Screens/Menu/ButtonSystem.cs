@@ -17,6 +17,7 @@ using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Menu
 {
@@ -281,25 +282,30 @@ namespace osu.Game.Screens.Menu
             }
         }
 
+        private ScheduledDelegate logoDelayedAction;
+
         private void updateLogoState(MenuState lastState = MenuState.Initial)
         {
+            if (logo == null) return;
+
+            logoDelayedAction?.Cancel();
+
             switch (state)
             {
                 case MenuState.Exit:
                 case MenuState.Initial:
                     logoTracking = false;
 
-                    logo?.Delay(150)
-                        .Schedule(() =>
-                        {
-                            toolbar?.Hide();
+                    logoDelayedAction = Scheduler.AddDelayed(() =>
+                    {
+                        toolbar?.Hide();
 
-                            logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.RelativePositionAxes = Axes.Both;
+                        logo.ClearTransforms(targetMember: nameof(Position));
+                        logo.RelativePositionAxes = Axes.Both;
 
-                            logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                            logo.ScaleTo(1, 800, Easing.OutExpo);
-                        });
+                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                        logo.ScaleTo(1, 800, Easing.OutExpo);
+                    }, 150);
 
                     break;
                 case MenuState.TopLevel:
@@ -307,26 +313,24 @@ namespace osu.Game.Screens.Menu
                     logo.ClearTransforms(targetMember: nameof(Position));
                     logo.RelativePositionAxes = Axes.None;
 
-                    logoTracking = true;
-
                     switch (lastState)
                     {
                         case MenuState.Initial:
+                            logoTracking = false;
                             logo.ScaleTo(0.5f, 200, Easing.In);
 
-                            logoTracking = false;
+                            logo.MoveTo(logoTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In);
 
-                            logo
-                                .MoveTo(logoTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In)
-                                .OnComplete(o =>
-                                {
-                                    logoTracking = true;
+                            logoDelayedAction = Scheduler.AddDelayed(() =>
+                            {
+                                logoTracking = true;
 
-                                    o.Impact();
-                                    toolbar?.Show();
-                                });
+                                logo.Impact();
+                                toolbar?.Show();
+                            }, 200);
                             break;
                         default:
+                            logoTracking = true;
                             logo.ScaleTo(0.5f, 200, Easing.OutQuint);
                             break;
                     }
