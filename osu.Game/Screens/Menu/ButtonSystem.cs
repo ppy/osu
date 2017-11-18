@@ -17,6 +17,7 @@ using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Menu
 {
@@ -55,6 +56,8 @@ namespace osu.Game.Screens.Menu
 
                 // osuLogo.SizeForFlow relies on loading to be complete.
                 buttonFlow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + this.logo.SizeForFlow / 4), 0);
+
+                updateLogoState();
             }
         }
 
@@ -217,28 +220,16 @@ namespace osu.Game.Screens.Menu
                 if (state == MenuState.TopLevel)
                     buttonArea.FinishTransforms(true);
 
+                updateLogoState(lastState);
+
                 using (buttonArea.BeginDelayedSequence(lastState == MenuState.Initial ? 150 : 0, true))
                 {
                     switch (state)
                     {
                         case MenuState.Exit:
                         case MenuState.Initial:
-                            trackingPosition = false;
-
                             buttonAreaBackground.ScaleTo(Vector2.One, 500, Easing.Out);
                             buttonArea.FadeOut(300);
-
-                            logo?.Delay(150)
-                                .Schedule(() =>
-                                {
-                                    toolbar?.Hide();
-
-                                    logo.ClearTransforms(targetMember: nameof(Position));
-                                    logo.RelativePositionAxes = Axes.Both;
-
-                                    logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                                    logo.ScaleTo(1, 800, Easing.OutExpo);
-                                });
 
                             foreach (Button b in buttonsTopLevel)
                                 b.State = ButtonState.Contracted;
@@ -251,33 +242,6 @@ namespace osu.Game.Screens.Menu
                             break;
                         case MenuState.TopLevel:
                             buttonAreaBackground.ScaleTo(Vector2.One, 200, Easing.Out);
-
-                            logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.RelativePositionAxes = Axes.None;
-
-                            trackingPosition = true;
-
-                            switch (lastState)
-                            {
-                                case MenuState.Initial:
-                                    logo.ScaleTo(0.5f, 200, Easing.In);
-
-                                    trackingPosition = false;
-
-                                    logo
-                                        .MoveTo(iconTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In)
-                                        .OnComplete(o =>
-                                        {
-                                            trackingPosition = true;
-
-                                            o.Impact();
-                                            toolbar?.Show();
-                                        });
-                                    break;
-                                default:
-                                    logo.ScaleTo(0.5f, 200, Easing.OutQuint);
-                                    break;
-                            }
 
                             buttonArea.FadeIn(300);
 
@@ -296,8 +260,6 @@ namespace osu.Game.Screens.Menu
                             break;
                         case MenuState.EnteringMode:
                             buttonAreaBackground.ScaleTo(new Vector2(2, 0), 300, Easing.InSine);
-
-                            trackingPosition = true;
 
                             buttonsTopLevel.ForEach(b => b.ContractStyle = 1);
                             buttonsPlay.ForEach(b => b.ContractStyle = 1);
@@ -320,9 +282,69 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private Vector2 iconTrackingPosition => logo.Parent.ToLocalSpace(iconFacade.ScreenSpaceDrawQuad.Centre);
+        private ScheduledDelegate logoDelayedAction;
 
-        private bool trackingPosition;
+        private void updateLogoState(MenuState lastState = MenuState.Initial)
+        {
+            if (logo == null) return;
+
+            logoDelayedAction?.Cancel();
+
+            switch (state)
+            {
+                case MenuState.Exit:
+                case MenuState.Initial:
+                    logoTracking = false;
+
+                    logoDelayedAction = Scheduler.AddDelayed(() =>
+                    {
+                        toolbar?.Hide();
+
+                        logo.ClearTransforms(targetMember: nameof(Position));
+                        logo.RelativePositionAxes = Axes.Both;
+
+                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                        logo.ScaleTo(1, 800, Easing.OutExpo);
+                    }, 150);
+
+                    break;
+                case MenuState.TopLevel:
+                case MenuState.Play:
+                    logo.ClearTransforms(targetMember: nameof(Position));
+                    logo.RelativePositionAxes = Axes.None;
+
+                    switch (lastState)
+                    {
+                        case MenuState.TopLevel: // coming from toplevel to play
+                        case MenuState.Initial:
+                            logoTracking = false;
+                            logo.ScaleTo(0.5f, 200, Easing.In);
+
+                            logo.MoveTo(logoTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In);
+
+                            logoDelayedAction = Scheduler.AddDelayed(() =>
+                            {
+                                logoTracking = true;
+
+                                logo.Impact();
+                                toolbar?.Show();
+                            }, 200);
+                            break;
+                        default:
+                            logoTracking = true;
+                            logo.ScaleTo(0.5f, 200, Easing.OutQuint);
+                            break;
+                    }
+                    break;
+                case MenuState.EnteringMode:
+                    logoTracking = true;
+                    break;
+            }
+        }
+
+        private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(iconFacade.ScreenSpaceDrawQuad.Centre);
+
+        private bool logoTracking;
 
         protected override void Update()
         {
@@ -333,8 +355,8 @@ namespace osu.Game.Screens.Menu
 
             if (logo != null)
             {
-                if (trackingPosition)
-                    logo.Position = iconTrackingPosition;
+                if (logoTracking)
+                    logo.Position = logoTrackingPosition;
 
                 iconFacade.Width = logo.SizeForFlow * 0.5f;
             }
