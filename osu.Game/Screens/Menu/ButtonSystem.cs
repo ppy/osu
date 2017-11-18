@@ -287,7 +287,7 @@ namespace osu.Game.Screens.Menu
             {
                 case MenuState.Exit:
                 case MenuState.Initial:
-                    trackingPosition = false;
+                    logoTracking = false;
 
                     logo?.Delay(150)
                         .Schedule(() =>
@@ -307,20 +307,20 @@ namespace osu.Game.Screens.Menu
                     logo.ClearTransforms(targetMember: nameof(Position));
                     logo.RelativePositionAxes = Axes.None;
 
-                    trackingPosition = true;
+                    logoTracking = true;
 
                     switch (lastState)
                     {
                         case MenuState.Initial:
                             logo.ScaleTo(0.5f, 200, Easing.In);
 
-                            trackingPosition = false;
+                            logoTracking = false;
 
                             logo
-                                .MoveTo(iconTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In)
+                                .MoveTo(logoTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In)
                                 .OnComplete(o =>
                                 {
-                                    trackingPosition = true;
+                                    logoTracking = true;
 
                                     o.Impact();
                                     toolbar?.Show();
@@ -332,14 +332,14 @@ namespace osu.Game.Screens.Menu
                     }
                     break;
                 case MenuState.EnteringMode:
-                    trackingPosition = true;
+                    logoTracking = true;
                     break;
             }
         }
 
-        private Vector2 iconTrackingPosition => logo.Parent.ToLocalSpace(iconFacade.ScreenSpaceDrawQuad.Centre);
+        private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(iconFacade.ScreenSpaceDrawQuad.Centre);
 
-        private bool trackingPosition;
+        private bool logoTracking;
 
         protected override void Update()
         {
@@ -350,8 +350,8 @@ namespace osu.Game.Screens.Menu
 
             if (logo != null)
             {
-                if (trackingPosition)
-                    logo.Position = iconTrackingPosition;
+                if (logoTracking)
+                    logo.Position = logoTrackingPosition;
 
                 iconFacade.Width = logo.SizeForFlow * 0.5f;
             }
