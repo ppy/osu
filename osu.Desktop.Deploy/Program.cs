@@ -299,18 +299,27 @@ namespace osu.Desktop.Deploy
 
         private static void updateAssemblyInfo(string version)
         {
-            string file = Path.Combine(ProjectName, "Properties", "AssemblyInfo.cs");
+            var toUpdate = new[] { "<Version>", "<FileVersion>" };
+            string file = Path.Combine(ProjectName, $"{ProjectName}.csproj");
 
             var l1 = File.ReadAllLines(file);
             List<string> l2 = new List<string>();
             foreach (var l in l1)
             {
-                if (l.StartsWith("[assembly: AssemblyVersion("))
-                    l2.Add($"[assembly: AssemblyVersion(\"{version}\")]");
-                else if (l.StartsWith("[assembly: AssemblyFileVersion("))
-                    l2.Add($"[assembly: AssemblyFileVersion(\"{version}\")]");
-                else
-                    l2.Add(l);
+                string line = l;
+
+                foreach (var tag in toUpdate)
+                {
+                    int startIndex = l.IndexOf(tag);
+                    if (startIndex == -1)
+                        continue;
+                    startIndex += tag.Length;
+
+                    int endIndex = l.IndexOf("<", startIndex);
+                    line = $"{l.Substring(0, startIndex)}{version}{l.Substring(endIndex)}";
+                }
+
+                l2.Add(line);
             }
 
             File.WriteAllLines(file, l2);
