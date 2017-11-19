@@ -27,7 +27,6 @@ namespace osu.Game.Rulesets.Mods
                 if (judgement.Result != HitResult.Perfect)
                 {
                     scoreProcessor.ForceFail();
-                    
                 }
             };
         }
