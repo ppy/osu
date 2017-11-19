@@ -65,7 +65,7 @@ namespace osu.Game.Online.API.Requests
                     Ranked = ranked,
                     LastUpdated = lastUpdated,
                 },
-                Beatmaps = beatmaps.Select(b => b.ToBeatmap(rulesets)).ToList(),
+                Beatmaps = beatmaps?.Select(b => b.ToBeatmap(rulesets)).ToList(),
             };
         }
 

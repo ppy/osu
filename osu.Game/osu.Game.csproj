@@ -282,6 +282,7 @@
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
+    <Compile Include="Online\API\Requests\GetUserMostPlayedBeatmapsRequest.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ClickableUsername.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableScore.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableTopScore.cs" />
