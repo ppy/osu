@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Ionic.Zip;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
@@ -24,6 +23,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps
 {
@@ -418,7 +418,7 @@ namespace osu.Game.Beatmaps
         /// <returns>A reader giving access to the beatmap's content.</returns>
         private ArchiveReader getReaderFrom(string path)
         {
-            if (ZipFile.IsZipFile(path))
+            if (ZipUtils.IsZipArchive(path))
                 // ReSharper disable once InconsistentlySynchronizedField
                 return new OszArchiveReader(storage.GetStream(path));
             return new LegacyFilesystemReader(path);
