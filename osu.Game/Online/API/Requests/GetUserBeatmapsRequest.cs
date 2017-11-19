@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserBeatmapsRequest<T> : APIRequest<List<T>>
+    public abstract class GetUserBeatmapsRequest<T> : APIRequest<List<T>>
     {
         private readonly long userId;
         private readonly int offset;

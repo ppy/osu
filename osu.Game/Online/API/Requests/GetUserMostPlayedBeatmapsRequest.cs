@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 

@@ -9,7 +9,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Leaderboards;
-using osu.Framework.Localisation;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using OpenTK.Graphics;
@@ -113,7 +112,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colour, LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
+        private void load(OsuColour colour)
         {
             coloredBackground.Colour = underscoreLine.Colour = colour.Gray4;
 
