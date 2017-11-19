@@ -10,7 +10,8 @@
     <Version>0.0.0.0</Version>
     <Description>click the circles. to the beat.</Description>
     <Copyright>ppy Pty Ltd 2007-2017</Copyright>
-    <AssemblyTitle>osu!lazer</AssemblyTitle>
+    <AssemblyName>osu!</AssemblyName>
+    <Title>osu!lazer</Title>
     <Product>osu!lazer</Product>
   </PropertyGroup>
   <ItemGroup Label="Project References">
