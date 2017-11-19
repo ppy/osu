@@ -47,6 +47,7 @@ namespace osu.Desktop
 
                 string stableInstallPath;
 
+#if NET461
                 try
                 {
                     using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
@@ -58,6 +59,7 @@ namespace osu.Desktop
                 catch
                 {
                 }
+#endif
 
                 stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
                 if (checkExists(stableInstallPath))

@@ -21,13 +21,19 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using OpenTK;
 using OpenTK.Graphics;
+
+#if NET461
 using Squirrel;
+#endif
 
 namespace osu.Desktop.Overlays
 {
     public class VersionManager : OverlayContainer
     {
+#if NET461
         private UpdateManager updateManager;
+#endif
+
         private NotificationOverlay notificationOverlay;
         private OsuConfigManager config;
         private OsuGameBase game;
@@ -138,11 +144,15 @@ namespace osu.Desktop.Overlays
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+#if NET461
             updateManager?.Dispose();
+#endif
         }
 
         private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
+#if NET461
             //should we schedule a retry on completion of this check?
             bool scheduleRetry = true;
 
@@ -213,6 +223,7 @@ namespace osu.Desktop.Overlays
                         notification.State = ProgressNotificationState.Cancelled;
                 }
             }
+#endif
         }
 
         protected override void PopIn()
@@ -234,7 +245,9 @@ namespace osu.Desktop.Overlays
                 Activated = () =>
                 {
                     // Squirrel returns execution to us after the update process is started, so it's safe to use Wait() here
+#if NET461
                     UpdateManager.RestartAppWhenExited().Wait();
+#endif
                     game.GracefullyExit();
                     return true;
                 }
