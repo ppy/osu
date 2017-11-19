@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Mods
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override bool Ranked => true;
     }
 
-    public class CatchModSuddenDeath : ModSuddenDeath
+    public class CatchModSuddenDeath : ModSuddenDeath<Droplet>
     {
 
     }
@@ -62,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override double ScoreMultiplier => 1.12;
     }
 
-    public class CatchModPerfect : ModPerfect
+    public class CatchModPerfect : ModPerfect<Droplet>
     {
 
     }

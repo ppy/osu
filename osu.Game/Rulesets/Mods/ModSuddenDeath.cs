@@ -3,6 +3,10 @@
 
 using System;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -16,5 +20,27 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
+    }
+
+    public abstract class ModSuddenDeath<T> : ModSuddenDeath, IApplicableToRulesetContainer<T>, IApplicableToScoreProcessor
+        where T : HitObject
+    {
+        private ScoreProcessor scoreProcessor;
+
+        public void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer)
+        {
+            rulesetContainer.OnJudgement += judgement =>
+            {
+                if (judgement.Result == HitResult.Miss)
+                {
+                    scoreProcessor.ForceFail();
+                }
+            };
+        }
+
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        {
+            this.scoreProcessor = scoreProcessor;
+        }
     }
 }

@@ -128,6 +128,12 @@ namespace osu.Game.Rulesets.Scoring
                 HasFailed = true;
         }
 
+        public void ForceFail()
+        {
+            Failed?.Invoke();
+            HasFailed = true;
+        }
+
         /// <summary>
         /// Notifies subscribers of <see cref="NewJudgement"/> that a new judgement has occurred.
         /// </summary>
@@ -186,6 +192,7 @@ namespace osu.Game.Rulesets.Scoring
 
             rulesetContainer.OnJudgement += AddJudgement;
             rulesetContainer.OnJudgementRemoved += RemoveJudgement;
+            rulesetContainer.ApplyModsToScoreProcessor(this);
 
             SimulateAutoplay(rulesetContainer.Beatmap);
             Reset(true);

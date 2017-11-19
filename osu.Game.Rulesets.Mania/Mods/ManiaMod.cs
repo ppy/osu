@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 1.0;
     }
 
-    public class ManiaModSuddenDeath : ModSuddenDeath
+    public class ManiaModSuddenDeath : ModSuddenDeath<ManiaHitObject>
     {
 
     }
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
     }
 
-    public class ManiaModPerfect : ModPerfect
+    public class ManiaModPerfect : ModPerfect<ManiaHitObject>
     {
 
     }
