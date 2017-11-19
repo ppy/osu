@@ -14,10 +14,8 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -130,37 +128,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Depth = -1,
             });
 
-            metadata.Add(new MetadataContainer(Score.Beatmap.Metadata.Title, Score.Beatmap.Metadata.Artist)
-            {
-                AutoSizeAxes = Axes.Both,
-                Action = () =>
-                {
-                    if (Score.Beatmap.OnlineBeatmapSetID.HasValue) beatmapSetOverlay?.ShowBeatmapSet(Score.Beatmap.OnlineBeatmapSetID.Value);
-                },
-                Child = new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Current = locale.GetUnicodePreference(
-                                $"{Score.Beatmap.Metadata.TitleUnicode ?? Score.Beatmap.Metadata.Title} [{Score.Beatmap.Version}] ",
-                                $"{Score.Beatmap.Metadata.Title ?? Score.Beatmap.Metadata.TitleUnicode} [{Score.Beatmap.Version}] "
-                            ),
-                            TextSize = 15,
-                            Font = "Exo2.0-SemiBoldItalic",
-                        },
-                        new OsuSpriteText
-                        {
-                            Current = locale.GetUnicodePreference(Score.Beatmap.Metadata.ArtistUnicode, Score.Beatmap.Metadata.Artist),
-                            TextSize = 12,
-                            Padding = new MarginPadding { Top = 3 },
-                            Font = "Exo2.0-RegularItalic",
-                        },
-                    },
-                },
-            });
+            metadata.Add(new BeatmapMetadataContainer(Score.Beatmap));
 
             foreach (Mod mod in Score.Mods)
                 modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.5f) });
@@ -180,16 +148,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             background.FadeOut(fade_duration, Easing.OutQuint);
             underscoreLine.FadeIn(fade_duration, Easing.OutQuint);
             base.OnHoverLost(state);
-        }
-
-        private class MetadataContainer : OsuHoverContainer, IHasTooltip
-        {
-            public string TooltipText { get; set; }
-
-            public MetadataContainer(string title, string artist)
-            {
-                TooltipText = $"{artist} - {title}";
-            }
         }
     }
 }
