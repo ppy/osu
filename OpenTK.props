@@ -1,0 +1,9 @@
+<!-- Contains required properties for OpenTK includes. -->
+<Project>
+  <ItemGroup Label="OpenTK">
+    <Reference Include="..\osu-framework\Libraries\OpenTK.dll" />
+    <Content Include="..\osu-framework\Libraries\OpenTK.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

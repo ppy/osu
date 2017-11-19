@@ -1,0 +1,8 @@
+<!-- Contains required properties for osu!framework projects. -->
+<Project>
+  <ItemGroup Label="License">
+    <None Include="..\osu.licenseheader">
+      <Link>osu.licenseheader</Link>
+    </None>
+  </ItemGroup>
+</Project>
