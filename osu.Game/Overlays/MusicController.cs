@@ -71,6 +71,7 @@ namespace osu.Game.Overlays
         {
             Trace.Assert(state.Mouse.PositionMouseDown != null, "state.Mouse.PositionMouseDown != null");
 
+            // ReSharper disable once PossibleInvalidOperationException
             Vector2 change = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
 
             // Diminish the drag distance as we go further to simulate "rubber band" feeling.

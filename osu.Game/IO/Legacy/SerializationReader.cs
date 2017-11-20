@@ -186,6 +186,7 @@ namespace osu.Game.IO.Legacy
 
                 Debug.Assert(formatter != null, "formatter != null");
 
+                // ReSharper disable once PossibleNullReferenceException
                 return formatter.Deserialize(stream);
             }
 

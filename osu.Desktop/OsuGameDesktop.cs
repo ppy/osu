@@ -5,12 +5,15 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Win32;
 using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
 using OpenTK.Input;
+
+#if NET461
+using Microsoft.Win32;
+#endif
 
 namespace osu.Desktop
 {
@@ -45,9 +48,9 @@ namespace osu.Desktop
             {
                 Func<string, bool> checkExists = p => Directory.Exists(Path.Combine(p, "Songs"));
 
+#if NET461
                 string stableInstallPath;
 
-#if NET461
                 try
                 {
                     using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
@@ -61,7 +64,11 @@ namespace osu.Desktop
                 }
 #endif
 
+#if NET461
                 stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
+#else
+                var stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
+#endif
                 if (checkExists(stableInstallPath))
                     return stableInstallPath;
 

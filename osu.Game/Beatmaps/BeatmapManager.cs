@@ -307,6 +307,7 @@ namespace osu.Game.Beatmaps
                     context.ChangeTracker.AutoDetectChangesEnabled = false;
 
                     // re-fetch the beatmap set on the import context.
+                    // ReSharper disable once AccessToModifiedClosure
                     beatmapSet = context.BeatmapSetInfo.Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == beatmapSet.ID);
 
                     // create local stores so we can isolate and thread safely, and share a context/transaction.

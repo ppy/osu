@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Tournament.Teams
                             if (string.IsNullOrEmpty(line))
                                 continue;
 
+                            // ReSharper disable once PossibleNullReferenceException
                             string[] split = line.Split(':');
 
                             if (split.Length < 2)

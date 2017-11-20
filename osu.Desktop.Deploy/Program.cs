@@ -310,12 +310,12 @@ namespace osu.Desktop.Deploy
 
                 foreach (var tag in toUpdate)
                 {
-                    int startIndex = l.IndexOf(tag);
+                    int startIndex = l.IndexOf(tag, StringComparison.InvariantCulture);
                     if (startIndex == -1)
                         continue;
                     startIndex += tag.Length;
 
-                    int endIndex = l.IndexOf("<", startIndex);
+                    int endIndex = l.IndexOf("<", startIndex, StringComparison.InvariantCulture);
                     line = $"{l.Substring(0, startIndex)}{version}{l.Substring(endIndex)}";
                 }
 

@@ -13,9 +13,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Threading;
+using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Screens.Tournament.Teams;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -118,16 +118,18 @@ namespace osu.Game.Screens.Tournament
                         if (!Children.Any())
                             break;
 
-                        Drawable closest = null;
+                        ScrollingTeam closest = null;
 
                         foreach (var c in Children)
                         {
-                            if (!(c is ScrollingTeam))
+                            var stc = c as ScrollingTeam;
+
+                            if (stc == null)
                                 continue;
 
                             if (closest == null)
                             {
-                                closest = c;
+                                closest = stc;
                                 continue;
                             }
 
@@ -135,14 +137,15 @@ namespace osu.Game.Screens.Tournament
                             float lastOffset = Math.Abs(closest.Position.X + closest.DrawWidth / 2f - DrawWidth / 2f);
 
                             if (o < lastOffset)
-                                closest = c;
+                                closest = stc;
                         }
 
                         Trace.Assert(closest != null, "closest != null");
 
+                        // ReSharper disable once PossibleNullReferenceException
                         offset += DrawWidth / 2f - (closest.Position.X + closest.DrawWidth / 2f);
 
-                        ScrollingTeam st = closest as ScrollingTeam;
+                        ScrollingTeam st = closest;
 
                         availableTeams.RemoveAll(at => at == st.Team);
 

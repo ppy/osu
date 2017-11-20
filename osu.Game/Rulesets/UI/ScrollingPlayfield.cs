@@ -255,6 +255,7 @@ namespace osu.Game.Rulesets.UI
                     var sX = (SpeedAdjustmentContainer)x;
                     var sY = (SpeedAdjustmentContainer)y;
 
+                    // ReSharper disable once ImpureMethodCallOnReadonlyValueField
                     int result = sY.ControlPoint.StartTime.CompareTo(sX.ControlPoint.StartTime);
                     if (result != 0)
                         return result;
