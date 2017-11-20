@@ -10,19 +10,22 @@ using osu.Game.Rulesets;
 using osu.Game.Users;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Online.API.Requests
 {
     public class GetScoresRequest : APIRequest<GetScoresResponse>
     {
         private readonly BeatmapInfo beatmap;
+        private readonly LeaderboardScope scope;
 
-        public GetScoresRequest(BeatmapInfo beatmap)
+        public GetScoresRequest(BeatmapInfo beatmap, LeaderboardScope scope = LeaderboardScope.Global)
         {
             if (!beatmap.OnlineBeatmapID.HasValue)
                 throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.OnlineBeatmapID)}.");
 
             this.beatmap = beatmap;
+            this.scope = scope;
 
             Success += onSuccess;
         }
@@ -33,7 +36,25 @@ namespace osu.Game.Online.API.Requests
                 score.ApplyBeatmap(beatmap);
         }
 
-        protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores";
+        private string mapScopeToQuery()
+        {
+            switch(scope)
+            {
+                case LeaderboardScope.Global:
+                    return @"?type=global";
+
+                case LeaderboardScope.Friends:
+                    return @"?type=friend";
+
+                case LeaderboardScope.Country:
+                    return @"?type=country";
+
+                default:
+                    return String.Empty;
+            }
+        }
+
+        protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores{mapScopeToQuery()}";
     }
 
     public class GetScoresResponse
