@@ -93,8 +93,7 @@ namespace osu.Game.Screens.Edit
                                 ColumnDimensions = new[]
                                 {
                                     new Dimension(),
-                                    new Dimension(GridSizeMode.Relative, 0.67f),
-                                    new Dimension(),
+                                    new Dimension(GridSizeMode.Relative, 0.65f),
                                 },
                                 Content = new[]
                                 {
@@ -173,8 +172,11 @@ namespace osu.Game.Screens.Edit
         protected override bool OnExiting(Screen next)
         {
             Background.FadeColour(Color4.White, 500);
-            Beatmap.Value.Track.Tempo.Value = 1;
-            Beatmap.Value.Track?.Start();
+            if (Beatmap.Value.Track != null)
+            {
+                Beatmap.Value.Track.Tempo.Value = 1;
+                Beatmap.Value.Track.Start();
+            }
             return base.OnExiting(next);
         }
     }
