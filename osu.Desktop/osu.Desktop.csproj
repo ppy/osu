@@ -2,7 +2,7 @@
   <Import Project="..\osu.Game.props" />
   <Import Project="..\OpenTK.props" />
   <PropertyGroup Label="Project">
-    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
