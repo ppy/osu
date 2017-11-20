@@ -74,6 +74,19 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
+        private LeaderboardScope scope = LeaderboardScope.Global;
+        public LeaderboardScope Scope
+        {
+            get { return scope; }
+            set
+            {
+                if (value == scope) return;
+
+                scope = value;
+                updateScores();
+            }
+        }
+
         public Leaderboard()
         {
             Children = new Drawable[]
@@ -120,6 +133,11 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             if (!IsLoaded) return;
 
+            if (Scope == LeaderboardScope.Local)
+            {
+                // TODO: get local scores from wherever here.
+            }
+
             Scores = null;
             getScoresRequest?.Cancel();
 
@@ -127,7 +145,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             loading.Show();
 
-            getScoresRequest = new GetScoresRequest(Beatmap);
+            getScoresRequest = new GetScoresRequest(Beatmap, Scope);
             getScoresRequest.Success += r =>
             {
                 Scores = r.Scores;
@@ -164,5 +182,13 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
             }
         }
+    }
+
+    public enum LeaderboardScope
+    {
+        Local,
+        Country,
+        Global,
+        Friends,
     }
 }
