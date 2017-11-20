@@ -484,19 +484,14 @@ namespace osu.Game.Beatmaps
                 metadata = BeatmapDecoder.GetDecoder(stream).Decode(stream).Metadata;
 
             // check if a set already exists with the same online id.
-            beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID);
-
-            if (beatmapSet == null)
+            beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) ?? new BeatmapSetInfo
             {
-                beatmapSet = new BeatmapSetInfo
-                {
-                    OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
-                    Beatmaps = new List<BeatmapInfo>(),
-                    Hash = hash,
-                    Files = fileInfos,
-                    Metadata = metadata
-                };
-            }
+                OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
+                Beatmaps = new List<BeatmapInfo>(),
+                Hash = hash,
+                Files = fileInfos,
+                Metadata = metadata
+            };
 
             var mapNames = reader.Filenames.Where(f => f.EndsWith(".osu"));
 
