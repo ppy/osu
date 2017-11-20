@@ -228,11 +228,15 @@ namespace osu.Game.Screens.Play
             scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;
 
-            if (Beatmap.Value.Mods.Value.Any(m => m.Name == "Sudden Death"))
-                scoreProcessor.strictFail = 1;
+            applyAlternateFailConditions();
+        }
 
-            if (Beatmap.Value.Mods.Value.Any(m => m.Name == "Perfect"))
-                scoreProcessor.strictFail = 2;
+        private void applyAlternateFailConditions()
+        {
+            foreach(var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
+                {
+                    mod.ApplyToScoreProcessor(scoreProcessor);
+                }
         }
 
         private void applyRateFromMods()

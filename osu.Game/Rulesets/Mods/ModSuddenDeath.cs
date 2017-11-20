@@ -3,10 +3,11 @@
 
 using System;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModSuddenDeath : Mod
+    public abstract class ModSuddenDeath : Mod, IApplicableToScoreProcessor
     {
         public override string Name => "Sudden Death";
         public override string ShortenedName => "SD";
@@ -16,5 +17,15 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
+
+        public bool onFailCheck(ScoreProcessor scoreProcessor)
+        {
+            return scoreProcessor.Combo.Value != scoreProcessor.HighestCombo.Value;
+        }
+
+        public virtual void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        {
+            scoreProcessor.FailChecker += onFailCheck;
+        }
     }
 }
