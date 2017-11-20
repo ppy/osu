@@ -38,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Key == Key.Escape)
+            if (!args.Repeat && args.Key == Key.Escape)
             {
                 if (Text.Length > 0)
                     Text = string.Empty;
