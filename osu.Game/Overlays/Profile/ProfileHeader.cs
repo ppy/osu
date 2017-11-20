@@ -19,22 +19,32 @@ using osu.Game.Users;
 using System.Diagnostics;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Profile
 {
     public class ProfileHeader : Container
     {
+        private const int count_duration = 300;
+
         private readonly OsuTextFlowContainer infoTextLeft;
         private readonly LinkFlowContainer infoTextRight;
-        private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
 
         private readonly Container coverContainer, chartContainer, supporterTag;
         private readonly Sprite levelBadge;
-        private readonly SpriteText levelText;
+        private readonly StatisticsCounter levelCounter;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
         private readonly Box colourBar;
         private readonly DrawableFlag countryFlag;
         private readonly RankChart graph;
+
+        private readonly StatisticsCounter rankedScoreCounter;
+        private readonly PercentageCounter accuracyCounter;
+        private readonly StatisticsCounter playCountCounter;
+        private readonly StatisticsCounter totalScoreCounter;
+        private readonly StatisticsCounter totalHitsCounter;
+        private readonly StatisticsCounter maxComboCounter;
+        private readonly StatisticsCounter replaysCounter;
 
         private const float cover_height = 350;
         private const float info_height = 150;
@@ -202,12 +212,11 @@ namespace osu.Game.Overlays.Profile
                                     Height = 50,
                                     Width = 50,
                                 },
-                                levelText = new OsuSpriteText
+                                levelCounter = new StatisticsCounter(20, false)
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Y = 11,
-                                    TextSize = 20
                                 }
                             }
                         },
@@ -225,21 +234,23 @@ namespace osu.Game.Overlays.Profile
                                     Colour = Color4.Black.Opacity(0.5f),
                                     RelativeSizeAxes = Axes.Both
                                 },
-                                scoreText = new FillFlowContainer<SpriteText>
+                                new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0, 2),
                                     Padding = new MarginPadding { Horizontal = 20, Vertical = 18 },
-                                    Spacing = new Vector2(0, 2)
-                                },
-                                scoreNumberText = new FillFlowContainer<SpriteText>
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
-                                    Padding = new MarginPadding { Horizontal = 20, Vertical = 18 },
-                                    Spacing = new Vector2(0, 2)
+                                    Children = new Drawable[]
+                                    {
+                                        new StatisticsLine("Ranked Score") { Child = rankedScoreCounter = new StatisticsCounter() },
+                                        new StatisticsLine("Accuracy") { Child = accuracyCounter = new PercentageCounter() },
+                                        new StatisticsLine("Play Count") { Child = playCountCounter = new StatisticsCounter() },
+                                        new StatisticsLine("Total Score") { Child = totalScoreCounter = new StatisticsCounter() },
+                                        new StatisticsLine("Total Hits") { Child = totalHitsCounter = new StatisticsCounter() },
+                                        new StatisticsLine("Max Combo") { Child = maxComboCounter = new StatisticsCounter() },
+                                        new StatisticsLine("Replays Watched by Others") { Child = replaysCounter = new StatisticsCounter() },
+                                    },
                                 },
                                 new FillFlowContainer<GradeBadge>
                                 {
@@ -251,7 +262,7 @@ namespace osu.Game.Overlays.Profile
                                     Spacing = new Vector2(20, 0),
                                     Children = new[]
                                     {
-                                        gradeSSPlus = new GradeBadge("SSPlus"),
+                                        gradeSSPlus = new GradeBadge("SSPlus") { Alpha = 0 },
                                         gradeSS = new GradeBadge("SS"),
                                     }
                                 },
@@ -265,7 +276,7 @@ namespace osu.Game.Overlays.Profile
                                     Spacing = new Vector2(20, 0),
                                     Children = new[]
                                     {
-                                        gradeSPlus = new GradeBadge("SPlus"),
+                                        gradeSPlus = new GradeBadge("SPlus") { Alpha = 0 },
                                         gradeS = new GradeBadge("S"),
                                         gradeA = new GradeBadge("A"),
                                     }
@@ -407,50 +418,25 @@ namespace osu.Game.Overlays.Profile
         {
             var statistics = user.Statistics;
 
-            levelText.Text = statistics?.Level.Current.ToString() ?? "0";
+            levelCounter.CountTo(statistics?.Level.Current ?? 0, count_duration, Easing.OutQuad);
 
-            scoreText.Clear();
-            scoreNumberText.Clear();
+            rankedScoreCounter.CountTo(statistics?.RankedScore ?? 0, count_duration, Easing.OutQuad);
+            accuracyCounter.CountTo((double)(statistics?.Accuracy ?? 0), count_duration, Easing.OutQuad);
+            playCountCounter.CountTo(statistics?.PlayCount ?? 0, count_duration, Easing.OutQuad);
+            totalScoreCounter.CountTo(statistics?.TotalScore ?? 0, count_duration, Easing.OutQuad);
+            totalHitsCounter.CountTo(statistics?.TotalHits ?? 0, count_duration, Easing.OutQuad);
+            maxComboCounter.CountTo(statistics?.MaxCombo ?? 0, count_duration, Easing.OutQuad);
+            replaysCounter.CountTo(statistics?.ReplaysWatched ?? 0, count_duration, Easing.OutQuad);
 
-            scoreText.Add(createScoreText("Ranked Score"));
-            scoreNumberText.Add(createScoreNumberText(statistics?.RankedScore.ToString(@"#,0") ?? "0"));
-            scoreText.Add(createScoreText("Accuracy"));
-            scoreNumberText.Add(createScoreNumberText($"{statistics?.Accuracy ?? 0:0.##}%"));
-            scoreText.Add(createScoreText("Play Count"));
-            scoreNumberText.Add(createScoreNumberText(statistics?.PlayCount.ToString(@"#,0") ?? "0"));
-            scoreText.Add(createScoreText("Total Score"));
-            scoreNumberText.Add(createScoreNumberText(statistics?.TotalScore.ToString(@"#,0") ?? "0"));
-            scoreText.Add(createScoreText("Total Hits"));
-            scoreNumberText.Add(createScoreNumberText(statistics?.TotalHits.ToString(@"#,0") ?? "0"));
-            scoreText.Add(createScoreText("Max Combo"));
-            scoreNumberText.Add(createScoreNumberText(statistics?.MaxCombo.ToString(@"#,0") ?? "0"));
-            scoreText.Add(createScoreText("Replays Watched by Others"));
-            scoreNumberText.Add(createScoreNumberText(statistics?.ReplaysWatched.ToString(@"#,0") ?? "0"));
+            gradeSS.UpdateValue(statistics?.GradesCount.SS ?? 0);
+            gradeS.UpdateValue(statistics?.GradesCount.S ?? 0);
+            gradeA.UpdateValue(statistics?.GradesCount.A ?? 0);
 
-            gradeSS.DisplayCount = statistics?.GradesCount.SS ?? 0;
-            gradeS.DisplayCount = statistics?.GradesCount.S ?? 0;
-            gradeA.DisplayCount = statistics?.GradesCount.A ?? 0;
-
-            gradeSPlus.DisplayCount = 0;
-            gradeSSPlus.DisplayCount = 0;
+            gradeSPlus.UpdateValue(0);
+            gradeSSPlus.UpdateValue(0);
 
             graph.Redraw(user);
         }
-
-        private OsuSpriteText createScoreText(string text) => new OsuSpriteText
-        {
-            TextSize = 14,
-            Text = text
-        };
-
-        private OsuSpriteText createScoreNumberText(string text) => new OsuSpriteText
-        {
-            TextSize = 14,
-            Font = @"Exo2.0-Bold",
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight,
-            Text = text
-        };
 
         private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
         {
@@ -461,17 +447,69 @@ namespace osu.Game.Overlays.Profile
             infoTextRight.NewLine();
         }
 
+        private class StatisticsLine : Container
+        {
+            private readonly Container content;
+            protected override Container<Drawable> Content => content;
+
+            public StatisticsLine(string title)
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                AddInternal(new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    TextSize = 14,
+                    Text = title,
+                });
+                AddInternal(content = new Container
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    AutoSizeAxes = Axes.Both,
+                });
+            }
+        }
+
+        private class StatisticsCounter : Counter
+        {
+            protected readonly OsuSpriteText Counter;
+
+            public StatisticsCounter(int textsize = 14, bool isBold = true)
+            {
+                AutoSizeAxes = Axes.Both;
+                InternalChild = Counter = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    TextSize = textsize,
+                    Text = "0",
+                };
+
+                if (isBold)
+                    Counter.Font = @"Exo2.0-Bold";
+            }
+
+            protected override void OnCountChanged(double count) => Counter.Text = $"{count:n0}";
+        }
+
+        private class PercentageCounter : StatisticsCounter
+        {
+            public PercentageCounter(int textsize = 14, bool isBold = true)
+                :base(textsize, isBold)
+            {
+            }
+
+            protected override void OnCountChanged(double count) => Counter.Text = $"{count:p2}";
+        }
+
         private class GradeBadge : Container
         {
             private const float width = 50;
             private readonly string grade;
             private readonly Sprite badge;
-            private readonly SpriteText numberText;
-
-            public int DisplayCount
-            {
-                set { numberText.Text = value.ToString(@"#,0"); }
-            }
+            private readonly StatisticsCounter counter;
 
             public GradeBadge(string grade)
             {
@@ -483,12 +521,10 @@ namespace osu.Game.Overlays.Profile
                     Width = width,
                     Height = 26
                 });
-                Add(numberText = new SpriteText
+                Add(counter = new StatisticsCounter(14, true)
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    TextSize = 14,
-                    Font = @"Exo2.0-Bold"
                 });
             }
 
@@ -497,6 +533,8 @@ namespace osu.Game.Overlays.Profile
             {
                 badge.Texture = textures.Get($"Grades/{grade}");
             }
+
+            public void UpdateValue(int newValue) => counter.CountTo(newValue, count_duration, Easing.OutQuad);
         }
 
         private class LinkFlowContainer : OsuTextFlowContainer
