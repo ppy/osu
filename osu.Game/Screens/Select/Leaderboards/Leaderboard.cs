@@ -52,6 +52,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (scores == null)
                     return;
 
+                loading.Hide();
+
                 if (scores.Count() == 0)
                 {
                     placeholderContainer.FadeIn(fade_duration);
@@ -191,7 +193,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             getScoresRequest.Success += r =>
             {
                 Scores = r.Scores;
-                loading.Hide();
             };
             api.Queue(getScoresRequest);
         }
