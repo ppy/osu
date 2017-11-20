@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -30,6 +31,11 @@ namespace osu.Game.Rulesets.Scoring
         /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by the <see cref="ScoreProcessor"/>.
         /// </summary>
         public event Action<Judgement> NewJudgement;
+
+        /// <summary>
+        /// Invoked when we want to check if a failure condition has been fulfilled
+        /// </summary>
+        public event Func<ScoreProcessor, bool> FailChecker;
 
         /// <summary>
         /// The current total score.
@@ -66,8 +72,6 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual bool HasCompleted => false;
 
-        public int strictFail = 0;
-
         /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
         /// </summary>
@@ -77,16 +81,6 @@ namespace osu.Game.Rulesets.Scoring
         /// The conditions for failing.
         /// </summary>
         protected virtual bool FailCondition => Health.Value == Health.MinValue;
-
-        /// <summary>
-        /// The conditions for failing if the Sudden Death mod is enabled.
-        /// </summary>
-        protected virtual bool SuddenDeathFailCondition => Combo.Value != HighestCombo.Value;
-
-        /// <summary>
-        /// The conditions for failing if the Perfect mod is enabled.
-        /// </summary>
-        protected virtual bool PerfectFailCondition => Accuracy.Value != 1;
 
         protected ScoreProcessor()
         {
@@ -133,16 +127,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected void UpdateFailed()
         {
-            if (HasFailed)
+            if (HasFailed || !FailCondition)
                 return;
 
-            if(FailCondition ||
-                (strictFail==1 && SuddenDeathFailCondition) ||
-                (strictFail==2 && PerfectFailCondition))
-            {
-                if (Failed?.Invoke() != false)
-                    HasFailed = true;
-            }
+            if (Failed?.Invoke() != false)
+                HasFailed = true;
         }
 
         /// <summary>
@@ -155,6 +144,18 @@ namespace osu.Game.Rulesets.Scoring
 
             if (HasCompleted)
                 AllJudged?.Invoke();
+        }
+
+        protected void CheckAlternateFailConditions()
+        {
+            if (HasFailed)
+                return;
+
+            if (FailChecker?.Invoke(this) == true)
+            {
+                if (Failed?.Invoke() != false)
+                    HasFailed = true;
+            }
         }
 
         /// <summary>
@@ -232,6 +233,8 @@ namespace osu.Game.Rulesets.Scoring
         {
             OnNewJudgement(judgement);
             updateScore();
+
+            CheckAlternateFailConditions();
 
             NotifyNewJudgement(judgement);
             UpdateFailed();

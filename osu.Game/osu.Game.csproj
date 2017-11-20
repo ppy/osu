@@ -294,6 +294,7 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToScoreProcessor.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
