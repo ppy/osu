@@ -89,6 +89,11 @@ namespace osu.Game.Overlays.Profile
 
         public void Redraw(User user)
         {
+            if (this.user == null && user != null)
+                placeholder.FadeOut(fade_duration, Easing.Out);
+
+            this.user = user;
+
             if (user == null)
             {
                 rankText.Text = string.Empty;
@@ -99,11 +104,6 @@ namespace osu.Game.Overlays.Profile
                 ranks = null;
                 return;
             }
-
-            if (this.user == null && user != null)
-                placeholder.FadeOut(fade_duration, Easing.Out);
-
-            this.user = user;
 
             int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
             ranks = userRanks.SkipWhile(x => x == 0).ToArray();
