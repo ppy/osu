@@ -8,12 +8,24 @@ namespace osu.Game.Online.API.Requests
     public class GetUserRequest : APIRequest<User>
     {
         private long? userId;
+        private Mode userPlayMode;
 
-        public GetUserRequest(long? userId = null)
+        public GetUserRequest(long? userId = null, Mode userPlayMode = Mode.Default)
         {
             this.userId = userId;
+            this.userPlayMode = userPlayMode;
         }
 
-        protected override string Target => userId.HasValue ? $@"users/{userId}" : @"me";
+        protected override string Target => userId.HasValue ? (userPlayMode == Mode.Default ? $@"users/{userId}"
+            : $@"users/{userId}/{userPlayMode.ToString().ToLower()}") : @"me";
+    }
+
+    public enum Mode
+    {
+        Default,
+        Osu,
+        Mania,
+        Taiko,
+        Fruits
     }
 }

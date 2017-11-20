@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         {
             base.ShowMore();
 
-            var req = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
+            var req = new GetUserScoresRequest(User.Value.Id, type, Mode.Default, VisiblePages++ * ItemsPerPage);
 
             req.Success += scores =>
             {
