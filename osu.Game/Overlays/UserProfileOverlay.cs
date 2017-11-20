@@ -91,6 +91,7 @@ namespace osu.Game.Overlays
         public void ShowUser(User user, bool fetchOnline = true)
         {
             userReq?.Cancel();
+            modeReq?.Cancel();
             Clear();
             lastSection = null;
 
@@ -132,10 +133,11 @@ namespace osu.Game.Overlays
                         Height = 35,
                         Alpha = 0,
                         AlwaysPresent = true,
+                        Margin = new MarginPadding { Top = 15 }
                     },
                     profileHeader = new ProfileHeader(user)
                     {
-                        Margin = new MarginPadding{ Top = 35 },
+                        Margin = new MarginPadding{ Top = 50 },
                     }
                 }
             };
@@ -201,6 +203,9 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(User user)
         {
+            if (user == null)
+                return;
+
             profileHeader.User = user;
 
             foreach (string id in user.ProfileOrder)
@@ -218,6 +223,7 @@ namespace osu.Game.Overlays
             string playMode = "";
             switch (user.PlayMode)
             {
+                default:
                 case "osu":
                     playMode = "osu!";
                     break;
