@@ -18,13 +18,18 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using System.Linq;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
     public class Leaderboard : Container
     {
+        private const double fade_duration = 200;
+
         private readonly ScrollContainer scrollContainer;
         private FillFlowContainer<LeaderboardScore> scrollFlow;
+        private Container placeholderContainer;
 
         public Action<Score> ScoreSelected;
 
@@ -40,12 +45,18 @@ namespace osu.Game.Screens.Select.Leaderboards
                 scores = value;
                 getScoresRequest?.Cancel();
 
-                scrollFlow?.FadeOut(200);
-                scrollFlow?.Expire();
+                placeholderContainer.FadeOut(fade_duration);
+                scrollFlow?.FadeOut(fade_duration).Expire();
                 scrollFlow = null;
 
                 if (scores == null)
                     return;
+
+                if (scores.Count() == 0)
+                {
+                    placeholderContainer.FadeIn(fade_duration);
+                    return;
+                }
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
                 Schedule(() =>
@@ -74,7 +85,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        private LeaderboardScope scope = LeaderboardScope.Global;
+        private LeaderboardScope scope;
         public LeaderboardScope Scope
         {
             get { return scope; }
@@ -96,7 +107,36 @@ namespace osu.Game.Screens.Select.Leaderboards
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
                 },
-                loading = new LoadingAnimation()
+                loading = new LoadingAnimation(),
+                placeholderContainer = new Container
+                {
+                    Alpha = 0,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        new FillFlowContainer
+                        {
+                            Direction = FillDirection.Horizontal,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                new SpriteIcon
+                                {
+                                    Icon = FontAwesome.fa_exclamation_circle,
+                                    Size = new Vector2(26),
+                                    Margin = new MarginPadding { Right = 10 },
+                                },
+                                new OsuSpriteText
+                                {
+                                    Text = @"No records yet!",
+                                    TextSize = 22,
+                                },
+                            }
+                        },
+                    },
+                },
             };
         }
 
@@ -133,13 +173,15 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             if (!IsLoaded) return;
 
+            Scores = null;
+            getScoresRequest?.Cancel();
+
             if (Scope == LeaderboardScope.Local)
             {
                 // TODO: get local scores from wherever here.
+                Scores = Enumerable.Empty<Score>();
+                return;
             }
-
-            Scores = null;
-            getScoresRequest?.Cancel();
 
             if (api == null || Beatmap?.OnlineBeatmapID == null) return;
 
