@@ -8,7 +8,7 @@ namespace osu.Game.Online.API.Requests
     public class GetUserRequest : APIRequest<User>
     {
         private long? userId;
-        private Mode userPlayMode;
+        private readonly Mode userPlayMode;
 
         public GetUserRequest(long? userId = null, Mode userPlayMode = Mode.Default)
         {

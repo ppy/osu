@@ -276,7 +276,7 @@ namespace osu.Game.Overlays
 
             private readonly Box bottom;
 
-            public UserTabControl()
+            protected UserTabControl()
             {
                 TabContainer.RelativeSizeAxes &= ~Axes.X;
                 TabContainer.AutoSizeAxes |= Axes.X;
@@ -306,7 +306,7 @@ namespace osu.Game.Overlays
 
                 protected readonly SpriteText TextRegular;
 
-                public UserTabItem(T value) : base(value)
+                protected UserTabItem(T value) : base(value)
                 {
                     Add(TextRegular = new OsuSpriteText
                     {

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Profile
         private const float primary_textsize = 25;
         private const float secondary_textsize = 13;
         private const float padding = 10;
-        private const float fade_duration = 100;
+        private const float fade_duration = 150;
 
         private readonly SpriteText rankText, performanceText, relativeText;
         private readonly RankChartLineGraph graph;
@@ -178,8 +178,6 @@ namespace osu.Game.Overlays.Profile
 
         private class RankChartLineGraph : LineGraph
         {
-            private const double fade_duration = 200;
-
             private readonly CircularContainer staticBall;
             private readonly CircularContainer movingBall;
 

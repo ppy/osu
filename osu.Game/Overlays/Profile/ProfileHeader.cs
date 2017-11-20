@@ -20,7 +20,6 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -31,7 +30,7 @@ namespace osu.Game.Overlays.Profile
         private readonly OsuTextFlowContainer infoTextLeft;
         private readonly LinkFlowContainer infoTextRight;
 
-        private readonly Container coverContainer, chartContainer, supporterTag;
+        private readonly Container coverContainer, supporterTag;
         private readonly Sprite levelBadge;
         private readonly StatisticsCounter levelCounter;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
@@ -300,7 +299,7 @@ namespace osu.Game.Overlays.Profile
                                 }
                             }
                         },
-                        chartContainer = new Container
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.BottomCentre,
@@ -561,7 +560,7 @@ namespace osu.Game.Overlays.Profile
                     Width = width,
                     Height = 26
                 });
-                Add(counter = new StatisticsCounter(14, true)
+                Add(counter = new StatisticsCounter
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
