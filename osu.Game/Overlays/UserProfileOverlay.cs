@@ -19,6 +19,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
+using osu.Game.Graphics.Sprites;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
@@ -141,9 +143,9 @@ namespace osu.Game.Overlays
             profileHeader.IsReloading = true;
 
             modeTabs.AddItem("osu!");
-            modeTabs.AddItem("mania");
-            modeTabs.AddItem("taiko");
-            modeTabs.AddItem("catch");
+            modeTabs.AddItem("osu!taiko");
+            modeTabs.AddItem("osu!catch");
+            modeTabs.AddItem("osu!mania");
 
             Add(sectionsContainer = new SectionsContainer<ProfileSection>
             {
@@ -220,13 +222,13 @@ namespace osu.Game.Overlays
                     playMode = "osu!";
                     break;
                 case "mania":
-                    playMode = "mania";
+                    playMode = "osu!mania";
                     break;
                 case "fruits":
-                    playMode = "catch";
+                    playMode = "osu!catch";
                     break;
                 case "taiko":
-                    playMode = "taiko";
+                    playMode = "osu!taiko";
                     break;
             }
             modeTabs.Current.Value = playMode;
@@ -255,11 +257,11 @@ namespace osu.Game.Overlays
             {
                 case "osu!":
                     return Mode.Osu;
-                case "mania":
+                case "osu!mania":
                     return Mode.Mania;
-                case "catch":
+                case "osu!catch":
                     return Mode.Fruits;
-                case "taiko":
+                case "osu!taiko":
                     return Mode.Taiko;
             }
 
@@ -300,10 +302,37 @@ namespace osu.Game.Overlays
 
             protected class UserTabItem : PageTabItem
             {
+                private const int fade_duration = 100;
+
+                protected readonly SpriteText TextRegular;
+
                 public UserTabItem(T value) : base(value)
                 {
-                    Text.TextSize = 20;
-                    Text.Font = @"Exo2.0-Regular";
+                    Add(TextRegular = new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Margin = new MarginPadding { Bottom = 7 },
+                        Font = @"Exo2.0-Regular",
+                    });
+
+                    Text.Alpha = 0;
+                    Text.AlwaysPresent = true;
+                    Text.TextSize = TextRegular.TextSize = 20;
+                }
+
+                protected override void OnActivated()
+                {
+                    base.OnActivated();
+                    TextRegular.FadeOut(fade_duration, Easing.Out);
+                    Text.FadeIn(fade_duration, Easing.Out);
+                }
+
+                protected override void OnDeactivated()
+                {
+                    base.OnDeactivated();
+                    TextRegular.FadeIn(fade_duration, Easing.Out);
+                    Text.FadeOut(fade_duration, Easing.Out);
                 }
             }
         }
@@ -316,7 +345,7 @@ namespace osu.Game.Overlays
             {
                 public ProfileTabItem(ProfileSection value) : base(value)
                 {
-                    Text.Text = value.Title;
+                    Text.Text = TextRegular.Text = value.Title;
                 }
             }
         }
@@ -329,7 +358,7 @@ namespace osu.Game.Overlays
             {
                 public ModeTabItem(string value) : base(value)
                 {
-                    Text.Text = value;
+                    Text.Text = TextRegular.Text = value;
                 }
             }
         }
