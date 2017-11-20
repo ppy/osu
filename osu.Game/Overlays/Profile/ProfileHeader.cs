@@ -343,10 +343,17 @@ namespace osu.Game.Overlays.Profile
             set
             {
                 IsReloading = false;
+                if (value == null)
+                {
+                    if (user != null)
+                        reloadStatistics(null);
+
+                    return;
+                }
+
                 if (user != null && user.Id == value.Id && user.Statistics != value.Statistics)
                 {
-                    user = value;
-                    reloadStatistics();
+                    reloadStatistics(value);
                     return;
                 }
 
@@ -434,7 +441,7 @@ namespace osu.Game.Overlays.Profile
             tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
             tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
 
-            reloadStatistics();
+            reloadStatistics(user);
         }
 
         public bool IsReloading
@@ -447,9 +454,9 @@ namespace osu.Game.Overlays.Profile
             }
         }
 
-        private void reloadStatistics()
+        private void reloadStatistics(User user)
         {
-            var statistics = user?.Statistics ?? null;
+            var statistics = user?.Statistics;
 
             levelCounter.CountTo(statistics?.Level.Current ?? 0, count_duration, Easing.OutQuad);
 

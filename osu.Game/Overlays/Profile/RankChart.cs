@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.Profile
 
         private readonly SpriteText rankText, performanceText, relativeText;
         private readonly RankChartLineGraph graph;
+        private readonly OsuSpriteText placeholder;
 
         private int[] ranks;
         private User user;
@@ -35,6 +36,16 @@ namespace osu.Game.Overlays.Profile
             Padding = new MarginPadding { Vertical = padding };
             Children = new Drawable[]
             {
+                placeholder = new OsuSpriteText
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Text = "No recent plays",
+                    TextSize = 14,
+                    Font = @"Exo2.0-RegularItalic",
+                    Alpha = 0,
+                    Padding = new MarginPadding { Bottom = padding }
+                },
                 rankText = new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
@@ -82,10 +93,16 @@ namespace osu.Game.Overlays.Profile
             {
                 rankText.Text = string.Empty;
                 performanceText.Text = string.Empty;
+                relativeText.Text = string.Empty;
                 graph.FadeOut(fade_duration, Easing.Out);
+                placeholder.FadeIn(fade_duration, Easing.Out);
                 ranks = null;
                 return;
             }
+
+            if (this.user == null && user != null)
+                placeholder.FadeOut(fade_duration, Easing.Out);
+
             this.user = user;
 
             int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
@@ -118,7 +135,6 @@ namespace osu.Game.Overlays.Profile
             rankText.Text = $"#{ranks[dayIndex]:#,0}";
             dayIndex++;
             relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
-            //plural should be handled in a general way
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
@@ -133,7 +149,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnHover(InputState state)
         {
-            if (ranks != null && ranks.Length > 0)
+            if (ranks != null && ranks.Length > 1)
             {
                 graph.UpdateBallPosition(state.Mouse.Position.X);
                 graph.ShowBall();
@@ -143,7 +159,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnMouseMove(InputState state)
         {
-            if (ranks != null && ranks.Length > 0)
+            if (ranks != null && ranks.Length > 1)
                 graph.UpdateBallPosition(state.Mouse.Position.X);
 
             return base.OnMouseMove(state);
@@ -151,7 +167,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override void OnHoverLost(InputState state)
         {
-            if (ranks != null && ranks.Length > 0)
+            if (ranks != null && ranks.Length > 1)
             {
                 graph.HideBall();
                 updateRankTexts();
