@@ -220,7 +220,7 @@ namespace osu.Game.Overlays
                 }
             }
 
-            string playMode = "";
+            string playMode;
             switch (user.PlayMode)
             {
                 default:
