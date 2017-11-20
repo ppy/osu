@@ -137,6 +137,8 @@ namespace osu.Game.Overlays
                 }
             };
 
+            profileHeader.IsReloading = true;
+
             modeTabs.AddItem("osu!");
             modeTabs.AddItem("mania");
             modeTabs.AddItem("taiko");
@@ -234,11 +236,9 @@ namespace osu.Game.Overlays
 
         private void updateMode(string newMode)
         {
+            profileHeader.IsReloading = true;
             userReq = new GetUserRequest(profileHeader.User.Id, getMode(newMode));
-            userReq.Success += user =>
-            {
-                profileHeader.User = user;
-            };
+            userReq.Success += user => profileHeader.User = user;
             api.Queue(userReq);
         }
 

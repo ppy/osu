@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -45,6 +46,10 @@ namespace osu.Game.Overlays.Profile
         private readonly StatisticsCounter totalHitsCounter;
         private readonly StatisticsCounter maxComboCounter;
         private readonly StatisticsCounter replaysCounter;
+
+        private readonly Box levelLoader;
+        private readonly Box graphLoader;
+        private readonly Box statisticsLoader;
 
         private const float cover_height = 350;
         private const float info_height = 150;
@@ -217,6 +222,12 @@ namespace osu.Game.Overlays.Profile
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Y = 11,
+                                },
+                                levelLoader = new Box
+                                {
+                                    Colour = Color4.Black.Opacity(0.5f),
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
                                 }
                             }
                         },
@@ -280,6 +291,12 @@ namespace osu.Game.Overlays.Profile
                                         gradeS = new GradeBadge("S"),
                                         gradeA = new GradeBadge("A"),
                                     }
+                                },
+                                statisticsLoader = new Box
+                                {
+                                    Colour = Color4.Black.Opacity(0.5f),
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
                                 }
                             }
                         },
@@ -299,6 +316,12 @@ namespace osu.Game.Overlays.Profile
                                 graph = new RankChart
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                },
+                                graphLoader = new Box
+                                {
+                                    Colour = Color4.Black.Opacity(0.5f),
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
                                 }
                             }
                         }
@@ -319,6 +342,7 @@ namespace osu.Game.Overlays.Profile
             get { return user; }
             set
             {
+                IsReloading = false;
                 if (user != null && user.Id == value.Id && user.Statistics != value.Statistics)
                 {
                     user = value;
@@ -412,7 +436,16 @@ namespace osu.Game.Overlays.Profile
 
             reloadStatistics();
         }
-        // These could be local functions when C# 7 enabled
+
+        public bool IsReloading
+        {
+            set
+            {
+                levelLoader.FadeTo(value ? 1 : 0, count_duration);
+                graphLoader.FadeTo(value ? 1 : 0, count_duration);
+                statisticsLoader.FadeTo(value ? 1 : 0, count_duration);
+            }
+        }
 
         private void reloadStatistics()
         {
@@ -501,7 +534,7 @@ namespace osu.Game.Overlays.Profile
             {
             }
 
-            protected override void OnCountChanged(double count) => Counter.Text = $"{count:p2}";
+            protected override void OnCountChanged(double count) => Counter.Text = $"{count:0.##}%";
         }
 
         private class GradeBadge : Container
