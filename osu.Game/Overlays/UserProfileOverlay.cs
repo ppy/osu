@@ -28,9 +28,11 @@ namespace osu.Game.Overlays
         private ProfileSection[] sections;
         private GetUserRequest userReq;
         private APIAccess api;
-        private ProfileHeader header;
+        private Container header;
+        private ProfileHeader profileHeader;
         private SectionsContainer<ProfileSection> sectionsContainer;
-        private ProfileTabControl tabs;
+        private ProfileTabControl sectionTabs;
+        private ModeTabControl modeTabs;
 
         public const float CONTENT_X_MARGIN = 50;
 
@@ -99,7 +101,7 @@ namespace osu.Game.Overlays
                 new BeatmapsSection(),
                 //new KudosuSection()
             };
-            tabs = new ProfileTabControl
+            sectionTabs = new ProfileTabControl
             {
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.TopCentre,
@@ -113,13 +115,38 @@ namespace osu.Game.Overlays
                 Colour = OsuColour.Gray(0.2f)
             });
 
-            header = new ProfileHeader(user);
+            header = new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Children = new Drawable[]
+                {
+                    modeTabs = new ModeTabControl
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Height = 30,
+                        Alpha = 0,
+                        AlwaysPresent = true,
+                    },
+                    profileHeader = new ProfileHeader(user)
+                    {
+                        Margin = new MarginPadding{ Top = 30 },
+                    }
+                }
+            };
+
+            modeTabs.AddItem("osu!");
+            modeTabs.AddItem("mania");
+            modeTabs.AddItem("taiko");
+            modeTabs.AddItem("catch");
 
             Add(sectionsContainer = new SectionsContainer<ProfileSection>
             {
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = header,
-                FixedHeader = tabs,
+                FixedHeader = sectionTabs,
                 HeaderBackground = new Box
                 {
                     Colour = OsuColour.Gray(34),
@@ -131,17 +158,17 @@ namespace osu.Game.Overlays
                 if (lastSection != s)
                 {
                     lastSection = s;
-                    tabs.Current.Value = lastSection;
+                    sectionTabs.Current.Value = lastSection;
                 }
             };
 
-            tabs.Current.ValueChanged += s =>
+            sectionTabs.Current.ValueChanged += s =>
             {
                 if (lastSection == null)
                 {
                     lastSection = sectionsContainer.Children.FirstOrDefault();
                     if (lastSection != null)
-                        tabs.Current.Value = lastSection;
+                        sectionTabs.Current.Value = lastSection;
                     return;
                 }
                 if (lastSection != s)
@@ -169,7 +196,7 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(User user)
         {
-            header.User = user;
+            profileHeader.User = user;
 
             foreach (string id in user.ProfileOrder)
             {
@@ -179,16 +206,66 @@ namespace osu.Game.Overlays
                     sec.User.Value = user;
 
                     sectionsContainer.Add(sec);
-                    tabs.AddItem(sec);
+                    sectionTabs.AddItem(sec);
                 }
             }
+
+            string playMode = "";
+            switch (user.PlayMode)
+            {
+                case "osu":
+                    playMode = "osu!";
+                    break;
+                case "mania":
+                    playMode = "mania";
+                    break;
+                case "fruits":
+                    playMode = "catch";
+                    break;
+                case "taiko":
+                    playMode = "taiko";
+                    break;
+            }
+            modeTabs.Current.Value = playMode;
+            modeTabs.FadeIn(200, Easing.Out);
+
+            modeTabs.Current.ValueChanged += updateMode;
         }
 
-        private class ProfileTabControl : PageTabControl<ProfileSection>
+        private void updateMode(string newMode)
         {
+            userReq = new GetUserRequest(profileHeader.User.Id, getMode(newMode));
+            userReq.Success += user =>
+            {
+                profileHeader.User = user;
+            };
+            api.Queue(userReq);
+        }
+
+        private Mode getMode(string mode)
+        {
+            switch (mode)
+            {
+                case "osu!":
+                    return Mode.Osu;
+                case "mania":
+                    return Mode.Mania;
+                case "catch":
+                    return Mode.Fruits;
+                case "taiko":
+                    return Mode.Taiko;
+            }
+
+            return Mode.Default;
+        }
+
+        private class UserTabControl<T> : PageTabControl<T>
+        {
+            protected override Dropdown<T> CreateDropdown() => null;
+
             private readonly Box bottom;
 
-            public ProfileTabControl()
+            public UserTabControl()
             {
                 TabContainer.RelativeSizeAxes &= ~Axes.X;
                 TabContainer.AutoSizeAxes |= Axes.X;
@@ -204,9 +281,16 @@ namespace osu.Game.Overlays
                 });
             }
 
-            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value);
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                bottom.Colour = colours.Yellow;
+            }
+        }
 
-            protected override Dropdown<ProfileSection> CreateDropdown() => null;
+        private class ProfileTabControl : UserTabControl<ProfileSection>
+        {
+            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value);
 
             private class ProfileTabItem : PageTabItem
             {
@@ -215,11 +299,18 @@ namespace osu.Game.Overlays
                     Text.Text = value.Title;
                 }
             }
+        }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+        private class ModeTabControl : UserTabControl<string>
+        {
+            protected override TabItem<string> CreateTabItem(string value) => new ModeTabItem(value);
+
+            private class ModeTabItem : PageTabItem
             {
-                bottom.Colour = colours.Yellow;
+                public ModeTabItem(string value) : base(value)
+                {
+                    Text.Text = value;
+                }
             }
         }
     }

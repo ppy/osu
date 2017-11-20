@@ -34,6 +34,7 @@ namespace osu.Game.Overlays.Profile
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
         private readonly Box colourBar;
         private readonly DrawableFlag countryFlag;
+        private readonly RankChart graph;
 
         private const float cover_height = 350;
         private const float info_height = 150;
@@ -200,7 +201,6 @@ namespace osu.Game.Overlays.Profile
                                     Origin = Anchor.Centre,
                                     Height = 50,
                                     Width = 50,
-                                    Alpha = 0
                                 },
                                 levelText = new OsuSpriteText
                                 {
@@ -251,8 +251,8 @@ namespace osu.Game.Overlays.Profile
                                     Spacing = new Vector2(20, 0),
                                     Children = new[]
                                     {
-                                        gradeSSPlus = new GradeBadge("SSPlus") { Alpha = 0 },
-                                        gradeSS = new GradeBadge("SS") { Alpha = 0 },
+                                        gradeSSPlus = new GradeBadge("SSPlus"),
+                                        gradeSS = new GradeBadge("SS"),
                                     }
                                 },
                                 new FillFlowContainer<GradeBadge>
@@ -265,9 +265,9 @@ namespace osu.Game.Overlays.Profile
                                     Spacing = new Vector2(20, 0),
                                     Children = new[]
                                     {
-                                        gradeSPlus = new GradeBadge("SPlus") { Alpha = 0 },
-                                        gradeS = new GradeBadge("S") { Alpha = 0 },
-                                        gradeA = new GradeBadge("A") { Alpha = 0 },
+                                        gradeSPlus = new GradeBadge("SPlus"),
+                                        gradeS = new GradeBadge("S"),
+                                        gradeA = new GradeBadge("A"),
                                     }
                                 }
                             }
@@ -284,6 +284,10 @@ namespace osu.Game.Overlays.Profile
                                 {
                                     Colour = Color4.Black.Opacity(0.25f),
                                     RelativeSizeAxes = Axes.Both
+                                },
+                                graph = new RankChart
+                                {
+                                    RelativeSizeAxes = Axes.Both,
                                 }
                             }
                         }
@@ -299,16 +303,18 @@ namespace osu.Game.Overlays.Profile
         }
 
         private User user;
-
         public User User
         {
-            get
-            {
-                return user;
-            }
-
+            get { return user; }
             set
             {
+                if (user != null && user.Id == value.Id && user.Statistics != value.Statistics)
+                {
+                    user = value;
+                    reloadStatistics();
+                    return;
+                }
+
                 user = value;
                 loadUser();
             }
@@ -393,41 +399,43 @@ namespace osu.Game.Overlays.Profile
             tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
             tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
 
-            if (user.Statistics != null)
-            {
-                levelBadge.Show();
-                levelText.Text = user.Statistics.Level.Current.ToString();
-
-                scoreText.Add(createScoreText("Ranked Score"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.RankedScore.ToString(@"#,0")));
-                scoreText.Add(createScoreText("Accuracy"));
-                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy:0.##}%"));
-                scoreText.Add(createScoreText("Play Count"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.PlayCount.ToString(@"#,0")));
-                scoreText.Add(createScoreText("Total Score"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.TotalScore.ToString(@"#,0")));
-                scoreText.Add(createScoreText("Total Hits"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.TotalHits.ToString(@"#,0")));
-                scoreText.Add(createScoreText("Max Combo"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.MaxCombo.ToString(@"#,0")));
-                scoreText.Add(createScoreText("Replays Watched by Others"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.ReplaysWatched.ToString(@"#,0")));
-
-                gradeSS.DisplayCount = user.Statistics.GradesCount.SS;
-                gradeSS.Show();
-                gradeS.DisplayCount = user.Statistics.GradesCount.S;
-                gradeS.Show();
-                gradeA.DisplayCount = user.Statistics.GradesCount.A;
-                gradeA.Show();
-
-                gradeSPlus.DisplayCount = 0;
-                gradeSSPlus.DisplayCount = 0;
-
-                chartContainer.Add(new RankChart(user) { RelativeSizeAxes = Axes.Both });
-            }
+            reloadStatistics();
         }
-
         // These could be local functions when C# 7 enabled
+
+        private void reloadStatistics()
+        {
+            var statistics = user.Statistics;
+
+            levelText.Text = statistics?.Level.Current.ToString() ?? "0";
+
+            scoreText.Clear();
+            scoreNumberText.Clear();
+
+            scoreText.Add(createScoreText("Ranked Score"));
+            scoreNumberText.Add(createScoreNumberText(statistics?.RankedScore.ToString(@"#,0") ?? "0"));
+            scoreText.Add(createScoreText("Accuracy"));
+            scoreNumberText.Add(createScoreNumberText($"{statistics?.Accuracy ?? 0:0.##}%"));
+            scoreText.Add(createScoreText("Play Count"));
+            scoreNumberText.Add(createScoreNumberText(statistics?.PlayCount.ToString(@"#,0") ?? "0"));
+            scoreText.Add(createScoreText("Total Score"));
+            scoreNumberText.Add(createScoreNumberText(statistics?.TotalScore.ToString(@"#,0") ?? "0"));
+            scoreText.Add(createScoreText("Total Hits"));
+            scoreNumberText.Add(createScoreNumberText(statistics?.TotalHits.ToString(@"#,0") ?? "0"));
+            scoreText.Add(createScoreText("Max Combo"));
+            scoreNumberText.Add(createScoreNumberText(statistics?.MaxCombo.ToString(@"#,0") ?? "0"));
+            scoreText.Add(createScoreText("Replays Watched by Others"));
+            scoreNumberText.Add(createScoreNumberText(statistics?.ReplaysWatched.ToString(@"#,0") ?? "0"));
+
+            gradeSS.DisplayCount = statistics?.GradesCount.SS ?? 0;
+            gradeS.DisplayCount = statistics?.GradesCount.S ?? 0;
+            gradeA.DisplayCount = statistics?.GradesCount.A ?? 0;
+
+            gradeSPlus.DisplayCount = 0;
+            gradeSSPlus.DisplayCount = 0;
+
+            graph.Redraw(user);
+        }
 
         private OsuSpriteText createScoreText(string text) => new OsuSpriteText
         {
