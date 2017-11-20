@@ -27,6 +27,7 @@ namespace osu.Game.Online.API.Requests
             this.direction = direction;
         }
 
+        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&s={(int)rankStatus}&sort={sortCriteria.ToString().ToLower()}_{directionString}";
     }
 }

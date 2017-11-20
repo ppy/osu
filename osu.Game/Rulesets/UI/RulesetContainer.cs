@@ -157,6 +157,7 @@ namespace osu.Game.Rulesets.UI
 
             WorkingBeatmap = workingBeatmap;
             IsForCurrentRuleset = isForCurrentRuleset;
+            // ReSharper disable once PossibleNullReferenceException
             Mods = workingBeatmap.Mods.Value;
 
             RelativeSizeAxes = Axes.Both;

@@ -1,9 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Diagnostics;
-using System.Net.Http;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
@@ -12,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Logging;
 using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -23,6 +20,9 @@ using OpenTK;
 using OpenTK.Graphics;
 
 #if NET461
+using System;
+using System.Net.Http;
+using osu.Framework.Logging;
 using Squirrel;
 #endif
 
@@ -101,8 +101,10 @@ namespace osu.Desktop.Overlays
                 }
             };
 
+#if NET461
             if (game.IsDeployedBuild)
                 checkForUpdateAsync();
+#endif
         }
 
         protected override void LoadComplete()
@@ -150,9 +152,9 @@ namespace osu.Desktop.Overlays
 #endif
         }
 
+#if NET461
         private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
-#if NET461
             //should we schedule a retry on completion of this check?
             bool scheduleRetry = true;
 
@@ -223,8 +225,8 @@ namespace osu.Desktop.Overlays
                         notification.State = ProgressNotificationState.Cancelled;
                 }
             }
-#endif
         }
+#endif
 
         protected override void PopIn()
         {
