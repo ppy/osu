@@ -416,7 +416,7 @@ namespace osu.Game.Overlays.Profile
 
         private void reloadStatistics()
         {
-            var statistics = user.Statistics;
+            var statistics = user?.Statistics ?? null;
 
             levelCounter.CountTo(statistics?.Level.Current ?? 0, count_duration, Easing.OutQuad);
 

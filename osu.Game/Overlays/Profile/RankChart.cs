@@ -78,6 +78,14 @@ namespace osu.Game.Overlays.Profile
 
         public void Redraw(User user)
         {
+            if (user == null)
+            {
+                rankText.Text = string.Empty;
+                performanceText.Text = string.Empty;
+                graph.FadeOut(fade_duration, Easing.Out);
+                ranks = null;
+                return;
+            }
             this.user = user;
 
             int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
@@ -125,7 +133,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnHover(InputState state)
         {
-            if (ranks.Length > 0)
+            if (ranks != null && ranks.Length > 0)
             {
                 graph.UpdateBallPosition(state.Mouse.Position.X);
                 graph.ShowBall();
@@ -135,7 +143,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnMouseMove(InputState state)
         {
-            if (ranks.Length > 0)
+            if (ranks != null && ranks.Length > 0)
                 graph.UpdateBallPosition(state.Mouse.Position.X);
 
             return base.OnMouseMove(state);
@@ -143,7 +151,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override void OnHoverLost(InputState state)
         {
-            if (ranks.Length > 0)
+            if (ranks != null && ranks.Length > 0)
             {
                 graph.HideBall();
                 updateRankTexts();
