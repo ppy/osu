@@ -10,6 +10,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -24,6 +25,24 @@ namespace osu.Game.Overlays.Profile
         protected override Container<Drawable> Content => content;
 
         public readonly Bindable<User> User = new Bindable<User>();
+
+        private Mode playMode;
+        public Mode PlayMode
+        {
+            get { return playMode; }
+            set
+            {
+                if (playMode == value)
+                    return;
+                playMode = value;
+
+                OnPlayModeChanged();
+            }
+        }
+
+        protected virtual void OnPlayModeChanged()
+        {
+        }
 
         protected ProfileSection()
         {

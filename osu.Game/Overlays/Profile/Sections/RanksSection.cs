@@ -12,13 +12,24 @@ namespace osu.Game.Overlays.Profile.Sections
 
         public override string Identifier => "top_ranks";
 
+        private readonly PaginatedScoreContainer bestScores;
+        private readonly PaginatedScoreContainer firstsScores;
+
         public RanksSection()
         {
             Children = new[]
             {
-                new PaginatedScoreContainer(ScoreType.Best, User, "Best Performance", "No performance records. :(", true),
-                new PaginatedScoreContainer(ScoreType.Firsts, User, "First Place Ranks", "No awesome performance records yet. :("),
+                bestScores = new PaginatedScoreContainer(ScoreType.Best, User, "Best Performance", "No performance records. :(", true),
+                firstsScores = new PaginatedScoreContainer(ScoreType.Firsts, User, "First Place Ranks", "No awesome performance records yet. :(", false),
             };
+        }
+
+        protected override void OnPlayModeChanged()
+        {
+            base.OnPlayModeChanged();
+
+            bestScores.ApplyPlaymode(PlayMode);
+            firstsScores.ApplyPlaymode(PlayMode);
         }
     }
 }

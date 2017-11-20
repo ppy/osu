@@ -27,6 +27,7 @@ namespace osu.Game.Overlays
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
+        private GetUserRequest modeReq;
         private APIAccess api;
         private Container header;
         private ProfileHeader profileHeader;
@@ -126,13 +127,13 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Height = 30,
+                        Height = 35,
                         Alpha = 0,
                         AlwaysPresent = true,
                     },
                     profileHeader = new ProfileHeader(user)
                     {
-                        Margin = new MarginPadding{ Top = 30 },
+                        Margin = new MarginPadding{ Top = 35 },
                     }
                 }
             };
@@ -236,13 +237,19 @@ namespace osu.Game.Overlays
 
         private void updateMode(string newMode)
         {
+            modeReq?.Cancel();
+
+            foreach (var s in sections)
+                s.PlayMode = getModeFromString(newMode);
+
             profileHeader.IsReloading = true;
-            userReq = new GetUserRequest(profileHeader.User.Id, getMode(newMode));
-            userReq.Success += user => profileHeader.User = user;
-            api.Queue(userReq);
+
+            modeReq = new GetUserRequest(profileHeader.User.Id, getModeFromString(newMode));
+            modeReq.Success += user => profileHeader.User = user;
+            api.Queue(modeReq);
         }
 
-        private Mode getMode(string mode)
+        private Mode getModeFromString(string mode)
         {
             switch (mode)
             {
@@ -263,6 +270,8 @@ namespace osu.Game.Overlays
         {
             protected override Dropdown<T> CreateDropdown() => null;
 
+            protected override bool OnClick(InputState state) => true;
+
             private readonly Box bottom;
 
             public UserTabControl()
@@ -279,6 +288,8 @@ namespace osu.Game.Overlays
                     Origin = Anchor.BottomCentre,
                     EdgeSmoothness = new Vector2(1)
                 });
+
+                TabContainer.Spacing = new Vector2(20, 0);
             }
 
             [BackgroundDependencyLoader]
@@ -286,13 +297,22 @@ namespace osu.Game.Overlays
             {
                 bottom.Colour = colours.Yellow;
             }
+
+            protected class UserTabItem : PageTabItem
+            {
+                public UserTabItem(T value) : base(value)
+                {
+                    Text.TextSize = 20;
+                    Text.Font = @"Exo2.0-Regular";
+                }
+            }
         }
 
         private class ProfileTabControl : UserTabControl<ProfileSection>
         {
             protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value);
 
-            private class ProfileTabItem : PageTabItem
+            private class ProfileTabItem : UserTabItem
             {
                 public ProfileTabItem(ProfileSection value) : base(value)
                 {
@@ -305,7 +325,7 @@ namespace osu.Game.Overlays
         {
             protected override TabItem<string> CreateTabItem(string value) => new ModeTabItem(value);
 
-            private class ModeTabItem : PageTabItem
+            private class ModeTabItem : UserTabItem
             {
                 public ModeTabItem(string value) : base(value)
                 {

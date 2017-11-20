@@ -15,6 +15,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     {
         private readonly bool includeWeight;
         private readonly ScoreType type;
+        private Mode playMode;
+        private GetUserScoresRequest request;
 
         public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing, bool includeWeight = false)
             : base(user, header, missing)
@@ -27,13 +29,20 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
+        public void ApplyPlaymode(Mode playMode)
+        {
+            request?.Cancel();
+            this.playMode = playMode;
+            TriggerUserChange();
+        }
+
         protected override void ShowMore()
         {
             base.ShowMore();
 
-            var req = new GetUserScoresRequest(User.Value.Id, type, Mode.Default, VisiblePages++ * ItemsPerPage);
+            request = new GetUserScoresRequest(User.Value.Id, type, playMode, VisiblePages++ * ItemsPerPage);
 
-            req.Success += scores =>
+            request.Success += scores =>
             {
                 foreach (var s in scores)
                     s.ApplyRuleset(Rulesets.GetRuleset(s.OnlineRulesetID));
@@ -67,7 +76,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 }
             };
 
-            Api.Queue(req);
+            Api.Queue(request);
         }
     }
 }
