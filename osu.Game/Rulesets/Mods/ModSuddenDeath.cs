@@ -3,8 +3,8 @@
 
 using System;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -29,14 +29,20 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer)
         {
-            rulesetContainer.OnJudgement += judgement =>
-            {
-                if (judgement.Result == HitResult.Miss)
-                {
-                    scoreProcessor.ForceFail();
-                }
-            };
+            rulesetContainer.OnJudgement += onRulesetContainerOnOnJudgement;
         }
+
+        private void onRulesetContainerOnOnJudgement(Judgement judgement)
+        {
+            if (!judgement.IsHit ||
+                scoreProcessor.Combo.Value == 0 &&
+                scoreProcessor.HighestCombo.Value != 0)
+            {
+                scoreProcessor.ForceFail();
+            }
+        }
+
+
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {

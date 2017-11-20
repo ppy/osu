@@ -189,14 +189,6 @@ namespace osu.Game.Rulesets.UI
             applyMods(Mods);
         }
 
-        public void ApplyModsToScoreProcessor(ScoreProcessor scoreProcessor)
-        {
-            foreach (var mod in Mods.OfType<IApplicableToScoreProcessor>())
-            {
-                mod.ApplyToScoreProcessor(scoreProcessor);
-            }
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {

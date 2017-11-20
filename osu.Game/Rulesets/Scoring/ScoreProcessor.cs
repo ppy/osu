@@ -130,8 +130,11 @@ namespace osu.Game.Rulesets.Scoring
 
         public void ForceFail()
         {
-            Failed?.Invoke();
-            HasFailed = true;
+            if (HasFailed)
+                return;
+
+            if (Failed?.Invoke() != false)
+                HasFailed = true;
         }
 
         /// <summary>
@@ -192,7 +195,6 @@ namespace osu.Game.Rulesets.Scoring
 
             rulesetContainer.OnJudgement += AddJudgement;
             rulesetContainer.OnJudgementRemoved += RemoveJudgement;
-            rulesetContainer.ApplyModsToScoreProcessor(this);
 
             SimulateAutoplay(rulesetContainer.Beatmap);
             Reset(true);
