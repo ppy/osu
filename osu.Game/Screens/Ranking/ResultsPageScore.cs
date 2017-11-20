@@ -324,7 +324,7 @@ namespace osu.Game.Screens.Ranking
                 title.Colour = artist.Colour = colours.BlueDarker;
                 versionMapper.Colour = colours.Gray8;
 
-                versionMapper.Text = $"{beatmap.Version} - mapped by {beatmap.Metadata.Author}";
+                versionMapper.Text = $"{beatmap.Version} - mapped by {beatmap.Metadata.Author.Username}";
                 title.Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title);
                 artist.Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist);
             }
