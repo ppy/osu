@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Input.Handlers;
 using osu.Framework.Platform;
@@ -32,7 +33,7 @@ namespace osu.Game.Input.Handlers
 
         public override int Priority => 0;
 
-        public class ReplayState<T> : InputState
+        public sealed class ReplayState<T> : InputState
             where T : struct
         {
             public List<T> PressedActions;
@@ -42,6 +43,26 @@ namespace osu.Game.Input.Handlers
                 var clone = (ReplayState<T>)base.Clone();
                 clone.PressedActions = new List<T>(PressedActions);
                 return clone;
+            }
+
+            public override IEnumerable<InputState> CreateDistinctStates(InputState currentState)
+            {
+                // handles mouse, keyboard, positional
+                foreach (var state in base.CreateDistinctStates(currentState))
+                    yield return state;
+
+                var current = currentState as ReplayState<T>;
+
+                if (current == null)
+                    yield break;
+
+                var lastActions = current.PressedActions;
+
+                foreach (var releasedAction in lastActions?.Except(PressedActions) ?? new T[] { })
+                    yield return new ReplayState<T> { PressedActions = lastActions = lastActions.Where(d => !d.Equals(releasedAction)).ToList() };
+
+                foreach (var pressedKey in PressedActions.Except(lastActions ?? new List<T>()))
+                    yield return new ReplayState<T> { PressedActions = lastActions = lastActions?.Union(new[] { pressedKey }).ToList() ?? new List<T> { pressedKey } };
             }
         }
     }
