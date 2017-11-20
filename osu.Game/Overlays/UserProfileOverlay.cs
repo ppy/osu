@@ -241,14 +241,14 @@ namespace osu.Game.Overlays
         {
             modeReq?.Cancel();
 
-            foreach (var s in sections)
-                s.PlayMode = getModeFromString(newMode);
-
             profileHeader.IsReloading = true;
 
             modeReq = new GetUserRequest(profileHeader.User.Id, getModeFromString(newMode));
             modeReq.Success += user => profileHeader.User = user;
             api.Queue(modeReq);
+
+            foreach (var s in sections)
+                s.PlayMode = getModeFromString(newMode);
         }
 
         private Mode getModeFromString(string mode)
