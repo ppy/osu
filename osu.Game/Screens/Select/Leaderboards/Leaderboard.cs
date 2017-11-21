@@ -146,6 +146,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private BeatmapInfo beatmap;
 
+        private OsuGame osuGame;
+
         private ScheduledDelegate pendingBeatmapSwitch;
 
         public BeatmapInfo Beatmap
@@ -164,9 +166,12 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api)
+        private void load(APIAccess api, OsuGame osuGame)
         {
             this.api = api;
+            this.osuGame = osuGame;
+
+            osuGame.Ruleset.ValueChanged += r => updateScores();
         }
 
         private GetScoresRequest getScoresRequest;
@@ -176,7 +181,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (!IsLoaded) return;
 
             Scores = null;
-            getScoresRequest?.Cancel();
+
+            if (api == null || Beatmap?.OnlineBeatmapID == null) return;
 
             if (Scope == LeaderboardScope.Local)
             {
@@ -185,11 +191,9 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return;
             }
 
-            if (api == null || Beatmap?.OnlineBeatmapID == null) return;
-
             loading.Show();
 
-            getScoresRequest = new GetScoresRequest(Beatmap, Scope);
+            getScoresRequest = new GetScoresRequest(Beatmap, Scope, osuGame.Ruleset.Value);
             getScoresRequest.Success += r =>
             {
                 Scores = r.Scores;
