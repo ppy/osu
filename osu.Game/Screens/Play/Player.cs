@@ -227,6 +227,9 @@ namespace osu.Game.Screens.Play
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;
+
+            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
+                mod.ApplyToScoreProcessor(scoreProcessor);
         }
 
         private void applyRateFromMods()
