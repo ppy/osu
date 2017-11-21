@@ -259,7 +259,7 @@ namespace osu.Game.Tests.Visual
                     if (calculator == null)
                         return;
 
-                    var attributes = new Dictionary<string, string>();
+                    var attributes = new Dictionary<string, double>();
                     double performance = calculator.Calculate(attributes);
 
                     text.Text = $"{score.User.Username} -> online: {score.PP:n2}pp | local: {performance:n2}pp";
@@ -364,12 +364,12 @@ namespace osu.Game.Tests.Visual
                     var diffCalc = ruleset.CreateDifficultyCalculator(beatmap.Beatmap, activeMods);
                     if (diffCalc != null)
                     {
-                        var categories = new Dictionary<string, string>();
+                        var categories = new Dictionary<string, double>();
                         double totalSr = diffCalc.Calculate(categories);
 
                         totalText.Text = $"Star rating: {totalSr:n2}";
                         foreach (var kvp in categories)
-                            categoryTexts.Add(new OsuSpriteText { Text = $"{kvp.Key}: {kvp.Value}" });
+                            categoryTexts.Add(new OsuSpriteText { Text = $"{kvp.Key}: {kvp.Value:n2}" });
                     }
 
                     informationCache.Validate();

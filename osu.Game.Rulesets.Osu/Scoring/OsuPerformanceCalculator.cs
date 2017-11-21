@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private readonly int beatmapMaxCombo;
 
         private Mod[] mods;
+        private double realApproachRate;
         private double accuracy;
         private int scoreMaxCombo;
         private int count300;
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.RepeatCount + s.Ticks.Count());
         }
 
-        public override double Calculate(Dictionary<string, string> categoryRatings = null)
+        public override double Calculate(Dictionary<string, double> categoryRatings = null)
         {
             mods = Score.Mods;
             accuracy = Score.Accuracy;
@@ -81,9 +82,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             if (categoryRatings != null)
             {
-                categoryRatings.Add("Aim", aimValue.ToString("0.00"));
-                categoryRatings.Add("Speed", speedValue.ToString("0.00"));
-                categoryRatings.Add("Accuracy", accuracyValue.ToString("0.00"));
+                categoryRatings.Add("Aim", aimValue);
+                categoryRatings.Add("Speed", speedValue);
+                categoryRatings.Add("Accuracy", accuracyValue);
             }
 
             return totalValue;
@@ -91,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private double computeAimValue()
         {
-            double aimValue = Math.Pow(5.0f * Math.Max(1.0f, double.Parse(Attributes["Aim"]) / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double aimValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes["Aim"] / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
             double lengthBonus = 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
@@ -139,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private double computeSpeedValue()
         {
-            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, double.Parse(Attributes["Speed"]) / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes["Speed"] / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
             speedValue *= 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
