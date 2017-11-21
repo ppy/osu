@@ -43,12 +43,6 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            AlwaysPresent = true;
-        }
-
         protected override bool BlockPassThroughMouse => false;
 
         protected override void PopIn()
