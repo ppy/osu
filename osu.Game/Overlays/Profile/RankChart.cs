@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Profile
             int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
             ranks = userRanks.Where(x => x != 0).ToArray();
 
-            if (ranks.Length > 0)
+            if (ranks.Length > 1)
             {
                 graph.DefaultValueCount = ranks.Length;
                 graph.Values = ranks.Select(x => -(float)Math.Log(x));
