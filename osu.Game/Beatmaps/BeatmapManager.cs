@@ -20,6 +20,7 @@ using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IPC;
+using osu.Game.Notifications;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
@@ -87,7 +88,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
-        public Action<Notification> PostNotification { private get; set; }
+        public Action<NotificationContainer> PostNotification { private get; set; }
 
         /// <summary>
         /// Set a storage with access to an osu-stable install for import purposes.
@@ -119,19 +120,17 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Import one or more <see cref="BeatmapSetInfo"/> from filesystem <paramref name="paths"/>.
-        /// This will post a notification tracking import progress.
+        /// This will post a notificationContainer tracking import progress.
         /// </summary>
         /// <param name="paths">One or more beatmap locations on disk.</param>
         public void Import(params string[] paths)
         {
-            var notification = new ProgressNotification
+            var notification = new ProgressNotification("Beatmap import is initialising...")
             {
-                Text = "Beatmap import is initialising...",
-                Progress = 0,
-                State = ProgressNotificationState.Active,
+                State = ProgressNotificationState.Active
             };
 
-            PostNotification?.Invoke(notification);
+            PostNotification?.Invoke(new ProgressNotificationContainer(notification));
 
             int i = 0;
             foreach (string path in paths)
@@ -230,10 +229,11 @@ namespace osu.Game.Beatmaps
 
             if (api == null) return null;
 
-            ProgressNotification downloadNotification = new ProgressNotification
-            {
-                Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
-            };
+            ProgressNotification downloadNotification = new ProgressNotification(
+                $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}"
+            );
+
+            downloadNotification.FollowUpNotifications.Add(new SimpleNotificationContainer($"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title} finished"));
 
             var request = new DownloadBeatmapSetRequest(beatmapSetInfo);
 
@@ -272,11 +272,10 @@ namespace osu.Game.Beatmaps
                 request.Cancel();
                 currentDownloads.Remove(request);
                 downloadNotification.State = ProgressNotificationState.Cancelled;
-                return true;
             };
 
             currentDownloads.Add(request);
-            PostNotification?.Invoke(downloadNotification);
+            PostNotification?.Invoke(new ProgressNotificationContainer(downloadNotification));
 
             // don't run in the main api queue as this is a long-running task.
             Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
@@ -634,13 +633,13 @@ namespace osu.Game.Beatmaps
 
             if (maps.Count == 0) return;
 
-            var notification = new ProgressNotification
+            var notification = new ProgressNotification("")
             {
                 Progress = 0,
                 State = ProgressNotificationState.Active,
             };
 
-            PostNotification?.Invoke(notification);
+            PostNotification?.Invoke(new ProgressNotificationContainer(notification));
 
             int i = 0;
 

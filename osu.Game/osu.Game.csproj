@@ -284,6 +284,10 @@
       <DependentUpon>20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
+    <Compile Include="Notifications\IHasCompletionTarget.cs" />
+    <Compile Include="Notifications\Notification.cs" />
+    <Compile Include="Notifications\ProgressNotification.cs" />
+    <Compile Include="Notifications\ProgressNotificationState.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ClickableUsername.cs" />
@@ -291,6 +295,7 @@
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableTopScore.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ScoresContainer.cs" />
     <Compile Include="Online\API\Requests\GetUserBeatmapsRequest.cs" />
+    <Compile Include="Overlays\Notifications\IHasNotification.cs" />
     <Compile Include="Overlays\Profile\Sections\Beatmaps\PaginatedBeatmapContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\PaginatedContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawablePerformanceScore.cs" />
@@ -470,12 +475,10 @@
     <Compile Include="Overlays\Music\PlaylistList.cs" />
     <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
     <Compile Include="Overlays\NotificationOverlay.cs" />
-    <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
-    <Compile Include="Overlays\Notifications\Notification.cs" />
+    <Compile Include="Overlays\Notifications\NotificationContainer.cs" />
     <Compile Include="Overlays\Notifications\NotificationSection.cs" />
-    <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
-    <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
-    <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
+    <Compile Include="Overlays\Notifications\ProgressNotificationContainer.cs" />
+    <Compile Include="Overlays\Notifications\SimpleNotificationContainer.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableScore.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />

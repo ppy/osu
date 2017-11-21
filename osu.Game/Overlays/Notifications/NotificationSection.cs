@@ -22,11 +22,11 @@ namespace osu.Game.Overlays.Notifications
 
         private ClearAllButton clearButton;
 
-        private FlowContainer<Notification> notifications;
+        private FlowContainer<NotificationContainer> notifications;
 
         public int DisplayedCount => notifications.Count(n => !n.WasClosed);
 
-        public void Add(Notification notification) => notifications.Add(notification);
+        public void Add(NotificationContainer notificationContainer) => notifications.Add(notificationContainer);
 
         public IEnumerable<Type> AcceptTypes;
 
@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Notifications
                         },
                     },
                 },
-                notifications = new FillFlowContainer<Notification>
+                notifications = new FillFlowContainer<NotificationContainer>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,

@@ -4,97 +4,20 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Notifications;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class ProgressNotification : Notification, IHasCompletionTarget
+    public class ProgressNotificationContainer : NotificationContainer, IHasNotification
     {
-        public string Text
-        {
-            set
-            {
-                Schedule(() => textDrawable.Text = value);
-            }
-        }
-
-        public float Progress
-        {
-            get { return progressBar.Progress; }
-            set { Schedule(() => progressBar.Progress = value); }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            //we may have received changes before we were displayed.
-            State = state;
-        }
-
-        public virtual ProgressNotificationState State
-        {
-            get { return state; }
-            set
-            {
-                Schedule(() =>
-                {
-                    bool stateChanged = state != value;
-                    state = value;
-
-                    if (IsLoaded)
-                    {
-                        switch (state)
-                        {
-                            case ProgressNotificationState.Queued:
-                                Light.Colour = colourQueued;
-                                Light.Pulsate = false;
-                                progressBar.Active = false;
-                                break;
-                            case ProgressNotificationState.Active:
-                                Light.Colour = colourActive;
-                                Light.Pulsate = true;
-                                progressBar.Active = true;
-                                break;
-                            case ProgressNotificationState.Cancelled:
-                                Light.Colour = colourCancelled;
-                                Light.Pulsate = false;
-                                progressBar.Active = false;
-                                break;
-                        }
-                    }
-
-                    if (stateChanged)
-                    {
-                        switch (state)
-                        {
-                            case ProgressNotificationState.Completed:
-                                NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
-                                this.FadeOut(200).Finally(d => Completed());
-                                break;
-                        }
-                    }
-                });
-            }
-        }
-
-        private ProgressNotificationState state;
-
-        protected virtual Notification CreateCompletionNotification() => new ProgressCompletionNotification
-        {
-            Activated = CompletionClickAction,
-            Text = "Task has completed!"
-        };
-
-        protected virtual void Completed()
-        {
-            Expire();
-            CompletionTarget?.Invoke(CreateCompletionNotification());
-        }
+        public ProgressNotification ProgressNotification { get; }
+        public Notification Notification => ProgressNotification;
 
         public override bool DisplayOnTop => false;
 
@@ -104,17 +27,39 @@ namespace osu.Game.Overlays.Notifications
         private Color4 colourCancelled;
 
         private readonly TextFlowContainer textDrawable;
+        private readonly SpriteIcon iconDrawable;
 
-        public ProgressNotification()
+        protected Box IconBackgound;
+
+        public ProgressNotificationContainer(ProgressNotification progressNotification)
         {
-            IconContent.Add(new Box
+            ProgressNotification = progressNotification;
+            ProgressNotification.StateBinding.ValueChanged += stateOnValueChanged;
+
+            ProgressNotification.ProgressBinding.ValueChanged += value => Schedule(() => progressBar.Progress = value);
+            ProgressNotification.IconBinding.ValueChanged += value => Schedule(() => iconDrawable.Icon = value);
+            ProgressNotification.TextBinding.ValueChanged += value => Schedule(() => textDrawable.Text = value);
+
+            IconContent.AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
+                IconBackgound = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.6f))
+                },
+                iconDrawable = new SpriteIcon
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Icon = ProgressNotification.Icon,
+                    Size = new Vector2(20),
+                }
             });
 
             Content.Add(textDrawable = new TextFlowContainer(t =>
             {
                 t.TextSize = 16;
+
             })
             {
                 Colour = OsuColour.Gray(128),
@@ -122,17 +67,47 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.X,
             });
 
+            Schedule(() => textDrawable.Text = ProgressNotification.Text);
+
             NotificationContent.Add(progressBar = new ProgressBar
             {
                 Origin = Anchor.BottomLeft,
                 Anchor = Anchor.BottomLeft,
                 RelativeSizeAxes = Axes.X,
+                Progress = 0
             });
-
-            State = ProgressNotificationState.Queued;
 
             // don't close on click by default.
             Activated = () => false;
+        }
+
+        private void stateOnValueChanged(ProgressNotificationState newValue)
+        {
+            if (IsLoaded)
+            {
+                switch (newValue)
+                {
+                    case ProgressNotificationState.Queued:
+                        Light.Colour = colourQueued;
+                        Light.Pulsate = false;
+                        progressBar.Active = false;
+                        break;
+                    case ProgressNotificationState.Active:
+                        Light.Colour = colourActive;
+                        Light.Pulsate = true;
+                        progressBar.Active = true;
+                        break;
+                    case ProgressNotificationState.Cancelled:
+                        Light.Colour = colourCancelled;
+                        Light.Pulsate = false;
+                        progressBar.Active = false;
+                        break;
+                    case ProgressNotificationState.Completed:
+                        NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
+                        this.FadeOut(200).Finally(d => Expire());
+                        break;
+                }
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -145,28 +120,23 @@ namespace osu.Game.Overlays.Notifications
 
         public override void Close()
         {
-            switch (State)
+            switch (ProgressNotification.State)
             {
                 case ProgressNotificationState.Cancelled:
                     base.Close();
                     break;
                 case ProgressNotificationState.Active:
                 case ProgressNotificationState.Queued:
-                    if (CancelRequested?.Invoke() != false)
-                        State = ProgressNotificationState.Cancelled;
+                    ProgressNotification.RequestCancel();
                     break;
             }
         }
 
         public Func<bool> CancelRequested { get; set; }
 
-        /// <summary>
-        /// The function to post completion notifications back to.
-        /// </summary>
-        public Action<Notification> CompletionTarget { get; set; }
 
         /// <summary>
-        /// An action to complete when the completion notification is clicked.
+        /// An action to complete when the completion notificationContainer is clicked.
         /// </summary>
         public Func<bool> CompletionClickAction;
 
@@ -223,13 +193,9 @@ namespace osu.Game.Overlays.Notifications
                 Height = 5;
             }
         }
+
+
     }
 
-    public enum ProgressNotificationState
-    {
-        Queued,
-        Active,
-        Completed,
-        Cancelled
-    }
+
 }

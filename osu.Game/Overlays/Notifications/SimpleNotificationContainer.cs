@@ -1,47 +1,44 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Notifications;
 using OpenTK;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class SimpleNotification : Notification
+    public class SimpleNotificationContainer : NotificationContainer, IHasNotification
     {
-        private string text = string.Empty;
-        public string Text
-        {
-            get { return text; }
-            set
-            {
-                text = value;
-                textDrawable.Text = text;
-            }
-        }
+        public Notification Notification { get; }
 
-        private FontAwesome icon = FontAwesome.fa_info_circle;
-        public FontAwesome Icon
-        {
-            get { return icon; }
-            set
-            {
-                icon = value;
-                iconDrawable.Icon = icon;
-            }
-        }
+        public string Text => Notification.Text;
+        public FontAwesome Icon => Notification.Icon;
 
         private readonly TextFlowContainer textDrawable;
         private readonly SpriteIcon iconDrawable;
 
         protected Box IconBackgound;
 
-        public SimpleNotification()
+        public SimpleNotificationContainer(String text, FontAwesome icon = FontAwesome.fa_info_circle)
+         : this(new Notification(text, icon))
+        {}
+
+        public SimpleNotificationContainer(Notification notification)
         {
+            if (notification == null)
+                throw new ArgumentNullException(nameof(notification));
+
+            Notification = notification;
+
+            Notification.IconBinding.ValueChanged += value => iconDrawable.Icon = value;
+            Notification.TextBinding.ValueChanged += value => textDrawable.Text = value;
+
             IconContent.AddRange(new Drawable[]
             {
                 IconBackgound = new Box
@@ -53,7 +50,7 @@ namespace osu.Game.Overlays.Notifications
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = icon,
+                    Icon = Notification.Icon,
                     Size = new Vector2(20),
                 }
             });
@@ -63,9 +60,16 @@ namespace osu.Game.Overlays.Notifications
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-                Text = text
+                Text = Notification.Text
             });
+
+            Activated = () =>
+            {
+                Notification.Activate();
+                return true;
+            };
         }
+
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

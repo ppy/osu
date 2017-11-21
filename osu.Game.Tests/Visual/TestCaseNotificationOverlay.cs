@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
+using osu.Game.Notifications;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
@@ -64,48 +65,48 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            progressingNotifications.RemoveAll(n => n.State == ProgressNotificationState.Completed);
+            progressingNotifications.RemoveAll(n => n.ProgressNotification.State == ProgressNotificationState.Completed);
 
-            if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
+            if (progressingNotifications.Count(n => n.ProgressNotification.State == ProgressNotificationState.Active) < 3)
             {
-                var p = progressingNotifications.FirstOrDefault(n => n.IsAlive && n.State == ProgressNotificationState.Queued);
+                var p = progressingNotifications.FirstOrDefault(n => n.IsAlive && n.ProgressNotification.State == ProgressNotificationState.Queued);
                 if (p != null)
-                    p.State = ProgressNotificationState.Active;
+                    p.ProgressNotification.State = ProgressNotificationState.Active;
             }
 
-            foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))
+            foreach (var n in progressingNotifications.FindAll(n => n.ProgressNotification.State == ProgressNotificationState.Active))
             {
-                if (n.Progress < 1)
-                    n.Progress += (float)(Time.Elapsed / 2000) * RNG.NextSingle();
+                if (n.ProgressNotification.Progress < 1)
+                    n.ProgressNotification.Progress += (float)(Time.Elapsed / 2000) * RNG.NextSingle();
                 else
-                    n.State = ProgressNotificationState.Completed;
+                    n.ProgressNotification.State = ProgressNotificationState.Completed;
             }
         }
 
         private void sendProgress2()
         {
-            var n = new ProgressNotification { Text = @"Downloading Haitai..." };
+            var n = new ProgressNotificationContainer(new ProgressNotification(@"Downloading Haitai..."));
             manager.Post(n);
             progressingNotifications.Add(n);
         }
 
-        private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
+        private readonly List<ProgressNotificationContainer> progressingNotifications = new List<ProgressNotificationContainer>();
 
         private void sendProgress1()
         {
-            var n = new ProgressNotification { Text = @"Uploading to BSS..." };
+            var n = new ProgressNotificationContainer(new ProgressNotification(@"Uploading to BSS..."));
             manager.Post(n);
             progressingNotifications.Add(n);
         }
 
         private void sendNotification2()
         {
-            manager.Post(new SimpleNotification { Text = @"You are amazing" });
+            manager.Post(new SimpleNotificationContainer(@"You are amazing" ));
         }
 
         private void sendNotification1()
         {
-            manager.Post(new SimpleNotification { Text = @"Welcome to osu!. Enjoy your stay!" });
+            manager.Post(new SimpleNotificationContainer (@"Welcome to osu!. Enjoy your stay!" ));
         }
     }
 }

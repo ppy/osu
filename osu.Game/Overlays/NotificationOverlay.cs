@@ -10,6 +10,7 @@ using osu.Game.Overlays.Notifications;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
+using osu.Game.Notifications;
 
 namespace osu.Game.Overlays
 {
@@ -55,13 +56,13 @@ namespace osu.Game.Overlays
                                 {
                                     Title = @"Notifications",
                                     ClearText = @"Clear All",
-                                    AcceptTypes = new[] { typeof(SimpleNotification) },
+                                    AcceptTypes = new[] { typeof(SimpleNotificationContainer) },
                                 },
                                 new NotificationSection
                                 {
                                     Title = @"Running Tasks",
                                     ClearText = @"Cancel All",
-                                    AcceptTypes = new[] { typeof(ProgressNotification) },
+                                    AcceptTypes = new[] { typeof(ProgressNotificationContainer) },
                                 },
                             }
                         }
@@ -79,23 +80,24 @@ namespace osu.Game.Overlays
                 State = Visibility.Hidden;
         }
 
-        public void Post(Notification notification)
+        public void Post(NotificationContainer notificationContainer)
         {
             Schedule(() =>
             {
                 State = Visibility.Visible;
 
                 ++runningDepth;
-                notification.Depth = notification.DisplayOnTop ? runningDepth : -runningDepth;
+                notificationContainer.Depth = notificationContainer.DisplayOnTop ? runningDepth : -runningDepth;
 
-                notification.Closed += notificationClosed;
+                notificationContainer.Closed += notificationClosed;
 
-                var hasCompletionTarget = notification as IHasCompletionTarget;
-                if (hasCompletionTarget != null)
-                    hasCompletionTarget.CompletionTarget = Post;
+                Notification notification = (notificationContainer as IHasNotification)?.Notification;
 
-                var ourType = notification.GetType();
-                sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
+                if (notification is IHasCompletionTarget)
+                    (notification as IHasCompletionTarget).CompletionTarget = Post;
+
+                var ourType = notificationContainer.GetType();
+                sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notificationContainer);
             });
         }
 
