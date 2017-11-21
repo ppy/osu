@@ -11,7 +11,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
-    internal class VolumeControl : OverlayContainer
+    public class VolumeControl : OverlayContainer
     {
         private readonly VolumeMeter volumeMeterMaster;
 

@@ -100,7 +100,7 @@ namespace osu.Game.Online.Multiplayer
         }
     }
 
-    internal class VersusRow : FillFlowContainer
+    public class VersusRow : FillFlowContainer
     {
         public VersusRow(Color4 first, Color4 second, float size)
         {

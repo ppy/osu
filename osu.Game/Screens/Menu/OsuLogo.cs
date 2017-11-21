@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         /// <param name="action">The animation to be performed</param>
         /// <param name="waitForPrevious">If true, the new animation is delayed until all previous transforms finish. If false, existing transformed are cleared.</param>
-        internal void AppendAnimatingAction(Action action, bool waitForPrevious)
+        public void AppendAnimatingAction(Action action, bool waitForPrevious)
         {
             Action runnableAction = () =>
             {

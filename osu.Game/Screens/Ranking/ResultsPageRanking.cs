@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Ranking
 {
-    internal class ResultsPageRanking : ResultsPage
+    public class ResultsPageRanking : ResultsPage
     {
         public ResultsPageRanking(Score score, WorkingBeatmap beatmap = null) : base(score, beatmap)
         {
