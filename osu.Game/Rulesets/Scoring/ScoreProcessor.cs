@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
