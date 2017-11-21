@@ -49,6 +49,17 @@ namespace osu.Game.Rulesets.Osu.Scoring
             if (mods.Any(m => m is OsuModRelax || m is OsuModAutopilot || m is OsuModAutoplay))
                 return 0;
 
+            // Todo: In the future we should apply changes to PreEmpt/AR at an OsuHitObject/BaseDifficulty level, but this is done
+            // locally for now as doing so would modify animations and other things unexpectedly
+            // DO NOT MODIFY THIS
+            double ar = Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate;
+            if (mods.Any(m => m is OsuModHardRock))
+                ar = Math.Min(10, ar * 1.4);
+            if (mods.Any(m => m is OsuModEasy))
+                ar = Math.Max(0, ar / 2);
+            double preEmpt = BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450);
+            realApproachRate = preEmpt > 1200 ? (1800 - preEmpt) / 120 : (1200 - preEmpt) / 150 + 5;
+
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.12f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
@@ -95,17 +106,16 @@ namespace osu.Game.Rulesets.Osu.Scoring
             if (beatmapMaxCombo > 0)
                 aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
 
-            double approachRate = Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate;
             double approachRateFactor = 1.0f;
-            if (approachRate > 10.33f)
-                approachRateFactor += 0.45f * (approachRate - 10.33f);
-            else if (approachRate < 8.0f)
+            if (realApproachRate > 10.33f)
+                approachRateFactor += 0.45f * (realApproachRate - 10.33f);
+            else if (realApproachRate < 8.0f)
             {
                 // HD is worth more with lower ar!
                 if (mods.Any(h => h is OsuModHidden))
-                    approachRateFactor += 0.02f * (8.0f - approachRate);
+                    approachRateFactor += 0.02f * (8.0f - realApproachRate);
                 else
-                    approachRateFactor += 0.01f * (8.0f - approachRate);
+                    approachRateFactor += 0.01f * (8.0f - realApproachRate);
             }
 
             aimValue *= approachRateFactor;
