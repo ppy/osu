@@ -279,6 +279,10 @@
     <Compile Include="Migrations\20171025071459_AddMissingIndexRules.Designer.cs">
       <DependentUpon>20171025071459_AddMissingIndexRules.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs" />
+    <Compile Include="Migrations\20171119065731_AddBeatmapOnlineIDUniqueConstraint.designer.cs">
+      <DependentUpon>20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />

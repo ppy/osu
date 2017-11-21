@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public HitObjectContainer HitObjects { get; protected set; }
 
-        internal Container<Drawable> ScaledContent;
+        public Container<Drawable> ScaledContent;
 
         /// <summary>
         /// Whether we are currently providing the local user a gameplay cursor.

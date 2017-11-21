@@ -13,7 +13,7 @@ using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Overlays
 {
-    internal class LoginOverlay : OsuFocusedOverlayContainer
+    public class LoginOverlay : OsuFocusedOverlayContainer
     {
         private LoginSettings settingsSection;
 
