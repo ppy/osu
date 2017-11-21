@@ -12,7 +12,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Multiplayer
 {
-    internal class Match : ScreenWhiteBox
+    public class Match : ScreenWhiteBox
     {
         protected override IEnumerable<Type> PossibleChildren => new[] {
             typeof(MatchSongSelect),

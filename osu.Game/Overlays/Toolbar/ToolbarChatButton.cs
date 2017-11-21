@@ -6,7 +6,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    internal class ToolbarChatButton : ToolbarOverlayToggleButton
+    public class ToolbarChatButton : ToolbarOverlayToggleButton
     {
         public ToolbarChatButton()
         {

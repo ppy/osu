@@ -26,7 +26,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Ranking
 {
-    internal class ResultsPageScore : ResultsPage
+    public class ResultsPageScore : ResultsPage
     {
         private ScoreCounter scoreCounter;
 
