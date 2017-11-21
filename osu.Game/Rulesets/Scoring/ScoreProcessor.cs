@@ -128,6 +128,15 @@ namespace osu.Game.Rulesets.Scoring
                 HasFailed = true;
         }
 
+        public void ForceFail()
+        {
+            if (HasFailed)
+                return;
+
+            if (Failed?.Invoke() != false)
+                HasFailed = true;
+        }
+
         /// <summary>
         /// Notifies subscribers of <see cref="NewJudgement"/> that a new judgement has occurred.
         /// </summary>

@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
     }
 
-    public class OsuModSuddenDeath : ModSuddenDeath
+    public class OsuModSuddenDeath : ModSuddenDeath<OsuHitObject>
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
     }
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1.12;
     }
 
-    public class OsuModPerfect : ModPerfect
+    public class OsuModPerfect : ModPerfect<OsuHitObject>
     {
 
     }

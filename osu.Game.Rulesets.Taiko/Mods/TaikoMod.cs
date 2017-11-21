@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override bool Ranked => true;
     }
 
-    public class TaikoModSuddenDeath : ModSuddenDeath
+    public class TaikoModSuddenDeath : ModSuddenDeath<TaikoHitObject>
     {
 
     }
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override double ScoreMultiplier => 1.12;
     }
 
-    public class TaikoModPerfect : ModPerfect
+    public class TaikoModPerfect : ModPerfect<TaikoHitObject>
     {
 
     }

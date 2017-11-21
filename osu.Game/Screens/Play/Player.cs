@@ -16,6 +16,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -207,6 +208,8 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = RulesetContainer.CreateScoreProcessor();
 
+            applyModsToScoreProcessor(working.Mods.Value, scoreProcessor);
+
             if (showStoryboard)
                 initializeStoryboard(false);
 
@@ -227,6 +230,12 @@ namespace osu.Game.Screens.Play
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;
+        }
+
+        private void applyModsToScoreProcessor(IEnumerable<Mod> mods, ScoreProcessor scoreProcessor)
+        {
+            foreach (var mod in mods.OfType<IApplicableToScoreProcessor>())
+                mod.ApplyToScoreProcessor(scoreProcessor);
         }
 
         private void applyRateFromMods()
