@@ -146,7 +146,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnHover(InputState state)
         {
-            if (ranks != null && ranks.Length > 1)
+            if (ranks?.Length > 1)
             {
                 graph.UpdateBallPosition(state.Mouse.Position.X);
                 graph.ShowBall();
@@ -156,7 +156,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnMouseMove(InputState state)
         {
-            if (ranks != null && ranks.Length > 1)
+            if (ranks?.Length > 1)
                 graph.UpdateBallPosition(state.Mouse.Position.X);
 
             return base.OnMouseMove(state);
@@ -164,7 +164,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override void OnHoverLost(InputState state)
         {
-            if (ranks != null && ranks.Length > 1)
+            if (ranks?.Length > 1)
             {
                 graph.HideBall();
                 updateRankTexts();
