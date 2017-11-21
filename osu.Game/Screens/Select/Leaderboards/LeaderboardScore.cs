@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Padding = new MarginPadding(edge_margin),
                             Children = new Drawable[]
                             {
-                                avatar = new DelayedLoadWrapper(
+                                avatar = new LoadWrapper(
                                     new Avatar(Score.User)
                                     {
                                         RelativeSizeAxes = Axes.Both,

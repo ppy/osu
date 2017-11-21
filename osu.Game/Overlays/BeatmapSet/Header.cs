@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly AuthorInfo author;
         public Details Details;
 
-        private DelayedLoadWrapper cover;
+        private LoadWrapper cover;
 
         public readonly BeatmapPicker Picker;
 
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
 
                 cover?.FadeOut(400, Easing.Out);
-                coverContainer.Add(cover = new DelayedLoadWrapper(new BeatmapSetCover(BeatmapSet)
+                coverContainer.Add(cover = new LoadWrapper(new BeatmapSetCover(BeatmapSet)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
