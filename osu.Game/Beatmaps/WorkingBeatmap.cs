@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace osu.Game.Beatmaps
 {
@@ -29,10 +30,10 @@ namespace osu.Game.Beatmaps
 
             Mods.ValueChanged += mods => applyRateAdjustments();
 
-            beatmap = new Lazy<Beatmap>(populateBeatmap);
-            background = new Lazy<Texture>(populateBackground);
-            track = new Lazy<Track>(populateTrack);
-            waveform = new Lazy<Waveform>(populateWaveform);
+            beatmap = new AsyncLazy<Beatmap>(populateBeatmap);
+            background = new AsyncLazy<Texture>(populateBackground);
+            track = new AsyncLazy<Track>(populateTrack);
+            waveform = new AsyncLazy<Waveform>(populateWaveform);
         }
 
         protected abstract Beatmap GetBeatmap();
@@ -41,8 +42,10 @@ namespace osu.Game.Beatmaps
         protected virtual Waveform GetWaveform() => new Waveform();
 
         public bool BeatmapLoaded => beatmap.IsValueCreated;
-        public Beatmap Beatmap => beatmap.Value;
-        private readonly Lazy<Beatmap> beatmap;
+        public Beatmap Beatmap => beatmap.Value.Result;
+        public async Task<Beatmap> GetBeatmapAsync() => await beatmap.Value;
+
+        private readonly AsyncLazy<Beatmap> beatmap;
 
         private Beatmap populateBeatmap()
         {
@@ -55,14 +58,16 @@ namespace osu.Game.Beatmaps
         }
 
         public bool BackgroundLoaded => background.IsValueCreated;
-        public Texture Background => background.Value;
-        private Lazy<Texture> background;
+        public Texture Background => background.Value.Result;
+        public async Task<Texture> GetBackgroundAsync() => await background.Value;
+        private AsyncLazy<Texture> background;
 
         private Texture populateBackground() => GetBackground();
 
         public bool TrackLoaded => track.IsValueCreated;
-        public Track Track => track.Value;
-        private Lazy<Track> track;
+        public Track Track => track.Value.Result;
+        public async Task<Track> GetTrackAsync() => await track.Value;
+        private AsyncLazy<Track> track;
 
         private Track populateTrack()
         {
@@ -73,8 +78,9 @@ namespace osu.Game.Beatmaps
         }
 
         public bool WaveformLoaded => waveform.IsValueCreated;
-        public Waveform Waveform => waveform.Value;
-        private readonly Lazy<Waveform> waveform;
+        public Waveform Waveform => waveform.Value.Result;
+        public async Task<Waveform> GetWaveformAsync() => await waveform.Value;
+        private readonly AsyncLazy<Waveform> waveform;
 
         private Waveform populateWaveform() => GetWaveform();
 
@@ -106,6 +112,14 @@ namespace osu.Game.Beatmaps
             t.ResetSpeedAdjustments();
             foreach (var mod in Mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(t);
+        }
+
+        public class AsyncLazy<T> : Lazy<Task<T>>
+        {
+            public AsyncLazy(Func<T> valueFactory)
+                : base(() => Task.Run(valueFactory))
+            {
+            }
         }
     }
 }
