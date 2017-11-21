@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                 ShowMoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
                 ShowMoreLoading.Hide();
 
-                if (!sets.Any())
+                if (!sets.Any() && VisiblePages == 1)
                 {
                     MissingText.Show();
                     return;
