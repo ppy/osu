@@ -301,6 +301,7 @@
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
     <Compile Include="Screens\Edit\Components\PlaybackContainer.cs" />
     <Compile Include="Screens\Edit\Components\TimeInfoContainer.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToScoreProcessor.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
