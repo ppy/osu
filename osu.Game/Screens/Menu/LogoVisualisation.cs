@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Menu
 
         private void updateAmplitudes()
         {
-            var track = beatmap.Value.Track;
+            var track = beatmap.Value.TrackLoaded ? beatmap.Value.Track : null;
 
             float[] temporalAmplitudes = track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
 
