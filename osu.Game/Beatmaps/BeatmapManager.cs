@@ -483,7 +483,8 @@ namespace osu.Game.Beatmaps
             using (var stream = new StreamReader(reader.GetStream(mapName)))
                 metadata = BeatmapDecoder.GetDecoder(stream).Decode(stream).Metadata;
 
-            beatmapSet = new BeatmapSetInfo
+            // check if a set already exists with the same online id.
+            beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) ?? new BeatmapSetInfo
             {
                 OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
@@ -510,16 +511,21 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
-                    // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
-                    beatmap.BeatmapInfo.Metadata = null;
+                    var existing = beatmaps.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.BeatmapInfo.Hash || b.OnlineBeatmapID == beatmap.BeatmapInfo.OnlineBeatmapID);
 
-                    RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
+                    if (existing == null)
+                    {
+                        // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
+                        beatmap.BeatmapInfo.Metadata = null;
 
-                    // TODO: this should be done in a better place once we actually need to dynamically update it.
-                    beatmap.BeatmapInfo.Ruleset = ruleset;
-                    beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance()?.CreateDifficultyCalculator(beatmap).Calculate() ?? 0;
+                        RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
 
-                    beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
+                        // TODO: this should be done in a better place once we actually need to dynamically update it.
+                        beatmap.BeatmapInfo.Ruleset = ruleset;
+                        beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance()?.CreateDifficultyCalculator(beatmap).Calculate() ?? 0;
+
+                        beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
+                    }
                 }
             }
 

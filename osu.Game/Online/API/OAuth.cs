@@ -6,7 +6,7 @@ using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API
 {
-    internal class OAuth
+    public class OAuth
     {
         private readonly string clientId;
         private readonly string clientSecret;

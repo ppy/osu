@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.UI
         /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
         /// </summary>
         /// <param name="ruleset">The ruleset being repesented.</param>
-        internal RulesetContainer(Ruleset ruleset)
+        protected RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
         }

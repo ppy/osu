@@ -279,6 +279,10 @@
     <Compile Include="Migrations\20171025071459_AddMissingIndexRules.Designer.cs">
       <DependentUpon>20171025071459_AddMissingIndexRules.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs" />
+    <Compile Include="Migrations\20171119065731_AddBeatmapOnlineIDUniqueConstraint.designer.cs">
+      <DependentUpon>20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
@@ -294,6 +298,10 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
+    <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
+    <Compile Include="Screens\Edit\Components\PlaybackContainer.cs" />
+    <Compile Include="Screens\Edit\Components\TimeInfoContainer.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToScoreProcessor.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
