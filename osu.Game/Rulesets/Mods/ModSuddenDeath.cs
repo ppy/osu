@@ -18,14 +18,11 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
 
-        public bool OnFailCheck(ScoreProcessor scoreProcessor)
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            return scoreProcessor.Combo.Value != scoreProcessor.HighestCombo.Value;
+            scoreProcessor.FailConditions += FailCondition;
         }
 
-        public virtual void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
-        {
-            scoreProcessor.FailChecker += OnFailCheck;
-        }
+        protected virtual bool FailCondition(ScoreProcessor scoreProcessor) => scoreProcessor.Combo.Value != scoreProcessor.HighestCombo.Value;
     }
 }

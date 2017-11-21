@@ -11,14 +11,6 @@ namespace osu.Game.Rulesets.Mods
         public override string ShortenedName => "PF";
         public override string Description => "SS or quit.";
 
-        public bool OnFailCheck(ScoreProcessor scoreProcessor)
-        {
-            return scoreProcessor.Accuracy.Value != 1;
-        }
-
-        public virtual void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
-        {
-            scoreProcessor.FailChecker += OnFailCheck;
-        }
+        protected override bool FailCondition(ScoreProcessor scoreProcessor) => scoreProcessor.Accuracy.Value != 1;
     }
 }

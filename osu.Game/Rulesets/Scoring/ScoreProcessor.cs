@@ -32,9 +32,9 @@ namespace osu.Game.Rulesets.Scoring
         public event Action<Judgement> NewJudgement;
 
         /// <summary>
-        /// Invoked when we want to check if a failure condition has been fulfilled
+        /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
         /// </summary>
-        public event Func<ScoreProcessor, bool> FailChecker;
+        public event Func<ScoreProcessor, bool> FailConditions;
 
         /// <summary>
         /// The current total score.
@@ -77,9 +77,9 @@ namespace osu.Game.Rulesets.Scoring
         public virtual bool HasFailed { get; private set; }
 
         /// <summary>
-        /// The conditions for failing.
+        /// The default conditions for failing.
         /// </summary>
-        protected virtual bool FailCondition => Health.Value == Health.MinValue;
+        protected virtual bool DefaultFailCondition => Health.Value == Health.MinValue;
 
         protected ScoreProcessor()
         {
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected void UpdateFailed()
         {
-            if (HasFailed || !FailCondition)
+            if (HasFailed || !DefaultFailCondition)
                 return;
 
             if (Failed?.Invoke() != false)
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Scoring
             if (HasFailed)
                 return;
 
-            if (FailChecker?.Invoke(this) == true)
+            if (FailConditions?.Invoke(this) == true)
             {
                 if (Failed?.Invoke() != false)
                     HasFailed = true;
