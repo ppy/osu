@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private float textSize = 28;
-        internal float TextSize
+        public float TextSize
         {
             get
             {
