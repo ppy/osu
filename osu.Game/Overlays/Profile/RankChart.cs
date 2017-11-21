@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Profile
         private const float secondary_textsize = 13;
         private const float padding = 10;
         private const float fade_duration = 150;
-        private const int rankedDays = 88;
+        private const int ranked_days = 88;
 
         private readonly SpriteText rankText, performanceText, relativeText;
         private readonly RankChartLineGraph graph;
@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.Profile
         private void showHistoryRankTexts(int dayIndex)
         {
             rankText.Text = $"#{ranks[dayIndex].Value:#,0}";
-            relativeText.Text = dayIndex + 1 == ranks.Length ? "Now" : $"{rankedDays - ranks[dayIndex].Key} days ago";
+            relativeText.Text = dayIndex + 1 == ranks.Length ? "Now" : $"{ranked_days - ranks[dayIndex].Key} days ago";
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
