@@ -19,7 +19,7 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Humanizer" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="SharpCompress" Version="0.18.1" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.0" />

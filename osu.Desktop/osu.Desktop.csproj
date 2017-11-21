@@ -28,6 +28,7 @@
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
     <PackageReference Include="NUnit" Version="3.8.1" />
     <PackageReference Include="squirrel.windows" Version="1.7.8" Condition="'$(TargetFramework)' == 'net461'" />
   </ItemGroup>

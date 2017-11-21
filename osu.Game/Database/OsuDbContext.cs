@@ -29,12 +29,6 @@ namespace osu.Game.Database
 
         private static readonly Lazy<OsuDbLoggerFactory> logger = new Lazy<OsuDbLoggerFactory>(() => new OsuDbLoggerFactory());
 
-        static OsuDbContext()
-        {
-            // required to initialise native SQLite libraries on some platforms.
-            SQLitePCL.Batteries_V2.Init();
-        }
-
         /// <summary>
         /// Create a new in-memory OsuDbContext instance.
         /// </summary>
