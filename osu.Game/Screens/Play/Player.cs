@@ -228,15 +228,8 @@ namespace osu.Game.Screens.Play
             scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;
 
-            applyAlternateFailConditions();
-        }
-
-        private void applyAlternateFailConditions()
-        {
-            foreach(var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
-                {
-                    mod.ApplyToScoreProcessor(scoreProcessor);
-                }
+            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
+                mod.ApplyToScoreProcessor(scoreProcessor);
         }
 
         private void applyRateFromMods()
