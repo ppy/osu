@@ -316,18 +316,18 @@ namespace osu.Game.Overlays.Profile
 
         private void loadUser()
         {
-            coverContainer.Add(new AsyncLoadWrapper(new UserCoverBackground(user)
+            LoadComponentAsync(new UserCoverBackground(user)
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 FillMode = FillMode.Fill,
                 OnLoadComplete = d => d.FadeInFromZero(200)
-            })
+            },
+            ucb =>
             {
-                Masking = true,
-                RelativeSizeAxes = Axes.Both,
-                Depth = float.MaxValue
+                ucb.Depth = float.MaxValue;
+                coverContainer.Add(ucb);
             });
 
             if (user.IsSupporter) supporterTag.Show();
