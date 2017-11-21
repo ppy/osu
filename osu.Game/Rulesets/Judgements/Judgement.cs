@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Judgements
         /// The offset from a perfect hit at which this judgement occurred.
         /// Populated when added via <see cref="DrawableHitObject{TObject}.AddJudgement"/>.
         /// </summary>
-        public double TimeOffset { get; public set; }
+        public double TimeOffset { get; set; }
 
         /// <summary>
         /// Whether the <see cref="Result"/> should affect the combo portion of the score.

@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
     /// <summary>
     /// A HitObjectParser to parse legacy Beatmaps.
     /// </summary>
-    internal abstract class ConvertHitObjectParser : HitObjectParser
+    public abstract class ConvertHitObjectParser : HitObjectParser
     {
         public override HitObject Parse(string text)
         {
