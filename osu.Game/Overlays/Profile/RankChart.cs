@@ -108,8 +108,7 @@ namespace osu.Game.Overlays.Profile
             }
 
             int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
-            var tempRanks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).SkipWhile(x => x.Value == 0).ToArray();
-            ranks = tempRanks.Where(x => x.Value != 0).ToArray();
+            ranks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
 
             if (ranks.Length > 1)
             {
