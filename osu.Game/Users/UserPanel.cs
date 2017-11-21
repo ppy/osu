@@ -16,6 +16,7 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Users
 {
@@ -42,6 +43,8 @@ namespace osu.Game.Users
                 throw new ArgumentNullException(nameof(user));
 
             this.user = user;
+
+            FillFlowContainer infoContainer;
 
             Height = height - status_height;
             Masking = true;
@@ -100,7 +103,7 @@ namespace osu.Game.Users
                                     TextSize = 18,
                                     Font = @"Exo2.0-SemiBoldItalic",
                                 },
-                                new FillFlowContainer
+                                infoContainer = new FillFlowContainer
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
@@ -113,16 +116,6 @@ namespace osu.Game.Users
                                         new DrawableFlag(user.Country?.FlagName)
                                         {
                                             Width = 30f,
-                                            RelativeSizeAxes = Axes.Y,
-                                        },
-                                        new Container
-                                        {
-                                            Width = 40f,
-                                            RelativeSizeAxes = Axes.Y,
-                                        },
-                                        new CircularContainer
-                                        {
-                                            Width = 20f,
                                             RelativeSizeAxes = Axes.Y,
                                         },
                                     },
@@ -171,6 +164,13 @@ namespace osu.Game.Users
                     },
                 },
             };
+
+            if (user.IsSupporter)
+                infoContainer.Add(new SupporterIcon
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 20f,
+                });
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -219,5 +219,53 @@ namespace osu.Game.Users
         {
             new OsuMenuItem("View Profile", MenuItemType.Highlighted, ViewProfile),
         };
+
+        private class SupporterIcon : CircularContainer
+        {
+            private readonly Box background;
+
+            public SupporterIcon()
+            {
+                Masking = true;
+                Children = new Drawable[]
+                {
+                    new Box { RelativeSizeAxes = Axes.Both },
+                    new CircularContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.8f),
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            background = new Box { RelativeSizeAxes = Axes.Both },
+                            new Triangles
+                            {
+                                TriangleScale = 0.2f,
+                                ColourLight = OsuColour.FromHex(@"ff7db7"),
+                                ColourDark = OsuColour.FromHex(@"de5b95"),
+                                RelativeSizeAxes = Axes.Both,
+                                Velocity = 0.3f,
+                            },
+                        }
+                    },
+                    new SpriteIcon
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Icon = FontAwesome.fa_heart,
+                        Scale = new Vector2(0.45f),
+                    }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                background.Colour = colours.Pink;
+            }
+        }
     }
 }
