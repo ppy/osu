@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
 using System.Collections.Generic;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Overlays.Profile
         private readonly OsuSpriteText placeholder;
 
         private KeyValuePair<int, int>[] ranks;
-        private User user;
+        public Bindable<User> User = new Bindable<User>();
 
         public RankChart()
         {
@@ -81,6 +82,8 @@ namespace osu.Game.Overlays.Profile
             };
 
             graph.OnBallMove += showHistoryRankTexts;
+
+            User.ValueChanged += userChanged;
         }
 
         [BackgroundDependencyLoader]
@@ -89,25 +92,21 @@ namespace osu.Game.Overlays.Profile
             graph.Colour = colours.Yellow;
         }
 
-        public void Redraw(User user)
+        private void userChanged(User newUser)
         {
-            if (this.user == null && user != null)
-                placeholder.FadeOut(fade_duration, Easing.Out);
+            placeholder.FadeTo(newUser == null ? 1 : 0, fade_duration, Easing.Out);
 
-            this.user = user;
-
-            if (user == null)
+            if (newUser == null)
             {
                 rankText.Text = string.Empty;
                 performanceText.Text = string.Empty;
                 relativeText.Text = string.Empty;
                 graph.FadeOut(fade_duration, Easing.Out);
-                placeholder.FadeIn(fade_duration, Easing.Out);
                 ranks = null;
                 return;
             }
 
-            int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
+            int[] userRanks = newUser.RankHistory?.Data ?? new[] { newUser.Statistics.Rank };
             ranks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
 
             if (ranks.Length > 1)
@@ -115,21 +114,18 @@ namespace osu.Game.Overlays.Profile
                 graph.DefaultValueCount = ranks.Length;
                 graph.Values = ranks.Select(x => -(float)Math.Log(x.Value));
                 graph.SetStaticBallPosition();
-                graph.FadeIn(fade_duration, Easing.Out);
             }
-            else
-            {
-                graph.FadeOut(fade_duration, Easing.Out);
-            }
+
+            graph.FadeTo(ranks.Length > 1 ? 1 : 0, fade_duration, Easing.Out);
 
             updateRankTexts();
         }
 
         private void updateRankTexts()
         {
-            rankText.Text = user.Statistics.Rank > 0 ? $"#{user.Statistics.Rank:#,0}" : "no rank";
-            performanceText.Text = user.Statistics.PP != null ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
-            relativeText.Text = $"{user.Country?.FullName} #{user.CountryRank:#,0}";
+            rankText.Text = User.Value.Statistics.Rank > 0 ? $"#{User.Value.Statistics.Rank:#,0}" : "no rank";
+            performanceText.Text = User.Value.Statistics.PP != null ? $"{User.Value.Statistics.PP:#,0}pp" : string.Empty;
+            relativeText.Text = $"{User.Value.Country?.FullName} #{User.Value.CountryRank:#,0}";
         }
 
         private void showHistoryRankTexts(int dayIndex)

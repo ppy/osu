@@ -421,7 +421,7 @@ namespace osu.Game.Overlays.Profile
                 gradeSPlus.DisplayCount = 0;
                 gradeSSPlus.DisplayCount = 0;
 
-                rankGraph.Redraw(user);
+                rankGraph.User.Value = user;
             }
         }
 
