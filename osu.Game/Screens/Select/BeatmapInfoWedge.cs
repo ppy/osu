@@ -84,42 +84,43 @@ namespace osu.Game.Screens.Select
 
         public class BufferedWedgeInfo : BufferedContainer
         {
-            private readonly WorkingBeatmap beatmap;
+            private readonly WorkingBeatmap working;
 
-            public BufferedWedgeInfo(WorkingBeatmap beatmap)
+            public BufferedWedgeInfo(WorkingBeatmap working)
             {
-                this.beatmap = beatmap;
+                this.working = working;
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
-                BeatmapMetadata metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+                BeatmapInfo beatmapInfo = working.BeatmapInfo;
+                BeatmapMetadata metadata = beatmapInfo.Metadata ?? working.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+                Beatmap beatmap = working.Beatmap;
 
                 List<InfoLabel> labels = new List<InfoLabel>();
 
-                if (beatmap.Beatmap != null)
+                if (beatmap != null)
                 {
-                    HitObject lastObject = beatmap.Beatmap.HitObjects.LastOrDefault();
+                    HitObject lastObject = beatmap.HitObjects.LastOrDefault();
                     double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "Length",
                         Icon = FontAwesome.fa_clock_o,
-                        Content = beatmap.Beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(endTime - beatmap.Beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                        Content = beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(endTime - beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "BPM",
                         Icon = FontAwesome.fa_circle,
-                        Content = getBPMRange(beatmap.Beatmap),
+                        Content = getBPMRange(beatmap),
                     }));
 
                     //get statistics from the current ruleset.
-                    labels.AddRange(beatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
+                    labels.AddRange(beatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(working).Select(s => new InfoLabel(s)));
                 }
 
                 PixelSnapping = true;
@@ -145,7 +146,7 @@ namespace osu.Game.Screens.Select
                         Children = new[]
                         {
                             // Zoomed-in and cropped beatmap background
-                            new BeatmapBackgroundSprite(beatmap)
+                            new BeatmapBackgroundSprite(working)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
@@ -154,7 +155,7 @@ namespace osu.Game.Screens.Select
                             },
                         },
                     },
-                    new DifficultyColourBar(beatmap.BeatmapInfo)
+                    new DifficultyColourBar(beatmapInfo)
                     {
                         RelativeSizeAxes = Axes.Y,
                         Width = 20,
