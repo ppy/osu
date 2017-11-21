@@ -29,20 +29,14 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer)
         {
-            rulesetContainer.OnJudgement += onRulesetContainerOnOnJudgement;
+            rulesetContainer.OnJudgement += onJudgement;
         }
 
-        private void onRulesetContainerOnOnJudgement(Judgement judgement)
+        private void onJudgement(Judgement judgement)
         {
-            if (!judgement.IsHit ||
-                scoreProcessor.Combo.Value == 0 &&
-                scoreProcessor.HighestCombo.Value != 0)
-            {
+            if (!judgement.IsHit || scoreProcessor.Combo.Value == 0 && scoreProcessor.HighestCombo.Value != 0)
                 scoreProcessor.ForceFail();
-            }
         }
-
-
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {

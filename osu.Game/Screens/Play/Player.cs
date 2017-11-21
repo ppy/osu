@@ -232,11 +232,10 @@ namespace osu.Game.Screens.Play
             scoreProcessor.Failed += onFail;
         }
 
-        private void applyModsToScoreProcessor(IEnumerable<Mod> mods,ScoreProcessor scoreProcessor)
+        private void applyModsToScoreProcessor(IEnumerable<Mod> mods, ScoreProcessor scoreProcessor)
         {
             foreach (var mod in mods.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(scoreProcessor);
-
         }
 
         private void applyRateFromMods()

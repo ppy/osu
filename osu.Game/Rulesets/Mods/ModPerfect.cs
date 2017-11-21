@@ -24,12 +24,8 @@ namespace osu.Game.Rulesets.Mods
         {
             rulesetContainer.OnJudgement += judgement =>
             {
-                if (judgement.Result != HitResult.Perfect ||
-                    scoreProcessor.Combo.Value == 0 &&
-                    scoreProcessor.HighestCombo.Value != 0)
-                {
+                if (judgement.Result != HitResult.Perfect || scoreProcessor.Combo.Value == 0 && scoreProcessor.HighestCombo.Value != 0)
                     scoreProcessor.ForceFail();
-                }
             };
         }
 
