@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu
         };
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
-            {
+        {
             new BeatmapStatistic
             {
                 Name = @"Circle count",
