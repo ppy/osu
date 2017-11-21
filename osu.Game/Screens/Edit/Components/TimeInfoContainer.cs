@@ -12,7 +12,6 @@ namespace osu.Game.Screens.Edit.Components
         private const int count_duration = 150;
 
         private readonly OsuSpriteText trackTimer;
-        private double savedTime;
 
         public TimeInfoContainer()
         {
@@ -33,13 +32,7 @@ namespace osu.Game.Screens.Edit.Components
         {
             base.Update();
 
-            var currentTime = Track.CurrentTime;
-
-            if (savedTime == currentTime)
-                return;
-
-            trackTimer.Text = TimeSpan.FromMilliseconds(currentTime).ToString(@"mm\:ss\:fff");
-            savedTime = currentTime;
+            trackTimer.Text = TimeSpan.FromMilliseconds(Track.CurrentTime).ToString(@"mm\:ss\:fff");
         }
     }
 }

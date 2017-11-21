@@ -17,8 +17,6 @@ namespace osu.Game.Screens.Edit.Components
     {
         private readonly IconButton playButton;
 
-        private bool lastTrackState;
-
         public PlaybackContainer()
         {
             PlaybackTabControl tabs;
@@ -32,7 +30,7 @@ namespace osu.Game.Screens.Edit.Components
                     Scale = new Vector2(1.4f),
                     IconScale = new Vector2(1.4f),
                     Icon = FontAwesome.fa_play_circle_o,
-                    Action = play,
+                    Action = playPause,
                     Padding = new MarginPadding { Left = 20 }
                 },
                 new OsuSpriteText
@@ -61,7 +59,7 @@ namespace osu.Game.Screens.Edit.Components
             tabs.Current.ValueChanged += newValue => Track.Tempo.Value = newValue;
         }
 
-        private void play()
+        private void playPause()
         {
             if (Track.IsRunning)
                 Track.Stop();
@@ -73,13 +71,7 @@ namespace osu.Game.Screens.Edit.Components
         {
             base.Update();
 
-            var currentTrackState = Track.IsRunning;
-            if (currentTrackState == lastTrackState)
-                return;
-
-            playButton.Icon = currentTrackState ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
-
-            lastTrackState = currentTrackState;
+            playButton.Icon = Track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
         }
 
         private class PlaybackTabControl : OsuTabControl<double>
