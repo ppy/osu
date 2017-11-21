@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.UI
         /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
         /// </summary>
         /// <param name="ruleset">The ruleset being repesented.</param>
-        internal RulesetContainer(Ruleset ruleset)
+        protected RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
         }
@@ -213,7 +213,11 @@ namespace osu.Game.Rulesets.UI
             if (mods == null)
                 return;
 
-            foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
+            foreach (var mod in mods.OfType<IApplicableToHitObject<TObject>>())
+                foreach (var obj in Beatmap.HitObjects)
+                    mod.ApplyToHitObject(obj);
+
+            foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);
         }
 

@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets
         /// <returns></returns>
         public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset);
 
-        public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap);
+        public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null);
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_question_circle };
 
