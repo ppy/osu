@@ -229,6 +229,7 @@ namespace osu.Game.Screens.Multiplayer
             {
                 coverContainer.FadeIn(transition_duration);
 
+                
                 LoadComponentAsync(new BeatmapSetCover(value.BeatmapSet)
                 {
                     Anchor = Anchor.Centre,
@@ -236,11 +237,7 @@ namespace osu.Game.Screens.Multiplayer
                     FillMode = FillMode.Fill,
                     OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
                 },
-                bsc =>
-                {
-                    bsc.RelativeSizeAxes = Axes.Both;
-                    coverContainer.Add(bsc);
-                });
+                bsc => coverContainer.Add(bsc));
 
                 beatmapTitle.Current = localisation.GetUnicodePreference(value.Metadata.TitleUnicode, value.Metadata.Title);
                 beatmapDash.Text = @" - ";
