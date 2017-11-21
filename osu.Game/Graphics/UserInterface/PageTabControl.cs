@@ -41,9 +41,9 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Text = new OsuSpriteText
                     {
-                        Margin = new MarginPadding { Top = 8, Bottom = 8 },
-                        Origin = Anchor.BottomLeft,
-                        Anchor = Anchor.BottomLeft,
+                        Margin = new MarginPadding { Vertical = 8 },
+                        Origin = Anchor.BottomCentre,
+                        Anchor = Anchor.BottomCentre,
                         Text = (value as Enum)?.GetDescription() ?? value.ToString(),
                         TextSize = 14,
                         Font = @"Exo2.0-Bold",

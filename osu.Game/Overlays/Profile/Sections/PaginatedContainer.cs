@@ -88,8 +88,10 @@ namespace osu.Game.Overlays.Profile.Sections
             Rulesets = rulesets;
 
             User.ValueChanged += onUserChanged;
-            User.TriggerChange();
+            TriggerUserChange();
         }
+
+        protected void TriggerUserChange() => User.TriggerChange();
 
         private void onUserChanged(User newUser)
         {

@@ -14,30 +14,40 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Profile
 {
     public class RankChart : Container
     {
+        private const float primary_textsize = 25;
+        private const float secondary_textsize = 13;
+        private const float padding = 10;
+        private const float fade_duration = 150;
+
         private readonly SpriteText rankText, performanceText, relativeText;
         private readonly RankChartLineGraph graph;
+        private readonly OsuSpriteText placeholder;
 
-        private readonly int[] ranks;
+        private KeyValuePair<int, int>[] ranks;
+        private User user;
+        private int rankedDays;
 
-        private const float primary_textsize = 25, secondary_textsize = 13, padding = 10;
-
-        private readonly User user;
-
-        public RankChart(User user)
+        public RankChart()
         {
-            this.user = user;
-
-            int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
-            ranks = userRanks.SkipWhile(x => x == 0).ToArray();
-
             Padding = new MarginPadding { Vertical = padding };
             Children = new Drawable[]
             {
+                placeholder = new OsuSpriteText
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Text = "No recent plays",
+                    TextSize = 14,
+                    Font = @"Exo2.0-RegularItalic",
+                    Alpha = 0,
+                    Padding = new MarginPadding { Bottom = padding }
+                },
                 rankText = new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
@@ -60,21 +70,61 @@ namespace osu.Game.Overlays.Profile
                     Font = @"Exo2.0-RegularItalic",
                     TextSize = secondary_textsize
                 },
-            };
-
-            if (ranks.Length > 0)
-            {
-                Add(graph = new RankChartLineGraph
+                graph = new RankChartLineGraph
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
                     Y = -secondary_textsize,
-                    DefaultValueCount = ranks.Length,
-                });
+                    Alpha = 0,
+                }
+            };
 
-                graph.OnBallMove += showHistoryRankTexts;
+            graph.OnBallMove += showHistoryRankTexts;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            graph.Colour = colours.Yellow;
+        }
+
+        public void Redraw(User user)
+        {
+            if (this.user == null && user != null)
+                placeholder.FadeOut(fade_duration, Easing.Out);
+
+            this.user = user;
+
+            if (user == null)
+            {
+                rankText.Text = string.Empty;
+                performanceText.Text = string.Empty;
+                relativeText.Text = string.Empty;
+                graph.FadeOut(fade_duration, Easing.Out);
+                placeholder.FadeIn(fade_duration, Easing.Out);
+                ranks = null;
+                return;
             }
+
+            int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
+            var tempRanks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).SkipWhile(x => x.Value == 0).ToArray();
+            rankedDays = tempRanks.Length;
+            ranks = tempRanks.Where(x => x.Value != 0).ToArray();
+
+            if (ranks.Length > 1)
+            {
+                graph.DefaultValueCount = ranks.Length;
+                graph.Values = ranks.Select(x => -(float)Math.Log(x.Value));
+                graph.SetStaticBallPosition();
+                graph.FadeIn(fade_duration, Easing.Out);
+            }
+            else
+            {
+                graph.FadeOut(fade_duration, Easing.Out);
+            }
+
+            updateRankTexts();
         }
 
         private void updateRankTexts()
@@ -86,24 +136,8 @@ namespace osu.Game.Overlays.Profile
 
         private void showHistoryRankTexts(int dayIndex)
         {
-            rankText.Text = $"#{ranks[dayIndex]:#,0}";
-            dayIndex++;
-            relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
-            //plural should be handled in a general way
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            if (graph != null)
-            {
-                graph.Colour = colours.Yellow;
-                // use logarithmic coordinates
-                graph.Values = ranks.Select(x => -(float)Math.Log(x));
-                graph.SetStaticBallPosition();
-            }
-
-            updateRankTexts();
+            rankText.Text = $"#{ranks[dayIndex].Value:#,0}";
+            relativeText.Text = dayIndex + 1 == ranks.Length ? "Now" : $"{rankedDays - ranks[dayIndex].Key - 1} days ago";
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
@@ -118,31 +152,35 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnHover(InputState state)
         {
-            graph?.UpdateBallPosition(state.Mouse.Position.X);
-            graph?.ShowBall();
+            if (ranks != null && ranks.Length > 1)
+            {
+                graph.UpdateBallPosition(state.Mouse.Position.X);
+                graph.ShowBall();
+            }
             return base.OnHover(state);
         }
 
         protected override bool OnMouseMove(InputState state)
         {
-            graph?.UpdateBallPosition(state.Mouse.Position.X);
+            if (ranks != null && ranks.Length > 1)
+                graph.UpdateBallPosition(state.Mouse.Position.X);
+
             return base.OnMouseMove(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            if (graph != null)
+            if (ranks != null && ranks.Length > 1)
             {
                 graph.HideBall();
                 updateRankTexts();
             }
+
             base.OnHoverLost(state);
         }
 
         private class RankChartLineGraph : LineGraph
         {
-            private const double fade_duration = 200;
-
             private readonly CircularContainer staticBall;
             private readonly CircularContainer movingBall;
 

@@ -19,6 +19,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
+using osu.Game.Graphics.Sprites;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
@@ -27,10 +29,13 @@ namespace osu.Game.Overlays
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
+        private GetUserRequest modeReq;
         private APIAccess api;
-        private ProfileHeader header;
+        private Container header;
+        private ProfileHeader profileHeader;
         private SectionsContainer<ProfileSection> sectionsContainer;
-        private ProfileTabControl tabs;
+        private ProfileTabControl sectionTabs;
+        private ModeTabControl modeTabs;
 
         public const float CONTENT_X_MARGIN = 50;
 
@@ -86,6 +91,7 @@ namespace osu.Game.Overlays
         public void ShowUser(User user, bool fetchOnline = true)
         {
             userReq?.Cancel();
+            modeReq?.Cancel();
             Clear();
             lastSection = null;
 
@@ -99,7 +105,7 @@ namespace osu.Game.Overlays
                 new BeatmapsSection(),
                 //new KudosuSection()
             };
-            tabs = new ProfileTabControl
+            sectionTabs = new ProfileTabControl
             {
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.TopCentre,
@@ -113,13 +119,41 @@ namespace osu.Game.Overlays
                 Colour = OsuColour.Gray(0.2f)
             });
 
-            header = new ProfileHeader(user);
+            header = new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Children = new Drawable[]
+                {
+                    modeTabs = new ModeTabControl
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Height = 35,
+                        Alpha = 0,
+                        AlwaysPresent = true,
+                        Margin = new MarginPadding { Top = 15 }
+                    },
+                    profileHeader = new ProfileHeader(user)
+                    {
+                        Margin = new MarginPadding{ Top = 50 },
+                    }
+                }
+            };
+
+            profileHeader.IsReloading = true;
+
+            modeTabs.AddItem("osu!");
+            modeTabs.AddItem("osu!taiko");
+            modeTabs.AddItem("osu!catch");
+            modeTabs.AddItem("osu!mania");
 
             Add(sectionsContainer = new SectionsContainer<ProfileSection>
             {
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = header,
-                FixedHeader = tabs,
+                FixedHeader = sectionTabs,
                 HeaderBackground = new Box
                 {
                     Colour = OsuColour.Gray(34),
@@ -131,17 +165,17 @@ namespace osu.Game.Overlays
                 if (lastSection != s)
                 {
                     lastSection = s;
-                    tabs.Current.Value = lastSection;
+                    sectionTabs.Current.Value = lastSection;
                 }
             };
 
-            tabs.Current.ValueChanged += s =>
+            sectionTabs.Current.ValueChanged += s =>
             {
                 if (lastSection == null)
                 {
                     lastSection = sectionsContainer.Children.FirstOrDefault();
                     if (lastSection != null)
-                        tabs.Current.Value = lastSection;
+                        sectionTabs.Current.Value = lastSection;
                     return;
                 }
                 if (lastSection != s)
@@ -169,7 +203,10 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(User user)
         {
-            header.User = user;
+            if (user == null)
+                return;
+
+            profileHeader.User = user;
 
             foreach (string id in user.ProfileOrder)
             {
@@ -179,16 +216,73 @@ namespace osu.Game.Overlays
                     sec.User.Value = user;
 
                     sectionsContainer.Add(sec);
-                    tabs.AddItem(sec);
+                    sectionTabs.AddItem(sec);
                 }
             }
+
+            string playMode;
+            switch (user.PlayMode)
+            {
+                default:
+                case "osu":
+                    playMode = "osu!";
+                    break;
+                case "mania":
+                    playMode = "osu!mania";
+                    break;
+                case "fruits":
+                    playMode = "osu!catch";
+                    break;
+                case "taiko":
+                    playMode = "osu!taiko";
+                    break;
+            }
+            modeTabs.Current.Value = playMode;
+            modeTabs.FadeIn(200, Easing.Out);
+
+            modeTabs.Current.ValueChanged += updateMode;
         }
 
-        private class ProfileTabControl : PageTabControl<ProfileSection>
+        private void updateMode(string newMode)
         {
+            modeReq?.Cancel();
+
+            profileHeader.IsReloading = true;
+
+            modeReq = new GetUserRequest(profileHeader.User.Id, getModeFromString(newMode));
+            modeReq.Success += user => profileHeader.User = user;
+            api.Queue(modeReq);
+
+            foreach (var s in sections)
+                s.PlayMode = getModeFromString(newMode);
+        }
+
+        private Mode getModeFromString(string mode)
+        {
+            switch (mode)
+            {
+                case "osu!":
+                    return Mode.Osu;
+                case "osu!mania":
+                    return Mode.Mania;
+                case "osu!catch":
+                    return Mode.Fruits;
+                case "osu!taiko":
+                    return Mode.Taiko;
+            }
+
+            return Mode.Default;
+        }
+
+        private class UserTabControl<T> : PageTabControl<T>
+        {
+            protected override Dropdown<T> CreateDropdown() => null;
+
+            protected override bool OnClick(InputState state) => true;
+
             private readonly Box bottom;
 
-            public ProfileTabControl()
+            protected UserTabControl()
             {
                 TabContainer.RelativeSizeAxes &= ~Axes.X;
                 TabContainer.AutoSizeAxes |= Axes.X;
@@ -202,24 +296,76 @@ namespace osu.Game.Overlays
                     Origin = Anchor.BottomCentre,
                     EdgeSmoothness = new Vector2(1)
                 });
-            }
 
-            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value);
-
-            protected override Dropdown<ProfileSection> CreateDropdown() => null;
-
-            private class ProfileTabItem : PageTabItem
-            {
-                public ProfileTabItem(ProfileSection value) : base(value)
-                {
-                    Text.Text = value.Title;
-                }
+                TabContainer.Spacing = new Vector2(20, 0);
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
                 bottom.Colour = colours.Yellow;
+            }
+
+            protected class UserTabItem : PageTabItem
+            {
+                private const int fade_duration = 100;
+
+                protected readonly SpriteText TextRegular;
+
+                protected UserTabItem(T value) : base(value)
+                {
+                    Add(TextRegular = new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Margin = new MarginPadding { Bottom = 7 },
+                        Font = @"Exo2.0-Regular",
+                    });
+
+                    Text.Alpha = 0;
+                    Text.AlwaysPresent = true;
+                    Text.TextSize = TextRegular.TextSize = 20;
+                }
+
+                protected override void OnActivated()
+                {
+                    base.OnActivated();
+                    TextRegular.FadeOut(fade_duration, Easing.Out);
+                    Text.FadeIn(fade_duration, Easing.Out);
+                }
+
+                protected override void OnDeactivated()
+                {
+                    base.OnDeactivated();
+                    TextRegular.FadeIn(fade_duration, Easing.Out);
+                    Text.FadeOut(fade_duration, Easing.Out);
+                }
+            }
+        }
+
+        private class ProfileTabControl : UserTabControl<ProfileSection>
+        {
+            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value);
+
+            private class ProfileTabItem : UserTabItem
+            {
+                public ProfileTabItem(ProfileSection value) : base(value)
+                {
+                    Text.Text = TextRegular.Text = value.Title;
+                }
+            }
+        }
+
+        private class ModeTabControl : UserTabControl<string>
+        {
+            protected override TabItem<string> CreateTabItem(string value) => new ModeTabItem(value);
+
+            private class ModeTabItem : UserTabItem
+            {
+                public ModeTabItem(string value) : base(value)
+                {
+                    Text.Text = TextRegular.Text = value;
+                }
             }
         }
     }
