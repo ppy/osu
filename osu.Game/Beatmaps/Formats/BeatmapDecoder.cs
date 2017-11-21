@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -26,10 +25,9 @@ namespace osu.Game.Beatmaps.Formats
             do { line = stream.ReadLine()?.Trim(); }
             while (line != null && line.Length == 0);
 
-            string decoderKey = decoders.Keys.FirstOrDefault(k => line?.Contains(k) ?? false);
-            if (decoderKey == null)
+            if (line == null || !decoders.ContainsKey(line))
                 throw new IOException(@"Unknown file format");
-            return (BeatmapDecoder)Activator.CreateInstance(decoders[decoderKey], decoderKey);
+            return (BeatmapDecoder)Activator.CreateInstance(decoders[line], line);
         }
 
         protected static void AddDecoder<T>(string magic) where T : BeatmapDecoder
