@@ -40,11 +40,13 @@ namespace osu.Game.Users
         {
             displayedAvatar?.FadeOut(300);
             displayedAvatar?.Expire();
-            Add(displayedAvatar = new LoadWrapper(new Avatar(user)
-            {
-                RelativeSizeAxes = Axes.Both,
-                OnLoadComplete = d => d.FadeInFromZero(200),
-            }));
+            Add(displayedAvatar = new LoadWrapper(
+                new Avatar(user)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    OnLoadComplete = d => d.FadeInFromZero(200),
+                })
+            );
         }
     }
 }

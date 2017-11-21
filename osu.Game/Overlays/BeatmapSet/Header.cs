@@ -52,17 +52,18 @@ namespace osu.Game.Overlays.BeatmapSet
                 videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
 
                 cover?.FadeOut(400, Easing.Out);
-                coverContainer.Add(cover = new LoadWrapper(new BeatmapSetCover(BeatmapSet)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fill,
-                    OnLoadComplete = d =>
+                coverContainer.Add(cover = new LoadWrapper(
+                    new BeatmapSetCover(BeatmapSet)
                     {
-                        d.FadeInFromZero(400, Easing.Out);
-                    },
-                })
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        FillMode = FillMode.Fill,
+                        OnLoadComplete = d =>
+                        {
+                            d.FadeInFromZero(400, Easing.Out);
+                        },
+                    })
                 {
                     RelativeSizeAxes = Axes.Both,
                     TimeBeforeLoad = 300

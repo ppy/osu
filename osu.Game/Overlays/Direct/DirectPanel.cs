@@ -219,18 +219,19 @@ namespace osu.Game.Overlays.Direct
             return icons;
         }
 
-        protected Drawable CreateBackground() => new LoadWrapper(new BeatmapSetCover(SetInfo)
-        {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            RelativeSizeAxes = Axes.Both,
-            FillMode = FillMode.Fill,
-            OnLoadComplete = d =>
+        protected Drawable CreateBackground() => new LoadWrapper(
+            new BeatmapSetCover(SetInfo)
             {
-                d.FadeInFromZero(400, Easing.Out);
-                BlackBackground.Delay(400).FadeOut();
-            },
-        })
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                FillMode = FillMode.Fill,
+                OnLoadComplete = d =>
+                {
+                    d.FadeInFromZero(400, Easing.Out);
+                    BlackBackground.Delay(400).FadeOut();
+                },
+            })
         {
             RelativeSizeAxes = Axes.Both,
             TimeBeforeLoad = 300
