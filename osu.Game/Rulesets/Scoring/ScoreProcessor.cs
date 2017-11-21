@@ -126,7 +126,10 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected void UpdateFailed()
         {
-            if (HasFailed || !DefaultFailCondition)
+            if (HasFailed)
+                return;
+
+            if (!DefaultFailCondition && FailConditions?.Invoke(this) != true)
                 return;
 
             if (Failed?.Invoke() != false)
@@ -143,18 +146,6 @@ namespace osu.Game.Rulesets.Scoring
 
             if (HasCompleted)
                 AllJudged?.Invoke();
-        }
-
-        protected void CheckAlternateFailConditions()
-        {
-            if (HasFailed)
-                return;
-
-            if (FailConditions?.Invoke(this) == true)
-            {
-                if (Failed?.Invoke() != false)
-                    HasFailed = true;
-            }
         }
 
         /// <summary>
@@ -232,8 +223,6 @@ namespace osu.Game.Rulesets.Scoring
         {
             OnNewJudgement(judgement);
             updateScore();
-
-            CheckAlternateFailConditions();
 
             NotifyNewJudgement(judgement);
             UpdateFailed();
