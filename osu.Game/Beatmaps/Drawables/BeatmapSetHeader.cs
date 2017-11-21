@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
@@ -28,10 +27,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         public Action<BeatmapSetInfo> RestoreHiddenRequested;
 
-        private readonly SpriteText title;
-        private readonly SpriteText artist;
-
         private readonly WorkingBeatmap beatmap;
+
         private readonly FillFlowContainer difficultyIcons;
 
         public BeatmapSetHeader(WorkingBeatmap beatmap)
@@ -40,6 +37,25 @@ namespace osu.Game.Beatmaps.Drawables
                 throw new ArgumentNullException(nameof(beatmap));
 
             this.beatmap = beatmap;
+
+            difficultyIcons = new FillFlowContainer
+            {
+                Margin = new MarginPadding { Top = 5 },
+                AutoSizeAxes = Axes.Both,
+            };
+        }
+
+        protected override void Selected()
+        {
+            base.Selected();
+            GainedSelection?.Invoke(this);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(LocalisationEngine localisation)
+        {
+            if (localisation == null)
+                throw new ArgumentNullException(nameof(localisation));
 
             Children = new Drawable[]
             {
@@ -60,42 +76,24 @@ namespace osu.Game.Beatmaps.Drawables
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        title = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
+                            Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title),
                             TextSize = 22,
                             Shadow = true,
                         },
-                        artist = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Font = @"Exo2.0-SemiBoldItalic",
+                            Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist),
                             TextSize = 17,
                             Shadow = true,
                         },
-                        difficultyIcons = new FillFlowContainer
-                        {
-                            Margin = new MarginPadding { Top = 5 },
-                            AutoSizeAxes = Axes.Both,
-                        }
+                        difficultyIcons
                     }
                 }
             };
-        }
-
-        protected override void Selected()
-        {
-            base.Selected();
-            GainedSelection?.Invoke(this);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation)
-        {
-            if (localisation == null)
-                throw new ArgumentNullException(nameof(localisation));
-
-            title.Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title);
-            artist.Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist);
         }
 
         private class PanelBackground : BufferedContainer
