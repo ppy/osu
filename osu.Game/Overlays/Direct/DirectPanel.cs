@@ -219,7 +219,7 @@ namespace osu.Game.Overlays.Direct
             return icons;
         }
 
-        protected Drawable CreateBackground() => new DelayedLoadWrapper(new BeatmapSetCover(SetInfo)
+        protected Drawable CreateBackground() => new LoadWrapper(new BeatmapSetCover(SetInfo)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,

@@ -40,7 +40,7 @@ namespace osu.Game.Users
         {
             displayedAvatar?.FadeOut(300);
             displayedAvatar?.Expire();
-            Add(displayedAvatar = new DelayedLoadWrapper(new Avatar(user)
+            Add(displayedAvatar = new LoadWrapper(new Avatar(user)
             {
                 RelativeSizeAxes = Axes.Both,
                 OnLoadComplete = d => d.FadeInFromZero(200),
