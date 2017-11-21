@@ -11,7 +11,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Beatmaps
 {
-    internal class DummyWorkingBeatmap : WorkingBeatmap
+    public class DummyWorkingBeatmap : WorkingBeatmap
     {
         private readonly OsuGameBase game;
 
@@ -59,7 +59,7 @@ namespace osu.Game.Beatmaps
                     throw new NotImplementedException();
                 }
 
-                public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => null;
+                public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => null;
 
                 public override string Description => "dummy";
 

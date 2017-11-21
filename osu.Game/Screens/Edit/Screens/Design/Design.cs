@@ -9,7 +9,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Design
 {
-    internal class Design : EditorScreen
+    public class Design : EditorScreen
     {
         public Design()
         {

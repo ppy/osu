@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight) };
     }
 
-    public class ManiaModRandom : Mod, IApplicableMod<ManiaHitObject>
+    public class ManiaModRandom : Mod, IApplicableToRulesetContainer<ManiaHitObject>
     {
         public override string Name => "Random";
         public override string ShortenedName => "RD";
@@ -97,7 +97,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public void ApplyToRulesetContainer(RulesetContainer<ManiaHitObject> rulesetContainer)
         {
             int availableColumns = ((ManiaRulesetContainer)rulesetContainer).AvailableColumns;
-
             var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(item => RNG.Next()).ToList();
 
             rulesetContainer.Objects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
@@ -188,6 +187,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
             base.ApplyToRulesetContainer(rulesetContainer);
         }
+
         protected override Score CreateReplayScore(Beatmap<ManiaHitObject> beatmap) => new Score
         {
             User = new User { Username = "osu!topus!" },

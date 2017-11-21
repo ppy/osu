@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Net.Http;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
@@ -198,10 +197,9 @@ namespace osu.Desktop.Overlays
                     }
                 }
             }
-            catch (HttpRequestException)
+            catch (Exception)
             {
-                //likely have no internet connection.
-                //we'll ignore this and retry later.
+                // we'll ignore this and retry later. can be triggered by no internet connection or thread abortion.
             }
             finally
             {

@@ -22,7 +22,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Select
 {
-    internal class BeatmapInfoWedge : OverlayContainer
+    public class BeatmapInfoWedge : OverlayContainer
     {
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
 

@@ -279,6 +279,10 @@
     <Compile Include="Migrations\20171025071459_AddMissingIndexRules.Designer.cs">
       <DependentUpon>20171025071459_AddMissingIndexRules.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs" />
+    <Compile Include="Migrations\20171119065731_AddBeatmapOnlineIDUniqueConstraint.designer.cs">
+      <DependentUpon>20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
@@ -549,9 +553,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rulesets\Judgements\DrawableJudgement.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
-    <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToClock.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToHitObject.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToRulesetContainer.cs" />
     <Compile Include="Rulesets\Mods\Mod.cs" />
     <Compile Include="Rulesets\Mods\ModAutoplay.cs" />
     <Compile Include="Rulesets\Mods\ModCinema.cs" />
