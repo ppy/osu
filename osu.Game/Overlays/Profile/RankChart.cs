@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -28,8 +29,9 @@ namespace osu.Game.Overlays.Profile
         private readonly RankChartLineGraph graph;
         private readonly OsuSpriteText placeholder;
 
-        private int[] ranks;
+        private KeyValuePair<int, int>[] ranks;
         private User user;
+        private int rankedDays;
 
         public RankChart()
         {
@@ -106,12 +108,14 @@ namespace osu.Game.Overlays.Profile
             }
 
             int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
-            ranks = userRanks.Where(x => x != 0).ToArray();
+            var tempRanks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).SkipWhile(x => x.Value == 0).ToArray();
+            rankedDays = tempRanks.Length;
+            ranks = tempRanks.Where(x => x.Value != 0).ToArray();
 
             if (ranks.Length > 1)
             {
                 graph.DefaultValueCount = ranks.Length;
-                graph.Values = ranks.Select(x => -(float)Math.Log(x));
+                graph.Values = ranks.Select(x => -(float)Math.Log(x.Value));
                 graph.SetStaticBallPosition();
                 graph.FadeIn(fade_duration, Easing.Out);
             }
@@ -132,9 +136,8 @@ namespace osu.Game.Overlays.Profile
 
         private void showHistoryRankTexts(int dayIndex)
         {
-            rankText.Text = $"#{ranks[dayIndex]:#,0}";
-            dayIndex++;
-            relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
+            rankText.Text = $"#{ranks[dayIndex].Value:#,0}";
+            relativeText.Text = dayIndex + 1 == ranks.Length ? "Now" : $"{rankedDays - ranks[dayIndex].Key - 1} days ago";
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
