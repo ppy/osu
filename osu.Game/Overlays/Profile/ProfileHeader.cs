@@ -27,9 +27,9 @@ namespace osu.Game.Overlays.Profile
         private readonly OsuTextFlowContainer infoTextLeft;
         private readonly LinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
-        protected readonly RankChart rankGraph;
+        private readonly RankChart rankGraph;
 
-        private readonly Container coverContainer, chartContainer, supporterTag;
+        private readonly Container coverContainer, supporterTag;
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
@@ -274,7 +274,7 @@ namespace osu.Game.Overlays.Profile
                                 }
                             }
                         },
-                        chartContainer = new Container
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.BottomCentre,
