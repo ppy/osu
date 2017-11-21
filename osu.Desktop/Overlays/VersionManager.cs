@@ -238,20 +238,9 @@ namespace osu.Desktop.Overlays
 
         private class UpdateProgressNotificationContainer : ProgressNotificationContainer
         {
-
-
-
-
-
-
-
-
-
-
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, OsuGame game)
+            private void load(OsuColour colours)
             {
-
 
                 IconContent.AddRange(new Drawable[]
                 {
