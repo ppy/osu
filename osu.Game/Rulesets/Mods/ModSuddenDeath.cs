@@ -23,6 +23,6 @@ namespace osu.Game.Rulesets.Mods
             scoreProcessor.FailConditions += FailCondition;
         }
 
-        protected virtual bool FailCondition(ScoreProcessor scoreProcessor) => scoreProcessor.Combo.Value != scoreProcessor.HighestCombo.Value;
+        protected virtual bool FailCondition(ScoreProcessor scoreProcessor) => scoreProcessor.Combo.Value == 0;
     }
 }
