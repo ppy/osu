@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Globalization;
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -11,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -77,7 +74,7 @@ namespace osu.Game.Screens.Edit.Components
 
         private class PlaybackTabControl : OsuTabControl<double>
         {
-            private static double[] tempo_values = new [] { 0.5, 0.75, 1 };
+            private static readonly double[] tempo_values = { 0.5, 0.75, 1 };
 
             protected override TabItem<double> CreateTabItem(double value) => new PlaybackTabItem(value);
 

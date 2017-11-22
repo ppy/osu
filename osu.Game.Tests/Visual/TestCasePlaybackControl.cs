@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual
     {
         public TestCasePlaybackControl()
         {
-            var playback = new PlaybackControl()
+            var playback = new PlaybackControl
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
