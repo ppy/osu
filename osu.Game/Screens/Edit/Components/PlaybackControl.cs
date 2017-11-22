@@ -17,11 +17,11 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Components
 {
-    public class PlaybackContainer : BottomBarContainer
+    public class PlaybackControl : BottomBarContainer
     {
         private readonly IconButton playButton;
 
-        public PlaybackContainer()
+        public PlaybackControl()
         {
             PlaybackTabControl tabs;
 
