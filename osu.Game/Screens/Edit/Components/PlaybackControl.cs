@@ -138,11 +138,9 @@ namespace osu.Game.Screens.Edit.Components
                     return true;
                 }
 
-                protected override void OnHoverLost(InputState state)
-                {
-                    updateState();
-                }
-
+                protected override void OnHoverLost(InputState state) => updateState();
+                protected override void OnActivated() => updateState();
+                protected override void OnDeactivated() => updateState();
 
                 private void updateState()
                 {
@@ -150,10 +148,6 @@ namespace osu.Game.Screens.Edit.Components
                     text.FadeTo(Active ? 0 : 1, fade_duration, Easing.OutQuint);
                     textBold.FadeTo(Active ? 1 : 0, fade_duration, Easing.OutQuint);
                 }
-
-                protected override void OnActivated() => updateState();
-
-                protected override void OnDeactivated() => updateState();
             }
         }
     }
