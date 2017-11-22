@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Padding = new MarginPadding(edge_margin),
                             Children = new Drawable[]
                             {
-                                avatar = new LoadWrapper(
+                                avatar = new DelayedLoadWrapper(
                                     new Avatar(Score.User)
                                     {
                                         RelativeSizeAxes = Axes.Both,
@@ -112,9 +112,9 @@ namespace osu.Game.Screens.Select.Leaderboards
                                             Radius = 1,
                                             Colour = Color4.Black.Opacity(0.2f),
                                         },
-                                    })
+                                    },
+                                    500)
                                 {
-                                    TimeBeforeLoad = 500,
                                     RelativeSizeAxes = Axes.None,
                                     Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
                                 },
