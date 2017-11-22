@@ -104,14 +104,14 @@ namespace osu.Game.Screens.Edit.Components
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Text = $"{value:P0}",
+                            Text = $"{value:0%}",
                             TextSize = 14,
                         },
                         textBold = new OsuSpriteText
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Text = $"{value:P0}",
+                            Text = $"{value:0%}",
                             TextSize = 14,
                             Font = @"Exo2.0-Bold",
                             Alpha = 0,
