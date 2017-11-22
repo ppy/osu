@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Edit.Components
                     Scale = new Vector2(1.4f),
                     IconScale = new Vector2(1.4f),
                     Icon = FontAwesome.fa_play_circle_o,
-                    Action = playPause,
+                    Action = togglePause,
                     Padding = new MarginPadding { Left = 20 }
                 },
                 new OsuSpriteText
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Components
             tabs.Current.ValueChanged += newValue => Track.Tempo.Value = newValue;
         }
 
-        private void playPause()
+        private void togglePause()
         {
             if (Track.IsRunning)
                 Track.Stop();
