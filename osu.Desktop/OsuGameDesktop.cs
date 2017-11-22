@@ -10,10 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
 using OpenTK.Input;
-
-#if NET_FRAMEWORK
 using Microsoft.Win32;
-#endif
 
 namespace osu.Desktop
 {
@@ -48,7 +45,6 @@ namespace osu.Desktop
             {
                 Func<string, bool> checkExists = p => Directory.Exists(Path.Combine(p, "Songs"));
 
-#if NET_FRAMEWORK
                 string stableInstallPath;
 
                 try
@@ -62,13 +58,8 @@ namespace osu.Desktop
                 catch
                 {
                 }
-#endif
 
-#if NET_FRAMEWORK
                 stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
-#else
-                var stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
-#endif
                 if (checkExists(stableInstallPath))
                     return stableInstallPath;
 
