@@ -96,7 +96,7 @@ namespace osu.Desktop.Deploy
             runCommand(nuget_path, "restore " + solutionPath);
 
             write("Updating AssemblyInfo...");
-            updateAssemblyInfo(version);
+            updateCsprojVersion(version);
 
             write("Running build process...");
             foreach (string targetName in TargetNames.Split(','))
@@ -123,7 +123,7 @@ namespace osu.Desktop.Deploy
             uploadBuild(version);
 
             //reset assemblyinfo.
-            updateAssemblyInfo("0.0.0");
+            updateCsprojVersion("0.0.0");
 
             write("Done!", ConsoleColor.White);
             Console.ReadLine();
@@ -297,7 +297,7 @@ namespace osu.Desktop.Deploy
             Directory.CreateDirectory(directory);
         }
 
-        private static void updateAssemblyInfo(string version)
+        private static void updateCsprojVersion(string version)
         {
             var toUpdate = new[] { "<Version>", "<FileVersion>" };
             string file = Path.Combine(ProjectName, $"{ProjectName}.csproj");
@@ -336,8 +336,8 @@ namespace osu.Desktop.Deploy
                 path = Environment.CurrentDirectory;
 
             while (!File.Exists(Path.Combine(path, $"{SolutionName}.sln")))
-                path = path.Remove(path.LastIndexOf('\\'));
-            path += "\\";
+                path = path.Remove(path.LastIndexOf(Path.DirectorySeparatorChar));
+            path += Path.DirectorySeparatorChar;
 
             Environment.CurrentDirectory = path;
         }
