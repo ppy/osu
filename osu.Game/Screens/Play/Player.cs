@@ -248,8 +248,10 @@ namespace osu.Game.Screens.Play
             storyboard = beatmap.Storyboard.CreateDrawable(Beatmap.Value);
             storyboard.Masking = true;
 
-            if (asyncLoad) LoadComponentAsync(storyboard, s => storyboardContainer.Add(s));
-            else storyboardContainer.Add((Drawable)storyboard);
+            if (asyncLoad)
+                LoadComponentAsync(storyboard, storyboardContainer.Add);
+            else
+                storyboardContainer.Add(storyboard);
         }
 
         public void Restart()

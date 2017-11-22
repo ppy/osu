@@ -237,7 +237,7 @@ namespace osu.Game.Screens.Multiplayer
                     FillMode = FillMode.Fill,
                     OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
                 },
-                bsc => coverContainer.Add(bsc));
+                coverContainer.Add);
 
                 beatmapTitle.Current = localisation.GetUnicodePreference(value.Metadata.TitleUnicode, value.Metadata.Title);
                 beatmapDash.Text = @" - ";
