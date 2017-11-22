@@ -46,7 +46,6 @@ namespace osu.Game.Overlays.Profile
                     Text = "No recent plays",
                     TextSize = 14,
                     Font = @"Exo2.0-RegularItalic",
-                    Alpha = 0,
                     Padding = new MarginPadding { Bottom = padding }
                 },
                 rankText = new OsuSpriteText
