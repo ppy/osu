@@ -83,7 +83,7 @@ namespace osu.Game.Overlays
         private NotificationDrawable createContainerFor(Notification notification)
         {
             if (notification is ProgressNotification)
-                return new ProgressNotificationDrawable(notification as ProgressNotification);
+                return new ProgressNotificationDrawable((ProgressNotification)notification);
 
             return new SimpleNotificationDrawable(notification);
         }
@@ -101,10 +101,10 @@ namespace osu.Game.Overlays
 
                 notificationDrawable.Closed += notificationClosed;
 
-                if (notification is IHasFollowUpNotifications)
+                var n = notification as IHasFollowUpNotifications;
+                if (n != null)
                 {
-                    var n = notification as IHasFollowUpNotifications;
-                    n.ProgressCompleted += () => n.FollowUpNotifications.ForEach(followUp => Post(followUp));
+                    n.ProgressCompleted += () => n.FollowUpNotifications.ForEach(Post);
                 }
 
                 var ourType = notificationDrawable.GetType();
