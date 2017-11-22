@@ -45,8 +45,8 @@ namespace osu.Game.Graphics.Containers
 
             double currentTrackTime = track.Length > 0 ? track.CurrentTime + EarlyActivationMilliseconds : Clock.CurrentTime;
 
-            TimingControlPoint timingPoint = Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
-            EffectControlPoint effectPoint = Beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
+            TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
+            EffectControlPoint effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
 
             if (timingPoint.BeatLength == 0)
                 return;
@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.Containers
                 return;
 
             using (BeginDelayedSequence(-TimeSinceLastBeat, true))
-                OnNewBeat(beatIndex, timingPoint, effectPoint, Beatmap.Value.Track.CurrentAmplitudes);
+                OnNewBeat(beatIndex, timingPoint, effectPoint, track.CurrentAmplitudes);
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;

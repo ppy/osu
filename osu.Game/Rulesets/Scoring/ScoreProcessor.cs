@@ -32,6 +32,11 @@ namespace osu.Game.Rulesets.Scoring
         public event Action<Judgement> NewJudgement;
 
         /// <summary>
+        /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
+        /// </summary>
+        public event Func<ScoreProcessor, bool> FailConditions;
+
+        /// <summary>
         /// The current total score.
         /// </summary>
         public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
@@ -72,9 +77,9 @@ namespace osu.Game.Rulesets.Scoring
         public virtual bool HasFailed { get; private set; }
 
         /// <summary>
-        /// The conditions for failing.
+        /// The default conditions for failing.
         /// </summary>
-        protected virtual bool FailCondition => Health.Value == Health.MinValue;
+        protected virtual bool DefaultFailCondition => Health.Value == Health.MinValue;
 
         protected ScoreProcessor()
         {
@@ -121,7 +126,10 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected void UpdateFailed()
         {
-            if (HasFailed || !FailCondition)
+            if (HasFailed)
+                return;
+
+            if (!DefaultFailCondition && FailConditions?.Invoke(this) != true)
                 return;
 
             if (Failed?.Invoke() != false)

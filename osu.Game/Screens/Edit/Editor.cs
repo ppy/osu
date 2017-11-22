@@ -10,13 +10,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Design;
+using osu.Game.Screens.Edit.Components;
 
 namespace osu.Game.Screens.Edit
 {
@@ -34,7 +34,9 @@ namespace osu.Game.Screens.Edit
         public Editor()
         {
             EditorMenuBar menuBar;
+            TimeInfoContainer timeInfo;
             SummaryTimeline timeline;
+            PlaybackContainer playback;
 
             Children = new[]
             {
@@ -84,30 +86,47 @@ namespace osu.Game.Screens.Edit
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 10 },
-                            Child = new FillFlowContainer
+                            Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
+                            Child = new GridContainer
                             {
-                                Name = "Bottom bar",
                                 RelativeSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(10, 0),
-                                Children = new[]
+                                ColumnDimensions = new[]
                                 {
-                                    timeline = new SummaryTimeline
+                                    new Dimension(GridSizeMode.Absolute, 220),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.Absolute, 220)
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
                                     {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        RelativeSizeAxes = Axes.Both,
-                                        Width = 0.65f
-                                    }
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Right = 10 },
+                                            Child = timeInfo = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
+                                        },
+                                        timeline = new SummaryTimeline
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Left = 10 },
+                                            Child = playback = new PlaybackContainer { RelativeSizeAxes = Axes.Both },
+                                        }
+                                    },
                                 }
-                            }
+                            },
                         }
                     }
                 },
             };
 
+            timeInfo.Beatmap.BindTo(Beatmap);
             timeline.Beatmap.BindTo(Beatmap);
+            playback.Beatmap.BindTo(Beatmap);
             menuBar.Mode.ValueChanged += onModeChanged;
         }
 
@@ -154,7 +173,11 @@ namespace osu.Game.Screens.Edit
         protected override bool OnExiting(Screen next)
         {
             Background.FadeColour(Color4.White, 500);
-            Beatmap.Value.Track?.Start();
+            if (Beatmap.Value.Track != null)
+            {
+                Beatmap.Value.Track.Tempo.Value = 1;
+                Beatmap.Value.Track.Start();
+            }
             return base.OnExiting(next);
         }
     }
