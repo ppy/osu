@@ -6,9 +6,7 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
@@ -18,7 +16,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Notifications;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
 using OpenTK;
 using OpenTK.Graphics;
 using Squirrel;
@@ -109,27 +106,20 @@ namespace osu.Desktop.Overlays
             {
                 config.Set(OsuSetting.Version, version);
 
+
+
                 // only show a notificationContainer if we've previously saved a version to the config file (ie. not the first run).
                 if (!string.IsNullOrEmpty(lastVersion))
-                    Scheduler.AddDelayed(() => notificationOverlay.Post(new UpdateCompleteNotification(version)), 5000);
-            }
-        }
+                    Scheduler.AddDelayed(() => notificationOverlay.Post(
+                        new Notification(
+                            $"You are now running osu!lazer {version}.\nClick to see what's new!",
+                            FontAwesome.fa_check_square,
+                            () =>
+                            {
+                                Process.Start($"https://github.com/ppy/osu/releases/tag/v{version}");
+                            })
 
-        private class UpdateCompleteNotification : SimpleNotificationContainer
-        {
-            public UpdateCompleteNotification(string version)
-                : base($"You are now running osu!lazer {version}.\nClick to see what's new!", FontAwesome.fa_check_square)
-            {
-                Notification.OnActivate += () =>
-                {
-                    Process.Start($"https://github.com/ppy/osu/releases/tag/v{version}");
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                IconBackgound.Colour = colours.BlueDark;
+                    ), 5000);
             }
         }
 
@@ -139,7 +129,7 @@ namespace osu.Desktop.Overlays
             updateManager?.Dispose();
         }
 
-        private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotificationContainer notificationContainer = null)
+        private async void checkForUpdateAsync(bool useDeltaPatching = true, ProgressNotification notificationContainer = null)
         {
             //should we schedule a retry on completion of this check?
             bool scheduleRetry = true;
@@ -155,8 +145,8 @@ namespace osu.Desktop.Overlays
 
                 if (notificationContainer == null)
                 {
-                    notificationContainer = new UpdateProgressNotificationContainer(new ProgressNotification(""));
-                    notificationContainer.ProgressNotification.ProgressCompleted += () =>
+                    notificationContainer = new ProgressNotification("", FontAwesome.fa_upload);
+                    notificationContainer.ProgressCompleted += () =>
                     {
                         var readyNotification = new Notification(@"Update ready to install. Click to restart!");
                         readyNotification.OnActivate += () =>
@@ -166,9 +156,7 @@ namespace osu.Desktop.Overlays
                             game.Exit();
                         };
 
-                        Schedule(() => notificationOverlay.Post(new SimpleNotificationContainer(
-                            readyNotification
-                        )));
+                        Schedule(() => notificationOverlay.Post(readyNotification));
                     };
 
                     Schedule(() => notificationOverlay.Post(notificationContainer));
@@ -176,23 +164,23 @@ namespace osu.Desktop.Overlays
 
                 Schedule(() =>
                 {
-                    notificationContainer.ProgressNotification.Progress = 0;
-                    notificationContainer.ProgressNotification.Text = @"Downloading update...";
+                    notificationContainer.Progress = 0;
+                    notificationContainer.Text = @"Downloading update...";
                 });
 
                 try
                 {
-                    await updateManager.DownloadReleases(info.ReleasesToApply, p => Schedule(() => notificationContainer.ProgressNotification.Progress = p / 100f));
+                    await updateManager.DownloadReleases(info.ReleasesToApply, p => Schedule(() => notificationContainer.Progress = p / 100f));
 
                     Schedule(() =>
                     {
-                        notificationContainer.ProgressNotification.Progress = 0;
-                        notificationContainer.ProgressNotification.Text = @"Installing update...";
+                        notificationContainer.Progress = 0;
+                        notificationContainer.Text = @"Installing update...";
                     });
 
-                    await updateManager.ApplyReleases(info, p => Schedule(() => notificationContainer.ProgressNotification.Progress = p / 100f));
+                    await updateManager.ApplyReleases(info, p => Schedule(() => notificationContainer.Progress = p / 100f));
 
-                    Schedule(() => notificationContainer.ProgressNotification.State = ProgressNotificationState.Completed);
+                    Schedule(() => notificationContainer.State = ProgressNotificationState.Completed);
                 }
                 catch (Exception e)
                 {
@@ -222,7 +210,7 @@ namespace osu.Desktop.Overlays
                     //check again in 30 minutes.
                     Scheduler.AddDelayed(() => checkForUpdateAsync(), 60000 * 30);
                     if (notificationContainer != null)
-                        notificationContainer.ProgressNotification.State = ProgressNotificationState.Cancelled;
+                        notificationContainer.State = ProgressNotificationState.Cancelled;
                 }
             }
         }
@@ -236,34 +224,5 @@ namespace osu.Desktop.Overlays
         {
         }
 
-        private class UpdateProgressNotificationContainer : ProgressNotificationContainer
-        {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-
-                IconContent.AddRange(new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
-                    },
-                    new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Icon = FontAwesome.fa_upload,
-                        Colour = Color4.White,
-                        Size = new Vector2(20),
-                    }
-                });
-            }
-
-            public UpdateProgressNotificationContainer(ProgressNotification progressNotification)
-                : base(progressNotification)
-            {
-            }
-        }
     }
 }

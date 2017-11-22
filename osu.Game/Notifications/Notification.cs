@@ -30,13 +30,15 @@ namespace osu.Game.Notifications
             OnActivate?.Invoke();
         }
 
-        public Notification(string text = "", FontAwesome icon = FontAwesome.fa_info_circle)
+        public Notification(string text = "", FontAwesome icon = FontAwesome.fa_info_circle, Action onActivate = null)
         {
             if (text == null)
                 throw new ArgumentNullException(nameof(text));
 
             TextBinding = new Bindable<string>(text);
             IconBinding = new Bindable<FontAwesome>(icon);
+            if (onActivate != null)
+                OnActivate += onActivate;
         }
     }
 }

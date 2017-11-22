@@ -18,7 +18,6 @@ using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Framework.Logging;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Configuration;
 using osu.Framework.Audio.Track;
@@ -154,9 +153,7 @@ namespace osu.Game.Overlays.Direct
         {
             if (!api.LocalUser.Value.IsSupporter)
             {
-                notifications.Post(new SimpleNotificationContainer(
-                    new Notification("You gotta be a supporter to download for now 'yo", FontAwesome.fa_superpowers)
-                ));
+                notifications.Post(new Notification("You gotta be a supporter to download for now 'yo", FontAwesome.fa_superpowers));
                 return;
             }
 

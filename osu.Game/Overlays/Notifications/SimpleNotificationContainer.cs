@@ -13,21 +13,14 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class SimpleNotificationContainer : NotificationContainer, IHasNotification
+    public class SimpleNotificationContainer : NotificationContainer
     {
         public Notification Notification { get; }
-
-        public string Text => Notification.Text;
-        public FontAwesome Icon => Notification.Icon;
 
         private readonly TextFlowContainer textDrawable;
         private readonly SpriteIcon iconDrawable;
 
         protected Box IconBackgound;
-
-        public SimpleNotificationContainer(String text, FontAwesome icon = FontAwesome.fa_info_circle)
-         : this(new Notification(text, icon))
-        {}
 
         public SimpleNotificationContainer(Notification notification)
         {

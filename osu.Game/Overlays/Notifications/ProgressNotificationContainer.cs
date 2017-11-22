@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class ProgressNotificationContainer : NotificationContainer, IHasNotification
+    public class ProgressNotificationContainer : NotificationContainer
     {
         public ProgressNotification ProgressNotification { get; }
         public Notification Notification => ProgressNotification;

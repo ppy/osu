@@ -23,7 +23,6 @@ using osu.Game.IPC;
 using osu.Game.Notifications;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Beatmaps
@@ -88,7 +87,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
-        public Action<NotificationContainer> PostNotification { private get; set; }
+        public Action<Notification> PostNotification { private get; set; }
 
         /// <summary>
         /// Set a storage with access to an osu-stable install for import purposes.
@@ -130,7 +129,7 @@ namespace osu.Game.Beatmaps
                 State = ProgressNotificationState.Active
             };
 
-            PostNotification?.Invoke(new ProgressNotificationContainer(notification));
+            PostNotification?.Invoke(notification);
 
             int i = 0;
             foreach (string path in paths)
@@ -233,7 +232,9 @@ namespace osu.Game.Beatmaps
                 $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}"
             );
 
-            downloadNotification.FollowUpNotifications.Add(new SimpleNotificationContainer($"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title} finished"));
+            downloadNotification.FollowUpNotifications.Add(
+                new Notification($"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title} finished")
+            );
 
             var request = new DownloadBeatmapSetRequest(beatmapSetInfo);
 
@@ -275,7 +276,7 @@ namespace osu.Game.Beatmaps
             };
 
             currentDownloads.Add(request);
-            PostNotification?.Invoke(new ProgressNotificationContainer(downloadNotification));
+            PostNotification?.Invoke(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
             Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
@@ -639,7 +640,7 @@ namespace osu.Game.Beatmaps
                 State = ProgressNotificationState.Active,
             };
 
-            PostNotification?.Invoke(new ProgressNotificationContainer(notification));
+            PostNotification?.Invoke(notification);
 
             int i = 0;
 

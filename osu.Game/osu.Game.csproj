@@ -284,7 +284,7 @@
       <DependentUpon>20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
-    <Compile Include="Notifications\IHasCompletionTarget.cs" />
+    <Compile Include="Notifications\IHasFollowUpNotifications.cs" />
     <Compile Include="Notifications\Notification.cs" />
     <Compile Include="Notifications\ProgressNotification.cs" />
     <Compile Include="Notifications\ProgressNotificationState.cs" />

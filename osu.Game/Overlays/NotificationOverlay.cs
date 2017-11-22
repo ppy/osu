@@ -80,10 +80,20 @@ namespace osu.Game.Overlays
                 State = Visibility.Hidden;
         }
 
-        public void Post(NotificationContainer notificationContainer)
+        private NotificationContainer createContainerFor(Notification notification)
+        {
+            if (notification is ProgressNotification)
+                return new ProgressNotificationContainer(notification as ProgressNotification);
+
+            return new SimpleNotificationContainer(notification);
+        }
+
+        public void Post(Notification notification)
         {
             Schedule(() =>
             {
+                NotificationContainer notificationContainer = createContainerFor(notification);
+
                 State = Visibility.Visible;
 
                 ++runningDepth;
@@ -91,10 +101,11 @@ namespace osu.Game.Overlays
 
                 notificationContainer.Closed += notificationClosed;
 
-                Notification notification = (notificationContainer as IHasNotification)?.Notification;
-
-                if (notification is IHasCompletionTarget)
-                    (notification as IHasCompletionTarget).CompletionTarget = Post;
+                if (notification is IHasFollowUpNotifications)
+                {
+                    var n = notification as IHasFollowUpNotifications;
+                    n.ProgressCompleted += () => n.FollowUpNotifications.ForEach(followUp => Post(followUp));
+                }
 
                 var ourType = notificationContainer.GetType();
                 sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notificationContainer);

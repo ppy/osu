@@ -11,7 +11,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Notifications;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
@@ -73,9 +72,9 @@ namespace osu.Game.Screens.Play
             {
                 hasShownNotificationOnce = true;
 
-                notificationOverlay?.Post(new SimpleNotificationContainer(
+                notificationOverlay?.Post(
                     new Notification(@"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab.")
-                ));
+                );
             }
 
             // todo: the stuff below should probably not be in this base implementation, but in each individual class.

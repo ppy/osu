@@ -2,12 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Game.Overlays.Notifications;
+using System.Collections.Generic;
 
 namespace osu.Game.Notifications
 {
-    public interface IHasCompletionTarget
+    public interface IHasFollowUpNotifications
     {
-        Action<NotificationContainer> CompletionTarget { get; set; }
+        List<Notification> FollowUpNotifications { get; }
+        event Action ProgressCompleted;
     }
 }
