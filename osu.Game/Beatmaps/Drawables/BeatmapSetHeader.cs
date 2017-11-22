@@ -43,16 +43,14 @@ namespace osu.Game.Beatmaps.Drawables
 
             Children = new Drawable[]
             {
-                new LoadWrapper(
+                new DelayedLoadWrapper(
                     new PanelBackground(beatmap)
                     {
                         RelativeSizeAxes = Axes.Both,
                         OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    }
-                )
-                {
-                    TimeBeforeLoad = 300,
-                },
+                    },
+                    300
+                ),
                 new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,

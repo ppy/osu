@@ -219,7 +219,7 @@ namespace osu.Game.Overlays.Direct
             return icons;
         }
 
-        protected Drawable CreateBackground() => new LoadWrapper(
+        protected Drawable CreateBackground() => new DelayedLoadWrapper(
             new BeatmapSetCover(SetInfo)
             {
                 Anchor = Anchor.Centre,
@@ -231,10 +231,10 @@ namespace osu.Game.Overlays.Direct
                     d.FadeInFromZero(400, Easing.Out);
                     BlackBackground.Delay(400).FadeOut();
                 },
-            })
+            },
+            300)
         {
             RelativeSizeAxes = Axes.Both,
-            TimeBeforeLoad = 300
         };
 
         public class Statistic : FillFlowContainer

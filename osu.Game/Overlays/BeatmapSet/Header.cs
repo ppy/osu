@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly AuthorInfo author;
         public Details Details;
 
-        private LoadWrapper cover;
+        private DelayedLoadWrapper cover;
 
         public readonly BeatmapPicker Picker;
 
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
 
                 cover?.FadeOut(400, Easing.Out);
-                coverContainer.Add(cover = new LoadWrapper(
+                coverContainer.Add(cover = new DelayedLoadWrapper(
                     new BeatmapSetCover(BeatmapSet)
                     {
                         Anchor = Anchor.Centre,
@@ -60,10 +60,10 @@ namespace osu.Game.Overlays.BeatmapSet
                         RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fill,
                         OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    })
+                    },
+                    300)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    TimeBeforeLoad = 300
                 });
             }
         }

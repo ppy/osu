@@ -58,7 +58,7 @@ namespace osu.Game.Users
 
             Children = new Drawable[]
             {
-                new LoadWrapper(new UserCoverBackground(user)
+                new DelayedLoadWrapper(new UserCoverBackground(user)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
