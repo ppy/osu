@@ -82,8 +82,9 @@ namespace osu.Game.Overlays
 
         private NotificationDrawable createContainerFor(Notification notification)
         {
-            if (notification is ProgressNotification)
-                return new ProgressNotificationDrawable((ProgressNotification)notification);
+            var progressNotification = notification as ProgressNotification;
+            if (progressNotification != null)
+                return new ProgressNotificationDrawable(progressNotification);
 
             return new SimpleNotificationDrawable(notification);
         }
