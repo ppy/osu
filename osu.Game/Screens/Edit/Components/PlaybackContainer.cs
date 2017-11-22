@@ -1,12 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Globalization;
+using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -52,10 +56,6 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            tabs.AddItem(0.25);
-            tabs.AddItem(0.75);
-            tabs.AddItem(1);
-
             tabs.Current.ValueChanged += newValue => Track.Tempo.Value = newValue;
         }
 
@@ -76,6 +76,8 @@ namespace osu.Game.Screens.Edit.Components
 
         private class PlaybackTabControl : OsuTabControl<double>
         {
+            private static double[] tempo_values = new [] { 0.5, 0.75, 1 };
+
             protected override TabItem<double> CreateTabItem(double value) => new PlaybackTabItem(value);
 
             protected override Dropdown<double> CreateDropdown() => null;
@@ -83,7 +85,9 @@ namespace osu.Game.Screens.Edit.Components
             public PlaybackTabControl()
             {
                 RelativeSizeAxes = Axes.Both;
-                TabContainer.Spacing = new Vector2(20, 0);
+                TabContainer.Spacing = Vector2.Zero;
+
+                tempo_values.ForEach(AddItem);
             }
 
             public class PlaybackTabItem : TabItem<double>
@@ -95,8 +99,9 @@ namespace osu.Game.Screens.Edit.Components
 
                 public PlaybackTabItem(double value) : base(value)
                 {
-                    AutoSizeAxes = Axes.X;
-                    RelativeSizeAxes = Axes.Y;
+                    RelativeSizeAxes = Axes.Both;
+
+                    Width = 1f / tempo_values.Length;
 
                     Children = new Drawable[]
                     {
@@ -115,7 +120,6 @@ namespace osu.Game.Screens.Edit.Components
                             TextSize = 14,
                             Font = @"Exo2.0-Bold",
                             Alpha = 0,
-                            AlwaysPresent = true,
                         },
                     };
                 }
