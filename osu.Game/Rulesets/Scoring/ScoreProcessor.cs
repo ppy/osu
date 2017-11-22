@@ -224,8 +224,8 @@ namespace osu.Game.Rulesets.Scoring
             OnNewJudgement(judgement);
             updateScore();
 
-            NotifyNewJudgement(judgement);
             UpdateFailed();
+            NotifyNewJudgement(judgement);
         }
 
         protected void RemoveJudgement(Judgement judgement)
