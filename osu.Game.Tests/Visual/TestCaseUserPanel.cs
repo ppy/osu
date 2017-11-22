@@ -36,7 +36,8 @@ namespace osu.Game.Tests.Visual
                         Username = @"peppy",
                         Id = 2,
                         Country = new Country { FlagName = @"AU" },
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        IsSupporter = true,
                     }) { Width = 300 },
                 },
             });
