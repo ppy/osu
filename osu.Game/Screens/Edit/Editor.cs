@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit
             EditorMenuBar menuBar;
             TimeInfoContainer timeInfo;
             SummaryTimeline timeline;
-            PlaybackContainer playback;
+            PlaybackControl playback;
 
             Children = new[]
             {
@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Edit
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding { Left = 10 },
-                                            Child = playback = new PlaybackContainer { RelativeSizeAxes = Axes.Both },
+                                            Child = playback = new PlaybackControl { RelativeSizeAxes = Axes.Both },
                                         }
                                     },
                                 }
