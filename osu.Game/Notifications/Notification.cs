@@ -9,22 +9,36 @@ namespace osu.Game.Notifications
 {
     public class Notification
     {
+        /// <summary>
+        /// The text displayed in the notification.
+        /// </summary>
         public string Text
         {
             get { return TextBinding.Value; }
             set { TextBinding.Value = value; }
         }
 
+        /// <summary>
+        /// The icon displayed in the notification.
+        /// </summary>
         public FontAwesome Icon
         {
             get { return IconBinding.Value; }
             set { IconBinding.Value = value; }
         }
 
+
         public Bindable<string> TextBinding { get; }
         public Bindable<FontAwesome> IconBinding { get; }
+
+        /// <summary>
+        /// An event, that gets triggered when the user activates the notification.
+        /// </summary>
         public event Action OnActivate;
 
+        /// <summary>
+        /// Activates this notification.
+        /// </summary>
         public void Activate()
         {
             OnActivate?.Invoke();

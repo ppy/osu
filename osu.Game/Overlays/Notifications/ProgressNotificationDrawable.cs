@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class ProgressNotificationContainer : NotificationContainer
+    public class ProgressNotificationDrawable : NotificationDrawable
     {
         public ProgressNotification ProgressNotification { get; }
         public Notification Notification => ProgressNotification;
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Notifications
 
         protected Box IconBackgound;
 
-        public ProgressNotificationContainer(ProgressNotification progressNotification)
+        public ProgressNotificationDrawable(ProgressNotification progressNotification)
         {
             ProgressNotification = progressNotification;
             ProgressNotification.StateBinding.ValueChanged += stateOnValueChanged;
@@ -136,7 +136,7 @@ namespace osu.Game.Overlays.Notifications
 
 
         /// <summary>
-        /// An action to complete when the completion notificationContainer is clicked.
+        /// An action to complete when the completion notificationDrawable is clicked.
         /// </summary>
         public Func<bool> CompletionClickAction;
 

@@ -56,13 +56,13 @@ namespace osu.Game.Overlays
                                 {
                                     Title = @"Notifications",
                                     ClearText = @"Clear All",
-                                    AcceptTypes = new[] { typeof(SimpleNotificationContainer) },
+                                    AcceptTypes = new[] { typeof(SimpleNotificationDrawable) },
                                 },
                                 new NotificationSection
                                 {
                                     Title = @"Running Tasks",
                                     ClearText = @"Cancel All",
-                                    AcceptTypes = new[] { typeof(ProgressNotificationContainer) },
+                                    AcceptTypes = new[] { typeof(ProgressNotificationDrawable) },
                                 },
                             }
                         }
@@ -80,26 +80,26 @@ namespace osu.Game.Overlays
                 State = Visibility.Hidden;
         }
 
-        private NotificationContainer createContainerFor(Notification notification)
+        private NotificationDrawable createContainerFor(Notification notification)
         {
             if (notification is ProgressNotification)
-                return new ProgressNotificationContainer(notification as ProgressNotification);
+                return new ProgressNotificationDrawable(notification as ProgressNotification);
 
-            return new SimpleNotificationContainer(notification);
+            return new SimpleNotificationDrawable(notification);
         }
 
         public void Post(Notification notification)
         {
             Schedule(() =>
             {
-                NotificationContainer notificationContainer = createContainerFor(notification);
+                NotificationDrawable notificationDrawable = createContainerFor(notification);
 
                 State = Visibility.Visible;
 
                 ++runningDepth;
-                notificationContainer.Depth = notificationContainer.DisplayOnTop ? runningDepth : -runningDepth;
+                notificationDrawable.Depth = notificationDrawable.DisplayOnTop ? runningDepth : -runningDepth;
 
-                notificationContainer.Closed += notificationClosed;
+                notificationDrawable.Closed += notificationClosed;
 
                 if (notification is IHasFollowUpNotifications)
                 {
@@ -107,8 +107,8 @@ namespace osu.Game.Overlays
                     n.ProgressCompleted += () => n.FollowUpNotifications.ForEach(followUp => Post(followUp));
                 }
 
-                var ourType = notificationContainer.GetType();
-                sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notificationContainer);
+                var ourType = notificationDrawable.GetType();
+                sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notificationDrawable);
             });
         }
 

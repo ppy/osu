@@ -108,7 +108,7 @@ namespace osu.Desktop.Overlays
 
 
 
-                // only show a notificationContainer if we've previously saved a version to the config file (ie. not the first run).
+                // only show a notificationDrawable if we've previously saved a version to the config file (ie. not the first run).
                 if (!string.IsNullOrEmpty(lastVersion))
                     Scheduler.AddDelayed(() => notificationOverlay.Post(
                         new Notification(

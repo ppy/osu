@@ -13,7 +13,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class SimpleNotificationContainer : NotificationContainer
+    public class SimpleNotificationDrawable : NotificationDrawable
     {
         public Notification Notification { get; }
 
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Notifications
 
         protected Box IconBackgound;
 
-        public SimpleNotificationContainer(Notification notification)
+        public SimpleNotificationDrawable(Notification notification)
         {
             if (notification == null)
                 throw new ArgumentNullException(nameof(notification));

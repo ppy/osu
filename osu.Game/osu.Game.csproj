@@ -475,10 +475,10 @@
     <Compile Include="Overlays\Music\PlaylistList.cs" />
     <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
     <Compile Include="Overlays\NotificationOverlay.cs" />
-    <Compile Include="Overlays\Notifications\NotificationContainer.cs" />
+    <Compile Include="Overlays\Notifications\NotificationDrawable.cs" />
     <Compile Include="Overlays\Notifications\NotificationSection.cs" />
-    <Compile Include="Overlays\Notifications\ProgressNotificationContainer.cs" />
-    <Compile Include="Overlays\Notifications\SimpleNotificationContainer.cs" />
+    <Compile Include="Overlays\Notifications\ProgressNotificationDrawable.cs" />
+    <Compile Include="Overlays\Notifications\SimpleNotificationDrawable.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableScore.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />

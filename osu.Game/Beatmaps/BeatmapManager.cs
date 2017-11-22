@@ -119,7 +119,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Import one or more <see cref="BeatmapSetInfo"/> from filesystem <paramref name="paths"/>.
-        /// This will post a notificationContainer tracking import progress.
+        /// This will post a notificationDrawable tracking import progress.
         /// </summary>
         /// <param name="paths">One or more beatmap locations on disk.</param>
         public void Import(params string[] paths)
