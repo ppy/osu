@@ -128,32 +128,25 @@ namespace osu.Game.Screens.Edit.Components
 
                 protected override bool OnHover(InputState state)
                 {
-                    if (!Active)
-                        toBold();
+                    updateState();
                     return true;
                 }
 
                 protected override void OnHoverLost(InputState state)
                 {
-                    if (!Active)
-                        toNormal();
+                    updateState();
                 }
 
-                private void toBold()
+
+                private void updateState()
                 {
-                    text.FadeOut(fade_duration);
-                    textBold.FadeIn(fade_duration);
+                    text.FadeTo(Active || IsHovered ? 0 : 1, fade_duration);
+                    textBold.FadeTo(Active || IsHovered ? 1 : 0, fade_duration);
                 }
 
-                private void toNormal()
-                {
-                    text.FadeIn(fade_duration);
-                    textBold.FadeOut(fade_duration);
-                }
+                protected override void OnActivated() => updateState();
 
-                protected override void OnActivated() => toBold();
-
-                protected override void OnDeactivated() => toNormal();
+                protected override void OnDeactivated() => updateState();
             }
         }
     }
