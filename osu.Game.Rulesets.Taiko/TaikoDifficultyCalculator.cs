@@ -36,12 +36,12 @@ namespace osu.Game.Rulesets.Taiko
         {
         }
 
-        protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
+        public override double Calculate(Dictionary<string, string> categoryDifficulty = null)
         {
             // Fill our custom DifficultyHitObject class, that carries additional information
             difficultyHitObjects.Clear();
 
-            foreach (var hitObject in Objects)
+            foreach (var hitObject in Beatmap.HitObjects)
                 difficultyHitObjects.Add(new TaikoHitObjectDifficulty(hitObject));
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
@@ -134,6 +134,6 @@ namespace osu.Game.Rulesets.Taiko
             return difficulty;
         }
 
-        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter(true);
+        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter(Beatmap beatmap) => new TaikoBeatmapConverter(true);
     }
 }

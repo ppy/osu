@@ -3,6 +3,10 @@
 
 using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Mods;
+using osu.Framework.Timing;
+using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Beatmaps
 {
@@ -10,45 +14,46 @@ namespace osu.Game.Beatmaps
     {
         protected double TimeRate = 1;
 
-        protected abstract double CalculateInternal(Dictionary<string, string> categoryDifficulty);
-
-        private void loadTiming()
-        {
-            // TODO: Handle mods
-            const int audio_rate = 100;
-            TimeRate = audio_rate / 100.0;
-        }
-
-        public double Calculate(Dictionary<string, string> categoryDifficulty = null)
-        {
-            loadTiming();
-            double difficulty = CalculateInternal(categoryDifficulty);
-            return difficulty;
-        }
+        public abstract double Calculate(Dictionary<string, string> categoryDifficulty = null);
     }
 
     public abstract class DifficultyCalculator<T> : DifficultyCalculator where T : HitObject
     {
-        protected readonly Beatmap Beatmap;
+        protected readonly Beatmap<T> Beatmap;
+        protected readonly Mod[] Mods;
 
-        protected List<T> Objects;
-
-        protected DifficultyCalculator(Beatmap beatmap)
+        protected DifficultyCalculator(Beatmap beatmap, Mod[] mods = null)
         {
-            Beatmap = beatmap;
+            Beatmap = CreateBeatmapConverter(beatmap).Convert(beatmap);
+            Mods = mods ?? new Mod[0];
 
-            Objects = CreateBeatmapConverter().Convert(beatmap).HitObjects;
 
-            foreach (var h in Objects)
-                h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
+            ApplyMods(Mods);
 
             PreprocessHitObjects();
+        }
+
+        protected virtual void ApplyMods(Mod[] mods)
+        {
+            var clock = new StopwatchClock();
+            mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
+            TimeRate = clock.Rate;
+
+            foreach (var mod in Mods.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(Beatmap.BeatmapInfo.BaseDifficulty);
+
+            foreach (var mod in mods.OfType<IApplicableToHitObject<T>>())
+                foreach (var obj in Beatmap.HitObjects)
+                    mod.ApplyToHitObject(obj);
+
+            foreach (var h in Beatmap.HitObjects)
+                h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
         }
 
         protected virtual void PreprocessHitObjects()
         {
         }
 
-        protected abstract BeatmapConverter<T> CreateBeatmapConverter();
+        protected abstract BeatmapConverter<T> CreateBeatmapConverter(Beatmap beatmap);
     }
 }

@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.KeyBinding
         }
     }
 
-    internal class ResetButton : OsuButton
+    public class ResetButton : OsuButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

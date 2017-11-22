@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 namespace osu.Game.Online.API
 {
     [Serializable]
-    internal class OAuthToken
+    public class OAuthToken
     {
         /// <summary>
         /// OAuth 2.0 access token.

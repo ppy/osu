@@ -58,7 +58,7 @@ namespace osu.Game.Overlays
         private readonly Box chatBackground;
         private readonly Box tabBackground;
 
-        public Bindable<double> ChatHeight { get; internal set; }
+        public Bindable<double> ChatHeight { get; set; }
 
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
