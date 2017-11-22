@@ -322,13 +322,10 @@ namespace osu.Game.Overlays.Profile
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 FillMode = FillMode.Fill,
-                OnLoadComplete = d => d.FadeInFromZero(200)
+                OnLoadComplete = d => d.FadeInFromZero(200),
+                Depth = float.MaxValue,
             },
-            ucb =>
-            {
-                ucb.Depth = float.MaxValue;
-                coverContainer.Add(ucb);
-            });
+            coverContainer.Add);
 
             if (user.IsSupporter) supporterTag.Show();
 
