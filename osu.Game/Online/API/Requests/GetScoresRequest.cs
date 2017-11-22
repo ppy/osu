@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using System.Collections.Specialized;
+using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Online.API.Requests
             Success += onSuccess;
         }
 
-        public GetScoresRequest(BeatmapInfo beatmap, LeaderboardScope scope, RulesetInfo ruleset)
+        public GetScoresRequest(BeatmapInfo beatmap, RulesetInfo ruleset, LeaderboardScope scope = LeaderboardScope.Global)
         {
             if (!beatmap.OnlineBeatmapID.HasValue)
                 throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.OnlineBeatmapID)}.");
@@ -49,46 +50,53 @@ namespace osu.Game.Online.API.Requests
                 score.ApplyBeatmap(beatmap);
         }
 
-        private string mapScopeToQuery()
+        protected override WebRequest CreateWebRequest()
         {
+            var req = base.CreateWebRequest();
+
             switch(scope)
             {
+                default:
                 case LeaderboardScope.Global:
-                    return @"type=global";
+                    req.AddParameter(@"type", @"global");
+                    break;
 
                 case LeaderboardScope.Friends:
-                    return @"type=friend";
+                    req.AddParameter(@"type", @"friend");
+                    break;
 
                 case LeaderboardScope.Country:
-                    return @"type=country";
-
-                default:
-                    return String.Empty;
+                    req.AddParameter(@"type", @"country");
+                    break;
             }
-        }
 
-        private string mapRulesetToQuery()
-        {
-            switch(ruleset.Name)
+            if (ruleset != null)
             {
-                case @"osu!":
-                    return @"mode=osu";
+                switch (ruleset.Name)
+                {
+                    default:
+                    case @"osu!":
+                        req.AddParameter(@"mode", @"osu");
+                        break;
 
-                case @"osu!taiko":
-                    return @"mode=taiko";
-                
-                case @"osu!catch":
-                    return @"mode=catch";
-                
-                case @"osu!mania":
-                    return @"mode=mania";
+                    case @"osu!taiko":
+                        req.AddParameter(@"mode", @"taiko");
+                        break;
 
-                default:
-                    return String.Empty;
+                    case @"osu!catch":
+                        req.AddParameter(@"mode", @"catch");
+                        break;
+
+                    case @"osu!mania":
+                        req.AddParameter(@"mode", @"mania");
+                        break;
+                }
             }
+
+            return req;
         }
 
-        protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores?{mapScopeToQuery()}&{mapRulesetToQuery()}";
+        protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores";
     }
 
     public class GetScoresResponse
