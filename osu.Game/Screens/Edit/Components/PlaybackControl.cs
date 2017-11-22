@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Linq;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -92,7 +93,7 @@ namespace osu.Game.Screens.Edit.Components
 
             public class PlaybackTabItem : TabItem<double>
             {
-                private const float fade_duration = 100;
+                private const float fade_duration = 200;
 
                 private readonly OsuSpriteText text;
                 private readonly OsuSpriteText textBold;
@@ -124,10 +125,14 @@ namespace osu.Game.Screens.Edit.Components
                     };
                 }
 
+                private Color4 hoveredColour;
+                private Color4 normalColour;
+
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
-                    text.Colour = colours.Gray5;
+                    text.Colour = normalColour = colours.YellowDarker;
+                    textBold.Colour = hoveredColour = colours.Yellow;
                 }
 
                 protected override bool OnHover(InputState state)
@@ -144,8 +149,9 @@ namespace osu.Game.Screens.Edit.Components
 
                 private void updateState()
                 {
-                    text.FadeTo(Active || IsHovered ? 0 : 1, fade_duration);
-                    textBold.FadeTo(Active || IsHovered ? 1 : 0, fade_duration);
+                    text.FadeColour(Active || IsHovered ? hoveredColour : normalColour, fade_duration, Easing.OutQuint);
+                    text.FadeTo(Active ? 0 : 1, fade_duration, Easing.OutQuint);
+                    textBold.FadeTo(Active ? 1 : 0, fade_duration, Easing.OutQuint);
                 }
 
                 protected override void OnActivated() => updateState();
