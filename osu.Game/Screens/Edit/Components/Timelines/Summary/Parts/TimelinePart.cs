@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// Represents a part of the summary timeline..
     /// </summary>
-    internal abstract class TimelinePart : CompositeDrawable
+    public abstract class TimelinePart : CompositeDrawable
     {
         public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 

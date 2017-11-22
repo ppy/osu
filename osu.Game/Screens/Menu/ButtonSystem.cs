@@ -39,10 +39,10 @@ namespace osu.Game.Screens.Menu
         private readonly FlowContainerWithOrigin buttonFlow;
 
         //todo: make these non-internal somehow.
-        internal const float BUTTON_AREA_HEIGHT = 100;
+        public const float BUTTON_AREA_HEIGHT = 100;
 
-        internal const float BUTTON_WIDTH = 140f;
-        internal const float WEDGE_WIDTH = 20;
+        public const float BUTTON_WIDTH = 140f;
+        public const float WEDGE_WIDTH = 20;
 
         private OsuLogo logo;
 

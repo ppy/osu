@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// The part of the timeline that displays the control points.
     /// </summary>
-    internal class ControlPointPart : TimelinePart
+    public class ControlPointPart : TimelinePart
     {
         protected override void LoadBeatmap(WorkingBeatmap beatmap)
         {

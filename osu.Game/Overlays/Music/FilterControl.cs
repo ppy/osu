@@ -13,7 +13,7 @@ using System;
 
 namespace osu.Game.Overlays.Music
 {
-    internal class FilterControl : Container
+    public class FilterControl : Container
     {
         public readonly FilterTextBox Search;
 

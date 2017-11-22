@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// Whether we have loaded the menu previously.
         /// </summary>
-        internal bool DidLoadMenu;
+        public bool DidLoadMenu;
 
         private MainMenu mainMenu;
         private SampleChannel welcome;
