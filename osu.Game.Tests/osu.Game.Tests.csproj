@@ -116,7 +116,7 @@
     <Compile Include="Visual\TestCaseKeyCounter.cs" />
     <Compile Include="Visual\TestCaseLeaderboard.cs" />
     <Compile Include="Visual\TestCaseMedalOverlay.cs" />
-    <Compile Include="Visual\TestCaseMenuButtonSystem.cs" />
+    <Compile Include="Visual\TestCaseButtonSystem.cs" />
     <Compile Include="Visual\TestCaseMenuOverlays.cs" />
     <Compile Include="Visual\TestCaseMods.cs" />
     <Compile Include="Visual\TestCaseMusicController.cs" />
