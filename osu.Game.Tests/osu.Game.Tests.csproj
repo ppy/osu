@@ -124,6 +124,7 @@
     <Compile Include="Visual\TestCaseOnScreenDisplay.cs" />
     <Compile Include="Visual\TestCaseAllPlayers.cs" />
     <Compile Include="Visual\TestCaseOsuGame.cs" />
+    <Compile Include="Visual\TestCasePlaybackControl.cs" />
     <Compile Include="Visual\TestCasePlaySongSelect.cs" />
     <Compile Include="Visual\TestCaseReplay.cs" />
     <Compile Include="Visual\TestCaseReplaySettingsOverlay.cs" />

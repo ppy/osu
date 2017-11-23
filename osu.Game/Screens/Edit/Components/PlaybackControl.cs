@@ -2,7 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -13,11 +15,11 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Components
 {
-    public class PlaybackContainer : BottomBarContainer
+    public class PlaybackControl : BottomBarContainer
     {
         private readonly IconButton playButton;
 
-        public PlaybackContainer()
+        public PlaybackControl()
         {
             PlaybackTabControl tabs;
 
@@ -30,7 +32,7 @@ namespace osu.Game.Screens.Edit.Components
                     Scale = new Vector2(1.4f),
                     IconScale = new Vector2(1.4f),
                     Icon = FontAwesome.fa_play_circle_o,
-                    Action = playPause,
+                    Action = togglePause,
                     Padding = new MarginPadding { Left = 20 }
                 },
                 new OsuSpriteText
@@ -52,14 +54,10 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            tabs.AddItem(0.25);
-            tabs.AddItem(0.75);
-            tabs.AddItem(1);
-
             tabs.Current.ValueChanged += newValue => Track.Tempo.Value = newValue;
         }
 
-        private void playPause()
+        private void togglePause()
         {
             if (Track.IsRunning)
                 Track.Stop();
@@ -76,6 +74,8 @@ namespace osu.Game.Screens.Edit.Components
 
         private class PlaybackTabControl : OsuTabControl<double>
         {
+            private static readonly double[] tempo_values = { 0.5, 0.75, 1 };
+
             protected override TabItem<double> CreateTabItem(double value) => new PlaybackTabItem(value);
 
             protected override Dropdown<double> CreateDropdown() => null;
@@ -83,20 +83,23 @@ namespace osu.Game.Screens.Edit.Components
             public PlaybackTabControl()
             {
                 RelativeSizeAxes = Axes.Both;
-                TabContainer.Spacing = new Vector2(20, 0);
+                TabContainer.Spacing = Vector2.Zero;
+
+                tempo_values.ForEach(AddItem);
             }
 
             public class PlaybackTabItem : TabItem<double>
             {
-                private const float fade_duration = 100;
+                private const float fade_duration = 200;
 
                 private readonly OsuSpriteText text;
                 private readonly OsuSpriteText textBold;
 
                 public PlaybackTabItem(double value) : base(value)
                 {
-                    AutoSizeAxes = Axes.X;
-                    RelativeSizeAxes = Axes.Y;
+                    RelativeSizeAxes = Axes.Both;
+
+                    Width = 1f / tempo_values.Length;
 
                     Children = new Drawable[]
                     {
@@ -104,56 +107,47 @@ namespace osu.Game.Screens.Edit.Components
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Text = $"{value:P0}",
+                            Text = $"{value:0%}",
                             TextSize = 14,
                         },
                         textBold = new OsuSpriteText
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Text = $"{value:P0}",
+                            Text = $"{value:0%}",
                             TextSize = 14,
                             Font = @"Exo2.0-Bold",
                             Alpha = 0,
-                            AlwaysPresent = true,
                         },
                     };
                 }
 
+                private Color4 hoveredColour;
+                private Color4 normalColour;
+
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
-                    text.Colour = colours.Gray5;
+                    text.Colour = normalColour = colours.YellowDarker;
+                    textBold.Colour = hoveredColour = colours.Yellow;
                 }
 
                 protected override bool OnHover(InputState state)
                 {
-                    if (!Active)
-                        toBold();
+                    updateState();
                     return true;
                 }
 
-                protected override void OnHoverLost(InputState state)
+                protected override void OnHoverLost(InputState state) => updateState();
+                protected override void OnActivated() => updateState();
+                protected override void OnDeactivated() => updateState();
+
+                private void updateState()
                 {
-                    if (!Active)
-                        toNormal();
+                    text.FadeColour(Active || IsHovered ? hoveredColour : normalColour, fade_duration, Easing.OutQuint);
+                    text.FadeTo(Active ? 0 : 1, fade_duration, Easing.OutQuint);
+                    textBold.FadeTo(Active ? 1 : 0, fade_duration, Easing.OutQuint);
                 }
-
-                private void toBold()
-                {
-                    text.FadeOut(fade_duration);
-                    textBold.FadeIn(fade_duration);
-                }
-
-                private void toNormal()
-                {
-                    text.FadeIn(fade_duration);
-                    textBold.FadeOut(fade_duration);
-                }
-
-                protected override void OnActivated() => toBold();
-
-                protected override void OnDeactivated() => toNormal();
             }
         }
     }
