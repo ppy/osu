@@ -45,8 +45,7 @@ namespace osu.Game.Users
                 {
                     RelativeSizeAxes = Axes.Both,
                     OnLoadComplete = d => d.FadeInFromZero(200),
-                },
-                500)
+                }, 500)
             );
         }
     }

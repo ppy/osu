@@ -231,8 +231,7 @@ namespace osu.Game.Overlays.Direct
                     d.FadeInFromZero(400, Easing.Out);
                     BlackBackground.Delay(400).FadeOut();
                 },
-            },
-            300)
+            }, 300)
         {
             RelativeSizeAxes = Axes.Both,
         };
