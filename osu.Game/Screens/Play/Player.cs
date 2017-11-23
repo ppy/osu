@@ -227,10 +227,15 @@ namespace osu.Game.Screens.Play
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;
+
+            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
+                mod.ApplyToScoreProcessor(scoreProcessor);
         }
 
         private void applyRateFromMods()
         {
+            if (adjustableSourceClock == null) return;
+
             adjustableSourceClock.Rate = 1;
             foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(adjustableSourceClock);

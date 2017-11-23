@@ -207,14 +207,12 @@ namespace osu.Game.Overlays.Mods
                     {
                         Origin = Anchor.BottomRight,
                         Anchor = Anchor.BottomRight,
-                        AutoSizeAxes = Axes.Both,
                         Position = new Vector2(1.5f),
                     },
                     foregroundIcon = new ModIcon(Mods[0])
                     {
                         Origin = Anchor.BottomRight,
                         Anchor = Anchor.BottomRight,
-                        AutoSizeAxes = Axes.Both,
                         Position = new Vector2(-1.5f),
                     },
                 });
@@ -225,7 +223,6 @@ namespace osu.Game.Overlays.Mods
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
                 });
             }
         }

@@ -9,7 +9,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    internal class ToolbarUserArea : Container
+    public class ToolbarUserArea : Container
     {
         public LoginOverlay LoginOverlay;
         private ToolbarUserButton button;

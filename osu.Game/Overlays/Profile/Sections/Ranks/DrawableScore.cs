@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,7 +9,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Leaderboards;
-using System.Linq;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -29,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         protected readonly FillFlowContainer<OsuSpriteText> Stats;
         private readonly FillFlowContainer metadata;
-        private readonly ModContainer modContainer;
+        private readonly ScoreModsContainer modsContainer;
         protected readonly Score Score;
         private readonly Box underscoreLine;
         private readonly Box coloredBackground;
@@ -103,7 +101,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 Depth = -1,
                             },
                         },
-                        modContainer = new ModContainer
+                        modsContainer = new ScoreModsContainer
                         {
                             AutoSizeAxes = Axes.Y,
                             Anchor = Anchor.CentreRight,
@@ -165,11 +163,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             });
 
             foreach (Mod mod in Score.Mods)
-                modContainer.Add(new ModIcon(mod)
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Scale = new Vector2(0.5f),
-                });
+                modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.5f) });
         }
 
         protected override bool OnClick(InputState state) => true;
@@ -186,16 +180,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             background.FadeOut(fade_duration, Easing.OutQuint);
             underscoreLine.FadeIn(fade_duration, Easing.OutQuint);
             base.OnHoverLost(state);
-        }
-
-        private class ModContainer : FlowContainer<ModIcon>
-        {
-            protected override IEnumerable<Vector2> ComputeLayoutPositions()
-            {
-                int count = FlowingChildren.Count();
-                for (int i = 0; i < count; i++)
-                    yield return new Vector2(DrawWidth * i * (count == 1 ? 0 : 1f / (count - 1)), 0);
-            }
         }
 
         private class MetadataContainer : OsuHoverContainer, IHasTooltip

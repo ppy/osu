@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.Settings
         private class RestoreDefaultValueButton : Box, IHasTooltip
         {
             private Bindable<T> bindable;
-            internal Bindable<T> Bindable
+            public Bindable<T> Bindable
             {
                 get { return bindable; }
                 set
@@ -185,13 +185,13 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            internal void SetButtonColour(Color4 buttonColour)
+            public void SetButtonColour(Color4 buttonColour)
             {
                 this.buttonColour = buttonColour;
                 UpdateState();
             }
 
-            internal void UpdateState()
+            public void UpdateState()
             {
                 if (bindable == null)
                     return;

@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace osu.Game.Beatmaps
 {
@@ -28,16 +29,11 @@ namespace osu.Game.Beatmaps
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
             Mods.ValueChanged += mods => applyRateAdjustments();
-        }
 
-        private void applyRateAdjustments()
-        {
-            var t = track;
-            if (t == null) return;
-
-            t.ResetSpeedAdjustments();
-            foreach (var mod in Mods.Value.OfType<IApplicableToClock>())
-                mod.ApplyToClock(t);
+            beatmap = new AsyncLazy<Beatmap>(populateBeatmap);
+            background = new AsyncLazy<Texture>(populateBackground);
+            track = new AsyncLazy<Track>(populateTrack);
+            waveform = new AsyncLazy<Waveform>(populateWaveform);
         }
 
         protected abstract Beatmap GetBeatmap();
@@ -45,97 +41,84 @@ namespace osu.Game.Beatmaps
         protected abstract Track GetTrack();
         protected virtual Waveform GetWaveform() => new Waveform();
 
-        private Beatmap beatmap;
-        private readonly object beatmapLock = new object();
-        public Beatmap Beatmap
+        public bool BeatmapLoaded => beatmap.IsValueCreated;
+        public Beatmap Beatmap => beatmap.Value.Result;
+        public async Task<Beatmap> GetBeatmapAsync() => await beatmap.Value;
+
+        private readonly AsyncLazy<Beatmap> beatmap;
+
+        private Beatmap populateBeatmap()
         {
-            get
-            {
-                lock (beatmapLock)
-                {
-                    if (beatmap != null) return beatmap;
+            var b = GetBeatmap() ?? new Beatmap();
 
-                    beatmap = GetBeatmap() ?? new Beatmap();
+            // use the database-backed info.
+            b.BeatmapInfo = BeatmapInfo;
 
-                    // use the database-backed info.
-                    beatmap.BeatmapInfo = BeatmapInfo;
-
-                    return beatmap;
-                }
-            }
+            return b;
         }
 
-        private readonly object backgroundLock = new object();
-        private Texture background;
-        public Texture Background
+        public bool BackgroundLoaded => background.IsValueCreated;
+        public Texture Background => background.Value.Result;
+        public async Task<Texture> GetBackgroundAsync() => await background.Value;
+        private AsyncLazy<Texture> background;
+
+        private Texture populateBackground() => GetBackground();
+
+        public bool TrackLoaded => track.IsValueCreated;
+        public Track Track => track.Value.Result;
+        public async Task<Track> GetTrackAsync() => await track.Value;
+        private AsyncLazy<Track> track;
+
+        private Track populateTrack()
         {
-            get
-            {
-                lock (backgroundLock)
-                {
-                    return background ?? (background = GetBackground());
-                }
-            }
+            // we want to ensure that we always have a track, even if it's a fake one.
+            var t = GetTrack() ?? new TrackVirtual();
+            applyRateAdjustments(t);
+            return t;
         }
 
-        private Track track;
-        private readonly object trackLock = new object();
-        public Track Track
-        {
-            get
-            {
-                lock (trackLock)
-                {
-                    if (track != null) return track;
+        public bool WaveformLoaded => waveform.IsValueCreated;
+        public Waveform Waveform => waveform.Value.Result;
+        public async Task<Waveform> GetWaveformAsync() => await waveform.Value;
+        private readonly AsyncLazy<Waveform> waveform;
 
-                    // we want to ensure that we always have a track, even if it's a fake one.
-                    track = GetTrack() ?? new TrackVirtual();
-
-                    applyRateAdjustments();
-                    return track;
-                }
-            }
-        }
-
-        private Waveform waveform;
-        private readonly object waveformLock = new object();
-        public Waveform Waveform
-        {
-            get
-            {
-                lock (waveformLock)
-                    return waveform ?? (waveform = GetWaveform());
-            }
-        }
-
-        public bool TrackLoaded => track != null;
+        private Waveform populateWaveform() => GetWaveform();
 
         public void TransferTo(WorkingBeatmap other)
         {
-            lock (trackLock)
-            {
-                if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
-                    other.track = track;
-            }
+            if (track.IsValueCreated && Track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
+                other.track = track;
 
-            if (background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
+            if (background.IsValueCreated && Background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
                 other.background = background;
         }
 
         public virtual void Dispose()
         {
-            background?.Dispose();
-            background = null;
-
-            waveform?.Dispose();
+            if (BackgroundLoaded) Background?.Dispose();
+            if (WaveformLoaded) Waveform?.Dispose();
         }
 
         public void DisposeTrack()
         {
-            lock (trackLock)
+            if (TrackLoaded) Track?.Dispose();
+        }
+
+        private void applyRateAdjustments(Track t = null)
+        {
+            if (t == null && track.IsValueCreated) t = Track;
+            if (t == null) return;
+
+            t.ResetSpeedAdjustments();
+            foreach (var mod in Mods.Value.OfType<IApplicableToClock>())
+                mod.ApplyToClock(t);
+        }
+
+        public class AsyncLazy<T> : Lazy<Task<T>>
+        {
+            public AsyncLazy(Func<T> valueFactory)
+                : base(() => Task.Run(valueFactory))
             {
-                track?.Dispose();
-                track = null;
             }
         }
     }
