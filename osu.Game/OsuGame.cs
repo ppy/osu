@@ -109,7 +109,7 @@ namespace osu.Game
             dependencies.Cache(this);
 
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
-            Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value);
+            Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
         }
 
@@ -248,6 +248,22 @@ namespace osu.Game
                     if (state == Visibility.Hidden) return;
 
                     foreach (var c in singleDisplayOverlays)
+                    {
+                        if (c == overlay) continue;
+                        c.State = Visibility.Hidden;
+                    }
+                };
+            }
+
+            // eventually informational overlays should be displayed in a stack, but for now let's only allow one to stay open at a time.
+            var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile };
+            foreach (var overlay in informationalOverlays)
+            {
+                overlay.StateChanged += state =>
+                {
+                    if (state == Visibility.Hidden) return;
+
+                    foreach (var c in informationalOverlays)
                     {
                         if (c == overlay) continue;
                         c.State = Visibility.Hidden;

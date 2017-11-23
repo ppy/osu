@@ -85,11 +85,10 @@ namespace osu.Game.Screens.Menu
 
         private void updateAmplitudes()
         {
-            var track = beatmap.Value.Track;
+            var track = beatmap.Value.TrackLoaded ? beatmap.Value.Track : null;
+            var effect = beatmap.Value.BeatmapLoaded ? beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? Time.Current) : null;
 
             float[] temporalAmplitudes = track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
-
-            var effect = beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? Time.Current);
 
             for (int i = 0; i < bars_per_visualiser; i++)
             {

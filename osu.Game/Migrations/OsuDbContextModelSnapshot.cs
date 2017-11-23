@@ -103,6 +103,9 @@ namespace osu.Game.Migrations
 
                     b.HasIndex("MetadataID");
 
+                    b.HasIndex("OnlineBeatmapID")
+                        .IsUnique();
+
                     b.HasIndex("RulesetID");
 
                     b.ToTable("BeatmapInfo");
