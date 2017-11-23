@@ -203,8 +203,8 @@ namespace osu.Game.Screens.Select
             Push(new Editor());
         }
 
-        private void onBeatmapRestored(BeatmapInfo b) => carousel.UpdateBeatmap(b);
-        private void onBeatmapHidden(BeatmapInfo b) => carousel.UpdateBeatmap(b);
+        private void onBeatmapRestored(BeatmapInfo b) => Schedule(() => carousel.UpdateBeatmap(b));
+        private void onBeatmapHidden(BeatmapInfo b) => Schedule(() => carousel.UpdateBeatmap(b));
 
         private void carouselBeatmapsLoaded()
         {
