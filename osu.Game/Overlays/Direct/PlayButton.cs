@@ -146,18 +146,17 @@ namespace osu.Game.Overlays.Direct
 
             loading = true;
 
-            Add(new AsyncLoadWrapper(trackLoader = new TrackLoader($"https://b.ppy.sh/preview/{BeatmapSet.OnlineBeatmapSetID}.mp3")
-            {
-                OnLoadComplete = d =>
+            LoadComponentAsync(trackLoader = new TrackLoader($"https://b.ppy.sh/preview/{BeatmapSet.OnlineBeatmapSetID}.mp3"),
+                d =>
                 {
-                    // we may have been replaced by another loader
+                    // We may have been replaced by another loader
                     if (trackLoader != d) return;
 
-                    Preview = (d as TrackLoader)?.Preview;
+                    Preview = d?.Preview;
                     Playing.TriggerChange();
                     loading = false;
-                },
-            }));
+                    Add(trackLoader);
+                });
         }
 
         private class TrackLoader : Drawable
