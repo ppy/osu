@@ -286,6 +286,7 @@
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Notifications\IHasFollowUpNotifications.cs" />
     <Compile Include="Notifications\Notification.cs" />
+    <Compile Include="Notifications\NotificationColors.cs" />
     <Compile Include="Notifications\ProgressNotification.cs" />
     <Compile Include="Notifications\ProgressNotificationState.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
@@ -295,7 +296,6 @@
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableTopScore.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ScoresContainer.cs" />
     <Compile Include="Online\API\Requests\GetUserBeatmapsRequest.cs" />
-    <Compile Include="Overlays\Notifications\IHasNotification.cs" />
     <Compile Include="Overlays\Profile\Sections\Beatmaps\PaginatedBeatmapContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\PaginatedContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawablePerformanceScore.cs" />

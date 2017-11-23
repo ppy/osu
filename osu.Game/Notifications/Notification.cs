@@ -27,7 +27,16 @@ namespace osu.Game.Notifications
             set { IconBinding.Value = value; }
         }
 
+        /// <summary>
+        /// Custom colors for the notification. If null default colors will be used.
+        /// </summary>
+        public NotificationColors CustomColors
+        {
+            get { return CustomColorsBinding.Value; }
+            set { CustomColorsBinding.Value = value; }
+        }
 
+        public Bindable<NotificationColors> CustomColorsBinding { get; }
         public Bindable<string> TextBinding { get; }
         public Bindable<FontAwesome> IconBinding { get; }
 
@@ -51,6 +60,7 @@ namespace osu.Game.Notifications
 
             TextBinding = new Bindable<string>(text);
             IconBinding = new Bindable<FontAwesome>(icon);
+            CustomColorsBinding = new Bindable<NotificationColors>();
             if (onActivate != null)
                 OnActivate += onActivate;
         }

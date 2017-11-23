@@ -17,7 +17,6 @@ namespace osu.Game.Overlays.Notifications
     public class ProgressNotificationDrawable : NotificationDrawable
     {
         public ProgressNotification ProgressNotification { get; }
-        public Notification Notification => ProgressNotification;
 
         public override bool DisplayOnTop => false;
 
