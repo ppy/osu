@@ -9,7 +9,7 @@ using OpenTK;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    [Description("PlaySongSelect leaderboard/details area")]
+    [System.ComponentModel.Description("PlaySongSelect leaderboard/details area")]
     internal class TestCaseBeatmapDetailArea : OsuTestCase
     {
         public TestCaseBeatmapDetailArea()
