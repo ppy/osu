@@ -10,8 +10,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseKeyCounter : OsuTestCase
     {
-        public override string Description => @"Tests key counter";
-
         public TestCaseKeyCounter()
         {
             KeyCounterCollection kc = new KeyCounterCollection

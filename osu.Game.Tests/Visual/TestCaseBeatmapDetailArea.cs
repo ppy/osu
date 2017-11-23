@@ -9,10 +9,9 @@ using OpenTK;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
+    [Description("PlaySongSelect leaderboard/details area")]
     internal class TestCaseBeatmapDetailArea : OsuTestCase
     {
-        public override string Description => @"Beatmap details in song select";
-
         public TestCaseBeatmapDetailArea()
         {
             Add(new BeatmapDetailArea

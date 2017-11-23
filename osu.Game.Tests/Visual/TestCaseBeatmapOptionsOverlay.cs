@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.ComponentModel;
 using osu.Game.Graphics;
 using osu.Game.Screens.Select.Options;
 using OpenTK.Graphics;
@@ -8,10 +9,9 @@ using OpenTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
+    [Description("bottom beatmap details")]
     internal class TestCaseBeatmapOptionsOverlay : OsuTestCase
     {
-        public override string Description => @"Beatmap options in song select";
-
         public TestCaseBeatmapOptionsOverlay()
         {
             var overlay = new BeatmapOptionsOverlay();
