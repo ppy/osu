@@ -7,8 +7,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseSkipButton : OsuTestCase
     {
-        public override string Description => @"Skip skip skippediskip";
-
         protected override void LoadComplete()
         {
             base.LoadComplete();

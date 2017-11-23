@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private Box background;
         private Container content;
-        private Container avatar;
+        private Drawable avatar;
         private DrawableRank scoreRank;
         private OsuSpriteText nameLabel;
         private GlowingSpriteText scoreLabel;
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding(edge_margin),
-                            Children = new Drawable[]
+                            Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
                                     new Avatar(Score.User)
@@ -114,7 +114,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                                         },
                                     })
                                 {
-                                    TimeBeforeLoad = 500,
                                     RelativeSizeAxes = Axes.None,
                                     Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
                                 },
@@ -211,7 +210,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         public override void Show()
         {
-            foreach (var d in new Drawable[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, maxCombo, accuracy, modsContainer })
+            foreach (var d in new[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, maxCombo, accuracy, modsContainer })
                 d.FadeOut();
 
             Alpha = 0;

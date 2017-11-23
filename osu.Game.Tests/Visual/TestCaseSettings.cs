@@ -7,8 +7,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseSettings : OsuTestCase
     {
-        public override string Description => @"Tests the settings overlay";
-
         private readonly SettingsOverlay settings;
 
         public TestCaseSettings()

@@ -56,20 +56,17 @@ namespace osu.Game.Overlays.BeatmapSet
                 videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
 
                 cover?.FadeOut(400, Easing.Out);
-                coverContainer.Add(cover = new DelayedLoadWrapper(new BeatmapSetCover(BeatmapSet)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fill,
-                    OnLoadComplete = d =>
+                coverContainer.Add(cover = new DelayedLoadWrapper(
+                    new BeatmapSetCover(BeatmapSet)
                     {
-                        d.FadeInFromZero(400, Easing.Out);
-                    },
-                })
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        FillMode = FillMode.Fill,
+                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
+                    }, 300)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    TimeBeforeLoad = 300
                 });
             }
         }
@@ -232,7 +229,7 @@ namespace osu.Game.Overlays.BeatmapSet
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            beatmaps.BeatmapSetAdded -= handleBeatmapAdd;
+            if (beatmaps != null) beatmaps.BeatmapSetAdded -= handleBeatmapAdd;
         }
 
         private void handleBeatmapAdd(BeatmapSetInfo beatmap)
