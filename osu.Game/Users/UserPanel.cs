@@ -65,7 +65,7 @@ namespace osu.Game.Users
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
                     OnLoadComplete = d => d.FadeInFromZero(200),
-                }) { RelativeSizeAxes = Axes.Both },
+                }, 0) { RelativeSizeAxes = Axes.Both },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
