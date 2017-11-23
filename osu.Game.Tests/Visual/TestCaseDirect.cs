@@ -11,8 +11,6 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseDirect : OsuTestCase
     {
-        public override string Description => @"osu!direct overlay";
-
         private DirectOverlay direct;
         private RulesetStore rulesets;
 
