@@ -64,11 +64,7 @@ namespace osu.Game.Beatmaps.Drawables
                     {
                         RelativeSizeAxes = Axes.Both,
                         OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    }
-                )
-                {
-                    TimeBeforeLoad = 300,
-                },
+                    }, 300),
                 new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
