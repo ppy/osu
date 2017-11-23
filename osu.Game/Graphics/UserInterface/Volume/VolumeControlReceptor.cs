@@ -8,7 +8,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
-    internal class VolumeControlReceptor : Container, IKeyBindingHandler<GlobalAction>
+    public class VolumeControlReceptor : Container, IKeyBindingHandler<GlobalAction>
     {
         public Func<GlobalAction, bool> ActionRequested;
 

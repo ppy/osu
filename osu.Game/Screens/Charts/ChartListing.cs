@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Screens.Charts
 {
-    internal class ChartListing : ScreenWhiteBox
+    public class ChartListing : ScreenWhiteBox
     {
         protected override IEnumerable<Type> PossibleChildren => new[] {
                 typeof(ChartInfo)

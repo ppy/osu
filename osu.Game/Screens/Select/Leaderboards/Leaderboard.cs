@@ -40,20 +40,12 @@ namespace osu.Game.Screens.Select.Leaderboards
                 scores = value;
                 getScoresRequest?.Cancel();
 
-                int i = 150;
+                scrollFlow?.FadeOut(200);
+                scrollFlow?.Expire();
+                scrollFlow = null;
+
                 if (scores == null)
-                {
-                    if (scrollFlow != null)
-                    {
-                        foreach (var c in scrollFlow.Children)
-                            c.FadeOut(i += 10);
-
-                        foreach (var c in scrollFlow.Children)
-                            c.LifetimeEnd = Time.Current + i;
-                    }
-
                     return;
-                }
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
                 Schedule(() =>
@@ -64,13 +56,12 @@ namespace osu.Game.Screens.Select.Leaderboards
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(0f, 5f),
                         Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                        ChildrenEnumerable = scores.Select(s => new LeaderboardScore(s, 1 + i) { Action = () => ScoreSelected?.Invoke(s) })
+                        ChildrenEnumerable = scores.Select((s, index) => new LeaderboardScore(s, index + 1) { Action = () => ScoreSelected?.Invoke(s) })
                     }, f =>
                     {
-                        scrollFlow?.Expire();
                         scrollContainer.Add(scrollFlow = f);
 
-                        i = 0;
+                        int i = 0;
                         foreach (var s in f.Children)
                         {
                             using (s.BeginDelayedSequence(i++ * 50, true))

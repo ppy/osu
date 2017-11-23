@@ -12,7 +12,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    internal class ToolbarUserButton : ToolbarButton, IOnlineComponent
+    public class ToolbarUserButton : ToolbarButton, IOnlineComponent
     {
         private readonly UpdateableAvatar avatar;
 

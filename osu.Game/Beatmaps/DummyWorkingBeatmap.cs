@@ -11,7 +11,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Beatmaps
 {
-    internal class DummyWorkingBeatmap : WorkingBeatmap
+    public class DummyWorkingBeatmap : WorkingBeatmap
     {
         private readonly OsuGameBase game;
 

@@ -23,7 +23,7 @@ using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Screens.Select
 {
-    internal class BeatmapCarousel : OsuScrollContainer
+    public class BeatmapCarousel : OsuScrollContainer
     {
         public BeatmapInfo SelectedBeatmap => selectedPanel?.Beatmap;
 
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Select
             Schedule(() => removeGroup(groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID)));
         }
 
-        internal void UpdateBeatmap(BeatmapInfo beatmap)
+        public void UpdateBeatmap(BeatmapInfo beatmap)
         {
             // todo: this method should not run more than once for the same BeatmapSetInfo.
             var set = manager.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
@@ -572,7 +572,18 @@ namespace osu.Game.Screens.Select
                     // Makes sure headers are always _below_ panels,
                     // and depth flows downward.
                     panel.Depth = i + (panel is BeatmapSetHeader ? panels.Count : 0);
-                    scrollableContent.Add(panel);
+
+                    switch (panel.LoadState)
+                    {
+                        case LoadState.NotLoaded:
+                            LoadComponentAsync(panel);
+                            break;
+                        case LoadState.Loading:
+                            break;
+                        default:
+                            scrollableContent.Add(panel);
+                            break;
+                    }
                 }
             }
 
