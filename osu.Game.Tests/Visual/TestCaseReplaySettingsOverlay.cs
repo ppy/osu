@@ -10,8 +10,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseReplaySettingsOverlay : OsuTestCase
     {
-        public override string Description => @"Settings visible in replay/auto";
-
         public TestCaseReplaySettingsOverlay()
         {
             ExampleContainer container;

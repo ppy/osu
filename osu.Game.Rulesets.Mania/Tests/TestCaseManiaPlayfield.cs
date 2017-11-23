@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Mania.Tests
         private const double start_time = 500;
         private const double duration = 500;
 
-        public override string Description => @"Mania playfield";
-
         protected override double TimePerAction => 200;
 
         private RulesetInfo maniaRuleset;

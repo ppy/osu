@@ -10,8 +10,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseUserPanel : OsuTestCase
     {
-        public override string Description => @"Panels for displaying a user's status";
-
         public TestCaseUserPanel()
         {
             UserPanel flyte;
