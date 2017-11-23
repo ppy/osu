@@ -572,7 +572,18 @@ namespace osu.Game.Screens.Select
                     // Makes sure headers are always _below_ panels,
                     // and depth flows downward.
                     panel.Depth = i + (panel is BeatmapSetHeader ? panels.Count : 0);
-                    scrollableContent.Add(panel);
+
+                    switch (panel.LoadState)
+                    {
+                        case LoadState.NotLoaded:
+                            LoadComponentAsync(panel);
+                            break;
+                        case LoadState.Loading:
+                            break;
+                        default:
+                            scrollableContent.Add(panel);
+                            break;
+                    }
                 }
             }
 
