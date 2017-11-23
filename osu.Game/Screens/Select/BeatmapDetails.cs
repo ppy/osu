@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -217,7 +218,7 @@ namespace osu.Game.Screens.Select
             if (description == null || source == null || tags == null)
                 throw new InvalidOperationException($@"Requires all {nameof(MetadataSection)} elements to be non-null.");
 
-            Schedule(() =>
+            Task.Run(() =>
             {
                 description.Text = Beatmap?.Version;
                 source.Text = Beatmap?.Metadata?.Source;
