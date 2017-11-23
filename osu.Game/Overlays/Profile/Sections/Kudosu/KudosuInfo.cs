@@ -73,8 +73,6 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
         private class CountSection : Container
         {
-            public readonly TextFlowContainer TextFlow;
-
             private readonly OsuSpriteText valueText;
 
             public int Count
@@ -122,7 +120,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                                 }
                             }
                         },
-                        TextFlow = new TextFlowContainer(t => { t.TextSize = 19; })
+                        new TextFlowContainer(t => { t.TextSize = 19; })
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
