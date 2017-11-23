@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Select.Details
 
                 negativeRatings.Text = negativeCount.ToString();
                 positiveRatings.Text = (totalCount - negativeCount).ToString();
-                ratingsBar.Length = (float)negativeCount / totalCount;
+                ratingsBar.Length = totalCount == 0 ? 0 : (float)negativeCount / totalCount;
                 graph.Values = ratings.GetRange(0, rating_range).Select(r => (float)r);
             }
         }
