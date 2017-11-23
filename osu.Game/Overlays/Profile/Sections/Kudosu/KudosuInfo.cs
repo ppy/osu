@@ -23,8 +23,8 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         {
             this.user.BindTo(user);
 
-            SubSection total;
-            SubSection avaliable;
+            CountSection total;
+            CountSection avaliable;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -44,19 +44,19 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
-                total = new SubSection("Total Kudosu Earned"),
-                avaliable = new SubSection("Kudosu Avaliable")
+                total = new CountSection(
+                    "Total Kudosu Earned",
+                    "Based on how much of a contribution the user has made to beatmap moderation. See this link for more information."
+                    ),
+                avaliable = new CountSection(
+                    "Kudosu Avaliable",
+                    "Kudosu can be traded for kudosu stars, which will help your beatmap get more attention. This is the number of kudosu you haven't traded in yet."
+                    )
                 {
                     RelativePositionAxes = Axes.X,
                     X = 0.5f,
                 },
             };
-
-            total.TextFlow.Text = "Based on how much of a contribution the user has made to " +
-                "beatmap moderation. See this link for more information.";
-
-            avaliable.TextFlow.Text = "Kudosu can be traded for kudosu stars, which will help your beatmap get " +
-                "more attention. This is the number of kudosu you haven't traded in yet.";
 
             this.user.ValueChanged += newUser =>
             {
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
         protected override bool OnClick(InputState state) => true;
 
-        private class SubSection : Container
+        private class CountSection : Container
         {
             public readonly TextFlowContainer TextFlow;
 
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 }
             }
 
-            public SubSection(string header)
+            public CountSection(string header, string description)
             {
                 RelativeSizeAxes = Axes.X;
                 Width = 0.5f;
@@ -131,6 +131,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Text = description
                         }
                     }
                 };
