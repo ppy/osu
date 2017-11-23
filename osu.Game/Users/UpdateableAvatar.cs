@@ -11,7 +11,7 @@ namespace osu.Game.Users
     /// </summary>
     public class UpdateableAvatar : Container
     {
-        private Container displayedAvatar;
+        private Drawable displayedAvatar;
 
         private User user;
 
@@ -45,7 +45,7 @@ namespace osu.Game.Users
                 {
                     RelativeSizeAxes = Axes.Both,
                     OnLoadComplete = d => d.FadeInFromZero(200),
-                }, 500)
+                })
             );
         }
     }

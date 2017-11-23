@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.Direct
                     // We may have been replaced by another loader
                     if (trackLoader != d) return;
 
-                    Preview = (d as TrackLoader)?.Preview;
+                    Preview = d?.Preview;
                     Playing.TriggerChange();
                     loading = false;
                     Add(trackLoader);
