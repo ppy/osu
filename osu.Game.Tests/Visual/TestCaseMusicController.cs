@@ -13,8 +13,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseMusicController : OsuTestCase
     {
-        public override string Description => @"Tests music controller ui.";
-
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
         public TestCaseMusicController()
