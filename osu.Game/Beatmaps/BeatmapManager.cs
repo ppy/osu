@@ -515,6 +515,10 @@ namespace osu.Game.Beatmaps
 
                     if (existing == null)
                     {
+                        // Exclude beatmap-metadata if it's equal to beatmapset-metadata
+                        if (metadata.Equals(beatmap.Metadata))
+                            beatmap.BeatmapInfo.Metadata = null;
+
                         RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
 
                         // TODO: this should be done in a better place once we actually need to dynamically update it.
