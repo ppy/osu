@@ -112,8 +112,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                             Radius = 1,
                                             Colour = Color4.Black.Opacity(0.2f),
                                         },
-                                    },
-                                    500)
+                                    }, 500)
                                 {
                                     RelativeSizeAxes = Axes.None,
                                     Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),

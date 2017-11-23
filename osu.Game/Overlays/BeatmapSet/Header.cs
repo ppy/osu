@@ -60,8 +60,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fill,
                         OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    },
-                    300)
+                    }, 300)
                 {
                     RelativeSizeAxes = Axes.Both,
                 });
