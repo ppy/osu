@@ -12,8 +12,6 @@ namespace osu.Game.Tests.Visual
         private FrameworkConfigManager config;
         private Bindable<FrameSync> frameSyncMode;
 
-        public override string Description => @"Make it easier to see setting changes";
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
