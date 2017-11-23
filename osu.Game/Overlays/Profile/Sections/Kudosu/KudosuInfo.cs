@@ -44,18 +44,22 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
-                total = new CountSection(
-                    "Total Kudosu Earned",
-                    "Based on how much of a contribution the user has made to beatmap moderation. See this link for more information."
-                    ),
-                avaliable = new CountSection(
-                    "Kudosu Avaliable",
-                    "Kudosu can be traded for kudosu stars, which will help your beatmap get more attention. This is the number of kudosu you haven't traded in yet."
-                    )
+                new FillFlowContainer
                 {
-                    RelativePositionAxes = Axes.X,
-                    X = 0.5f,
-                },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new[]
+                    {
+                        total = new CountSection(
+                            "Total Kudosu Earned",
+                            "Based on how much of a contribution the user has made to beatmap moderation. See this link for more information."
+                        ),
+                        avaliable = new CountSection(
+                            "Kudosu Avaliable",
+                            "Kudosu can be traded for kudosu stars, which will help your beatmap get more attention. This is the number of kudosu you haven't traded in yet."
+                        ),
+                    }
+                }
             };
 
             this.user.ValueChanged += newUser =>
