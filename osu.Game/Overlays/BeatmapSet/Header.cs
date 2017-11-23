@@ -229,7 +229,7 @@ namespace osu.Game.Overlays.BeatmapSet
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            beatmaps.BeatmapSetAdded -= handleBeatmapAdd;
+            if (beatmaps != null) beatmaps.BeatmapSetAdded -= handleBeatmapAdd;
         }
 
         private void handleBeatmapAdd(BeatmapSetInfo beatmap)

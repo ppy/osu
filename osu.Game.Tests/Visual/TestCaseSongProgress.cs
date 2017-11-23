@@ -12,8 +12,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseSongProgress : OsuTestCase
     {
-        public override string Description => @"With fake data";
-
         private readonly SongProgress progress;
         private readonly SongProgressGraph graph;
 

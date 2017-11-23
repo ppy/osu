@@ -8,8 +8,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseBreadcrumbs : OsuTestCase
     {
-        public override string Description => @"breadcrumb > control";
-
         public TestCaseBreadcrumbs()
         {
             BreadcrumbControl<BreadcrumbTab> c;
