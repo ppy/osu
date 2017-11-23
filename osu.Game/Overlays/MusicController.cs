@@ -173,7 +173,7 @@ namespace osu.Game.Overlays
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
                                                     Action = play,
-                                                    Icon = FontAwesome.fa_play_circle_o,
+                                                    Icon = FontAwesome.fa_pause_circle_o,   //Jingle song play by default, so we using pause icon instead of play
                                                 },
                                                 nextButton = new IconButton
                                                 {
