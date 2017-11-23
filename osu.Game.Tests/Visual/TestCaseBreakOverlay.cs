@@ -10,8 +10,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseBreakOverlay : OsuTestCase
     {
-        public override string Description => @"Tests breaks behavior";
-
         private readonly BreakOverlay breakOverlay;
 
         public TestCaseBreakOverlay()

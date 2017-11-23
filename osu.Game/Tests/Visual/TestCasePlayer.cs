@@ -23,8 +23,6 @@ namespace osu.Game.Tests.Visual
 
         protected Player Player;
 
-        public override string Description => @"Showing everything to play the game.";
-
         /// <summary>
         /// Create a TestCase which runs through the Player screen.
         /// </summary>

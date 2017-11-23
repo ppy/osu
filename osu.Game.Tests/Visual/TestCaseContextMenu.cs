@@ -15,8 +15,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseContextMenu : OsuTestCase
     {
-        public override string Description => @"Menu visible on right click";
-
         private const int start_time = 0;
         private const int duration = 1000;
 
