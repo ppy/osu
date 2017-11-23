@@ -22,10 +22,6 @@ namespace osu.Game.Tests.Visual
 
         public class TestOsuScreen : OsuScreen
         {
-            public TestOsuScreen()
-            {
-            }
-
             private OsuScreen nextScreen;
 
             public void LoadScreen(OsuScreen screen) => Schedule(() =>
