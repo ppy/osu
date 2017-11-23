@@ -20,12 +20,12 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// The combo prior to this judgement occurring.
         /// </summary>
-        internal int ComboAtJudgement;
+        public int ComboAtJudgement;
 
         /// <summary>
         /// The highest combo achieved prior to this judgement occurring.
         /// </summary>
-        internal int HighestComboAtJudgement;
+        public int HighestComboAtJudgement;
 
         /// <summary>
         /// Whether a successful hit occurred.
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Judgements
         /// The offset from a perfect hit at which this judgement occurred.
         /// Populated when added via <see cref="DrawableHitObject{TObject}.AddJudgement"/>.
         /// </summary>
-        public double TimeOffset { get; internal set; }
+        public double TimeOffset { get; set; }
 
         /// <summary>
         /// Whether the <see cref="Result"/> should affect the combo portion of the score.
