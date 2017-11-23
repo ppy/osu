@@ -64,8 +64,8 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
             this.user.ValueChanged += newUser =>
             {
-                total.KudosuValue = newUser?.Kudosu.Total ?? 0;
-                avaliable.KudosuValue = newUser?.Kudosu.Available ?? 0;
+                total.Count = newUser?.Kudosu.Total ?? 0;
+                avaliable.Count = newUser?.Kudosu.Available ?? 0;
             };
         }
 
@@ -77,18 +77,9 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
             private readonly OsuSpriteText valueText;
 
-            private int kudosuValue;
-            public int KudosuValue
+            public int Count
             {
-                get { return kudosuValue; }
-                set
-                {
-                    if (kudosuValue == value)
-                        return;
-                    kudosuValue = value;
-
-                    valueText.Text = kudosuValue.ToString();
-                }
+                set { valueText.Text = value.ToString(); }
             }
 
             public CountSection(string header, string description)
