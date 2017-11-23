@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -187,9 +188,7 @@ namespace osu.Game.Screens.Select
 
             ratingsContainer.FadeIn(transition_duration);
             advanced.Beatmap = Beatmap;
-            description.Text = Beatmap.Version;
-            source.Text = Beatmap.Metadata.Source;
-            tags.Text = Beatmap.Metadata.Tags;
+            loadDetailsAsync(Beatmap);
 
             var requestedBeatmap = Beatmap;
             if (requestedBeatmap.Metrics == null)
@@ -211,6 +210,19 @@ namespace osu.Game.Screens.Select
             }
 
             displayMetrics(requestedBeatmap.Metrics, false);
+        }
+
+        private void loadDetailsAsync(BeatmapInfo beatmap)
+        {
+            if (description == null || source == null || tags == null)
+                throw new InvalidOperationException($@"Requires all {nameof(MetadataSection)} elements to be non-null.");
+
+            Schedule(() =>
+            {
+                description.Text = Beatmap?.Version;
+                source.Text = Beatmap?.Metadata?.Source;
+                tags.Text = Beatmap?.Metadata?.Tags;
+            });
         }
 
         private void displayMetrics(BeatmapMetrics metrics, bool failOnMissing = true)
@@ -258,9 +270,7 @@ namespace osu.Game.Screens.Select
 
         private void clearStats()
         {
-            description.Text = null;
-            source.Text = null;
-            tags.Text = null;
+            loadDetailsAsync(null);
             advanced.Beatmap = new BeatmapInfo
             {
                 StarDifficulty = 0,
