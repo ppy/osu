@@ -10,8 +10,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseGraph : OsuTestCase
     {
-        public override string Description => "graph";
-
         public TestCaseGraph()
         {
             BarGraph graph;

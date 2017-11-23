@@ -5,6 +5,5 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseAllPlayers : TestCasePlayer
     {
-        public override string Description => @"Showing everything to play the game.";
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Mods;
@@ -10,10 +11,9 @@ using OpenTK;
 
 namespace osu.Game.Tests.Visual
 {
+    [Description("mod select and icon display")]
     internal class TestCaseMods : OsuTestCase
     {
-        public override string Description => @"Mod select overlay and in-game display";
-
         private ModSelectOverlay modSelect;
         private ModDisplay modDisplay;
 
