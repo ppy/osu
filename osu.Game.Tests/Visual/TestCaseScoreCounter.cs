@@ -12,8 +12,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseScoreCounter : OsuTestCase
     {
-        public override string Description => @"Tests multiple counters";
-
         public TestCaseScoreCounter()
         {
             int numerator = 0, denominator = 0;

@@ -11,8 +11,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseMedalOverlay : OsuTestCase
     {
-        public override string Description => @"medal get!";
-
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(MedalOverlay),
