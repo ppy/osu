@@ -66,5 +66,23 @@ namespace osu.Game.Beatmaps
             Source,
             Tags
         }.Where(s => !string.IsNullOrEmpty(s)).ToArray();
+
+        public override bool Equals(object other)
+        {
+            var otherMetadata = other as BeatmapMetadata;
+            if (otherMetadata == null) return false;
+
+            return (onlineBeatmapSetID?.Equals(otherMetadata.onlineBeatmapSetID) ?? false)
+                && (Title?.Equals(otherMetadata.Title) ?? false)
+                && (TitleUnicode?.Equals(otherMetadata.TitleUnicode) ?? false)
+                && (Artist?.Equals(otherMetadata.Artist) ?? false)
+                && (ArtistUnicode?.Equals(otherMetadata.ArtistUnicode) ?? false)
+                && (AuthorString?.Equals(otherMetadata.AuthorString) ?? false)
+                && (Source?.Equals(otherMetadata.Source) ?? false)
+                && (Tags?.Equals(otherMetadata.Tags) ?? false)
+                && PreviewTime.Equals(otherMetadata.PreviewTime)
+                && (AudioFile?.Equals(otherMetadata.AudioFile) ?? false)
+                && (BackgroundFile?.Equals(otherMetadata.BackgroundFile) ?? false);
+        }
     }
 }
