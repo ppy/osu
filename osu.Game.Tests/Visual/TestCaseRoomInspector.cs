@@ -13,8 +13,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseRoomInspector : OsuTestCase
     {
-        public override string Description => @"from the multiplayer lobby";
-
         private RulesetStore rulesets;
 
         protected override void LoadComplete()

@@ -16,9 +16,7 @@ using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Framework.Logging;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Configuration;
 using osu.Framework.Audio.Track;
@@ -35,10 +33,8 @@ namespace osu.Game.Overlays.Direct
 
         private Container content;
 
-        private APIAccess api;
         private ProgressBar progressBar;
         private BeatmapManager beatmaps;
-        private NotificationOverlay notifications;
         private BeatmapSetOverlay beatmapSetOverlay;
 
         public Track Preview => PlayButton.Preview;
@@ -71,11 +67,9 @@ namespace osu.Game.Overlays.Direct
 
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api, BeatmapManager beatmaps, OsuColour colours, NotificationOverlay notifications, BeatmapSetOverlay beatmapSetOverlay)
+        private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay)
         {
-            this.api = api;
             this.beatmaps = beatmaps;
-            this.notifications = notifications;
             this.beatmapSetOverlay = beatmapSetOverlay;
 
             AddInternal(content = new Container
@@ -109,6 +103,14 @@ namespace osu.Game.Overlays.Direct
 
             if (downloadRequest != null)
                 attachDownload(downloadRequest);
+
+            beatmaps.BeatmapDownloadBegan += attachDownload;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmaps.BeatmapDownloadBegan -= attachDownload;
         }
 
         protected override void Update()
@@ -151,16 +153,6 @@ namespace osu.Game.Overlays.Direct
 
         protected void StartDownload()
         {
-            if (!api.LocalUser.Value.IsSupporter)
-            {
-                notifications.Post(new SimpleNotification
-                {
-                    Icon = FontAwesome.fa_superpowers,
-                    Text = "You gotta be a supporter to download for now 'yo"
-                });
-                return;
-            }
-
             if (beatmaps.GetExistingDownload(SetInfo) != null)
             {
                 // we already have an active download running.
@@ -172,13 +164,14 @@ namespace osu.Game.Overlays.Direct
                 return;
             }
 
-            var request = beatmaps.Download(SetInfo);
-
-            attachDownload(request);
+            beatmaps.Download(SetInfo);
         }
 
         private void attachDownload(DownloadBeatmapSetRequest request)
         {
+            if (request.BeatmapSet.OnlineBeatmapSetID != SetInfo.OnlineBeatmapSetID)
+                return;
+
             progressBar.FadeIn(400, Easing.OutQuint);
             progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
 
@@ -219,21 +212,21 @@ namespace osu.Game.Overlays.Direct
             return icons;
         }
 
-        protected Drawable CreateBackground() => new DelayedLoadWrapper(new BeatmapSetCover(SetInfo)
-        {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            RelativeSizeAxes = Axes.Both,
-            FillMode = FillMode.Fill,
-            OnLoadComplete = d =>
+        protected Drawable CreateBackground() => new DelayedLoadWrapper(
+            new BeatmapSetCover(SetInfo)
             {
-                d.FadeInFromZero(400, Easing.Out);
-                BlackBackground.Delay(400).FadeOut();
-            },
-        })
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                FillMode = FillMode.Fill,
+                OnLoadComplete = d =>
+                {
+                    d.FadeInFromZero(400, Easing.Out);
+                    BlackBackground.Delay(400).FadeOut();
+                },
+            }, 300)
         {
             RelativeSizeAxes = Axes.Both,
-            TimeBeforeLoad = 300
         };
 
         public class Statistic : FillFlowContainer
