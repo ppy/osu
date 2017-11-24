@@ -58,14 +58,14 @@ namespace osu.Game.Users
 
             Children = new Drawable[]
             {
-                new AsyncLoadWrapper(new UserCoverBackground(user)
+                new DelayedLoadWrapper(new UserCoverBackground(user)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
                     OnLoadComplete = d => d.FadeInFromZero(200),
-                }) { RelativeSizeAxes = Axes.Both },
+                }, 0) { RelativeSizeAxes = Axes.Both },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
