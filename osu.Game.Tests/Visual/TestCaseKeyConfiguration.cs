@@ -9,8 +9,6 @@ namespace osu.Game.Tests.Visual
     {
         private readonly KeyBindingOverlay overlay;
 
-        public override string Description => @"Key configuration";
-
         public TestCaseKeyConfiguration()
         {
             Child = overlay = new KeyBindingOverlay();
