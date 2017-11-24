@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -28,7 +27,7 @@ namespace osu.Game.Online.API.Requests
         public int PlayCount;
 
         [JsonProperty]
-        private BeatmapResponse beatmap;
+        private BeatmapInfo beatmap;
 
         [JsonProperty]
         private GetBeatmapSetsResponse beatmapSet;
@@ -36,31 +35,10 @@ namespace osu.Game.Online.API.Requests
         public BeatmapInfo GetBeatmapInfo(RulesetStore rulesets)
         {
             BeatmapSetInfo setInfo = beatmapSet.ToBeatmapSet(rulesets);
-            return new BeatmapInfo
-            {
-                OnlineBeatmapID = beatmap.Id,
-                OnlineBeatmapSetID = setInfo.OnlineBeatmapSetID,
-                Ruleset = rulesets.AvailableRulesets.FirstOrDefault(ruleset => ruleset.Name.Equals(beatmap.Mode)),
-                StarDifficulty = beatmap.DifficultyRating,
-                Version = beatmap.Version,
-                Metadata = setInfo.Metadata,
-                BeatmapSet = setInfo,
-            };
-        }
-
-        private class BeatmapResponse
-        {
-            [JsonProperty]
-            public int Id;
-
-            [JsonProperty]
-            public string Mode;
-
-            [JsonProperty("difficulty_rating")]
-            public double DifficultyRating;
-
-            [JsonProperty]
-            public string Version;
+            beatmap.BeatmapSet = setInfo;
+            beatmap.OnlineBeatmapSetID = setInfo.OnlineBeatmapSetID;
+            beatmap.Metadata = setInfo.Metadata;
+            return beatmap;
         }
     }
 }
