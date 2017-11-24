@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
@@ -20,5 +22,14 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// The next fruit starts a new combo. Used for explodey.
         /// </summary>
         public virtual bool LastInCombo { get; set; }
+
+        public float Scale { get; set; } = 1;
+
+        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        {
+            base.ApplyDefaults(controlPointInfo, difficulty);
+
+            Scale = 1.0f - 0.7f * (difficulty.CircleSize - 5) / 5;
+        }
     }
 }

@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -17,6 +18,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             : base(hitObject)
         {
             HitObject = hitObject;
+
+            Scale = new Vector2(HitObject.Scale);
         }
     }
 
