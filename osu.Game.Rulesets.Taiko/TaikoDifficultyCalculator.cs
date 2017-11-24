@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 using System.Collections.Generic;
-using System.Globalization;
 using System;
 
 namespace osu.Game.Rulesets.Taiko
@@ -54,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko
             if (categoryDifficulty != null)
             {
                 categoryDifficulty.Add("Strain", starRating);
-                categoryDifficulty.Add("Hit window 300", (35 /*HitObjectManager.HitWindow300*/ / TimeRate));
+                categoryDifficulty.Add("Hit window 300", 35 /*HitObjectManager.HitWindow300*/ / TimeRate);
             }
 
             return starRating;
