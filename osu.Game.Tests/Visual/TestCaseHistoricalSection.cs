@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual
     {
         public override string Description => "User's History";
 
-        public override IReadOnlyList<Type> RequiredTypes => new [] { typeof(HistoricalSection), typeof(MostPlayedBeatmapDrawable)};
+        public override IReadOnlyList<Type> RequiredTypes => new [] { typeof(HistoricalSection), typeof(PaginatedMostPlayedBeatmapContainer), typeof(MostPlayedBeatmapDrawable) };
 
 
         public TestCaseHistoricalSection()
