@@ -180,19 +180,21 @@ namespace osu.Game.Screens.Menu
             State = MenuState.TopLevel;
         }
 
-        private void onOsuLogo()
+        private bool onOsuLogo()
         {
             switch (state)
             {
+                default:
+                    return true;
                 case MenuState.Initial:
                     State = MenuState.TopLevel;
-                    return;
+                    return true;
                 case MenuState.TopLevel:
                     buttonsTopLevel.First().TriggerOnClick();
-                    return;
+                    return false;
                 case MenuState.Play:
                     buttonsPlay.First().TriggerOnClick();
-                    return;
+                    return false;
             }
         }
 
