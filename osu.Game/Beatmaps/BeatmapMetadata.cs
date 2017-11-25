@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -9,7 +10,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapMetadata
+    public class BeatmapMetadata : IEquatable<BeatmapMetadata>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
@@ -67,22 +68,22 @@ namespace osu.Game.Beatmaps
             Tags
         }.Where(s => !string.IsNullOrEmpty(s)).ToArray();
 
-        public override bool Equals(object other)
+        public bool Equals(BeatmapMetadata other)
         {
-            var otherMetadata = other as BeatmapMetadata;
-            if (otherMetadata == null) return false;
+            if (other == null)
+                return false;
 
-            return (onlineBeatmapSetID?.Equals(otherMetadata.onlineBeatmapSetID) ?? false)
-                && (Title?.Equals(otherMetadata.Title) ?? false)
-                && (TitleUnicode?.Equals(otherMetadata.TitleUnicode) ?? false)
-                && (Artist?.Equals(otherMetadata.Artist) ?? false)
-                && (ArtistUnicode?.Equals(otherMetadata.ArtistUnicode) ?? false)
-                && (AuthorString?.Equals(otherMetadata.AuthorString) ?? false)
-                && (Source?.Equals(otherMetadata.Source) ?? false)
-                && (Tags?.Equals(otherMetadata.Tags) ?? false)
-                && PreviewTime.Equals(otherMetadata.PreviewTime)
-                && (AudioFile?.Equals(otherMetadata.AudioFile) ?? false)
-                && (BackgroundFile?.Equals(otherMetadata.BackgroundFile) ?? false);
+            return onlineBeatmapSetID == other.onlineBeatmapSetID
+                && (Title?.Equals(other.Title) ?? false)
+                && (TitleUnicode?.Equals(other.TitleUnicode) ?? false)
+                && (Artist?.Equals(other.Artist) ?? false)
+                && (ArtistUnicode?.Equals(other.ArtistUnicode) ?? false)
+                && (AuthorString?.Equals(other.AuthorString) ?? false)
+                && (Source?.Equals(other.Source) ?? false)
+                && (Tags?.Equals(other.Tags) ?? false)
+                && PreviewTime == other.PreviewTime
+                && (AudioFile?.Equals(other.AudioFile) ?? false)
+                && (BackgroundFile?.Equals(other.BackgroundFile) ?? false);
         }
     }
 }
