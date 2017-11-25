@@ -335,7 +335,7 @@ namespace osu.Game.Screens.Select
             logo.Action = () =>
             {
                 carouselRaisedStart();
-                return true;
+                return false;
             };
         }
 
