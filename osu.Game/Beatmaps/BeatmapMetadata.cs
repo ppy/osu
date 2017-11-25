@@ -74,16 +74,16 @@ namespace osu.Game.Beatmaps
                 return false;
 
             return onlineBeatmapSetID == other.onlineBeatmapSetID
-                && (Title?.Equals(other.Title) ?? false)
-                && (TitleUnicode?.Equals(other.TitleUnicode) ?? false)
-                && (Artist?.Equals(other.Artist) ?? false)
-                && (ArtistUnicode?.Equals(other.ArtistUnicode) ?? false)
-                && (AuthorString?.Equals(other.AuthorString) ?? false)
-                && (Source?.Equals(other.Source) ?? false)
-                && (Tags?.Equals(other.Tags) ?? false)
+                && Title == other.Title
+                && TitleUnicode == other.TitleUnicode
+                && Artist == other.Artist
+                && ArtistUnicode == other.ArtistUnicode
+                && AuthorString == other.AuthorString
+                && Source == other.Source
+                && Tags == other.Tags
                 && PreviewTime == other.PreviewTime
-                && (AudioFile?.Equals(other.AudioFile) ?? false)
-                && (BackgroundFile?.Equals(other.BackgroundFile) ?? false);
+                && AudioFile == other.AudioFile
+                && BackgroundFile == other.BackgroundFile;
         }
     }
 }
