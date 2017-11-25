@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
@@ -28,15 +27,12 @@ namespace osu.Game.Overlays.Notifications
                 throw new ArgumentNullException(nameof(notification));
 
             Notification = notification;
-
-            Notification.IconBinding.ValueChanged += value => Schedule(() => iconDrawable.Icon = value);
+            Notification.BackgroundColourBinding.ValueChanged += value => Schedule(() => Colour = value);
             Notification.TextBinding.ValueChanged += value => Schedule(() => textDrawable.Text = value);
-            Notification.CustomColorsBinding.ValueChanged += value => Schedule(() =>
+            Notification.NotificationIconBinding.ValueChanged += value => Schedule(() =>
             {
-                if (value == null)
-                    return;
-                IconBackgound.Colour = value.IconBackgroundColour;
-                Colour = value.BackgroundColour;
+                iconDrawable.Icon = value.Icon;
+                IconBackgound.Colour = value.BackgroundColour;
             });
 
             IconContent.AddRange(new Drawable[]
@@ -44,13 +40,13 @@ namespace osu.Game.Overlays.Notifications
                 IconBackgound = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.6f))
+                    Colour = Notification.NotificationIcon.BackgroundColour
                 },
                 iconDrawable = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = Notification.Icon,
+                    Icon = Notification.NotificationIcon.Icon,
                     Size = new Vector2(20),
                 }
             });
@@ -69,9 +65,7 @@ namespace osu.Game.Overlays.Notifications
                 return true;
             };
 
-            Notification.IconBinding.TriggerChange();
             Notification.TextBinding.TriggerChange();
-            Notification.CustomColorsBinding.TriggerChange();
         }
 
 

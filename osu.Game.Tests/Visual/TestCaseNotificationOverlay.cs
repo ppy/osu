@@ -103,31 +103,24 @@ namespace osu.Game.Tests.Visual
 
         private void sendUpdateProgressNotification()
         {
-            var completeNotification = new Notification("You are now running osu!lazer {version}.\nClick to see what's new!", FontAwesome.fa_check_square)
+            var completeNotification = new Notification("You are now running osu!lazer {version}.\nClick to see what's new!")
             {
-                CustomColors = new NotificationColors
-                {
-                    IconBackgroundColour = osuColour.BlueDark
-                }
+                NotificationIcon = new NotificationIcon(FontAwesome.fa_check_square, osuColour.BlueDark)
             };
 
             var restartNotification = new Notification(@"Update ready to install. Click to restart!")
             {
-                CustomColors = new NotificationColors
-                {
-                    IconBackgroundColour = osuColour.Green
-                },
-
+                NotificationIcon = new NotificationIcon(backgroundColour: osuColour.Green)
             };
             restartNotification.OnActivate += () => manager.Post(completeNotification);
 
             bool downloadCompleted = false;
-            var downloadNotification = new ProgressNotification(@"Downloading update...", FontAwesome.fa_upload)
+            var downloadNotification = new ProgressNotification(@"Downloading update...")
             {
-                CustomColors = new NotificationColors()
-                {
-                    IconBackgroundColour = ColourInfo.GradientVertical(osuColour.YellowDark, osuColour.Yellow)
-                }
+                NotificationIcon = new NotificationIcon(
+                    FontAwesome.fa_upload,
+                    ColourInfo.GradientVertical(osuColour.YellowDark, osuColour.Yellow)
+                )
             };
             downloadNotification.ProgressCompleted += () =>
             {

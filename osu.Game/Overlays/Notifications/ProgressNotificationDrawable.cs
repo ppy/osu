@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
@@ -36,14 +35,11 @@ namespace osu.Game.Overlays.Notifications
             ProgressNotification.StateBinding.ValueChanged += stateOnValueChanged;
 
             ProgressNotification.ProgressBinding.ValueChanged += value => Schedule(() => progressBar.Progress = value);
-            ProgressNotification.IconBinding.ValueChanged += value => Schedule(() => iconDrawable.Icon = value);
+            ProgressNotification.BackgroundColourBinding.ValueChanged += value => Schedule(() => Colour = value);
             ProgressNotification.TextBinding.ValueChanged += value => Schedule(() => textDrawable.Text = value);
-            ProgressNotification.CustomColorsBinding.ValueChanged += value => Schedule(() =>
-            {
-                if (value == null)
-                    return;
-                IconBackgound.Colour = value.IconBackgroundColour;
-                Colour = value.BackgroundColour;
+            ProgressNotification.NotificationIconBinding.ValueChanged += value => Schedule(() => {
+                iconDrawable.Icon = value.Icon;
+                IconBackgound.Colour = value.BackgroundColour;
             });
 
             IconContent.AddRange(new Drawable[]
@@ -51,17 +47,16 @@ namespace osu.Game.Overlays.Notifications
                 IconBackgound = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.6f))
+                    Colour = ProgressNotification.NotificationIcon.BackgroundColour
                 },
                 iconDrawable = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = ProgressNotification.Icon,
+                    Icon = ProgressNotification.NotificationIcon.Icon,
                     Size = new Vector2(20),
                 }
             });
-
             Content.Add(textDrawable = new TextFlowContainer(t =>
             {
                 t.TextSize = 16;
@@ -85,9 +80,6 @@ namespace osu.Game.Overlays.Notifications
 
             // don't close on click by default.
             Activated = () => false;
-            ProgressNotification.IconBinding.TriggerChange();
-            ProgressNotification.TextBinding.TriggerChange();
-            ProgressNotification.CustomColorsBinding.TriggerChange();
         }
 
         private void stateOnValueChanged(ProgressNotificationState newValue)

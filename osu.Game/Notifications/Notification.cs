@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 
 namespace osu.Game.Notifications
@@ -19,26 +20,26 @@ namespace osu.Game.Notifications
         }
 
         /// <summary>
-        /// The icon displayed in the notification.
+        /// Changes the background color of the notification. Defaults to white.
         /// </summary>
-        public FontAwesome Icon
+        public ColourInfo BackgroundColour
         {
-            get { return IconBinding.Value; }
-            set { IconBinding.Value = value; }
+            get { return BackgroundColourBinding.Value; }
+            set { BackgroundColourBinding.Value = value; }
         }
 
         /// <summary>
-        /// Custom colors for the notification. If null default colors will be used.
+        /// The icon with the notification.
         /// </summary>
-        public NotificationColors CustomColors
+        public NotificationIcon NotificationIcon
         {
-            get { return CustomColorsBinding.Value; }
-            set { CustomColorsBinding.Value = value; }
+            get { return NotificationIconBinding.Value; }
+            set { NotificationIconBinding.Value = value; }
         }
 
-        public Bindable<NotificationColors> CustomColorsBinding { get; }
-        public Bindable<string> TextBinding { get; }
-        public Bindable<FontAwesome> IconBinding { get; }
+        public Bindable<NotificationIcon> NotificationIconBinding { get; } = new Bindable<NotificationIcon>(new NotificationIcon());
+        public Bindable<ColourInfo> BackgroundColourBinding { get; } = new Bindable<ColourInfo>(OsuColour.FromHex("FFF"));
+        public Bindable<string> TextBinding { get; } = new Bindable<string>();
 
         /// <summary>
         /// An event, that gets triggered when the user activates the notification.
@@ -53,14 +54,12 @@ namespace osu.Game.Notifications
             OnActivate?.Invoke();
         }
 
-        public Notification(string text = "", FontAwesome icon = FontAwesome.fa_info_circle, Action onActivate = null)
+        public Notification(string text = "", FontAwesome icon = FontAwesome.fa_info_circle , Action onActivate = null)
         {
-            if (text == null)
-                throw new ArgumentNullException(nameof(text));
+            Text = text;
 
-            TextBinding = new Bindable<string>(text);
-            IconBinding = new Bindable<FontAwesome>(icon);
-            CustomColorsBinding = new Bindable<NotificationColors>(new NotificationColors());
+            NotificationIcon = new NotificationIcon(icon);
+
             if (onActivate != null)
                 OnActivate += onActivate;
         }

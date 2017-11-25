@@ -153,7 +153,11 @@ namespace osu.Game.Overlays.Direct
         {
             if (!api.LocalUser.Value.IsSupporter)
             {
-                notifications.Post(new Notification("You gotta be a supporter to download for now 'yo", FontAwesome.fa_superpowers));
+                notifications.Post(new Notification()
+                {
+                    Text = "You gotta be a supporter to download for now 'yo",
+                    NotificationIcon = new NotificationIcon(FontAwesome.fa_superpowers)
+                });
                 return;
             }
 
