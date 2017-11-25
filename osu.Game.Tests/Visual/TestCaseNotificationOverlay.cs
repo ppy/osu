@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     internal class TestCaseNotificationOverlay : OsuTestCase
     {
-        public override string Description => @"I handle notifications";
+
         private readonly OsuColour osuColour = new OsuColour();
         private readonly NotificationOverlay manager;
 

@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
@@ -14,13 +13,13 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using System.Collections.Generic;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Tests.Visual
 {
+    [System.ComponentModel.Description("in BeatmapOverlay")]
     public class TestCaseBeatmapScoresContainer : OsuTestCase
     {
-        public override string Description => "BeatmapOverlay scores container";
-
         private readonly IEnumerable<OnlineScore> scores;
         private readonly IEnumerable<OnlineScore> anotherScores;
         private readonly OnlineScore topScore;

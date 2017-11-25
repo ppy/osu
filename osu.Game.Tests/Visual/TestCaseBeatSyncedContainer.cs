@@ -19,8 +19,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseBeatSyncedContainer : OsuTestCase
     {
-        public override string Description => @"Tests beat synced containers.";
-
         private readonly MusicController mc;
 
         public TestCaseBeatSyncedContainer()

@@ -10,8 +10,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseUserProfile : OsuTestCase
     {
-        public override string Description => "Tests user's profile page.";
-
         public TestCaseUserProfile()
         {
             var profile = new UserProfileOverlay();

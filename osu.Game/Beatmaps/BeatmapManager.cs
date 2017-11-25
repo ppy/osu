@@ -18,6 +18,7 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Notifications;
@@ -51,6 +52,11 @@ namespace osu.Game.Beatmaps
         /// Fired when a single difficulty has been restored.
         /// </summary>
         public event Action<BeatmapInfo> BeatmapRestored;
+
+        /// <summary>
+        /// Fired when a beatmap download begins.
+        /// </summary>
+        public event Action<DownloadBeatmapSetRequest> BeatmapDownloadBegan;
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -163,7 +169,7 @@ namespace osu.Game.Beatmaps
                 catch (Exception e)
                 {
                     e = e.InnerException ?? e;
-                    Logger.Error(e, @"Could not import beatmap set");
+                    Logger.Error(e, $@"Could not import beatmap set ({Path.GetFileName(path)})");
                 }
             }
 
@@ -219,14 +225,23 @@ namespace osu.Game.Beatmaps
         /// Downloads a beatmap.
         /// </summary>
         /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to be downloaded.</param>
-        /// <returns>A new <see cref="DownloadBeatmapSetRequest"/>, or an existing one if a download is already in progress.</returns>
-        public DownloadBeatmapSetRequest Download(BeatmapSetInfo beatmapSetInfo)
+        /// <param name="noVideo">Whether the beatmap should be downloaded without video. Defaults to false.</param>
+        public void Download(BeatmapSetInfo beatmapSetInfo, bool noVideo = false)
         {
             var existing = GetExistingDownload(beatmapSetInfo);
 
-            if (existing != null) return existing;
+            if (existing != null || api == null) return;
 
-            if (api == null) return null;
+            if (!api.LocalUser.Value.IsSupporter)
+            {
+                PostNotification?.Invoke(
+                    new Notification(
+                        "You gotta be a supporter to download for now 'yo",
+                        FontAwesome.fa_superpowers
+                    )
+                );
+                return;
+            }
 
             ProgressNotification downloadNotification = new ProgressNotification(
                 $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}"
@@ -236,7 +251,7 @@ namespace osu.Game.Beatmaps
                 new Notification($"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title} finished")
             );
 
-            var request = new DownloadBeatmapSetRequest(beatmapSetInfo);
+            var request = new DownloadBeatmapSetRequest(beatmapSetInfo, noVideo);
 
             request.DownloadProgressed += progress =>
             {
@@ -280,8 +295,7 @@ namespace osu.Game.Beatmaps
 
             // don't run in the main api queue as this is a long-running task.
             Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
-
-            return request;
+            BeatmapDownloadBegan?.Invoke(request);
         }
 
         /// <summary>
