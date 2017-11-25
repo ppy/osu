@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.UserInterface
                 },
             });
 
-            sampleClick = audio.Sample.Get(@"UI/generic-click");
+            sampleClick = audio.Sample.Get(@"UI/generic-select");
             sampleHover = audio.Sample.Get(@"UI/generic-hover");
 
             Enabled.ValueChanged += enabled_ValueChanged;
