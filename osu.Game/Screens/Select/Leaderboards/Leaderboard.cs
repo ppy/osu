@@ -22,6 +22,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Framework.Logging;
 using System.Net;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -206,10 +207,20 @@ namespace osu.Game.Screens.Select.Leaderboards
             this.osuGame = osuGame;
 
             if (osuGame != null)
-                osuGame.Ruleset.ValueChanged += r => updateScores();
+                osuGame.Ruleset.ValueChanged += handleRulesetChange;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (osuGame != null)
+                osuGame.Ruleset.ValueChanged -= handleRulesetChange;
         }
 
         private GetScoresRequest getScoresRequest;
+
+        private void handleRulesetChange(RulesetInfo ruleset) => updateScores();
 
         private void updateScores()
         {
