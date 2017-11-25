@@ -60,7 +60,7 @@ namespace osu.Game.Notifications
 
             TextBinding = new Bindable<string>(text);
             IconBinding = new Bindable<FontAwesome>(icon);
-            CustomColorsBinding = new Bindable<NotificationColors>();
+            CustomColorsBinding = new Bindable<NotificationColors>(new NotificationColors());
             if (onActivate != null)
                 OnActivate += onActivate;
         }

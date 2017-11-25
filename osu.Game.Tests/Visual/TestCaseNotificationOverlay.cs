@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
@@ -17,7 +18,7 @@ namespace osu.Game.Tests.Visual
     internal class TestCaseNotificationOverlay : OsuTestCase
     {
         public override string Description => @"I handle notifications";
-
+        private readonly OsuColour osuColour = new OsuColour();
         private readonly NotificationOverlay manager;
 
         public TestCaseNotificationOverlay()
@@ -36,6 +37,7 @@ namespace osu.Game.Tests.Visual
             AddStep(@"simple #2", sendNotification2);
             AddStep(@"progress #1", sendProgress1);
             AddStep(@"progress #2", sendProgress2);
+            AddStep(@"game update flow", sendUpdateProgressNotification);
             AddStep(@"barrage", () => sendBarrage());
         }
 
@@ -97,6 +99,52 @@ namespace osu.Game.Tests.Visual
             var n = new ProgressNotification(@"Uploading to BSS...", FontAwesome.fa_upload);
             manager.Post(n);
             progressingNotifications.Add(n);
+        }
+
+        private void sendUpdateProgressNotification()
+        {
+            var completeNotification = new Notification("You are now running osu!lazer {version}.\nClick to see what's new!", FontAwesome.fa_check_square)
+            {
+                CustomColors = new NotificationColors
+                {
+                    IconBackgroundColour = osuColour.BlueDark
+                }
+            };
+
+            var restartNotification = new Notification(@"Update ready to install. Click to restart!")
+            {
+                CustomColors = new NotificationColors
+                {
+                    IconBackgroundColour = osuColour.Green
+                },
+
+            };
+            restartNotification.OnActivate += () => manager.Post(completeNotification);
+
+            bool downloadCompleted = false;
+            var downloadNotification = new ProgressNotification(@"Downloading update...", FontAwesome.fa_upload)
+            {
+                CustomColors = new NotificationColors()
+                {
+                    IconBackgroundColour = ColourInfo.GradientVertical(osuColour.YellowDark, osuColour.Yellow)
+                }
+            };
+            downloadNotification.ProgressCompleted += () =>
+            {
+                if (downloadCompleted)
+                {
+                    downloadNotification.FollowUpNotifications.Add(restartNotification);
+                    return;
+                }
+
+                downloadCompleted = true;
+                downloadNotification.Progress = 0;
+                downloadNotification.State = ProgressNotificationState.Active;
+                downloadNotification.Text = @"Installing update...";
+            };
+
+            progressingNotifications.Add(downloadNotification);
+            manager.Post(downloadNotification);
         }
 
         private void sendNotification2()

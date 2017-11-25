@@ -29,8 +29,15 @@ namespace osu.Game.Overlays.Notifications
 
             Notification = notification;
 
-            Notification.IconBinding.ValueChanged += value => iconDrawable.Icon = value;
-            Notification.TextBinding.ValueChanged += value => textDrawable.Text = value;
+            Notification.IconBinding.ValueChanged += value => Schedule(() => iconDrawable.Icon = value);
+            Notification.TextBinding.ValueChanged += value => Schedule(() => textDrawable.Text = value);
+            Notification.CustomColorsBinding.ValueChanged += value => Schedule(() =>
+            {
+                if (value == null)
+                    return;
+                IconBackgound.Colour = value.IconBackgroundColour;
+                Colour = value.BackgroundColour;
+            });
 
             IconContent.AddRange(new Drawable[]
             {
@@ -61,6 +68,10 @@ namespace osu.Game.Overlays.Notifications
                 Notification.Activate();
                 return true;
             };
+
+            Notification.IconBinding.TriggerChange();
+            Notification.TextBinding.TriggerChange();
+            Notification.CustomColorsBinding.TriggerChange();
         }
 
 

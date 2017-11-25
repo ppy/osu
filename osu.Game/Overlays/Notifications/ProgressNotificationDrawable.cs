@@ -38,6 +38,13 @@ namespace osu.Game.Overlays.Notifications
             ProgressNotification.ProgressBinding.ValueChanged += value => Schedule(() => progressBar.Progress = value);
             ProgressNotification.IconBinding.ValueChanged += value => Schedule(() => iconDrawable.Icon = value);
             ProgressNotification.TextBinding.ValueChanged += value => Schedule(() => textDrawable.Text = value);
+            ProgressNotification.CustomColorsBinding.ValueChanged += value => Schedule(() =>
+            {
+                if (value == null)
+                    return;
+                IconBackgound.Colour = value.IconBackgroundColour;
+                Colour = value.BackgroundColour;
+            });
 
             IconContent.AddRange(new Drawable[]
             {
@@ -78,6 +85,9 @@ namespace osu.Game.Overlays.Notifications
 
             // don't close on click by default.
             Activated = () => false;
+            ProgressNotification.IconBinding.TriggerChange();
+            ProgressNotification.TextBinding.TriggerChange();
+            ProgressNotification.CustomColorsBinding.TriggerChange();
         }
 
         private void stateOnValueChanged(ProgressNotificationState newValue)
