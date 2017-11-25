@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -38,11 +37,8 @@ namespace osu.Game.Graphics.UserInterface
         public override bool HandleInput => Action != null;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(OsuColour colours)
         {
-            if (Action == null)
-                Colour = OsuColour.Gray(0.5f);
-
             BackgroundColour = colours.BlueDark;
 
             Content.Masking = true;
