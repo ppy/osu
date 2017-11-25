@@ -48,7 +48,10 @@ namespace osu.Game.Screens.Menu
 
         private readonly Triangles triangles;
 
-        public Action Action;
+        /// <summary>
+        /// Return value decides whether the logo should play its own sample for the click action.
+        /// </summary>
+        public Func<bool> Action;
 
         public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X * 0.74f;
 
@@ -354,13 +357,12 @@ namespace osu.Game.Screens.Menu
         {
             if (!interactive) return false;
 
-            sampleClick.Play();
+            if (Action?.Invoke() ?? true)
+                sampleClick.Play();
 
             flashLayer.ClearTransforms();
             flashLayer.Alpha = 0.4f;
             flashLayer.FadeOut(1500, Easing.OutExpo);
-
-            Action?.Invoke();
             return true;
         }
 

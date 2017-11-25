@@ -332,7 +332,11 @@ namespace osu.Game.Screens.Select
             logo.FadeIn(logo_transition, Easing.OutQuint);
             logo.ScaleTo(0.4f, logo_transition, Easing.OutQuint);
 
-            logo.Action = () => carouselRaisedStart();
+            logo.Action = () =>
+            {
+                carouselRaisedStart();
+                return true;
+            };
         }
 
         protected override void LogoExiting(OsuLogo logo)
