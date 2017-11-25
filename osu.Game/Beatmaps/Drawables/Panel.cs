@@ -3,12 +3,15 @@
 
 using System;
 using osu.Framework;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -38,6 +41,20 @@ namespace osu.Game.Beatmaps.Drawables
             });
 
             Alpha = 0;
+        }
+
+        private SampleChannel sampleHover;
+
+        protected override bool OnHover(InputState state)
+        {
+            sampleHover?.Play();
+            return base.OnHover(state);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, OsuColour colours)
+        {
+            sampleHover = audio.Sample.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
         }
 
         public void SetMultiplicativeAlpha(float alpha)
