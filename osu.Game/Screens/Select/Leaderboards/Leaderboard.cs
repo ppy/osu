@@ -51,6 +51,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 noResultsPlaceholder.FadeOut(fade_duration);
                 scrollFlow?.FadeOut(fade_duration).Expire();
+                scrollContainer.Clear(true); // scores stick around in scrollFlow in VisualTests without this for some reason
                 scrollFlow = null;
 
                 loading.Hide();
@@ -204,7 +205,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             this.api = api;
             this.osuGame = osuGame;
 
-            osuGame.Ruleset.ValueChanged += r => updateScores();
+            if (osuGame != null)
+                osuGame.Ruleset.ValueChanged += r => updateScores();
         }
 
         private GetScoresRequest getScoresRequest;
@@ -228,7 +230,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             loading.Show();
 
-            getScoresRequest = new GetScoresRequest(Beatmap, osuGame.Ruleset.Value, Scope);
+            getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value, Scope);
             getScoresRequest.Success += r =>
             {
                 Scores = r.Scores;

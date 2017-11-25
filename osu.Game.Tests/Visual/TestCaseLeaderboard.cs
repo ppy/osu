@@ -6,14 +6,42 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
+using osu.Framework.Allocation;
 using OpenTK;
+using System.Linq;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
     [Description("PlaySongSelect leaderboard")]
     internal class TestCaseLeaderboard : OsuTestCase
     {
+        private RulesetStore rulesets;
+
         private readonly Leaderboard leaderboard;
+
+        public TestCaseLeaderboard()
+        {
+            Add(leaderboard = new Leaderboard
+            {
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Size = new Vector2(550f, 450f),
+                Scope = LeaderboardScope.Global,
+            });
+
+            AddStep(@"New Scores", newScores);
+            AddStep(@"Empty Scores", () => leaderboard.Scores = Enumerable.Empty<Score>());
+            AddStep(@"Real beatmap", realBeatmap);
+            newScores();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets)
+        {
+            this.rulesets = rulesets;
+        }
 
         private void newScores()
         {
@@ -204,17 +232,36 @@ namespace osu.Game.Tests.Visual
             leaderboard.Scores = scores;
         }
 
-        public TestCaseLeaderboard()
+        private void realBeatmap()
         {
-            Add(leaderboard = new Leaderboard
+            leaderboard.Beatmap = new BeatmapInfo
             {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Size = new Vector2(550f, 450f),
-            });
-
-            AddStep(@"New Scores", newScores);
-            newScores();
+                StarDifficulty = 1.36,
+                Version = @"BASIC",
+                OnlineBeatmapID = 1113057,
+                Ruleset = rulesets.GetRuleset(0),
+                BaseDifficulty = new BeatmapDifficulty
+                {
+                    CircleSize = 4,
+                    DrainRate = 6.5f,
+                    OverallDifficulty = 6.5f,
+                    ApproachRate = 5,
+                },
+                OnlineInfo = new BeatmapOnlineInfo
+                {
+                    Length = 115000,
+                    CircleCount = 265,
+                    SliderCount = 71,
+                    PlayCount = 47906,
+                    PassCount = 19899,
+                },
+                Metrics = new BeatmapMetrics
+                {
+                    Ratings = Enumerable.Range(0, 11),
+                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
+                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                },
+            };
         }
     }
 }
