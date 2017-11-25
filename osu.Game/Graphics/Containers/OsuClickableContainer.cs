@@ -2,34 +2,24 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Containers
 {
     public class OsuClickableContainer : ClickableContainer
     {
-        protected SampleChannel SampleClick, SampleHover;
+        private readonly HoverSampleSet sampleSet;
+
+        public OsuClickableContainer(HoverSampleSet sampleSet = HoverSampleSet.Normal)
+        {
+            this.sampleSet = sampleSet;
+        }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
-            SampleHover = audio.Sample.Get(@"UI/generic-hover");
-            SampleClick = audio.Sample.Get(@"UI/generic-select");
-        }
-
-        protected override bool OnHover(InputState state)
-        {
-            SampleHover?.Play();
-            return base.OnHover(state);
-        }
-
-        protected override bool OnClick(InputState state)
-        {
-            SampleClick?.Play();
-            return base.OnClick(state);
+            AddInternal(new HoverClickSounds(sampleSet));
         }
     }
 }
