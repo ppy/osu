@@ -248,8 +248,8 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, AudioManager audio)
         {
-            sampleClick = audio.Sample.Get(@"Menu/select-2");
-            sampleBeat = audio.Sample.Get(@"Menu/heartbeat");
+            sampleClick = audio.Sample.Get(@"Menu/osu-logo-select");
+            sampleBeat = audio.Sample.Get(@"Menu/osu-logo-heartbeat");
 
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");

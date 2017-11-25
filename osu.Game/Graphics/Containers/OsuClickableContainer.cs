@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.Containers
         private void load(AudioManager audio)
         {
             SampleHover = audio.Sample.Get(@"UI/generic-hover");
-            SampleClick = audio.Sample.Get(@"UI/generic-click");
+            SampleClick = audio.Sample.Get(@"UI/generic-select");
         }
 
         protected override bool OnHover(InputState state)
