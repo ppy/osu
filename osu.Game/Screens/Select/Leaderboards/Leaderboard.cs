@@ -23,6 +23,9 @@ using osu.Game.Graphics;
 using osu.Framework.Logging;
 using System.Net;
 using osu.Game.Rulesets;
+using osu.Framework.Input;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Framework.Audio.Track;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -167,7 +170,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                 new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopLeft,
-                                    Text = @"An error occurred!",
+                                    Text = @"Couldn't retrieve scores!",
                                     TextSize = 22,
                                 },
                             }
@@ -289,47 +292,71 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        private class RetryButton : ClickableContainer
+        private class RetryButton : BeatSyncedContainer
         {
             private SpriteIcon icon;
+
+            public Action Action;
 
             public RetryButton()
             {
                 Height = 26;
                 Width = 26;
-                Children = new Drawable[]
+                Child = new ClickableContainer
                 {
-                    icon = new SpriteIcon
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Action = () => Action?.Invoke(),
+                    Child = icon = new SpriteIcon
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_refresh,
                         Size = new Vector2(26),
-                    }
+                    },
                 };
             }
 
-            protected override bool OnHover(Framework.Input.InputState state)
+            private bool rightWard;
+
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+            {
+                var duration = timingPoint.BeatLength / 2;
+
+                icon.RotateTo(rightWard ? 3 : -3, duration * 2, Easing.OutCubic);
+                icon.Animate(
+                    i => i.MoveToY(-3, duration, Easing.Out),
+                    i => i.ScaleTo(IsHovered ? 1.3f : 1.1f, duration, Easing.Out)
+                ).Then(
+                    i => i.MoveToY(0, duration, Easing.In),
+                    i => i.ScaleTo(IsHovered ? 1.4f : 1f, duration, Easing.In)
+                );
+
+                rightWard = !rightWard;
+            }
+
+            protected override bool OnHover(InputState state)
             {
                 icon.ScaleTo(1.4f, 400, Easing.OutQuint);
                 return base.OnHover(state);
             }
 
-            protected override void OnHoverLost(Framework.Input.InputState state)
+            protected override void OnHoverLost(InputState state)
             {
+                icon.ClearTransforms();
                 icon.ScaleTo(1f, 400, Easing.OutQuint);
                 base.OnHoverLost(state);
             }
 
-            protected override bool OnMouseDown(Framework.Input.InputState state, Framework.Input.MouseDownEventArgs args)
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                icon.ScaleTo(0.8f, 800, Easing.InElastic);
+                icon.ClearTransforms();
+                icon.ScaleTo(0.8f, 400, Easing.InElastic);
                 return base.OnMouseDown(state, args);
             }
 
-            protected override bool OnMouseUp(Framework.Input.InputState state, Framework.Input.MouseUpEventArgs args)
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                icon.ScaleTo(1.2f, 800, Easing.OutElastic).Then().ScaleTo(1f, 800, Easing.OutElastic);
+                icon.ScaleTo(1.2f, 400, Easing.OutElastic).Then().ScaleTo(1f, 400, Easing.OutElastic);
                 return base.OnMouseUp(state, args);
             }
         }
