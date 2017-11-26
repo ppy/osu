@@ -50,7 +50,7 @@ namespace osu.Game.Overlays
             {
                 if (beatmapSets?.Equals(value) ?? false) return;
 
-                beatmapSets = value;
+                beatmapSets = value?.ToList();
 
                 if (beatmapSets == null) return;
 
