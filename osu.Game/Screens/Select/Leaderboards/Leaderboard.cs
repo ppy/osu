@@ -34,9 +34,10 @@ namespace osu.Game.Screens.Select.Leaderboards
         private const double fade_duration = 200;
 
         private readonly ScrollContainer scrollContainer;
+        private readonly Container placeholderContainer;
+        private readonly FillFlowContainer placeholderFlow;
+
         private FillFlowContainer<LeaderboardScore> scrollFlow;
-        private Container placeholderContainer;
-        private FillFlowContainer placeholderFlow;
 
         public Action<Score> ScoreSelected;
 
@@ -63,7 +64,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (scores == null)
                     return;
 
-                if (scores.Count() == 0)
+                if (!scores.Any())
                 {
                     placeholderFlow.Children = new Drawable[]
                     {
@@ -278,7 +279,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private class RetryButton : BeatSyncedContainer
         {
-            private SpriteIcon icon;
+            private readonly SpriteIcon icon;
 
             public Action Action;
 
