@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load()
         {
-            Stats.Add(new OsuSpriteText
+            RightFlowContainer.Add(new OsuSpriteText
             {
                 Text = Score.TotalScore.ToString("#,###"),
                 Anchor = Anchor.TopRight,
