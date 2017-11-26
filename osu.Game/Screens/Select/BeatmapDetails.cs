@@ -226,16 +226,9 @@ namespace osu.Game.Screens.Select
                 ratings.FadeIn(transition_duration);
             }
             else if (failOnMissing)
-            {
-                ratings.Metrics = new BeatmapMetrics
-                {
-                    Ratings = new int[10],
-                };
-            }
+                ratings.Metrics = new BeatmapMetrics { Ratings = new int[11] };
             else
-            {
                 ratings.FadeTo(0.25f, transition_duration);
-            }
 
             if (hasRetriesFails)
             {
