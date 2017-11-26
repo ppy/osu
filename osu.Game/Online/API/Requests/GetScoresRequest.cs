@@ -11,7 +11,6 @@ using osu.Game.Users;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
-using System.Collections.Specialized;
 using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API.Requests
