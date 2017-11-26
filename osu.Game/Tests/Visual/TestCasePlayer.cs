@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class TestCasePlayer : OsuTestCase
+    public abstract class TestCasePlayer : ScreenTestCase
     {
         private readonly Type ruleset;
 
@@ -44,6 +44,7 @@ namespace osu.Game.Tests.Visual
             {
                 RelativeSizeAxes = Framework.Graphics.Axes.Both,
                 Colour = Color4.Black,
+                Depth = int.MaxValue
             });
 
             string instantiation = ruleset?.AssemblyQualifiedName;
@@ -77,19 +78,17 @@ namespace osu.Game.Tests.Visual
             if (Player != null)
                 Remove(Player);
 
-            Add(Player = CreatePlayer(working, instance));
+            LoadScreen(CreatePlayer(working, instance));
         }
 
-        protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset)
+        protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset) => new Player
         {
-            return new Player
-            {
-                InitialBeatmap = beatmap
-            };
-        }
+            InitialBeatmap = beatmap,
+            AllowPause = false
+        };
 
         private const string test_beatmap_data =
-@"osu file format v14
+            @"osu file format v14
 
 [General]
 AudioLeadIn: 500
