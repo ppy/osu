@@ -1,21 +1,25 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserMostPlayedBeatmapsRequest : GetUserBeatmapsRequest<UserMostPlayedBeatmapsResponse>
+    public class GetUserMostPlayedBeatmapsRequest : APIRequest<List<UserMostPlayedBeatmapsResponse>>
     {
-        public GetUserMostPlayedBeatmapsRequest(long userID, BeatmapSetType type, int offset = 0)
-            : base(userID, type, offset)
+        private readonly long userId;
+        private readonly int offset;
+
+        public GetUserMostPlayedBeatmapsRequest(long userId, int offset = 0)
         {
-            if (type != BeatmapSetType.MostPlayed)
-                throw new ArgumentException("Please use " + nameof(GetUserBeatmapsRequest) + " instead");
+            this.userId = userId;
+            this.offset = offset;
         }
+
+        protected override string Target => $@"users/{userId}/beatmapsets/most_played?offset={offset}";
     }
 
     public class UserMostPlayedBeatmapsResponse
