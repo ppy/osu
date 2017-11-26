@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             base.ShowMore();
 
-            var req = new GetUserMostPlayedBeatmapsRequest(User.Value.Id, BeatmapSetType.MostPlayed, VisiblePages++ * ItemsPerPage);
+            var req = new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++ * ItemsPerPage);
 
             req.Success += beatmaps =>
             {
