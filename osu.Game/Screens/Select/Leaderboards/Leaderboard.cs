@@ -232,14 +232,14 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (api == null || Beatmap?.OnlineBeatmapID == null) return;
 
+            loading.Show();
+
             if (Scope == LeaderboardScope.Local)
             {
                 // TODO: get local scores from wherever here.
                 Scores = Enumerable.Empty<Score>();
                 return;
             }
-
-            loading.Show();
 
             getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value, Scope);
             getScoresRequest.Success += r =>
@@ -323,13 +323,13 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             protected override bool OnMouseDown(Framework.Input.InputState state, Framework.Input.MouseDownEventArgs args)
             {
-                icon.ScaleTo(0.8f, 200, Easing.InElastic);
+                icon.ScaleTo(0.8f, 800, Easing.InElastic);
                 return base.OnMouseDown(state, args);
             }
 
             protected override bool OnMouseUp(Framework.Input.InputState state, Framework.Input.MouseUpEventArgs args)
             {
-                icon.ScaleTo(1.2f, 400, Easing.OutElastic).Then().ScaleTo(1f, 400, Easing.OutElastic);
+                icon.ScaleTo(1.2f, 800, Easing.OutElastic).Then().ScaleTo(1f, 800, Easing.OutElastic);
                 return base.OnMouseUp(state, args);
             }
         }
