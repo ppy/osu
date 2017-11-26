@@ -35,8 +35,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private readonly ScrollContainer scrollContainer;
         private FillFlowContainer<LeaderboardScore> scrollFlow;
-        private Container noResultsPlaceholder;
-        private Container retryPlaceholder;
+        private Container placeholderContainer;
+        private FillFlowContainer placeholderFlow;
 
         public Action<Score> ScoreSelected;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 getScoresRequest?.Cancel();
                 getScoresRequest = null;
 
-                noResultsPlaceholder.FadeOut(fade_duration);
+                placeholderContainer.FadeOut(fade_duration);
                 scrollFlow?.FadeOut(fade_duration).Expire();
                 scrollContainer.Clear(true); // scores stick around in scrollFlow in VisualTests without this for some reason
                 scrollFlow = null;
@@ -65,7 +65,22 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 if (scores.Count() == 0)
                 {
-                    noResultsPlaceholder.FadeIn(fade_duration);
+                    placeholderFlow.Children = new Drawable[]
+                    {
+                        new SpriteIcon
+                        {
+                            Icon = FontAwesome.fa_exclamation_circle,
+                            Size = new Vector2(26),
+                            Margin = new MarginPadding { Right = 10 },
+                        },
+                        new OsuSpriteText
+                        {
+                            Text = @"No records yet!",
+                            TextSize = 22,
+                        },
+                    };
+
+                    placeholderContainer.FadeIn(fade_duration);
                     return;
                 }
 
@@ -119,61 +134,18 @@ namespace osu.Game.Screens.Select.Leaderboards
                     ScrollbarVisible = false,
                 },
                 loading = new LoadingAnimation(),
-                noResultsPlaceholder = new Container
+                placeholderContainer = new Container
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        placeholderFlow = new FillFlowContainer
                         {
                             Direction = FillDirection.Horizontal,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             AutoSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                new SpriteIcon
-                                {
-                                    Icon = FontAwesome.fa_exclamation_circle,
-                                    Size = new Vector2(26),
-                                    Margin = new MarginPadding { Right = 10 },
-                                },
-                                new OsuSpriteText
-                                {
-                                    Text = @"No records yet!",
-                                    TextSize = 22,
-                                },
-                            }
-                        },
-                    },
-                },
-                retryPlaceholder = new Container
-                {
-                    Alpha = 0,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new FillFlowContainer
-                        {
-                            Direction = FillDirection.Horizontal,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                new RetryButton
-                                {
-                                    Action = updateScores,
-                                    Margin = new MarginPadding { Right = 10 },
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.TopLeft,
-                                    Text = @"Couldn't retrieve scores!",
-                                    TextSize = 22,
-                                },
-                            }
                         },
                     },
                 },
@@ -229,8 +201,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             if (!IsLoaded) return;
 
-            retryPlaceholder.FadeOut(fade_duration);
-
             Scores = null;
 
             if (api == null || Beatmap?.OnlineBeatmapID == null) return;
@@ -255,7 +225,21 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (e is WebException)
                 {
                     Scores = null;
-                    retryPlaceholder.FadeIn(fade_duration);
+                    placeholderFlow.Children = new Drawable[]
+                    {
+                        new RetryButton
+                        {
+                            Action = updateScores,
+                            Margin = new MarginPadding { Right = 10 },
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopLeft,
+                            Text = @"Couldn't retrieve scores!",
+                            TextSize = 22,
+                        },
+                    };
+                    placeholderContainer.FadeIn(fade_duration);
                     Logger.Error(e, @"Couldn't fetch beatmap scores!");
                 }
             };
@@ -298,6 +282,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             public Action Action;
 
+            private OsuColour colours;
+
             public RetryButton()
             {
                 Height = 26;
@@ -314,6 +300,12 @@ namespace osu.Game.Screens.Select.Leaderboards
                         Size = new Vector2(26),
                     },
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                this.colours = colours;
             }
 
             private bool rightWard;
@@ -350,6 +342,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
                 icon.ClearTransforms();
+                icon.FlashColour(colours.Yellow, 400);
                 icon.ScaleTo(0.8f, 400, Easing.InElastic);
                 return base.OnMouseDown(state, args);
             }
