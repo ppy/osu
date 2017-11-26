@@ -294,6 +294,7 @@
     <Compile Include="Online\API\Requests\GetUserBeatmapsRequest.cs" />
     <Compile Include="Overlays\Profile\Sections\BeatmapMetadataContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Beatmaps\PaginatedBeatmapContainer.cs" />
+    <Compile Include="Overlays\Profile\Sections\DrawableBeatmapRow.cs" />
     <Compile Include="Overlays\Profile\Sections\Historical\MostPlayedBeatmapDrawable.cs" />
     <Compile Include="Overlays\Profile\Sections\Historical\PaginatedMostPlayedBeatmapContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Kudosu\KudosuInfo.cs" />
