@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,6 +12,7 @@ using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.MathUtils;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 
@@ -60,11 +63,20 @@ namespace osu.Game.Beatmaps.Drawables
             Alpha = 0;
         }
 
+        private SampleChannel sampleHover;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, OsuColour colours)
+        {
+            sampleHover = audio.Sample.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
+            hoverLayer.Colour = colours.Blue.Opacity(0.1f);
+        }
 
         protected override bool OnHover(InputState state)
         {
-            hoverLayer.FadeIn(100, Easing.OutQuint);
+            sampleHover?.Play();
 
+            hoverLayer.FadeIn(100, Easing.OutQuint);
             return base.OnHover(state);
         }
 
@@ -72,12 +84,6 @@ namespace osu.Game.Beatmaps.Drawables
         {
             hoverLayer.FadeOut(1000, Easing.OutQuint);
             base.OnHoverLost(state);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
 
         public void SetMultiplicativeAlpha(float alpha)
