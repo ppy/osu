@@ -31,13 +31,13 @@ namespace osu.Game.Notifications
         /// <summary>
         /// The icon with the notification.
         /// </summary>
-        public NotificationIcon NotificationIcon
+        public NotificationIcon Icon
         {
-            get { return NotificationIconBinding.Value; }
-            set { NotificationIconBinding.Value = value; }
+            get { return IconBinding.Value; }
+            set { IconBinding.Value = value; }
         }
 
-        public Bindable<NotificationIcon> NotificationIconBinding { get; } = new Bindable<NotificationIcon>(new NotificationIcon());
+        public Bindable<NotificationIcon> IconBinding { get; } = new Bindable<NotificationIcon>(new NotificationIcon());
         public Bindable<ColourInfo> BackgroundColourBinding { get; } = new Bindable<ColourInfo>(OsuColour.FromHex("FFF"));
         public Bindable<string> TextBinding { get; } = new Bindable<string>();
 
@@ -49,7 +49,7 @@ namespace osu.Game.Notifications
         /// <summary>
         /// Activates this notification.
         /// </summary>
-        public void Activate()
+        public void TriggerActivate()
         {
             OnActivate?.Invoke();
         }
@@ -58,7 +58,7 @@ namespace osu.Game.Notifications
         {
             Text = text;
 
-            NotificationIcon = new NotificationIcon(icon);
+            Icon = new NotificationIcon(icon);
 
             if (onActivate != null)
                 OnActivate += onActivate;
