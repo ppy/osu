@@ -310,7 +310,7 @@ namespace osu.Game.Screens.Play
             if (!loadedSuccessfully)
                 return;
 
-            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, Easing.OutQuint);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1000, Easing.OutQuint);
 
             dimLevel.ValueChanged += dimLevel_ValueChanged;
             showStoryboard.ValueChanged += showStoryboard_ValueChanged;
