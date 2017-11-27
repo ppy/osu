@@ -34,8 +34,6 @@ namespace osu.Game.Graphics.UserInterface
             Font = @"Exo2.0-Bold",
         };
 
-        public override bool HandleInput => Action != null;
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
