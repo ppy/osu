@@ -145,6 +145,8 @@ namespace osu.Desktop.Deploy
         /// </summary>
         private static void checkReleaseFiles()
         {
+            if (!canGitHub) return;
+
             var releaseLines = getReleaseLines();
 
             //ensure we have all files necessary
@@ -157,6 +159,8 @@ namespace osu.Desktop.Deploy
 
         private static void pruneReleases()
         {
+            if (!canGitHub) return;
+
             write("Pruning RELEASES...");
 
             var releaseLines = getReleaseLines().ToList();
@@ -190,7 +194,7 @@ namespace osu.Desktop.Deploy
 
         private static void uploadBuild(string version)
         {
-            if (string.IsNullOrEmpty(GitHubAccessToken) || string.IsNullOrEmpty(codeSigningCertPath))
+            if (!canGitHub || string.IsNullOrEmpty(CodeSigningCertificate))
                 return;
 
             write("Publishing to GitHub...");
@@ -228,8 +232,12 @@ namespace osu.Desktop.Deploy
 
         private static void openGitHubReleasePage() => Process.Start(GitHubReleasePage);
 
+        private static bool canGitHub => !string.IsNullOrEmpty(GitHubAccessToken);
+
         private static void checkGitHubReleases()
         {
+            if (!canGitHub) return;
+
             write("Checking GitHub releases...");
             var req = new JsonWebRequest<List<GitHubRelease>>($"{GitHubApiEndpoint}");
             req.AuthenticatedBlockingPerform();
