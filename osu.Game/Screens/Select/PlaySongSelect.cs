@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            sampleConfirm = audio.Sample.Get($@"SongSelect/confirm-selection");
+            sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
 
             Footer.AddButton(@"mods", colours.Yellow, modSelect, Key.F1, float.MaxValue);
 
