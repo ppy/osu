@@ -36,9 +36,9 @@ namespace osu.Game.Overlays.BeatmapSet
             Masking = true;
             CornerRadius = 3;
             BackgroundColour = OsuColour.FromHex(@"094c5f");
-            Triangles.ColourLight = OsuColour.FromHex(@"0f7c9b");
-            Triangles.ColourDark = OsuColour.FromHex(@"094c5f");
-            Triangles.TriangleScale = 1.5f;
+            this.Triangles.ColourLight = OsuColour.FromHex(@"0f7c9b");
+            this.Triangles.ColourDark = OsuColour.FromHex(@"094c5f");
+            this.Triangles.TriangleScale = 1.5f;
         }
 
     }
