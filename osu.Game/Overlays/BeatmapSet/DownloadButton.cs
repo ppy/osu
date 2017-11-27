@@ -14,10 +14,10 @@ namespace osu.Game.Overlays.BeatmapSet
         public DownloadButton(string title, string subtitle)
         {
             Width = 120;
-            RelativeSizeAxes = Axes.Y;
 
             Child = new Container
             {
+                Depth = -1,
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding { Horizontal = 10 },
                 Children = new Drawable[]

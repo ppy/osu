@@ -5,12 +5,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Audio;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class HeaderButton : OsuClickableContainer
+    public class HeaderButton : OsuButton
     {
         private readonly Container content;
 
@@ -18,28 +21,25 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public HeaderButton()
         {
-            CornerRadius = 3;
-            Masking = true;
+            Height = 0;
+            RelativeSizeAxes = Axes.Y;
 
-            InternalChildren = new Drawable[]
+            AddInternal(content = new Container
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex(@"094c5f"),
-                },
-                new Triangles
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ColourLight = OsuColour.FromHex(@"0f7c9b"),
-                    ColourDark = OsuColour.FromHex(@"094c5f"),
-                    TriangleScale = 1.5f,
-                },
-                content = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-            };
+                RelativeSizeAxes = Axes.Both
+            });
         }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, AudioManager audio)
+        {
+            Masking = true;
+            CornerRadius = 3;
+            BackgroundColour = OsuColour.FromHex(@"094c5f");
+            Triangles.ColourLight = OsuColour.FromHex(@"0f7c9b");
+            Triangles.ColourDark = OsuColour.FromHex(@"094c5f");
+            Triangles.TriangleScale = 1.5f;
+        }
+
     }
 }

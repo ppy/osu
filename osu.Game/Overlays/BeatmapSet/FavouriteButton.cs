@@ -17,7 +17,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public FavouriteButton()
         {
-            RelativeSizeAxes = Axes.Y;
 
             Container pink;
             SpriteIcon icon;
@@ -25,6 +24,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 pink = new Container
                 {
+                    Depth = -1,
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0f,
                     Children = new Drawable[]
@@ -45,6 +45,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
                 icon = new SpriteIcon
                 {
+                    Depth = -1,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Icon = FontAwesome.fa_heart_o,
