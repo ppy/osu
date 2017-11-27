@@ -10,8 +10,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseReplay : TestCasePlayer
     {
-        public override string Description => @"Testing replay playback.";
-
         protected override Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset)
         {
             beatmap.Mods.Value = beatmap.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });

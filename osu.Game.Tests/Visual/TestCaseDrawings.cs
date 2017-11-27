@@ -2,15 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using osu.Game.Screens.Tournament;
 using osu.Game.Screens.Tournament.Teams;
 
 namespace osu.Game.Tests.Visual
 {
+    [Description("for tournament use")]
     internal class TestCaseDrawings : OsuTestCase
     {
-        public override string Description => "Tournament drawings";
-
         public TestCaseDrawings()
         {
             Add(new Drawings
