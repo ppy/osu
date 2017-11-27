@@ -52,7 +52,7 @@ namespace osu.Game.Beatmaps.Drawables
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        Blending = new BlendingParameters { Mode = BlendingMode.Additive },
+                        Blending = BlendingMode.Additive,
                     },
                 }
             });
