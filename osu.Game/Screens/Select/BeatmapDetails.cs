@@ -321,11 +321,11 @@ namespace osu.Game.Screens.Select
                     }
 
                     this.FadeIn(transition_duration);
-                    addTextAsync(value);
+                    setTextAsync(value);
                 }
             }
 
-            private void addTextAsync(string text)
+            private void setTextAsync(string text)
             {
                 var newTextFlow = new TextFlowContainer
                 {
