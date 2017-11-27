@@ -26,7 +26,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             SampleSet = sampleSet;
             RelativeSizeAxes = Axes.Both;
-            AlwaysPresent = true;
         }
 
         protected override bool OnHover(InputState state)
