@@ -16,6 +16,7 @@ namespace osu.Game.Screens.Select
         public SortMode Sort;
         public string SearchText;
         public RulesetInfo Ruleset;
+        public bool AllowConvertedBeatmaps;
 
         public void Filter(List<BeatmapGroup> groups)
         {
@@ -23,7 +24,7 @@ namespace osu.Game.Screens.Select
             {
                 var set = g.BeatmapSet;
 
-                bool hasCurrentMode = set.Beatmaps.Any(bm => bm.RulesetID == (Ruleset?.ID ?? 0));
+                bool hasCurrentMode = AllowConvertedBeatmaps || set.Beatmaps.Any(bm => bm.RulesetID == (Ruleset?.ID ?? 0));
 
                 bool match = hasCurrentMode;
 
