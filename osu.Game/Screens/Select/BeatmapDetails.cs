@@ -308,6 +308,7 @@ namespace osu.Game.Screens.Select
 
         private class MetadataSection : Container
         {
+            private readonly FillFlowContainer textContainer;
             private TextFlowContainer textFlow;
 
             public string Text
@@ -338,7 +339,6 @@ namespace osu.Game.Screens.Select
 
                 LoadComponentAsync(newTextFlow, d =>
                 {
-                    var textContainer = (InternalChild as FillFlowContainer);
                     textContainer.Remove(textFlow);
                     textContainer.Add(textFlow = d);
                 });
@@ -355,7 +355,7 @@ namespace osu.Game.Screens.Select
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 
-                InternalChild = new FillFlowContainer
+                InternalChild = textContainer = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
