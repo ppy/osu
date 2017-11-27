@@ -188,7 +188,9 @@ namespace osu.Game.Screens.Select
 
             ratingsContainer.FadeIn(transition_duration);
             advanced.Beatmap = Beatmap;
-            loadDetailsAsync(Beatmap);
+            description.Text = Beatmap.Version;
+            source.Text = Beatmap.Metadata.Source;
+            tags.Text = Beatmap.Metadata.Tags;
 
             var requestedBeatmap = Beatmap;
             if (requestedBeatmap.Metrics == null)
@@ -210,16 +212,6 @@ namespace osu.Game.Screens.Select
             }
 
             displayMetrics(requestedBeatmap.Metrics, false);
-        }
-
-        private void loadDetailsAsync(BeatmapInfo beatmap)
-        {
-            if (description == null || source == null || tags == null)
-                throw new InvalidOperationException($@"Requires all {nameof(MetadataSection)} elements to be non-null.");
-
-            description.Text = beatmap.Version;
-            source.Text = beatmap.Metadata?.Source;
-            tags.Text = beatmap.Metadata?.Tags;
         }
 
         private void displayMetrics(BeatmapMetrics metrics, bool failOnMissing = true)
@@ -267,7 +259,10 @@ namespace osu.Game.Screens.Select
 
         private void clearStats()
         {
-            loadDetailsAsync(null);
+            description.Text = null;
+            source.Text = null;
+            tags.Text = null;
+
             advanced.Beatmap = new BeatmapInfo
             {
                 StarDifficulty = 0,
