@@ -17,6 +17,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new Drawable[]
             {
+                new SettingsCheckbox
+                {
+                    LabelText = "Show converted beatmaps",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                },
                 new SettingsSlider<double, StarSlider>
                 {
                     LabelText = "Display beatmaps from",
@@ -33,7 +38,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Random beatmap selection",
                     Bindable = config.GetBindable<SelectionRandomType>(OsuSetting.SelectionRandomType),
-                },
+                }
             };
         }
 
