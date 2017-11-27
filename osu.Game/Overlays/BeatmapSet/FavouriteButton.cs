@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Container pink;
             SpriteIcon icon;
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 pink = new Container
                 {
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     Size = new Vector2(18),
                     Shadow = false,
                 },
-            };
+            });
 
             Favourited.ValueChanged += value =>
             {
