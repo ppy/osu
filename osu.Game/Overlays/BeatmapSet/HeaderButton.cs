@@ -2,12 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.Containers;
 using osu.Framework.Audio;
 using osu.Framework.Allocation;
 
@@ -23,7 +19,7 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load()
         {
             Masking = true;
             CornerRadius = 3;
