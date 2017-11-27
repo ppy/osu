@@ -48,7 +48,10 @@ namespace osu.Game.Screens.Menu
 
         private readonly Triangles triangles;
 
-        public Action Action;
+        /// <summary>
+        /// Return value decides whether the logo should play its own sample for the click action.
+        /// </summary>
+        public Func<bool> Action;
 
         public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X * 0.74f;
 
@@ -248,8 +251,8 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, AudioManager audio)
         {
-            sampleClick = audio.Sample.Get(@"Menu/select-2");
-            sampleBeat = audio.Sample.Get(@"Menu/heartbeat");
+            sampleClick = audio.Sample.Get(@"Menu/osu-logo-select");
+            sampleBeat = audio.Sample.Get(@"Menu/osu-logo-heartbeat");
 
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
@@ -354,13 +357,12 @@ namespace osu.Game.Screens.Menu
         {
             if (!interactive) return false;
 
-            sampleClick.Play();
+            if (Action?.Invoke() ?? true)
+                sampleClick.Play();
 
             flashLayer.ClearTransforms();
             flashLayer.Alpha = 0.4f;
             flashLayer.FadeOut(1500, Easing.OutExpo);
-
-            Action?.Invoke();
             return true;
         }
 
