@@ -3,12 +3,15 @@
 
 using System;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -22,6 +25,10 @@ namespace osu.Game.Beatmaps.Drawables
 
         private readonly Container nestedContainer;
 
+        private readonly Container borderContainer;
+
+        private readonly Box hoverLayer;
+
         protected override Container<Drawable> Content => nestedContainer;
 
         protected Panel()
@@ -29,20 +36,53 @@ namespace osu.Game.Beatmaps.Drawables
             Height = MAX_HEIGHT;
             RelativeSizeAxes = Axes.X;
 
-            AddInternal(nestedContainer = new Container
+            AddInternal(borderContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 CornerRadius = 10,
                 BorderColour = new Color4(221, 255, 255, 255),
+                Children = new Drawable[]
+                {
+                    nestedContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    hoverLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        Blending = BlendingMode.Additive,
+                    },
+                }
             });
 
             Alpha = 0;
         }
 
+
+        protected override bool OnHover(InputState state)
+        {
+            hoverLayer.FadeIn(100, Easing.OutQuint);
+
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            hoverLayer.FadeOut(1000, Easing.OutQuint);
+            base.OnHoverLost(state);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            hoverLayer.Colour = colours.Blue.Opacity(0.1f);
+        }
+
         public void SetMultiplicativeAlpha(float alpha)
         {
-            nestedContainer.Alpha = alpha;
+            borderContainer.Alpha = alpha;
         }
 
         protected override void LoadComplete()
@@ -94,8 +134,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected virtual void Selected()
         {
-            nestedContainer.BorderThickness = 2.5f;
-            nestedContainer.EdgeEffect = new EdgeEffectParameters
+            borderContainer.BorderThickness = 2.5f;
+            borderContainer.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = new Color4(130, 204, 255, 150),
@@ -106,8 +146,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected virtual void Deselected()
         {
-            nestedContainer.BorderThickness = 0;
-            nestedContainer.EdgeEffect = new EdgeEffectParameters
+            borderContainer.BorderThickness = 0;
+            borderContainer.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(1),
