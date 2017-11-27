@@ -316,7 +316,7 @@ namespace osu.Game.Screens.Select
 
         private class MetadataSection : Container
         {
-            private readonly TextFlowContainer textFlow;
+            private TextFlowContainer textFlow;
 
             public string Text
             {
@@ -329,9 +329,27 @@ namespace osu.Game.Screens.Select
                     }
 
                     this.FadeIn(transition_duration);
-                    textFlow.Clear();
-                    textFlow.AddText(value, s => s.TextSize = 14);
+                    addTextAsync(value);
                 }
+            }
+
+            private void addTextAsync(string text)
+            {
+                var newTextFlow = new TextFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Colour = textFlow.Colour,
+                };
+
+                newTextFlow.AddText(text, s => s.TextSize = 14);
+
+                LoadComponentAsync(newTextFlow, d =>
+                {
+                    var textContainer = (InternalChild as FillFlowContainer);
+                    textContainer.Remove(textFlow);
+                    textContainer.Add(textFlow = d);
+                });
             }
 
             public Color4 TextColour
