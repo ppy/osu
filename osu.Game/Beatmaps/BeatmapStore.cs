@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
@@ -31,6 +32,15 @@ namespace osu.Game.Beatmaps
         public void Add(BeatmapSetInfo beatmapSet)
         {
             var context = GetContext();
+
+            foreach (var beatmap in beatmapSet.Beatmaps.Where(b => b.Metadata != null))
+            {
+                var contextMetadata = context.Set<BeatmapMetadata>().Local.SingleOrDefault(e => e.Equals(beatmap.Metadata));
+                if (contextMetadata != null)
+                    beatmap.Metadata = contextMetadata;
+                else
+                    context.BeatmapMetadata.Attach(beatmap.Metadata);
+            }
 
             context.BeatmapSetInfo.Attach(beatmapSet);
             context.SaveChanges();
