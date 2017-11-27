@@ -413,7 +413,7 @@ namespace osu.Game.Screens.Select
             if (backgroundModeBeatmap != null)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurTo(background_blur, 1000);
+                backgroundModeBeatmap.BlurTo(background_blur, 750, Easing.OutQuint);
                 backgroundModeBeatmap.FadeTo(1, 250);
             }
 
