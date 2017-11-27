@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             Width = 120;
 
-            Child = new Container
+            Add(new Container
             {
                 Depth = -1,
                 RelativeSizeAxes = Axes.Both,
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Margin = new MarginPadding { Right = 5 },
                     },
                 },
-            };
+            });
         }
     }
 }
