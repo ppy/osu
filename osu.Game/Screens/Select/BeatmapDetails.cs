@@ -217,12 +217,9 @@ namespace osu.Game.Screens.Select
             if (description == null || source == null || tags == null)
                 throw new InvalidOperationException($@"Requires all {nameof(MetadataSection)} elements to be non-null.");
 
-            Schedule(() =>
-            {
-                description.Text = Beatmap?.Version;
-                source.Text = Beatmap?.Metadata?.Source;
-                tags.Text = Beatmap?.Metadata?.Tags;
-            });
+            description.Text = beatmap.Version;
+            source.Text = beatmap.Metadata?.Source;
+            tags.Text = beatmap.Metadata?.Tags;
         }
 
         private void displayMetrics(BeatmapMetrics metrics, bool failOnMissing = true)
