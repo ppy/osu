@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
         protected override IEnumerable<CatchBaseHit> ConvertHitObject(HitObject obj, Beatmap beatmap)
         {
             var curveData = obj as IHasCurve;
-            var positionData = obj as IHasPosition;
+            var positionData = obj as IHasXPosition;
             var comboData = obj as IHasCombo;
 
             if (positionData == null)

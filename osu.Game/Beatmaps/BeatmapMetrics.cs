@@ -12,7 +12,7 @@ namespace osu.Game.Beatmaps
     public class BeatmapMetrics
     {
         /// <summary>
-        /// Total vote counts of user ratings on a scale of 0..length.
+        /// Total vote counts of user ratings on a scale of 0..10 where 0 is unused (probably will be fixed at API?).
         /// </summary>
         public IEnumerable<int> Ratings { get; set; }
 

@@ -12,8 +12,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseTextAwesome : OsuTestCase
     {
-        public override string Description => @"Tests display of icons";
-
         public TestCaseTextAwesome()
         {
             FillFlowContainer flow;
