@@ -50,7 +50,7 @@ namespace osu.Game.Overlays
             {
                 if (beatmapSets?.Equals(value) ?? false) return;
 
-                beatmapSets = value;
+                beatmapSets = value?.ToList();
 
                 if (beatmapSets == null) return;
 
@@ -65,8 +65,6 @@ namespace osu.Game.Overlays
                 }
 
                 ResultAmounts = new ResultCounts(distinctCount(artists), distinctCount(songs), distinctCount(tags));
-
-                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             }
         }
 
@@ -282,7 +280,11 @@ namespace osu.Game.Overlays
                     var sets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID)).ToList();
 
                     // may not need scheduling; loads async internally.
-                    Schedule(() => BeatmapSets = sets);
+                    Schedule(() =>
+                    {
+                        BeatmapSets = sets;
+                        recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                    });
                 });
             };
 
