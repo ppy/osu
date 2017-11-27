@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Mods
         private readonly Container<ModIcon> iconsContainer;
         private SampleChannel sampleOn, sampleOff;
 
-        public new Action<Mod> Action; // Passed the selected mod or null if none
+        public Action<Mod> Action; // Passed the selected mod or null if none
 
         public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
 
