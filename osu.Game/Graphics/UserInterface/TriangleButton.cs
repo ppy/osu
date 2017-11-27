@@ -15,6 +15,9 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
+    /// <summary>
+    /// A button with moving triangles in the background.
+    /// </summary>
     public class TriangleButton : OsuButton, IFilterable
     {
         private Box hover;
