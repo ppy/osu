@@ -16,6 +16,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
             Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
+            Set(OsuSetting.ShowConvertedBeatmaps, true);
             Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
             Set(OsuSetting.DisplayStarsMaximum, 10.0, 0, 10, 0.1);
 
@@ -112,6 +113,7 @@ namespace osu.Game.Configuration
         SnakingOutSliders,
         ShowFpsDisplay,
         ChatDisplayHeight,
-        Version
+        Version,
+        ShowConvertedBeatmaps
     }
 }
