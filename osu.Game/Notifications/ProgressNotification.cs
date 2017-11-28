@@ -10,7 +10,6 @@ namespace osu.Game.Notifications
 {
     public class ProgressNotification : Notification, IHasFollowUpNotifications
     {
-
         /// <summary>
         /// The progress of the notification ranging from 0.0 to 1.0
         /// </summary>
@@ -29,8 +28,8 @@ namespace osu.Game.Notifications
             set { StateBinding.Value = value; }
         }
 
-        public Bindable<float> ProgressBinding { get; }
-        public Bindable<ProgressNotificationState> StateBinding { get; }
+        public Bindable<float> ProgressBinding { get; } = new BindableFloat();
+        public Bindable<ProgressNotificationState> StateBinding { get; } = new Bindable<ProgressNotificationState>();
 
         /// <summary>
         /// A list of notifications that get run after this noctification completes.
@@ -52,13 +51,10 @@ namespace osu.Game.Notifications
         /// </summary>
         public bool IsCompleted => ProgressBinding.Value >= 1;
 
-        public ProgressNotification(string text, FontAwesome icon = FontAwesome.fa_info_circle)
+        public ProgressNotification(string text = "", FontAwesome icon = FontAwesome.fa_info_circle)
          : base(text, icon)
         {
-            ProgressBinding = new BindableFloat();
-            ProgressBinding.ValueChanged += progressOnValueChanged;
-
-            StateBinding = new Bindable<ProgressNotificationState>();
+            ProgressBinding.ValueChanged += progressChanged;
         }
 
         /// <summary>
@@ -69,7 +65,7 @@ namespace osu.Game.Notifications
             CancelRequested?.Invoke();
         }
 
-        private void progressOnValueChanged(float newValue)
+        private void progressChanged(float newValue)
         {
             if (IsCompleted)
                 ProgressCompleted?.Invoke();

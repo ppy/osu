@@ -114,7 +114,6 @@ namespace osu.Game.Tests.Visual
             };
             restartNotification.OnActivate += () => manager.Post(completeNotification);
 
-            bool downloadCompleted = false;
             var downloadNotification = new ProgressNotification(@"Downloading update...")
             {
                 NotificationIcon = new NotificationIcon(
@@ -122,6 +121,7 @@ namespace osu.Game.Tests.Visual
                     ColourInfo.GradientVertical(osuColour.YellowDark, osuColour.Yellow)
                 )
             };
+            bool downloadCompleted = false;
             downloadNotification.ProgressCompleted += () =>
             {
                 if (downloadCompleted)
@@ -132,7 +132,6 @@ namespace osu.Game.Tests.Visual
 
                 downloadCompleted = true;
                 downloadNotification.Progress = 0;
-                downloadNotification.State = ProgressNotificationState.Active;
                 downloadNotification.Text = @"Installing update...";
             };
 

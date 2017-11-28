@@ -12,41 +12,41 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class SimpleNotificationDrawable : NotificationDrawable
+    public class SimpleDrawableNotification : DrawableNotification
     {
-        public Notification Notification { get; }
+        private readonly Notification notification;
 
         private readonly TextFlowContainer textDrawable;
         private readonly SpriteIcon iconDrawable;
 
-        protected Box IconBackgound;
+        private Box iconBackgound;
 
-        public SimpleNotificationDrawable(Notification notification)
+        public SimpleDrawableNotification(Notification notification)
         {
             if (notification == null)
                 throw new ArgumentNullException(nameof(notification));
 
-            Notification = notification;
-            Notification.BackgroundColourBinding.ValueChanged += value => Schedule(() => Colour = value);
-            Notification.TextBinding.ValueChanged += value => Schedule(() => textDrawable.Text = value);
-            Notification.NotificationIconBinding.ValueChanged += value => Schedule(() =>
+            this.notification = notification;
+            notification.BackgroundColourBinding.ValueChanged += value => Schedule(() => Colour = value);
+            notification.TextBinding.ValueChanged += value => Schedule(() => textDrawable.Text = value);
+            notification.NotificationIconBinding.ValueChanged += value => Schedule(() =>
             {
                 iconDrawable.Icon = value.Icon;
-                IconBackgound.Colour = value.BackgroundColour;
+                iconBackgound.Colour = value.BackgroundColour;
             });
 
             IconContent.AddRange(new Drawable[]
             {
-                IconBackgound = new Box
+                iconBackgound = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Notification.NotificationIcon.BackgroundColour
+                    Colour = notification.NotificationIcon.BackgroundColour
                 },
                 iconDrawable = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = Notification.NotificationIcon.Icon,
+                    Icon = notification.NotificationIcon.Icon,
                     Size = new Vector2(20),
                 }
             });
@@ -56,16 +56,14 @@ namespace osu.Game.Overlays.Notifications
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-                Text = Notification.Text
+                Text = this.notification.Text
             });
 
             Activated = () =>
             {
-                Notification.Activate();
+                notification.TriggerActivate();
                 return true;
             };
-
-            Notification.TextBinding.TriggerChange();
         }
 
 

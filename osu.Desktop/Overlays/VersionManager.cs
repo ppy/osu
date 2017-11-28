@@ -108,19 +108,10 @@ namespace osu.Desktop.Overlays
             if (!game.IsDeployedBuild || version == lastVersion) return;
             config.Set(OsuSetting.Version, version);
 
-            // only show a notificationDrawable if we've previously saved a version to the config file (ie. not the first run).
+            // only show a notification if we've previously saved a version to the config file (ie. not the first run).
             if (!string.IsNullOrEmpty(lastVersion))
-                Scheduler.AddDelayed(() =>
-                    notificationOverlay.Post(
-                            new Notification(
-                            $"You are now running osu!lazer {version}.\nClick to see what's new!",
-                            onActivate: () =>
-                            {
-                                Process.Start($"https://github.com/ppy/osu/releases/tag/v{version}");
-                            })
-                        {
-                            NotificationIcon = new NotificationIcon(FontAwesome.fa_check_square, osuColours.BlueDark)
-                        }),
+                Scheduler.AddDelayed(
+                    () => notificationOverlay.Post(createUpdateFinishedNotification(version)),
                     5000
                 );
         }
@@ -131,7 +122,7 @@ namespace osu.Desktop.Overlays
             updateManager?.Dispose();
         }
 
-        private async void checkForUpdateAsync(bool useDeltaPatching = true, ProgressNotification notificationContainer = null)
+        private async void checkForUpdateAsync(bool useDeltaPatching = true, ProgressNotification progressNotification = null)
         {
             //should we schedule a retry on completion of this check?
             bool scheduleRetry = true;
@@ -145,46 +136,27 @@ namespace osu.Desktop.Overlays
                     //no updates available. bail and retry later.
                     return;
 
-                if (notificationContainer == null)
+                if (progressNotification == null)
                 {
-                    notificationContainer = new ProgressNotification("", FontAwesome.fa_upload)
-                    {
-                        FollowUpNotifications =
-                        {
-                            new Notification(@"Update ready to install. Click to restart!", onActivate: () =>
-                            {
-                                // Squirrel returns execution to us after the update process is started, so it's safe to use Wait() here
-                                UpdateManager.RestartAppWhenExited().Wait();
-                                game.Exit();
-                            })
-                            {
-                                NotificationIcon = new NotificationIcon(backgroundColour: osuColours.Green)
-                            }
-                        },
-                        NotificationIcon = new NotificationIcon(
-                            FontAwesome.fa_upload,
-                            ColourInfo.GradientVertical(osuColours.YellowDark, osuColours.Yellow)
-                        )
-                    };
+                    progressNotification = createProgressNotification();
+                    progressNotification.FollowUpNotifications.Add(createRestartNotification());
 
-                    notificationOverlay.Post(notificationContainer);
+                    notificationOverlay.Post(progressNotification);
                 }
 
-
-                notificationContainer.Progress = 0;
-                notificationContainer.Text = @"Downloading update...";
+                progressNotification.Progress = 0;
+                progressNotification.Text = @"Downloading update...";
 
                 try
                 {
-                    await updateManager.DownloadReleases(info.ReleasesToApply, p => notificationContainer.Progress = p / 100f);
+                    await updateManager.DownloadReleases(info.ReleasesToApply, p => progressNotification.Progress = p / 100f);
 
-                    notificationContainer.Progress = 0;
-                    notificationContainer.State = ProgressNotificationState.Active;
-                    notificationContainer.Text = @"Installing update...";
+                    progressNotification.Progress = 0;
+                    progressNotification.Text = @"Installing update...";
 
-                    await updateManager.ApplyReleases(info, p => notificationContainer.Progress = p / 100f);
+                    await updateManager.ApplyReleases(info, p => progressNotification.Progress = p / 100f);
 
-                    Schedule(() => notificationContainer.State = ProgressNotificationState.Completed);
+                    Schedule(() => progressNotification.State = ProgressNotificationState.Completed);
                 }
                 catch (Exception e)
                 {
@@ -194,7 +166,7 @@ namespace osu.Desktop.Overlays
 
                         //could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
                         //try again without deltas.
-                        checkForUpdateAsync(false, notificationContainer);
+                        checkForUpdateAsync(false, progressNotification);
                         scheduleRetry = false;
                     }
                     else
@@ -213,8 +185,8 @@ namespace osu.Desktop.Overlays
                 {
                     //check again in 30 minutes.
                     Scheduler.AddDelayed(() => checkForUpdateAsync(), 60000 * 30);
-                    if (notificationContainer != null)
-                        notificationContainer.State = ProgressNotificationState.Cancelled;
+                    if (progressNotification != null)
+                        progressNotification.State = ProgressNotificationState.Cancelled;
                 }
             }
         }
@@ -226,6 +198,41 @@ namespace osu.Desktop.Overlays
 
         protected override void PopOut()
         {
+        }
+
+        private Notification createRestartNotification()
+        {
+            return new Notification(@"Update ready to install. Click to restart!", onActivate: () =>
+            {
+                // Squirrel returns execution to us after the update process is started, so it's safe to use Wait() here
+                UpdateManager.RestartAppWhenExited().Wait();
+                game.Exit();
+            })
+            {
+                NotificationIcon = new NotificationIcon(backgroundColour: osuColours.Green)
+            };
+        }
+
+        private ProgressNotification createProgressNotification()
+        {
+            return new ProgressNotification
+            {
+                NotificationIcon = new NotificationIcon(
+                    FontAwesome.fa_upload,
+                    ColourInfo.GradientVertical(osuColours.YellowDark, osuColours.Yellow)
+                )
+            };
+        }
+
+        private Notification createUpdateFinishedNotification(String version)
+        {
+            return new Notification($"You are now running osu!lazer {version}.\nClick to see what's new!", onActivate: () =>
+            {
+                Process.Start($"https://github.com/ppy/osu/releases/tag/v{version}");
+            })
+            {
+                NotificationIcon = new NotificationIcon(FontAwesome.fa_check_square, osuColours.BlueDark)
+            };
         }
 
     }

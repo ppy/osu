@@ -296,6 +296,7 @@
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableTopScore.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ScoresContainer.cs" />
     <Compile Include="Online\API\Requests\GetUserBeatmapsRequest.cs" />
+    <Compile Include="Overlays\Notifications\ProgressNotificationDrawable.cs" />
     <Compile Include="Overlays\Profile\Sections\Beatmaps\PaginatedBeatmapContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Kudosu\KudosuInfo.cs" />
     <Compile Include="Overlays\Profile\Sections\PaginatedContainer.cs" />
@@ -476,9 +477,8 @@
     <Compile Include="Overlays\Music\PlaylistList.cs" />
     <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
     <Compile Include="Overlays\NotificationOverlay.cs" />
-    <Compile Include="Overlays\Notifications\NotificationDrawable.cs" />
+    <Compile Include="Overlays\Notifications\DrawableNotification.cs" />
     <Compile Include="Overlays\Notifications\NotificationSection.cs" />
-    <Compile Include="Overlays\Notifications\ProgressNotificationDrawable.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotificationDrawable.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableScore.cs" />

@@ -49,7 +49,7 @@ namespace osu.Game.Notifications
         /// <summary>
         /// Activates this notification.
         /// </summary>
-        public void Activate()
+        public void TriggerActivate()
         {
             OnActivate?.Invoke();
         }

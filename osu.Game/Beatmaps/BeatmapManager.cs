@@ -125,7 +125,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Import one or more <see cref="BeatmapSetInfo"/> from filesystem <paramref name="paths"/>.
-        /// This will post a notificationDrawable tracking import progress.
+        /// This will post a notification tracking import progress.
         /// </summary>
         /// <param name="paths">One or more beatmap locations on disk.</param>
         public void Import(params string[] paths)
@@ -235,17 +235,12 @@ namespace osu.Game.Beatmaps
             if (!api.LocalUser.Value.IsSupporter)
             {
                 PostNotification?.Invoke(
-                    new Notification(
-                        "You gotta be a supporter to download for now 'yo",
-                        FontAwesome.fa_superpowers
-                    )
+                    new Notification("You gotta be a supporter to download for now 'yo", FontAwesome.fa_superpowers)
                 );
                 return;
             }
 
-            ProgressNotification downloadNotification = new ProgressNotification(
-                $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}"
-            );
+            var downloadNotification = new ProgressNotification($"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}");
 
             downloadNotification.FollowUpNotifications.Add(
                 new Notification($"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title} finished")
@@ -648,7 +643,7 @@ namespace osu.Game.Beatmaps
 
             if (maps.Count == 0) return;
 
-            var notification = new ProgressNotification("")
+            var notification = new ProgressNotification
             {
                 Progress = 0,
                 State = ProgressNotificationState.Active,
@@ -658,9 +653,13 @@ namespace osu.Game.Beatmaps
 
             int i = 0;
 
+            bool userRequestedCancel = false;
+
+            notification.CancelRequested += () => userRequestedCancel = true;
+
             foreach (var b in maps)
             {
-                if (notification.State == ProgressNotificationState.Cancelled)
+                if (userRequestedCancel)
                     // user requested abort
                     return;
 
