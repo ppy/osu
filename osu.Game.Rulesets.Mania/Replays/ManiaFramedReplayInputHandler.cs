@@ -19,8 +19,6 @@ namespace osu.Game.Rulesets.Mania.Replays
             this.container = container;
         }
 
-        protected override bool AtImportantFrame => CurrentFrame.MouseX != PreviousFrame.MouseX;
-
         private ManiaPlayfield playfield;
         public override List<InputState> GetPendingStates()
         {
