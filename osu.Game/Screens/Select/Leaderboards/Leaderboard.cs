@@ -51,7 +51,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             set
             {
                 scores = value;
-                getScoresRequest?.Cancel();
                 getScoresRequest = null;
 
                 placeholderContainer.FadeOut(fade_duration);
@@ -202,6 +201,8 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             if (!IsLoaded) return;
 
+            getScoresRequest?.Cancel();
+
             Scores = null;
 
             if (api == null || Beatmap?.OnlineBeatmapID == null) return;
@@ -350,7 +351,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                icon.ScaleTo(1.2f, 400, Easing.OutElastic).Then().ScaleTo(1f, 400, Easing.OutElastic);
+                icon.ScaleTo(1.2f, 400, Easing.OutElastic);
                 return base.OnMouseUp(state, args);
             }
         }
