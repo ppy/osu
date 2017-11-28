@@ -21,7 +21,6 @@ using System.Linq;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Framework.Logging;
-using System.Net;
 using osu.Game.Rulesets;
 using osu.Framework.Input;
 using osu.Game.Beatmaps.ControlPoints;
@@ -51,7 +50,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             set
             {
                 scores = value;
-                getScoresRequest = null;
 
                 placeholderContainer.FadeOut(fade_duration);
                 scrollFlow?.FadeOut(fade_duration).Expire();
@@ -120,7 +118,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (value == scope) return;
 
                 scope = value;
-                updateScores();
+                UpdateScores();
             }
         }
 
@@ -171,7 +169,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 Scores = null;
 
                 pendingBeatmapSwitch?.Cancel();
-                pendingBeatmapSwitch = Schedule(updateScores);
+                pendingBeatmapSwitch = Schedule(UpdateScores);
             }
         }
 
@@ -195,13 +193,14 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private GetScoresRequest getScoresRequest;
 
-        private void handleRulesetChange(RulesetInfo ruleset) => updateScores();
+        private void handleRulesetChange(RulesetInfo ruleset) => UpdateScores();
 
-        private void updateScores()
+        protected virtual void UpdateScores()
         {
             if (!IsLoaded) return;
 
             getScoresRequest?.Cancel();
+            getScoresRequest = null;
 
             Scores = null;
 
@@ -221,32 +220,32 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 Scores = r.Scores;
             };
-            getScoresRequest.Failure += e =>
-            {
-                // TODO: check why failure is repeatedly invoked even on successful requests
-                if (e is WebException)
-                {
-                    Scores = null;
-                    placeholderFlow.Children = new Drawable[]
-                    {
-                        new RetryButton
-                        {
-                            Action = updateScores,
-                            Margin = new MarginPadding { Right = 10 },
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.TopLeft,
-                            Text = @"Couldn't retrieve scores!",
-                            TextSize = 22,
-                        },
-                    };
-                    placeholderContainer.FadeIn(fade_duration);
-                    Logger.Error(e, @"Couldn't fetch beatmap scores!");
-                }
-            };
+            getScoresRequest.Failure += OnUpdateFailed;
 
             api.Queue(getScoresRequest);
+        }
+
+        protected void OnUpdateFailed(Exception e)
+        {
+            if (e is OperationCanceledException) return;
+
+            Scores = null;
+            placeholderFlow.Children = new Drawable[]
+            {
+                new RetryButton
+                {
+                    Action = UpdateScores,
+                    Margin = new MarginPadding { Right = 10 },
+                },
+                new OsuSpriteText
+                {
+                    Anchor = Anchor.TopLeft,
+                    Text = @"Couldn't retrieve scores!",
+                    TextSize = 22,
+                },
+            };
+            placeholderContainer.FadeIn(fade_duration);
+            Logger.Error(e, @"Couldn't fetch beatmap scores!");
         }
 
         protected override void Update()
