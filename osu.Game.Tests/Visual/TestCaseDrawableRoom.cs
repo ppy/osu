@@ -14,8 +14,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseDrawableRoom : OsuTestCase
     {
-        public override string Description => @"Select your favourite room";
-
         private RulesetStore rulesets;
 
         protected override void LoadComplete()

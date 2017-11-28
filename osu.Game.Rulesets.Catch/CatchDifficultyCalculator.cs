@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Catch
 {
-    public class CatchDifficultyCalculator : DifficultyCalculator<CatchBaseHit>
+    public class CatchDifficultyCalculator : DifficultyCalculator<CatchHitObject>
     {
         public CatchDifficultyCalculator(Beatmap beatmap) : base(beatmap)
         {
@@ -16,6 +16,6 @@ namespace osu.Game.Rulesets.Catch
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null) => 0;
 
-        protected override BeatmapConverter<CatchBaseHit> CreateBeatmapConverter(Beatmap beatmap) => new CatchBeatmapConverter();
+        protected override BeatmapConverter<CatchHitObject> CreateBeatmapConverter(Beatmap beatmap) => new CatchBeatmapConverter();
     }
 }

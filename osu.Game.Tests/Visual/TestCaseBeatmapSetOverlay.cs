@@ -14,8 +14,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseBeatmapSetOverlay : OsuTestCase
     {
-        public override string Description => @"view online beatmap sets";
-
         private readonly BeatmapSetOverlay overlay;
 
         public TestCaseBeatmapSetOverlay()
