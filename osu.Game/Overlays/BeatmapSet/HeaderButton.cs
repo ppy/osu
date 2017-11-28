@@ -20,8 +20,6 @@ namespace osu.Game.Overlays.BeatmapSet
         [BackgroundDependencyLoader]
         private void load()
         {
-            Masking = true;
-            CornerRadius = 3;
             BackgroundColour = OsuColour.FromHex(@"094c5f");
             Triangles.ColourLight = OsuColour.FromHex(@"0f7c9b");
             Triangles.ColourDark = OsuColour.FromHex(@"094c5f");
