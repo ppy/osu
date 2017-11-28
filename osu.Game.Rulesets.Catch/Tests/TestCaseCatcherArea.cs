@@ -8,17 +8,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Tests.Visual;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
     [Ignore("getting CI working")]
-    internal class TestCaseCatcher : OsuTestCase
+    internal class TestCaseCatcherArea : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(Catcher),
+            typeof(CatcherArea),
         };
 
         [BackgroundDependencyLoader]
@@ -29,13 +28,10 @@ namespace osu.Game.Rulesets.Catch.Tests
                 new CatchInputManager(rulesets.GetRuleset(2))
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new Catcher
+                    Child = new CatcherArea()
                     {
-                        RelativePositionAxes = Axes.Both,
-                        RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        Size = new Vector2(1, 0.2f),
+                        Origin = Anchor.BottomLeft
                     }
                 },
             };
