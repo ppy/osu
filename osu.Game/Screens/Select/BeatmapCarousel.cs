@@ -124,23 +124,18 @@ namespace osu.Game.Screens.Select
             // todo: this method should be smarter as to not recreate panels that haven't changed, etc.
             var group = groups.Find(b => b.BeatmapSet.ID == set.ID);
 
-            BeatmapGroup newGroup;
-            if (group == null)
-            {
-                newGroup = createGroup(set);
-
-                if (newGroup != null)
-                    groups.Add(newGroup);
-            }
-            else
-            {
-                int i = groups.IndexOf(group);
+            int i = groups.IndexOf(group);
+            if (i >= 0)
                 groups.RemoveAt(i);
 
-                newGroup = createGroup(set);
+            var newGroup = createGroup(set);
 
-                if (newGroup != null)
+            if (newGroup != null)
+            {
+                if (i >= 0)
                     groups.Insert(i, newGroup);
+                else
+                    groups.Add(newGroup);
             }
 
             bool hadSelection = selectedGroup == group;
