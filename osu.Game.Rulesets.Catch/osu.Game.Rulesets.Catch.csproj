@@ -57,7 +57,7 @@
     <Compile Include="Objects\JuiceStream.cs" />
     <Compile Include="Scoring\CatchScoreProcessor.cs" />
     <Compile Include="Judgements\CatchJudgement.cs" />
-    <Compile Include="Objects\CatchBaseHit.cs" />
+    <Compile Include="Objects\CatchHitObject.cs" />
     <Compile Include="Objects\Drawable\DrawableFruit.cs" />
     <Compile Include="Objects\Droplet.cs" />
     <Compile Include="Objects\Fruit.cs" />
