@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             countMiss = Convert.ToInt32(Score.Statistics["x"]);
 
             // Don't count scores made with supposedly unranked mods
-            if (mods.Any(m => m is OsuModRelax || m is OsuModAutopilot || m is OsuModAutoplay))
+            if (mods.Any(m => !m.Ranked))
                 return 0;
 
             // Todo: In the future we should apply changes to PreEmpt/AR at an OsuHitObject/BaseDifficulty level, but this is done
