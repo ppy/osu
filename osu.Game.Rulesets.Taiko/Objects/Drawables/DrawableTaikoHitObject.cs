@@ -35,6 +35,17 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.KiaiMode = HitObject.Kiai;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            State.ValueChanged += state =>
+            {
+                if (state != ArmedState.Hit)
+                    PlaySamples();
+            };
+        }
+
         protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
 
         public abstract bool OnPressed(TaikoAction action);
