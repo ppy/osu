@@ -8,6 +8,7 @@ namespace osu.Game.Notifications
 {
     public class NotificationIcon
     {
+
         /// <summary>
         /// The icon displayed in the notification.
         /// </summary>

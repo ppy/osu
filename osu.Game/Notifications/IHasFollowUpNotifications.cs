@@ -9,6 +9,6 @@ namespace osu.Game.Notifications
     public interface IHasFollowUpNotifications
     {
         List<Notification> FollowUpNotifications { get; }
-        event Action Completed;
+        event Action ProgressCompleted;
     }
 }

@@ -12,24 +12,24 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class SimpleDrawableNotification : DrawableNotification
+    public class SimpleNotificationDrawable : NotificationDrawable
     {
-        private readonly Notification notification;
+        public Notification Notification { get; }
 
         private readonly TextFlowContainer textDrawable;
         private readonly SpriteIcon iconDrawable;
 
         protected Box IconBackgound;
 
-        public SimpleDrawableNotification(Notification notification)
+        public SimpleNotificationDrawable(Notification notification)
         {
             if (notification == null)
                 throw new ArgumentNullException(nameof(notification));
 
-            this.notification = notification;
-            this.notification.BackgroundColourBinding.ValueChanged += value => Schedule(() => Colour = value);
-            this.notification.TextBinding.ValueChanged += value => Schedule(() => textDrawable.Text = value);
-            this.notification.IconBinding.ValueChanged += value => Schedule(() =>
+            Notification = notification;
+            Notification.BackgroundColourBinding.ValueChanged += value => Schedule(() => Colour = value);
+            Notification.TextBinding.ValueChanged += value => Schedule(() => textDrawable.Text = value);
+            Notification.NotificationIconBinding.ValueChanged += value => Schedule(() =>
             {
                 iconDrawable.Icon = value.Icon;
                 IconBackgound.Colour = value.BackgroundColour;
@@ -40,13 +40,13 @@ namespace osu.Game.Overlays.Notifications
                 IconBackgound = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = this.notification.Icon.BackgroundColour
+                    Colour = Notification.NotificationIcon.BackgroundColour
                 },
                 iconDrawable = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = this.notification.Icon.Icon,
+                    Icon = Notification.NotificationIcon.Icon,
                     Size = new Vector2(20),
                 }
             });
@@ -56,15 +56,18 @@ namespace osu.Game.Overlays.Notifications
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-                Text = this.notification.Text
+                Text = Notification.Text
             });
 
             Activated = () =>
             {
-                this.notification.TriggerActivate();
+                Notification.Activate();
                 return true;
             };
+
+            Notification.TextBinding.TriggerChange();
         }
+
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

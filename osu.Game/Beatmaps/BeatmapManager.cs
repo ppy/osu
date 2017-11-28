@@ -125,7 +125,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Import one or more <see cref="BeatmapSetInfo"/> from filesystem <paramref name="paths"/>.
-        /// This will post a drawableNotification tracking import progress.
+        /// This will post a notificationDrawable tracking import progress.
         /// </summary>
         /// <param name="paths">One or more beatmap locations on disk.</param>
         public void Import(params string[] paths)
@@ -235,20 +235,21 @@ namespace osu.Game.Beatmaps
             if (!api.LocalUser.Value.IsSupporter)
             {
                 PostNotification?.Invoke(
-                    new Notification("You gotta be a supporter to download for now 'yo", FontAwesome.fa_superpowers)
+                    new Notification(
+                        "You gotta be a supporter to download for now 'yo",
+                        FontAwesome.fa_superpowers
+                    )
                 );
                 return;
             }
 
             ProgressNotification downloadNotification = new ProgressNotification(
                 $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}"
-            )
-            {
-                FollowUpNotifications =
-                {
-                    new Notification($"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title} finished")
-                }
-            };
+            );
+
+            downloadNotification.FollowUpNotifications.Add(
+                new Notification($"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title} finished")
+            );
 
             var request = new DownloadBeatmapSetRequest(beatmapSetInfo, noVideo);
 

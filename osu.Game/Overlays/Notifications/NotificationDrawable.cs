@@ -16,7 +16,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public abstract class DrawableNotification : Container
+    public abstract class NotificationDrawable : Container
     {
         /// <summary>
         /// User requested close.
@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Notifications
         public event Action Closed;
 
         /// <summary>
-        /// Run on user activating the drawableNotification. Return true to close.
+        /// Run on user activating the notificationDrawable. Return true to close.
         /// </summary>
         public Func<bool> Activated;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Notifications
 
         public virtual bool Read { get; set; }
 
-        protected DrawableNotification()
+        protected NotificationDrawable()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

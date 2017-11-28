@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,9 +13,9 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class DrawableProgressNotification : DrawableNotification
+    public class ProgressNotificationDrawable : NotificationDrawable
     {
-        private readonly ProgressNotification progressNotification;
+        public ProgressNotification ProgressNotification { get; }
 
         public override bool DisplayOnTop => false;
 
@@ -26,47 +27,48 @@ namespace osu.Game.Overlays.Notifications
         private readonly TextFlowContainer textDrawable;
         private readonly SpriteIcon iconDrawable;
 
-        private readonly Box iconBackgound;
+        protected Box IconBackgound;
 
-        public DrawableProgressNotification(ProgressNotification progressNotification)
+        public ProgressNotificationDrawable(ProgressNotification progressNotification)
         {
-            this.progressNotification = progressNotification;
+            ProgressNotification = progressNotification;
+            ProgressNotification.StateBinding.ValueChanged += stateOnValueChanged;
 
-            this.progressNotification.StateBinding.ValueChanged += stateChanged;
-            this.progressNotification.ProgressBinding.ValueChanged += value => Schedule(() => progressBar.Progress = value);
-            this.progressNotification.BackgroundColourBinding.ValueChanged += value => Schedule(() => Colour = value);
-            this.progressNotification.TextBinding.ValueChanged += value => Schedule(() => textDrawable.Text = value);
-            this.progressNotification.IconBinding.ValueChanged += value => Schedule(() =>
-            {
+            ProgressNotification.ProgressBinding.ValueChanged += value => Schedule(() => progressBar.Progress = value);
+            ProgressNotification.BackgroundColourBinding.ValueChanged += value => Schedule(() => Colour = value);
+            ProgressNotification.TextBinding.ValueChanged += value => Schedule(() => textDrawable.Text = value);
+            ProgressNotification.NotificationIconBinding.ValueChanged += value => Schedule(() => {
                 iconDrawable.Icon = value.Icon;
-                iconBackgound.Colour = value.BackgroundColour;
+                IconBackgound.Colour = value.BackgroundColour;
             });
 
             IconContent.AddRange(new Drawable[]
             {
-                iconBackgound = new Box
+                IconBackgound = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = this.progressNotification.Icon.BackgroundColour
+                    Colour = ProgressNotification.NotificationIcon.BackgroundColour
                 },
                 iconDrawable = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = this.progressNotification.Icon.Icon,
+                    Icon = ProgressNotification.NotificationIcon.Icon,
                     Size = new Vector2(20),
                 }
             });
             Content.Add(textDrawable = new TextFlowContainer(t =>
             {
                 t.TextSize = 16;
+
             })
             {
-                Text = this.progressNotification.Text,
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
             });
+
+            Schedule(() => textDrawable.Text = ProgressNotification.Text);
 
             NotificationContent.Add(progressBar = new ProgressBar
             {
@@ -80,29 +82,32 @@ namespace osu.Game.Overlays.Notifications
             Activated = () => false;
         }
 
-        private void stateChanged(ProgressNotificationState newValue)
+        private void stateOnValueChanged(ProgressNotificationState newValue)
         {
-            if (!IsLoaded) return;
-
-            switch (newValue)
+            if (IsLoaded)
             {
-                case ProgressNotificationState.Queued:
-                    Light.Colour = colourQueued;
-                    Light.Pulsate = false;
-                    progressBar.Active = false;
-                    break;
-                case ProgressNotificationState.Active:
-                    Light.Colour = colourActive;
-                    Light.Pulsate = true;
-                    progressBar.Active = true;
-                    break;
-                case ProgressNotificationState.Cancelled:
-                    base.Close();
-                    break;
-                case ProgressNotificationState.Completed:
-                    NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
-                    this.FadeOut(200).Finally(d => Expire());
-                    break;
+                switch (newValue)
+                {
+                    case ProgressNotificationState.Queued:
+                        Light.Colour = colourQueued;
+                        Light.Pulsate = false;
+                        progressBar.Active = false;
+                        break;
+                    case ProgressNotificationState.Active:
+                        Light.Colour = colourActive;
+                        Light.Pulsate = true;
+                        progressBar.Active = true;
+                        break;
+                    case ProgressNotificationState.Cancelled:
+                        Light.Colour = colourCancelled;
+                        Light.Pulsate = false;
+                        progressBar.Active = false;
+                        break;
+                    case ProgressNotificationState.Completed:
+                        NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
+                        this.FadeOut(200).Finally(d => Expire());
+                        break;
+                }
             }
         }
 
@@ -116,14 +121,25 @@ namespace osu.Game.Overlays.Notifications
 
         public override void Close()
         {
-            switch (progressNotification.State)
+            switch (ProgressNotification.State)
             {
+                case ProgressNotificationState.Cancelled:
+                    base.Close();
+                    break;
                 case ProgressNotificationState.Active:
                 case ProgressNotificationState.Queued:
-                    progressNotification.RequestCancel();
+                    ProgressNotification.RequestCancel();
                     break;
             }
         }
+
+        public Func<bool> CancelRequested { get; set; }
+
+
+        /// <summary>
+        /// An action to complete when the completion notificationDrawable is clicked.
+        /// </summary>
+        public Func<bool> CompletionClickAction;
 
         private class ProgressBar : Container
         {

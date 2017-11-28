@@ -108,18 +108,19 @@ namespace osu.Desktop.Overlays
             if (!game.IsDeployedBuild || version == lastVersion) return;
             config.Set(OsuSetting.Version, version);
 
-            // only show a notification if we've previously saved a version to the config file (ie. not the first run).
+            // only show a notificationDrawable if we've previously saved a version to the config file (ie. not the first run).
             if (!string.IsNullOrEmpty(lastVersion))
                 Scheduler.AddDelayed(() =>
                     notificationOverlay.Post(
-                        new Notification($"You are now running osu!lazer {version}.\nClick to see what's new!", onActivate: () =>
+                            new Notification(
+                            $"You are now running osu!lazer {version}.\nClick to see what's new!",
+                            onActivate: () =>
+                            {
+                                Process.Start($"https://github.com/ppy/osu/releases/tag/v{version}");
+                            })
                         {
-                            Process.Start($"https://github.com/ppy/osu/releases/tag/v{version}");
-                        })
-                        {
-                            Icon = new NotificationIcon(FontAwesome.fa_check_square, osuColours.BlueDark)
-                        }
-                    ),
+                            NotificationIcon = new NotificationIcon(FontAwesome.fa_check_square, osuColours.BlueDark)
+                        }),
                     5000
                 );
         }
@@ -146,7 +147,7 @@ namespace osu.Desktop.Overlays
 
                 if (notificationContainer == null)
                 {
-                    notificationContainer = new ProgressNotification
+                    notificationContainer = new ProgressNotification("", FontAwesome.fa_upload)
                     {
                         FollowUpNotifications =
                         {
@@ -157,10 +158,10 @@ namespace osu.Desktop.Overlays
                                 game.Exit();
                             })
                             {
-                                Icon = new NotificationIcon(backgroundColour: osuColours.Green)
+                                NotificationIcon = new NotificationIcon(backgroundColour: osuColours.Green)
                             }
                         },
-                        Icon = new NotificationIcon(
+                        NotificationIcon = new NotificationIcon(
                             FontAwesome.fa_upload,
                             ColourInfo.GradientVertical(osuColours.YellowDark, osuColours.Yellow)
                         )
@@ -168,6 +169,7 @@ namespace osu.Desktop.Overlays
 
                     notificationOverlay.Post(notificationContainer);
                 }
+
 
                 notificationContainer.Progress = 0;
                 notificationContainer.Text = @"Downloading update...";

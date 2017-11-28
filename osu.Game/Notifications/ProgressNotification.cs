@@ -10,6 +10,7 @@ namespace osu.Game.Notifications
 {
     public class ProgressNotification : Notification, IHasFollowUpNotifications
     {
+
         /// <summary>
         /// The progress of the notification ranging from 0.0 to 1.0
         /// </summary>
@@ -28,8 +29,8 @@ namespace osu.Game.Notifications
             set { StateBinding.Value = value; }
         }
 
-        public Bindable<float> ProgressBinding { get; } = new BindableFloat();
-        public Bindable<ProgressNotificationState> StateBinding { get; } = new Bindable<ProgressNotificationState>();
+        public Bindable<float> ProgressBinding { get; }
+        public Bindable<ProgressNotificationState> StateBinding { get; }
 
         /// <summary>
         /// A list of notifications that get run after this noctification completes.
@@ -39,7 +40,7 @@ namespace osu.Game.Notifications
         /// <summary>
         /// Event that gets triggererd when the progress completes.
         /// </summary>
-        public event Action Completed;
+        public event Action ProgressCompleted;
 
         /// <summary>
         /// Event that gets called when the user requests canceling the progress.
@@ -51,10 +52,13 @@ namespace osu.Game.Notifications
         /// </summary>
         public bool IsCompleted => ProgressBinding.Value >= 1;
 
-        public ProgressNotification(string text = "", FontAwesome icon = FontAwesome.fa_info_circle)
-          : base(text, icon)
+        public ProgressNotification(string text, FontAwesome icon = FontAwesome.fa_info_circle)
+         : base(text, icon)
         {
-            ProgressBinding.ValueChanged += progressChanged;
+            ProgressBinding = new BindableFloat();
+            ProgressBinding.ValueChanged += progressOnValueChanged;
+
+            StateBinding = new Bindable<ProgressNotificationState>();
         }
 
         /// <summary>
@@ -65,10 +69,10 @@ namespace osu.Game.Notifications
             CancelRequested?.Invoke();
         }
 
-        private void progressChanged(float newValue)
+        private void progressOnValueChanged(float newValue)
         {
             if (IsCompleted)
-                Completed?.Invoke();
+                ProgressCompleted?.Invoke();
         }
     }
 }
