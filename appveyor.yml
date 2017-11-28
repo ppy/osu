@@ -21,5 +21,5 @@ build:
   parallel: true
   verbosity: minimal
 after_build:
-  - cmd: inspectcode /o="inspectcodereport.xml" /caches-home="inspectcode" osu.sln
+  - cmd: inspectcode /o="inspectcodereport.xml" /caches-home="inspectcode" osu.sln > NUL
   - cmd: NVika parsereport "inspectcodereport.xml" --treatwarningsaserrors
