@@ -117,13 +117,13 @@ namespace osu.Game.Screens.Menu
                 },
             };
 
-            buttonsPlay.Add(new Button(@"solo", @"select-6", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new Button(@"multi", @"select-5", FontAwesome.fa_users, new Color4(94, 63, 186, 255), () => OnMulti?.Invoke(), 0, Key.M));
-            buttonsPlay.Add(new Button(@"chart", @"select-5", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
+            buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
+            buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.fa_users, new Color4(94, 63, 186, 255), () => OnMulti?.Invoke(), 0, Key.M));
+            buttonsPlay.Add(new Button(@"chart", @"button-generic-select", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
 
-            buttonsTopLevel.Add(new Button(@"play", @"select-1", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, WEDGE_WIDTH, Key.P));
-            buttonsTopLevel.Add(new Button(@"osu!editor", @"select-5", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new Button(@"osu!direct", string.Empty, FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
+            buttonsTopLevel.Add(new Button(@"play", @"button-play-select", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, WEDGE_WIDTH, Key.P));
+            buttonsTopLevel.Add(new Button(@"osu!editor", @"button-generic-select", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
+            buttonsTopLevel.Add(new Button(@"osu!direct", @"button-direct-select", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
             buttonsTopLevel.Add(new Button(@"exit", string.Empty, FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), onExit, 0, Key.Q));
 
             buttonFlow.AddRange(buttonsPlay);
@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Menu
         private void load(AudioManager audio, OsuGame game = null)
         {
             toolbar = game?.Toolbar;
-            sampleBack = audio.Sample.Get(@"Menu/select-4");
+            sampleBack = audio.Sample.Get(@"Menu/button-back-select");
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -180,19 +180,21 @@ namespace osu.Game.Screens.Menu
             State = MenuState.TopLevel;
         }
 
-        private void onOsuLogo()
+        private bool onOsuLogo()
         {
             switch (state)
             {
+                default:
+                    return true;
                 case MenuState.Initial:
                     State = MenuState.TopLevel;
-                    return;
+                    return true;
                 case MenuState.TopLevel:
                     buttonsTopLevel.First().TriggerOnClick();
-                    return;
+                    return false;
                 case MenuState.Play:
                     buttonsPlay.First().TriggerOnClick();
-                    return;
+                    return false;
             }
         }
 

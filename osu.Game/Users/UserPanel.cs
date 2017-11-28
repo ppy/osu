@@ -17,10 +17,11 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Users
 {
-    public class UserPanel : ClickableContainer, IHasContextMenu
+    public class UserPanel : OsuClickableContainer, IHasContextMenu
     {
         private readonly User user;
         private const float height = 100;
@@ -58,14 +59,14 @@ namespace osu.Game.Users
 
             Children = new Drawable[]
             {
-                new AsyncLoadWrapper(new UserCoverBackground(user)
+                new DelayedLoadWrapper(new UserCoverBackground(user)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
                     OnLoadComplete = d => d.FadeInFromZero(200),
-                }) { RelativeSizeAxes = Axes.Both },
+                }, 0) { RelativeSizeAxes = Axes.Both },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,

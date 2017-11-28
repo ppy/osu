@@ -35,6 +35,7 @@ namespace osu.Game.Database
 
             var id = obj.ID;
             obj = lookupSource?.SingleOrDefault(t => t.ID == id) ?? context.Find<T>(id);
+            context.Entry(obj).Reload();
         }
 
         /// <summary>

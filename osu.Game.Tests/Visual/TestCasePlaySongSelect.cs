@@ -22,8 +22,6 @@ namespace osu.Game.Tests.Visual
     {
         private BeatmapManager manager;
 
-        public override string Description => @"with fake data";
-
         private RulesetStore rulesets;
 
         private DependencyContainer dependencies;

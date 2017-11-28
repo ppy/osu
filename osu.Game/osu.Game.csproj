@@ -271,6 +271,9 @@
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
+    <Compile Include="Graphics\UserInterface\HoverClickSounds.cs" />
+    <Compile Include="Graphics\UserInterface\HoverSounds.cs" />
+    <Compile Include="Graphics\UserInterface\OsuButton.cs" />
     <Compile Include="Migrations\20171019041408_InitialCreate.cs" />
     <Compile Include="Migrations\20171019041408_InitialCreate.Designer.cs">
       <DependentUpon>20171019041408_InitialCreate.cs</DependentUpon>
@@ -292,6 +295,7 @@
     <Compile Include="Overlays\BeatmapSet\Scores\ScoresContainer.cs" />
     <Compile Include="Online\API\Requests\GetUserBeatmapsRequest.cs" />
     <Compile Include="Overlays\Profile\Sections\Beatmaps\PaginatedBeatmapContainer.cs" />
+    <Compile Include="Overlays\Profile\Sections\Kudosu\KudosuInfo.cs" />
     <Compile Include="Overlays\Profile\Sections\PaginatedContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawablePerformanceScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\PaginatedScoreContainer.cs" />
@@ -299,7 +303,7 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
-    <Compile Include="Screens\Edit\Components\PlaybackContainer.cs" />
+    <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
     <Compile Include="Screens\Edit\Components\TimeInfoContainer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToScoreProcessor.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
@@ -365,7 +369,7 @@
     <Compile Include="Graphics\UserInterface\LoadingAnimation.cs" />
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
     <Compile Include="Graphics\UserInterface\Nub.cs" />
-    <Compile Include="Graphics\UserInterface\OsuButton.cs" />
+    <Compile Include="Graphics\UserInterface\TriangleButton.cs" />
     <Compile Include="Graphics\UserInterface\OsuCheckbox.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropdown.cs" />
@@ -785,6 +789,7 @@
     <Compile Include="Tests\Platform\TestStorage.cs" />
     <Compile Include="Tests\Visual\OsuTestCase.cs" />
     <Compile Include="Tests\Visual\TestCasePerformancePoints.cs" />
+    <Compile Include="Tests\Visual\ScreenTestCase.cs" />
     <Compile Include="Tests\Visual\TestCasePlayer.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Users\Country.cs" />

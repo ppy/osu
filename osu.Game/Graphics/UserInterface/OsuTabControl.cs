@@ -131,7 +131,8 @@ namespace osu.Game.Graphics.UserInterface
                         Colour = Color4.White,
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
-                    }
+                    },
+                    new HoverClickSounds()
                 };
             }
 
