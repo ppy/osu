@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Tests.Visual;
 
@@ -15,26 +16,35 @@ namespace osu.Game.Rulesets.Catch.Tests
     [Ignore("getting CI working")]
     internal class TestCaseCatcherArea : OsuTestCase
     {
+        private RulesetInfo catchRuleset;
+
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(CatcherArea),
         };
 
+        public TestCaseCatcherArea()
+        {
+            AddSliderStep<float>("CircleSize", 0, 8, 5, craeteCatcher);
+        }
+
+        private void craeteCatcher(float size)
+        {
+            Child = new CatchInputManager(catchRuleset)
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = new CatcherArea(new BeatmapDifficulty { CircleSize = size })
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.BottomLeft
+                },
+            };
+        }
+
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            Children = new Drawable[]
-            {
-                new CatchInputManager(rulesets.GetRuleset(2))
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new CatcherArea()
-                    {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft
-                    }
-                },
-            };
+            catchRuleset = rulesets.GetRuleset(2);
         }
     }
 }

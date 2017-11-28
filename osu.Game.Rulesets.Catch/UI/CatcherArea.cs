@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.UI
             catcher.Add(fruit);
         }
 
-        public bool CanCatch(CatchHitObject obj) => Math.Abs(catcher.Position.X - obj.X) < catcher.DrawSize.X / DrawSize.X / 2;
+        public bool CanCatch(CatchHitObject obj) => Math.Abs(catcher.Position.X - obj.X) < catcher.DrawSize.X * Math.Abs(catcher.Scale.X) / DrawSize.X / 2;
 
         public class Catcher : Container, IKeyBindingHandler<CatchAction>
         {
@@ -68,10 +68,12 @@ namespace osu.Game.Rulesets.Catch.UI
                 RelativePositionAxes = Axes.X;
                 X = 0.5f;
 
-                Origin = Anchor.BottomCentre;
-                Anchor = Anchor.BottomLeft;
+                Origin = Anchor.TopCentre;
+                Anchor = Anchor.TopLeft;
 
                 Size = new Vector2(CATCHER_SIZE);
+                if (difficulty != null)
+                    Scale = new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
             }
 
             [BackgroundDependencyLoader]
@@ -115,7 +117,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 var additive = createCatcherSprite();
 
                 additive.Anchor = Anchor;
-                additive.OriginPosition = additive.OriginPosition + new Vector2(DrawWidth / 2, DrawHeight); // also temporary to align sprite correctly.
+                additive.OriginPosition = additive.OriginPosition + new Vector2(DrawWidth / 2, 0); // also temporary to align sprite correctly.
                 additive.Position = Position;
                 additive.Scale = Scale;
                 additive.RelativePositionAxes = RelativePositionAxes;
@@ -201,7 +203,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 double dashModifier = Dashing ? 1 : 0.5;
 
-                Scale = new Vector2(Math.Sign(currentDirection), 1);
+                Scale = new Vector2(Math.Abs(Scale.X) * Math.Sign(currentDirection), Scale.Y);
                 X = (float)MathHelper.Clamp(X + Math.Sign(currentDirection) * Clock.ElapsedFrameTime * BASE_SPEED * dashModifier, 0, 1);
             }
 
