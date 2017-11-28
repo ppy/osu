@@ -9,6 +9,7 @@ using osu.Game.Users;
 using osu.Framework.Allocation;
 using OpenTK;
 using System.Linq;
+using System.Net;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 
@@ -19,11 +20,11 @@ namespace osu.Game.Tests.Visual
     {
         private RulesetStore rulesets;
 
-        private readonly Leaderboard leaderboard;
+        private readonly FailableLeaderboard leaderboard;
 
         public TestCaseLeaderboard()
         {
-            Add(leaderboard = new Leaderboard
+            Add(leaderboard = new FailableLeaderboard
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
@@ -33,8 +34,8 @@ namespace osu.Game.Tests.Visual
 
             AddStep(@"New Scores", newScores);
             AddStep(@"Empty Scores", () => leaderboard.Scores = Enumerable.Empty<Score>());
+            AddStep(@"Network failure", networkFailure);
             AddStep(@"Real beatmap", realBeatmap);
-            newScores();
         }
 
         [BackgroundDependencyLoader]
@@ -262,6 +263,22 @@ namespace osu.Game.Tests.Visual
                     Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                 },
             };
+        }
+
+        private void networkFailure()
+        {
+            leaderboard.Beatmap = new BeatmapInfo();
+        }
+
+        private class FailableLeaderboard : Leaderboard
+        {
+            protected override void UpdateScores()
+            {
+                if (Beatmap?.OnlineBeatmapID == null)
+                    OnUpdateFailed(new WebException());
+                else
+                    base.UpdateScores();
+            }
         }
     }
 }
