@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             var beatmap = new Beatmap<ManiaHitObject>();
             beatmap.HitObjects.Add(new Note { StartTime = 1000 });
 
-            var generated = new ManiaAutoGenerator(beatmap, 1).Generate();
+            var generated = new ManiaAutoGenerator(beatmap).Generate();
 
             Assert.IsTrue(generated.Frames.Count == 3, "Replay must have 3 frames");
             Assert.AreEqual(1000, generated.Frames[1].Time, "Incorrect hit time");
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             var beatmap = new Beatmap<ManiaHitObject>();
             beatmap.HitObjects.Add(new HoldNote { StartTime = 1000, Duration = 2000 });
 
-            var generated = new ManiaAutoGenerator(beatmap, 1).Generate();
+            var generated = new ManiaAutoGenerator(beatmap).Generate();
 
             Assert.IsTrue(generated.Frames.Count == 3, "Replay must have 3 frames");
             Assert.AreEqual(1000, generated.Frames[1].Time, "Incorrect hit time");
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             beatmap.HitObjects.Add(new Note { StartTime = 1000 });
             beatmap.HitObjects.Add(new Note { StartTime = 1000, Column = 1 });
 
-            var generated = new ManiaAutoGenerator(beatmap, 2).Generate();
+            var generated = new ManiaAutoGenerator(beatmap).Generate();
 
             Assert.IsTrue(generated.Frames.Count == 3, "Replay must have 3 frames");
             Assert.AreEqual(1000, generated.Frames[1].Time, "Incorrect hit time");
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             beatmap.HitObjects.Add(new HoldNote { StartTime = 1000, Duration = 2000 });
             beatmap.HitObjects.Add(new HoldNote { StartTime = 1000, Duration = 2000, Column = 1 });
 
-            var generated = new ManiaAutoGenerator(beatmap, 2).Generate();
+            var generated = new ManiaAutoGenerator(beatmap).Generate();
 
             Assert.IsTrue(generated.Frames.Count == 3, "Replay must have 3 frames");
             Assert.AreEqual(1000, generated.Frames[1].Time, "Incorrect hit time");
@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             beatmap.HitObjects.Add(new Note { StartTime = 1000 });
             beatmap.HitObjects.Add(new Note { StartTime = 2000, Column = 1 });
 
-            var generated = new ManiaAutoGenerator(beatmap, 2).Generate();
+            var generated = new ManiaAutoGenerator(beatmap).Generate();
 
             Assert.IsTrue(generated.Frames.Count == 5, "Replay must have 5 frames");
             Assert.AreEqual(1000, generated.Frames[1].Time, "Incorrect first note hit time");
@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             beatmap.HitObjects.Add(new HoldNote { StartTime = 1000, Duration = 2000 });
             beatmap.HitObjects.Add(new HoldNote { StartTime = 2000, Duration = 2000, Column = 1 });
 
-            var generated = new ManiaAutoGenerator(beatmap, 2).Generate();
+            var generated = new ManiaAutoGenerator(beatmap).Generate();
 
             Assert.IsTrue(generated.Frames.Count == 5, "Replay must have 5 frames");
             Assert.AreEqual(1000, generated.Frames[1].Time, "Incorrect first note hit time");
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             beatmap.HitObjects.Add(new HoldNote { StartTime = 1000, Duration = 2000 - ManiaAutoGenerator.RELEASE_DELAY });
             beatmap.HitObjects.Add(new Note { StartTime = 3000, Column = 1 });
 
-            var generated = new ManiaAutoGenerator(beatmap, 2).Generate();
+            var generated = new ManiaAutoGenerator(beatmap).Generate();
 
             Assert.IsTrue(generated.Frames.Count == 4, "Replay must have 4 frames");
             Assert.AreEqual(1000, generated.Frames[1].Time, "Incorrect first note hit time");
