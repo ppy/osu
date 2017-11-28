@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override BeatmapConverter<CatchHitObject> CreateBeatmapConverter() => new CatchBeatmapConverter();
 
-        protected override Playfield CreatePlayfield() => new CatchPlayfield();
+        protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty);
 
         public override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
