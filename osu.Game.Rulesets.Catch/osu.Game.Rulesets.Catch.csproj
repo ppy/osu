@@ -67,6 +67,8 @@
     <Compile Include="Tests\TestCaseCatchStacker.cs" />
     <Compile Include="Tests\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\TestCaseCatchPlayer.cs" />
+    <Compile Include="Tests\TestCaseFruit.cs" />
+    <Compile Include="Tests\TestCaseHyperdash.cs" />
     <Compile Include="UI\CatcherArea.cs" />
     <Compile Include="UI\CatchRulesetContainer.cs" />
     <Compile Include="UI\CatchPlayfield.cs" />
