@@ -14,6 +14,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
+using osu.Framework.MathUtils;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
@@ -552,6 +553,24 @@ namespace osu.Game.Beatmaps
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
             return beatmaps.BeatmapSets.Where(s => !s.DeletePending).ToList();
+        }
+
+        /// <summary>
+        /// Returns a random usable and visible <see cref="BeatmapInfo"/>.
+        /// </summary>
+        /// <returns>A random <see cref="BeatmapInfo"/> or null if none are available.</returns>
+        public BeatmapInfo GetRandomUsableBeatmap()
+        {
+            var beatmapSetList = GetAllUsableBeatmapSets();
+
+            if (beatmapSetList.Count() == 0) return null;
+
+            var beatmapSet = beatmapSetList.ElementAt(RNG.Next(beatmapSetList.Count()));
+            var beatmapList = beatmapSet.Beatmaps.Where(b => !b.Hidden).ToList();
+
+            if (beatmapList.Count() == 0) return null;
+
+            return beatmapList.ElementAt(RNG.Next(beatmapList.Count()));
         }
 
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
