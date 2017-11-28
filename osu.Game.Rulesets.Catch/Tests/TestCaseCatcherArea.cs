@@ -25,10 +25,10 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         public TestCaseCatcherArea()
         {
-            AddSliderStep<float>("CircleSize", 0, 8, 5, craeteCatcher);
+            AddSliderStep<float>("CircleSize", 0, 8, 5, createCatcher);
         }
 
-        private void craeteCatcher(float size)
+        private void createCatcher(float size)
         {
             Child = new CatchInputManager(catchRuleset)
             {
