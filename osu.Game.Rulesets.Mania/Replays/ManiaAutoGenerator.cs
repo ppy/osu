@@ -15,13 +15,9 @@ namespace osu.Game.Rulesets.Mania.Replays
     {
         public const double RELEASE_DELAY = 20;
 
-        private readonly int availableColumns;
-
-        public ManiaAutoGenerator(Beatmap<ManiaHitObject> beatmap, int availableColumns)
+        public ManiaAutoGenerator(Beatmap<ManiaHitObject> beatmap)
             : base(beatmap)
         {
-            this.availableColumns = availableColumns;
-
             Replay = new Replay { User = new User { Username = @"Autoplay" } };
         }
 
