@@ -563,14 +563,14 @@ namespace osu.Game.Beatmaps
         {
             var beatmapSetList = GetAllUsableBeatmapSets();
 
-            if (beatmapSetList.Count() == 0) return null;
+            if (beatmapSetList.Any()) return null;
 
-            var beatmapSet = beatmapSetList.ElementAt(RNG.Next(beatmapSetList.Count()));
+            var beatmapSet = beatmapSetList.ElementAt(RNG.Next(beatmapSetList.Count));
             var beatmapList = beatmapSet.Beatmaps.Where(b => !b.Hidden).ToList();
 
-            if (beatmapList.Count() == 0) return null;
+            if (beatmapList.Any()) return null;
 
-            return beatmapList.ElementAt(RNG.Next(beatmapList.Count()));
+            return beatmapList.ElementAt(RNG.Next(beatmapList.Count));
         }
 
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
