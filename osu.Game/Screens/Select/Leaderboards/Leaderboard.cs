@@ -299,6 +299,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     {
                         Icon = FontAwesome.fa_refresh,
                         Size = new Vector2(26),
+                        Shadow = true,
                     },
                 };
             }
@@ -309,13 +310,10 @@ namespace osu.Game.Screens.Select.Leaderboards
                 this.colours = colours;
             }
 
-            private bool rightWard;
-
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
             {
                 var duration = timingPoint.BeatLength / 2;
 
-                icon.RotateTo(rightWard ? 3 : -3, duration * 2, Easing.OutCubic);
                 icon.Animate(
                     i => i.MoveToY(-3, duration, Easing.Out),
                     i => i.ScaleTo(IsHovered ? 1.3f : 1.1f, duration, Easing.Out)
@@ -323,8 +321,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                     i => i.MoveToY(0, duration, Easing.In),
                     i => i.ScaleTo(IsHovered ? 1.4f : 1f, duration, Easing.In)
                 );
-
-                rightWard = !rightWard;
             }
 
             protected override bool OnHover(InputState state)
@@ -342,15 +338,13 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                icon.ClearTransforms();
-                icon.FlashColour(colours.Yellow, 400);
-                icon.ScaleTo(0.8f, 400, Easing.InElastic);
+                icon.FadeColour(colours.Yellow, 400);
                 return base.OnMouseDown(state, args);
             }
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                icon.ScaleTo(1.2f, 400, Easing.OutElastic);
+                icon.FadeColour(Color4.White, 400);
                 return base.OnMouseUp(state, args);
             }
         }
