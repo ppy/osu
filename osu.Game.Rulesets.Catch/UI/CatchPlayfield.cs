@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.UI
             catcher.Size = new Vector2(catcherContainer.DrawSize.Y);
         }
 
-        public bool CheckIfWeCanCatch(CatchBaseHit obj) => Math.Abs(catcher.Position.X - obj.X) < catcher.DrawSize.X / DrawSize.X / 2;
+        public bool CheckIfWeCanCatch(CatchHitObject obj) => Math.Abs(catcher.Position.X - obj.X) < catcher.DrawSize.X / DrawSize.X / 2;
 
         public override void Add(DrawableHitObject h)
         {

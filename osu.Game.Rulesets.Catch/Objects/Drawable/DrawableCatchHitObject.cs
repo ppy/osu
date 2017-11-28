@@ -10,7 +10,7 @@ using OpenTK;
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public abstract class DrawableCatchHitObject<TObject> : DrawableCatchHitObject
-        where TObject : CatchBaseHit
+        where TObject : CatchHitObject
     {
         public new TObject HitObject;
 
@@ -23,9 +23,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         }
     }
 
-    public abstract class DrawableCatchHitObject : DrawableScrollingHitObject<CatchBaseHit>
+    public abstract class DrawableCatchHitObject : DrawableScrollingHitObject<CatchHitObject>
     {
-        protected DrawableCatchHitObject(CatchBaseHit hitObject)
+        protected DrawableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {
             RelativePositionAxes = Axes.Both;
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Y = (float)HitObject.StartTime;
         }
 
-        public Func<CatchBaseHit, bool> CheckPosition;
+        public Func<CatchHitObject, bool> CheckPosition;
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {

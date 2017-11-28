@@ -9,8 +9,10 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public abstract class CatchBaseHit : HitObject, IHasXPosition, IHasCombo
+    public abstract class CatchHitObject : HitObject, IHasXPosition, IHasCombo
     {
+        public const double OBJECT_RADIUS = 44;
+
         public float X { get; set; }
 
         public Color4 ComboColour { get; set; } = Color4.Gray;

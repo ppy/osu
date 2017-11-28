@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class Fruit : CatchBaseHit
+    public class Fruit : CatchHitObject
     {
     }
 }

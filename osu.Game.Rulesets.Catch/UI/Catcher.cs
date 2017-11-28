@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             caughtFruit.Add(fruit);
 
-            if (((CatchBaseHit)fruit.HitObject).LastInCombo)
+            if (((CatchHitObject)fruit.HitObject).LastInCombo)
                 explode();
         }
 
