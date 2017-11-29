@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
@@ -40,6 +41,7 @@ namespace osu.Game.Beatmaps
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
         protected virtual Waveform GetWaveform() => new Waveform();
+        protected virtual Storyboard GetStoryboard() => new Storyboard();
 
         public bool BeatmapLoaded => beatmap.IsValueCreated;
         public Beatmap Beatmap => beatmap.Value.Result;
