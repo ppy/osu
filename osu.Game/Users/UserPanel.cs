@@ -17,10 +17,11 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Users
 {
-    public class UserPanel : ClickableContainer, IHasContextMenu
+    public class UserPanel : OsuClickableContainer, IHasContextMenu
     {
         private readonly User user;
         private const float height = 100;

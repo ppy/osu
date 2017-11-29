@@ -138,8 +138,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             Pattern newPattern = conversion.Generate();
             lastPattern = newPattern;
 
-            var stairPatternGenerator = (HitObjectPatternGenerator)conversion;
-            lastStair = stairPatternGenerator.StairType;
+            var stairPatternGenerator = conversion as HitObjectPatternGenerator;
+            lastStair = stairPatternGenerator?.StairType ?? lastStair;
 
             return newPattern.HitObjects;
         }
