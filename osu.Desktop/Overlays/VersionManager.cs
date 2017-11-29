@@ -21,7 +21,6 @@ using OpenTK.Graphics;
 
 #if NET_FRAMEWORK
 using System;
-using System.Net.Http;
 using osu.Framework.Logging;
 using Squirrel;
 #endif
