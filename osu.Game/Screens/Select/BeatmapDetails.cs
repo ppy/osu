@@ -310,6 +310,39 @@ namespace osu.Game.Screens.Select
             private readonly FillFlowContainer textContainer;
             private TextFlowContainer textFlow;
 
+            public MetadataSection(string title)
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Alpha = 0;
+
+                InternalChild = textContainer = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(spacing / 2),
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Child = new OsuSpriteText
+                            {
+                                Text = title,
+                                Font = @"Exo2.0-Bold",
+                                TextSize = 14,
+                            },
+                        },
+                        textFlow = new TextFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        },
+                    },
+                };
+            }
+
             public string Text
             {
                 set
@@ -346,38 +379,6 @@ namespace osu.Game.Screens.Select
             {
                 get { return textFlow.Colour; }
                 set { textFlow.Colour = value; }
-            }
-
-            public MetadataSection(string title)
-            {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-
-                InternalChild = textContainer = new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(spacing / 2),
-                    Children = new Drawable[]
-                    {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Child = new OsuSpriteText
-                            {
-                                Text = title,
-                                Font = @"Exo2.0-Bold",
-                                TextSize = 14,
-                            },
-                        },
-                        textFlow = new TextFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        },
-                    },
-                };
             }
         }
 
