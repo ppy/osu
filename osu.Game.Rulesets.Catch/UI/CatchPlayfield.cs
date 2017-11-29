@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.UI;
 using OpenTK;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
@@ -20,10 +20,9 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
 
-        private readonly Container catcherContainer;
-        private readonly Catcher catcher;
+        private readonly CatcherArea catcherArea;
 
-        public CatchPlayfield()
+        public CatchPlayfield(BeatmapDifficulty difficulty)
             : base(Axes.Y)
         {
             Container explodingFruitContainer;
@@ -43,30 +42,16 @@ namespace osu.Game.Rulesets.Catch.UI
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                catcherContainer = new Container
+                catcherArea = new CatcherArea(difficulty)
                 {
-                    RelativeSizeAxes = Axes.X,
+                    ExplodingFruitTarget = explodingFruitContainer,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
-                    Height = 180,
-                    Child = catcher = new Catcher
-                    {
-                        ExplodingFruitTarget = explodingFruitContainer,
-                        RelativePositionAxes = Axes.Both,
-                        Origin = Anchor.TopCentre,
-                        X = 0.5f,
-                    }
                 }
             };
         }
 
-        protected override void Update()
-        {
-            base.Update();
-            catcher.Size = new Vector2(catcherContainer.DrawSize.Y);
-        }
-
-        public bool CheckIfWeCanCatch(CatchBaseHit obj) => Math.Abs(catcher.Position.X - obj.X) < catcher.DrawSize.X / DrawSize.X / 2;
+        public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.CanCatch(obj);
 
         public override void Add(DrawableHitObject h)
         {
@@ -88,7 +73,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 (judgedObject.Parent as Container<DrawableHitObject>)?.Remove(judgedObject);
                 (judgedObject.Parent as Container)?.Remove(judgedObject);
 
-                catcher.Add(judgedObject, screenPosition);
+                catcherArea.Add(judgedObject, screenPosition);
             }
         }
     }

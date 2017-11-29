@@ -203,15 +203,15 @@ namespace osu.Game.Screens.Select
             Push(new Editor());
         }
 
-        private void onBeatmapRestored(BeatmapInfo b) => carousel.UpdateBeatmap(b);
-        private void onBeatmapHidden(BeatmapInfo b) => carousel.UpdateBeatmap(b);
+        private void onBeatmapRestored(BeatmapInfo b) => Schedule(() => carousel.UpdateBeatmap(b));
+        private void onBeatmapHidden(BeatmapInfo b) => Schedule(() => carousel.UpdateBeatmap(b));
 
         private void carouselBeatmapsLoaded()
         {
             if (Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
                 carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false);
             else
-                carousel.SelectNext();
+                carousel.SelectNextRandom();
         }
 
         private void carouselRaisedStart(InputState state = null)
@@ -332,7 +332,11 @@ namespace osu.Game.Screens.Select
             logo.FadeIn(logo_transition, Easing.OutQuint);
             logo.ScaleTo(0.4f, logo_transition, Easing.OutQuint);
 
-            logo.Action = () => carouselRaisedStart();
+            logo.Action = () =>
+            {
+                carouselRaisedStart();
+                return false;
+            };
         }
 
         protected override void LogoExiting(OsuLogo logo)
@@ -413,7 +417,7 @@ namespace osu.Game.Screens.Select
             if (backgroundModeBeatmap != null)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurTo(background_blur, 1000);
+                backgroundModeBeatmap.BlurTo(background_blur, 750, Easing.OutQuint);
                 backgroundModeBeatmap.FadeTo(1, 250);
             }
 

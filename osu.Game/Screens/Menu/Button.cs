@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleHover = audio.Sample.Get(@"Menu/hover");
+            sampleHover = audio.Sample.Get(@"Menu/button-hover");
             if (!string.IsNullOrEmpty(sampleName))
                 sampleClick = audio.Sample.Get($@"Menu/{sampleName}");
         }

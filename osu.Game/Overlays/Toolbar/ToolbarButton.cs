@@ -13,6 +13,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -74,7 +75,7 @@ namespace osu.Game.Overlays.Toolbar
         private readonly SpriteText tooltip2;
         protected FillFlowContainer Flow;
 
-        public ToolbarButton()
+        public ToolbarButton() : base(HoverSampleSet.Loud)
         {
             Width = WIDTH;
             RelativeSizeAxes = Axes.Y;

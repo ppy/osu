@@ -16,8 +16,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseStoryboard : OsuTestCase
     {
-        public override string Description => @"Tests storyboards.";
-
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
         private readonly Container<DrawableStoryboard> storyboardContainer;

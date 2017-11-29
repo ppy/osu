@@ -15,8 +15,6 @@ namespace osu.Game.Tests.Visual
     {
         private BeatmapManager beatmaps;
 
-        public override string Description => @"Results after playing.";
-
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmaps)
         {
