@@ -1,5 +1,5 @@
 <!-- Contains required properties for osu!framework projects. -->
-<Project>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="LangVer.props" />
   <ItemGroup Label="License">
     <None Include="..\osu.licenseheader">
