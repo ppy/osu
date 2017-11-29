@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Replays
                         activeColumns ^= 1 << point.Column;
                 }
 
-                Replay.Frames.Add(new ReplayFrame(group.First().Time, activeColumns, 0, ReplayButtonState.None));
+                Replay.Frames.Add(new ManiaReplayFrame(group.First().Time, activeColumns));
             }
 
             return Replay;
