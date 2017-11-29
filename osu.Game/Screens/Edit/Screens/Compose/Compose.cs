@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
@@ -76,18 +77,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             };
 
             timeline.Beatmap.BindTo(Beatmap);
-
             Beatmap.ValueChanged += beatmapChanged;
         }
 
         private void beatmapChanged(WorkingBeatmap newBeatmap)
         {
-            var ruleset = newBeatmap.BeatmapInfo.Ruleset.CreateInstance();
-            var composer = ruleset.CreateHitObjectComposer();
+            var ruleset = newBeatmap.BeatmapInfo.Ruleset?.CreateInstance();
+            var composer = ruleset?.CreateHitObjectComposer();
             if (composer == null)
             {
-                // Todo: Handle this
-                //throw new InvalidOperationException($"Ruleset {ruleset.Description} doesn't support hitobject composition.");
+                Logger.Log($"Ruleset {ruleset.Description} doesn't support hitobject composition.");
+                ExitRequested?.Invoke();
                 return;
             }
 
