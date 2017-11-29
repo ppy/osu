@@ -30,8 +30,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
         private const double default_duration = 1000;
         private const float scroll_time = 1000;
 
-        public override string Description => "Taiko playfield";
-
         protected override double TimePerAction => default_duration * 2;
 
         private readonly Random rng = new Random(1337);

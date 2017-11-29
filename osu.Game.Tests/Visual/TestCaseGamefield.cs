@@ -7,8 +7,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseGamefield : OsuTestCase
     {
-        public override string Description => @"Showing hitobjects and what not.";
-
         protected override void LoadComplete()
         {
             base.LoadComplete();

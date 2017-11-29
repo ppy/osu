@@ -14,8 +14,6 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseIconButton : OsuTestCase
     {
-        public override string Description => "Various display modes of icon buttons";
-
         public TestCaseIconButton()
         {
             Child = new FillFlowContainer
