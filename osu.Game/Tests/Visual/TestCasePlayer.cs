@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual
             if (Player != null)
                 Remove(Player);
 
-            LoadScreen(CreatePlayer(working, instance));
+            LoadComponentAsync(CreatePlayer(working, instance), LoadScreen);
         }
 
         protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset) => new Player
