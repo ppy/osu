@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
@@ -220,6 +221,17 @@ namespace osu.Game.Tests.Visual
             private void load(OsuGameBase osuGame, APIAccess api)
             {
                 this.api = api;
+
+                if (!api.IsLoggedIn)
+                {
+                    InternalChild = new SpriteText
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Text = "Please login to see online scores",
+                    };
+                }
+
                 osuGame.Beatmap.ValueChanged += beatmapChanged;
             }
 
@@ -228,6 +240,9 @@ namespace osu.Game.Tests.Visual
             {
                 lastRequest?.Cancel();
                 scores.Clear();
+
+                if (!api.IsLoggedIn)
+                    return;
 
                 lastRequest = new GetScoresRequest(newBeatmap.BeatmapInfo);
                 lastRequest.Success += res => res.Scores.ForEach(s => scores.Add(new PerformanceDisplay(s, newBeatmap.Beatmap)));
