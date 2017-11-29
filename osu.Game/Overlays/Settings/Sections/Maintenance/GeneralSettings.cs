@@ -12,9 +12,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class GeneralSettings : SettingsSubsection
     {
-        private OsuButton importButton;
-        private OsuButton deleteButton;
-        private OsuButton restoreButton;
+        private TriangleButton importButton;
+        private TriangleButton deleteButton;
+        private TriangleButton restoreButton;
 
         protected override string Header => "General";
 

@@ -46,6 +46,8 @@ namespace osu.Game.Screens.Play
 
         public bool HasFailed { get; private set; }
 
+        public bool AllowPause { get; set; } = true;
+
         public int RestartCount;
 
         private IAdjustableClock adjustableSourceClock;
@@ -158,7 +160,7 @@ namespace osu.Game.Screens.Play
                     FramedClock = offsetClock,
                     OnRetry = Restart,
                     OnQuit = Exit,
-                    CheckCanPause = () => ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
+                    CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
                     Retries = RestartCount,
                     OnPause = () => {
                         hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
@@ -308,7 +310,7 @@ namespace osu.Game.Screens.Play
             if (!loadedSuccessfully)
                 return;
 
-            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, Easing.OutQuint);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1000, Easing.OutQuint);
 
             dimLevel.ValueChanged += dimLevel_ValueChanged;
             showStoryboard.ValueChanged += showStoryboard_ValueChanged;
@@ -355,7 +357,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(Screen next)
         {
-            if (HasFailed || !ValidForResume || pauseContainer?.AllowExit != false || RulesetContainer?.HasReplayLoaded != false)
+            if (!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused != false || RulesetContainer?.HasReplayLoaded != false)
             {
                 // In the case of replays, we may have changed the playback rate.
                 applyRateFromMods();
