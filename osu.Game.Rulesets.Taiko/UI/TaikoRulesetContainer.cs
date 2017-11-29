@@ -106,16 +106,20 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            var sampleBank = Beatmap.ControlPointInfo.SoundPointAt(WorkingBeatmap.Track.CurrentTime).SampleBank ?? "normal";
-            string sampleName = "";
+            if (!args.Repeat)
+            {
+                var sampleBank = Beatmap.ControlPointInfo.SoundPointAt(WorkingBeatmap.Track.CurrentTime).SampleBank ?? "normal";
+                string sampleName = "";
 
-            if (centreKeys.Contains(args.Key))
-                sampleName = "hitnormal";
+                if (centreKeys.Contains(args.Key))
+                    sampleName = "hitnormal";
 
-            else if (rimKeys.Contains(args.Key))
-                sampleName = "hitclap";
+                else if (rimKeys.Contains(args.Key))
+                    sampleName = "hitclap";
 
-            audio.Sample.Get($"Gameplay/{sampleBank}-{sampleName}")?.Play();
+                audio.Sample.Get($"Gameplay/{sampleBank}-{sampleName}")?.Play();
+            }
+
             return base.OnKeyDown(state, args);
         }
 
