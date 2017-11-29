@@ -105,6 +105,7 @@
     <Compile Include="Visual\TestCaseDrawableRoom.cs" />
     <Compile Include="Visual\TestCaseDrawings.cs" />
     <Compile Include="Visual\TestCaseEditor.cs" />
+    <Compile Include="Visual\TestCaseEditorCompose.cs" />
     <Compile Include="Visual\TestCaseEditorComposeTimeline.cs" />
     <Compile Include="Visual\TestCaseEditorMenuBar.cs" />
     <Compile Include="Visual\TestCaseEditorSummaryTimeline.cs" />
