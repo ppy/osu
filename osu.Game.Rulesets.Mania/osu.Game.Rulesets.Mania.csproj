@@ -81,6 +81,7 @@
     <Compile Include="Objects\Note.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ManiaInputManager.cs" />
+    <Compile Include="Tests\TestCaseAutoGeneration.cs" />
     <Compile Include="Tests\TestCaseManiaHitObjects.cs" />
     <Compile Include="Tests\TestCaseManiaPlayfield.cs" />
     <Compile Include="Tests\TestCasePerformancePoints.cs" />
