@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Beatmaps\CatchBeatmapConverter.cs" />
     <Compile Include="Beatmaps\CatchBeatmapProcessor.cs" />
+    <Compile Include="Edit\HitObjectComposer.cs" />
     <Compile Include="CatchDifficultyCalculator.cs" />
     <Compile Include="CatchInputManager.cs" />
     <Compile Include="Objects\Drawable\DrawableCatchHitObject.cs" />

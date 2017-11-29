@@ -559,6 +559,7 @@
     <Compile Include="Overlays\UserProfileOverlay.cs" />
     <Compile Include="Overlays\WaveOverlayContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rulesets\Edit\HitObjectComposer.cs" />
     <Compile Include="Rulesets\Judgements\DrawableJudgement.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToClock.cs" />
