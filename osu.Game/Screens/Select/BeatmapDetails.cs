@@ -320,26 +320,25 @@ namespace osu.Game.Screens.Select
                         return;
                     }
 
-                    this.FadeIn(transition_duration);
                     setTextAsync(value);
                 }
             }
 
             private void setTextAsync(string text)
             {
-                var newTextFlow = new TextFlowContainer
+                LoadComponentAsync(new TextFlowContainer(s => s.TextSize = 14)
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Colour = textFlow.Colour,
-                };
-
-                newTextFlow.AddText(text, s => s.TextSize = 14);
-
-                LoadComponentAsync(newTextFlow, d =>
+                    Text = text
+                }, loaded =>
                 {
-                    textContainer.Remove(textFlow);
-                    textContainer.Add(textFlow = d);
+                    textFlow?.Expire();
+                    textContainer.Add(textFlow = loaded);
+
+                    // fade in if we haven't yet.
+                    this.FadeIn(transition_duration);
                 });
             }
 
