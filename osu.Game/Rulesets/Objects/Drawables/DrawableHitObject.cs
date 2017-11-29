@@ -59,6 +59,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private readonly List<Judgement> judgements = new List<Judgement>();
         public IReadOnlyList<Judgement> Judgements => judgements;
 
+        // Override in inheriting classes to prevent from playing samples on hit
+        protected virtual bool PlaysSamples => true;
+
         protected List<SampleChannel> Samples = new List<SampleChannel>();
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
@@ -92,7 +95,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 UpdateState(state);
 
-                if (State == ArmedState.Hit)
+                if (State == ArmedState.Hit && PlaysSamples)
                     PlaySamples();
             };
 
