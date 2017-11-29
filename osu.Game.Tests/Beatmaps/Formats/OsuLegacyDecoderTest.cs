@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var beatmap = decoder.Decode(new StreamReader(stream));
 
                 var curveData = beatmap.HitObjects[0] as IHasCurve;
-                var positionData = beatmap.HitObjects[0] as IHasPosition;
+                var positionData = (IHasPosition)beatmap.HitObjects[0];
 
                 Assert.IsNotNull(positionData);
                 Assert.IsNotNull(curveData);
@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(956, beatmap.HitObjects[0].StartTime);
                 Assert.IsTrue(beatmap.HitObjects[0].Samples.Any(s => s.Name == SampleInfo.HIT_NORMAL));
 
-                positionData = beatmap.HitObjects[1] as IHasPosition;
+                positionData = (IHasPosition)beatmap.HitObjects[1];
 
                 Assert.IsNotNull(positionData);
                 Assert.AreEqual(new Vector2(304, 56), positionData.Position);
