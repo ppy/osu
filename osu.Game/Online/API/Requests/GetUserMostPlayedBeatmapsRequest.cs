@@ -34,7 +34,7 @@ namespace osu.Game.Online.API.Requests
         private BeatmapInfo beatmap;
 
         [JsonProperty]
-        private GetBeatmapSetsResponse beatmapSet;
+        private APIResponseBeatmapSet beatmapSet;
 
         public BeatmapInfo GetBeatmapInfo(RulesetStore rulesets)
         {
