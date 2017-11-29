@@ -154,6 +154,7 @@ namespace osu.Game.Screens.Edit
             }
 
             currentScreen.Beatmap.BindTo(Beatmap);
+            currentScreen.ExitRequested = Exit;
             screenContainer.Add(currentScreen);
         }
 
