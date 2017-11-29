@@ -307,6 +307,19 @@ namespace osu.Game.Screens.Select
             Content.FadeInFromZero(250);
 
             FilterControl.Activate();
+
+            // select and preview a random beatmap if we come from MainMenu the first time
+            if (last is MainMenu)
+            {
+                var beatmapInfo = Beatmap.Value.BeatmapInfo;
+                if (beatmapInfo?.Hash == Intro.MENU_MUSIC_BEATMAP_HASH)
+                {
+                    var rndBeatmap = beatmaps.GetRandomUsableBeatmap();
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(rndBeatmap, Beatmap);
+                    UpdateBeatmap(Beatmap);
+                    ensurePlayingSelected();
+                }
+            }
         }
 
         private const double logo_transition = 250;
