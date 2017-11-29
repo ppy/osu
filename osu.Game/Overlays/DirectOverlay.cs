@@ -220,7 +220,11 @@ namespace osu.Game.Overlays
                     switch (displayStyle)
                     {
                         case PanelDisplayStyle.Grid:
-                            return new DirectGridPanel(b);
+                            return new DirectGridPanel(b)
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            };
                         default:
                             return new DirectListPanel(b);
                     }
