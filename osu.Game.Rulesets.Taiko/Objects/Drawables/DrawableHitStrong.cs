@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const double second_hit_window = 30;
 
+        protected override bool PlaysSamples => true;
+
         private double firstHitTime;
         private bool firstKeyHeld;
         private TaikoAction firstHitAction;
@@ -51,6 +53,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (action == firstHitAction)
                 firstKeyHeld = false;
             return base.OnReleased(action);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (Samples.Count > 1)
+                // Removes the "normal" hitsound, leaving only the hitfinish one
+                Samples.RemoveAt(0);
         }
 
         public override bool OnPressed(TaikoAction action)
