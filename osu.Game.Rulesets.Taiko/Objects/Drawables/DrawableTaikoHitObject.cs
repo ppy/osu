@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
+        protected override bool PlaysSamples => false;
+
         protected readonly Vector2 BaseSize;
 
         protected readonly TaikoPiece MainPiece;
