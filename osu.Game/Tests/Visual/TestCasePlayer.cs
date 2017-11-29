@@ -50,7 +50,11 @@ namespace osu.Game.Tests.Visual
             string instantiation = ruleset?.AssemblyQualifiedName;
 
             foreach (var r in rulesets.AvailableRulesets.Where(rs => instantiation == null || rs.InstantiationInfo == instantiation))
-                AddStep(r.Name, () => loadPlayerFor(r));
+            {
+                Player p = null;
+                AddStep(r.Name, () => p = loadPlayerFor(r));
+                AddUntilStep(() => p.IsLoaded);
+            }
         }
 
         protected virtual Beatmap CreateBeatmap()
@@ -64,7 +68,7 @@ namespace osu.Game.Tests.Visual
             return beatmap;
         }
 
-        private void loadPlayerFor(RulesetInfo r)
+        private Player loadPlayerFor(RulesetInfo r)
         {
             var beatmap = CreateBeatmap();
 
@@ -78,7 +82,11 @@ namespace osu.Game.Tests.Visual
             if (Player != null)
                 Remove(Player);
 
-            LoadScreen(CreatePlayer(working, instance));
+            var player = CreatePlayer(working, instance);
+
+            LoadComponentAsync(player, LoadScreen);
+
+            return player;
         }
 
         protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset) => new Player
