@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Replays
         public override Replay Generate()
         {
             // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
-            Replay.Frames.Add(new ReplayFrame(-100000, null, null, ReplayButtonState.None));
+            Replay.Frames.Add(new ManiaReplayFrame(-100000, 0));
 
             double[] holdEndTimes = new double[availableColumns];
             for (int i = 0; i < availableColumns; i++)
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Mania.Replays
                     activeColumns |= 1 << obj.Column;
                 }
 
-                Replay.Frames.Add(new ReplayFrame(groupTime, activeColumns, null, ReplayButtonState.None));
+                Replay.Frames.Add(new ManiaReplayFrame(groupTime, activeColumns));
 
                 // Add the release frames. We can't do this with the loop above because we need activeColumns to be fully populated
                 foreach (var obj in objGroup.GroupBy(h => (h as IHasEndTime)?.EndTime ?? h.StartTime + release_delay).OrderBy(h => h.Key))
@@ -74,14 +74,15 @@ namespace osu.Game.Rulesets.Mania.Replays
                             activeColumnsAtEnd |= 1 << i;
                     }
 
-                    Replay.Frames.Add(new ReplayFrame(groupEndTime, activeColumnsAtEnd, 0, ReplayButtonState.None));
+                    Replay.Frames.Add(new ManiaReplayFrame(groupEndTime, activeColumnsAtEnd));
                 }
             }
 
             Replay.Frames = Replay.Frames
                                   // Pick the maximum activeColumns for all frames at the same time
                                   .GroupBy(f => f.Time)
-                                  .Select(g => new ReplayFrame(g.First().Time, maxMouseX(g), 0, ReplayButtonState.None))
+                                  .Select(g => new ManiaReplayFrame(g.First().Time, maxMouseX(g)))
+                                  .Cast<ReplayFrame>()
                                   // The addition of release frames above maybe result in unordered frames, but we need them ordered
                                   .OrderBy(f => f.Time)
                                   .ToList();
@@ -94,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.Replays
         /// </summary>
         /// <param name="group">The <see cref="ReplayFrame"/> grouping to search.</param>
         /// <returns>The maximum <see cref="ReplayFrame.MouseX"/> by count of bits.</returns>
-        private float maxMouseX(IGrouping<double, ReplayFrame> group)
+        private int maxMouseX(IGrouping<double, ReplayFrame> group)
         {
             int currentCount = -1;
             int currentMax = 0;
