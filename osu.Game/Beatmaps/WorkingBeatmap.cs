@@ -35,6 +35,7 @@ namespace osu.Game.Beatmaps
             background = new AsyncLazy<Texture>(populateBackground);
             track = new AsyncLazy<Track>(populateTrack);
             waveform = new AsyncLazy<Waveform>(populateWaveform);
+            storyboard = new AsyncLazy<Storyboard>(populateStoryboard);
         }
 
         protected abstract Beatmap GetBeatmap();
@@ -86,6 +87,13 @@ namespace osu.Game.Beatmaps
 
         private Waveform populateWaveform() => GetWaveform();
 
+        public bool StoryboardLoaded => storyboard.IsValueCreated;
+        public Storyboard Storyboard => storyboard.Value.Result;
+        public async Task<Storyboard> GetStoryboardAsync() => await storyboard.Value;
+        private readonly AsyncLazy<Storyboard> storyboard;
+
+        private Storyboard populateStoryboard() => GetStoryboard();
+
         public void TransferTo(WorkingBeatmap other)
         {
             if (track.IsValueCreated && Track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
@@ -99,6 +107,7 @@ namespace osu.Game.Beatmaps
         {
             if (BackgroundLoaded) Background?.Dispose();
             if (WaveformLoaded) Waveform?.Dispose();
+            if (StoryboardLoaded) Storyboard?.Dispose();
         }
 
         public void DisposeTrack()
