@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Replays
         public override Replay Generate()
         {
             // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
-            Replay.Frames.Add(new ReplayFrame(-100000, null, null, ReplayButtonState.None));
+            Replay.Frames.Add(new ManiaReplayFrame(-100000, 0));
 
             var pointGroups = generateActionPoints().GroupBy(a => a.Time).OrderBy(g => g.First().Time);
 
