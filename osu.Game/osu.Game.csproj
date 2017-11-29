@@ -632,6 +632,7 @@
     <Compile Include="Rulesets\Ruleset.cs" />
     <Compile Include="Rulesets\RulesetInfo.cs" />
     <Compile Include="Rulesets\RulesetStore.cs" />
+    <Compile Include="Rulesets\Scoring\PerformanceCalculator.cs" />
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
     <Compile Include="Rulesets\Scoring\ScoreRank.cs" />
@@ -787,6 +788,7 @@
     <Compile Include="Tests\Beatmaps\TestWorkingBeatmap.cs" />
     <Compile Include="Tests\Platform\TestStorage.cs" />
     <Compile Include="Tests\Visual\OsuTestCase.cs" />
+    <Compile Include="Tests\Visual\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\Visual\ScreenTestCase.cs" />
     <Compile Include="Tests\Visual\TestCasePlayer.cs" />
     <Compile Include="Users\Avatar.cs" />

@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
                 (h as Slider)?.Curve?.Calculate();
         }
 
-        public override double Calculate(Dictionary<string, string> categoryDifficulty = null)
+        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
-            OsuDifficultyBeatmap beatmap = new OsuDifficultyBeatmap(Beatmap.HitObjects);
+            OsuDifficultyBeatmap beatmap = new OsuDifficultyBeatmap(Beatmap.HitObjects, TimeRate);
             Skill[] skills =
             {
                 new Aim(),
@@ -67,8 +67,8 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
 
             if (categoryDifficulty != null)
             {
-                categoryDifficulty.Add("Aim", aimRating.ToString("0.00"));
-                categoryDifficulty.Add("Speed", speedRating.ToString("0.00"));
+                categoryDifficulty.Add("Aim", aimRating);
+                categoryDifficulty.Add("Speed", speedRating);
             }
 
             return starRating;
