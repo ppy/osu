@@ -25,6 +25,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
@@ -577,13 +578,6 @@ namespace osu.Game.Beatmaps
                         beatmap = decoder.Decode(stream);
                     }
 
-                    if (beatmap == null || BeatmapSetInfo.StoryboardFile == null)
-                        return beatmap;
-
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
-                        decoder.Decode(stream, beatmap);
-
-
                     return beatmap;
                 }
                 catch
@@ -623,6 +617,30 @@ namespace osu.Game.Beatmaps
             }
 
             protected override Waveform GetWaveform() => new Waveform(store.GetStream(getPathForFile(Metadata.AudioFile)));
+
+            protected override Storyboard GetStoryboard()
+            {
+                try
+                {
+                    Beatmap beatmap = Beatmap;
+
+                    if (beatmap == null || BeatmapSetInfo.StoryboardFile == null)
+                        return new Storyboard();
+
+                    BeatmapDecoder decoder;
+                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
+                        decoder = BeatmapDecoder.GetDecoder(stream);
+
+                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
+                        decoder.Decode(stream, beatmap);
+
+                    return beatmap.Storyboard;
+                }
+                catch
+                {
+                    return new Storyboard();
+                }
+            }
         }
 
         /// <summary>
