@@ -2,8 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
+using osu.Game.Input;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
@@ -15,21 +18,45 @@ using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Taiko.Replays;
 using OpenTK;
+using OpenTK.Input;
 using System.Linq;
 using osu.Framework.Input;
+using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
     public class TaikoRulesetContainer : ScrollingRulesetContainer<TaikoPlayfield, TaikoHitObject>
     {
+        private readonly HashSet<Key> centreKeys = new HashSet<Key>();
+        private readonly HashSet<Key> rimKeys = new HashSet<Key>();
+        private AudioManager audio;
+        private IEnumerable<KeyBinding> keyBindings;
+
         public TaikoRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
         {
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio, KeyBindingStore store)
         {
+            keyBindings = store.Query(Ruleset.RulesetInfo.ID, Ruleset.AvailableVariants?.First() ?? 0).Cast<KeyBinding>();
+            if (keyBindings.Count() == 0)
+                keyBindings = Ruleset.GetDefaultKeyBindings();
+
+            foreach (var kb in keyBindings)
+            {
+                var key = (Key)(kb.KeyCombination.Keys as InputKey[]).First();
+                var action = kb.GetAction<TaikoAction>();
+
+                if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
+                    centreKeys.Add(key);
+
+                if (action == TaikoAction.LeftRim || action == TaikoAction.RightRim)
+                    rimKeys.Add(key);
+            }
+
+            this.audio = audio;
             loadBarLines();
         }
 
@@ -75,6 +102,21 @@ namespace osu.Game.Rulesets.Taiko.UI
                 time += bl;
                 currentBeat++;
             }
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            var sampleBank = Beatmap.ControlPointInfo.SoundPointAt(WorkingBeatmap.Track.CurrentTime).SampleBank ?? "normal";
+            string sampleName = "";
+
+            if (centreKeys.Contains(args.Key))
+                sampleName = "hitnormal";
+
+            else if (rimKeys.Contains(args.Key))
+                sampleName = "hitclap";
+
+            audio.Sample.Get($"Gameplay/{sampleBank}-{sampleName}")?.Play();
+            return base.OnKeyDown(state, args);
         }
 
         protected override Vector2 GetPlayfieldAspectAdjust()
