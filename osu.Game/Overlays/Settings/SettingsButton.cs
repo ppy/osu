@@ -6,7 +6,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SettingsButton : OsuButton
+    public class SettingsButton : TriangleButton
     {
         public SettingsButton()
         {

@@ -70,7 +70,8 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Margin = new MarginPadding { Right = 5 },
-                }
+                },
+                new HoverClickSounds()
             };
 
             Nub.Current.BindTo(Current);

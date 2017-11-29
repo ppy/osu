@@ -176,22 +176,10 @@ namespace osu.Game.Rulesets.Mania.Mods
 
     public class ManiaModAutoplay : ModAutoplay<ManiaHitObject>
     {
-        private int availableColumns;
-
-        public override void ApplyToRulesetContainer(RulesetContainer<ManiaHitObject> rulesetContainer)
-        {
-            // Todo: This shouldn't be done, we should be getting a ManiaBeatmap which should store AvailableColumns
-            // But this is dependent on a _lot_ of refactoring
-            var maniaRulesetContainer = (ManiaRulesetContainer)rulesetContainer;
-            availableColumns = maniaRulesetContainer.AvailableColumns;
-
-            base.ApplyToRulesetContainer(rulesetContainer);
-        }
-
         protected override Score CreateReplayScore(Beatmap<ManiaHitObject> beatmap) => new Score
         {
             User = new User { Username = "osu!topus!" },
-            Replay = new ManiaAutoGenerator(beatmap, availableColumns).Generate(),
+            Replay = new ManiaAutoGenerator(beatmap).Generate(),
         };
     }
 }
