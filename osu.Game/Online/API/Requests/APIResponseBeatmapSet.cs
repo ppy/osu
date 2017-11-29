@@ -10,7 +10,7 @@ using System;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetBeatmapSetsResponse : BeatmapMetadata // todo: this is a bit wrong...
+    public class APIResponseBeatmapSet : BeatmapMetadata // todo: this is a bit wrong...
     {
         [JsonProperty(@"covers")]
         private BeatmapSetOnlineCovers covers { get; set; }
@@ -45,7 +45,7 @@ namespace osu.Game.Online.API.Requests
         }
 
         [JsonProperty(@"beatmaps")]
-        private IEnumerable<GetBeatmapSetsBeatmapResponse> beatmaps { get; set; }
+        private IEnumerable<APIResponseSetsBeatmap> beatmaps { get; set; }
 
         public BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
         {
@@ -69,7 +69,7 @@ namespace osu.Game.Online.API.Requests
             };
         }
 
-        private class GetBeatmapSetsBeatmapResponse : BeatmapMetadata
+        private class APIResponseSetsBeatmap : BeatmapMetadata
         {
             [JsonProperty(@"id")]
             private int onlineBeatmapID { get; set; }
