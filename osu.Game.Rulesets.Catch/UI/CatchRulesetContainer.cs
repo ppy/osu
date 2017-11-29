@@ -13,7 +13,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchRulesetContainer : ScrollingRulesetContainer<CatchPlayfield, CatchBaseHit>
+    public class CatchRulesetContainer : ScrollingRulesetContainer<CatchPlayfield, CatchHitObject>
     {
         public CatchRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
@@ -22,15 +22,15 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
 
-        protected override BeatmapProcessor<CatchBaseHit> CreateBeatmapProcessor() => new CatchBeatmapProcessor();
+        protected override BeatmapProcessor<CatchHitObject> CreateBeatmapProcessor() => new CatchBeatmapProcessor();
 
-        protected override BeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
+        protected override BeatmapConverter<CatchHitObject> CreateBeatmapConverter() => new CatchBeatmapConverter();
 
-        protected override Playfield CreatePlayfield() => new CatchPlayfield();
+        protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty);
 
         public override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
-        protected override DrawableHitObject<CatchBaseHit> GetVisualRepresentation(CatchBaseHit h)
+        protected override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)
         {
             var fruit = h as Fruit;
             if (fruit != null)
