@@ -1,6 +1,6 @@
 <!-- Contains required properties for C#. -->
 <Project>
   <PropertyGroup Label="C#">
-    <LangVersion>6</LangVersion>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
 </Project>
