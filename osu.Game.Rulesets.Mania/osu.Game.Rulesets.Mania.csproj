@@ -72,6 +72,7 @@
     <Compile Include="Objects\Types\IHasColumn.cs" />
     <Compile Include="Replays\ManiaAutoGenerator.cs" />
     <Compile Include="Replays\ManiaFramedReplayInputHandler.cs" />
+    <Compile Include="Replays\ManiaReplayFrame.cs" />
     <Compile Include="Scoring\ManiaScoreProcessor.cs" />
     <Compile Include="Objects\BarLine.cs" />
     <Compile Include="Objects\HoldNote.cs" />
