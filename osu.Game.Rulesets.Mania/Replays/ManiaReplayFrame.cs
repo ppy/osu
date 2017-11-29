@@ -9,8 +9,8 @@ namespace osu.Game.Rulesets.Mania.Replays
     {
         public override bool IsImportant => MouseX > 0;
 
-        public ManiaReplayFrame(double time, float? mouseX, float? mouseY, ReplayButtonState buttonState)
-            : base(time, mouseX, mouseY, buttonState)
+        public ManiaReplayFrame(double time, int activeColumns)
+            : base(time, (float)activeColumns, null, ReplayButtonState.None)
         {
         }
     }
