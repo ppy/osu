@@ -1,11 +1,14 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
@@ -14,6 +17,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose
     {
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
+
+        private readonly Container composerContainer;
 
         public Compose()
         {
@@ -58,7 +63,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                         },
                         new Drawable[]
                         {
-                            new Container
+                            composerContainer = new Container
                             {
                                 Name = "Composer content",
                                 RelativeSizeAxes = Axes.Both,
@@ -71,6 +76,23 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             };
 
             timeline.Beatmap.BindTo(Beatmap);
+
+            Beatmap.ValueChanged += beatmapChanged;
+        }
+
+        private void beatmapChanged(WorkingBeatmap newBeatmap)
+        {
+            var ruleset = newBeatmap.BeatmapInfo.Ruleset.CreateInstance();
+            var composer = ruleset.CreateHitObjectComposer();
+            if (composer == null)
+            {
+                // Todo: Handle this
+                //throw new InvalidOperationException($"Ruleset {ruleset.Description} doesn't support hitobject composition.");
+                return;
+            }
+
+            composerContainer.Add(composer);
+            composerContainer.Clock = new InterpolatingFramedClock((IAdjustableClock)newBeatmap.Track ?? new StopwatchClock());
         }
     }
 }

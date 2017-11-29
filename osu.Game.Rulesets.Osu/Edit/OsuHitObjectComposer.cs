@@ -3,8 +3,11 @@
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class HitObjectComposer : Rulesets.Edit.HitObjectComposer
+    public class OsuHitObjectComposer : Rulesets.Edit.HitObjectComposer
     {
-
+        public OsuHitObjectComposer(Ruleset ruleset)
+            : base(ruleset)
+        {
+        }
     }
 }
