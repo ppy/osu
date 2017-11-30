@@ -6,17 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit.Tools;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
-using osu.Game.Screens.Play.ReplaySettings;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -24,7 +21,7 @@ namespace osu.Game.Rulesets.Edit
     {
         private readonly Ruleset ruleset;
 
-        public HitObjectComposer(Ruleset ruleset)
+        protected HitObjectComposer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
 
