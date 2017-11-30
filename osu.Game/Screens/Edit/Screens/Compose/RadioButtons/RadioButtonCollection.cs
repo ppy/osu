@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
             get { return items; }
             set
             {
-                if (items == value)
+                if (ReferenceEquals(items, value))
                     return;
                 items = value;
 

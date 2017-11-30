@@ -29,8 +29,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
         /// </summary>
         public Action<RadioButton> Selected;
 
-        private Drawable bubble;
-
+        private readonly Drawable bubble;
         private readonly RadioButton button;
 
         public DrawableRadioButton(RadioButton button)
