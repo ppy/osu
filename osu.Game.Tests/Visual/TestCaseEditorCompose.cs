@@ -31,7 +31,6 @@ namespace osu.Game.Tests.Visual
             this.beatmaps = beatmaps;
 
             compose.Beatmap.BindTo(osuGame.Beatmap);
-            nextBeatmap();
         }
 
         private void nextBeatmap()
