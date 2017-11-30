@@ -569,16 +569,11 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    Beatmap beatmap;
-
-                    BeatmapDecoder decoder;
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                     {
-                        decoder = BeatmapDecoder.GetDecoder(stream);
-                        beatmap = decoder.Decode(stream);
+                        BeatmapDecoder decoder = BeatmapDecoder.GetDecoder(stream);
+                        return decoder.Decode(stream);
                     }
-
-                    return beatmap;
                 }
                 catch
                 {
@@ -622,9 +617,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    Beatmap beatmap = Beatmap;
-
-                    if (beatmap == null || BeatmapSetInfo.StoryboardFile == null)
+                    if (Beatmap == null || BeatmapSetInfo.StoryboardFile == null)
                         return new Storyboard();
 
                     BeatmapDecoder decoder;
@@ -632,9 +625,9 @@ namespace osu.Game.Beatmaps
                         decoder = BeatmapDecoder.GetDecoder(stream);
 
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
-                        decoder.Decode(stream, beatmap);
+                        decoder.Decode(stream, Beatmap);
 
-                    return beatmap.Storyboard;
+                    return Beatmap.Storyboard;
                 }
                 catch
                 {
