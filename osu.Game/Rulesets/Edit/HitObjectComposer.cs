@@ -89,11 +89,13 @@ namespace osu.Game.Rulesets.Edit
             rulesetContainer.Clock = new InterpolatingFramedClock((IAdjustableClock)osuGame.Beatmap.Value.Track ?? new StopwatchClock());
 
             toolboxCollection.Items =
-                new[] { new RadioButton("Select", () => setCompositionTool(new SelectionTool())) }
+                new[] { new RadioButton("Select", () => setCompositionTool(null)) }
                 .Concat(
                     CompositionTools.Select(t => new RadioButton(t.Name, () => setCompositionTool(t)))
                 )
                 .ToList();
+
+            toolboxCollection.Items[0].Select();
         }
 
         private void setCompositionTool(ICompositionTool tool)
