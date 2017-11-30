@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Play
 
         private void initializeStoryboard(bool asyncLoad)
         {
-            var beatmap = Beatmap.Value.Beatmap;
+            var beatmap = Beatmap.Value;
 
             storyboard = beatmap.Storyboard.CreateDrawable(Beatmap.Value);
             storyboard.Masking = true;
@@ -388,7 +388,7 @@ namespace osu.Game.Screens.Play
                 initializeStoryboard(true);
 
             var beatmap = Beatmap.Value;
-            var storyboardVisible = showStoryboard && beatmap.Beatmap.Storyboard.HasDrawable;
+            var storyboardVisible = showStoryboard && beatmap.Storyboard.HasDrawable;
 
             storyboardContainer.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
             storyboardContainer.FadeTo(storyboardVisible && opacity > 0 ? 1 : 0);
