@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Replays
     {
         public Vector2 Position => new Vector2(MouseX ?? 0, MouseY ?? 0);
 
-        public bool IsImportant => MouseX.HasValue && MouseY.HasValue && (MouseLeft || MouseRight);
+        public virtual bool IsImportant => MouseX.HasValue && MouseY.HasValue && (MouseLeft || MouseRight);
 
         public float? MouseX;
         public float? MouseY;

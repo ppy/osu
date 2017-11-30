@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps
     {
         protected double TimeRate = 1;
 
-        public abstract double Calculate(Dictionary<string, string> categoryDifficulty = null);
+        public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);
     }
 
     public abstract class DifficultyCalculator<T> : DifficultyCalculator where T : HitObject
