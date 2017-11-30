@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             if (composer == null)
             {
                 Logger.Log($"Ruleset {ruleset.Description} doesn't support hitobject composition.");
-                ExitRequested?.Invoke();
+                // ExitRequested?.Invoke();
                 return;
             }
 
