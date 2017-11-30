@@ -106,9 +106,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap, true);
 
-        protected virtual PlayfieldUnderlay CreateUnderlay(Playfield playfield) => new PlayfieldUnderlay(playfield);
+        protected virtual PlayfieldUnderlay CreateUnderlay(Playfield playfield) => new PlayfieldUnderlay();
 
-        protected virtual PlayfieldOverlay CreateOverlay(Playfield playfield) => new PlayfieldOverlay(playfield);
+        protected virtual PlayfieldOverlay CreateOverlay(Playfield playfield) => new PlayfieldOverlay();
 
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
     }

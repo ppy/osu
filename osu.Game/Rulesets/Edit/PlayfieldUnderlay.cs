@@ -3,18 +3,13 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Edit
 {
     public class PlayfieldUnderlay : CompositeDrawable
     {
-        private readonly Playfield playfield;
-
-        public PlayfieldUnderlay(Playfield playfield)
+        public PlayfieldUnderlay()
         {
-            this.playfield = playfield;
-
             RelativeSizeAxes = Axes.Both;
         }
     }
