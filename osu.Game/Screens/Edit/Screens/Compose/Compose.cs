@@ -94,7 +94,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             }
 
             composerContainer.Child = composer;
-            composerContainer.Clock = new InterpolatingFramedClock((IAdjustableClock)newBeatmap.Track ?? new StopwatchClock());
         }
     }
 }
