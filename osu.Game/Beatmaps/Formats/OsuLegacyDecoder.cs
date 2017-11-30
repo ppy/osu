@@ -54,8 +54,6 @@ namespace osu.Game.Beatmaps.Formats
             beatmapVersion = int.Parse(header.Substring(17));
         }
 
-        //
-
         protected override Beatmap ParseBeatmap(StreamReader stream)
         {
             return new LegacyBeatmap(base.ParseBeatmap(stream));
@@ -180,8 +178,6 @@ namespace osu.Game.Beatmaps.Formats
                 }
             }
         }
-
-        //
 
         private void handleGeneral(Beatmap beatmap, string line)
         {
@@ -719,8 +715,6 @@ namespace osu.Game.Beatmaps.Formats
             var pair = splitKeyVal(line, '=');
             variables[pair.Key] = pair.Value;
         }
-
-        //
 
         /// <summary>
         /// Decodes any beatmap variables present in a line into their real values.
