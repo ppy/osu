@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
 
 namespace osu.Game.Tests.Visual

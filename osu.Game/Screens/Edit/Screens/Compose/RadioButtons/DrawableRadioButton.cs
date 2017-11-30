@@ -19,10 +19,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
 {
     public class DrawableRadioButton : TriangleButton
     {
-        private static readonly Color4 DefaultBackgroundColour = OsuColour.FromHex("333");
-        private static readonly Color4 DefaultBubbleColour = DefaultBackgroundColour.Darken(0.5f);
-        private static readonly Color4 SelectedBackgroundColour = OsuColour.FromHex("1188aa");
-        private static readonly Color4 SelectedBubbleColour = SelectedBackgroundColour.Lighten(0.5f);
+        private static readonly Color4 default_background_colour = OsuColour.FromHex("333");
+        private static readonly Color4 default_bubble_colour = default_background_colour.Darken(0.5f);
+        private static readonly Color4 selected_background_colour = OsuColour.FromHex("1188aa");
+        private static readonly Color4 selected_bubble_colour = selected_background_colour.Lighten(0.5f);
 
         /// <summary>
         /// Invoked when this <see cref="DrawableRadioButton"/> has been selected.
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
         private void load()
         {
             Triangles.Alpha = 0;
-            BackgroundColour = DefaultBackgroundColour;
+            BackgroundColour = default_background_colour;
 
             Content.EdgeEffect = new EdgeEffectParameters
             {
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
                 Scale = new Vector2(0.5f),
                 X = 10,
                 Masking = true,
-                Colour = DefaultBubbleColour,
+                Colour = default_bubble_colour,
                 Blending = BlendingMode.Additive,
                 Child = new Box { RelativeSizeAxes = Axes.Both }
             });
@@ -76,8 +76,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
                 return;
             isSelected = false;
 
-            BackgroundColour = DefaultBackgroundColour;
-            bubble.Colour = DefaultBubbleColour;
+            BackgroundColour = default_background_colour;
+            bubble.Colour = default_bubble_colour;
         }
 
         public void Select()
@@ -87,8 +87,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
             isSelected = true;
             Selected?.Invoke(this);
 
-            BackgroundColour = SelectedBackgroundColour;
-            bubble.Colour = SelectedBubbleColour;
+            BackgroundColour = selected_background_colour;
+            bubble.Colour = selected_bubble_colour;
         }
 
         protected override bool OnClick(InputState state)

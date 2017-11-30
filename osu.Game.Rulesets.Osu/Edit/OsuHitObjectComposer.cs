@@ -2,12 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuHitObjectComposer : Rulesets.Edit.HitObjectComposer
+    public class OsuHitObjectComposer : HitObjectComposer
     {
         public OsuHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
