@@ -4,10 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit.Tools;
@@ -65,7 +67,18 @@ namespace osu.Game.Rulesets.Edit
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = true,
-                            Child = rulesetContainer
+                            BorderColour = Color4.White,
+                            BorderThickness = 2,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
+                                    AlwaysPresent = true,
+                                },
+                                rulesetContainer
+                            }
                         }
                     },
                 },
