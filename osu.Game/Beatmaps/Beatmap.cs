@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO.Serialization;
-using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
