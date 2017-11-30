@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Edit
     {
         private readonly Ruleset ruleset;
 
+        protected ICompositionTool CurrentTool { get; private set; }
+
         protected HitObjectComposer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
@@ -75,7 +77,9 @@ namespace osu.Game.Rulesets.Edit
                                     Alpha = 0,
                                     AlwaysPresent = true,
                                 },
-                                rulesetContainer
+                                CreateUnderlay(rulesetContainer.Playfield),
+                                rulesetContainer,
+                                CreateOverlay(rulesetContainer.Playfield)
                             }
                         }
                     },
@@ -98,11 +102,13 @@ namespace osu.Game.Rulesets.Edit
             toolboxCollection.Items[0].Select();
         }
 
-        private void setCompositionTool(ICompositionTool tool)
-        {
-        }
+        private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
 
         protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap, true);
+
+        protected virtual PlayfieldUnderlay CreateUnderlay(Playfield playfield) => new PlayfieldUnderlay(playfield);
+
+        protected virtual PlayfieldOverlay CreateOverlay(Playfield playfield) => new PlayfieldOverlay(playfield);
 
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
     }
