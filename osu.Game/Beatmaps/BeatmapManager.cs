@@ -351,8 +351,7 @@ namespace osu.Game.Beatmaps
                     var iFiles = new FileStore(() => context, storage);
                     var iBeatmaps = createBeatmapStore(() => context);
 
-                    if (iBeatmaps.Undelete(beatmapSet))
-                        iFiles.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+                    undelete(iBeatmaps, iFiles, beatmapSet);
 
                     context.ChangeTracker.AutoDetectChangesEnabled = true;
                     context.SaveChanges(transaction);
