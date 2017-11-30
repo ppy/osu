@@ -495,7 +495,7 @@ namespace osu.Game.Beatmaps
             BeatmapMetadata metadata;
 
             using (var stream = new StreamReader(reader.GetStream(mapName)))
-                metadata = BeatmapDecoder.GetDecoder(stream).Decode(stream).Metadata;
+                metadata = BeatmapDecoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
 
             // check if a set already exists with the same online id.
             beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) ?? new BeatmapSetInfo
@@ -519,7 +519,7 @@ namespace osu.Game.Beatmaps
                     ms.Position = 0;
 
                     var decoder = BeatmapDecoder.GetDecoder(sr);
-                    Beatmap beatmap = decoder.Decode(sr);
+                    Beatmap beatmap = decoder.DecodeBeatmap(sr);
 
                     beatmap.BeatmapInfo.Path = name;
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
@@ -572,7 +572,7 @@ namespace osu.Game.Beatmaps
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                     {
                         BeatmapDecoder decoder = BeatmapDecoder.GetDecoder(stream);
-                        return decoder.Decode(stream);
+                        return decoder.DecodeBeatmap(stream);
                     }
                 }
                 catch
@@ -615,19 +615,17 @@ namespace osu.Game.Beatmaps
 
             protected override Storyboard GetStoryboard()
             {
+                if (BeatmapSetInfo?.StoryboardFile == null)
+                    return new Storyboard();
+
                 try
                 {
-                    if (Beatmap == null || BeatmapSetInfo.StoryboardFile == null)
-                        return new Storyboard();
-
                     BeatmapDecoder decoder;
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                         decoder = BeatmapDecoder.GetDecoder(stream);
 
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
-                        decoder.Decode(stream, Beatmap);
-
-                    return Beatmap.Storyboard;
+                        return decoder.DecodeStoryboard(stream);
                 }
                 catch
                 {
