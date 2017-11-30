@@ -82,6 +82,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 
         private void beatmapChanged(WorkingBeatmap newBeatmap)
         {
+            composerContainer.Clear();
+
             var ruleset = newBeatmap.BeatmapInfo.Ruleset?.CreateInstance();
             var composer = ruleset?.CreateHitObjectComposer();
             if (composer == null)
@@ -91,7 +93,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 return;
             }
 
-            composerContainer.Add(composer);
+            composerContainer.Child = composer;
             composerContainer.Clock = new InterpolatingFramedClock((IAdjustableClock)newBeatmap.Track ?? new StopwatchClock());
         }
     }
