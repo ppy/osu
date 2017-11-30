@@ -80,6 +80,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 set
                 {
+                    KeyboardStep = 0.01f;
+
                     BindableDouble doubleValue = (BindableDouble)value;
 
                     // create a second layer of bindable so we can only handle state changes when not being dragged.
@@ -105,8 +107,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             public SensitivitySlider()
             {
-                KeyboardStep = 0.01f;
-
                 Current.ValueChanged += newValue =>
                 {
                     if (!isDragging && Sensitivity != null)
