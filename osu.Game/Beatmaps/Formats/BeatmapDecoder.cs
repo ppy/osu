@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -35,17 +36,12 @@ namespace osu.Game.Beatmaps.Formats
             decoders[magic] = typeof(T);
         }
 
-        public virtual Beatmap Decode(StreamReader stream)
+        public virtual Beatmap DecodeBeatmap(StreamReader stream)
         {
-            return ParseFile(stream);
+            return ParseBeatmap(stream);
         }
 
-        public virtual void Decode(StreamReader stream, Beatmap beatmap)
-        {
-            ParseFile(stream, beatmap);
-        }
-
-        protected virtual Beatmap ParseFile(StreamReader stream)
+        protected virtual Beatmap ParseBeatmap(StreamReader stream)
         {
             var beatmap = new Beatmap
             {
@@ -56,10 +52,19 @@ namespace osu.Game.Beatmaps.Formats
                 },
             };
 
-            ParseFile(stream, beatmap);
+            ParseBeatmap(stream, beatmap);
             return beatmap;
         }
 
-        protected abstract void ParseFile(StreamReader stream, Beatmap beatmap);
+        protected abstract void ParseBeatmap(StreamReader stream, Beatmap beatmap);
+
+        public virtual Storyboard DecodeStoryboard(StreamReader stream)
+        {
+            var storyboard = new Storyboard();
+            ParseStoryboard(stream, storyboard);
+            return storyboard;
+        }
+
+        protected abstract void ParseStoryboard(StreamReader stream, Storyboard storyboard);
     }
 }

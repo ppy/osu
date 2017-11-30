@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(test_beatmap_data)))
             using (var reader = new StreamReader(stream))
-                beatmap = BeatmapDecoder.GetDecoder(reader).Decode(reader);
+                beatmap = BeatmapDecoder.GetDecoder(reader).DecodeBeatmap(reader);
 
             return beatmap;
         }

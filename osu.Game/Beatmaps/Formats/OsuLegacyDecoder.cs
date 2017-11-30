@@ -54,19 +54,134 @@ namespace osu.Game.Beatmaps.Formats
             beatmapVersion = int.Parse(header.Substring(17));
         }
 
-        private enum Section
+        //
+
+        protected override Beatmap ParseBeatmap(StreamReader stream)
         {
-            None,
-            General,
-            Editor,
-            Metadata,
-            Difficulty,
-            Events,
-            TimingPoints,
-            Colours,
-            HitObjects,
-            Variables,
+            return new LegacyBeatmap(base.ParseBeatmap(stream));
         }
+
+        public override Beatmap DecodeBeatmap(StreamReader stream)
+        {
+            return new LegacyBeatmap(base.DecodeBeatmap(stream));
+        }
+
+        protected override void ParseBeatmap(StreamReader stream, Beatmap beatmap)
+        {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+
+            beatmap.BeatmapInfo.BeatmapVersion = beatmapVersion;
+
+            Section section = Section.None;
+            bool hasCustomColours = false;
+
+            string line;
+            while ((line = stream.ReadLine()) != null)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                if (line.StartsWith("//"))
+                    continue;
+
+                if (line.StartsWith(@"osu file format v"))
+                {
+                    beatmap.BeatmapInfo.BeatmapVersion = int.Parse(line.Substring(17));
+                    continue;
+                }
+
+                if (line.StartsWith(@"[") && line.EndsWith(@"]"))
+                {
+                    if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
+                        throw new InvalidDataException($@"Unknown osu section {line}");
+                    continue;
+                }
+
+                switch (section)
+                {
+                    case Section.General:
+                        handleGeneral(beatmap, line);
+                        break;
+                    case Section.Editor:
+                        handleEditor(beatmap, line);
+                        break;
+                    case Section.Metadata:
+                        handleMetadata(beatmap, line);
+                        break;
+                    case Section.Difficulty:
+                        handleDifficulty(beatmap, line);
+                        break;
+                    case Section.Events:
+                        handleEvents(beatmap, line);
+                        break;
+                    case Section.TimingPoints:
+                        handleTimingPoints(beatmap, line);
+                        break;
+                    case Section.Colours:
+                        handleColours(beatmap, line, ref hasCustomColours);
+                        break;
+                    case Section.HitObjects:
+
+                        // If the ruleset wasn't specified, assume the osu!standard ruleset.
+                        if (parser == null)
+                            parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser();
+
+                        var obj = parser.Parse(line);
+
+                        if (obj != null)
+                            beatmap.HitObjects.Add(obj);
+
+                        break;
+                    case Section.Variables:
+                        handleVariables(line);
+                        break;
+                }
+            }
+
+            foreach (var hitObject in beatmap.HitObjects)
+                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
+        }
+
+        protected override void ParseStoryboard(StreamReader stream, Storyboard storyboard)
+        {
+            if (storyboard == null)
+                throw new ArgumentNullException(nameof(storyboard));
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+
+            Section section = Section.None;
+            StoryboardSprite storyboardSprite = null;
+            CommandTimelineGroup timelineGroup = null;
+
+            string line;
+            while ((line = stream.ReadLine()) != null)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                if (line.StartsWith("//"))
+                    continue;
+
+                if (line.StartsWith(@"[") && line.EndsWith(@"]"))
+                {
+                    if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
+                        throw new InvalidDataException($@"Unknown osu section {line}");
+                    continue;
+                }
+
+                switch (section)
+                {
+                    case Section.Events:
+                        handleEvents(storyboard, line, ref storyboardSprite, ref timelineGroup);
+                        break;
+                }
+            }
+        }
+
+        //
 
         private void handleGeneral(Beatmap beatmap, string line)
         {
@@ -240,37 +355,48 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        /// <summary>
-        /// Decodes any beatmap variables present in a line into their real values.
-        /// </summary>
-        /// <param name="line">The line which may contains variables.</param>
-        private void decodeVariables(ref string line)
-        {
-            if (line == null)
-                throw new ArgumentNullException(nameof(line));
-
-            while (line.IndexOf('$') >= 0)
-            {
-                string origLine = line;
-                string[] split = line.Split(',');
-                for (int i = 0; i < split.Length; i++)
-                {
-                    var item = split[i];
-                    if (item.StartsWith("$") && variables.ContainsKey(item))
-                        split[i] = variables[item];
-                }
-
-                line = string.Join(",", split);
-                if (line == origLine) break;
-            }
-        }
-
-        private void handleEvents(Beatmap beatmap, string line, ref StoryboardSprite storyboardSprite, ref CommandTimelineGroup timelineGroup)
+        private void handleEvents(Beatmap beatmap, string line)
         {
             if (line == null)
                 throw new ArgumentNullException(nameof(line));
             if (beatmap == null)
                 throw new ArgumentNullException(nameof(beatmap));
+
+            decodeVariables(ref line);
+
+            string[] split = line.Split(',');
+
+            EventType type;
+            if (!Enum.TryParse(split[0], out type))
+                throw new InvalidDataException($@"Unknown event type {split[0]}");
+
+            switch (type)
+            {
+                case EventType.Background:
+                    string filename = split[2].Trim('"');
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
+                    break;
+                case EventType.Break:
+                    var breakEvent = new BreakPeriod
+                    {
+                        StartTime = double.Parse(split[1], NumberFormatInfo.InvariantInfo),
+                        EndTime = double.Parse(split[2], NumberFormatInfo.InvariantInfo)
+                    };
+
+                    if (!breakEvent.HasEffect)
+                        return;
+
+                    beatmap.Breaks.Add(breakEvent);
+                    break;
+            }
+        }
+
+        private void handleEvents(Storyboard storyboard, string line, ref StoryboardSprite storyboardSprite, ref CommandTimelineGroup timelineGroup)
+        {
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+            if (storyboard == null)
+                throw new ArgumentNullException(nameof(storyboard));
 
             var depth = 0;
             while (line.StartsWith(" ") || line.StartsWith("_"))
@@ -293,26 +419,6 @@ namespace osu.Game.Beatmaps.Formats
 
                 switch (type)
                 {
-                    case EventType.Video:
-                    case EventType.Background:
-                        string filename = split[2].Trim('"');
-
-                        if (type == EventType.Background)
-                            beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
-
-                        break;
-                    case EventType.Break:
-                        var breakEvent = new BreakPeriod
-                        {
-                            StartTime = double.Parse(split[1], NumberFormatInfo.InvariantInfo),
-                            EndTime = double.Parse(split[2], NumberFormatInfo.InvariantInfo)
-                        };
-
-                        if (!breakEvent.HasEffect)
-                            return;
-
-                        beatmap.Breaks.Add(breakEvent);
-                        break;
                     case EventType.Sprite:
                         {
                             var layer = parseLayer(split[1]);
@@ -321,7 +427,7 @@ namespace osu.Game.Beatmaps.Formats
                             var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
                             var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
                             storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
-                            beatmap.Storyboard.GetLayer(layer).Add(storyboardSprite);
+                            storyboard.GetLayer(layer).Add(storyboardSprite);
                         }
                         break;
                     case EventType.Animation:
@@ -335,7 +441,7 @@ namespace osu.Game.Beatmaps.Formats
                             var frameDelay = double.Parse(split[7], NumberFormatInfo.InvariantInfo);
                             var loopType = split.Length > 8 ? (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), split[8]) : AnimationLoopType.LoopForever;
                             storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
-                            beatmap.Storyboard.GetLayer(layer).Add(storyboardSprite);
+                            storyboard.GetLayer(layer).Add(storyboardSprite);
                         }
                         break;
                     case EventType.Sample:
@@ -344,7 +450,7 @@ namespace osu.Game.Beatmaps.Formats
                             var layer = parseLayer(split[2]);
                             var path = cleanFilename(split[3]);
                             var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
-                            beatmap.Storyboard.GetLayer(layer).Add(new StoryboardSample(path, time, volume));
+                            storyboard.GetLayer(layer).Add(new StoryboardSample(path, time, volume));
                         }
                         break;
                 }
@@ -456,9 +562,15 @@ namespace osu.Game.Beatmaps.Formats
                                         var type = split[4];
                                         switch (type)
                                         {
-                                            case "A": timelineGroup?.BlendingMode.Add(easing, startTime, endTime, BlendingMode.Additive, startTime == endTime ? BlendingMode.Additive : BlendingMode.Inherit); break;
-                                            case "H": timelineGroup?.FlipH.Add(easing, startTime, endTime, true, startTime == endTime); break;
-                                            case "V": timelineGroup?.FlipV.Add(easing, startTime, endTime, true, startTime == endTime); break;
+                                            case "A":
+                                                timelineGroup?.BlendingMode.Add(easing, startTime, endTime, BlendingMode.Additive, startTime == endTime ? BlendingMode.Additive : BlendingMode.Inherit);
+                                                break;
+                                            case "H":
+                                                timelineGroup?.FlipH.Add(easing, startTime, endTime, true, startTime == endTime);
+                                                break;
+                                            case "V":
+                                                timelineGroup?.FlipV.Add(easing, startTime, endTime, true, startTime == endTime);
+                                                break;
                                         }
                                     }
                                     break;
@@ -470,30 +582,6 @@ namespace osu.Game.Beatmaps.Formats
                 }
             }
         }
-
-        private static string cleanFilename(string path)
-            => FileSafety.PathStandardise(path.Trim('\"'));
-
-        private static Anchor parseOrigin(string value)
-        {
-            var origin = (LegacyOrigins)Enum.Parse(typeof(LegacyOrigins), value);
-            switch (origin)
-            {
-                case LegacyOrigins.TopLeft: return Anchor.TopLeft;
-                case LegacyOrigins.TopCentre: return Anchor.TopCentre;
-                case LegacyOrigins.TopRight: return Anchor.TopRight;
-                case LegacyOrigins.CentreLeft: return Anchor.CentreLeft;
-                case LegacyOrigins.Centre: return Anchor.Centre;
-                case LegacyOrigins.CentreRight: return Anchor.CentreRight;
-                case LegacyOrigins.BottomLeft: return Anchor.BottomLeft;
-                case LegacyOrigins.BottomCentre: return Anchor.BottomCentre;
-                case LegacyOrigins.BottomRight: return Anchor.BottomRight;
-            }
-            throw new InvalidDataException($@"Unknown origin: {value}");
-        }
-
-        private static string parseLayer(string value)
-            => Enum.Parse(typeof(StoryLayer), value).ToString();
 
         private void handleTimingPoints(Beatmap beatmap, string line)
         {
@@ -632,96 +720,56 @@ namespace osu.Game.Beatmaps.Formats
             variables[pair.Key] = pair.Value;
         }
 
-        protected override Beatmap ParseFile(StreamReader stream)
+        //
+
+        /// <summary>
+        /// Decodes any beatmap variables present in a line into their real values.
+        /// </summary>
+        /// <param name="line">The line which may contains variables.</param>
+        private void decodeVariables(ref string line)
         {
-            return new LegacyBeatmap(base.ParseFile(stream));
-        }
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
 
-        public override Beatmap Decode(StreamReader stream)
-        {
-            return new LegacyBeatmap(base.Decode(stream));
-        }
-
-        protected override void ParseFile(StreamReader stream, Beatmap beatmap)
-        {
-            if (beatmap == null)
-                throw new ArgumentNullException(nameof(beatmap));
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-
-            beatmap.BeatmapInfo.BeatmapVersion = beatmapVersion;
-
-            Section section = Section.None;
-            bool hasCustomColours = false;
-            StoryboardSprite storyboardSprite = null;
-            CommandTimelineGroup timelineGroup = null;
-
-            string line;
-            while ((line = stream.ReadLine()) != null)
+            while (line.IndexOf('$') >= 0)
             {
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                if (line.StartsWith("//"))
-                    continue;
-
-                if (line.StartsWith(@"osu file format v"))
+                string origLine = line;
+                string[] split = line.Split(',');
+                for (int i = 0; i < split.Length; i++)
                 {
-                    beatmap.BeatmapInfo.BeatmapVersion = int.Parse(line.Substring(17));
-                    continue;
+                    var item = split[i];
+                    if (item.StartsWith("$") && variables.ContainsKey(item))
+                        split[i] = variables[item];
                 }
 
-                if (line.StartsWith(@"[") && line.EndsWith(@"]"))
-                {
-                    if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
-                        throw new InvalidDataException($@"Unknown osu section {line}");
-                    continue;
-                }
-
-                switch (section)
-                {
-                    case Section.General:
-                        handleGeneral(beatmap, line);
-                        break;
-                    case Section.Editor:
-                        handleEditor(beatmap, line);
-                        break;
-                    case Section.Metadata:
-                        handleMetadata(beatmap, line);
-                        break;
-                    case Section.Difficulty:
-                        handleDifficulty(beatmap, line);
-                        break;
-                    case Section.Events:
-                        handleEvents(beatmap, line, ref storyboardSprite, ref timelineGroup);
-                        break;
-                    case Section.TimingPoints:
-                        handleTimingPoints(beatmap, line);
-                        break;
-                    case Section.Colours:
-                        handleColours(beatmap, line, ref hasCustomColours);
-                        break;
-                    case Section.HitObjects:
-
-                        // If the ruleset wasn't specified, assume the osu!standard ruleset.
-                        if (parser == null)
-                            parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser();
-
-                        var obj = parser.Parse(line);
-
-                        if (obj != null)
-                            beatmap.HitObjects.Add(obj);
-
-                        break;
-                    case Section.Variables:
-                        handleVariables(line);
-                        break;
-                }
+                line = string.Join(",", split);
+                if (line == origLine) break;
             }
-
-            foreach (var hitObject in beatmap.HitObjects)
-                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
         }
+
+        private static string cleanFilename(string path)
+            => FileSafety.PathStandardise(path.Trim('\"'));
+
+        private static Anchor parseOrigin(string value)
+        {
+            var origin = (LegacyOrigins)Enum.Parse(typeof(LegacyOrigins), value);
+            switch (origin)
+            {
+                case LegacyOrigins.TopLeft: return Anchor.TopLeft;
+                case LegacyOrigins.TopCentre: return Anchor.TopCentre;
+                case LegacyOrigins.TopRight: return Anchor.TopRight;
+                case LegacyOrigins.CentreLeft: return Anchor.CentreLeft;
+                case LegacyOrigins.Centre: return Anchor.Centre;
+                case LegacyOrigins.CentreRight: return Anchor.CentreRight;
+                case LegacyOrigins.BottomLeft: return Anchor.BottomLeft;
+                case LegacyOrigins.BottomCentre: return Anchor.BottomCentre;
+                case LegacyOrigins.BottomRight: return Anchor.BottomRight;
+            }
+            throw new InvalidDataException($@"Unknown origin: {value}");
+        }
+
+        private static string parseLayer(string value)
+            => Enum.Parse(typeof(StoryLayer), value).ToString();
 
         private KeyValuePair<string, string> splitKeyVal(string line, char separator)
         {
@@ -735,6 +783,20 @@ namespace osu.Game.Beatmaps.Formats
                 split[0].Trim(),
                 split.Length > 1 ? split[1].Trim() : string.Empty
             );
+        }
+
+        private enum Section
+        {
+            None,
+            General,
+            Editor,
+            Metadata,
+            Difficulty,
+            Events,
+            TimingPoints,
+            Colours,
+            HitObjects,
+            Variables,
         }
 
         internal enum LegacySampleBank
