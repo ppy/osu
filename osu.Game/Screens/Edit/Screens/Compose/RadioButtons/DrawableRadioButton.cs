@@ -45,6 +45,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
             Triangles.Alpha = 0;
             BackgroundColour = DefaultBackgroundColour;
 
+            Content.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Radius = 2,
+                Offset = new Vector2(0, 1),
+                Colour = Color4.Black.Opacity(0.5f)
+            };
+
             Add(bubble = new CircularContainer
             {
                 Anchor = Anchor.CentreLeft,
