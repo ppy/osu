@@ -27,16 +27,34 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
         /// <summary>
         /// Invoked when this <see cref="DrawableRadioButton"/> has been selected.
         /// </summary>
-        public Action<DrawableRadioButton> Selected;
+        public Action<RadioButton> Selected;
 
         private Drawable bubble;
 
+        private readonly RadioButton button;
+
         public DrawableRadioButton(RadioButton button)
         {
+            this.button = button;
+
             Text = button.Text;
             Action = button.Action;
 
             RelativeSizeAxes = Axes.X;
+
+            bubble = new CircularContainer
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                RelativeSizeAxes = Axes.Both,
+                FillMode = FillMode.Fit,
+                Scale = new Vector2(0.5f),
+                X = 10,
+                Masking = true,
+                Colour = default_bubble_colour,
+                Blending = BlendingMode.Additive,
+                Child = new Box { RelativeSizeAxes = Axes.Both }
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -53,53 +71,41 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
                 Colour = Color4.Black.Opacity(0.5f)
             };
 
-            Add(bubble = new CircularContainer
+            Add(bubble);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            button.Selected.ValueChanged += v =>
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit,
-                Scale = new Vector2(0.5f),
-                X = 10,
-                Masking = true,
-                Colour = default_bubble_colour,
-                Blending = BlendingMode.Additive,
-                Child = new Box { RelativeSizeAxes = Axes.Both }
-            });
+                updateSelectionState();
+                if (v)
+                    Selected?.Invoke(button);
+            };
+
+            updateSelectionState();
         }
 
-        private bool isSelected;
-
-        public void Deselect()
+        private void updateSelectionState()
         {
-            if (!isSelected)
+            if (!IsLoaded)
                 return;
-            isSelected = false;
 
-            BackgroundColour = default_background_colour;
-            bubble.Colour = default_bubble_colour;
-        }
-
-        public void Select()
-        {
-            if (isSelected)
-                return;
-            isSelected = true;
-            Selected?.Invoke(this);
-
-            BackgroundColour = selected_background_colour;
-            bubble.Colour = selected_bubble_colour;
+            BackgroundColour = button.Selected ? selected_background_colour : default_background_colour;
+            bubble.Colour = button.Selected ? selected_bubble_colour : default_bubble_colour;
         }
 
         protected override bool OnClick(InputState state)
         {
-            if (isSelected)
+            if (button.Selected)
                 return true;
 
             if (!Enabled)
                 return true;
 
-            Select();
+            button.Selected.Value = true;
 
             return base.OnClick(state);
         }

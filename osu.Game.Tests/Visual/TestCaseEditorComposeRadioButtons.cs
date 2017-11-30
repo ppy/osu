@@ -14,7 +14,8 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseEditorComposeRadioButtons()
         {
-            Add(new RadioButtonCollection
+            RadioButtonCollection collection;
+            Add(collection = new RadioButtonCollection
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -28,6 +29,13 @@ namespace osu.Game.Tests.Visual
                     new RadioButton("Item 5", () => { })
                 }
             });
+
+            for (int i = 0; i < collection.Items.Count; i++)
+            {
+                int l = i;
+                AddStep($"Select item {l + 1}", () => collection.Items[l].Select());
+                AddStep($"Deselect item {l + 1}", () => collection.Items[l].Deselect());
+            }
         }
     }
 }
