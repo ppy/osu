@@ -5,7 +5,7 @@ using System;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
 {
-    public class RadioButton
+    public struct RadioButton
     {
         /// <summary>
         /// The text that should be displayed in this button.
@@ -16,5 +16,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
         /// The <see cref="Action"/> that should be invoked when this button is selected.
         /// </summary>
         public Action Action;
+
+        public RadioButton(string text)
+        {
+            Text = text;
+            Action = null;
+        }
+
+        public RadioButton(string text, Action action)
+        {
+            Text = text;
+            Action = action;
+        }
     }
 }
