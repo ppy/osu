@@ -338,6 +338,28 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        public void Undelete(BeatmapSetInfo beatmapSet)
+        {
+            lock (importContext)
+            {
+                var context = importContext.Value;
+
+                using (var transaction = context.BeginTransaction())
+                {
+                    context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                    var iFiles = new FileStore(() => context, storage);
+                    var iBeatmaps = createBeatmapStore(() => context);
+
+                    if (iBeatmaps.Undelete(beatmapSet))
+                        iFiles.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+
+                    context.ChangeTracker.AutoDetectChangesEnabled = true;
+                    context.SaveChanges(transaction);
+                }
+            }
+        }
+
         /// <summary>
         /// Delete a beatmap difficulty.
         /// </summary>
