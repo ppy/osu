@@ -11,10 +11,16 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
 {
     public class RadioButtonCollection : CompositeDrawable
     {
+        private IReadOnlyList<RadioButton> items;
         public IReadOnlyList<RadioButton> Items
         {
+            get { return items; }
             set
             {
+                if (items == value)
+                    return;
+                items = value;
+
                 buttonContainer.Clear();
                 value.ForEach(addButton);
             }
@@ -35,13 +41,21 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
             };
         }
 
-        private void addButton(RadioButton button) => buttonContainer.Add(new DrawableRadioButton(button) { Selected = buttonSelected });
-
-        private DrawableRadioButton currentlySelected;
-        private void buttonSelected(DrawableRadioButton drawableButton)
+        private RadioButton currentlySelected;
+        private void addButton(RadioButton button)
         {
-            currentlySelected?.Deselect();
-            currentlySelected = drawableButton;
+            button.Selected.ValueChanged += v =>
+            {
+                if (v)
+                {
+                    currentlySelected?.Deselect();
+                    currentlySelected = button;
+                }
+                else
+                    currentlySelected = null;
+            };
+
+            buttonContainer.Add(new DrawableRadioButton(button));
         }
     }
 }
