@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Edit
             RulesetContainer rulesetContainer;
             try
             {
-                rulesetContainer = ruleset.CreateRulesetContainerWith(osuGame.Beatmap.Value, true);
+                rulesetContainer = CreateRulesetContainer(ruleset, osuGame.Beatmap.Value);
             }
             catch (Exception e)
             {
@@ -98,6 +99,8 @@ namespace osu.Game.Rulesets.Edit
         private void setCompositionTool(ICompositionTool tool)
         {
         }
+
+        protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap, true);
 
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
     }
