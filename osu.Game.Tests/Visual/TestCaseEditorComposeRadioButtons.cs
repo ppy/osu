@@ -22,11 +22,11 @@ namespace osu.Game.Tests.Visual
                 Width = 150,
                 Items = new[]
                 {
-                    new RadioButton { Text = "Item 1", Action = () => { } },
-                    new RadioButton { Text = "Item 2", Action = () => { } },
-                    new RadioButton { Text = "Item 3", Action = () => { } },
-                    new RadioButton { Text = "Item 4", Action = () => { } },
-                    new RadioButton { Text = "Item 5", Action = () => { } }
+                    new RadioButton("Item 1", () => { }),
+                    new RadioButton("Item 2", () => { }),
+                    new RadioButton("Item 3", () => { }),
+                    new RadioButton("Item 4", () => { }),
+                    new RadioButton("Item 5", () => { })
                 }
             });
         }
