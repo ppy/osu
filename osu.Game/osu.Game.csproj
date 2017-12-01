@@ -313,7 +313,7 @@
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
-    <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
+    <Compile Include="Beatmaps\Formats\Decoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />

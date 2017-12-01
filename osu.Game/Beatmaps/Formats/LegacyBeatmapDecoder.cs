@@ -20,6 +20,15 @@ namespace osu.Game.Beatmaps.Formats
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
 
+        public LegacyBeatmapDecoder()
+        {
+        }
+
+        public LegacyBeatmapDecoder(string header)
+        {
+            BeatmapVersion = int.Parse(header.Substring(17));
+        }
+
         protected override void ProcessSection(Section section, string line)
         {
             switch (section)
