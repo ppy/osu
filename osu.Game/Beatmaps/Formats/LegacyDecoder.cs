@@ -4,15 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps.Formats
 {
-    public abstract class LegacyDecoder : BeatmapDecoder
+    public class LegacyDecoder : BeatmapDecoder
     {
         public static void Register()
         {
@@ -31,11 +28,20 @@ namespace osu.Game.Beatmaps.Formats
             // TODO: differences between versions
         }
 
-        protected Beatmap beatmap;
-        protected Storyboard storyboard;
+        public LegacyDecoder()
+        {
+        }
 
-        protected int beatmapVersion;
-        protected readonly Dictionary<string, string> variables = new Dictionary<string, string>();
+        public LegacyDecoder(string header)
+        {
+            BeatmapVersion = int.Parse(header.Substring(17));
+        }
+
+        protected Beatmap Beatmap;
+        protected Storyboard Storyboard;
+
+        protected int BeatmapVersion;
+        protected readonly Dictionary<string, string> Variables = new Dictionary<string, string>();
 
         public override Beatmap DecodeBeatmap(StreamReader stream) => new LegacyBeatmap(base.DecodeBeatmap(stream));
 
@@ -48,13 +54,13 @@ namespace osu.Game.Beatmaps.Formats
             if (beatmap == null)
                 throw new ArgumentNullException(nameof(beatmap));
 
-            this.beatmap = beatmap;
-            this.beatmap.BeatmapInfo.BeatmapVersion = beatmapVersion;
+            Beatmap = beatmap;
+            Beatmap.BeatmapInfo.BeatmapVersion = BeatmapVersion;
 
             ParseContent(stream);
 
-            foreach (var hitObject in this.beatmap.HitObjects)
-                hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
+            foreach (var hitObject in Beatmap.HitObjects)
+                hitObject.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
         }
 
         protected override void ParseStoryboard(StreamReader stream, Storyboard storyboard)
@@ -64,7 +70,7 @@ namespace osu.Game.Beatmaps.Formats
             if (storyboard == null)
                 throw new ArgumentNullException(nameof(storyboard));
 
-            this.storyboard = storyboard;
+            Storyboard = storyboard;
 
             ParseContent(stream);
         }
@@ -84,7 +90,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (line.StartsWith(@"osu file format v"))
                 {
-                    beatmap.BeatmapInfo.BeatmapVersion = int.Parse(line.Substring(17));
+                    Beatmap.BeatmapInfo.BeatmapVersion = int.Parse(line.Substring(17));
                     continue;
                 }
 
@@ -95,17 +101,20 @@ namespace osu.Game.Beatmaps.Formats
                     continue;
                 }
 
-                processSection(section, line);
+                ProcessSection(section, line);
             }
         }
 
-        protected abstract void processSection(Section section, string line);
+        protected virtual void ProcessSection(Section section, string line)
+        {
+
+        }
 
         /// <summary>
         /// Decodes any beatmap variables present in a line into their real values.
         /// </summary>
         /// <param name="line">The line which may contains variables.</param>
-        protected void decodeVariables(ref string line)
+        protected void DecodeVariables(ref string line)
         {
             while (line.IndexOf('$') >= 0)
             {
@@ -114,8 +123,8 @@ namespace osu.Game.Beatmaps.Formats
                 for (int i = 0; i < split.Length; i++)
                 {
                     var item = split[i];
-                    if (item.StartsWith("$") && variables.ContainsKey(item))
-                        split[i] = variables[item];
+                    if (item.StartsWith("$") && Variables.ContainsKey(item))
+                        split[i] = Variables[item];
                 }
 
                 line = string.Join(",", split);
