@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                     if (HyperDashing)
                     {
-                        this.FadeColour(Color4.Yellow, transition_length, Easing.OutQuint);
+                        this.FadeColour(Color4.OrangeRed, transition_length, Easing.OutQuint);
                         this.FadeTo(0.2f, transition_length, Easing.OutQuint);
                         Trail = true;
                     }
