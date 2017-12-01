@@ -121,6 +121,8 @@ namespace osu.Game.Beatmaps
             private readonly Func<T> valueFactory;
             private readonly Func<T, bool> stillValidFunction;
 
+            private readonly object initLock = new object();
+
             public AsyncLazy(Func<T> valueFactory, Func<T, bool> stillValidFunction = null)
             {
                 this.valueFactory = valueFactory;
@@ -134,7 +136,6 @@ namespace osu.Game.Beatmaps
                 if (!IsValueCreated) return;
 
                 (lazy.Value.Result as IDisposable)?.Dispose();
-
                 init();
             }
 
@@ -158,9 +159,11 @@ namespace osu.Game.Beatmaps
 
             private void ensureValid()
             {
-                if (!lazy.IsValueCreated || (stillValidFunction?.Invoke(lazy.Value.Result) ?? true)) return;
-
-                init();
+                lock (initLock)
+                {
+                    if (!lazy.IsValueCreated || (stillValidFunction?.Invoke(lazy.Value.Result) ?? true)) return;
+                    init();
+                }
             }
 
             private void init()
