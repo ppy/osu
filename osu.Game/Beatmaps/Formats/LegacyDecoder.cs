@@ -9,32 +9,23 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps.Formats
 {
-    public class LegacyDecoder : BeatmapDecoder
+    public abstract class LegacyDecoder : Decoder
     {
         public static void Register()
         {
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v14");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v13");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v12");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v11");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v10");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v9");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v8");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v7");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v6");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v5");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v4");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v3");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v14");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v13");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v12");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v11");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v10");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v9");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v8");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v7");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v6");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v5");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v4");
+            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v3");
             // TODO: differences between versions
-        }
-
-        public LegacyDecoder()
-        {
-        }
-
-        public LegacyDecoder(string header)
-        {
-            BeatmapVersion = int.Parse(header.Substring(17));
         }
 
         protected Beatmap Beatmap;
@@ -105,10 +96,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected virtual void ProcessSection(Section section, string line)
-        {
-
-        }
+        protected abstract void ProcessSection(Section section, string line);
 
         /// <summary>
         /// Decodes any beatmap variables present in a line into their real values.
