@@ -2,8 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Tests.Visual

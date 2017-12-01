@@ -304,6 +304,7 @@
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
     <Compile Include="Rulesets\Edit\PlayfieldOverlay.cs" />
     <Compile Include="Rulesets\Edit\PlayfieldUnderlay.cs" />
+    <Compile Include="Rulesets\Edit\PlayfieldUnderlay.cs" />
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
     <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
     <Compile Include="Screens\Edit\Components\TimeInfoContainer.cs" />
@@ -567,6 +568,7 @@
     <Compile Include="Rulesets\Edit\Tools\HitObjectCompositionTool.cs" />
     <Compile Include="Rulesets\Edit\Tools\ICompositionTool.cs" />
     <Compile Include="Rulesets\Edit\HitObjectComposer.cs" />
+    <Compile Include="Rulesets\Edit\SelectionDragger.cs" />
     <Compile Include="Rulesets\Edit\ToolboxGroup.cs" />
     <Compile Include="Rulesets\Judgements\DrawableJudgement.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
