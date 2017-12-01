@@ -218,8 +218,14 @@ namespace osu.Game.Rulesets.Catch.UI
 
             private double hyperDashModifier = 1;
 
+            /// <summary>
+            /// The direction in which hyperdash is allowed. 0 allows both directions.
+            /// </summary>
             public double HyperDashDirection;
 
+            /// <summary>
+            /// The speed modifier resultant from hyperdash. Will trigger hyperdash when not equal to 1.
+            /// </summary>
             public double HyperDashModifier
             {
                 get { return hyperDashModifier; }
