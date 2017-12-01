@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public float Scale { get; set; } = 1;
 
+        public bool HyperDash { get; set; }
+
         public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaults(controlPointInfo, difficulty);
