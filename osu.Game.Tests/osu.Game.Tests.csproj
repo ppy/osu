@@ -89,7 +89,7 @@
     <Compile Include="Beatmaps\IO\OszArchiveReaderTest.cs" />
     <Compile Include="Beatmaps\IO\ImportBeatmapTest.cs" />
     <Compile Include="Resources\Resource.cs" />
-    <Compile Include="Beatmaps\Formats\OsuLegacyDecoderTest.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyDecoderTest.cs" />
     <Compile Include="Visual\TestCaseBeatmapDetailArea.cs" />
     <Compile Include="Visual\TestCaseBeatmapDetails.cs" />
     <Compile Include="Visual\TestCaseBeatmapOptionsOverlay.cs" />

@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Objects.Types;
 namespace osu.Game.Tests.Beatmaps.Formats
 {
     [TestFixture]
-    public class OsuLegacyDecoderTest
+    public class LegacyDecoderTest
     {
         [Test]
         public void TestDecodeMetadata()
