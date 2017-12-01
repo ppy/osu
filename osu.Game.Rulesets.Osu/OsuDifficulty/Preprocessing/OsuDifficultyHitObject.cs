@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
+using OpenTK;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
@@ -33,13 +35,17 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 
         private const int normalized_radius = 52;
 
+        private readonly double timeRate;
+
         private readonly OsuHitObject[] t;
 
         /// <summary>
         /// Initializes the object calculating extra data required for difficulty calculation.
         /// </summary>
-        public OsuDifficultyHitObject(OsuHitObject[] triangle)
+        public OsuDifficultyHitObject(OsuHitObject[] triangle, double timeRate)
         {
+            this.timeRate = timeRate;
+
             t = triangle;
             BaseObject = t[0];
             setDistances();
@@ -57,14 +63,53 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
-            Distance = (t[0].StackedPosition - t[1].StackedPosition).Length * scalingFactor;
+            Vector2 lastCursorPosition = t[1].StackedPosition;
+            float lastTravelDistance = 0;
+
+            var lastSlider = t[1] as Slider;
+            if (lastSlider != null)
+            {
+                computeSliderCursorPosition(lastSlider);
+                lastCursorPosition = lastSlider.LazyEndPosition ?? lastCursorPosition;
+                lastTravelDistance = lastSlider.LazyTravelDistance;
+            }
+
+            Distance = (lastTravelDistance + (BaseObject.StackedPosition - lastCursorPosition).Length) * scalingFactor;
         }
 
         private void setTimingValues()
         {
             // Every timing inverval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure.
-            DeltaTime = Math.Max(40, t[0].StartTime - t[1].StartTime);
+            DeltaTime = Math.Max(40, (t[0].StartTime - t[1].StartTime) / timeRate);
             TimeUntilHit = 450; // BaseObject.PreEmpt;
+        }
+
+        private void computeSliderCursorPosition(Slider slider)
+        {
+            if (slider.LazyEndPosition != null)
+                return;
+            slider.LazyEndPosition = slider.StackedPosition;
+
+            float approxFollowCircleRadius = (float)(slider.Radius * 3);
+            var computeVertex = new Action<double>(t =>
+            {
+                var diff = slider.PositionAt(t) - slider.LazyEndPosition.Value;
+                float dist = diff.Length;
+
+                if (dist > approxFollowCircleRadius)
+                {
+                    // The cursor would be outside the follow circle, we need to move it
+                    diff.Normalize(); // Obtain direction of diff
+                    dist -= approxFollowCircleRadius;
+                    slider.LazyEndPosition += diff * dist;
+                    slider.LazyTravelDistance += dist;
+                }
+            });
+
+            var scoringTimes = slider.Ticks.Select(t => t.StartTime).Concat(slider.RepeatPoints.Select(r => r.StartTime)).OrderBy(t => t);
+            foreach (var time in scoringTimes)
+                computeVertex(time);
+            computeVertex(slider.EndTime);
         }
     }
 }
