@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <Import Project="..\osu.Game.props" />
   <PropertyGroup>
     <ProjectGuid>{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -61,7 +62,6 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <Commandlineparameters>
     </Commandlineparameters>
-    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -195,9 +195,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
     <None Include="app.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="osu!.res" />
