@@ -9,8 +9,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseDialogOverlay : OsuTestCase
     {
-        public override string Description => @"Display dialogs";
-
         public TestCaseDialogOverlay()
         {
             DialogOverlay overlay;

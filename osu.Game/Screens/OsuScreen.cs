@@ -70,7 +70,7 @@ namespace osu.Game.Screens
             if (osuGame != null)
                 Ruleset.BindTo(osuGame.Ruleset);
 
-            sampleExit = audio.Sample.Get(@"UI/melodic-1");
+            sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
 
         protected override void OnResuming(Screen last)

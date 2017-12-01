@@ -6,7 +6,7 @@ using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API
 {
-    internal class OAuth
+    public class OAuth
     {
         private readonly string clientId;
         private readonly string clientSecret;
@@ -96,6 +96,7 @@ namespace osu.Game.Online.API
 
                 // if not, let's try using our refresh token to request a new access token.
                 if (!string.IsNullOrEmpty(Token?.RefreshToken))
+                    // ReSharper disable once PossibleNullReferenceException
                     AuthenticateWithRefresh(Token.RefreshToken);
 
                 return accessTokenValid;

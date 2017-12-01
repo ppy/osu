@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// The part of the timeline that displays the current position of the song.
     /// </summary>
-    internal class MarkerPart : TimelinePart
+    public class MarkerPart : TimelinePart
     {
         private readonly Drawable marker;
 

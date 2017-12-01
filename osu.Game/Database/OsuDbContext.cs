@@ -29,12 +29,6 @@ namespace osu.Game.Database
 
         private static readonly Lazy<OsuDbLoggerFactory> logger = new Lazy<OsuDbLoggerFactory>(() => new OsuDbLoggerFactory());
 
-        static OsuDbContext()
-        {
-            // required to initialise native SQLite libraries on some platforms.
-            SQLitePCL.Batteries_V2.Init();
-        }
-
         /// <summary>
         /// Create a new in-memory OsuDbContext instance.
         /// </summary>
@@ -78,6 +72,7 @@ namespace osu.Game.Database
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.OnlineBeatmapID).IsUnique();
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash).IsUnique();
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash).IsUnique();
 
@@ -102,7 +97,7 @@ namespace osu.Game.Database
             return null;
         }
 
-        public new int SaveChanges(IDbContextTransaction transaction = null)
+        public int SaveChanges(IDbContextTransaction transaction = null)
         {
             var ret = base.SaveChanges();
             transaction?.Commit();
@@ -262,7 +257,7 @@ namespace osu.Game.Database
                         throw new MigrationFailedException(e);
                     }
                 }
-                catch (MigrationFailedException e)
+                catch (MigrationFailedException)
                 {
                     throw;
                 }

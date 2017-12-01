@@ -96,7 +96,7 @@ namespace osu.Desktop.Deploy
             runCommand(nuget_path, "restore " + solutionPath);
 
             write("Updating AssemblyInfo...");
-            updateAssemblyInfo(version);
+            updateCsprojVersion(version);
 
             write("Running build process...");
             foreach (string targetName in TargetNames.Split(','))
@@ -123,7 +123,7 @@ namespace osu.Desktop.Deploy
             uploadBuild(version);
 
             //reset assemblyinfo.
-            updateAssemblyInfo("0.0.0");
+            updateCsprojVersion("0.0.0");
 
             write("Done!", ConsoleColor.White);
             Console.ReadLine();
@@ -145,6 +145,8 @@ namespace osu.Desktop.Deploy
         /// </summary>
         private static void checkReleaseFiles()
         {
+            if (!canGitHub) return;
+
             var releaseLines = getReleaseLines();
 
             //ensure we have all files necessary
@@ -157,6 +159,8 @@ namespace osu.Desktop.Deploy
 
         private static void pruneReleases()
         {
+            if (!canGitHub) return;
+
             write("Pruning RELEASES...");
 
             var releaseLines = getReleaseLines().ToList();
@@ -190,7 +194,7 @@ namespace osu.Desktop.Deploy
 
         private static void uploadBuild(string version)
         {
-            if (string.IsNullOrEmpty(GitHubAccessToken) || string.IsNullOrEmpty(codeSigningCertPath))
+            if (!canGitHub || string.IsNullOrEmpty(CodeSigningCertificate))
                 return;
 
             write("Publishing to GitHub...");
@@ -228,8 +232,12 @@ namespace osu.Desktop.Deploy
 
         private static void openGitHubReleasePage() => Process.Start(GitHubReleasePage);
 
+        private static bool canGitHub => !string.IsNullOrEmpty(GitHubAccessToken);
+
         private static void checkGitHubReleases()
         {
+            if (!canGitHub) return;
+
             write("Checking GitHub releases...");
             var req = new JsonWebRequest<List<GitHubRelease>>($"{GitHubApiEndpoint}");
             req.AuthenticatedBlockingPerform();
@@ -297,20 +305,29 @@ namespace osu.Desktop.Deploy
             Directory.CreateDirectory(directory);
         }
 
-        private static void updateAssemblyInfo(string version)
+        private static void updateCsprojVersion(string version)
         {
-            string file = Path.Combine(ProjectName, "Properties", "AssemblyInfo.cs");
+            var toUpdate = new[] { "<Version>", "<FileVersion>" };
+            string file = Path.Combine(ProjectName, $"{ProjectName}.csproj");
 
             var l1 = File.ReadAllLines(file);
             List<string> l2 = new List<string>();
             foreach (var l in l1)
             {
-                if (l.StartsWith("[assembly: AssemblyVersion("))
-                    l2.Add($"[assembly: AssemblyVersion(\"{version}\")]");
-                else if (l.StartsWith("[assembly: AssemblyFileVersion("))
-                    l2.Add($"[assembly: AssemblyFileVersion(\"{version}\")]");
-                else
-                    l2.Add(l);
+                string line = l;
+
+                foreach (var tag in toUpdate)
+                {
+                    int startIndex = l.IndexOf(tag, StringComparison.InvariantCulture);
+                    if (startIndex == -1)
+                        continue;
+                    startIndex += tag.Length;
+
+                    int endIndex = l.IndexOf("<", startIndex, StringComparison.InvariantCulture);
+                    line = $"{l.Substring(0, startIndex)}{version}{l.Substring(endIndex)}";
+                }
+
+                l2.Add(line);
             }
 
             File.WriteAllLines(file, l2);
@@ -327,8 +344,8 @@ namespace osu.Desktop.Deploy
                 path = Environment.CurrentDirectory;
 
             while (!File.Exists(Path.Combine(path, $"{SolutionName}.sln")))
-                path = path.Remove(path.LastIndexOf('\\'));
-            path += "\\";
+                path = path.Remove(path.LastIndexOf(Path.DirectorySeparatorChar));
+            path += Path.DirectorySeparatorChar;
 
             Environment.CurrentDirectory = path;
         }

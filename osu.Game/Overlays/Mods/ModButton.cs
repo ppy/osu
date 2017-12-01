@@ -17,6 +17,7 @@ using osu.Game.Rulesets.UI;
 using System;
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -148,7 +149,7 @@ namespace osu.Game.Overlays.Mods
 
         // the mods from Mod, only multiple if Mod is a MultiMod
 
-        public override Mod SelectedMod => Mods.ElementAtOrDefault(SelectedIndex);
+        public virtual Mod SelectedMod => Mods.ElementAtOrDefault(SelectedIndex);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -207,14 +208,12 @@ namespace osu.Game.Overlays.Mods
                     {
                         Origin = Anchor.BottomRight,
                         Anchor = Anchor.BottomRight,
-                        AutoSizeAxes = Axes.Both,
                         Position = new Vector2(1.5f),
                     },
                     foregroundIcon = new ModIcon(Mods[0])
                     {
                         Origin = Anchor.BottomRight,
                         Anchor = Anchor.BottomRight,
-                        AutoSizeAxes = Axes.Both,
                         Position = new Vector2(-1.5f),
                     },
                 });
@@ -225,7 +224,6 @@ namespace osu.Game.Overlays.Mods
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
                 });
             }
         }
@@ -256,6 +254,7 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.TopCentre,
                     TextSize = 18,
                 },
+                new HoverClickSounds()
             };
 
             Mod = mod;

@@ -22,8 +22,6 @@ namespace osu.Game.Screens.Play
     {
         public bool IsPaused { get; private set; }
 
-        public bool AllowExit => IsPaused && pauseOverlay.Alpha == 1;
-
         public Func<bool> CheckCanPause;
 
         private const double pause_cooldown = 1000;
