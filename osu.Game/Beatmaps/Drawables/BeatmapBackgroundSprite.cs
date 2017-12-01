@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    internal class BeatmapBackgroundSprite : Sprite
+    public class BeatmapBackgroundSprite : Sprite
     {
         private readonly WorkingBeatmap working;
 

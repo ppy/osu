@@ -193,21 +193,21 @@ namespace osu.Game.Screens.Tournament
 
                                     Children = new Drawable[]
                                     {
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Begin random",
                                             Action = teamsContainer.StartScrolling,
                                         },
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Stop random",
                                             Action = teamsContainer.StopScrolling,
                                         },
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
@@ -232,7 +232,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Children = new Drawable[]
                                     {
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
@@ -326,6 +326,7 @@ namespace osu.Game.Screens.Tournament
                             if (line.ToUpper().StartsWith("GROUP"))
                                 continue;
 
+                            // ReSharper disable once AccessToModifiedClosure
                             DrawingsTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
 
                             if (teamToAdd == null)

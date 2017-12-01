@@ -15,7 +15,7 @@ using osu.Framework.Lists;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class JuiceStream : CatchBaseHit, IHasCurve
+    public class JuiceStream : CatchHitObject, IHasCurve
     {
         /// <summary>
         /// Positional distance that results in a duration of one second, before any speed adjustments.
@@ -42,11 +42,11 @@ namespace osu.Game.Rulesets.Catch.Objects
             TickDistance = scoringDistance / difficulty.SliderTickRate;
         }
 
-        public IEnumerable<CatchBaseHit> Ticks
+        public IEnumerable<CatchHitObject> Ticks
         {
             get
             {
-                SortedList<CatchBaseHit> ticks = new SortedList<CatchBaseHit>((a, b) => a.StartTime.CompareTo(b.StartTime));
+                SortedList<CatchHitObject> ticks = new SortedList<CatchHitObject>((a, b) => a.StartTime.CompareTo(b.StartTime));
 
                 if (TickDistance == 0)
                     return ticks;

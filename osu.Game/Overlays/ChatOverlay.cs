@@ -58,7 +58,7 @@ namespace osu.Game.Overlays
         private readonly Box chatBackground;
         private readonly Box tabBackground;
 
-        public Bindable<double> ChatHeight { get; internal set; }
+        public Bindable<double> ChatHeight { get; set; }
 
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
@@ -207,6 +207,7 @@ namespace osu.Game.Overlays
             {
                 Trace.Assert(state.Mouse.PositionMouseDown != null);
 
+                // ReSharper disable once PossibleInvalidOperationException
                 double targetChatHeight = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
@@ -380,6 +381,7 @@ namespace osu.Game.Overlays
         {
             if (channel == null) return;
 
+            // ReSharper disable once AccessToModifiedClosure
             var existing = careChannels.Find(c => c.Id == channel.Id);
 
             if (existing != null)

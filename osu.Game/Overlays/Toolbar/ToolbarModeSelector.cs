@@ -14,7 +14,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    internal class ToolbarModeSelector : Container
+    public class ToolbarModeSelector : Container
     {
         private const float padding = 10;
 

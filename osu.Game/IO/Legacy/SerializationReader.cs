@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
@@ -175,7 +174,7 @@ namespace osu.Game.IO.Legacy
                 versionBinder = new VersionConfigToNamespaceAssemblyObjectBinder();
                 formatter = new BinaryFormatter
                 {
-                    AssemblyFormat = FormatterAssemblyStyle.Simple,
+//                    AssemblyFormat = FormatterAssemblyStyle.Simple,
                     Binder = versionBinder
                 };
             }
@@ -187,6 +186,7 @@ namespace osu.Game.IO.Legacy
 
                 Debug.Assert(formatter != null, "formatter != null");
 
+                // ReSharper disable once PossibleNullReferenceException
                 return formatter.Deserialize(stream);
             }
 

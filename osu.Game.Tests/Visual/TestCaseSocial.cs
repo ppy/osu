@@ -8,8 +8,6 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseSocial : OsuTestCase
     {
-        public override string Description => @"social browser overlay";
-
         public TestCaseSocial()
         {
             SocialOverlay s = new SocialOverlay

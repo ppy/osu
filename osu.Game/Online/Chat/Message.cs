@@ -57,6 +57,7 @@ namespace osu.Game.Online.Chat
 
         public virtual bool Equals(Message other) => Id == other?.Id;
 
+        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         public override int GetHashCode() => Id.GetHashCode();
     }
 

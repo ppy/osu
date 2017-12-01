@@ -19,6 +19,7 @@ namespace osu.Game.Online.API.Requests
             this.type = type;
         }
 
+        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         protected override string Target => $@"users/{userId}/beatmapsets/{type.ToString().Underscore()}?offset={offset}";
     }
 
@@ -26,6 +27,8 @@ namespace osu.Game.Online.API.Requests
     {
         MostPlayed,
         Favourite,
-        RankedAndApproved
+        RankedAndApproved,
+        Unranked,
+        Graveyard
     }
 }

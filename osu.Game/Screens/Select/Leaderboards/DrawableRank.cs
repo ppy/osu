@@ -14,14 +14,9 @@ namespace osu.Game.Screens.Select.Leaderboards
     public class DrawableRank : Container
     {
         private readonly Sprite rankSprite;
+        private TextureStore textures;
 
         public ScoreRank Rank { get; private set; }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            rankSprite.Texture = textures.Get($@"Grades/{Rank.GetDescription()}");
-        }
 
         public DrawableRank(ScoreRank rank)
         {
@@ -37,6 +32,21 @@ namespace osu.Game.Screens.Select.Leaderboards
                     FillMode = FillMode.Fit
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
+        {
+            this.textures = textures;
+            updateTexture();
+        }
+
+        private void updateTexture() => rankSprite.Texture = textures.Get($@"Grades/{Rank.GetDescription()}");
+
+        public void UpdateRank(ScoreRank newRank)
+        {
+            Rank = newRank;
+            updateTexture();
         }
     }
 }

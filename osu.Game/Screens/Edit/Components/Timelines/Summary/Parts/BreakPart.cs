@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// The part of the timeline that displays breaks in the song.
     /// </summary>
-    internal class BreakPart : TimelinePart
+    public class BreakPart : TimelinePart
     {
         protected override void LoadBeatmap(WorkingBeatmap beatmap)
         {

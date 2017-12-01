@@ -10,8 +10,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseUserPanel : OsuTestCase
     {
-        public override string Description => @"Panels for displaying a user's status";
-
         public TestCaseUserPanel()
         {
             UserPanel flyte;
@@ -36,7 +34,8 @@ namespace osu.Game.Tests.Visual
                         Username = @"peppy",
                         Id = 2,
                         Country = new Country { FlagName = @"AU" },
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                        IsSupporter = true,
                     }) { Width = 300 },
                 },
             });

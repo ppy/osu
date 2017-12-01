@@ -10,8 +10,6 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseReplaySettingsOverlay : OsuTestCase
     {
-        public override string Description => @"Settings visible in replay/auto";
-
         public TestCaseReplaySettingsOverlay()
         {
             ExampleContainer container;
@@ -24,7 +22,7 @@ namespace osu.Game.Tests.Visual
 
             Add(container = new ExampleContainer());
 
-            AddStep(@"Add button", () => container.Add(new OsuButton
+            AddStep(@"Add button", () => container.Add(new TriangleButton
             {
                 RelativeSizeAxes = Axes.X,
                 Text = @"Button",

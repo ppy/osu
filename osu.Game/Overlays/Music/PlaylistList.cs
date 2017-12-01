@@ -14,7 +14,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {
-    internal class PlaylistList : CompositeDrawable
+    public class PlaylistList : CompositeDrawable
     {
         public Action<BeatmapSetInfo> OnSelect;
 

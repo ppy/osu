@@ -17,13 +17,11 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class TestCasePlayer : OsuTestCase
+    public abstract class TestCasePlayer : ScreenTestCase
     {
         private readonly Type ruleset;
 
         protected Player Player;
-
-        public override string Description => @"Showing everything to play the game.";
 
         /// <summary>
         /// Create a TestCase which runs through the Player screen.
@@ -46,12 +44,17 @@ namespace osu.Game.Tests.Visual
             {
                 RelativeSizeAxes = Framework.Graphics.Axes.Both,
                 Colour = Color4.Black,
+                Depth = int.MaxValue
             });
 
             string instantiation = ruleset?.AssemblyQualifiedName;
 
             foreach (var r in rulesets.AvailableRulesets.Where(rs => instantiation == null || rs.InstantiationInfo == instantiation))
-                AddStep(r.Name, () => loadPlayerFor(r));
+            {
+                Player p = null;
+                AddStep(r.Name, () => p = loadPlayerFor(r));
+                AddUntilStep(() => p.IsLoaded);
+            }
         }
 
         protected virtual Beatmap CreateBeatmap()
@@ -65,7 +68,7 @@ namespace osu.Game.Tests.Visual
             return beatmap;
         }
 
-        private void loadPlayerFor(RulesetInfo r)
+        private Player loadPlayerFor(RulesetInfo r)
         {
             var beatmap = CreateBeatmap();
 
@@ -79,19 +82,21 @@ namespace osu.Game.Tests.Visual
             if (Player != null)
                 Remove(Player);
 
-            Add(Player = CreatePlayer(working, instance));
+            var player = CreatePlayer(working, instance);
+
+            LoadComponentAsync(player, LoadScreen);
+
+            return player;
         }
 
-        protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset)
+        protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset) => new Player
         {
-            return new Player
-            {
-                InitialBeatmap = beatmap
-            };
-        }
+            InitialBeatmap = beatmap,
+            AllowPause = false
+        };
 
         private const string test_beatmap_data =
-@"osu file format v14
+            @"osu file format v14
 
 [General]
 AudioLeadIn: 500

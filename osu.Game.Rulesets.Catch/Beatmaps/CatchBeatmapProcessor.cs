@@ -6,9 +6,9 @@ using osu.Game.Rulesets.Catch.Objects;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
-    internal class CatchBeatmapProcessor : BeatmapProcessor<CatchBaseHit>
+    internal class CatchBeatmapProcessor : BeatmapProcessor<CatchHitObject>
     {
-        public override void PostProcess(Beatmap<CatchBaseHit> beatmap)
+        public override void PostProcess(Beatmap<CatchHitObject> beatmap)
         {
             if (beatmap.ComboColors.Count == 0)
                 return;
@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             int comboIndex = 0;
             int colourIndex = 0;
 
-            CatchBaseHit lastObj = null;
+            CatchHitObject lastObj = null;
 
             foreach (var obj in beatmap.HitObjects)
             {

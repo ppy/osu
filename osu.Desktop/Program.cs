@@ -15,6 +15,9 @@ namespace osu.Desktop
         [STAThread]
         public static int Main(string[] args)
         {
+            // required to initialise native SQLite libraries on some platforms.
+            SQLitePCL.Batteries_V2.Init();
+
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
 

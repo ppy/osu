@@ -17,7 +17,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {
-    internal class PlaylistItem : Container, IFilterable, IDraggable
+    public class PlaylistItem : Container, IFilterable, IDraggable
     {
         private const float fade_duration = 100;
 

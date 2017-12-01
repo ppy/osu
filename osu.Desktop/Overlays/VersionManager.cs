@@ -1,9 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Diagnostics;
-using System.Net.Http;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
@@ -12,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Logging;
 using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -21,13 +18,21 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using OpenTK;
 using OpenTK.Graphics;
+
+#if NET_FRAMEWORK
+using System;
+using osu.Framework.Logging;
 using Squirrel;
+#endif
 
 namespace osu.Desktop.Overlays
 {
     public class VersionManager : OverlayContainer
     {
+#if NET_FRAMEWORK
         private UpdateManager updateManager;
+#endif
+
         private NotificationOverlay notificationOverlay;
         private OsuConfigManager config;
         private OsuGameBase game;
@@ -95,8 +100,10 @@ namespace osu.Desktop.Overlays
                 }
             };
 
+#if NET_FRAMEWORK
             if (game.IsDeployedBuild)
                 checkForUpdateAsync();
+#endif
         }
 
         protected override void LoadComplete()
@@ -138,9 +145,13 @@ namespace osu.Desktop.Overlays
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+#if NET_FRAMEWORK
             updateManager?.Dispose();
+#endif
         }
 
+#if NET_FRAMEWORK
         private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
             //should we schedule a retry on completion of this check?
@@ -198,10 +209,9 @@ namespace osu.Desktop.Overlays
                     }
                 }
             }
-            catch (HttpRequestException)
+            catch (Exception)
             {
-                //likely have no internet connection.
-                //we'll ignore this and retry later.
+                // we'll ignore this and retry later. can be triggered by no internet connection or thread abortion.
             }
             finally
             {
@@ -214,6 +224,7 @@ namespace osu.Desktop.Overlays
                 }
             }
         }
+#endif
 
         protected override void PopIn()
         {
@@ -233,7 +244,10 @@ namespace osu.Desktop.Overlays
                 Text = @"Update ready to install. Click to restart!",
                 Activated = () =>
                 {
-                    UpdateManager.RestartAppWhenExited();
+                    // Squirrel returns execution to us after the update process is started, so it's safe to use Wait() here
+#if NET_FRAMEWORK
+                    UpdateManager.RestartAppWhenExited().Wait();
+#endif
                     game.GracefullyExit();
                     return true;
                 }

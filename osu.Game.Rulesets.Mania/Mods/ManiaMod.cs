@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight) };
     }
 
-    public class ManiaModRandom : Mod, IApplicableMod<ManiaHitObject>
+    public class ManiaModRandom : Mod, IApplicableToRulesetContainer<ManiaHitObject>
     {
         public override string Name => "Random";
         public override string ShortenedName => "RD";
@@ -97,7 +97,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public void ApplyToRulesetContainer(RulesetContainer<ManiaHitObject> rulesetContainer)
         {
             int availableColumns = ((ManiaRulesetContainer)rulesetContainer).AvailableColumns;
-
             var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(item => RNG.Next()).ToList();
 
             rulesetContainer.Objects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
@@ -177,21 +176,10 @@ namespace osu.Game.Rulesets.Mania.Mods
 
     public class ManiaModAutoplay : ModAutoplay<ManiaHitObject>
     {
-        private int availableColumns;
-
-        public override void ApplyToRulesetContainer(RulesetContainer<ManiaHitObject> rulesetContainer)
-        {
-            // Todo: This shouldn't be done, we should be getting a ManiaBeatmap which should store AvailableColumns
-            // But this is dependent on a _lot_ of refactoring
-            var maniaRulesetContainer = (ManiaRulesetContainer)rulesetContainer;
-            availableColumns = maniaRulesetContainer.AvailableColumns;
-
-            base.ApplyToRulesetContainer(rulesetContainer);
-        }
         protected override Score CreateReplayScore(Beatmap<ManiaHitObject> beatmap) => new Score
         {
             User = new User { Username = "osu!topus!" },
-            Replay = new ManiaAutoGenerator(beatmap, availableColumns).Generate(),
+            Replay = new ManiaAutoGenerator(beatmap).Generate(),
         };
     }
 }

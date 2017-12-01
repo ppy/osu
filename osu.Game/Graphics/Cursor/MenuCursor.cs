@@ -33,6 +33,7 @@ namespace osu.Game.Graphics.Cursor
 
                 // don't start rotating until we're moved a minimum distance away from the mouse down location,
                 // else it can have an annoying effect.
+                // ReSharper disable once PossibleInvalidOperationException
                 startRotation |= Vector2Extensions.Distance(state.Mouse.Position, state.Mouse.PositionMouseDown.Value) > 30;
 
                 if (startRotation)

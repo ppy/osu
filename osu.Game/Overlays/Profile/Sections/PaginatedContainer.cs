@@ -51,6 +51,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
+                    Margin = new MarginPadding { Bottom = 10 }
                 },
                 ShowMoreButton = new OsuHoverContainer
                 {

@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace osu.Game.Screens.Tournament.Components
 {
-    internal class VisualiserContainer : Container
+    public class VisualiserContainer : Container
     {
         /// <summary>
         /// Number of lines in the visualiser.

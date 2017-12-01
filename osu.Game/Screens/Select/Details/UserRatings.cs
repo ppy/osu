@@ -29,11 +29,17 @@ namespace osu.Game.Screens.Select.Details
                 if (value == metrics) return;
                 metrics = value;
 
-                var ratings = Metrics.Ratings.ToList();
-                negativeRatings.Text = ratings.GetRange(0, ratings.Count / 2).Sum().ToString();
-                positiveRatings.Text = ratings.GetRange(ratings.Count / 2, ratings.Count / 2).Sum().ToString();
-                ratingsBar.Length = (float)ratings.GetRange(0, ratings.Count / 2).Sum() / ratings.Sum();
-                graph.Values = Metrics.Ratings.Select(r => (float)r);
+                const int rating_range = 10;
+
+                var ratings = Metrics.Ratings.Skip(1).Take(rating_range); // adjust for API returning weird empty data at 0.
+
+                var negativeCount = ratings.Take(rating_range / 2).Sum();
+                var totalCount = ratings.Sum();
+
+                negativeRatings.Text = negativeCount.ToString();
+                positiveRatings.Text = (totalCount - negativeCount).ToString();
+                ratingsBar.Length = totalCount == 0 ? 0 : (float)negativeCount / totalCount;
+                graph.Values = ratings.Take(rating_range).Select(r => (float)r);
             }
         }
 
