@@ -201,7 +201,10 @@ namespace osu.Game.Rulesets.Catch.UI
                     catchObjectPosition <= catcherPosition + relative_catcher_width / 2;
 
                 if (validCatch && fruit.HyperDash)
+                {
                     HyperDashModifier = Math.Abs(fruit.HyperDashTarget.X - fruit.X) / Math.Abs(fruit.HyperDashTarget.StartTime - fruit.StartTime) / BASE_SPEED;
+                    HyperDashDirection = fruit.HyperDashTarget.X - fruit.X;
+                }
                 else
                     HyperDashModifier = 1;
 
@@ -214,6 +217,8 @@ namespace osu.Game.Rulesets.Catch.UI
             public bool HyperDashing => hyperDashModifier != 1;
 
             private double hyperDashModifier = 1;
+
+            public double HyperDashDirection;
 
             public double HyperDashModifier
             {
@@ -233,6 +238,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     }
                     else
                     {
+                        HyperDashDirection = 0;
                         this.FadeColour(Color4.White, transition_length, Easing.OutQuint);
                         this.FadeTo(1, transition_length, Easing.OutQuint);
                     }
@@ -286,13 +292,15 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (currentDirection == 0) return;
 
+                var direction = Math.Sign(currentDirection);
+
                 double dashModifier = Dashing ? 1 : 0.5;
 
-                if (hyperDashModifier != 1)
+                if (hyperDashModifier != 1 && (HyperDashDirection == 0 || direction == Math.Sign(HyperDashDirection)))
                     dashModifier = hyperDashModifier;
 
-                Scale = new Vector2(Math.Abs(Scale.X) * Math.Sign(currentDirection), Scale.Y);
-                X = (float)MathHelper.Clamp(X + Math.Sign(currentDirection) * Clock.ElapsedFrameTime * BASE_SPEED * dashModifier, 0, 1);
+                Scale = new Vector2(Math.Abs(Scale.X) * direction, Scale.Y);
+                X = (float)MathHelper.Clamp(X + direction * Clock.ElapsedFrameTime * BASE_SPEED * dashModifier, 0, 1);
             }
 
             private void explode()
