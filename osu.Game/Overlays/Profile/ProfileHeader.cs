@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Profile
     public class ProfileHeader : Container
     {
         private readonly OsuTextFlowContainer infoTextLeft;
-        private readonly LinkFlowContainer infoTextRight;
+        private readonly OsuLinkTextFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
 
         private readonly Container coverContainer, chartContainer, supporterTag;
@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Profile
                                                 }
                                             }
                                         },
-                                        new LinkFlowContainer.ProfileLink(user)
+                                        new ProfileLink(user)
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
@@ -160,7 +160,7 @@ namespace osu.Game.Overlays.Profile
                     ParagraphSpacing = 0.8f,
                     LineSpacing = 0.2f
                 },
-                infoTextRight = new LinkFlowContainer(t =>
+                infoTextRight = new OsuLinkTextFlowContainer(t =>
                 {
                     t.TextSize = 14;
                     t.Font = @"Exo2.0-RegularItalic";
@@ -488,57 +488,16 @@ namespace osu.Game.Overlays.Profile
             }
         }
 
-        private class LinkFlowContainer : OsuTextFlowContainer
+        private class ProfileLink : OsuLinkSpriteText, IHasTooltip
         {
-            public override bool HandleInput => true;
+            public string TooltipText => "View Profile in Browser";
 
-            public LinkFlowContainer(Action<SpriteText> defaultCreationParameters = null) : base(defaultCreationParameters)
+            public ProfileLink(User user)
             {
-            }
-
-            protected override SpriteText CreateSpriteText() => new LinkText();
-
-            public void AddLink(string text, string url) => AddText(text, link => ((LinkText)link).Url = url);
-
-            public class LinkText : OsuSpriteText
-            {
-                private readonly OsuHoverContainer content;
-
-                public override bool HandleInput => content.Action != null;
-
-                protected override Container<Drawable> Content => content ?? (Container<Drawable>)this;
-
-                protected override IEnumerable<Drawable> FlowingChildren => Children;
-
-                public string Url
-                {
-                    set
-                    {
-                        if(value != null)
-                            content.Action = () => Process.Start(value);
-                    }
-                }
-
-                public LinkText()
-                {
-                    AddInternal(content = new OsuHoverContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                    });
-                }
-            }
-
-            public class ProfileLink : LinkText, IHasTooltip
-            {
-                public string TooltipText => "View Profile in Browser";
-
-                public ProfileLink(User user)
-                {
-                    Text = user.Username;
-                    Url = $@"https://osu.ppy.sh/users/{user.Id}";
-                    Font = @"Exo2.0-RegularItalic";
-                    TextSize = 30;
-                }
+                Text = user.Username;
+                Url = $@"https://osu.ppy.sh/users/{user.Id}";
+                Font = @"Exo2.0-RegularItalic";
+                TextSize = 30;
             }
         }
     }
