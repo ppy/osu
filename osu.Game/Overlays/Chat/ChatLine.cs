@@ -67,12 +67,13 @@ namespace osu.Game.Overlays.Chat
         private const float text_size = 20;
 
         private Color4 customUsernameColour;
+        private Color4 urlColour;
 
         private OsuSpriteText timestamp;
 
         public ChatLine(Message message)
         {
-            Message = message;
+            Message = MessageFormatter.FormatMessage(message);
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -82,7 +83,7 @@ namespace osu.Game.Overlays.Chat
 
         private Message message;
         private OsuSpriteText username;
-        private OsuTextFlowContainer contentFlow;
+        private OsuLinkTextFlowContainer<ChatLinkSpriteText> contentFlow;
 
         public Message Message
         {
@@ -104,6 +105,7 @@ namespace osu.Game.Overlays.Chat
         private void load(OsuColour colours)
         {
             customUsernameColour = colours.ChatBlue;
+            urlColour = colours.Blue;
         }
 
         private bool senderHasBackground => !string.IsNullOrEmpty(message.Sender.Colour);
@@ -187,7 +189,7 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
-                        contentFlow = new OsuTextFlowContainer(t => { t.TextSize = text_size; })
+                        contentFlow = new OsuLinkTextFlowContainer<ChatLinkSpriteText>(t => { t.TextSize = text_size; })
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
@@ -210,16 +212,38 @@ namespace osu.Game.Overlays.Chat
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
             username.Text = $@"{message.Sender.Username}" + (senderHasBackground ? "" : ":");
 
-            if (message.IsAction)
+            contentFlow.Clear();
+
+            if (message.Links == null || message.Links.Count == 0)
             {
-                contentFlow.Clear();
-                contentFlow.AddText("[", sprite => sprite.Padding = new MarginPadding { Right = action_padding });
-                contentFlow.AddText(message.Content, sprite => sprite.Font = @"Exo2.0-MediumItalic");
-                contentFlow.AddText("]", sprite => sprite.Padding = new MarginPadding { Left = action_padding });
+                contentFlow.AddText(message.Content, sprite =>
+                {
+                    if (message.IsAction)
+                        sprite.Font = @"Exo2.0-MediumItalic";
+                });
+
+                return;
             }
             else
-                contentFlow.Text = message.Content;
+            {
+                int prevIndex = 0;
+                foreach (var link in message.Links)
+                {
+                    contentFlow.AddText(message.Content.Substring(prevIndex, link.Index - prevIndex));
+                    prevIndex = link.Index + link.Length;
 
+                    contentFlow.AddLink(message.Content.Substring(link.Index, link.Length), link.Url, sprite =>
+                    {
+                        if (message.IsAction)
+                            sprite.Font = @"Exo2.0-MediumItalic";
+                        sprite.Colour = urlColour;
+                    });
+                }
+
+                // Add text after the last link
+                var lastLink = message.Links[message.Links.Count - 1];
+                contentFlow.AddText(message.Content.Substring(lastLink.Index + lastLink.Length));
+            }
         }
 
         private class MessageSender : OsuClickableContainer, IHasContextMenu
