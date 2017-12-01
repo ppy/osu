@@ -22,18 +22,18 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         public const float CATCHER_SIZE = 172;
 
-        private readonly Catcher catcher;
+        protected readonly Catcher MovableCatcher;
 
         public Container ExplodingFruitTarget
         {
-            set { catcher.ExplodingFruitTarget = value; }
+            set { MovableCatcher.ExplodingFruitTarget = value; }
         }
 
         public CatcherArea(BeatmapDifficulty difficulty = null)
         {
             RelativeSizeAxes = Axes.X;
             Height = CATCHER_SIZE;
-            Child = catcher = new Catcher(difficulty)
+            Child = MovableCatcher = new Catcher(difficulty)
             {
                 AdditiveTarget = this,
             };
@@ -42,17 +42,17 @@ namespace osu.Game.Rulesets.Catch.UI
         public void Add(DrawableHitObject fruit, Vector2 absolutePosition)
         {
             fruit.RelativePositionAxes = Axes.None;
-            fruit.Position = new Vector2(catcher.ToLocalSpace(absolutePosition).X - catcher.DrawSize.X / 2, 0);
+            fruit.Position = new Vector2(MovableCatcher.ToLocalSpace(absolutePosition).X - MovableCatcher.DrawSize.X / 2, 0);
 
             fruit.Anchor = Anchor.TopCentre;
             fruit.Origin = Anchor.BottomCentre;
             fruit.Scale *= 0.7f;
             fruit.LifetimeEnd = double.MaxValue;
 
-            catcher.Add(fruit);
+            MovableCatcher.Add(fruit);
         }
 
-        public bool AttemptCatch(CatchHitObject obj) => catcher.AttemptCatch(obj);
+        public bool AttemptCatch(CatchHitObject obj) => MovableCatcher.AttemptCatch(obj);
 
         public class Catcher : Container, IKeyBindingHandler<CatchAction>
         {
@@ -181,8 +181,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (catchObject.LastInCombo)
                     explode();
-
-                updateHyperDashState(catchObject, true);
             }
 
             /// <summary>
@@ -202,10 +200,43 @@ namespace osu.Game.Rulesets.Catch.UI
                     catchObjectPosition >= catcherPosition - relative_catcher_width / 2 &&
                     catchObjectPosition <= catcherPosition + relative_catcher_width / 2;
 
-                // if we are hypderdashing in teh next hit is not, let's change our state here (it's our only opportunity to handle missed fruit currently).
-                updateHyperDashState(fruit, false);
+                if (validCatch && fruit.HyperDash)
+                    HyperDashModifier = Math.Abs(fruit.HyperDashTarget.X - fruit.X) / Math.Abs(fruit.HyperDashTarget.StartTime - fruit.StartTime) / BASE_SPEED;
+                else
+                    HyperDashModifier = 1;
 
                 return validCatch;
+            }
+
+            /// <summary>
+            /// Whether we are hypderdashing or not.
+            /// </summary>
+            public bool HyperDashing => hyperDashModifier != 1;
+
+            private double hyperDashModifier = 1;
+
+            public double HyperDashModifier
+            {
+                get { return hyperDashModifier; }
+                set
+                {
+                    if (value == hyperDashModifier) return;
+                    hyperDashModifier = value;
+
+                    const float transition_length = 180;
+
+                    if (HyperDashing)
+                    {
+                        this.FadeColour(Color4.Yellow, transition_length, Easing.OutQuint);
+                        this.FadeTo(0.2f, transition_length, Easing.OutQuint);
+                        Trail = true;
+                    }
+                    else
+                    {
+                        this.FadeColour(Color4.White, transition_length, Easing.OutQuint);
+                        this.FadeTo(1, transition_length, Easing.OutQuint);
+                    }
+                }
             }
 
             public bool OnPressed(CatchAction action)
@@ -262,39 +293,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 Scale = new Vector2(Math.Abs(Scale.X) * Math.Sign(currentDirection), Scale.Y);
                 X = (float)MathHelper.Clamp(X + Math.Sign(currentDirection) * Clock.ElapsedFrameTime * BASE_SPEED * dashModifier, 0, 1);
-            }
-
-            /// <summary>
-            /// Whether we are hypderdashing or not.
-            /// </summary>
-            protected bool HyperDashing => hyperDashModifier != 1;
-
-            private double hyperDashModifier = 1;
-
-            /// <summary>
-            /// Update whether we are hyper or not.
-            /// </summary>
-            /// <param name="fruit">The fruit to use as a condition for deciding our new state.</param>
-            /// <param name="allowBegin">Whether to allow entering hyperdash or not. If false, we will only exit if required, but never enter.</param>
-            private void updateHyperDashState(CatchHitObject fruit, bool allowBegin)
-            {
-                const float transition_length = 180;
-
-                if (!fruit.HyperDash)
-                {
-                    hyperDashModifier = 1;
-                    this.FadeColour(Color4.White, transition_length, Easing.OutQuint);
-                    this.FadeTo(1, transition_length, Easing.OutQuint);
-                    return;
-                }
-
-                if (allowBegin)
-                {
-                    hyperDashModifier = Math.Abs(fruit.HyperDashTarget.X - fruit.X) / Math.Abs(fruit.HyperDashTarget.StartTime - fruit.StartTime) / BASE_SPEED;
-                    this.FadeColour(Color4.AliceBlue, transition_length, Easing.OutQuint);
-                    this.FadeTo(0.5f, transition_length, Easing.OutQuint);
-                    Trail = true;
-                }
             }
 
             private void explode()
