@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -55,8 +58,6 @@ namespace osu.Game.Online.Chat
                                                 m.Groups[0],
                                                 m.Groups.Count > 1 ? m.Groups[1].Value : "",
                                                 m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
-
-                var testText = string.Format(link, m.Groups).Trim();
 
                 if (displayText.Length == 0 || linkText.Length == 0) continue;
 
@@ -130,11 +131,11 @@ namespace osu.Game.Online.Chat
             return result;
         }
 
-        public static FormattedMessage FormatMessage(Message inputMessage)
+        public static Message FormatMessage(Message inputMessage)
         {
             var result = format(inputMessage.Content);
+            var formatted = inputMessage;
 
-            FormattedMessage formatted = inputMessage as FormattedMessage;
             formatted.Content = result.Text;
             formatted.Links = result.Links;
             return formatted;
