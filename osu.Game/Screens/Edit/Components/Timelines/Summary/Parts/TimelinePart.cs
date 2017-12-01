@@ -40,6 +40,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 return;
             }
 
+            // Todo: This should be handled more gracefully
             timeline.RelativeChildSize = Beatmap.Value.Track.Length == double.PositiveInfinity ? Vector2.One : new Vector2((float)Math.Max(1, Beatmap.Value.Track.Length), 1);
         }
 
