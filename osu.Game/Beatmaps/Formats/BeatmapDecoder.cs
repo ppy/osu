@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps.Formats
 
         static BeatmapDecoder()
         {
-            OsuLegacyDecoder.Register();
+            LegacyDecoder.Register();
         }
 
         public static BeatmapDecoder GetDecoder(StreamReader stream)
@@ -36,10 +36,7 @@ namespace osu.Game.Beatmaps.Formats
             decoders[magic] = typeof(T);
         }
 
-        public virtual Beatmap DecodeBeatmap(StreamReader stream)
-        {
-            return ParseBeatmap(stream);
-        }
+        public virtual Beatmap DecodeBeatmap(StreamReader stream) => ParseBeatmap(stream);
 
         protected virtual Beatmap ParseBeatmap(StreamReader stream)
         {
