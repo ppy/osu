@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
                 if (timeToNext * CatcherArea.Catcher.BASE_SPEED < distanceToNext)
                 {
-                    currentObject.HyperDash = true;
+                    currentObject.HyperDashTarget = nextObject;
                     lastExcess = catcher_width_half;
                 }
                 else
