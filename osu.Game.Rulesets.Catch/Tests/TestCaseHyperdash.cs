@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             var beatmap = new Beatmap();
 
             for (int i = 0; i < 512; i++)
-                beatmap.HitObjects.Add(new Fruit { X = 0.5f + (i % 2 == 0 ? -0.4f : 0.4f), StartTime = i * 100, NewCombo = i % 8 == 0 });
+                beatmap.HitObjects.Add(new Fruit { X = 0.5f + (i % 8 < 4 ? -0.4f : 0.4f), StartTime = i * 100, NewCombo = i % 8 == 0 });
 
             return beatmap;
         }
