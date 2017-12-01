@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.UI
             };
         }
 
-        public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.CanCatch(obj);
+        public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.AttemptCatch(obj);
 
         public override void Add(DrawableHitObject h)
         {
