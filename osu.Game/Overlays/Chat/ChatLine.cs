@@ -237,6 +237,8 @@ namespace osu.Game.Overlays.Chat
                         if (message.IsAction)
                             sprite.Font = @"Exo2.0-MediumItalic";
                         sprite.Colour = urlColour;
+                        // We want to use something that is unique to every formatted link, so I just use the position of the link
+                        ((ChatLinkSpriteText)sprite).LinkId = prevIndex;
                     });
                 }
 
