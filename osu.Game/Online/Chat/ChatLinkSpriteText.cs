@@ -23,7 +23,8 @@ namespace osu.Game.Online.Chat
 
         protected override bool OnHover(InputState state)
         {
-            var otherSpritesWithSameLink = ((Container)Parent).Children.Where(child => (child as OsuLinkSpriteText)?.Url == Url && !Equals(child));
+            // Every word is one sprite in chat (for word wrap) so we need to find all other sprites that display the same link
+            var otherSpritesWithSameLink = ((Container<Drawable>)Parent).Children.Where(child => (child as OsuLinkSpriteText)?.Url == Url && !Equals(child));
 
             var hoverResult = base.OnHover(state);
 
@@ -38,7 +39,7 @@ namespace osu.Game.Online.Chat
 
         protected override void OnHoverLost(InputState state)
         {
-            var spritesWithSameLink = ((Container)Parent).Children.Where(child => (child as OsuLinkSpriteText)?.Url == Url);
+            var spritesWithSameLink = ((Container<Drawable>)Parent).Children.Where(child => (child as OsuLinkSpriteText)?.Url == Url);
 
             if (spritesWithSameLink.Any(sprite => sprite.IsHovered))
             {
