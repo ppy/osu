@@ -13,57 +13,36 @@ namespace osu.Game.Beatmaps.Formats
     {
         public static void Register()
         {
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v14");
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v13");
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v12");
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v11");
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v10");
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v9");
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v8");
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v7");
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v6");
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v5");
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v4");
-            AddDecoder<LegacyBeatmapDecoder, LegacyStoryboardDecoder>(@"osu file format v3");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v14");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v13");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v12");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v11");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v10");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v9");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v8");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v7");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v6");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v5");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v4");
+            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v3");
             // TODO: differences between versions
         }
-
-        protected Beatmap Beatmap;
-        protected Storyboard Storyboard;
 
         protected int BeatmapVersion;
         protected readonly Dictionary<string, string> Variables = new Dictionary<string, string>();
 
-        public override Beatmap DecodeBeatmap(StreamReader stream) => new LegacyBeatmap(base.DecodeBeatmap(stream));
+        public override Decoder GetStoryboardDecoder() => new LegacyStoryboardDecoder(BeatmapVersion);
 
-        protected override Beatmap ParseBeatmap(StreamReader stream) => new LegacyBeatmap(base.ParseBeatmap(stream));
+        public override Beatmap DecodeBeatmap(StreamReader stream) => new LegacyBeatmap(base.DecodeBeatmap(stream));
 
         protected override void ParseBeatmap(StreamReader stream, Beatmap beatmap)
         {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-            if (beatmap == null)
-                throw new ArgumentNullException(nameof(beatmap));
-
-            Beatmap = beatmap;
-            Beatmap.BeatmapInfo.BeatmapVersion = BeatmapVersion;
-
-            ParseContent(stream);
-
-            foreach (var hitObject in Beatmap.HitObjects)
-                hitObject.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
+            throw new NotImplementedException();
         }
 
         protected override void ParseStoryboard(StreamReader stream, Storyboard storyboard)
         {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-            if (storyboard == null)
-                throw new ArgumentNullException(nameof(storyboard));
-
-            Storyboard = storyboard;
-
-            ParseContent(stream);
+            throw new NotImplementedException();
         }
 
         protected void ParseContent(StreamReader stream)
@@ -79,11 +58,12 @@ namespace osu.Game.Beatmaps.Formats
                 if (line.StartsWith("//"))
                     continue;
 
-                if (line.StartsWith(@"osu file format v"))
-                {
-                    Beatmap.BeatmapInfo.BeatmapVersion = int.Parse(line.Substring(17));
-                    continue;
-                }
+                // It's already set in ParseBeatmap... why do it again?
+                //if (line.StartsWith(@"osu file format v"))
+                //{
+                //    Beatmap.BeatmapInfo.BeatmapVersion = int.Parse(line.Substring(17));
+                //    continue;
+                //}
 
                 if (line.StartsWith(@"[") && line.EndsWith(@"]"))
                 {

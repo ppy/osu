@@ -495,7 +495,7 @@ namespace osu.Game.Beatmaps
             BeatmapMetadata metadata;
 
             using (var stream = new StreamReader(reader.GetStream(mapName)))
-                metadata = Decoder.GetBeatmapDecoder(stream).DecodeBeatmap(stream).Metadata;
+                metadata = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
 
             // check if a set already exists with the same online id.
             beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) ?? new BeatmapSetInfo
@@ -518,7 +518,7 @@ namespace osu.Game.Beatmaps
                     raw.CopyTo(ms);
                     ms.Position = 0;
 
-                    var decoder = Decoder.GetBeatmapDecoder(sr);
+                    var decoder = Decoder.GetDecoder(sr);
                     Beatmap beatmap = decoder.DecodeBeatmap(sr);
 
                     beatmap.BeatmapInfo.Path = name;
@@ -571,7 +571,7 @@ namespace osu.Game.Beatmaps
                 {
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                     {
-                        Decoder decoder = Decoder.GetBeatmapDecoder(stream);
+                        Decoder decoder = Decoder.GetDecoder(stream);
                         return decoder.DecodeBeatmap(stream);
                     }
                 }
@@ -622,10 +622,10 @@ namespace osu.Game.Beatmaps
                 {
                     Decoder decoder;
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
-                        decoder = Decoder.GetStoryboardDecoder(stream);
+                        decoder = Decoder.GetDecoder(stream);
 
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
-                        return decoder.DecodeStoryboard(stream);
+                        return decoder.GetStoryboardDecoder().DecodeStoryboard(stream);
                 }
                 catch
                 {

@@ -14,6 +14,8 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyStoryboardDecoder : LegacyDecoder
     {
+        private Storyboard storyboard;
+
         private StoryboardSprite storyboardSprite;
         private CommandTimelineGroup timelineGroup;
 
@@ -21,9 +23,21 @@ namespace osu.Game.Beatmaps.Formats
         {
         }
 
-        public LegacyStoryboardDecoder(string header)
+        public LegacyStoryboardDecoder(int beatmapVersion)
         {
-            BeatmapVersion = int.Parse(header.Substring(17));
+            BeatmapVersion = beatmapVersion;
+        }
+
+        protected override void ParseStoryboard(StreamReader stream, Storyboard storyboard)
+        {
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+            if (storyboard == null)
+                throw new ArgumentNullException(nameof(storyboard));
+
+            this.storyboard = storyboard;
+
+            ParseContent(stream);
         }
 
         protected override void ProcessSection(Section section, string line)
@@ -67,7 +81,7 @@ namespace osu.Game.Beatmaps.Formats
                             var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
                             var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
                             storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
-                            Storyboard.GetLayer(layer).Add(storyboardSprite);
+                            storyboard.GetLayer(layer).Add(storyboardSprite);
                         }
                         break;
                     case EventType.Animation:
@@ -81,7 +95,7 @@ namespace osu.Game.Beatmaps.Formats
                             var frameDelay = double.Parse(split[7], NumberFormatInfo.InvariantInfo);
                             var loopType = split.Length > 8 ? (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), split[8]) : AnimationLoopType.LoopForever;
                             storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
-                            Storyboard.GetLayer(layer).Add(storyboardSprite);
+                            storyboard.GetLayer(layer).Add(storyboardSprite);
                         }
                         break;
                     case EventType.Sample:
@@ -90,7 +104,7 @@ namespace osu.Game.Beatmaps.Formats
                             var layer = parseLayer(split[2]);
                             var path = cleanFilename(split[3]);
                             var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
-                            Storyboard.GetLayer(layer).Add(new StoryboardSample(path, time, volume));
+                            storyboard.GetLayer(layer).Add(new StoryboardSample(path, time, volume));
                         }
                         break;
                 }
