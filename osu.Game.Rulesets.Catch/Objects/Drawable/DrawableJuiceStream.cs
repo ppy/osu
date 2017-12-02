@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 RelativeChildSize = new Vector2(1, (float)HitObject.Duration)
             };
 
-            foreach (CatchBaseHit tick in s.Ticks)
+            foreach (CatchHitObject tick in s.Ticks)
             {
                 TinyDroplet tiny = tick as TinyDroplet;
                 if (tiny != null)
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             }
         }
 
-        protected override void AddNested(DrawableHitObject<CatchBaseHit> h)
+        protected override void AddNested(DrawableHitObject<CatchHitObject> h)
         {
             ((DrawableCatchHitObject)h).CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
             dropletContainer.Add(h);

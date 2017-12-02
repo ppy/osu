@@ -57,6 +57,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },
+                    new HoverClickSounds()
                 };
             }
 

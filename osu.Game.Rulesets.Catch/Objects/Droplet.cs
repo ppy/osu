@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class Droplet : CatchBaseHit
+    public class Droplet : CatchHitObject
     {
     }
 }
