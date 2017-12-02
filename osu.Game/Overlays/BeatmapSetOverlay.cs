@@ -139,6 +139,20 @@ namespace osu.Game.Overlays
             return true;
         }
 
+        public void ShowBeatmap(int beatmapId)
+        {
+            var req = new GetBeatmapRequest(beatmapId);
+            req.Success += res =>
+            {
+                if (!res.OnlineBeatmapSetID.HasValue)
+                    return;
+
+                ShowBeatmapSet(res.OnlineBeatmapSetID.Value);
+            };
+
+            api.Queue(req);
+        }
+
         public void ShowBeatmapSet(int beatmapSetId)
         {
             // todo: display the overlay while we are loading here. we need to support setting BeatmapSet to null for this to work.
