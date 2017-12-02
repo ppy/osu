@@ -234,7 +234,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void handleBeatmapAdd(BeatmapSetInfo beatmap)
         {
-            if (beatmap.OnlineBeatmapSetID == BeatmapSet.OnlineBeatmapSetID)
+            if (beatmap.OnlineBeatmapSetID == BeatmapSet?.OnlineBeatmapSetID)
                 downloadButtonsContainer.FadeOut(transition_duration);
         }
 

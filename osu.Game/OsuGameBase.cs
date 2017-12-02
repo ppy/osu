@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Configuration;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
@@ -137,6 +138,10 @@ namespace osu.Game
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
             BeatmapManager.DefaultBeatmap = defaultBeatmap;
 
+            // tracks play so loud our samples can't keep up.
+            // this adds a global reduction of track volume for the time being.
+            Audio.Track.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
+
             Beatmap.ValueChanged += b =>
             {
                 var trackLoaded = lastBeatmap?.TrackLoaded ?? false;
@@ -149,7 +154,7 @@ namespace osu.Game
                         Debug.Assert(lastBeatmap != null);
                         Debug.Assert(lastBeatmap.Track != null);
 
-                        lastBeatmap.DisposeTrack();
+                        lastBeatmap.RecycleTrack();
                     }
 
                     Audio.Track.AddItem(b.Track);
