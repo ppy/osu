@@ -11,8 +11,6 @@ namespace osu.Game.Screens.Edit.Screens
 {
     public class EditorScreen : Container
     {
-        public Action ExitRequested;
-
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         protected override Container<Drawable> Content => content;
