@@ -621,7 +621,7 @@ namespace osu.Game.Beatmaps
                 try
                 {
                     Decoder decoder;
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo?.Path))))
                         decoder = Decoder.GetDecoder(stream);
 
                     // try for .osb first and fall back to .osu
