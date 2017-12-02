@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,6 +20,8 @@ namespace osu.Game.Graphics.Sprites
     public class OsuLinkSpriteText : OsuSpriteText
     {
         private readonly OsuHoverContainer content;
+
+        private BeatmapSetOverlay beatmapSetOverlay;
 
         public override bool HandleInput => content.Action != null;
 
@@ -39,7 +42,7 @@ namespace osu.Game.Graphics.Sprites
                 if (value != null)
                 {
                     url = value;
-                    content.Action = () => Process.Start(value);
+                    loadAction();
                 }
             }
         }
@@ -50,6 +53,46 @@ namespace osu.Game.Graphics.Sprites
             {
                 AutoSizeAxes = Axes.Both,
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(BeatmapSetOverlay beatmapSetOverlay)
+        {
+            this.beatmapSetOverlay = beatmapSetOverlay;
+        }
+
+        private void loadAction()
+        {
+            if (Url == null || String.IsNullOrEmpty(Url))
+                return;
+
+            var url = Url;
+
+            if (url.StartsWith("https://")) url = url.Substring(8);
+            else if (url.StartsWith("http://")) url = url.Substring(7);
+            else content.Action = () => Process.Start(Url);
+
+            if (url.StartsWith("osu.ppy.sh/"))
+            {
+                url = url.Substring(11);
+                if (url.StartsWith("s") || url.StartsWith("beatmapsets"))
+                    content.Action = () => beatmapSetOverlay.ShowBeatmapSet(getIdFromUrl(url));
+                else if (url.StartsWith("b") || url.StartsWith("beatmaps"))
+                    content.Action = () => beatmapSetOverlay.ShowBeatmap(getIdFromUrl(url));
+                // else if (url.StartsWith("d"))     Maybe later
+            }
+        }
+
+        private int getIdFromUrl(string url)
+        {
+            var lastSlashIndex = url.LastIndexOf('/');
+            if (lastSlashIndex == url.Length)
+            {
+                url = url.Substring(url.Length - 1);
+                lastSlashIndex = url.LastIndexOf('/');
+            }
+
+            return int.Parse(url.Substring(lastSlashIndex + 1));
         }
     }
 }
