@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Newtonsoft.Json;
 using osu.Game.Users;
@@ -39,6 +41,8 @@ namespace osu.Game.Online.Chat
         public Message()
         {
         }
+
+        public List<MessageFormatter.Link> Links;
 
         public Message(long? id)
         {
