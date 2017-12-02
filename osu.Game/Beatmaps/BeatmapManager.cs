@@ -615,7 +615,7 @@ namespace osu.Game.Beatmaps
 
             protected override Storyboard GetStoryboard()
             {
-                if (BeatmapSetInfo?.StoryboardFile == null)
+                if (BeatmapInfo?.Path == null && BeatmapSetInfo?.StoryboardFile == null)
                     return new Storyboard();
 
                 try
@@ -624,7 +624,9 @@ namespace osu.Game.Beatmaps
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                         decoder = Decoder.GetDecoder(stream);
 
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
+                    // try for .osb first and fall back to .osu
+                    string storyboardFile = BeatmapSetInfo.StoryboardFile ?? BeatmapInfo.Path;
+                    using (var stream = new StreamReader(store.GetStream(getPathForFile(storyboardFile))))
                         return decoder.GetStoryboardDecoder().DecodeStoryboard(stream);
                 }
                 catch

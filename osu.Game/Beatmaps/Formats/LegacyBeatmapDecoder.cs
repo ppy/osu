@@ -47,6 +47,13 @@ namespace osu.Game.Beatmaps.Formats
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
         }
 
+        protected override bool ShouldSkipLine(string line)
+        {
+            if (base.ShouldSkipLine(line) || line.StartsWith(" ") || line.StartsWith("_"))
+                return true;
+            return false;
+        }
+
         protected override void ProcessSection(Section section, string line)
         {
             switch (section)
