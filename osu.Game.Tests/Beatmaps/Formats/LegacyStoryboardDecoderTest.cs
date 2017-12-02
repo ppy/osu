@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -56,9 +55,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsTrue(foreground.EnabledWhenPassing);
                 Assert.AreEqual("Foreground", foreground.Name);
 
-                int spriteCount = background.Elements.Where(x => x.GetType() == typeof(StoryboardSprite)).Count();
-                int animationCount = background.Elements.Where(x => x.GetType() == typeof(StoryboardAnimation)).Count();
-                int sampleCount = background.Elements.Where(x => x.GetType() == typeof(StoryboardSample)).Count();
+                int spriteCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSprite));
+                int animationCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardAnimation));
+                int sampleCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSample));
 
                 Assert.AreEqual(15, spriteCount);
                 Assert.AreEqual(1, animationCount);
@@ -66,6 +65,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(background.Elements.Count(), spriteCount + animationCount + sampleCount);
 
                 var sprite = background.Elements.ElementAt(0) as StoryboardSprite;
+                Assert.NotNull(sprite);
                 Assert.IsTrue(sprite.HasCommands);
                 Assert.AreEqual(new Vector2(320, 240), sprite.InitialPosition);
                 Assert.IsTrue(sprite.IsDrawable);
@@ -73,6 +73,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("SB/lyric/ja-21.png", sprite.Path);
 
                 var animation = background.Elements.ElementAt(12) as StoryboardAnimation;
+                Assert.NotNull(animation);
                 Assert.AreEqual(141175, animation.EndTime);
                 Assert.AreEqual(10, animation.FrameCount);
                 Assert.AreEqual(30, animation.FrameDelay);

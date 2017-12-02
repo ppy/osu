@@ -237,9 +237,9 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private static string parseLayer(string value) => Enum.Parse(typeof(StoryLayer), value).ToString();
+        private string parseLayer(string value) => Enum.Parse(typeof(StoryLayer), value).ToString();
 
-        private static Anchor parseOrigin(string value)
+        private Anchor parseOrigin(string value)
         {
             var origin = (LegacyOrigins)Enum.Parse(typeof(LegacyOrigins), value);
             switch (origin)
@@ -266,6 +266,6 @@ namespace osu.Game.Beatmaps.Formats
             throw new InvalidDataException($@"Unknown origin: {value}");
         }
 
-        private static string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('\"'));
+        private string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('\"'));
     }
 }

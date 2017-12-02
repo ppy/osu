@@ -52,10 +52,7 @@ namespace osu.Game.Beatmaps.Formats
             string line;
             while ((line = stream.ReadLine()) != null)
             {
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                if (line.StartsWith("//"))
+                if (ShouldSkipLine(line))
                     continue;
 
                 // It's already set in ParseBeatmap... why do it again?
@@ -74,6 +71,13 @@ namespace osu.Game.Beatmaps.Formats
 
                 ProcessSection(section, line);
             }
+        }
+
+        protected virtual bool ShouldSkipLine(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line) || line.StartsWith("//"))
+                return true;
+            return false;
         }
 
         protected abstract void ProcessSection(Section section, string line);
