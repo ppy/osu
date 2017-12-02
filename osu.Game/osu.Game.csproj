@@ -268,6 +268,8 @@
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
+    <Compile Include="Graphics\Containers\OsuLinkTextFlowContainer.cs" />
+    <Compile Include="Graphics\Sprites\OsuLinkSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\HoverClickSounds.cs" />
     <Compile Include="Graphics\UserInterface\HoverSounds.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
@@ -284,8 +286,11 @@
       <DependentUpon>20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
+    <Compile Include="Online\API\Requests\GetBeatmapRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
+    <Compile Include="Online\Chat\ChatLinkSpriteText.cs" />
+    <Compile Include="Online\Chat\MessageFormatter.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ClickableUsername.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableScore.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableTopScore.cs" />
