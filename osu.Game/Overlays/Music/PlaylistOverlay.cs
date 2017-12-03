@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.Music
         {
             beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
 
-            if (BeatmapSets.Count() == 1)
+            if (BeatmapSets?.Count() == 1)
                 beatmapBacking.Value.Track.Looping = true;
             else
                 beatmapBacking.Value.Track.Looping = false;
