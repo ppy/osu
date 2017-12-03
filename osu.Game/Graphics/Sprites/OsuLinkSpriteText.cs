@@ -20,6 +20,8 @@ namespace osu.Game.Graphics.Sprites
 {
     public class OsuLinkSpriteText : OsuSpriteText
     {
+        private ChatOverlay chat;
+
         private readonly OsuHoverContainer content;
 
         private BeatmapSetOverlay beatmapSetOverlay;
@@ -57,9 +59,10 @@ namespace osu.Game.Graphics.Sprites
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapSetOverlay beatmapSetOverlay)
+        private void load(BeatmapSetOverlay beatmapSetOverlay, ChatOverlay chat)
         {
             this.beatmapSetOverlay = beatmapSetOverlay;
+            this.chat = chat;
         }
 
         private void loadAction()
@@ -69,7 +72,31 @@ namespace osu.Game.Graphics.Sprites
 
             var url = Url;
 
-            if (url.StartsWith("http://") || url.StartsWith("https://"))
+            // Client-internal stuff
+            if (url.StartsWith("osu://"))
+            {
+                var firstPath = url.Substring(6, 5);
+                url = url.Substring(11);
+
+                if (firstPath == "chan/")
+                {
+                    var nextSlashIndex = url.IndexOf('/');
+                    var channelName = url.Substring(0, nextSlashIndex != -1 ? nextSlashIndex - 1 : url.Length - 1);
+
+                    var foundChannel = chat.AvailableChannels.Find(channel => channel.Name == channelName);
+
+                    if (foundChannel != null)
+                        chat.OpenChannel(foundChannel);
+                }
+                else if (firstPath == "edit/")
+                {
+                    // Open editor here, then goto specified time
+                    // how to push new screen from here? we'll see
+                }
+                else
+                    throw new ArgumentException($"Unknown osu:// link at {nameof(OsuLinkSpriteText)} ({firstPath}).");
+            }
+            else if (url.StartsWith("http://") || url.StartsWith("https://"))
             {
                 var osuUrlIndex = url.IndexOf("osu.ppy.sh/");
                 if (osuUrlIndex == -1)
