@@ -36,7 +36,7 @@ namespace osu.Game.Graphics.Containers
         {
             AddText(text, link =>
             {
-                ((T)link).Url = url;
+                LoadComponentAsync(link, d => ((T)d).Url = url);
                 creationParameters?.Invoke(link);
             });
         }
