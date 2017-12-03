@@ -35,7 +35,11 @@ namespace osu.Game.Overlays.Music
             set { base.Padding = value; }
         }
 
-        public IEnumerable<BeatmapSetInfo> BeatmapSets { set { items.Sets = value; } }
+        public IEnumerable<BeatmapSetInfo> BeatmapSets
+        {
+            get { return items.Sets; }
+            set { items.Sets = value; }
+        }
 
         public BeatmapSetInfo FirstVisibleSet => items.FirstVisibleSet;
         public BeatmapSetInfo NextSet => items.NextSet;
@@ -81,6 +85,7 @@ namespace osu.Game.Overlays.Music
 
             public IEnumerable<BeatmapSetInfo> Sets
             {
+                get { return items.Select(x => x.BeatmapSetInfo).ToList(); }
                 set
                 {
                     items.Clear();
