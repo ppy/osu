@@ -11,6 +11,7 @@ using Microsoft.Win32;
 using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game;
 using OpenTK.Input;
 
@@ -109,12 +110,12 @@ namespace osu.Desktop
 
         private void fileDrop(object sender, FileDropEventArgs e)
         {
-            var filePaths = new [] { e.FileName };
+            var filePaths = new[] { e.FileName };
 
             if (filePaths.All(f => Path.GetExtension(f) == @".osz"))
-                Task.Factory.StartNew(() => BeatmapManager.Import(filePaths), TaskCreationOptions.LongRunning);
+                BackgroundTaskManager.Instance.StartNew(() => BeatmapManager.Import(filePaths), true);
             else if (filePaths.All(f => Path.GetExtension(f) == @".osr"))
-                Task.Run(() =>
+                BackgroundTaskManager.Instance.StartNew(() =>
                 {
                     var score = ScoreStore.ReadReplayFile(filePaths.First());
                     Schedule(() => LoadScore(score));

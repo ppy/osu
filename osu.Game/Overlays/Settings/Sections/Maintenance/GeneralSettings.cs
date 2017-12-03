@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 
@@ -29,7 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importButton.Enabled.Value = false;
-                        Task.Factory.StartNew(beatmaps.ImportFromStable)
+                        BackgroundTaskManager.Instance.StartNew(beatmaps.ImportFromStable)
                             .ContinueWith(t => Schedule(() => importButton.Enabled.Value = true), TaskContinuationOptions.LongRunning);
                     }
                 },
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         deleteButton.Enabled.Value = false;
-                        Task.Run(() => beatmaps.DeleteAll()).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
+                        BackgroundTaskManager.Instance.StartNew(beatmaps.DeleteAll).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
                     }
                 },
                 restoreButton = new SettingsButton
@@ -48,7 +49,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         restoreButton.Enabled.Value = false;
-                        Task.Run(() =>
+                        BackgroundTaskManager.Instance.StartNew(() =>
                         {
                             foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
                                 beatmaps.Restore(b);

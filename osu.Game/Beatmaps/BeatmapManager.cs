@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
@@ -261,7 +262,7 @@ namespace osu.Game.Beatmaps
             {
                 downloadNotification.Text = $"Importing {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}";
 
-                Task.Factory.StartNew(() =>
+                BackgroundTaskManager.Instance.StartNew(() =>
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
                     using (var stream = new MemoryStream(data))
@@ -269,7 +270,7 @@ namespace osu.Game.Beatmaps
                         Import(archive);
 
                     downloadNotification.State = ProgressNotificationState.Completed;
-                }, TaskCreationOptions.LongRunning);
+                }, true);
 
                 currentDownloads.Remove(request);
             };
@@ -293,7 +294,7 @@ namespace osu.Game.Beatmaps
             PostNotification?.Invoke(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
-            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
+            BackgroundTaskManager.Instance.StartNew(() => request.Perform(api), true);
             BeatmapDownloadBegan?.Invoke(request);
         }
 
