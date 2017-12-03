@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using System;
@@ -68,29 +69,39 @@ namespace osu.Game.Graphics.Sprites
 
             var url = Url;
 
-            if (url.StartsWith("https://")) url = url.Substring(8);
-            else if (url.StartsWith("http://")) url = url.Substring(7);
-            else content.Action = () => Process.Start(Url);
-
-            if (url.StartsWith("osu.ppy.sh/"))
+            if (url.StartsWith("http://") || url.StartsWith("https://"))
             {
-                url = url.Substring(11);
-                if (url.StartsWith("s") || url.StartsWith("beatmapsets"))
+                var osuUrlIndex = url.IndexOf("osu.ppy.sh/");
+                if (osuUrlIndex == -1)
+                {
+                    content.Action = () => Process.Start(url);
+                    return;
+                }
+
+                url = url.Substring(osuUrlIndex + 11);
+                if (url.StartsWith("s/") || url.StartsWith("beatmapsets/") || url.StartsWith("d/"))
                     content.Action = () => beatmapSetOverlay.ShowBeatmapSet(getIdFromUrl(url));
-                else if (url.StartsWith("b") || url.StartsWith("beatmaps"))
+                else if (url.StartsWith("b/") || url.StartsWith("beatmaps/"))
                     content.Action = () => beatmapSetOverlay.ShowBeatmap(getIdFromUrl(url));
-                // else if (url.StartsWith("d"))     Maybe later
             }
+            else
+                content.Action = () => Process.Start(url);
         }
 
         private int getIdFromUrl(string url)
         {
             var lastSlashIndex = url.LastIndexOf('/');
+            // Remove possible trailing slash
             if (lastSlashIndex == url.Length)
             {
-                url = url.Substring(url.Length - 1);
+                url = url.Substring(0, url.Length - 1);
                 lastSlashIndex = url.LastIndexOf('/');
             }
+
+            var lastQuestionMarkIndex = url.LastIndexOf('?');
+            // Filter out possible queries like mode specifications (e.g. /b/252238?m=0)
+            if (lastQuestionMarkIndex > lastSlashIndex)
+                url = url.Substring(0, lastQuestionMarkIndex);
 
             return int.Parse(url.Substring(lastSlashIndex + 1));
         }
