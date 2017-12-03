@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps
             Mods.ValueChanged += mods => applyRateAdjustments();
 
             beatmap = new AsyncLazy<Beatmap>(populateBeatmap);
-            background = new AsyncLazy<Texture>(populateBackground);
+            background = new AsyncLazy<Texture>(populateBackground, b => b == null || !b.IsDisposed);
             track = new AsyncLazy<Track>(populateTrack);
             waveform = new AsyncLazy<Waveform>(populateWaveform);
         }
@@ -99,10 +99,11 @@ namespace osu.Game.Beatmaps
             if (WaveformLoaded) Waveform?.Dispose();
         }
 
-        public void DisposeTrack()
-        {
-            if (TrackLoaded) Track?.Dispose();
-        }
+        /// <summary>
+        /// Eagerly dispose of the audio track associated with this <see cref="WorkingBeatmap"/> (if any).
+        /// Accessing track again will load a fresh instance.
+        /// </summary>
+        public void RecycleTrack() => track.Recycle();
 
         private void applyRateAdjustments(Track t = null)
         {
@@ -114,11 +115,60 @@ namespace osu.Game.Beatmaps
                 mod.ApplyToClock(t);
         }
 
-        public class AsyncLazy<T> : Lazy<Task<T>>
+        public class AsyncLazy<T>
         {
-            public AsyncLazy(Func<T> valueFactory)
-                : base(() => Task.Run(valueFactory))
+            private Lazy<Task<T>> lazy;
+            private readonly Func<T> valueFactory;
+            private readonly Func<T, bool> stillValidFunction;
+
+            private readonly object initLock = new object();
+
+            public AsyncLazy(Func<T> valueFactory, Func<T, bool> stillValidFunction = null)
             {
+                this.valueFactory = valueFactory;
+                this.stillValidFunction = stillValidFunction;
+
+                init();
+            }
+
+            public void Recycle()
+            {
+                if (!IsValueCreated) return;
+
+                (lazy.Value.Result as IDisposable)?.Dispose();
+                init();
+            }
+
+            public bool IsValueCreated
+            {
+                get
+                {
+                    ensureValid();
+                    return lazy.IsValueCreated;
+                }
+            }
+
+            public Task<T> Value
+            {
+                get
+                {
+                    ensureValid();
+                    return lazy.Value;
+                }
+            }
+
+            private void ensureValid()
+            {
+                lock (initLock)
+                {
+                    if (!lazy.IsValueCreated || (stillValidFunction?.Invoke(lazy.Value.Result) ?? true)) return;
+                    init();
+                }
+            }
+
+            private void init()
+            {
+                lazy = new Lazy<Task<T>>(() => Task.Run(valueFactory));
             }
         }
     }
