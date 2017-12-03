@@ -8,11 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Online.Chat
 {
