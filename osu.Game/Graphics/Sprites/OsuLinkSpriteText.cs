@@ -81,17 +81,18 @@ namespace osu.Game.Graphics.Sprites
                 if (firstPath == "chan/")
                 {
                     var nextSlashIndex = url.IndexOf('/');
-                    var channelName = url.Substring(0, nextSlashIndex != -1 ? nextSlashIndex - 1 : url.Length - 1);
+                    var channelName = nextSlashIndex != -1 ? url.Remove(nextSlashIndex) : url;
 
                     var foundChannel = chat.AvailableChannels.Find(channel => channel.Name == channelName);
 
                     if (foundChannel != null)
-                        chat.OpenChannel(foundChannel);
+                        content.Action = () => chat.OpenChannel(foundChannel);
                 }
                 else if (firstPath == "edit/")
                 {
                     // Open editor here, then goto specified time
                     // how to push new screen from here? we'll see
+                    content.Action = () => new Framework.Screens.Screen().Push(new Screens.Edit.Editor());
                 }
                 else
                     throw new ArgumentException($"Unknown osu:// link at {nameof(OsuLinkSpriteText)} ({firstPath}).");
@@ -121,14 +122,14 @@ namespace osu.Game.Graphics.Sprites
             // Remove possible trailing slash
             if (lastSlashIndex == url.Length)
             {
-                url = url.Substring(0, url.Length - 1);
+                url = url.Remove(url.Length - 1);
                 lastSlashIndex = url.LastIndexOf('/');
             }
 
             var lastQuestionMarkIndex = url.LastIndexOf('?');
             // Filter out possible queries like mode specifications (e.g. /b/252238?m=0)
             if (lastQuestionMarkIndex > lastSlashIndex)
-                url = url.Substring(0, lastQuestionMarkIndex);
+                url = url.Remove(lastQuestionMarkIndex);
 
             return int.Parse(url.Substring(lastSlashIndex + 1));
         }
