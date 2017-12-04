@@ -303,7 +303,6 @@
     <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
     <Compile Include="Screens\Edit\Components\TimeInfoContainer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToScoreProcessor.cs" />
-    <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
@@ -313,6 +312,10 @@
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
     <Compile Include="Online\API\Requests\GetUserScoresRequest.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\RadioButtons\DrawableRadioButton.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\RadioButtons\RadioButton.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\RadioButtons\RadioButtonCollection.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Timeline\TimelineButton.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\ArrowsOverlay.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\BlurredIcon.cs" />
@@ -556,6 +559,10 @@
     <Compile Include="Overlays\UserProfileOverlay.cs" />
     <Compile Include="Overlays\WaveOverlayContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rulesets\Edit\Tools\HitObjectCompositionTool.cs" />
+    <Compile Include="Rulesets\Edit\Tools\ICompositionTool.cs" />
+    <Compile Include="Rulesets\Edit\HitObjectComposer.cs" />
+    <Compile Include="Rulesets\Edit\ToolboxGroup.cs" />
     <Compile Include="Rulesets\Judgements\DrawableJudgement.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToClock.cs" />
