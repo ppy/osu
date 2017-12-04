@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Music
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
-        public IEnumerable<BeatmapSetInfo> BeatmapSets;
+        public IEnumerable<BeatmapSetInfo> BeatmapSets => list.BeatmapSets;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, BeatmapManager beatmaps, OsuColour colours)
@@ -74,11 +74,10 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            beatmaps.BeatmapSetAdded += s => Schedule(() => list.AddBeatmapSet(s));
-            beatmaps.BeatmapSetRemoved += s => Schedule(() => list.RemoveBeatmapSet(s));
+            beatmaps.BeatmapSetAdded += list.AddBeatmapSet;
+            beatmaps.BeatmapSetRemoved += list.RemoveBeatmapSet;
 
-            list.BeatmapSets = BeatmapSets = beatmaps.GetAllUsableBeatmapSets();
-
+            list.BeatmapSets = beatmaps.GetAllUsableBeatmapSets();
 
             beatmapBacking.BindTo(game.Beatmap);
 
@@ -121,7 +120,7 @@ namespace osu.Game.Overlays.Music
                 return;
             }
 
-            playSpecified(set.Beatmaps[0]);
+            playSpecified(set.Beatmaps.First());
         }
 
         public void PlayPrevious()
@@ -130,7 +129,7 @@ namespace osu.Game.Overlays.Music
 
             if (playable != null)
             {
-                playSpecified(playable.Beatmaps[0]);
+                playSpecified(playable.Beatmaps.First());
                 list.SelectedSet = playable;
             }
         }
@@ -141,7 +140,7 @@ namespace osu.Game.Overlays.Music
 
             if (playable != null)
             {
-                playSpecified(playable.Beatmaps[0]);
+                playSpecified(playable.Beatmaps.First());
                 list.SelectedSet = playable;
             }
         }
@@ -149,7 +148,7 @@ namespace osu.Game.Overlays.Music
         private void playSpecified(BeatmapInfo info)
         {
             beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
-            beatmapBacking.Value.Track.Start();
+            beatmapBacking.Value.Track.Restart();
         }
     }
 
