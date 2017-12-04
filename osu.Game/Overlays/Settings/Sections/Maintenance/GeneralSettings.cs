@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         protected override string Header => "General";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps)
+        private void load(BeatmapManager beatmaps, BackgroundTaskManager backgroundTaskManager)
         {
             Children = new Drawable[]
             {
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importButton.Enabled.Value = false;
-                        BackgroundTaskManager.Instance.StartNew(beatmaps.ImportFromStable)
+                        backgroundTaskManager.StartNew(beatmaps.ImportFromStable)
                             .ContinueWith(t => Schedule(() => importButton.Enabled.Value = true), TaskContinuationOptions.LongRunning);
                     }
                 },
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         deleteButton.Enabled.Value = false;
-                        BackgroundTaskManager.Instance.StartNew(beatmaps.DeleteAll).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
+                        backgroundTaskManager.StartNew(beatmaps.DeleteAll).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
                     }
                 },
                 restoreButton = new SettingsButton
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         restoreButton.Enabled.Value = false;
-                        BackgroundTaskManager.Instance.StartNew(() =>
+                        backgroundTaskManager.StartNew(() =>
                         {
                             foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
                                 beatmaps.Restore(b);

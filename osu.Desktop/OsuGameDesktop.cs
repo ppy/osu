@@ -6,12 +6,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
-using osu.Framework.Threading;
 using osu.Game;
 using OpenTK.Input;
 
@@ -113,9 +111,9 @@ namespace osu.Desktop
             var filePaths = new[] { e.FileName };
 
             if (filePaths.All(f => Path.GetExtension(f) == @".osz"))
-                BackgroundTaskManager.Instance.StartNew(() => BeatmapManager.Import(filePaths), true);
+                BackgroundTaskManager.StartNew(() => BeatmapManager.Import(filePaths), true);
             else if (filePaths.All(f => Path.GetExtension(f) == @".osr"))
-                BackgroundTaskManager.Instance.StartNew(() =>
+                BackgroundTaskManager.StartNew(() =>
                 {
                     var score = ScoreStore.ReadReplayFile(filePaths.First());
                     Schedule(() => LoadScore(score));
