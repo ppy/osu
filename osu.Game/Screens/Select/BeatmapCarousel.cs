@@ -40,13 +40,11 @@ namespace osu.Game.Screens.Select
                 panels.Clear();
                 groups.Clear();
 
-                List<BeatmapGroup> newGroups = null;
-
                 Task.Run(() =>
                 {
                     Schedule(() =>
                     {
-                        newGroups = value.Select(createGroup).Where(g => g != null).ToList();
+                        var newGroups = value.Select(createGroup).Where(g => g != null).ToList();
                         criteria.Filter(newGroups);
 
                         foreach (var g in newGroups)
@@ -484,8 +482,7 @@ namespace osu.Game.Screens.Select
                 if (panel == null)
                     panel = group.BeatmapPanels.First();
 
-                if (selectedPanel == panel)
-                    return;
+                if (selectedPanel == panel) return;
 
                 Trace.Assert(group.BeatmapPanels.Contains(panel), @"Selected panel must be in provided group");
 
@@ -497,8 +494,7 @@ namespace osu.Game.Screens.Select
 
                 panel.State = PanelSelectedState.Selected;
 
-                if (selectedPanel == panel)
-                    return;
+                if (selectedPanel == panel) return;
 
                 selectedPanel = panel;
                 selectedGroup = group;
