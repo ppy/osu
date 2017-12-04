@@ -118,7 +118,7 @@ namespace osu.Game.Graphics.Sprites
                     content.Action = () => beatmapSetOverlay.ShowBeatmapSet(getIdFromUrl(url));
                 else if (url.StartsWith("b/") || url.StartsWith("beatmaps/"))
                     content.Action = () => beatmapSetOverlay.ShowBeatmap(getIdFromUrl(url));
-                else 
+                else
                     content.Action = () => Process.Start($"https://osu.ppy.sh/{url}");
             }
             else
