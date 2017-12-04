@@ -34,7 +34,6 @@ namespace osu.Game.Screens.Select
         public IEnumerable<BeatmapSetInfo> Beatmaps
         {
             get { return groups.Select(g => g.BeatmapSet); }
-
             set
             {
                 scrollableContent.Clear(false);
@@ -45,14 +44,13 @@ namespace osu.Game.Screens.Select
 
                 Task.Run(() =>
                 {
-                    newGroups = value.Select(createGroup).Where(g => g != null).ToList();
-                    criteria.Filter(newGroups);
-                }).ContinueWith(t =>
-                {
                     Schedule(() =>
                     {
+                        newGroups = value.Select(createGroup).Where(g => g != null).ToList();
+                        criteria.Filter(newGroups);
+
                         foreach (var g in newGroups)
-                            if (g != null) addGroup(g);
+                            addGroup(g);
 
                         computeYPositions();
                         BeatmapsChanged?.Invoke();
@@ -135,7 +133,7 @@ namespace osu.Game.Screens.Select
                 if (i >= 0)
                     groups.Insert(i, newGroup);
                 else
-                    groups.Add(newGroup);
+                    addGroup(newGroup);
             }
 
             bool hadSelection = selectedGroup == group;
@@ -149,8 +147,10 @@ namespace osu.Game.Screens.Select
             if (hadSelection && newGroup != null)
             {
                 var newSelection =
-                    newGroup.BeatmapPanels.Find(p => p.Beatmap.ID == selectedPanel?.Beatmap.ID) ??
-                    newGroup.BeatmapPanels[Math.Min(newGroup.BeatmapPanels.Count - 1, group.BeatmapPanels.IndexOf(selectedPanel))];
+                    newGroup.BeatmapPanels.Find(p => p.Beatmap.ID == selectedPanel?.Beatmap.ID);
+
+                if(newSelection == null && group != null && selectedPanel != null)
+                    newSelection = newGroup.BeatmapPanels[Math.Min(newGroup.BeatmapPanels.Count - 1, group.BeatmapPanels.IndexOf(selectedPanel))];
 
                 selectGroup(newGroup, newSelection);
             }
@@ -350,6 +350,8 @@ namespace osu.Game.Screens.Select
 
         private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
         {
+            beatmapSet = manager.Refresh(beatmapSet);
+
             if (beatmapSet.Beatmaps.All(b => b.Hidden))
                 return null;
 
@@ -381,6 +383,10 @@ namespace osu.Game.Screens.Select
 
         private void addGroup(BeatmapGroup group)
         {
+            // prevent duplicates by concurrent independent actions trying to add a group
+            if (groups.Any(g => g.BeatmapSet.ID == group.BeatmapSet.ID))
+                return;
+
             groups.Add(group);
             panels.Add(group.Header);
             panels.AddRange(group.BeatmapPanels);
@@ -478,7 +484,8 @@ namespace osu.Game.Screens.Select
                 if (panel == null)
                     panel = group.BeatmapPanels.First();
 
-                if (selectedPanel == panel) return;
+                if (selectedPanel == panel)
+                    return;
 
                 Trace.Assert(group.BeatmapPanels.Contains(panel), @"Selected panel must be in provided group");
 
@@ -490,7 +497,8 @@ namespace osu.Game.Screens.Select
 
                 panel.State = PanelSelectedState.Selected;
 
-                if (selectedPanel == panel) return;
+                if (selectedPanel == panel)
+                    return;
 
                 selectedPanel = panel;
                 selectedGroup = group;

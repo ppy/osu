@@ -255,10 +255,10 @@ namespace osu.Game.Screens.Select
                 UpdateBeatmap(Beatmap.Value);
             };
 
-            selectionChangedDebounce?.Cancel();
-
             if (beatmap?.Equals(beatmapNoDebounce) == true)
                 return;
+
+            selectionChangedDebounce?.Cancel();
 
             beatmapNoDebounce = beatmap;
 
