@@ -55,6 +55,11 @@ namespace osu.Game.Rulesets.UI
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
+        /// <summary>
+        /// The playfield.
+        /// </summary>
+        public Playfield Playfield { get; protected set; }
+
         protected readonly Ruleset Ruleset;
 
         /// <summary>
@@ -134,11 +139,6 @@ namespace osu.Game.Rulesets.UI
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
-
-        /// <summary>
-        /// The playfield.
-        /// </summary>
-        public Playfield Playfield { get; private set; }
 
         protected override Container<Drawable> Content => content;
         private Container content;
