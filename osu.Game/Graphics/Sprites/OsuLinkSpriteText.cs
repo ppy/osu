@@ -4,6 +4,7 @@
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
@@ -56,6 +57,12 @@ namespace osu.Game.Graphics.Sprites
             {
                 AutoSizeAxes = Axes.Both,
             });
+        }
+
+        public ColourInfo TextColour
+        {
+            get { return Content.Colour; }
+            set { Content.Colour = value; }
         }
 
         [BackgroundDependencyLoader]

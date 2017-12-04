@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
@@ -32,12 +34,29 @@ namespace osu.Game.Graphics.Containers
 
         protected override SpriteText CreateSpriteText() => new T();
 
+        /// <summary>
+        /// The colour for normal text (links ignore this). This should be set before text is added.
+        /// <para>Default is white.</para>
+        /// </summary>
+        public ColourInfo? TextColour;
+
         public void AddLink(string text, string url, Action<SpriteText> creationParameters = null)
         {
             AddText(text, link =>
             {
                 LoadComponentAsync(link, d => ((T)d).Url = url);
                 creationParameters?.Invoke(link);
+            });
+        }
+
+        public IEnumerable<SpriteText> AddText(string text, Action<SpriteText> creationParameters = null)
+        {
+            return base.AddText(text, sprite =>
+            {
+                if (TextColour.HasValue)
+                    ((OsuLinkSpriteText)sprite).TextColour = TextColour.Value;
+
+                creationParameters?.Invoke(sprite);
             });
         }
     }

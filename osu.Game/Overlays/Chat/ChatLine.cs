@@ -198,7 +198,7 @@ namespace osu.Game.Overlays.Chat
                 }
             };
             if (message.IsAction && senderHasBackground)
-                contentFlow.Colour = OsuColour.FromHex(message.Sender.Colour);
+                contentFlow.TextColour = OsuColour.FromHex(message.Sender.Colour);
 
             updateMessageContent();
             FinishTransforms(true);
@@ -237,9 +237,7 @@ namespace osu.Game.Overlays.Chat
                         if (message.IsAction)
                             sprite.Font = @"Exo2.0-MediumItalic";
 
-                        // TODO: Somehow check (if channel link) that this is a real channel
-                        sprite.Colour = urlColour;
-                        // We want to use something that is unique to every formatted link, so I just use the position of the link
+                        // We want to use something that is unique to every formatted link PER MESSAGE
                         ((ChatLinkSpriteText)sprite).LinkId = link.Index;
                     });
                 }
