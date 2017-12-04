@@ -107,12 +107,11 @@ namespace osu.Game.Graphics.Sprites
                 }
 
                 url = url.Substring(osuUrlIndex + 11);
-                var id = getIdFromUrl(url);
                 if (url.StartsWith("s/") || url.StartsWith("beatmapsets/") || url.StartsWith("d/"))
-                    content.Action = () => beatmapSetOverlay.ShowBeatmapSet(id);
+                    content.Action = () => beatmapSetOverlay.ShowBeatmapSet(getIdFromUrl(url));
                 else if (url.StartsWith("b/") || url.StartsWith("beatmaps/"))
-                    content.Action = () => beatmapSetOverlay.ShowBeatmap(id);
-                else if (url.StartsWith("ss/"))
+                    content.Action = () => beatmapSetOverlay.ShowBeatmap(getIdFromUrl(url));
+                else 
                     content.Action = () => Process.Start($"https://osu.ppy.sh/{url}");
             }
             else
