@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Chat
 
         public ChatLine(Message message)
         {
-            Message = MessageFormatter.FormatMessage(message);
+            Message = message;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Chat
             {
                 if (message == value) return;
 
-                message = value;
+                message = MessageFormatter.FormatMessage(value);
 
                 if (!IsLoaded)
                     return;
