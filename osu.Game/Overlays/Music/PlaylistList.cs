@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Music
         }
 
         public void AddBeatmapSet(BeatmapSetInfo beatmapSet) => items.AddBeatmapSet(beatmapSet);
-        public bool RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => items.RemoveBeatmapSet(beatmapSet);
+        public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => items.RemoveBeatmapSet(beatmapSet);
 
         public void Filter(string searchTerm) => items.SearchTerm = searchTerm;
 
@@ -108,12 +108,11 @@ namespace osu.Game.Overlays.Music
                 });
             }
 
-            public bool RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
+            public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
             {
                 var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == beatmapSet.ID);
-                if (itemToRemove == null)
-                    return false;
-                return items.Remove(itemToRemove);
+                if (itemToRemove != null)
+                    items.Remove(itemToRemove);
             }
 
             public BeatmapSetInfo SelectedSet
@@ -235,6 +234,7 @@ namespace osu.Game.Overlays.Music
             private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
             {
                 public IEnumerable<string> FilterTerms => new string[] { };
+
                 public bool MatchingFilter
                 {
                     set
