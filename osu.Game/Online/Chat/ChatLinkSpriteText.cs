@@ -14,7 +14,7 @@ namespace osu.Game.Online.Chat
 {
     public class ChatLinkSpriteText : OsuLinkSpriteText
     {
-        public int LinkId;
+        public int LinkId = -1;
 
         private Color4 hoverColour;
         private Color4 urlColour;
@@ -57,6 +57,8 @@ namespace osu.Game.Online.Chat
         {
             hoverColour = colours.Yellow;
             urlColour = colours.Blue;
+            if (LinkId != -1)
+                Content.Colour = urlColour;
         }
     }
 }
