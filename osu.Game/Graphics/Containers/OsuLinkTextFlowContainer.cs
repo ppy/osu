@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.Containers
         protected override SpriteText CreateSpriteText() => new T();
 
         /// <summary>
-        /// The colour for normal text (links ignore this). This should be set before text is added.
+        /// The colour for normal text (links ignore this). Will only be used for new text elements.
         /// <para>Default is white.</para>
         /// </summary>
         public ColourInfo? TextColour;
@@ -44,8 +44,8 @@ namespace osu.Game.Graphics.Containers
         {
             AddText(text, link =>
             {
-                LoadComponentAsync(link, d => ((T)d).Url = url);
                 creationParameters?.Invoke(link);
+                LoadComponentAsync(link, d => ((T)d).Url = url);
             });
         }
 
