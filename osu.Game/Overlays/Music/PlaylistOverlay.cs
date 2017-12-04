@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Music
         private void playSpecified(BeatmapInfo info)
         {
             beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
-            beatmapBacking.Value.Track.Start();
+            beatmapBacking.Value.Track.Restart();
         }
     }
 
