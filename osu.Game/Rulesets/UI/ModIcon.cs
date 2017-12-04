@@ -10,13 +10,15 @@ using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using OpenTK;
+using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Rulesets.UI
 {
     public class ModIcon : Container, IHasTooltip
     {
-        private readonly SpriteIcon modIcon;
-        private readonly SpriteIcon background;
+        private readonly string modName;
+        private readonly ModButton modButton;
+        private readonly SpriteIcon modIcon, background;
 
         private const float size = 80;
 
@@ -28,15 +30,15 @@ namespace osu.Game.Rulesets.UI
 
         private readonly ModType type;
 
-        public string TooltipText { get; }
+        public string TooltipText => modButton?.TooltipText ?? modName;
 
-        public ModIcon(Mod mod)
+        public ModIcon(Mod mod, ModButton button = null)
         {
             if (mod == null) throw new ArgumentNullException(nameof(mod));
 
             type = mod.Type;
-
-            TooltipText = mod.Name;
+            modName = mod.Name;
+            modButton = button;
 
             Size = new Vector2(size);
 
