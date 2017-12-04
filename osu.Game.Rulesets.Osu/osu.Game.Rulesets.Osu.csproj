@@ -48,6 +48,9 @@
   <ItemGroup>
     <Compile Include="Beatmaps\OsuBeatmapConverter.cs" />
     <Compile Include="Beatmaps\OsuBeatmapProcessor.cs" />
+    <Compile Include="Edit\OsuEditPlayfield.cs" />
+    <Compile Include="Edit\OsuEditRulesetContainer.cs" />
+    <Compile Include="Edit\OsuHitObjectComposer.cs" />
     <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
     <Compile Include="Objects\Drawables\Connections\ConnectionRenderer.cs" />
     <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
