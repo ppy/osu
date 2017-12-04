@@ -74,8 +74,8 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            beatmaps.BeatmapSetAdded += delegate (BeatmapSetInfo set) { list.AddBeatmapSet(set); };
-            beatmaps.BeatmapSetRemoved += delegate (BeatmapSetInfo set) { list.RemoveBeatmapSet(set); };
+            beatmaps.BeatmapSetAdded += list.AddBeatmapSet;
+            beatmaps.BeatmapSetRemoved += list.RemoveBeatmapSet;
 
             list.BeatmapSets = beatmaps.GetAllUsableBeatmapSets();
 
