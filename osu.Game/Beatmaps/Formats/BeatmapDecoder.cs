@@ -14,6 +14,7 @@ namespace osu.Game.Beatmaps.Formats
         static BeatmapDecoder()
         {
             OsuLegacyDecoder.Register();
+            OsuJsonDecoder.Register();
         }
 
         public static BeatmapDecoder GetDecoder(StreamReader stream)
@@ -27,7 +28,16 @@ namespace osu.Game.Beatmaps.Formats
 
             if (line == null || !decoders.ContainsKey(line))
                 throw new IOException(@"Unknown file format");
-            return (BeatmapDecoder)Activator.CreateInstance(decoders[line], line);
+
+            try
+            {
+                return (BeatmapDecoder)Activator.CreateInstance(decoders[line], line);
+            }
+            catch
+            {
+                // As a default case, try a parameterless constructor
+                return (BeatmapDecoder)Activator.CreateInstance(decoders[line]);
+            }
         }
 
         protected static void AddDecoder<T>(string magic) where T : BeatmapDecoder
