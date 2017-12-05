@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace osu.Game.Beatmaps
 {
@@ -13,6 +14,7 @@ namespace osu.Game.Beatmaps
         public const float DEFAULT_DIFFICULTY = 5;
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonIgnore]
         public int ID { get; set; }
 
         public float DrainRate { get; set; } = DEFAULT_DIFFICULTY;
