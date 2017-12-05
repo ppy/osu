@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using System.Threading;
 
 namespace osu.Game.Overlays.Music
 {
@@ -148,7 +149,15 @@ namespace osu.Game.Overlays.Music
         private void playSpecified(BeatmapInfo info)
         {
             beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
-            beatmapBacking.Value.Track.Restart();
+
+            var track = beatmapBacking.Value.Track;
+
+            track.Restart();
+
+            // this is temporary until we have blocking (async.Wait()) audio component methods.
+            // then we can call RestartAsync().Wait() or the blocking version above.
+            while (!track.IsRunning)
+                Thread.Sleep(1);
         }
     }
 
