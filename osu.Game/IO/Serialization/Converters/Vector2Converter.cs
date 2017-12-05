@@ -8,6 +8,9 @@ using OpenTK;
 
 namespace osu.Game.IO.Serialization.Converters
 {
+    /// <summary>
+    /// A type of <see cref="JsonConverter"/> that serializes only the X and Y coordinates of a <see cref="Vector2"/>.
+    /// </summary>
     public class Vector2Converter : JsonConverter
     {
         public override bool CanConvert(Type objectType) => objectType == typeof(Vector2);
