@@ -6,6 +6,12 @@ using Newtonsoft.Json.Linq;
 
 namespace osu.Game.IO.Serialization.Converters
 {
+    /// <summary>
+    /// A type of <see cref="JsonConverter"/> that serializes a <see cref="List<T>"/> alongside
+    /// a lookup table for the types contained. The lookup table is used in deserialization to
+    /// reconstruct the objects with their original types.
+    /// </summary>
+    /// <typeparam name="T">The type of objects contained in the <see cref="List<T>"/> this attribute is attached to.</typeparam>
     public class TypedListConverter<T> : JsonConverter
     {
         public override bool CanConvert(Type objectType) => objectType == typeof(List<T>);
