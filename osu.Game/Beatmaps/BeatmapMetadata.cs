@@ -12,6 +12,7 @@ namespace osu.Game.Beatmaps
     public class BeatmapMetadata
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonIgnore]
         public int ID { get; set; }
 
         private int? onlineBeatmapSetID;
@@ -29,7 +30,10 @@ namespace osu.Game.Beatmaps
         public string Artist { get; set; }
         public string ArtistUnicode { get; set; }
 
+        [JsonIgnore]
         public List<BeatmapInfo> Beatmaps { get; set; }
+
+        [JsonIgnore]
         public List<BeatmapSetInfo> BeatmapSets { get; set; }
 
         /// <summary>
@@ -56,6 +60,7 @@ namespace osu.Game.Beatmaps
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
 
+        [JsonIgnore]
         public string[] SearchableTerms => new[]
         {
             Author?.Username,
