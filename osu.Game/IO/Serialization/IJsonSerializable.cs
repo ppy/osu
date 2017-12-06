@@ -16,7 +16,7 @@ namespace osu.Game.IO.Serialization
 
         public static T Deserialize<T>(this string objString) => JsonConvert.DeserializeObject<T>(objString, CreateGlobalSettings());
 
-        public static void DeserializeInto<T>(this string objString, T target) => JsonConvert.PopulateObject(objString, target, CreateGlobalSettings());
+        public static void DeserializeInto<T>(this string objString, T target) => JsonConvert.DeserializeAnonymousType(objString, target, CreateGlobalSettings());
 
         public static T DeepClone<T>(this T obj) where T : IJsonSerializable => Deserialize<T>(Serialize(obj));
 
