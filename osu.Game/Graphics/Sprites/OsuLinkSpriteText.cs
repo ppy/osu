@@ -99,7 +99,7 @@ namespace osu.Game.Graphics.Sprites
 
                         break;
                     case "edit":
-                        // TODO: Change screen to editor
+                        chat.Game.LoadEditorTimestamp();
                         break;
                     case "b":
                         if (args.Length > 1 && int.TryParse(args[1], out int mapId))
@@ -126,6 +126,7 @@ namespace osu.Game.Graphics.Sprites
                             
                         };
                         // api.Queue(req);
+                        chat.Game.LoadSpectatorScreen();
 
                         break;
                     default:
@@ -138,7 +139,7 @@ namespace osu.Game.Graphics.Sprites
                 if (!int.TryParse(url.Split('/').ElementAtOrDefault(1), out int multiId))
                     return;
 
-                // TODO: Join the specified multiplayer lobby here with multiId
+                chat.Game.LoadMultiplayerLobby();
             }
             else if (url.StartsWith("http://") || url.StartsWith("https://"))
             {
