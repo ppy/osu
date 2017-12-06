@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     internal class TestCaseCatcherArea : OsuTestCase
     {
         private RulesetInfo catchRuleset;
+        private TestCatcherArea catcherArea;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -26,6 +27,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         public TestCaseCatcherArea()
         {
             AddSliderStep<float>("CircleSize", 0, 8, 5, createCatcher);
+            AddToggleStep("Hyperdash", t => catcherArea.ToggleHyperDash(t));
         }
 
         private void createCatcher(float size)
@@ -33,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             Child = new CatchInputManager(catchRuleset)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new CatcherArea(new BeatmapDifficulty { CircleSize = size })
+                Child = catcherArea = new TestCatcherArea(new BeatmapDifficulty { CircleSize = size })
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.BottomLeft
@@ -45,6 +47,16 @@ namespace osu.Game.Rulesets.Catch.Tests
         private void load(RulesetStore rulesets)
         {
             catchRuleset = rulesets.GetRuleset(2);
+        }
+
+        private class TestCatcherArea : CatcherArea
+        {
+            public TestCatcherArea(BeatmapDifficulty beatmapDifficulty)
+                : base(beatmapDifficulty)
+            {
+            }
+
+            public void ToggleHyperDash(bool status) => MovableCatcher.HyperDashModifier = status ? 2 : 1;
         }
     }
 }
