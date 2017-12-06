@@ -144,7 +144,7 @@ namespace osu.Game.Beatmaps
                 get
                 {
                     ensureValid();
-                    return lazy.IsValueCreated;
+                    return lazy.Value.IsCompleted;
                 }
             }
 
