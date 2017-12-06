@@ -79,7 +79,6 @@ namespace osu.Game.Beatmaps
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
 
-        [JsonIgnore]
         public int RulesetID { get; set; }
 
         public RulesetInfo Ruleset { get; set; }
