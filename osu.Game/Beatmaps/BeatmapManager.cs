@@ -20,6 +20,7 @@ using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.IO;
+using osu.Game.IO.Serialization;
 using osu.Game.IPC;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -568,6 +569,53 @@ namespace osu.Game.Beatmaps
 
                 context.SaveChanges(transaction);
             }
+        }
+
+        public void MigrateAllToNewFormat()
+        {
+            var usableSets = GetAllUsableBeatmapSets();
+
+            if (usableSets.Count == 0)
+                return;
+
+            var notification = new ProgressNotification
+            {
+                Progress = 0,
+                State = ProgressNotificationState.Active,
+            };
+
+            PostNotification?.Invoke(notification);
+
+            int i = 1;
+            foreach (var set in usableSets)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
+                notification.Text = $"Migrating ({i} of {usableSets.Count})";
+                notification.Progress = (float)i++ / usableSets.Count;
+
+                foreach (var beatmap in set.Beatmaps)
+                {
+                    if (notification.State == ProgressNotificationState.Cancelled)
+                        // user requested abort
+                        return;
+
+                    var working = GetWorkingBeatmap(beatmap);
+                    using (var ms = new MemoryStream())
+                    using (var sw = new StreamWriter(ms))
+                    {
+                        sw.Write(working.Beatmap.Serialize());
+                        sw.Flush();
+
+                        ms.Position = 0;
+                        UpdateContent(beatmap, ms);
+                    }
+                }
+            }
+
+            notification.State = ProgressNotificationState.Completed;
         }
 
         /// <summary>

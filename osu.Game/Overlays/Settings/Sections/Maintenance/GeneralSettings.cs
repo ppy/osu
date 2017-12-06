@@ -65,34 +65,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         migrateButton.Enabled.Value = false;
-                        Task.Run(() =>
-                        {
-                            var usableSets = beatmaps.GetAllUsableBeatmapSets();
-                            foreach (var set in usableSets)
-                            {
-                                foreach (var beatmap in set.Beatmaps)
-                                {
-                                    var working = beatmaps.GetWorkingBeatmap(beatmap);
-                                    using (var ms = new MemoryStream())
-                                    using (var sw = new StreamWriter(ms))
-                                    {
-                                        try
-                                        {
-                                            sw.Write(working.Beatmap.Serialize());
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            Console.WriteLine(e);
-                                            throw;
-                                        }
-                                        sw.Flush();
-
-                                        ms.Position = 0;
-                                        beatmaps.UpdateContent(beatmap, ms);
-                                    }
-                                }
-                            }
-                        }).ContinueWith(t => Schedule(() => migrateButton.Enabled.Value = true));
+                        Task.Factory.StartNew(beatmaps.MigrateAllToNewFormat).ContinueWith(t => Schedule(() => migrateButton.Enabled.Value = true), TaskContinuationOptions.LongRunning);
                     }
                 }
             };
