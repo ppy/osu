@@ -1,12 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.IO.Serialization;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -15,6 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton importButton;
         private TriangleButton deleteButton;
         private TriangleButton restoreButton;
+        private TriangleButton migrateButton;
 
         protected override string Header => "General";
 
@@ -55,6 +59,42 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
                     }
                 },
+                migrateButton = new SettingsButton
+                {
+                    Text = "Migrate all beatmaps to the new format",
+                    Action = () =>
+                    {
+                        migrateButton.Enabled.Value = false;
+                        Task.Run(() =>
+                        {
+                            var usableSets = beatmaps.GetAllUsableBeatmapSets();
+                            foreach (var set in usableSets)
+                            {
+                                foreach (var beatmap in set.Beatmaps)
+                                {
+                                    var working = beatmaps.GetWorkingBeatmap(beatmap);
+                                    using (var ms = new MemoryStream())
+                                    using (var sw = new StreamWriter(ms))
+                                    {
+                                        try
+                                        {
+                                            sw.Write(working.Beatmap.Serialize());
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            Console.WriteLine(e);
+                                            throw;
+                                        }
+                                        sw.Flush();
+
+                                        ms.Position = 0;
+                                        beatmaps.UpdateContent(beatmap, ms);
+                                    }
+                                }
+                            }
+                        }).ContinueWith(t => Schedule(() => migrateButton.Enabled.Value = true));
+                    }
+                }
             };
         }
     }

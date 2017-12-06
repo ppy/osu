@@ -545,6 +545,31 @@ namespace osu.Game.Beatmaps
             return beatmapSet;
         }
 
+        public void UpdateContent(BeatmapInfo beatmapInfo, Stream newData)
+        {
+            // let's only allow one concurrent update at a time for now.
+            var context = createContext();
+
+            using (var transaction = context.BeginTransaction())
+            {
+                // create local stores so we can isolate and thread safely, and share a context/transaction.
+                var setInfo = beatmapInfo.BeatmapSet;
+                var existingSetFileInfo = setInfo.Files.First(f => f.FileInfo.Hash == beatmapInfo.Hash);
+                var existingFileInfo = existingSetFileInfo.FileInfo;
+
+                existingSetFileInfo.FileInfo = files.Add(newData);
+                files.Dereference(existingFileInfo);
+
+                beatmapInfo.Hash = newData.ComputeSHA2Hash();
+                beatmapInfo.MD5Hash = newData.ComputeMD5Hash();
+
+                context.Update(existingSetFileInfo);
+                context.Update(beatmapInfo);
+
+                context.SaveChanges(transaction);
+            }
+        }
+
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
