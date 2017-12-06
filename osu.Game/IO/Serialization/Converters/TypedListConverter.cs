@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -20,12 +19,10 @@ namespace osu.Game.IO.Serialization.Converters
         {
             var list = new List<T>();
 
-            var localSerializer = createLocalSerializer();
-
             var obj = JObject.Load(reader);
 
             var lookupTable = new List<string>();
-            localSerializer.Populate(obj["LookupTable"].CreateReader(), lookupTable);
+            serializer.Populate(obj["LookupTable"].CreateReader(), lookupTable);
 
             foreach (var tok in obj["Items"])
             {
@@ -33,7 +30,7 @@ namespace osu.Game.IO.Serialization.Converters
 
                 var typeName = lookupTable[(int)tok["Type"]];
                 var instance = (T)Activator.CreateInstance(Type.GetType(typeName));
-                localSerializer.Populate(itemReader, instance);
+                serializer.Populate(itemReader, instance);
 
                 list.Add(instance);
             }
@@ -44,8 +41,6 @@ namespace osu.Game.IO.Serialization.Converters
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var list = (List<T>)value;
-
-            var localSerializer = createLocalSerializer();
 
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
@@ -60,7 +55,7 @@ namespace osu.Game.IO.Serialization.Converters
                     typeId = lookupTable.Count - 1;
                 }
 
-                var itemObject = JObject.FromObject(item, localSerializer);
+                var itemObject = JObject.FromObject(item, serializer);
                 itemObject.AddFirst(new JProperty("Type", typeId));
                 objects.Add(itemObject);
             }
@@ -68,7 +63,7 @@ namespace osu.Game.IO.Serialization.Converters
             writer.WriteStartObject();
 
             writer.WritePropertyName("LookupTable");
-            localSerializer.Serialize(writer, lookupTable);
+            serializer.Serialize(writer, lookupTable);
 
             writer.WritePropertyName("Items");
             writer.WriteStartArray();
@@ -77,13 +72,6 @@ namespace osu.Game.IO.Serialization.Converters
             writer.WriteEndArray();
 
             writer.WriteEndObject();
-        }
-
-        private JsonSerializer createLocalSerializer()
-        {
-            var localSettings = JsonSerializableExtensions.CreateGlobalSettings();
-            localSettings.Converters = localSettings.Converters.Where(c => !(c is TypedListConverter<T>)).ToArray();
-            return JsonSerializer.Create(localSettings);
         }
     }
 }
