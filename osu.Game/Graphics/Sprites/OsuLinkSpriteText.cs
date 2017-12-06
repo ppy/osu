@@ -7,9 +7,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
+using osu.Game.Screens.Edit;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,6 +29,7 @@ namespace osu.Game.Graphics.Sprites
 
         private readonly OsuHoverContainer content;
 
+        private APIAccess api;
         private BeatmapSetOverlay beatmapSetOverlay;
 
         public override bool HandleInput => content.Action != null;
@@ -43,10 +48,10 @@ namespace osu.Game.Graphics.Sprites
             }
             set
             {
-                if (value != null)
+                if (!string.IsNullOrEmpty(value))
                 {
                     url = value;
-                    loadAction();
+                    content.Action = onClickAction;
                 }
             }
         }
@@ -66,63 +71,100 @@ namespace osu.Game.Graphics.Sprites
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapSetOverlay beatmapSetOverlay, ChatOverlay chat)
+        private void load(APIAccess api, BeatmapSetOverlay beatmapSetOverlay, ChatOverlay chat)
         {
+            this.api = api;
             this.beatmapSetOverlay = beatmapSetOverlay;
             this.chat = chat;
         }
 
-        private void loadAction()
+        private void onClickAction()
         {
-            if (Url == null || String.IsNullOrEmpty(Url))
-                return;
-
             var url = Url;
 
-            // Client-internal stuff
             if (url.StartsWith("osu://"))
             {
-                var firstPath = url.Substring(6, 5);
-                url = url.Substring(11);
+                url = url.Substring(6);
+                var args = url.Split('/');
 
-                if (firstPath == "chan/")
+                switch (args[0])
                 {
-                    var nextSlashIndex = url.IndexOf('/');
-                    var channelName = nextSlashIndex != -1 ? url.Remove(nextSlashIndex) : url;
+                    case "chan":
+                        var foundChannel = chat.AvailableChannels.Find(channel => channel.Name == args[1]);
 
-                    var foundChannel = chat.AvailableChannels.Find(channel => channel.Name == channelName);
+                        if (foundChannel == null)
+                            TextColour = Color4.White;
+                        else
+                            chat.OpenChannel(foundChannel);
 
-                    if (foundChannel != null)
-                        content.Action = () => chat.OpenChannel(foundChannel);
-                }
-                else if (firstPath == "edit/")
-                {
-                    // Open editor here, then goto specified time
-                    // how to push new screen from here? we'll see
-                    content.Action = () => new Framework.Screens.Screen().Push(new Screens.Edit.Editor());
-                }
-                else
-                    throw new ArgumentException($"Unknown osu:// link at {nameof(OsuLinkSpriteText)} ({firstPath}).");
+                        break;
+                    case "edit":
+                        // TODO: Change screen to editor
+                        break;
+                    case "b":
+                        if (args.Length > 1 && int.TryParse(args[1], out int mapId))
+                            beatmapSetOverlay.ShowBeatmap(mapId);
+
+                        break;
+                    case "s":
+                    case "dl":
+                        if (args.Length > 1 && int.TryParse(args[1], out int mapSetId))
+                            beatmapSetOverlay.ShowBeatmapSet(mapSetId);
+
+                        break;
+                    case "spectate":
+                        GetUserRequest req;
+                        if (int.TryParse(args[1], out int userId))
+                            req = new GetUserRequest(userId);
+                        else
+                            // Get by username instead
+                            req = new GetUserRequest(args[1]);
+
+                        req.Success += user =>
+                        {
+                            // TODO: Open spectator screen and start spectating
+                            
+                        };
+                        // api.Queue(req);
+
+                        break;
+                    default:
+                        throw new ArgumentException($"Unknown osu:// link at {nameof(OsuLinkSpriteText)} (https://osu.ppy.sh/{args[0]}).");
+                }    
+            }
+            else if (url.StartsWith("osump://"))
+            {
+                url = url.Substring(8);
+                if (!int.TryParse(url.Split('/').ElementAtOrDefault(1), out int multiId))
+                    return;
+
+                // TODO: Join the specified multiplayer lobby here with multiId
             }
             else if (url.StartsWith("http://") || url.StartsWith("https://"))
             {
                 var osuUrlIndex = url.IndexOf("osu.ppy.sh/");
                 if (osuUrlIndex == -1)
                 {
-                    content.Action = () => Process.Start(url);
+                    Process.Start(url);
                     return;
                 }
 
                 url = url.Substring(osuUrlIndex + 11);
                 if (url.StartsWith("s/") || url.StartsWith("beatmapsets/") || url.StartsWith("d/"))
-                    content.Action = () => beatmapSetOverlay.ShowBeatmapSet(getIdFromUrl(url));
+                {
+                    var id = getIdFromUrl(url);
+                    beatmapSetOverlay.ShowBeatmapSet(id);
+                }
                 else if (url.StartsWith("b/") || url.StartsWith("beatmaps/"))
-                    content.Action = () => beatmapSetOverlay.ShowBeatmap(getIdFromUrl(url));
+                {
+                    var id = getIdFromUrl(url);
+                    beatmapSetOverlay.ShowBeatmap(id);
+                }
                 else
-                    content.Action = () => Process.Start($"https://osu.ppy.sh/{url}");
+                    Process.Start($"https://osu.ppy.sh/{url}");
             }
             else
-                content.Action = () => Process.Start(url);
+                Process.Start(url);
         }
 
         private int getIdFromUrl(string url)
