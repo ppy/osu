@@ -41,6 +41,8 @@ namespace osu.Game.Overlays
 
         private readonly FocusedTextBox textbox;
 
+        public OsuGame Game;
+
         private APIAccess api;
 
         private const int transition_length = 500;
@@ -271,8 +273,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, OsuConfigManager config, OsuColour colours)
+        private void load(APIAccess api, OsuConfigManager config, OsuColour colours, OsuGame game)
         {
+            Game = game;
             this.api = api;
             api.Register(this);
 
