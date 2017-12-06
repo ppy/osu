@@ -161,7 +161,7 @@ namespace osu.Game.Beatmaps
             {
                 lock (initLock)
                 {
-                    if (!lazy.IsValueCreated || (stillValidFunction?.Invoke(lazy.Value.Result) ?? true)) return;
+                    if (!lazy.IsValueCreated || !lazy.Value.IsCompleted || (stillValidFunction?.Invoke(lazy.Value.Result) ?? true)) return;
                     init();
                 }
             }
