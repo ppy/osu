@@ -48,21 +48,11 @@ namespace osu.Game.Rulesets.Objects
             Kiai |= effectPoint.KiaiMode;
 
             // Initialize first sample
-            Samples.ForEach(s => initializeSampleInfo(s, soundPoint));
+            Samples.ForEach(s => s.ControlPoint = soundPoint);
 
             // Initialize any repeat samples
             var repeatData = this as IHasRepeats;
-            repeatData?.RepeatSamples?.ForEach(r => r.ForEach(s => initializeSampleInfo(s, soundPoint)));
-        }
-
-        private void initializeSampleInfo(SampleInfo sample, SoundControlPoint soundPoint)
-        {
-            if (sample.Volume == 0)
-                sample.Volume = soundPoint?.SampleVolume ?? 0;
-
-            // If the bank is not assigned a name, assign it from the control point
-            if (string.IsNullOrEmpty(sample.Bank))
-                sample.Bank = soundPoint?.SampleBank ?? @"normal";
+            repeatData?.RepeatSamples?.ForEach(r => r.ForEach(s => s.ControlPoint = soundPoint));
         }
     }
 }
