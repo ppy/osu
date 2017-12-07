@@ -66,8 +66,8 @@ namespace osu.Game.Tests.Visual
 
         private class DummyMessage : Message
         {
-            private static long messageCounter = 0;
-            private static User sender = new User
+            private static long messageCounter;
+            private readonly static User sender = new User
             {
                 Username = @"Somebody",
                 Id = 1,

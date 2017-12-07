@@ -256,7 +256,6 @@ namespace osu.Game.Overlays.Chat
                     });
                 }
 
-                // Add text after the last link
                 var lastLink = message.Links[message.Links.Count - 1];
                 contentFlow.AddText(message.Content.Substring(lastLink.Index + lastLink.Length));
             }
