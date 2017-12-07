@@ -19,13 +19,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
     [TestFixture]
     public class OsuJsonDecoderTest
     {
-        private const string beatmap_1 = "Soleily - Renatus (Gamu) [Insane].osu";
-        private const string beatmap_2 = "Within Temptation - The Unforgiving (Armin) [Marathon].osu";
+        private const string normal = "Soleily - Renatus (Gamu) [Insane].osu";
+        private const string marathon = "Within Temptation - The Unforgiving (Armin) [Marathon].osu";
+        private const string with_sb = "Kozato snow - Rengetsu Ouka (_Kiva) [Yuki YukI].osu";
 
         [Test]
         public void TestDecodeMetadata()
         {
-            var beatmap = decodeAsJson(beatmap_1);
+            var beatmap = decodeAsJson(normal);
             var meta = beatmap.BeatmapInfo.Metadata;
             Assert.AreEqual(241526, meta.OnlineBeatmapSetID);
             Assert.AreEqual("Soleily", meta.Artist);
@@ -43,7 +44,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeGeneral()
         {
-            var beatmap = decodeAsJson(beatmap_1);
+            var beatmap = decodeAsJson(normal);
             var beatmapInfo = beatmap.BeatmapInfo;
             Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
             Assert.AreEqual(false, beatmapInfo.Countdown);
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeEditor()
         {
-            var beatmap = decodeAsJson(beatmap_1);
+            var beatmap = decodeAsJson(normal);
             var beatmapInfo = beatmap.BeatmapInfo;
 
             int[] expectedBookmarks =
@@ -78,7 +79,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeDifficulty()
         {
-            var beatmap = decodeAsJson(beatmap_1);
+            var beatmap = decodeAsJson(normal);
             var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
             Assert.AreEqual(6.5f, difficulty.DrainRate);
             Assert.AreEqual(4, difficulty.CircleSize);
@@ -91,7 +92,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeColors()
         {
-            var beatmap = decodeAsJson(beatmap_1);
+            var beatmap = decodeAsJson(normal);
             Color4[] expected =
             {
                 new Color4(142, 199, 255, 255),
@@ -109,7 +110,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeHitObjects()
         {
-            var beatmap = decodeAsJson(beatmap_1);
+            var beatmap = decodeAsJson(normal);
 
             var curveData = beatmap.HitObjects[0] as IHasCurve;
             var positionData = beatmap.HitObjects[0] as IHasPosition;
@@ -128,8 +129,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.IsTrue(beatmap.HitObjects[1].Samples.Any(s => s.Name == SampleInfo.HIT_CLAP));
         }
 
-        [TestCase(beatmap_1)]
-        [TestCase(beatmap_2)]
+        [TestCase(normal)]
+        [TestCase(marathon)]
+        // Currently fails:
+        // [TestCase(with_sb)]
         public void TestParity(string beatmap)
         {
             var beatmaps = decode(beatmap);
