@@ -25,6 +25,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
@@ -494,7 +495,7 @@ namespace osu.Game.Beatmaps
             BeatmapMetadata metadata;
 
             using (var stream = new StreamReader(reader.GetStream(mapName)))
-                metadata = BeatmapDecoder.GetDecoder(stream).Decode(stream).Metadata;
+                metadata = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
 
             // check if a set already exists with the same online id.
             beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) ?? new BeatmapSetInfo
@@ -517,8 +518,8 @@ namespace osu.Game.Beatmaps
                     raw.CopyTo(ms);
                     ms.Position = 0;
 
-                    var decoder = BeatmapDecoder.GetDecoder(sr);
-                    Beatmap beatmap = decoder.Decode(sr);
+                    var decoder = Decoder.GetDecoder(sr);
+                    Beatmap beatmap = decoder.DecodeBeatmap(sr);
 
                     beatmap.BeatmapInfo.Path = name;
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
@@ -568,23 +569,11 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    Beatmap beatmap;
-
-                    BeatmapDecoder decoder;
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                     {
-                        decoder = BeatmapDecoder.GetDecoder(stream);
-                        beatmap = decoder.Decode(stream);
+                        Decoder decoder = Decoder.GetDecoder(stream);
+                        return decoder.DecodeBeatmap(stream);
                     }
-
-                    if (beatmap == null || BeatmapSetInfo.StoryboardFile == null)
-                        return beatmap;
-
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
-                        decoder.Decode(stream, beatmap);
-
-
-                    return beatmap;
                 }
                 catch
                 {
@@ -623,6 +612,28 @@ namespace osu.Game.Beatmaps
             }
 
             protected override Waveform GetWaveform() => new Waveform(store.GetStream(getPathForFile(Metadata.AudioFile)));
+
+            protected override Storyboard GetStoryboard()
+            {
+                if (BeatmapInfo?.Path == null && BeatmapSetInfo?.StoryboardFile == null)
+                    return new Storyboard();
+
+                try
+                {
+                    Decoder decoder;
+                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo?.Path))))
+                        decoder = Decoder.GetDecoder(stream);
+
+                    // try for .osb first and fall back to .osu
+                    string storyboardFile = BeatmapSetInfo.StoryboardFile ?? BeatmapInfo.Path;
+                    using (var stream = new StreamReader(store.GetStream(getPathForFile(storyboardFile))))
+                        return decoder.GetStoryboardDecoder().DecodeStoryboard(stream);
+                }
+                catch
+                {
+                    return new Storyboard();
+                }
+            }
         }
 
         /// <summary>
