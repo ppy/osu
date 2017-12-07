@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,16 +16,15 @@ namespace osu.Game.Overlays.BeatmapSet
     {
         public readonly Bindable<bool> Favourited = new Bindable<bool>();
 
-        public FavouriteButton()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-
             Container pink;
             SpriteIcon icon;
             AddRange(new Drawable[]
             {
                 pink = new Container
                 {
-                    Depth = -1,
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0f,
                     Children = new Drawable[]
@@ -45,7 +45,6 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
                 icon = new SpriteIcon
                 {
-                    Depth = -1,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Icon = FontAwesome.fa_heart_o,
