@@ -16,10 +16,16 @@ using osu.Framework.Extensions.Color4Extensions;
 using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Framework.Input.Bindings;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using System.Collections.Generic;
+using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoPlayfield : ScrollingPlayfield
+    public class TaikoPlayfield : ScrollingPlayfield, IKeyBindingHandler<TaikoAction>
     {
         /// <summary>
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoRulesetContainer"/>.
@@ -54,9 +60,14 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box overlayBackground;
         private readonly Box background;
 
-        public TaikoPlayfield()
+        private ControlPointInfo controlPointInfo;
+        private IEnumerable<Sample> allSamples;
+        private AudioManager audio;
+
+        public TaikoPlayfield(ControlPointInfo controlPointInfo)
             : base(Axes.X)
         {
+            this.controlPointInfo = controlPointInfo;
             AddRangeInternal(new Drawable[]
             {
                 backgroundContainer = new Container
@@ -194,8 +205,15 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
+            this.audio = audio;
+
+            foreach (var soundPoint in controlPointInfo.SoundPoints)
+            {
+                SampleInfo.FromSoundPoint(soundPoint).GetChannel(audio.Sample);
+            }
+
             overlayBackgroundContainer.BorderColour = colours.Gray0;
             overlayBackground.Colour = colours.Gray1;
 
@@ -258,5 +276,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                     kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
             }
         }
+
+        public bool OnPressed(TaikoAction action)
+        {
+            var soundPoint = controlPointInfo.SoundPointAt(Time.Current);
+
+            return true;
+        }
+
+        public bool OnReleased(TaikoAction action) => false;
     }
 }
