@@ -81,8 +81,7 @@ namespace osu.Game.Online.Chat
                         if (int.TryParse(args[1], out int userId))
                             req = new GetUserRequest(userId);
                         else
-                            // Get by username instead
-                            req = new GetUserRequest(args[1]);
+                            return;
 
                         req.Success += user =>
                         {
