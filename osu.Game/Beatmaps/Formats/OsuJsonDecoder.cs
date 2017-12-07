@@ -18,8 +18,16 @@ namespace osu.Game.Beatmaps.Formats
             stream.BaseStream.Position = 0;
             stream.DiscardBufferedData();
 
-            string fullText = stream.ReadToEnd();
-            fullText.DeserializeInto(beatmap);
+            try
+            {
+                string fullText = stream.ReadToEnd();
+                fullText.DeserializeInto(beatmap);
+            }
+            catch
+            {
+                // Temporary because storyboards are deserialized into beatmaps at the moment
+                // This try-catch shouldn't exist in the future
+            }
 
             foreach (var hitObject in beatmap.HitObjects)
                 hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
