@@ -3,28 +3,25 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace osu.Game.Online.Chat
 {
     public static class MessageFormatter
     {
         // [[Performance Points]] -> wiki:Performance Points (https://osu.ppy.sh/wiki/Performance_Points)
-        private static Regex wikiRegex = new Regex(@"\[\[([^\]]+)\]\]");
+        private static readonly Regex wiki_regex = new Regex(@"\[\[([^\]]+)\]\]");
 
         // (test)[https://osu.ppy.sh/b/1234] -> test (https://osu.ppy.sh/b/1234)
-        private static Regex oldLinkRegex = new Regex(@"\(([^\)]*)\)\[([a-z]+://[^ ]+)\]");
+        private static readonly Regex old_link_regex = new Regex(@"\(([^\)]*)\)\[([a-z]+://[^ ]+)\]");
 
         // [https://osu.ppy.sh/b/1234 Beatmap [Hard] (poop)] -> Beatmap [hard] (poop) (https://osu.ppy.sh/b/1234)
-        private static Regex newLinkRegex = new Regex(@"\[([a-z]+://[^ ]+) ([^\[\]]*(((?<open>\[)[^\[\]]*)+((?<close-open>\])[^\[\]]*)+)*(?(open)(?!)))\]");
+        private static readonly Regex new_link_regex = new Regex(@"\[([a-z]+://[^ ]+) ([^\[\]]*(((?<open>\[)[^\[\]]*)+((?<close-open>\])[^\[\]]*)+)*(?(open)(?!)))\]");
 
         // advanced, RFC-compatible regular expression that matches any possible URL, *but* allows certain invalid characters that are widely used
         // This is in the format (<required>, [optional]):
         //      http[s]://<domain>.<tld>[:port][/path][?query][#fragment]
-        private static Regex advancedLinkRegex = new Regex(@"(?<paren>\([^)]*)?" +
+        private static readonly Regex advanced_link_regex = new Regex(@"(?<paren>\([^)]*)?" +
                 @"(?<link>https?:\/\/" +
                     @"(?<domain>(?:[a-z0-9]\.|[a-z0-9][a-z0-9-]*[a-z0-9]\.)*[a-z][a-z0-9-]*[a-z0-9]" + // domain, TLD
                     @"(?::\d+)?)" + // port
@@ -34,13 +31,13 @@ namespace osu.Game.Online.Chat
                 RegexOptions.IgnoreCase);
 
         // 00:00:000 (1,2,3) - test
-        private static Regex timeRegex = new Regex(@"\d\d:\d\d:\d\d\d? [^-]*");
+        private static readonly Regex time_regex = new Regex(@"\d\d:\d\d:\d\d\d? [^-]*");
 
         // #osu
-        private static Regex channelRegex = new Regex(@"#[a-zA-Z]+[a-zA-Z0-9]+");
+        private static readonly Regex channel_regex = new Regex(@"#[a-zA-Z]+[a-zA-Z0-9]+");
 
         // Unicode emojis
-        private static Regex emojiRegex = new Regex(@"(\uD83D[\uDC00-\uDE4F])");
+        private static readonly Regex emoji_regex = new Regex(@"(\uD83D[\uDC00-\uDE4F])");
 
         private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0)
         {
@@ -62,7 +59,7 @@ namespace osu.Game.Online.Chat
                 if (displayText.Length == 0 || linkText.Length == 0) continue;
 
                 // Check for encapsulated links
-                if (result.Links.Find(l => (l.Index <= index && l.Index + l.Length >= index + m.Length) || index <= l.Index && index + m.Length >= l.Index + l.Length) == null)
+                if (result.Links.Find(l => l.Index <= index && l.Index + l.Length >= index + m.Length || index <= l.Index && index + m.Length >= l.Index + l.Length) == null)
                 {
                     result.Text = result.Text.Remove(index, m.Length).Insert(index, displayText);
 
@@ -72,7 +69,7 @@ namespace osu.Game.Online.Chat
                     result.Links.Add(new Link(linkText, index, displayText.Length));
 
                     //adjust the offset for processing the current matches group.
-                    captureOffset += (m.Length - displayText.Length);
+                    captureOffset += m.Length - displayText.Length;
                 }
             }
         }
@@ -105,28 +102,28 @@ namespace osu.Game.Online.Chat
             var result = new MessageFormatterResult(toFormat);
 
             // handle the [link display] format
-            handleMatches(newLinkRegex, "{2}", "{1}", result, startIndex);
+            handleMatches(new_link_regex, "{2}", "{1}", result, startIndex);
 
             // handle the ()[] link format
-            handleMatches(oldLinkRegex, "{1}", "{2}", result, startIndex);
+            handleMatches(old_link_regex, "{1}", "{2}", result, startIndex);
 
             // handle wiki links
-            handleMatches(wikiRegex, "{1}", "https://osu.ppy.sh/wiki/{1}", result, startIndex);
+            handleMatches(wiki_regex, "{1}", "https://osu.ppy.sh/wiki/{1}", result, startIndex);
 
             // handle bare links
-            handleAdvanced(advancedLinkRegex, result, startIndex);
+            handleAdvanced(advanced_link_regex, result, startIndex);
 
             // handle editor times
-            handleMatches(timeRegex, "{0}", "osu://edit/{0}", result, startIndex);
+            handleMatches(time_regex, "{0}", "osu://edit/{0}", result, startIndex);
 
             // handle channels
-            handleMatches(channelRegex, "{0}", "osu://chan/{0}", result, startIndex);
+            handleMatches(channel_regex, "{0}", "osu://chan/{0}", result, startIndex);
 
             var empty = "";
             while (space-- > 0)
                 empty += "\0";
 
-            handleMatches(emojiRegex, empty, "{0}", result, startIndex);
+            handleMatches(emoji_regex, empty, "{0}", result, startIndex);
 
             return result;
         }
