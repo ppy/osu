@@ -9,7 +9,6 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
-using static osu.Game.Online.Chat.ChatLink;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -20,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
     public class HoverSounds : CompositeDrawable
     {
         private SampleChannel sampleHover;
-
+         
         protected readonly HoverSampleSet SampleSet;
 
         public HoverSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal)
@@ -31,7 +30,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(InputState state)
         {
-            if ((Parent as IHasHoverSounds).ShouldPlayHoverSound) sampleHover?.Play();
+            // If Parent does not implement the interface, still play the sample
+            if ((Parent as ICanDisableHoverSounds)?.ShouldPlayHoverSound != false) sampleHover?.Play();
             return base.OnHover(state);
         }
 
@@ -52,7 +52,11 @@ namespace osu.Game.Graphics.UserInterface
         Soft
     }
 
-    public interface IHasHoverSounds
+    /// <summary>
+    /// Classes implementing this interface can choose whether or not the HoverSounds should be played.
+    /// <para>If this is not implemented, the sounds will always be played when OnHover is triggered.</para>
+    /// </summary>
+    public interface ICanDisableHoverSounds
     {
         bool ShouldPlayHoverSound { get; }
     }

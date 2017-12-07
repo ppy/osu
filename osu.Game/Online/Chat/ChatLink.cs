@@ -221,7 +221,7 @@ namespace osu.Game.Online.Chat
                 Content.Colour = urlColour;
         }
 
-        private class ChatHoverContainer : OsuHoverContainer, IHasHoverSounds
+        private class ChatHoverContainer : OsuHoverContainer, ICanDisableHoverSounds
         {
             public bool ShouldPlayHoverSound => ((ChatLink)Parent).SameLinkSprites.All(sprite => !sprite.IsHovered);
         }
