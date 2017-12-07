@@ -9,13 +9,11 @@ namespace osu.Game.Online.API.Requests
     {
         private long? userId;
 
-        /// <param name="userId">The user's ID.</param>
         public GetUserRequest(long? userId = null)
         {
             this.userId = userId;
         }
 
-        // Prefer ID over name
         protected override string Target => userId.HasValue ? $@"users/{userId}" : @"me";
     }
 }
