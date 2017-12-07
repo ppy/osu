@@ -9,6 +9,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using static osu.Game.Online.Chat.ChatLink;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(InputState state)
         {
-            sampleHover?.Play();
+            if ((Parent as IHasHoverSounds).ShouldPlayHoverSound) sampleHover?.Play();
             return base.OnHover(state);
         }
 
@@ -49,5 +50,10 @@ namespace osu.Game.Graphics.UserInterface
         Normal,
         [Description("-softer")]
         Soft
+    }
+
+    public interface IHasHoverSounds
+    {
+        bool ShouldPlayHoverSound { get; }
     }
 }
