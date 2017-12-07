@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace osu.Game.Online.Chat
 {
-    public class ChatLinkSpriteText : OsuLinkSpriteText
+    public class ChatLink : OsuLinkSpriteText
     {
         public int LinkId = -1;
 
@@ -22,12 +22,12 @@ namespace osu.Game.Online.Chat
         protected override bool OnHover(InputState state)
         {
             // Every word is one sprite in chat (for word wrap) so we need to find all other sprites that display the same link
-            var otherSpritesWithSameLink = ((Container<Drawable>)Parent).Children.Where(child => (child as ChatLinkSpriteText)?.LinkId == LinkId && !Equals(child));
+            var otherSpritesWithSameLink = ((Container<Drawable>)Parent).Children.Where(child => (child as ChatLink)?.LinkId == LinkId && !Equals(child));
 
             var hoverResult = base.OnHover(state);
 
             if (!otherSpritesWithSameLink.Any(sprite => sprite.IsHovered))
-                foreach (ChatLinkSpriteText sprite in otherSpritesWithSameLink)
+                foreach (ChatLink sprite in otherSpritesWithSameLink)
                     sprite.TriggerOnHover(state);
 
             Content.FadeColour(hoverColour, 500, Easing.OutQuint);
@@ -37,7 +37,7 @@ namespace osu.Game.Online.Chat
 
         protected override void OnHoverLost(InputState state)
         {
-            var spritesWithSameLink = ((Container<Drawable>)Parent).Children.Where(child => (child as ChatLinkSpriteText)?.LinkId == LinkId);
+            var spritesWithSameLink = ((Container<Drawable>)Parent).Children.Where(child => (child as ChatLink)?.LinkId == LinkId);
 
             if (spritesWithSameLink.Any(sprite => sprite.IsHovered))
             {
@@ -46,7 +46,7 @@ namespace osu.Game.Online.Chat
                 return;
             }
 
-            foreach (ChatLinkSpriteText sprite in spritesWithSameLink)
+            foreach (ChatLink sprite in spritesWithSameLink)
                 sprite.Content.FadeColour(urlColour, 500, Easing.OutQuint);
 
             base.OnHoverLost(state);

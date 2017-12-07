@@ -289,7 +289,7 @@
     <Compile Include="Online\API\Requests\GetBeatmapRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
-    <Compile Include="Online\Chat\ChatLinkSpriteText.cs" />
+    <Compile Include="Online\Chat\ChatLink.cs" />
     <Compile Include="Online\Chat\MessageFormatter.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ClickableUsername.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableScore.cs" />
