@@ -13,6 +13,7 @@ using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -65,7 +66,10 @@ namespace osu.Game.Rulesets.Osu.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            AddInternal(new GameplayCursor());
+
+            var cursor = CreateCursor();
+            if (cursor != null)
+                AddInternal(cursor);
         }
 
         public override void Add(DrawableHitObject h)
@@ -102,5 +106,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             judgementLayer.Add(explosion);
         }
+
+        protected virtual CursorContainer CreateCursor() => new GameplayCursor();
     }
 }

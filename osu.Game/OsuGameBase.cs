@@ -154,7 +154,7 @@ namespace osu.Game
                         Debug.Assert(lastBeatmap != null);
                         Debug.Assert(lastBeatmap.Track != null);
 
-                        lastBeatmap.DisposeTrack();
+                        lastBeatmap.RecycleTrack();
                     }
 
                     Audio.Track.AddItem(b.Track);
