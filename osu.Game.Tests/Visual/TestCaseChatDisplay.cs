@@ -4,7 +4,6 @@
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
