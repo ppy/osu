@@ -137,6 +137,9 @@ namespace osu.Game.Online.Chat
             var formatted = inputMessage;
 
             formatted.Content = result.Text;
+
+            // Sometimes, regex matches are not in order
+            result.Links.Sort();
             formatted.Links = result.Links;
             return formatted;
         }
@@ -153,7 +156,7 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        public class Link
+        public class Link : IComparable<Link>
         {
             public string Url;
             public int Index;
@@ -165,6 +168,8 @@ namespace osu.Game.Online.Chat
                 Index = startIndex;
                 Length = length;
             }
+
+            public int CompareTo(Link otherLink) => Index > otherLink.Index ? 1 : -1;
         }
     }
 }
