@@ -16,6 +16,26 @@ namespace osu.Game.IO.Serialization.Converters
     /// <typeparam name="T">The type of objects contained in the <see cref="List<T>"/> this attribute is attached to.</typeparam>
     public class TypedListConverter<T> : JsonConverter
     {
+        private readonly bool requiresTypeVersion;
+
+        /// <summary>
+        /// Constructs a new <see cref="TypedListConverter{T}"/>.
+        /// </summary>
+        // ReSharper disable once UnusedMember.Global
+        public TypedListConverter()
+        {
+        }
+
+        /// <summary>
+        /// Constructs a new <see cref="TypedListConverter{T}"/>.
+        /// </summary>
+        /// <param name="requiresTypeVersion">Whether the version of the type should be serialized.</param>
+        // ReSharper disable once UnusedMember.Global (Used in Beatmap)
+        public TypedListConverter(bool requiresTypeVersion)
+        {
+            this.requiresTypeVersion = requiresTypeVersion;
+        }
+
         public override bool CanConvert(Type objectType) => objectType == typeof(List<T>);
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -49,12 +69,17 @@ namespace osu.Game.IO.Serialization.Converters
             var objects = new List<JObject>();
             foreach (var item in list)
             {
-                var type = item.GetType().AssemblyQualifiedName;
+                var type = item.GetType();
+                var assemblyName = type.Assembly.GetName();
 
-                int typeId = lookupTable.IndexOf(type);
+                var typeString = $"{type.FullName}, {assemblyName.Name}";
+                if (requiresTypeVersion)
+                    typeString += $", {assemblyName.Version}";
+
+                int typeId = lookupTable.IndexOf(typeString);
                 if (typeId == -1)
                 {
-                    lookupTable.Add(type);
+                    lookupTable.Add(typeString);
                     typeId = lookupTable.Count - 1;
                 }
 
