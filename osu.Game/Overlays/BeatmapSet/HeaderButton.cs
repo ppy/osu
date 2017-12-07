@@ -10,7 +10,6 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class HeaderButton : TriangleButton
     {
-
         public HeaderButton()
         {
             Height = 0;
@@ -25,6 +24,5 @@ namespace osu.Game.Overlays.BeatmapSet
             Triangles.ColourDark = OsuColour.FromHex(@"094c5f");
             Triangles.TriangleScale = 1.5f;
         }
-
     }
 }
