@@ -11,16 +11,26 @@ namespace osu.Game.Rulesets.Catch.Tests
     [Ignore("getting CI working")]
     public class TestCaseCatchStacker : Game.Tests.Visual.TestCasePlayer
     {
-        public TestCaseCatchStacker() : base(typeof(CatchRuleset))
+        public TestCaseCatchStacker()
+            : base(typeof(CatchRuleset))
         {
         }
 
         protected override Beatmap CreateBeatmap()
         {
-            var beatmap = new Beatmap();
+            var beatmap = new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    BaseDifficulty = new BeatmapDifficulty
+                    {
+                        CircleSize = 6,
+                    }
+                }
+            };
 
-            for (int i = 0; i < 256; i++)
-                beatmap.HitObjects.Add(new Fruit { X = 0.5f, StartTime = i * 100, NewCombo = i % 8 == 0 });
+            for (int i = 0; i < 512; i++)
+                beatmap.HitObjects.Add(new Fruit { X = 0.5f + i / 2048f * (i % 10 - 5), StartTime = i * 100, NewCombo = i % 8 == 0 });
 
             return beatmap;
         }
