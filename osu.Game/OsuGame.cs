@@ -134,7 +134,7 @@ namespace osu.Game
             });
         }
 
-        internal void LoadMultiplayerLobby()
+        internal void LoadMultiplayerLobby(int lobbyId)
         {
             notificationOverlay.Post(new SimpleNotification
             {
