@@ -40,18 +40,19 @@ namespace osu.Game.Tests.Visual
 
             testSprites = new[]
             {
+                
                 new ChatLine(new DummyMessage("Test!")),
                 new ChatLine(new DummyMessage("osu.ppy.sh!")),
                 new ChatLine(new DummyMessage("http://lookatmy.horse/")),
                 new ChatLine(new DummyMessage("https://osu.ppy.sh!")),
                 new ChatLine(new DummyMessage("00:12:345 (1,2) - Test?")),
-                // TODO: Remove prefix and add tooltips with links
                 new ChatLine(new DummyMessage("Wiki link for tasty [[Performance Points]]")),
                 new ChatLine(new DummyMessage("(osu forums)[https://osu.ppy.sh/forum] (old link format)")),
                 new ChatLine(new DummyMessage("[https://osu.ppy.sh/home New site] (new link format)")),
                 new ChatLine(new DummyMessage("long message to test word wrap: use https://encrypted.google.com instead of https://google.com or even worse, [http://google.com Unencrypted google]")),
                 new ChatLine(new DummyMessage("is now listening to [https://osu.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", true)),
                 new ChatLine(new DummyMessage("is now playing [https://osu.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", true)),
+                new ChatLine(new DummyMessage("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).")),
             };
         }
 
