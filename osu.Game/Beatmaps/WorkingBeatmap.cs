@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
@@ -34,12 +35,14 @@ namespace osu.Game.Beatmaps
             background = new AsyncLazy<Texture>(populateBackground, b => b == null || !b.IsDisposed);
             track = new AsyncLazy<Track>(populateTrack);
             waveform = new AsyncLazy<Waveform>(populateWaveform);
+            storyboard = new AsyncLazy<Storyboard>(populateStoryboard);
         }
 
         protected abstract Beatmap GetBeatmap();
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
         protected virtual Waveform GetWaveform() => new Waveform();
+        protected virtual Storyboard GetStoryboard() => new Storyboard();
 
         public bool BeatmapLoaded => beatmap.IsResultAvailable;
         public Beatmap Beatmap => beatmap.Value.Result;
@@ -84,6 +87,13 @@ namespace osu.Game.Beatmaps
 
         private Waveform populateWaveform() => GetWaveform();
 
+        public bool StoryboardLoaded => storyboard.IsResultAvailable;
+        public Storyboard Storyboard => storyboard.Value.Result;
+        public async Task<Storyboard> GetStoryboardAsync() => await storyboard.Value;
+        private readonly AsyncLazy<Storyboard> storyboard;
+
+        private Storyboard populateStoryboard() => GetStoryboard();
+
         public void TransferTo(WorkingBeatmap other)
         {
             if (track.IsResultAvailable && Track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
@@ -97,6 +107,7 @@ namespace osu.Game.Beatmaps
         {
             if (BackgroundLoaded) Background?.Dispose();
             if (WaveformLoaded) Waveform?.Dispose();
+            if (StoryboardLoaded) Storyboard?.Dispose();
         }
 
         /// <summary>
