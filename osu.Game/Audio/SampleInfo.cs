@@ -15,6 +15,10 @@ namespace osu.Game.Audio
         public const string HIT_NORMAL = @"hitnormal";
         public const string HIT_CLAP = @"hitclap";
 
+        /// <summary>
+        /// The <see cref="SoundControlPoint"/> that is used for <see cref="Bank"/> and <see cref="Volume"/>
+        /// if the values have not already been provided by the hitobject.
+        /// </summary>
         [JsonIgnore]
         public SoundControlPoint ControlPoint;
 

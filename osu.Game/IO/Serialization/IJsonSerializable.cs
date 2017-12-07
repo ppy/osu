@@ -20,6 +20,10 @@ namespace osu.Game.IO.Serialization
 
         public static T DeepClone<T>(this T obj) where T : IJsonSerializable => Deserialize<T>(Serialize(obj));
 
+        /// <summary>
+        /// Creates the default <see cref="JsonSerializerSettings"/> that should be used for all <see cref="IJsonSerializable"/>s.
+        /// </summary>
+        /// <returns></returns>
         public static JsonSerializerSettings CreateGlobalSettings() => new JsonSerializerSettings
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
