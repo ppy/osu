@@ -67,7 +67,6 @@ namespace osu.Game.Overlays.Chat
         private const float text_size = 20;
 
         private Color4 customUsernameColour;
-        private Color4 urlColour;
 
         private OsuSpriteText timestamp;
 
@@ -106,7 +105,6 @@ namespace osu.Game.Overlays.Chat
         {
             this.chat = chat;
             customUsernameColour = colours.ChatBlue;
-            urlColour = colours.Blue;
         }
 
         private bool senderHasBackground => !string.IsNullOrEmpty(message.Sender.Colour);
@@ -224,8 +222,6 @@ namespace osu.Game.Overlays.Chat
                     if (message.IsAction)
                         sprite.Font = @"Exo2.0-MediumItalic";
                 });
-
-                return;
             }
             else
             {
