@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace osu.Game.Tests.Visual
 {
-    class TestCaseChatLink : OsuTestCase
+    internal class TestCaseChatLink : OsuTestCase
     {
         private readonly BeatmapSetOverlay beatmapSetOverlay;
         private readonly ChatOverlay chat;
@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual
         private DependencyContainer dependencies;
 
         private readonly TestChatLineContainer textContainer;
-        private ChatLine[] testSprites;
+        private readonly ChatLine[] testSprites;
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
 
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual
         private class DummyMessage : Message
         {
             private static long messageCounter;
-            private readonly static User sender = new User
+            private static readonly User sender = new User
             {
                 Username = @"Somebody",
                 Id = 1,
@@ -90,9 +90,6 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            public new long Id = 42;
-            public new TargetType TargetType = TargetType.Channel;
-            public new int TargetId = 1;
             public new DateTimeOffset Timestamp = DateTimeOffset.Now;
 
             public DummyMessage(string text, bool isAction = false)
