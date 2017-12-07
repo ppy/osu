@@ -261,6 +261,7 @@ namespace osu.Game.Screens.Select
             description.Text = null;
             source.Text = null;
             tags.Text = null;
+
             advanced.Beatmap = new BeatmapInfo
             {
                 StarDifficulty = 0,
@@ -306,36 +307,16 @@ namespace osu.Game.Screens.Select
 
         private class MetadataSection : Container
         {
-            private readonly TextFlowContainer textFlow;
-
-            public string Text
-            {
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        this.FadeOut(transition_duration);
-                        return;
-                    }
-
-                    this.FadeIn(transition_duration);
-                    textFlow.Clear();
-                    textFlow.AddText(value, s => s.TextSize = 14);
-                }
-            }
-
-            public Color4 TextColour
-            {
-                get { return textFlow.Colour; }
-                set { textFlow.Colour = value; }
-            }
+            private readonly FillFlowContainer textContainer;
+            private TextFlowContainer textFlow;
 
             public MetadataSection(string title)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
+                Alpha = 0;
 
-                InternalChild = new FillFlowContainer
+                InternalChild = textContainer = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -360,6 +341,44 @@ namespace osu.Game.Screens.Select
                         },
                     },
                 };
+            }
+
+            public string Text
+            {
+                set
+                {
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        this.FadeOut(transition_duration);
+                        return;
+                    }
+
+                    setTextAsync(value);
+                }
+            }
+
+            private void setTextAsync(string text)
+            {
+                LoadComponentAsync(new TextFlowContainer(s => s.TextSize = 14)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Colour = textFlow.Colour,
+                    Text = text
+                }, loaded =>
+                {
+                    textFlow?.Expire();
+                    textContainer.Add(textFlow = loaded);
+
+                    // fade in if we haven't yet.
+                    this.FadeIn(transition_duration);
+                });
+            }
+
+            public Color4 TextColour
+            {
+                get { return textFlow.Colour; }
+                set { textFlow.Colour = value; }
             }
         }
 

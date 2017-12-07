@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Select
             if (Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
                 carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false);
             else
-                carousel.SelectNext();
+                carousel.SelectNextRandom();
         }
 
         private void carouselRaisedStart(InputState state = null)
@@ -263,10 +263,7 @@ namespace osu.Game.Screens.Select
             beatmapNoDebounce = beatmap;
 
             if (beatmap == null)
-            {
-                if (!Beatmap.IsDefault)
-                    performLoad();
-            }
+                performLoad();
             else
             {
                 if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
@@ -332,7 +329,11 @@ namespace osu.Game.Screens.Select
             logo.FadeIn(logo_transition, Easing.OutQuint);
             logo.ScaleTo(0.4f, logo_transition, Easing.OutQuint);
 
-            logo.Action = () => carouselRaisedStart();
+            logo.Action = () =>
+            {
+                carouselRaisedStart();
+                return false;
+            };
         }
 
         protected override void LogoExiting(OsuLogo logo)

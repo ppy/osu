@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable.Pieces
 {
     public class Pulp : Circle, IHasAccentColour
     {
-        public const float PULP_SIZE = 20;
+        public const float PULP_SIZE = (float)CatchHitObject.OBJECT_RADIUS / 2.2f;
 
         public Pulp()
         {

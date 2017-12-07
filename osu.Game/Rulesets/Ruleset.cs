@@ -9,7 +9,9 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets
@@ -48,6 +50,10 @@ namespace osu.Game.Rulesets
         public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset);
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null);
+
+        public virtual PerformanceCalculator CreatePerformanceCalculator(Beatmap beatmap, Score score) => null;
+
+        public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_question_circle };
 

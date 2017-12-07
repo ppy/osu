@@ -5,10 +5,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Storyboards.Drawables;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace osu.Game.Storyboards
 {
-    public class Storyboard
+    public class Storyboard : IDisposable
     {
         private readonly Dictionary<string, StoryboardLayer> layers = new Dictionary<string, StoryboardLayer>();
         public IEnumerable<StoryboardLayer> Layers => layers.Values;
@@ -59,5 +60,29 @@ namespace osu.Game.Storyboards
             }
             return drawable;
         }
+
+        #region Disposal
+
+        ~Storyboard()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool isDisposed;
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (isDisposed)
+                return;
+            isDisposed = true;
+        }
+
+        #endregion
     }
 }
