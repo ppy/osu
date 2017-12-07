@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.KeyBinding
         }
     }
 
-    public class ResetButton : OsuButton
+    public class ResetButton : TriangleButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

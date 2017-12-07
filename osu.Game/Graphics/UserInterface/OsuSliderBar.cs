@@ -88,7 +88,8 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Origin = Anchor.TopCentre,
                     Expanded = true,
-                }
+                },
+                new HoverClickSounds()
             };
 
             Current.DisabledChanged += disabled =>
