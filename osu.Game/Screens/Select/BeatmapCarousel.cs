@@ -112,29 +112,26 @@ namespace osu.Game.Screens.Select
             Schedule(() => removeGroup(groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID)));
         }
 
-        public void UpdateBeatmap(BeatmapInfo beatmap)
+        public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            // todo: this method should not run more than once for the same BeatmapSetInfo.
-            var set = manager.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
-
             // todo: this method should be smarter as to not recreate panels that haven't changed, etc.
-            var group = groups.Find(b => b.BeatmapSet.ID == set.ID);
+            var oldGroup = groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID);
 
-            int i = groups.IndexOf(group);
-            if (i >= 0)
-                groups.RemoveAt(i);
+            var newGroup = createGroup(beatmapSet);
 
-            var newGroup = createGroup(set);
+            int index = groups.IndexOf(oldGroup);
+            if (index >= 0)
+                groups.RemoveAt(index);
 
             if (newGroup != null)
             {
-                if (i >= 0)
-                    groups.Insert(i, newGroup);
+                if (index >= 0)
+                    groups.Insert(index, newGroup);
                 else
                     addGroup(newGroup);
             }
 
-            bool hadSelection = selectedGroup == group;
+            bool hadSelection = selectedGroup == oldGroup;
 
             if (hadSelection && newGroup == null)
                 selectedGroup = null;
@@ -147,8 +144,8 @@ namespace osu.Game.Screens.Select
                 var newSelection =
                     newGroup.BeatmapPanels.Find(p => p.Beatmap.ID == selectedPanel?.Beatmap.ID);
 
-                if(newSelection == null && group != null && selectedPanel != null)
-                    newSelection = newGroup.BeatmapPanels[Math.Min(newGroup.BeatmapPanels.Count - 1, group.BeatmapPanels.IndexOf(selectedPanel))];
+                if(newSelection == null && oldGroup != null && selectedPanel != null)
+                    newSelection = newGroup.BeatmapPanels[Math.Min(newGroup.BeatmapPanels.Count - 1, oldGroup.BeatmapPanels.IndexOf(selectedPanel))];
 
                 selectGroup(newGroup, newSelection);
             }
@@ -306,8 +303,6 @@ namespace osu.Game.Screens.Select
             if (newCriteria != null)
                 criteria = newCriteria;
 
-            if (!IsLoaded) return;
-
             Action perform = delegate
             {
                 filterTask = null;
@@ -348,8 +343,6 @@ namespace osu.Game.Screens.Select
 
         private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
         {
-            beatmapSet = manager.Refresh(beatmapSet);
-
             if (beatmapSet.Beatmaps.All(b => b.Hidden))
                 return null;
 
