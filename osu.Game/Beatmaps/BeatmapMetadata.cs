@@ -52,8 +52,8 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The author of the beatmaps in this set.
         /// </summary>
+        [JsonIgnore]
         public User Author;
-        public bool ShouldSerializeAuthor() => false;
 
         public string Source { get; set; }
 
