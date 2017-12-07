@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.Sprites
                 {
                     url = value;
 
-                    content.Action = OnClick;
+                    content.Action = OnLinkClicked;
                 }
             }
         }
@@ -66,6 +66,6 @@ namespace osu.Game.Graphics.Sprites
             set { Content.Colour = value; }
         }
 
-        protected virtual void OnClick() => Process.Start(Url);
+        protected virtual void OnLinkClicked() => Process.Start(Url);
     }
 }
