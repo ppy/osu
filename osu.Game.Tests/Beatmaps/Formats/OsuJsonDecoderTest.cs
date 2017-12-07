@@ -3,6 +3,7 @@
 
 using System.IO;
 using System.Linq;
+using DeepEqual.Syntax;
 using NUnit.Framework;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -18,10 +19,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
     [TestFixture]
     public class OsuJsonDecoderTest
     {
+        private const string beatmap_1 = "Soleily - Renatus (Gamu) [Insane].osu";
+        private const string beatmap_2 = "Within Temptation - The Unforgiving (Armin) [Marathon].osu";
+
         [Test]
         public void TestDecodeMetadata()
         {
-            var beatmap = decodeAsJson("Soleily - Renatus (Gamu) [Insane].osu");
+            var beatmap = decodeAsJson(beatmap_1);
             var meta = beatmap.BeatmapInfo.Metadata;
             Assert.AreEqual(241526, meta.OnlineBeatmapSetID);
             Assert.AreEqual("Soleily", meta.Artist);
@@ -39,7 +43,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeGeneral()
         {
-            var beatmap = decodeAsJson("Soleily - Renatus (Gamu) [Insane].osu");
+            var beatmap = decodeAsJson(beatmap_1);
             var beatmapInfo = beatmap.BeatmapInfo;
             Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
             Assert.AreEqual(false, beatmapInfo.Countdown);
@@ -53,7 +57,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeEditor()
         {
-            var beatmap = decodeAsJson("Soleily - Renatus (Gamu) [Insane].osu");
+            var beatmap = decodeAsJson(beatmap_1);
             var beatmapInfo = beatmap.BeatmapInfo;
 
             int[] expectedBookmarks =
@@ -74,7 +78,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeDifficulty()
         {
-            var beatmap = decodeAsJson("Soleily - Renatus (Gamu) [Insane].osu");
+            var beatmap = decodeAsJson(beatmap_1);
             var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
             Assert.AreEqual(6.5f, difficulty.DrainRate);
             Assert.AreEqual(4, difficulty.CircleSize);
@@ -87,7 +91,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeColors()
         {
-            var beatmap = decodeAsJson("Soleily - Renatus (Gamu) [Insane].osu");
+            var beatmap = decodeAsJson(beatmap_1);
             Color4[] expected =
             {
                 new Color4(142, 199, 255, 255),
@@ -105,7 +109,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeHitObjects()
         {
-            var beatmap = decodeAsJson("Soleily - Renatus (Gamu) [Insane].osu");
+            var beatmap = decodeAsJson(beatmap_1);
 
             var curveData = beatmap.HitObjects[0] as IHasCurve;
             var positionData = beatmap.HitObjects[0] as IHasPosition;
@@ -124,13 +128,29 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.IsTrue(beatmap.HitObjects[1].Samples.Any(s => s.Name == SampleInfo.HIT_CLAP));
         }
 
+        [TestCase(beatmap_1)]
+        [TestCase(beatmap_2)]
+        public void TestParity(string beatmap)
+        {
+            var beatmaps = decode(beatmap);
+            beatmaps.jsonDecoded.ShouldDeepEqual(beatmaps.legacyDecoded);
+        }
+
         /// <summary>
         /// Reads a .osu file first with a <see cref="OsuLegacyDecoder"/>, serializes the resulting <see cref="Beatmap"/> to JSON
         /// and then deserializes the result back into a <see cref="Beatmap"/> through an <see cref="OsuJsonDecoder"/>.
         /// </summary>
         /// <param name="filename">The .osu file to decode.</param>
         /// <returns>The <see cref="Beatmap"/> after being decoded by an <see cref="OsuLegacyDecoder"/>.</returns>
-        private Beatmap decodeAsJson(string filename)
+        private Beatmap decodeAsJson(string filename) => decode(filename).jsonDecoded;
+
+        /// <summary>
+        /// Reads a .osu file first with a <see cref="OsuLegacyDecoder"/>, serializes the resulting <see cref="Beatmap"/> to JSON
+        /// and then deserializes the result back into a <see cref="Beatmap"/> through an <see cref="OsuJsonDecoder"/>.
+        /// </summary>
+        /// <param name="filename">The .osu file to decode.</param>
+        /// <returns>The <see cref="Beatmap"/> after being decoded by an <see cref="OsuLegacyDecoder"/>.</returns>
+        private (Beatmap legacyDecoded, Beatmap jsonDecoded) decode(string filename)
         {
             using (var stream = Resource.OpenResource(filename))
             using (var sr = new StreamReader(stream))
@@ -145,7 +165,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     sw.Flush();
 
                     ms.Position = 0;
-                    return new OsuJsonDecoder().Decode(sr2);
+                    return (legacyDecoded, new OsuJsonDecoder().Decode(sr2));
                 }
             }
         }
