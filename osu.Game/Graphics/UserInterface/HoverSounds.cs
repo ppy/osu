@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
     public class HoverSounds : CompositeDrawable
     {
         private SampleChannel sampleHover;
-         
+
         protected readonly HoverSampleSet SampleSet;
 
         public HoverSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal)
