@@ -65,7 +65,7 @@ namespace osu.Game.Overlays
 
         public Bindable<double> ChatHeight { get; set; }
 
-        public List<Channel> AvailableChannels { get; private set; }
+        public List<Channel> AvailableChannels { get; private set; } = new List<Channel>();
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
 
