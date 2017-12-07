@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Chat
 
         private Message message;
         private OsuSpriteText username;
-        private OsuLinkTextFlowContainer<ChatLinkSpriteText> contentFlow;
+        private OsuLinkTextFlowContainer<ChatLink> contentFlow;
 
         public Message Message
         {
@@ -189,7 +189,7 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
-                        contentFlow = new OsuLinkTextFlowContainer<ChatLinkSpriteText>(t => { t.TextSize = text_size; })
+                        contentFlow = new OsuLinkTextFlowContainer<ChatLink>(t => { t.TextSize = text_size; })
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
@@ -238,7 +238,7 @@ namespace osu.Game.Overlays.Chat
                             sprite.Font = @"Exo2.0-MediumItalic";
 
                         // We want to use something that is unique to every formatted link PER MESSAGE
-                        ((ChatLinkSpriteText)sprite).LinkId = link.Index;
+                        ((ChatLink)sprite).LinkId = link.Index;
                     });
                 }
 
