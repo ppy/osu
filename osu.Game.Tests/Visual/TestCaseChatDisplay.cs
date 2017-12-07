@@ -12,7 +12,7 @@ namespace osu.Game.Tests.Visual
     [Description("Testing chat api and overlay")]
     internal class TestCaseChatDisplay : OsuTestCase
     {
-        private BeatmapSetOverlay beatmapSetOverlay;
+        private readonly BeatmapSetOverlay beatmapSetOverlay;
         private readonly ChatOverlay chat;
 
         private DependencyContainer dependencies;
@@ -21,12 +21,10 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseChatDisplay()
         {
-            chat = new ChatOverlay
+            Add(chat = new ChatOverlay
             {
                 State = Visibility.Visible
-            };
-
-            Add(chat);
+            });
 
             Add(beatmapSetOverlay = new BeatmapSetOverlay());
         }
