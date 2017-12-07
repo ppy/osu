@@ -87,7 +87,7 @@ namespace osu.Game.Beatmaps
 
         private Waveform populateWaveform() => GetWaveform();
 
-        public bool StoryboardLoaded => storyboard.IsValueCreated;
+        public bool StoryboardLoaded => storyboard.IsResultAvailable;
         public Storyboard Storyboard => storyboard.Value.Result;
         public async Task<Storyboard> GetStoryboardAsync() => await storyboard.Value;
         private readonly AsyncLazy<Storyboard> storyboard;
