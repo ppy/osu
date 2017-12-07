@@ -111,7 +111,7 @@ namespace osu.Game.Online.Chat
             handleMatches(oldLinkRegex, "{1}", "{2}", result, startIndex);
 
             // handle wiki links
-            handleMatches(wikiRegex, "wiki:{1}", "https://osu.ppy.sh/wiki/{1}", result, startIndex);
+            handleMatches(wikiRegex, "{1}", "https://osu.ppy.sh/wiki/{1}", result, startIndex);
 
             // handle bare links
             handleAdvanced(advancedLinkRegex, result, startIndex);
