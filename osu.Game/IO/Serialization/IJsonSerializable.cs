@@ -30,7 +30,8 @@ namespace osu.Game.IO.Serialization
             Formatting = Formatting.Indented,
             ObjectCreationHandling = ObjectCreationHandling.Replace,
             DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
-            Converters = new JsonConverter[] { new Vector2Converter() }
+            Converters = new JsonConverter[] { new Vector2Converter() },
+            ContractResolver = new KeyContractResolver()
         };
     }
 }

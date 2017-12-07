@@ -18,7 +18,7 @@ namespace osu.Game.IO.Serialization.Converters
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var obj = JObject.Load(reader);
-            return new Vector2((float)obj["X"], (float)obj["Y"]);
+            return new Vector2((float)obj["x"], (float)obj["y"]);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -27,9 +27,9 @@ namespace osu.Game.IO.Serialization.Converters
 
             writer.WriteStartObject();
 
-            writer.WritePropertyName("X");
+            writer.WritePropertyName("x");
             writer.WriteValue(vector.X);
-            writer.WritePropertyName("Y");
+            writer.WritePropertyName("y");
             writer.WriteValue(vector.Y);
 
             writer.WriteEndObject();
