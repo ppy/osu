@@ -69,10 +69,7 @@ namespace osu.Game.IO.Serialization.Converters
             serializer.Serialize(writer, lookupTable);
 
             writer.WritePropertyName("Items");
-            writer.WriteStartArray();
-            foreach (var item in objects)
-                item.WriteTo(writer);
-            writer.WriteEndArray();
+            serializer.Serialize(writer, objects);
 
             writer.WriteEndObject();
         }
