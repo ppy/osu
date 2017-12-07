@@ -5,6 +5,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -12,12 +13,14 @@ using System.Linq;
 
 namespace osu.Game.Online.Chat
 {
-    public class ChatLink : OsuLinkSpriteText
+    public class ChatLink : OsuLinkSpriteText, IHasTooltip
     {
         public int LinkId = -1;
 
         private Color4 hoverColour;
         private Color4 urlColour;
+
+        public string TooltipText => LinkId != -1 ? Url : null;
 
         protected override bool OnHover(InputState state)
         {
