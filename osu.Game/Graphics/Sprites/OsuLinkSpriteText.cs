@@ -99,7 +99,7 @@ namespace osu.Game.Graphics.Sprites
 
                         break;
                     case "edit":
-                        chat.Game.LoadEditorTimestamp();
+                        chat.Game?.LoadEditorTimestamp();
                         break;
                     case "b":
                         if (args.Length > 1 && int.TryParse(args[1], out int mapId))
@@ -122,16 +122,14 @@ namespace osu.Game.Graphics.Sprites
 
                         req.Success += user =>
                         {
-                            // TODO: Open spectator screen and start spectating
-                            
+                            chat.Game?.LoadSpectatorScreen();
                         };
-                        // api.Queue(req);
-                        chat.Game.LoadSpectatorScreen();
+                        api.Queue(req);
 
                         break;
                     default:
                         throw new ArgumentException($"Unknown osu:// link at {nameof(OsuLinkSpriteText)} (https://osu.ppy.sh/{args[0]}).");
-                }    
+                }
             }
             else if (url.StartsWith("osump://"))
             {
@@ -139,7 +137,7 @@ namespace osu.Game.Graphics.Sprites
                 if (!int.TryParse(url.Split('/').ElementAtOrDefault(1), out int multiId))
                     return;
 
-                chat.Game.LoadMultiplayerLobby();
+                chat.Game?.LoadMultiplayerLobby();
             }
             else if (url.StartsWith("http://") || url.StartsWith("https://"))
             {

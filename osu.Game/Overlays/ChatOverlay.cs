@@ -41,6 +41,9 @@ namespace osu.Game.Overlays
 
         private readonly FocusedTextBox textbox;
 
+        /// <summary>
+        /// The current OsuGame instance. Will be null for Tests.
+        /// </summary>
         public OsuGame Game;
 
         private APIAccess api;
@@ -272,9 +275,10 @@ namespace osu.Game.Overlays
             base.PopOut();
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(APIAccess api, OsuConfigManager config, OsuColour colours, OsuGame game)
         {
+            // game will be null in testing, so some links will not work
             Game = game;
             this.api = api;
             api.Register(this);
