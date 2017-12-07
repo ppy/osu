@@ -102,8 +102,9 @@ namespace osu.Game.Overlays.Chat
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, ChatOverlay chat)
         {
+            this.chat = chat;
             customUsernameColour = colours.ChatBlue;
             urlColour = colours.Blue;
         }
@@ -204,6 +205,8 @@ namespace osu.Game.Overlays.Chat
             FinishTransforms(true);
         }
 
+        private ChatOverlay chat;
+
         private void updateMessageContent()
         {
             this.FadeTo(message is LocalEchoMessage ? 0.4f : 1.0f, 500, Easing.OutQuint);
@@ -231,6 +234,17 @@ namespace osu.Game.Overlays.Chat
                 {
                     contentFlow.AddText(message.Content.Substring(prevIndex, link.Index - prevIndex));
                     prevIndex = link.Index + link.Length;
+
+                    // If a channel doesn't exist, add it as normal text instead
+                    if (link.Url.StartsWith("osu://chan/"))
+                    {
+                        var channelName = link.Url.Substring(11).Split('/')[0];
+                        if (chat.AvailableChannels.TrueForAll(c => c.Name != channelName))
+                        {
+                            contentFlow.AddText(message.Content.Substring(link.Index, link.Length));
+                            continue;
+                        }
+                    }
 
                     contentFlow.AddLink(message.Content.Substring(link.Index, link.Length), link.Url, sprite =>
                     {
