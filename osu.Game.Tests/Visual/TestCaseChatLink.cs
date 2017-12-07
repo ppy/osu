@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual
 
         private DependencyContainer dependencies;
 
-        private readonly ChatLineContainer textContainer;
+        private readonly TestChatLineContainer textContainer;
         private ChatLine[] testSprites;
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
@@ -25,9 +25,9 @@ namespace osu.Game.Tests.Visual
         public TestCaseChatLink()
         {
             chat = new ChatOverlay();
-            Add(beatmapSetOverlay = new BeatmapSetOverlay { Depth = float.MaxValue });
+            Add(beatmapSetOverlay = new BeatmapSetOverlay { Depth = float.MinValue });
 
-            Add(textContainer = new ChatLineContainer
+            Add(textContainer = new TestChatLineContainer
             {
                 Padding = new MarginPadding { Left = 20, Right = 20 },
                 RelativeSizeAxes = Axes.X,
@@ -39,11 +39,15 @@ namespace osu.Game.Tests.Visual
             {
                 new ChatLine(new DummyMessage("Test!")),
                 new ChatLine(new DummyMessage("osu.ppy.sh!")),
-                new ChatLine(new DummyMessage("long message to test word wrap: use https://encrypted.google.com instead of https://google.com or even worse, [http://google.com Unencrypted google]")),
+                new ChatLine(new DummyMessage("http://lookatmy.horse/")),
                 new ChatLine(new DummyMessage("https://osu.ppy.sh!")),
                 new ChatLine(new DummyMessage("00:12:345 (1,2) - Test?")),
+                // TODO: Remove prefix and add tooltips with links
                 new ChatLine(new DummyMessage("Wiki link for tasty [[Performance Points]]")),
-                new ChatLine(new DummyMessage("is now playing [https://osu.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", true)),
+                new ChatLine(new DummyMessage("(osu forums)[https://osu.ppy.sh/forum] (old link format)")),
+                new ChatLine(new DummyMessage("[https://osu.ppy.sh/home New site] (new link format)")),
+                new ChatLine(new DummyMessage("long message to test word wrap: use https://encrypted.google.com instead of https://google.com or even worse, [http://google.com Unencrypted google]")),
+                new ChatLine(new DummyMessage("is now listening to [https://osu.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", true)),
                 new ChatLine(new DummyMessage("is now playing [https://osu.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", true)),
             };
         }
@@ -86,7 +90,6 @@ namespace osu.Game.Tests.Visual
             public new long Id = 42;
             public new TargetType TargetType = TargetType.Channel;
             public new int TargetId = 1;
-            public new bool IsAction;
             public new DateTimeOffset Timestamp = DateTimeOffset.Now;
 
             public DummyMessage(string text, bool isAction = false)
@@ -98,7 +101,7 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        private class ChatLineContainer : FillFlowContainer<ChatLine>
+        private class TestChatLineContainer : FillFlowContainer<ChatLine>
         {
             protected override int Compare(Drawable x, Drawable y)
             {
