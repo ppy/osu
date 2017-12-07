@@ -34,11 +34,12 @@ namespace osu.Game.Beatmaps
 
             foreach (var beatmap in beatmapSet.Beatmaps.Where(b => b.Metadata != null))
             {
+                // check local context for metadata so we can reuse duplicates from the same set
                 var contextMetadata = context.Set<BeatmapMetadata>().Local.SingleOrDefault(e => e.Equals(beatmap.Metadata));
                 if (contextMetadata != null)
-                    beatmap.Metadata = contextMetadata;
+                    beatmap.Metadata = contextMetadata; // reuse existing
                 else
-                    context.BeatmapMetadata.Attach(beatmap.Metadata);
+                    context.BeatmapMetadata.Attach(beatmap.Metadata); // adding new to context
             }
 
             context.BeatmapSetInfo.Attach(beatmapSet);
