@@ -14,10 +14,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Chat;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace osu.Game.Online.Chat
@@ -100,11 +98,11 @@ namespace osu.Game.Online.Chat
                 if (!int.TryParse(url.Split('/').ElementAtOrDefault(1), out int multiId))
                     return;
 
-                chat.Game?.LoadMultiplayerLobby();
+                chat.Game?.LoadMultiplayerLobby(multiId);
             }
-            else if (url.StartsWith("http://") || url.StartsWith("https://") && url.IndexOf("osu.ppy.sh/") != -1)
+            else if (url.StartsWith("http://") || url.StartsWith("https://") && url.IndexOf("osu.ppy.sh/", StringComparison.InvariantCultureIgnoreCase) != -1)
             {
-                var osuUrlIndex = url.IndexOf("osu.ppy.sh/");
+                var osuUrlIndex = url.IndexOf("osu.ppy.sh/", StringComparison.InvariantCultureIgnoreCase);
 
                 url = url.Substring(osuUrlIndex + 11);
                 if (url.StartsWith("s/") || url.StartsWith("beatmapsets/") || url.StartsWith("d/"))
@@ -176,7 +174,7 @@ namespace osu.Game.Online.Chat
             OnLoadComplete = d =>
             {
                 // All sprites in the same chatline that represent the same URL
-                SameLinkSprites = (d.Parent as Container<Drawable>).Children.Where(child => (child as ChatLink)?.LinkId == LinkId && !d.Equals(child)).Cast<ChatLink>();
+                SameLinkSprites = ((Container<Drawable>)d.Parent).Children.Where(child => (child as ChatLink)?.LinkId == LinkId && !d.Equals(child)).Cast<ChatLink>();
             };
         }
 
