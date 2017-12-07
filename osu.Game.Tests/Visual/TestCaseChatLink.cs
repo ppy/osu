@@ -40,7 +40,6 @@ namespace osu.Game.Tests.Visual
 
             testSprites = new[]
             {
-                
                 new ChatLine(new DummyMessage("Test!")),
                 new ChatLine(new DummyMessage("osu.ppy.sh!")),
                 new ChatLine(new DummyMessage("http://lookatmy.horse/")),
