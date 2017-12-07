@@ -51,7 +51,12 @@ namespace osu.Game.Graphics.Sprites
                 if (!string.IsNullOrEmpty(value))
                 {
                     url = value;
+
                     content.Action = onClickAction;
+
+                    // For inheriting classes
+                    if (Content is OsuHoverContainer hover)
+                        hover.Action = onClickAction;
                 }
             }
         }
