@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchPlayfield : ScrollingPlayfield
     {
-        public static readonly float BASE_WIDTH = 512;
+        public const float BASE_WIDTH = 512;
 
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.UI
             };
         }
 
-        public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.CanCatch(obj);
+        public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.AttemptCatch(obj);
 
         public override void Add(DrawableHitObject h)
         {
