@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         protected override string Header => "General";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps)
+        private void load(OsuGameBase osuGame, BeatmapManager beatmaps)
         {
             Children = new Drawable[]
             {
@@ -55,8 +55,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                 beatmaps.Restore(b);
                         }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
                     }
-                },
-                migrateButton = new SettingsButton
+                }
+            };
+
+            if (!osuGame.IsDeployedBuild)
+            {
+                Add(migrateButton = new SettingsButton
                 {
                     Text = "Migrate all beatmaps to the new format",
                     Action = () =>
@@ -64,8 +68,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         migrateButton.Enabled.Value = false;
                         Task.Factory.StartNew(beatmaps.MigrateAllToNewFormat).ContinueWith(t => Schedule(() => migrateButton.Enabled.Value = true), TaskContinuationOptions.LongRunning);
                     }
-                }
-            };
+                });
+            }
         }
     }
 }
