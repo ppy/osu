@@ -42,7 +42,7 @@ namespace osu.Game.Online.Chat
 
         protected override Container<Drawable> Content => content ?? base.Content;
 
-        protected override void OnClick()
+        protected override void OnLinkClicked()
         {
             var url = Url;
 
@@ -119,10 +119,10 @@ namespace osu.Game.Online.Chat
                     beatmapSetOverlay.ShowBeatmap(id);
                 }
                 else
-                    base.OnClick();
+                    base.OnLinkClicked();
             }
             else
-                base.OnClick();
+                base.OnLinkClicked();
         }
 
         private int getIdFromUrl(string url)
