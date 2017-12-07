@@ -12,6 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Chat;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,11 +27,29 @@ namespace osu.Game.Online.Chat
 
         private readonly ChatHoverContainer content;
 
+        /// <summary>
+        /// Every other sprite in the containing ChatLine that represents the same link.
+        /// </summary>
         protected IEnumerable<ChatLink> SameLinkSprites { get; private set; }
 
         protected override Container<Drawable> Content => content ?? base.Content;
 
-        public string TooltipText => LinkId != -1 ? Url : null;
+        public string TooltipText
+        {
+            get
+            {
+                if (LinkId == -1 || Url == Text)
+                    return null;
+
+                if (Url.StartsWith("osu://chan/"))
+                    return "Switch to channel " + Url.Substring(11);
+
+                if (Url.StartsWith("osu://edit/") && TimeSpan.TryParse(Url.Substring(11).Split(' ')[0], out TimeSpan editorTimeStamp))
+                    return "Go to " + editorTimeStamp.ToString();
+
+                return Url;
+            }
+        }
 
         public ChatLink()
         {
@@ -67,6 +86,8 @@ namespace osu.Game.Online.Chat
                 Content.FadeColour(hoverColour, 500, Easing.OutQuint);
                 return;
             }
+
+            Content.FadeColour(urlColour, 500, Easing.OutQuint);
 
             foreach (ChatLink sprite in SameLinkSprites)
                 sprite.Content.FadeColour(urlColour, 500, Easing.OutQuint);
