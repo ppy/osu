@@ -548,12 +548,10 @@ namespace osu.Game.Beatmaps
 
         public void UpdateContent(BeatmapInfo beatmapInfo, Stream newData)
         {
-            // let's only allow one concurrent update at a time for now.
             var context = createContext();
 
             using (var transaction = context.BeginTransaction())
             {
-                // create local stores so we can isolate and thread safely, and share a context/transaction.
                 var setInfo = beatmapInfo.BeatmapSet;
                 var existingSetFileInfo = setInfo.Files.First(f => f.FileInfo.Hash == beatmapInfo.Hash);
                 var existingFileInfo = existingSetFileInfo.FileInfo;
