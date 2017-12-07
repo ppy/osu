@@ -43,9 +43,7 @@ namespace osu.Game.IO.Serialization.Converters
             var list = new List<T>();
 
             var obj = JObject.Load(reader);
-
-            var lookupTable = new List<string>();
-            serializer.Populate(obj["lookup_table"].CreateReader(), lookupTable);
+            var lookupTable = serializer.Deserialize<List<string>>(obj["lookup_table"].CreateReader());
 
             foreach (var tok in obj["items"])
             {
