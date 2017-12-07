@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -9,6 +10,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
+    [Serializable]
     public class BeatmapMetadata
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -51,6 +53,7 @@ namespace osu.Game.Beatmaps
         /// The author of the beatmaps in this set.
         /// </summary>
         public User Author;
+        public bool ShouldSerializeAuthor() => false;
 
         public string Source { get; set; }
 

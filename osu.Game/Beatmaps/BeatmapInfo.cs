@@ -12,6 +12,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Beatmaps
 {
+    [Serializable]
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
