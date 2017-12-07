@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="..\osu.Game.props" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -22,7 +22,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -49,6 +48,9 @@
   <ItemGroup>
     <Compile Include="Beatmaps\OsuBeatmapConverter.cs" />
     <Compile Include="Beatmaps\OsuBeatmapProcessor.cs" />
+    <Compile Include="Edit\OsuEditPlayfield.cs" />
+    <Compile Include="Edit\OsuEditRulesetContainer.cs" />
+    <Compile Include="Edit\OsuHitObjectComposer.cs" />
     <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
     <Compile Include="Objects\Drawables\Connections\ConnectionRenderer.cs" />
     <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
@@ -105,9 +107,6 @@
     <Compile Include="Replays\OsuAutoGeneratorBase.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
     <None Include="app.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
