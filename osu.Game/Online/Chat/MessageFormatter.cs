@@ -134,14 +134,13 @@ namespace osu.Game.Online.Chat
         public static Message FormatMessage(Message inputMessage)
         {
             var result = format(inputMessage.Content);
-            var formatted = inputMessage;
 
-            formatted.Content = result.Text;
+            inputMessage.Content = result.Text;
 
             // Sometimes, regex matches are not in order
             result.Links.Sort();
-            formatted.Links = result.Links;
-            return formatted;
+            inputMessage.Links = result.Links;
+            return inputMessage;
         }
 
         public class MessageFormatterResult
