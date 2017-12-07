@@ -28,7 +28,7 @@ namespace osu.Game.Audio
             set { bank = value; }
         }
 
-        public bool ShouldSerializeBank() => Bank == ControlPoint.SampleBank;
+        public bool ShouldSerializeBank() => Bank != ControlPoint.SampleBank;
 
         /// <summary>
         /// The name of the sample to load.
@@ -45,6 +45,6 @@ namespace osu.Game.Audio
             set { volume = value; }
         }
 
-        public bool ShouldSerializeVolume() => Volume == ControlPoint.SampleVolume;
+        public bool ShouldSerializeVolume() => Volume != ControlPoint.SampleVolume;
     }
 }
