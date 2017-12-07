@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -33,6 +34,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
         /// </summary>
+        [JsonIgnore]
         public bool Kiai { get; private set; }
 
         /// <summary>
@@ -45,7 +47,7 @@ namespace osu.Game.Rulesets.Objects
             SoundControlPoint soundPoint = controlPointInfo.SoundPointAt(StartTime);
             EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
 
-            Kiai |= effectPoint.KiaiMode;
+            Kiai = effectPoint.KiaiMode;
 
             // Initialize first sample
             Samples.ForEach(s => s.ControlPoint = soundPoint);
