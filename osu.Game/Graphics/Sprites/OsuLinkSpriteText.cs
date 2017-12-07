@@ -1,25 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
-using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using osu.Game.Overlays;
-using osu.Game.Screens.Edit;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.Sprites
 {
