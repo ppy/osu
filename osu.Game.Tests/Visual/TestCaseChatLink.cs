@@ -1,4 +1,7 @@
-﻿using osu.Framework.Allocation;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Chat;
@@ -83,10 +86,10 @@ namespace osu.Game.Tests.Visual
                 RankHistory = new User.RankHistoryData
                 {
                     Mode = @"osu",
-                    Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                    Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray(),
                 }
             };
-            
+
             public new long Id = 42;
             public new TargetType TargetType = TargetType.Channel;
             public new int TargetId = 1;
