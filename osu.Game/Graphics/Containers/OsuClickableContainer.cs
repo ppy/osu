@@ -8,13 +8,15 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuClickableContainer : ClickableContainer
+    public class OsuClickableContainer : ClickableContainer, IHasHoverSounds
     {
         private readonly HoverSampleSet sampleSet;
 
         private readonly Container content = new Container { RelativeSizeAxes = Axes.Both };
 
         protected override Container<Drawable> Content => content;
+
+        public bool ShouldPlayHoverSound => true;
 
         public OsuClickableContainer(HoverSampleSet sampleSet = HoverSampleSet.Normal)
         {
