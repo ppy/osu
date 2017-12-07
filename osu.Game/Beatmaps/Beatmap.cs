@@ -34,15 +34,16 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
 
-        [JsonConverter(typeof(TypedListConverter<HitObject>))]
         /// <summary>
         /// The HitObjects this Beatmap contains.
         /// </summary>
+        [JsonConverter(typeof(TypedListConverter<HitObject>))]
         public List<T> HitObjects = new List<T>();
 
         /// <summary>
         /// Total amount of break time in the beatmap.
         /// </summary>
+        [JsonIgnore]
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
 
         /// <summary>
