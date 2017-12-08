@@ -61,9 +61,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box overlayBackground;
         private readonly Box background;
 
-        private ControlPointInfo controlPointInfo;
+        private readonly ControlPointInfo controlPointInfo;
         private Dictionary<double, Tuple<SampleChannel, SampleChannel>> allSamples;
-        private AudioManager audio;
 
         public TaikoPlayfield(ControlPointInfo controlPointInfo)
             : base(Axes.X)
@@ -208,8 +207,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            this.audio = audio;
-
             allSamples = new Dictionary<double, Tuple<SampleChannel, SampleChannel>>();
             foreach (var soundPoint in controlPointInfo.SoundPoints)
             {
