@@ -17,7 +17,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class PlayfieldOverlay : CompositeDrawable
+    public class SelectionLayer : CompositeDrawable
     {
         private readonly static Color4 selection_normal_colour = Color4.White;
         private readonly static Color4 selection_attached_colour = OsuColour.FromHex("eeaa00");
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Edit
 
         private readonly Playfield playfield;
 
-        public PlayfieldOverlay(Playfield playfield)
+        public SelectionLayer(Playfield playfield)
         {
             this.playfield = playfield;
 

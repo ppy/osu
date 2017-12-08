@@ -16,11 +16,11 @@ using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseEditorPlayfieldOverlay : OsuTestCase
+    public class TestCaseEditorSelectionLayer : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(PlayfieldOverlay) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(SelectionLayer) };
 
-        public TestCaseEditorPlayfieldOverlay()
+        public TestCaseEditorSelectionLayer()
         {
             var playfield = new OsuEditPlayfield();
             playfield.Add(new DrawableHitCircle(new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f }));
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual
                     Clock = new FramedClock(new StopwatchClock()),
                     Child = playfield
                 },
-                new PlayfieldOverlay(playfield)
+                new SelectionLayer(playfield)
             };
         }
     }
