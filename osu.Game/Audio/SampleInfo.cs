@@ -27,7 +27,7 @@ namespace osu.Game.Audio
 
         public SampleChannel GetChannel(SampleManager manager)
         {
-            var channel = manager.Get($"{Bank}-{Name}");
+            var channel = manager.Get($"Gameplay/{Bank}-{Name}");
 
             channel.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(Volume / 100.0));
             return channel;

@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         private ControlPointInfo controlPointInfo;
-        private SortedDictionary<double, Tuple<SampleChannel, SampleChannel>> allSamples;
+        private Dictionary<double, Tuple<SampleChannel, SampleChannel>> allSamples;
         private AudioManager audio;
 
         public TaikoPlayfield(ControlPointInfo controlPointInfo)
@@ -210,6 +210,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             this.audio = audio;
 
+            allSamples = new Dictionary<double, Tuple<SampleChannel, SampleChannel>>();
             foreach (var soundPoint in controlPointInfo.SoundPoints)
             {
                 var normalSample = SampleInfo.FromSoundPoint(soundPoint).GetChannel(audio.Sample);
@@ -282,7 +283,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public bool OnPressed(TaikoAction action)
         {
-            if (!allSamples.TryGetValue(controlPointInfo.SoundPointAt(Clock.CurrentTime).Time, out Tuple<SampleChannel, SampleChannel> samples))
+            var currentTime = Clock.CurrentTime;
+            var soundPoint = currentTime < controlPointInfo.SoundPoints[0].Time ? controlPointInfo.SoundPoints[0] : controlPointInfo.SoundPointAt(currentTime);
+
+            if (!allSamples.TryGetValue(soundPoint.Time, out Tuple<SampleChannel, SampleChannel> samples))
                 throw new InvalidOperationException("Current sample set not found.");
 
             if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
