@@ -22,6 +22,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using System.Collections.Generic;
 using osu.Game.Audio;
+using System;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -61,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         private ControlPointInfo controlPointInfo;
-        private IEnumerable<Sample> allSamples;
+        private SortedDictionary<double, Tuple<SampleChannel, SampleChannel>> allSamples;
         private AudioManager audio;
 
         public TaikoPlayfield(ControlPointInfo controlPointInfo)
@@ -211,7 +212,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             foreach (var soundPoint in controlPointInfo.SoundPoints)
             {
-                SampleInfo.FromSoundPoint(soundPoint).GetChannel(audio.Sample);
+                var normalSample = SampleInfo.FromSoundPoint(soundPoint).GetChannel(audio.Sample);
+                var clapSample = SampleInfo.FromSoundPoint(soundPoint, SampleInfo.HIT_CLAP).GetChannel(audio.Sample);
+                allSamples.Add(soundPoint.Time, new Tuple<SampleChannel, SampleChannel>(normalSample, clapSample));
             }
 
             overlayBackgroundContainer.BorderColour = colours.Gray0;
@@ -279,7 +282,13 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public bool OnPressed(TaikoAction action)
         {
-            var soundPoint = controlPointInfo.SoundPointAt(Time.Current);
+            if (!allSamples.TryGetValue(controlPointInfo.SoundPointAt(Clock.CurrentTime).Time, out Tuple<SampleChannel, SampleChannel> samples))
+                throw new InvalidOperationException("Current sample set not found.");
+
+            if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
+                samples.Item1.Play();
+            else
+                samples.Item2.Play();
 
             return true;
         }
