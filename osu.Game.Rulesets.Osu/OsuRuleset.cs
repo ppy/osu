@@ -16,6 +16,8 @@ using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.Edit;
+using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -117,6 +119,8 @@ namespace osu.Game.Rulesets.Osu
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new OsuDifficultyCalculator(beatmap, mods);
 
         public override PerformanceCalculator CreatePerformanceCalculator(Beatmap beatmap, Score score) => new OsuPerformanceCalculator(this, beatmap, score);
+
+        public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
         public override string Description => "osu!";
 
