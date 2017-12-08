@@ -564,7 +564,6 @@
     <Compile Include="Rulesets\Edit\Tools\HitObjectCompositionTool.cs" />
     <Compile Include="Rulesets\Edit\Tools\ICompositionTool.cs" />
     <Compile Include="Rulesets\Edit\HitObjectComposer.cs" />
-    <Compile Include="Rulesets\Edit\SelectionDragger.cs" />
     <Compile Include="Rulesets\Edit\SelectionLayer.cs" />
     <Compile Include="Rulesets\Edit\ToolboxGroup.cs" />
     <Compile Include="Rulesets\Judgements\DrawableJudgement.cs" />
