@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Select
 
                 Task.Run(() =>
                 {
-                    newGroups = value.Select(createGroup).ToList();
+                    newGroups = value.Select(createGroup).Where(g => g != null).ToList();
                     criteria.Filter(newGroups);
                 }).ContinueWith(t =>
                 {
@@ -124,16 +124,19 @@ namespace osu.Game.Screens.Select
             // todo: this method should be smarter as to not recreate panels that haven't changed, etc.
             var group = groups.Find(b => b.BeatmapSet.ID == set.ID);
 
-            if (group == null)
-                return;
-
             int i = groups.IndexOf(group);
-            groups.RemoveAt(i);
+            if (i >= 0)
+                groups.RemoveAt(i);
 
             var newGroup = createGroup(set);
 
             if (newGroup != null)
-                groups.Insert(i, newGroup);
+            {
+                if (i >= 0)
+                    groups.Insert(i, newGroup);
+                else
+                    groups.Add(newGroup);
+            }
 
             bool hadSelection = selectedGroup == group;
 

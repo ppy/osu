@@ -22,7 +22,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.SelectionRandomType, SelectionRandomType.RandomPermutation);
 
-            Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1, 0.01);
+            Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1);
 
             // Online settings
             Set(OsuSetting.Username, string.Empty);
