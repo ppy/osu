@@ -15,9 +15,9 @@ namespace osu.Game.Audio
         public const string HIT_NORMAL = @"hitnormal";
         public const string HIT_CLAP = @"hitclap";
 
-        public static SampleInfo FromSoundPoint(SoundControlPoint soundPoint, string sampleName = SampleInfo.HIT_NORMAL)
+        public static SampleInfo FromSoundPoint(SoundControlPoint soundPoint, string sampleName = HIT_NORMAL)
         {
-            return new SampleInfo()
+            return new SampleInfo
             {
                 Bank = soundPoint.SampleBank,
                 Name = sampleName,
