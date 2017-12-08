@@ -204,13 +204,13 @@ namespace osu.Game.Overlays.Mods
             {
                 iconsContainer.AddRange(new[]
                 {
-                    backgroundIcon = new ModIcon(Mods[1])
+                    backgroundIcon = new DisplayableModIcon(Mods[1])
                     {
                         Origin = Anchor.BottomRight,
                         Anchor = Anchor.BottomRight,
                         Position = new Vector2(1.5f),
                     },
-                    foregroundIcon = new ModIcon(Mods[0])
+                    foregroundIcon = new DisplayableModIcon(Mods[0])
                     {
                         Origin = Anchor.BottomRight,
                         Anchor = Anchor.BottomRight,
@@ -220,7 +220,7 @@ namespace osu.Game.Overlays.Mods
             }
             else
             {
-                iconsContainer.Add(foregroundIcon = new ModIcon(Mod)
+                iconsContainer.Add(foregroundIcon = new DisplayableModIcon(Mod)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -258,6 +258,16 @@ namespace osu.Game.Overlays.Mods
             };
 
             Mod = mod;
+        }
+
+        private class DisplayableModIcon : ModIcon {
+
+            public string TooltipText => null;
+
+            public DisplayableModIcon(Mod mod) : base(mod) {
+                
+            }
+
         }
     }
 }
