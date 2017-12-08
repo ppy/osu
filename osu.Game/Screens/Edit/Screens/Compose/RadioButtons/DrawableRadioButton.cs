@@ -19,15 +19,15 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
 {
     public class DrawableRadioButton : TriangleButton
     {
-        private static readonly Color4 default_background_colour = OsuColour.FromHex("333");
-        private static readonly Color4 default_bubble_colour = default_background_colour.Darken(0.5f);
-        private static readonly Color4 selected_background_colour = OsuColour.FromHex("1188aa");
-        private static readonly Color4 selected_bubble_colour = selected_background_colour.Lighten(0.5f);
-
         /// <summary>
         /// Invoked when this <see cref="DrawableRadioButton"/> has been selected.
         /// </summary>
         public Action<RadioButton> Selected;
+
+        private Color4 defaultBackgroundColour;
+        private Color4 defaultBubbleColour;
+        private Color4 selectedBackgroundColour;
+        private Color4 selectedBubbleColour;
 
         private readonly Drawable bubble;
         private readonly RadioButton button;
@@ -50,17 +50,20 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
                 Scale = new Vector2(0.5f),
                 X = 10,
                 Masking = true,
-                Colour = default_bubble_colour,
                 Blending = BlendingMode.Additive,
                 Child = new Box { RelativeSizeAxes = Axes.Both }
             };
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
+            defaultBackgroundColour = colours.Gray3;
+            defaultBubbleColour = defaultBackgroundColour.Darken(0.5f);
+            selectedBackgroundColour = colours.BlueDark;
+            selectedBubbleColour = selectedBackgroundColour.Lighten(0.5f);
+
             Triangles.Alpha = 0;
-            BackgroundColour = default_background_colour;
 
             Content.EdgeEffect = new EdgeEffectParameters
             {
@@ -92,8 +95,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
             if (!IsLoaded)
                 return;
 
-            BackgroundColour = button.Selected ? selected_background_colour : default_background_colour;
-            bubble.Colour = button.Selected ? selected_bubble_colour : default_bubble_colour;
+            BackgroundColour = button.Selected ? selectedBackgroundColour : defaultBackgroundColour;
+            bubble.Colour = button.Selected ? selectedBubbleColour : defaultBubbleColour;
         }
 
         protected override bool OnClick(InputState state)

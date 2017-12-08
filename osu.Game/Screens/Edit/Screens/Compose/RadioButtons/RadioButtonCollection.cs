@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
                 items = value;
 
                 buttonContainer.Clear();
-                value.ForEach(addButton);
+                items.ForEach(addButton);
             }
         }
 
