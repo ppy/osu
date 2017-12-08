@@ -263,10 +263,7 @@ namespace osu.Game.Screens.Select
             beatmapNoDebounce = beatmap;
 
             if (beatmap == null)
-            {
-                if (!Beatmap.IsDefault)
-                    performLoad();
-            }
+                performLoad();
             else
             {
                 if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
