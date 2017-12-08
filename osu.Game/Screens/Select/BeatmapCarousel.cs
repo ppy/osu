@@ -91,22 +91,6 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public void AddBeatmap(BeatmapSetInfo beatmapSet)
-        {
-            Schedule(() =>
-            {
-                var group = createGroup(beatmapSet);
-
-                if (group == null)
-                    return;
-
-                addGroup(group);
-                computeYPositions();
-                if (selectedGroup == null)
-                    selectGroup(group);
-            });
-        }
-
         public void RemoveBeatmap(BeatmapSetInfo beatmapSet)
         {
             Schedule(() => removeGroup(groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID)));
