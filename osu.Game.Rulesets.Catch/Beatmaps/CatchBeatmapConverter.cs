@@ -11,11 +11,11 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
-    internal class CatchBeatmapConverter : BeatmapConverter<CatchBaseHit>
+    internal class CatchBeatmapConverter : BeatmapConverter<CatchHitObject>
     {
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
-        protected override IEnumerable<CatchBaseHit> ConvertHitObject(HitObject obj, Beatmap beatmap)
+        protected override IEnumerable<CatchHitObject> ConvertHitObject(HitObject obj, Beatmap beatmap)
         {
             var curveData = obj as IHasCurve;
             var positionData = obj as IHasXPosition;

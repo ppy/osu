@@ -80,6 +80,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Performs the conversion of a hit object.
+        /// This method is generally executed sequentially for all objects in a beatmap.
         /// </summary>
         /// <param name="original">The hit object to convert.</param>
         /// <param name="beatmap">The un-converted Beatmap.</param>

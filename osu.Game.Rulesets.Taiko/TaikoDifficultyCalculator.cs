@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 using System.Collections.Generic;
-using System.Globalization;
 using System;
 
 namespace osu.Game.Rulesets.Taiko
@@ -36,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko
         {
         }
 
-        public override double Calculate(Dictionary<string, string> categoryDifficulty = null)
+        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
             // Fill our custom DifficultyHitObject class, that carries additional information
             difficultyHitObjects.Clear();
@@ -53,8 +52,8 @@ namespace osu.Game.Rulesets.Taiko
 
             if (categoryDifficulty != null)
             {
-                categoryDifficulty.Add("Strain", starRating.ToString("0.00", CultureInfo.InvariantCulture));
-                categoryDifficulty.Add("Hit window 300", (35 /*HitObjectManager.HitWindow300*/ / TimeRate).ToString("0.00", CultureInfo.InvariantCulture));
+                categoryDifficulty.Add("Strain", starRating);
+                categoryDifficulty.Add("Hit window 300", 35 /*HitObjectManager.HitWindow300*/ / TimeRate);
             }
 
             return starRating;
