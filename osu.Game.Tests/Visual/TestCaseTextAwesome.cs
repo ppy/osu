@@ -36,6 +36,7 @@ namespace osu.Game.Tests.Visual
         private class Icon : Container, IHasTooltip
         {
             public string TooltipText { get; }
+            public bool IgnoreTooltip => false;
 
             public Icon(FontAwesome fa)
             {

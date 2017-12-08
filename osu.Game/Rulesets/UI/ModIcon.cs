@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.UI
         private readonly ModType type;
 
         public string TooltipText { get; }
+        public virtual bool IgnoreTooltip { get; }
 
         public ModIcon(Mod mod)
         {
@@ -37,6 +38,7 @@ namespace osu.Game.Rulesets.UI
             type = mod.Type;
 
             TooltipText = mod.Name;
+            IgnoreTooltip = false;
 
             Size = new Vector2(size);
 

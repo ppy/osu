@@ -185,6 +185,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private class MetadataContainer : OsuHoverContainer, IHasTooltip
         {
             public string TooltipText { get; set; }
+            public bool IgnoreTooltip => false;
 
             public MetadataContainer(string title, string artist)
             {

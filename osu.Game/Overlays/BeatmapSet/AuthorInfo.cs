@@ -126,6 +126,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private class ClickableArea : OsuClickableContainer, IHasTooltip
         {
             public string TooltipText => @"View Profile";
+            public bool IgnoreTooltip => false;
         }
     }
 }

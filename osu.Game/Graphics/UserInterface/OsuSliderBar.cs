@@ -46,6 +46,7 @@ namespace osu.Game.Graphics.UserInterface
                 return Current.Value.ToString();
             }
         }
+        public bool IgnoreTooltip => false;
 
         private Color4 accentColour;
         public Color4 AccentColour
