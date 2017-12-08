@@ -531,7 +531,7 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
-                    var existing = beatmaps.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.BeatmapInfo.Hash || (beatmap.BeatmapInfo.OnlineBeatmapID != null && b.OnlineBeatmapID == beatmap.BeatmapInfo.OnlineBeatmapID));
+                    var existing = beatmaps.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.BeatmapInfo.Hash || beatmap.BeatmapInfo.OnlineBeatmapID != null && b.OnlineBeatmapID == beatmap.BeatmapInfo.OnlineBeatmapID);
 
                     if (existing == null)
                     {
