@@ -158,6 +158,7 @@ namespace osu.Game.Overlays.Settings
             }
 
             public string TooltipText => "Revert to default";
+            public bool IgnoreTooltip => false;
 
             public override bool HandleInput => true;
 

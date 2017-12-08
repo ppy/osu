@@ -531,6 +531,7 @@ namespace osu.Game.Overlays.Profile
             public class ProfileLink : LinkText, IHasTooltip
             {
                 public string TooltipText => "View Profile in Browser";
+                public bool IgnoreTooltip => false;
 
                 public ProfileLink(User user)
                 {
