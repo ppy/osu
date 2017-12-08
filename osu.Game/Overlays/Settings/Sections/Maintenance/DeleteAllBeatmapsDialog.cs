@@ -2,12 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using osu.Framework.Allocation;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Dialog;
 
@@ -15,14 +9,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class DeleteAllBeatmapsDialog : PopupDialog
     {
-        private BeatmapManager manager;
-
-        [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmapManager)
-        {
-            manager = beatmapManager;
-        }
-
         public DeleteAllBeatmapsDialog(Action deleteAction)
         {
             BodyText = "Everything?";
