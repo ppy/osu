@@ -302,7 +302,7 @@ namespace osu.Game.Screens.Select
             carousel.Filter(criteria, debounce);
         }
 
-        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => addBeatmapSet(s));
+        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => carousel.UpdateBeatmapSet(s));
 
         private void onBeatmapSetRemoved(BeatmapSetInfo s) => Schedule(() => removeBeatmapSet(s));
 
@@ -444,8 +444,6 @@ namespace osu.Game.Screens.Select
                 track.Start();
             }
         }
-
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet) => carousel.AddBeatmap(beatmapSet);
 
         private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
         {
