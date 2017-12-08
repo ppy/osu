@@ -77,9 +77,7 @@ namespace osu.Game.Rulesets.Edit
                                     Alpha = 0,
                                     AlwaysPresent = true,
                                 },
-                                CreateUnderlay(),
-                                rulesetContainer,
-                                CreateOverlay(rulesetContainer.Playfield)
+                                rulesetContainer
                             }
                         }
                     },
@@ -105,10 +103,6 @@ namespace osu.Game.Rulesets.Edit
         private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
 
         protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap, true);
-
-        protected virtual PlayfieldUnderlay CreateUnderlay() => new PlayfieldUnderlay();
-
-        protected virtual PlayfieldOverlay CreateOverlay(Playfield playfield) => new PlayfieldOverlay(playfield);
 
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
     }
