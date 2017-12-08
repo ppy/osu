@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -16,11 +17,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton deleteButton;
         private TriangleButton restoreButton;
 
+        private DialogOverlay dialogOverlay;
+
         protected override string Header => "General";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps)
+        private void load(BeatmapManager beatmaps, DialogOverlay dialog)
         {
+            dialogOverlay = dialog;
+
             Children = new Drawable[]
             {
                 importButton = new SettingsButton
@@ -38,8 +43,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Text = "Delete ALL beatmaps",
                     Action = () =>
                     {
-                        deleteButton.Enabled.Value = false;
-                        Task.Run(() => beatmaps.DeleteAll()).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
+                        Action deletion = delegate
+                        {
+                            deleteButton.Enabled.Value = false;
+                            Task.Run(() => beatmaps.DeleteAll()).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
+                        };
+                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(deletion));
                     }
                 },
                 restoreButton = new SettingsButton
