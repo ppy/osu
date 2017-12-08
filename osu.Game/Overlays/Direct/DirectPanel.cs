@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.Update();
 
-            if (PreviewPlaying && Preview != null)
+            if (PreviewPlaying && Preview != null && Preview.IsLoaded)
             {
                 PreviewBar.Width = (float)(Preview.CurrentTime / Preview.Length);
             }
