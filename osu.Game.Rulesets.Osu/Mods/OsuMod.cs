@@ -34,31 +34,34 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (DrawableOsuHitObject drawable in drawables)
+            foreach (DrawableHitObject drawable in drawables)
             {
-                drawable.FadeInSpeed = 2;
-                drawable.FadeOutSpeed = 2;
-                drawable.EarlyFadeOutTime = 400;
-
-                if (drawable is DrawableHitCircle circle)
+                if (drawable is DrawableOsuHitObject osuDrawable)
                 {
-                    circle.ShowApproachCircle = false;
-                    circle.PlayHitAnimation = false;
+                    osuDrawable.FadeInSpeed = 2;
+                    osuDrawable.FadeOutSpeed = 2;
+                    osuDrawable.EarlyFadeOutTime = 400;
+
+                    if (osuDrawable is DrawableHitCircle circle)
+                    {
+                        circle.ShowApproachCircle = false;
+                        circle.PlayHitAnimation = false;
+                    }
+
+                    if (osuDrawable is DrawableSlider slider)
+                    {
+                        slider.GraduallyFadeOut = true;
+
+                        slider.InitialCircle.ShowApproachCircle = false;
+                        slider.InitialCircle.PlayHitAnimation = false;
+                        slider.InitialCircle.FadeInSpeed = osuDrawable.FadeInSpeed;
+                        slider.InitialCircle.FadeOutSpeed = osuDrawable.FadeOutSpeed;
+                        slider.InitialCircle.EarlyFadeOutTime = osuDrawable.EarlyFadeOutTime;
+                    }
+
+                    if (osuDrawable is DrawableSpinner spinner)
+                        spinner.HideSpinnerDetails = true;
                 }
-
-                if (drawable is DrawableSlider slider)
-                {
-                    slider.GraduallyFadeOut = true;
-
-                    slider.InitialCircle.ShowApproachCircle = false;
-                    slider.InitialCircle.PlayHitAnimation = false;
-                    slider.InitialCircle.FadeInSpeed = drawable.FadeInSpeed;
-                    slider.InitialCircle.FadeOutSpeed = drawable.FadeOutSpeed;
-                    slider.InitialCircle.EarlyFadeOutTime = drawable.EarlyFadeOutTime;
-                }
-
-                if (drawable is DrawableSpinner spinner)
-                    spinner.HideSpinnerDetails = true;
             }
         }
     }

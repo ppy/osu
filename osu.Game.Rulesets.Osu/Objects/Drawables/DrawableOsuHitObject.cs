@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (duration > 0)
                 this.Delay(duration).Expire();
             else
-                this.Expire();
+                Expire();
         }
 
         // Todo: At some point we need to move these to DrawableHitObject after ensuring that all other Rulesets apply

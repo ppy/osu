@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -109,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
-                    this.FadeTo(FadeOutAlpha, (TIME_FADEOUT / 5) / FadeOutSpeed);
+                    this.FadeTo(FadeOutAlpha, TIME_FADEOUT / 5 / FadeOutSpeed);
                     break;
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
@@ -135,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         }
                     }
                     else
-                        this.FadeTo(FadeOutAlpha, (TIME_FADEOUT / 5) / FadeOutSpeed);
+                        this.FadeTo(FadeOutAlpha, TIME_FADEOUT / 5 / FadeOutSpeed);
 
                     break;
             }
