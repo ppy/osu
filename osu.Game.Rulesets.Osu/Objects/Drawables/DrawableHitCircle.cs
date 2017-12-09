@@ -21,6 +21,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
+        public bool ShowApproachCircle = true;
+        public bool PlayHitAnimation = true;
+
         public DrawableHitCircle(OsuHitObject h) : base(h)
         {
             Origin = Anchor.Centre;

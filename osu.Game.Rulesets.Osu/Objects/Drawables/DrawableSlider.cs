@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly SliderBody body;
         private readonly SliderBall ball;
 
+        public bool GraduallyFadeOut;
+
         public DrawableSlider(Slider s) : base(s)
         {
             slider = s;
@@ -161,6 +163,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 this.FadeTo(FadeOutAlpha, 800 / FadeOutSpeed);
             }
+        }
+
+        protected override void UpdatePostState()
+        {
+            if (GraduallyFadeOut)
+            {
+                body.FadeOut(slider.Duration);
+                repeatPoints.FadeOut(slider.Duration);
+                ticks.FadeOut(slider.Duration);
+            }
+            else
+                base.UpdatePostState();
         }
 
         public Drawable ProxiedLayer => InitialCircle.ApproachCircle;

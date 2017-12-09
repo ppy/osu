@@ -15,8 +15,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public const float TIME_FADEIN = 400;
         public const float TIME_FADEOUT = 500;
 
-        public bool ShowApproachCircle = true;
-        public bool PlayHitAnimation = true;
         public double FadeInSpeed = 1;
         public double FadeOutSpeed = 1;
         protected float FadeOutAlpha = 0.001f;

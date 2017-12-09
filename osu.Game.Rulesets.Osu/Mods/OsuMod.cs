@@ -36,19 +36,28 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             foreach (DrawableOsuHitObject drawable in drawables)
             {
-                setModValues(drawable);
+                drawable.FadeInSpeed = 2;
+                drawable.FadeOutSpeed = 2;
+
+                if (drawable is DrawableHitCircle circle)
+                {
+                    circle.ShowApproachCircle = false;
+                    circle.PlayHitAnimation = false;
+                }
 
                 if (drawable is DrawableSlider slider)
-                    setModValues(slider.InitialCircle);
-            }
-        }
+                {
+                    slider.GraduallyFadeOut = true;
 
-        private void setModValues(DrawableOsuHitObject drawable)
-        {
-            drawable.ShowApproachCircle = false;
-            drawable.PlayHitAnimation = false;
-            drawable.FadeInSpeed = 2;
-            drawable.FadeOutSpeed = 2;
+                    slider.InitialCircle.FadeInSpeed = drawable.FadeInSpeed;
+                    slider.InitialCircle.FadeOutSpeed = drawable.FadeOutSpeed;
+                }
+
+                if (drawable is DrawableSpinner spinner)
+                {
+                    // TODO
+                }
+            }
         }
     }
 
