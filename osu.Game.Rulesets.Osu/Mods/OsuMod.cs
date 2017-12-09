@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     slider.GraduallyFadeOut = true;
 
+                    slider.InitialCircle.ShowApproachCircle = false;
                     slider.InitialCircle.FadeInSpeed = drawable.FadeInSpeed;
                     slider.InitialCircle.FadeOutSpeed = drawable.FadeOutSpeed;
                 }
