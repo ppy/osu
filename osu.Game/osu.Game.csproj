@@ -301,6 +301,7 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
     <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
     <Compile Include="Screens\Edit\Components\TimeInfoContainer.cs" />

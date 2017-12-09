@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public const float TIME_FADEIN = 400;
         public const float TIME_FADEOUT = 500;
 
+        public bool ShowApproachCircle = false;
+
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {

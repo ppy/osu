@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -34,7 +34,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
+            foreach (DrawableOsuHitObject drawable in drawables)
+            {
+                drawable.ShowApproachCircle = false;
 
+                if (drawable is DrawableSlider slider)
+                    slider.InitialCircle.ShowApproachCircle = false;
+            }
         }
     }
 
@@ -56,11 +62,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             slider.ControlPoints = newControlPoints;
             slider.Curve?.Calculate(); // Recalculate the slider curve
-        }
-
-        public void ApplyToHitObjects(RulesetContainer<OsuHitObject> rulesetContainer)
-        {
-
         }
     }
 
