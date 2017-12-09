@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using OpenTK;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -26,10 +27,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     }
 
-    public class OsuModHidden : ModHidden
+    public class OsuModHidden : ModHidden, IApplicableToDrawableHitObjects
     {
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
+
+        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        {
+
+        }
     }
 
     public class OsuModHardRock : ModHardRock, IApplicableToHitObject<OsuHitObject>
