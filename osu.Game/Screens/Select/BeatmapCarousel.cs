@@ -40,13 +40,16 @@ namespace osu.Game.Screens.Select
                 panels.Clear();
                 groups.Clear();
 
+                List<BeatmapGroup> newGroups = null;
+
                 Task.Run(() =>
+                {
+                    newGroups = value.Select(createGroup).Where(g => g != null).ToList();
+                    criteria.Filter(newGroups);
+                }).ContinueWith(t =>
                 {
                     Schedule(() =>
                     {
-                        var newGroups = value.Select(createGroup).Where(g => g != null).ToList();
-                        criteria.Filter(newGroups);
-
                         foreach (var g in newGroups)
                             addGroup(g);
 
