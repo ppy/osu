@@ -64,8 +64,6 @@ namespace osu.Game.Screens.Menu
 
         private readonly float[] frequencyAmplitudes = new float[256];
 
-        public override bool HandleInput => false;
-
         private Shader shader;
         private readonly Texture texture;
 

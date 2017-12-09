@@ -21,8 +21,6 @@ namespace osu.Game.Screens.Play
 
         public int ColumnCount => columns.Length;
 
-        public override bool HandleInput => false;
-
         private int progress;
         public int Progress
         {
