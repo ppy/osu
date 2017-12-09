@@ -17,15 +17,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton deleteButton;
         private TriangleButton restoreButton;
 
-        private DialogOverlay dialogOverlay;
-
         protected override string Header => "General";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps, DialogOverlay dialog)
+        private void load(BeatmapManager beatmaps, DialogOverlay dialogOverlay)
         {
-            dialogOverlay = dialog;
-
             Children = new Drawable[]
             {
                 importButton = new SettingsButton

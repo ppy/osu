@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
@@ -8,16 +10,30 @@ namespace osu.Game.Tests.Visual
     internal class TestCaseSettings : OsuTestCase
     {
         private readonly SettingsOverlay settings;
+        private readonly DialogOverlay dialogOverlay;
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
 
         public TestCaseSettings()
         {
-            Children = new[] { settings = new MainSettings() };
+            settings = new MainSettings
+            {
+                State = Visibility.Visible
+            };
+            Add(dialogOverlay = new DialogOverlay
+            {
+                Depth = -1
+            });
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-            settings.ToggleVisibility();
+            dependencies.Cache(dialogOverlay);
+
+            Add(settings);
         }
     }
 }
