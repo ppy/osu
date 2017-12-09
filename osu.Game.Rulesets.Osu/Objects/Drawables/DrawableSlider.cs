@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             ball.FadeIn();
 
-            using (BeginDelayedSequence(slider.Duration, true))
+            using (BeginDelayedSequence(slider.Duration + EarlyFadeOutTime, true))
             {
                 body.FadeOut(160 / FadeOutSpeed);
                 ball.FadeOut(160 / FadeOutSpeed);
@@ -169,9 +169,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (GraduallyFadeOut)
             {
-                body.FadeOut(slider.Duration);
-                repeatPoints.FadeOut(slider.Duration);
-                ticks.FadeOut(slider.Duration);
+                var duration = slider.Duration + EarlyFadeOutTime;
+                body.FadeOut(duration);
+                repeatPoints.FadeOut(duration);
+                ticks.FadeOut(duration);
             }
             else
                 base.UpdatePostState();

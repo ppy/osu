@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 drawable.FadeInSpeed = 2;
                 drawable.FadeOutSpeed = 2;
+                drawable.EarlyFadeOutTime = 400;
 
                 if (drawable is DrawableHitCircle circle)
                 {
@@ -53,6 +54,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     slider.InitialCircle.PlayHitAnimation = false;
                     slider.InitialCircle.FadeInSpeed = drawable.FadeInSpeed;
                     slider.InitialCircle.FadeOutSpeed = drawable.FadeOutSpeed;
+                    slider.InitialCircle.EarlyFadeOutTime = drawable.EarlyFadeOutTime;
                 }
 
                 if (drawable is DrawableSpinner spinner)

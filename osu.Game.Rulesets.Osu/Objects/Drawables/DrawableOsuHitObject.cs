@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public double FadeInSpeed = 1;
         public double FadeOutSpeed = 1;
+        public double EarlyFadeOutTime = 0;
         protected float FadeOutAlpha = 0.001f;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
@@ -37,7 +38,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 UpdatePreemptState();
 
-                using (BeginDelayedSequence(TIME_PREEMPT + (Judgements.FirstOrDefault()?.TimeOffset ?? 0), true))
+                var delay = TIME_PREEMPT + (Judgements.FirstOrDefault()?.TimeOffset ?? 0) - EarlyFadeOutTime;
+                using (BeginDelayedSequence(delay, true))
                 {
                     UpdateCurrentState(state);
                     UpdatePostState();
@@ -56,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected virtual void UpdatePostState()
         {
-            double duration = ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime) - HitObject.StartTime;
+            double duration = ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime) - HitObject.StartTime + EarlyFadeOutTime;
             if (duration > 0)
                 this.Delay(duration).Expire();
             else
