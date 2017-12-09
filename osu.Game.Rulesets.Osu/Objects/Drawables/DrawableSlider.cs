@@ -57,9 +57,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     ComboColour = s.ComboColour,
                     Samples = s.Samples,
                 })
-                {
-                    ShowApproachCircle = this.ShowApproachCircle,
-                }
             };
 
             components.Add(body);
@@ -159,11 +156,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             using (BeginDelayedSequence(slider.Duration, true))
             {
-                body.FadeOut(160);
-                ball.FadeOut(160);
+                body.FadeOut(160 / FadeOutSpeed);
+                ball.FadeOut(160 / FadeOutSpeed);
 
-                this.FadeOut(800)
-                    .Expire();
+                this.FadeTo(FadeOutAlpha, 800 / FadeOutSpeed);
             }
         }
 

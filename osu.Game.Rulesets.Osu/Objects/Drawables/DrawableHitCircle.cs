@@ -90,52 +90,58 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (ShowApproachCircle)
             {
-                ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT));
-                ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
+                ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT) / FadeInSpeed);
+                ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT / FadeInSpeed);
             }
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            double duration = ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime) - HitObject.StartTime;
-
-            glow.Delay(duration).FadeOut(400);
+            glow.FadeOut(400 / FadeOutSpeed);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(duration + TIME_PREEMPT).FadeOut(TIME_FADEOUT);
-                    Expire(true);
+                    this.FadeTo(FadeOutAlpha, TIME_FADEOUT / FadeOutSpeed);
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
-                    this.FadeOut(TIME_FADEOUT / 5);
-                    Expire();
+                    this.FadeTo(FadeOutAlpha, (TIME_FADEOUT / 5) / FadeOutSpeed);
                     break;
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
 
-                    const double flash_in = 40;
-                    flash.FadeTo(0.8f, flash_in)
-                         .Then()
-                         .FadeOut(100);
-
-                    explode.FadeIn(flash_in);
-
-                    using (BeginDelayedSequence(flash_in, true))
+                    if (PlayHitAnimation)
                     {
-                        //after the flash, we can hide some elements that were behind it
-                        ring.FadeOut();
-                        circle.FadeOut();
-                        number.FadeOut();
+                        const double flash_in = 40;
+                        flash.FadeTo(0.8f, flash_in)
+                             .Then()
+                             .FadeOut(100);
 
-                        this.FadeOut(800)
-                            .ScaleTo(Scale * 1.5f, 400, Easing.OutQuad);
+                        explode.FadeIn(flash_in);
+
+                        using (BeginDelayedSequence(flash_in, true))
+                        {
+                            //after the flash, we can hide some elements that were behind it
+                            ring.FadeOut();
+                            circle.FadeOut();
+                            number.FadeOut();
+
+                            this.FadeTo(FadeOutAlpha, 800 / FadeOutSpeed)
+                                .ScaleTo(Scale * 1.5f, 400, Easing.OutQuad);
+                        }
                     }
+                    else
+                        this.FadeTo(FadeOutAlpha, (TIME_FADEOUT / 5) / FadeOutSpeed);
 
-                    Expire();
                     break;
             }
+        }
+
+        protected override void UpdatePostState()
+        {
+            if (!PlayHitAnimation)
+                base.UpdatePostState();
         }
 
         public Drawable ProxiedLayer => ApproachCircle;

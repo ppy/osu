@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            var sequence = this.Delay(spinner.Duration).FadeOut(160);
+            var sequence = this.Delay(spinner.Duration).FadeOut(160 / FadeOutSpeed);
 
             switch (state)
             {
@@ -215,8 +215,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;
             }
-
-            Expire();
         }
     }
 }

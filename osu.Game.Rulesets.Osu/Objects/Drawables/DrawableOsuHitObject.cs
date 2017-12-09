@@ -5,6 +5,7 @@ using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using System.Linq;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -14,7 +15,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public const float TIME_FADEIN = 400;
         public const float TIME_FADEOUT = 500;
 
-        public bool ShowApproachCircle = false;
+        public bool ShowApproachCircle = true;
+        public bool PlayHitAnimation = true;
+        public double FadeInSpeed = 1;
+        public double FadeOutSpeed = 1;
+        protected float FadeOutAlpha = 0.001f;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
@@ -35,17 +40,29 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 UpdatePreemptState();
 
                 using (BeginDelayedSequence(TIME_PREEMPT + (Judgements.FirstOrDefault()?.TimeOffset ?? 0), true))
+                {
                     UpdateCurrentState(state);
+                    UpdatePostState();
+                }
             }
         }
 
         protected virtual void UpdatePreemptState()
         {
-            this.FadeIn(TIME_FADEIN);
+            this.FadeIn(TIME_FADEIN / FadeInSpeed);
         }
 
         protected virtual void UpdateCurrentState(ArmedState state)
         {
+        }
+
+        protected virtual void UpdatePostState()
+        {
+            double duration = ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime) - HitObject.StartTime;
+            if (duration > 0)
+                this.Delay(duration).Expire();
+            else
+                this.Expire();
         }
 
         // Todo: At some point we need to move these to DrawableHitObject after ensuring that all other Rulesets apply
