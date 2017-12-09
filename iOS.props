@@ -1,0 +1,26 @@
+<Project>
+  <PropertyGroup Label="Project">
+    <TargetFramework>xamarinios10</TargetFramework>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchDebug>true</MtouchDebug>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+    <MtouchFastDev>true</MtouchFastDev>
+    <IOSDebuggerPort>60677</IOSDebuggerPort>
+    <DeviceSpecificBuild>false</DeviceSpecificBuild>
+    <MtouchLink></MtouchLink>
+    <MtouchHttpClientHandler></MtouchHttpClientHandler>
+  </PropertyGroup>
+
+  <ItemGroup Label="Package References">
+    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.1.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
+
+  <!-- Overwrite Xamarin.iOS reference to add alias -->
+  <ItemGroup Label="References">
+    <Reference Include="Xamarin.iOS">
+      <Aliases>IOS</Aliases>
+    </Reference>
+  </ItemGroup>
+</Project>

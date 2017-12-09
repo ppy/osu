@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Game.props" />
   <Import Project="..\OpenTK.props" />
+
   <PropertyGroup Label="Project">
-    <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -13,11 +13,15 @@
     <Description>click the circles. to the beat.</Description>
     <Product>osu.Game.Rulesets.Osu</Product>
   </PropertyGroup>
+
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
+
   <ItemGroup Label="Package References">
     <PackageReference Include="NUnit" Version="3.8.1" />
   </ItemGroup>
+
+  <Import Project="..\iOS.props" />
 </Project>
