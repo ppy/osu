@@ -27,7 +27,7 @@ namespace osu.Game.Input
             }
         }
 
-        public void Register(KeyBindingInputManager manager) => insertDefaults(manager.DefaultKeyBindings);
+        public void Register(KeyBindingContainer manager) => insertDefaults(manager.DefaultKeyBindings);
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {

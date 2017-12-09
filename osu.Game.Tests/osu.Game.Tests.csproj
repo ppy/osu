@@ -83,10 +83,11 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoderTest.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReaderTest.cs" />
     <Compile Include="Beatmaps\IO\ImportBeatmapTest.cs" />
     <Compile Include="Resources\Resource.cs" />
-    <Compile Include="Beatmaps\Formats\OsuLegacyDecoderTest.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoderTest.cs" />
     <Compile Include="Visual\TestCaseBeatmapDetailArea.cs" />
     <Compile Include="Visual\TestCaseBeatmapDetails.cs" />
     <Compile Include="Visual\TestCaseBeatmapOptionsOverlay.cs" />
@@ -146,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Soleily - Renatus %28Gamu%29 [Insane].osu" />
+    <EmbeddedResource Include="Resources\Himeringo - Yotsuya-san ni Yoroshiku %28RLC%29 [Winber1%27s Extreme].osu" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
