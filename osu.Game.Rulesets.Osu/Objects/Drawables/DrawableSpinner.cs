@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Color4 normalColour;
         private Color4 completeColour;
 
+        public bool HideSpinnerDetails;
+
         public DrawableSpinner(Spinner s) : base(s)
         {
             Origin = Anchor.Centre;
@@ -188,6 +190,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void UpdatePreemptState()
         {
             base.UpdatePreemptState();
+
+            if (HideSpinnerDetails)
+            {
+                glow.FadeOut();
+                ticks.FadeOut();
+                circle.FadeOut();
+                background.FadeOut();
+                disc.FadeTo(FadeOutAlpha); // we still need it to be able to spin
+            }
 
             circleContainer.ScaleTo(spinner.Scale * 0.3f);
             circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, Easing.OutQuint);

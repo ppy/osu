@@ -50,14 +50,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                     slider.GraduallyFadeOut = true;
 
                     slider.InitialCircle.ShowApproachCircle = false;
+                    slider.InitialCircle.PlayHitAnimation = false;
                     slider.InitialCircle.FadeInSpeed = drawable.FadeInSpeed;
                     slider.InitialCircle.FadeOutSpeed = drawable.FadeOutSpeed;
                 }
 
                 if (drawable is DrawableSpinner spinner)
-                {
-                    // TODO
-                }
+                    spinner.HideSpinnerDetails = true;
             }
         }
     }
