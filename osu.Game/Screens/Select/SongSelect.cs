@@ -240,6 +240,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         private void carouselSelectionChanged(BeatmapInfo beatmap)
         {
+            if (beatmap == null)
+                return;
             Action performLoad = delegate
             {
                 // We may be arriving here due to another component changing the bindable Beatmap.
