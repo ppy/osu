@@ -22,10 +22,10 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using osu.Game.Notifications;
 
 namespace osu.Game
 {
@@ -136,11 +136,9 @@ namespace osu.Game
 
             if (s.Beatmap == null)
             {
-                notificationOverlay.Post(new SimpleNotification
-                {
-                    Text = @"Tried to load a score for a beatmap we don't have!",
-                    Icon = FontAwesome.fa_life_saver,
-                });
+                notificationOverlay.Post(
+                    new Notification(@"Tried to load a score for a beatmap we don't have!", FontAwesome.fa_life_saver)
+                );
                 return;
             }
 
@@ -223,10 +221,7 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important) return;
 
-                notificationOverlay.Post(new SimpleNotification
-                {
-                    Text = $@"{entry.Level}: {entry.Message}"
-                });
+                notificationOverlay.Post(new Notification($@"{entry.Level}: {entry.Message}"));
             };
 
             dependencies.Cache(settings);

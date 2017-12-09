@@ -21,9 +21,9 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.IO;
 using osu.Game.IPC;
+using osu.Game.Notifications;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Storyboards;
 
@@ -131,11 +131,9 @@ namespace osu.Game.Beatmaps
         /// <param name="paths">One or more beatmap locations on disk.</param>
         public void Import(params string[] paths)
         {
-            var notification = new ProgressNotification
+            var notification = new ProgressNotification("Beatmap import is initialising...")
             {
-                Text = "Beatmap import is initialising...",
-                Progress = 0,
-                State = ProgressNotificationState.Active,
+                State = ProgressNotificationState.Active
             };
 
             PostNotification?.Invoke(notification);
@@ -237,18 +235,17 @@ namespace osu.Game.Beatmaps
 
             if (!api.LocalUser.Value.IsSupporter)
             {
-                PostNotification?.Invoke(new SimpleNotification
-                {
-                    Icon = FontAwesome.fa_superpowers,
-                    Text = "You gotta be a supporter to download for now 'yo"
-                });
+                PostNotification?.Invoke(
+                    new Notification("You gotta be a supporter to download for now 'yo", FontAwesome.fa_superpowers)
+                );
                 return;
             }
 
-            ProgressNotification downloadNotification = new ProgressNotification
-            {
-                Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
-            };
+            var downloadNotification = new ProgressNotification($"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}");
+
+            downloadNotification.FollowUpNotifications.Add(
+                new Notification($"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title} finished")
+            );
 
             var request = new DownloadBeatmapSetRequest(beatmapSetInfo, noVideo);
 
@@ -287,7 +284,6 @@ namespace osu.Game.Beatmaps
                 request.Cancel();
                 currentDownloads.Remove(request);
                 downloadNotification.State = ProgressNotificationState.Cancelled;
-                return true;
             };
 
             currentDownloads.Add(request);
@@ -674,9 +670,13 @@ namespace osu.Game.Beatmaps
 
             int i = 0;
 
+            bool userRequestedCancel = false;
+
+            notification.CancelRequested += () => userRequestedCancel = true;
+
             foreach (var b in maps)
             {
-                if (notification.State == ProgressNotificationState.Cancelled)
+                if (userRequestedCancel)
                     // user requested abort
                     return;
 

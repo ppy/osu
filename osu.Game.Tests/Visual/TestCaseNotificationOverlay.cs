@@ -5,16 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics;
+using osu.Game.Notifications;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
     internal class TestCaseNotificationOverlay : OsuTestCase
     {
+
+        private readonly OsuColour osuColour = new OsuColour();
         private readonly NotificationOverlay manager;
 
         public TestCaseNotificationOverlay()
@@ -33,6 +37,7 @@ namespace osu.Game.Tests.Visual
             AddStep(@"simple #2", sendNotification2);
             AddStep(@"progress #1", sendProgress1);
             AddStep(@"progress #2", sendProgress2);
+            AddStep(@"game update flow", sendUpdateProgressNotification);
             AddStep(@"barrage", () => sendBarrage());
         }
 
@@ -66,7 +71,7 @@ namespace osu.Game.Tests.Visual
 
             if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
             {
-                var p = progressingNotifications.FirstOrDefault(n => n.IsAlive && n.State == ProgressNotificationState.Queued);
+                var p = progressingNotifications.FirstOrDefault(n => n.State == ProgressNotificationState.Queued);
                 if (p != null)
                     p.State = ProgressNotificationState.Active;
             }
@@ -82,7 +87,7 @@ namespace osu.Game.Tests.Visual
 
         private void sendProgress2()
         {
-            var n = new ProgressNotification { Text = @"Downloading Haitai..." };
+            var n = new ProgressNotification(@"Downloading Haitai...");
             manager.Post(n);
             progressingNotifications.Add(n);
         }
@@ -91,19 +96,57 @@ namespace osu.Game.Tests.Visual
 
         private void sendProgress1()
         {
-            var n = new ProgressNotification { Text = @"Uploading to BSS..." };
+            var n = new ProgressNotification(@"Uploading to BSS...", FontAwesome.fa_upload);
             manager.Post(n);
             progressingNotifications.Add(n);
         }
 
+        private void sendUpdateProgressNotification()
+        {
+            var completeNotification = new Notification("You are now running osu!lazer {version}.\nClick to see what's new!")
+            {
+                NotificationIcon = new NotificationIcon(FontAwesome.fa_check_square, osuColour.BlueDark)
+            };
+
+            var restartNotification = new Notification(@"Update ready to install. Click to restart!")
+            {
+                NotificationIcon = new NotificationIcon(backgroundColour: osuColour.Green)
+            };
+            restartNotification.OnActivate += () => manager.Post(completeNotification);
+
+            var downloadNotification = new ProgressNotification(@"Downloading update...")
+            {
+                NotificationIcon = new NotificationIcon(
+                    FontAwesome.fa_upload,
+                    ColourInfo.GradientVertical(osuColour.YellowDark, osuColour.Yellow)
+                )
+            };
+            bool downloadCompleted = false;
+            downloadNotification.ProgressCompleted += () =>
+            {
+                if (downloadCompleted)
+                {
+                    downloadNotification.FollowUpNotifications.Add(restartNotification);
+                    return;
+                }
+
+                downloadCompleted = true;
+                downloadNotification.Progress = 0;
+                downloadNotification.Text = @"Installing update...";
+            };
+
+            progressingNotifications.Add(downloadNotification);
+            manager.Post(downloadNotification);
+        }
+
         private void sendNotification2()
         {
-            manager.Post(new SimpleNotification { Text = @"You are amazing" });
+            manager.Post(new Notification(@"You are amazing" ));
         }
 
         private void sendNotification1()
         {
-            manager.Post(new SimpleNotification { Text = @"Welcome to osu!. Enjoy your stay!" });
+            manager.Post(new Notification (@"Welcome to osu!. Enjoy your stay!" ));
         }
     }
 }
