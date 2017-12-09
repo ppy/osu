@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
 
-            storyboard = working.Beatmap.Storyboard.CreateDrawable(beatmapBacking);
+            storyboard = working.Storyboard.CreateDrawable(beatmapBacking);
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);

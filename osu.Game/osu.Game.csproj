@@ -266,6 +266,8 @@
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Graphics\UserInterface\HoverClickSounds.cs" />
@@ -307,8 +309,8 @@
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
-    <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
-    <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
+    <Compile Include="Beatmaps\Formats\Decoder.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
     <Compile Include="Online\API\Requests\GetUserScoresRequest.cs" />
