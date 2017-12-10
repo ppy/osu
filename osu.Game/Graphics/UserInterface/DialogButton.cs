@@ -78,6 +78,31 @@ namespace osu.Game.Graphics.UserInterface
                 spriteText.TextSize = value;
             }
         }
+        private bool isSelected = false;
+        public bool IsSelected
+        {
+            get
+            {
+                return isSelected;
+            }
+            set
+            {
+                isSelected = value;
+                if(value)
+                {
+                    spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
+                    colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);
+                    glowContainer.FadeIn(glow_fade_duration, Easing.Out);
+                }
+                else
+                {
+                    colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, Easing.OutElastic);
+                    spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
+                    glowContainer.FadeOut(glow_fade_duration, Easing.Out);
+                }
+
+            }
+        }
 
         private readonly Container backgroundContainer;
         private readonly Container colourContainer;
@@ -111,10 +136,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
-
-            colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);
-            glowContainer.FadeIn(glow_fade_duration, Easing.Out);
+            IsSelected = true;
             base.OnHover(state);
             return true;
         }
@@ -123,9 +145,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (!didClick)
             {
-                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, Easing.OutElastic);
-                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
-                glowContainer.FadeOut(glow_fade_duration, Easing.Out);
+                IsSelected = false;
             }
 
             didClick = false;
