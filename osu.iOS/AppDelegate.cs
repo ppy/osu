@@ -15,7 +15,7 @@ namespace osu.iOS
     public class AppDelegate : UIApplicationDelegate
     {
         // class-level declarations
-        private GameView gameView;
+        private iOSPlatformGameView gameView;
 
         public override UIWindow Window
         {
@@ -28,7 +28,7 @@ namespace osu.iOS
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
             Window = new UIWindow(UIScreen.MainScreen.Bounds);
-            gameView = new GameView(new IOS::System.Drawing.RectangleF(0.0f, 0.0f, (float)Window.Frame.Size.Width, (float)Window.Frame.Size.Height));
+            gameView = new iOSPlatformGameView(new IOS::System.Drawing.RectangleF(0.0f, 0.0f, (float)Window.Frame.Size.Width, (float)Window.Frame.Size.Height));
 
             UIViewController viewController = new UIViewController();
             viewController.View = gameView;
@@ -42,6 +42,11 @@ namespace osu.iOS
             host.Run(new OsuGame());
 
             return true;
+        }
+
+        public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations(UIApplication application, UIWindow forWindow)
+        {
+            return UIInterfaceOrientationMask.Landscape;
         }
 
         public override void OnResignActivation(UIApplication application)
