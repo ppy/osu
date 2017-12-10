@@ -20,8 +20,6 @@ namespace osu.Game.Screens.Menu
 {
     public class Intro : OsuScreen
     {
-        private const string menu_music_beatmap_hash = "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
-
         /// <summary>
         /// Whether we have loaded the menu previously.
         /// </summary>
@@ -58,7 +56,7 @@ namespace osu.Game.Screens.Menu
 
             if (setInfo == null)
             {
-                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == menu_music_beatmap_hash);
+                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapManager.MENU_MUSIC_BEATMAP_HASH);
 
                 if (setInfo == null)
                 {
