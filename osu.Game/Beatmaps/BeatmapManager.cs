@@ -35,11 +35,6 @@ namespace osu.Game.Beatmaps
     public class BeatmapManager
     {
         /// <summary>
-        /// The hash of the supplied menu music's beatmap set.
-        /// </summary>
-        public const string MENU_MUSIC_BEATMAP_HASH = "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
-
-        /// <summary>
         /// Fired when a new <see cref="BeatmapSetInfo"/> becomes available in the database.
         /// </summary>
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
@@ -346,8 +341,7 @@ namespace osu.Game.Beatmaps
 
         public void Undelete(BeatmapSetInfo beatmapSet)
         {
-            // So circles.osz doesn't get added as a map
-            if (beatmapSet.Hash == MENU_MUSIC_BEATMAP_HASH)
+            if (beatmapSet.Protected)
                 return;
 
             lock (importContext)
