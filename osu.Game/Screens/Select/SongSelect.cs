@@ -206,14 +206,20 @@ namespace osu.Game.Screens.Select
 
         private void onBeatmapRestored(BeatmapInfo beatmap)
         {
-            var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
-            Schedule(() => carousel.UpdateBeatmapSet(beatmapSet));
+            Schedule(() =>
+            {
+                var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
+                carousel.UpdateBeatmapSet(beatmapSet);
+            });
         }
 
         private void onBeatmapHidden(BeatmapInfo beatmap)
         {
-            var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
-            Schedule(() => carousel.UpdateBeatmapSet(beatmapSet));
+            Schedule(() =>
+            {
+                var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
+                carousel.UpdateBeatmapSet(beatmapSet);
+            });
         }
 
         private void carouselBeatmapsLoaded()
