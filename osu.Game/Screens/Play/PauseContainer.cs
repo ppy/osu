@@ -126,6 +126,8 @@ namespace osu.Game.Screens.Play
             public override string Header => "paused";
             public override string Description => "you're not going to do what i think you're going to do, are ya?";
 
+            private int selectedButton;
+
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
             {
                 if (!args.Repeat && args.Key == Key.Escape)
@@ -133,7 +135,6 @@ namespace osu.Game.Screens.Play
                     Buttons.Children.First().TriggerOnClick();
                     return true;
                 }
-
                 return base.OnKeyDown(state, args);
             }
 

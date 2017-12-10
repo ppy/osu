@@ -14,6 +14,7 @@ namespace osu.Game.Screens.Play
     {
         public override string Header => "failed";
         public override string Description => "you're dead, try again?";
+        private int selectedButton;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -29,7 +30,6 @@ namespace osu.Game.Screens.Play
                 Buttons.Children.Last().TriggerOnClick();
                 return true;
             }
-
             return base.OnKeyDown(state, args);
         }
     }

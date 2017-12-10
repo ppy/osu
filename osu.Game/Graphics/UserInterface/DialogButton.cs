@@ -78,17 +78,18 @@ namespace osu.Game.Graphics.UserInterface
                 spriteText.TextSize = value;
             }
         }
-        private bool isSelected = false;
-        public bool IsSelected
+
+        private bool isSelectedMouse;
+        public bool IsSelectedMouse
         {
             get
             {
-                return isSelected;
+                return isSelectedMouse;
             }
             set
             {
-                isSelected = value;
-                if(value)
+                isSelectedMouse = value;
+                if (value)
                 {
                     spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
                     colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);
@@ -100,9 +101,24 @@ namespace osu.Game.Graphics.UserInterface
                     spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
                     glowContainer.FadeOut(glow_fade_duration, Easing.Out);
                 }
-
             }
         }
+
+        private bool isSelectedKeyboard;
+        public bool IsSelectedKeyboard
+        {
+            get
+            {
+                return isSelectedKeyboard;
+            }
+            set
+            {
+                isSelectedKeyboard = value;
+                spriteText.Scale = value ? new Vector2(1.3f, 1.3f) : Vector2.One;
+            }
+        }
+
+        public bool IsSelected => isSelectedMouse || isSelectedKeyboard;
 
         private readonly Container backgroundContainer;
         private readonly Container colourContainer;
@@ -136,7 +152,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            IsSelected = true;
+            IsSelectedMouse = true;
             base.OnHover(state);
             return true;
         }
@@ -145,7 +161,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (!didClick)
             {
-                IsSelected = false;
+                IsSelectedMouse = false;
             }
 
             didClick = false;
