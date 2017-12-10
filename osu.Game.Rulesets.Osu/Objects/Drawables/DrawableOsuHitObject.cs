@@ -59,10 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected virtual void UpdatePostState()
         {
             double duration = ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime) - HitObject.StartTime + EarlyFadeOutTime;
-            if (duration > 0)
-                this.Delay(duration).Expire();
-            else
-                Expire();
+            this.Delay(duration).Expire();
         }
 
         // Todo: At some point we need to move these to DrawableHitObject after ensuring that all other Rulesets apply

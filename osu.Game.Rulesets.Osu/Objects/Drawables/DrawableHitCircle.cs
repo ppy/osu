@@ -142,8 +142,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdatePostState()
         {
-            if (!PlayHitAnimation)
-                base.UpdatePostState();
+            base.UpdatePostState();
+            ApproachCircle.FadeOut();
         }
 
         public Drawable ProxiedLayer => ApproachCircle;
