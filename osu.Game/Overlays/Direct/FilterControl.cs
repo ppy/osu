@@ -105,6 +105,7 @@ namespace osu.Game.Overlays.Direct
 
     public enum DirectSortCriteria
     {
+        Relevance,
         Title,
         Artist,
         Creator,
