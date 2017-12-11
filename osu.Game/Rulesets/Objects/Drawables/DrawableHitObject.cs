@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The local point that causes this <see cref="DrawableHitObject"/> to be selected in the Editor.
         /// </summary>
-        public virtual Vector2 SelectionPoint => Vector2.Zero;
+        public virtual Vector2 SelectionPoint => DrawSize / 2f;
 
         /// <summary>
         /// The local rectangle that outlines this <see cref="DrawableHitObject"/> for selections in the Editor.
