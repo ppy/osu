@@ -289,7 +289,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 Height = 26;
                 Width = 26;
-                Child = new ClickableContainer
+                Child = new OsuClickableContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
