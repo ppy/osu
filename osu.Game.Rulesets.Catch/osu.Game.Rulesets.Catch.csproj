@@ -66,6 +66,7 @@
     <Compile Include="Tests\TestCaseCatchStacker.cs" />
     <Compile Include="Tests\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\TestCaseCatchPlayer.cs" />
+    <Compile Include="Tests\TestCaseHyperdash.cs" />
     <Compile Include="UI\CatcherArea.cs" />
     <Compile Include="UI\CatchRulesetContainer.cs" />
     <Compile Include="UI\CatchPlayfield.cs" />
@@ -88,6 +89,9 @@
       <Name>osu.Game</Name>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
