@@ -17,6 +17,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using System;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -259,7 +260,7 @@ namespace osu.Game.Overlays.Chat
                 };
             }
 
-            public class CloseButton : ClickableContainer
+            public class CloseButton : OsuClickableContainer
             {
                 private readonly SpriteIcon icon;
 

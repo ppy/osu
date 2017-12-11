@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="..\osu.Game.props" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -22,7 +22,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -49,6 +48,9 @@
   <ItemGroup>
     <Compile Include="Beatmaps\OsuBeatmapConverter.cs" />
     <Compile Include="Beatmaps\OsuBeatmapProcessor.cs" />
+    <Compile Include="Edit\OsuEditPlayfield.cs" />
+    <Compile Include="Edit\OsuEditRulesetContainer.cs" />
+    <Compile Include="Edit\OsuHitObjectComposer.cs" />
     <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
     <Compile Include="Objects\Drawables\Connections\ConnectionRenderer.cs" />
     <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
@@ -85,9 +87,11 @@
     <Compile Include="OsuInputManager.cs" />
     <Compile Include="Replays\OsuReplayInputHandler.cs" />
     <Compile Include="Tests\TestCaseHitObjects.cs" />
+    <Compile Include="Tests\TestCasePerformancePoints.cs" />
     <Compile Include="UI\Cursor\CursorTrail.cs" />
     <Compile Include="UI\Cursor\GameplayCursor.cs" />
     <Compile Include="UI\OsuSettings.cs" />
+    <Compile Include="Scoring\OsuPerformanceCalculator.cs" />
     <Compile Include="Scoring\OsuScoreProcessor.cs" />
     <Compile Include="UI\OsuRulesetContainer.cs" />
     <Compile Include="UI\OsuPlayfield.cs" />
@@ -103,9 +107,6 @@
     <Compile Include="Replays\OsuAutoGeneratorBase.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
     <None Include="app.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
@@ -122,7 +123,9 @@
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

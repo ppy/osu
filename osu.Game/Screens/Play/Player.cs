@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Play
 
         private void initializeStoryboard(bool asyncLoad)
         {
-            var beatmap = Beatmap.Value.Beatmap;
+            var beatmap = Beatmap.Value;
 
             storyboard = beatmap.Storyboard.CreateDrawable(Beatmap.Value);
             storyboard.Masking = true;
@@ -310,7 +310,7 @@ namespace osu.Game.Screens.Play
             if (!loadedSuccessfully)
                 return;
 
-            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, Easing.OutQuint);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1000, Easing.OutQuint);
 
             dimLevel.ValueChanged += dimLevel_ValueChanged;
             showStoryboard.ValueChanged += showStoryboard_ValueChanged;
@@ -357,7 +357,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(Screen next)
         {
-            if (!AllowPause || HasFailed || !ValidForResume || pauseContainer?.AllowExit != false || RulesetContainer?.HasReplayLoaded != false)
+            if (!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused != false || RulesetContainer?.HasReplayLoaded != false)
             {
                 // In the case of replays, we may have changed the playback rate.
                 applyRateFromMods();
@@ -388,7 +388,7 @@ namespace osu.Game.Screens.Play
                 initializeStoryboard(true);
 
             var beatmap = Beatmap.Value;
-            var storyboardVisible = showStoryboard && beatmap.Beatmap.Storyboard.HasDrawable;
+            var storyboardVisible = showStoryboard && beatmap.Storyboard.HasDrawable;
 
             storyboardContainer.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
             storyboardContainer.FadeTo(storyboardVisible && opacity > 0 ? 1 : 0);
