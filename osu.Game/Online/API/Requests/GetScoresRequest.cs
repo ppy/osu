@@ -69,25 +69,7 @@ namespace osu.Game.Online.API.Requests
                     break;
             }
 
-            switch (ruleset?.Name)
-            {
-                default:
-                case @"osu!":
-                    req.AddParameter(@"mode", @"osu");
-                    break;
-
-                case @"osu!taiko":
-                    req.AddParameter(@"mode", @"taiko");
-                    break;
-
-                case @"osu!catch":
-                    req.AddParameter(@"mode", @"catch");
-                    break;
-
-                case @"osu!mania":
-                    req.AddParameter(@"mode", @"mania");
-                    break;
-            }
+            req.AddParameter(@"mode", ruleset?.ShortName ?? @"osu");
 
             return req;
         }
