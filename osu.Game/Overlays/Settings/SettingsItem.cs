@@ -159,8 +159,6 @@ namespace osu.Game.Overlays.Settings
 
             public string TooltipText => "Revert to default";
 
-            public override bool HandleInput => true;
-
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;

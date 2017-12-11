@@ -34,7 +34,6 @@ namespace osu.Game.Screens.Select
         public IEnumerable<BeatmapSetInfo> Beatmaps
         {
             get { return groups.Select(g => g.BeatmapSet); }
-
             set
             {
                 scrollableContent.Clear(false);
@@ -45,14 +44,14 @@ namespace osu.Game.Screens.Select
 
                 Task.Run(() =>
                 {
-                    newGroups = value.Select(createGroup).ToList();
+                    newGroups = value.Select(createGroup).Where(g => g != null).ToList();
                     criteria.Filter(newGroups);
                 }).ContinueWith(t =>
                 {
                     Schedule(() =>
                     {
                         foreach (var g in newGroups)
-                            if (g != null) addGroup(g);
+                            addGroup(g);
 
                         computeYPositions();
                         BeatmapsChanged?.Invoke();
@@ -95,47 +94,31 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public void AddBeatmap(BeatmapSetInfo beatmapSet)
-        {
-            Schedule(() =>
-            {
-                var group = createGroup(beatmapSet);
-
-                if (group == null)
-                    return;
-
-                addGroup(group);
-                computeYPositions();
-                if (selectedGroup == null)
-                    selectGroup(group);
-            });
-        }
-
         public void RemoveBeatmap(BeatmapSetInfo beatmapSet)
         {
             Schedule(() => removeGroup(groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID)));
         }
 
-        public void UpdateBeatmap(BeatmapInfo beatmap)
+        public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            // todo: this method should not run more than once for the same BeatmapSetInfo.
-            var set = manager.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
-
             // todo: this method should be smarter as to not recreate panels that haven't changed, etc.
-            var group = groups.Find(b => b.BeatmapSet.ID == set.ID);
+            var oldGroup = groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID);
 
-            if (group == null)
-                return;
+            var newGroup = createGroup(beatmapSet);
 
-            int i = groups.IndexOf(group);
-            groups.RemoveAt(i);
-
-            var newGroup = createGroup(set);
+            int index = groups.IndexOf(oldGroup);
+            if (index >= 0)
+                groups.RemoveAt(index);
 
             if (newGroup != null)
-                groups.Insert(i, newGroup);
+            {
+                if (index >= 0)
+                    groups.Insert(index, newGroup);
+                else
+                    addGroup(newGroup);
+            }
 
-            bool hadSelection = selectedGroup == group;
+            bool hadSelection = selectedGroup == oldGroup;
 
             if (hadSelection && newGroup == null)
                 selectedGroup = null;
@@ -146,8 +129,10 @@ namespace osu.Game.Screens.Select
             if (hadSelection && newGroup != null)
             {
                 var newSelection =
-                    newGroup.BeatmapPanels.Find(p => p.Beatmap.ID == selectedPanel?.Beatmap.ID) ??
-                    newGroup.BeatmapPanels[Math.Min(newGroup.BeatmapPanels.Count - 1, group.BeatmapPanels.IndexOf(selectedPanel))];
+                    newGroup.BeatmapPanels.Find(p => p.Beatmap.ID == selectedPanel?.Beatmap.ID);
+
+                if(newSelection == null && oldGroup != null && selectedPanel != null)
+                    newSelection = newGroup.BeatmapPanels[Math.Min(newGroup.BeatmapPanels.Count - 1, oldGroup.BeatmapPanels.IndexOf(selectedPanel))];
 
                 selectGroup(newGroup, newSelection);
             }
@@ -305,8 +290,6 @@ namespace osu.Game.Screens.Select
             if (newCriteria != null)
                 criteria = newCriteria;
 
-            if (!IsLoaded) return;
-
             Action perform = delegate
             {
                 filterTask = null;
@@ -378,6 +361,10 @@ namespace osu.Game.Screens.Select
 
         private void addGroup(BeatmapGroup group)
         {
+            // prevent duplicates by concurrent independent actions trying to add a group
+            if (groups.Any(g => g.BeatmapSet.ID == group.BeatmapSet.ID))
+                return;
+
             groups.Add(group);
             panels.Add(group.Header);
             panels.AddRange(group.BeatmapPanels);

@@ -93,6 +93,8 @@ namespace osu.Game.Rulesets.Catch
 
         public override string Description => "osu!catch";
 
+        public override string ShortName => "fruits";
+
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_fruits_o };
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new CatchDifficultyCalculator(beatmap);
