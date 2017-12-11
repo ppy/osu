@@ -19,11 +19,6 @@ namespace osu.Game.Rulesets.Edit
 {
     public class SelectionLayer : CompositeDrawable
     {
-        private readonly static Color4 selection_normal_colour = Color4.White;
-        private readonly static Color4 selection_attached_colour = OsuColour.FromHex("eeaa00");
-
-        private readonly Container dragBox;
-
         private readonly Playfield playfield;
 
         public SelectionLayer(Playfield playfield)
@@ -31,56 +26,26 @@ namespace osu.Game.Rulesets.Edit
             this.playfield = playfield;
 
             RelativeSizeAxes = Axes.Both;
-
-            InternalChildren = new[]
-            {
-                dragBox = new Container
-                {
-                    Masking = true,
-                    BorderColour = Color4.White,
-                    BorderThickness = 2,
-                    MaskingSmoothness = 1,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.1f
-                    }
-                }
-            };
         }
 
-        private Vector2 dragStartPos;
-        private RectangleF dragRectangle;
-        private List<DrawableHitObject> capturedHitObjects = new List<DrawableHitObject>();
+        private DragBox dragBox;
 
         protected override bool OnDragStart(InputState state)
         {
-            dragStartPos = ToLocalSpace(state.Mouse.NativeState.Position);
-            dragBox.Position = dragStartPos;
-            dragBox.Size = Vector2.Zero;
-            dragBox.FadeTo(1);
-            dragBox.FadeColour(selection_normal_colour);
-            dragBox.BorderThickness = 2;
+            dragBox?.Hide();
+            AddInternal(dragBox = new DragBox(ToLocalSpace(state.Mouse.NativeState.Position)));
             return true;
         }
 
         protected override bool OnDrag(InputState state)
         {
-            var dragPos = ToLocalSpace(state.Mouse.NativeState.Position);
-            dragRectangle = RectangleF.FromLTRB(
-                Math.Min(dragStartPos.X, dragPos.X),
-                Math.Min(dragStartPos.Y, dragPos.Y),
-                Math.Max(dragStartPos.X, dragPos.X),
-                Math.Max(dragStartPos.Y, dragPos.Y));
-
-            dragBox.Position = dragRectangle.Location;
-            dragBox.Size = dragRectangle.Size;
+            dragBox.ExpandTo(ToLocalSpace(state.Mouse.NativeState.Position));
 
             updateCapturedHitObjects();
-
             return true;
         }
 
+        private List<DrawableHitObject> capturedHitObjects = new List<DrawableHitObject>();
         private void updateCapturedHitObjects()
         {
             capturedHitObjects.Clear();
@@ -90,8 +55,8 @@ namespace osu.Game.Rulesets.Edit
                 if (!obj.IsAlive || !obj.IsPresent)
                     continue;
 
-                var objectPosition = obj.Parent.ToScreenSpace(obj.SelectionPoint);
-                if (dragRectangle.Contains(ToLocalSpace(objectPosition)))
+                var objectPosition = obj.ToScreenSpace(obj.SelectionPoint);
+                if (dragBox.ScreenSpaceDrawQuad.Contains(objectPosition))
                     capturedHitObjects.Add(obj);
             }
         }
@@ -99,29 +64,82 @@ namespace osu.Game.Rulesets.Edit
         protected override bool OnDragEnd(InputState state)
         {
             if (capturedHitObjects.Count == 0)
-                dragBox.FadeOut(400, Easing.OutQuint);
+                dragBox.Hide();
             else
+                dragBox.Capture(capturedHitObjects);
+            return true;
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            dragBox?.Hide();
+            return true;
+        }
+    }
+
+    public class DragBox : CompositeDrawable
+    {
+        private readonly Drawable background;
+        private readonly Vector2 startPos;
+
+        public DragBox(Vector2 startPos)
+        {
+            this.startPos = startPos;
+
+            Masking = true;
+            BorderColour = Color4.White;
+            BorderThickness = 2;
+            MaskingSmoothness = 1;
+            InternalChild = background = new Box
             {
-                // Move the rectangle to cover the hitobjects
-                var topLeft = new Vector2(float.MaxValue, float.MaxValue);
-                var bottomRight = new Vector2(float.MinValue, float.MinValue);
+                RelativeSizeAxes = Axes.Both,
+                Alpha = 0.1f,
+                AlwaysPresent = true
+            };
+        }
 
-                foreach (var obj in capturedHitObjects)
-                {
-                    topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(obj.SelectionQuad.TopLeft));
-                    bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(obj.SelectionQuad.BottomRight));
-                }
+        public void ExpandTo(Vector2 position)
+        {
+            var trackingRectangle = RectangleF.FromLTRB(
+                Math.Min(startPos.X, position.X),
+                Math.Min(startPos.Y, position.Y),
+                Math.Max(startPos.X, position.X),
+                Math.Max(startPos.Y, position.Y));
 
-                topLeft -= new Vector2(5);
-                bottomRight += new Vector2(5);
+            Position = trackingRectangle.Location;
+            Size = trackingRectangle.Size;
+        }
 
-                dragBox.MoveTo(topLeft, 200, Easing.OutQuint)
-                       .ResizeTo(bottomRight - topLeft, 200, Easing.OutQuint)
-                       .FadeColour(selection_attached_colour, 200, Easing.OutQuint);
-                dragBox.BorderThickness = 3;
+        public void Capture(IEnumerable<DrawableHitObject> hitObjects)
+        {
+            // Move the rectangle to cover the hitobjects
+            var topLeft = new Vector2(float.MaxValue, float.MaxValue);
+            var bottomRight = new Vector2(float.MinValue, float.MinValue);
+
+            foreach (var obj in hitObjects)
+            {
+                topLeft = Vector2.ComponentMin(topLeft, Parent.ToLocalSpace(obj.SelectionQuad.TopLeft));
+                bottomRight = Vector2.ComponentMax(bottomRight, Parent.ToLocalSpace(obj.SelectionQuad.BottomRight));
             }
 
-            return true;
+            topLeft -= new Vector2(5);
+            bottomRight += new Vector2(5);
+
+            this.MoveTo(topLeft, 200, Easing.OutQuint)
+                .ResizeTo(bottomRight - topLeft, 200, Easing.OutQuint);
+
+            background.FadeOut(200);
+
+            BorderThickness = 3;
+        }
+
+        private bool isActive = true;
+        public override bool HandleInput => isActive;
+
+        public override void Hide()
+        {
+            isActive = false;
+            this.FadeOut(400, Easing.OutQuint).Expire();
         }
     }
 }
