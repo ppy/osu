@@ -93,6 +93,7 @@ namespace osu.Game.Database
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.ReferenceCount);
 
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Available);
+            modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.ShortName).IsUnique();
 
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
         }
