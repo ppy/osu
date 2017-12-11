@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Select
                     match &= set.Metadata.SearchableTerms.Any(term => term.IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) >= 0);
 
                 foreach (var panel in g.BeatmapPanels)
-                    panel.Filtered = !canConvert(panel.Beatmap);
+                    panel.Filtered.Value = !canConvert(panel.Beatmap);
 
                 switch (g.State)
                 {

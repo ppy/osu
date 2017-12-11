@@ -7,6 +7,7 @@ using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -157,8 +158,7 @@ namespace osu.Game.Beatmaps.Drawables
             if (panels == null)
                 throw new ArgumentNullException(nameof(panels));
 
-            foreach (var p in panels)
-                difficultyIcons.Add(new DifficultyIcon(p.Beatmap));
+            difficultyIcons.AddRange(panels.Select(p => new FilterableDifficultyIcon(p)));
         }
 
         public MenuItem[] ContextMenuItems
@@ -176,6 +176,19 @@ namespace osu.Game.Beatmaps.Drawables
                 items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke(beatmap.BeatmapSetInfo)));
 
                 return items.ToArray();
+            }
+        }
+
+        public class FilterableDifficultyIcon : DifficultyIcon
+        {
+            private readonly BindableBool filtered = new BindableBool();
+
+            public FilterableDifficultyIcon(BeatmapPanel panel)
+                : base(panel.Beatmap)
+            {
+                filtered.BindTo(panel.Filtered);
+                filtered.ValueChanged += v => this.FadeTo(v ? 0.1f : 1, 100);
+                filtered.TriggerChange();
             }
         }
     }
