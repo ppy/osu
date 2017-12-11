@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
@@ -34,14 +35,16 @@ namespace osu.Game.Beatmaps
             background = new AsyncLazy<Texture>(populateBackground, b => b == null || !b.IsDisposed);
             track = new AsyncLazy<Track>(populateTrack);
             waveform = new AsyncLazy<Waveform>(populateWaveform);
+            storyboard = new AsyncLazy<Storyboard>(populateStoryboard);
         }
 
         protected abstract Beatmap GetBeatmap();
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
         protected virtual Waveform GetWaveform() => new Waveform();
+        protected virtual Storyboard GetStoryboard() => new Storyboard();
 
-        public bool BeatmapLoaded => beatmap.IsValueCreated;
+        public bool BeatmapLoaded => beatmap.IsResultAvailable;
         public Beatmap Beatmap => beatmap.Value.Result;
         public async Task<Beatmap> GetBeatmapAsync() => await beatmap.Value;
 
@@ -57,14 +60,14 @@ namespace osu.Game.Beatmaps
             return b;
         }
 
-        public bool BackgroundLoaded => background.IsValueCreated;
+        public bool BackgroundLoaded => background.IsResultAvailable;
         public Texture Background => background.Value.Result;
         public async Task<Texture> GetBackgroundAsync() => await background.Value;
         private AsyncLazy<Texture> background;
 
         private Texture populateBackground() => GetBackground();
 
-        public bool TrackLoaded => track.IsValueCreated;
+        public bool TrackLoaded => track.IsResultAvailable;
         public Track Track => track.Value.Result;
         public async Task<Track> GetTrackAsync() => await track.Value;
         private AsyncLazy<Track> track;
@@ -77,19 +80,26 @@ namespace osu.Game.Beatmaps
             return t;
         }
 
-        public bool WaveformLoaded => waveform.IsValueCreated;
+        public bool WaveformLoaded => waveform.IsResultAvailable;
         public Waveform Waveform => waveform.Value.Result;
         public async Task<Waveform> GetWaveformAsync() => await waveform.Value;
         private readonly AsyncLazy<Waveform> waveform;
 
         private Waveform populateWaveform() => GetWaveform();
 
+        public bool StoryboardLoaded => storyboard.IsResultAvailable;
+        public Storyboard Storyboard => storyboard.Value.Result;
+        public async Task<Storyboard> GetStoryboardAsync() => await storyboard.Value;
+        private readonly AsyncLazy<Storyboard> storyboard;
+
+        private Storyboard populateStoryboard() => GetStoryboard();
+
         public void TransferTo(WorkingBeatmap other)
         {
-            if (track.IsValueCreated && Track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
+            if (track.IsResultAvailable && Track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
                 other.track = track;
 
-            if (background.IsValueCreated && Background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
+            if (background.IsResultAvailable && Background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
                 other.background = background;
         }
 
@@ -97,6 +107,7 @@ namespace osu.Game.Beatmaps
         {
             if (BackgroundLoaded) Background?.Dispose();
             if (WaveformLoaded) Waveform?.Dispose();
+            if (StoryboardLoaded) Storyboard?.Dispose();
         }
 
         /// <summary>
@@ -107,7 +118,7 @@ namespace osu.Game.Beatmaps
 
         private void applyRateAdjustments(Track t = null)
         {
-            if (t == null && track.IsValueCreated) t = Track;
+            if (t == null && track.IsResultAvailable) t = Track;
             if (t == null) return;
 
             t.ResetSpeedAdjustments();
@@ -128,23 +139,23 @@ namespace osu.Game.Beatmaps
                 this.valueFactory = valueFactory;
                 this.stillValidFunction = stillValidFunction;
 
-                init();
+                recreate();
             }
 
             public void Recycle()
             {
-                if (!IsValueCreated) return;
+                if (!IsResultAvailable) return;
 
                 (lazy.Value.Result as IDisposable)?.Dispose();
-                init();
+                recreate();
             }
 
-            public bool IsValueCreated
+            public bool IsResultAvailable
             {
                 get
                 {
-                    ensureValid();
-                    return lazy.IsValueCreated;
+                    recreateIfInvalid();
+                    return lazy.Value.IsCompleted;
                 }
             }
 
@@ -152,24 +163,28 @@ namespace osu.Game.Beatmaps
             {
                 get
                 {
-                    ensureValid();
+                    recreateIfInvalid();
                     return lazy.Value;
                 }
             }
 
-            private void ensureValid()
+            private void recreateIfInvalid()
             {
                 lock (initLock)
                 {
-                    if (!lazy.IsValueCreated || (stillValidFunction?.Invoke(lazy.Value.Result) ?? true)) return;
-                    init();
+                    if (!lazy.IsValueCreated || !lazy.Value.IsCompleted)
+                        // we have not yet been initialised or haven't run the task.
+                        return;
+
+                    if (stillValidFunction?.Invoke(lazy.Value.Result) ?? true)
+                        // we are still in a valid state.
+                        return;
+
+                    recreate();
                 }
             }
 
-            private void init()
-            {
-                lazy = new Lazy<Task<T>>(() => Task.Run(valueFactory));
-            }
+            private void recreate() => lazy = new Lazy<Task<T>>(() => Task.Run(valueFactory));
         }
     }
 }

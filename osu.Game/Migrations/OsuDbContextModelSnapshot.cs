@@ -247,9 +247,14 @@ namespace osu.Game.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<string>("ShortName");
+
                     b.HasKey("ID");
 
                     b.HasIndex("Available");
+
+                    b.HasIndex("ShortName")
+                        .IsUnique();
 
                     b.ToTable("RulesetInfo");
                 });

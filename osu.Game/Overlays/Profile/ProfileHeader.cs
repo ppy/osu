@@ -380,7 +380,7 @@ namespace osu.Game.Overlays.Profile
             }
 
             tryAddInfoRightLine(FontAwesome.fa_map_marker, user.Location);
-            tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Intrerests);
+            tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Interests);
             tryAddInfoRightLine(FontAwesome.fa_suitcase, user.Occupation);
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))

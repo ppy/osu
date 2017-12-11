@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -9,7 +10,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapMetadata
+    public class BeatmapMetadata : IEquatable<BeatmapMetadata>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
@@ -66,5 +67,23 @@ namespace osu.Game.Beatmaps
             Source,
             Tags
         }.Where(s => !string.IsNullOrEmpty(s)).ToArray();
+
+        public bool Equals(BeatmapMetadata other)
+        {
+            if (other == null)
+                return false;
+
+            return onlineBeatmapSetID == other.onlineBeatmapSetID
+                && Title == other.Title
+                && TitleUnicode == other.TitleUnicode
+                && Artist == other.Artist
+                && ArtistUnicode == other.ArtistUnicode
+                && AuthorString == other.AuthorString
+                && Source == other.Source
+                && Tags == other.Tags
+                && PreviewTime == other.PreviewTime
+                && AudioFile == other.AudioFile
+                && BackgroundFile == other.BackgroundFile;
+        }
     }
 }
