@@ -13,7 +13,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public abstract class DrawableBeatmapRow : Container
+    public abstract class DrawableProfileRow : Container
     {
         private const int fade_duration = 200;
 
@@ -21,14 +21,17 @@ namespace osu.Game.Overlays.Profile.Sections
         private readonly Box coloredBackground;
         private readonly Container background;
 
-        protected abstract Drawable CreatePicture();
+        /// <summary>
+        /// A visual element displayed to the left of <see cref="LeftFlowContainer"/> content.
+        /// </summary>
+        protected abstract Drawable CreateLeftVisual();
 
         protected FillFlowContainer LeftFlowContainer { get; private set; }
         protected FillFlowContainer RightFlowContainer { get; private set; }
 
         protected override Container<Drawable> Content { get; }
 
-        protected DrawableBeatmapRow()
+        protected DrawableProfileRow()
         {
             RelativeSizeAxes = Axes.X;
             Height = 60;
@@ -77,7 +80,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     Direction = FillDirection.Horizontal,
                     Children = new[]
                     {
-                        CreatePicture(),
+                        CreateLeftVisual(),
                         LeftFlowContainer = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,

@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
                 foreach (var beatmap in beatmaps)
                 {
-                    ItemsContainer.Add(new MostPlayedBeatmapDrawable(beatmap.GetBeatmapInfo(Rulesets), beatmap.PlayCount));
+                    ItemsContainer.Add(new DrawableMostPlayedRow(beatmap.GetBeatmapInfo(Rulesets), beatmap.PlayCount));
                 }
             };
 

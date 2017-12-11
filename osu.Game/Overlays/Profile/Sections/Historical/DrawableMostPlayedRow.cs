@@ -14,19 +14,19 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public class MostPlayedBeatmapDrawable : DrawableBeatmapRow
+    public class DrawableMostPlayedRow : DrawableProfileRow
     {
         private readonly BeatmapInfo beatmap;
         private readonly int playCount;
         private OsuHoverContainer mapperContainer;
 
-        public MostPlayedBeatmapDrawable(BeatmapInfo beatmap, int playCount)
+        public DrawableMostPlayedRow(BeatmapInfo beatmap, int playCount)
         {
             this.beatmap = beatmap;
             this.playCount = playCount;
         }
 
-        protected override Drawable CreatePicture() => new Container
+        protected override Drawable CreateLeftVisual() => new Container
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,
