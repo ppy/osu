@@ -14,7 +14,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public abstract class DrawableScore : DrawableBeatmapRow
+    public abstract class DrawableScore : DrawableProfileRow
     {
         private readonly FillFlowContainer metadata;
         private readonly ScoreModsContainer modsContainer;
@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.5f) });
         }
 
-        protected override Drawable CreatePicture() => new DrawableRank(Score.Rank)
+        protected override Drawable CreateLeftVisual() => new DrawableRank(Score.Rank)
         {
             RelativeSizeAxes = Axes.Y,
             Width = 60,

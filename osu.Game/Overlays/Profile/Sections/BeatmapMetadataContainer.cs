@@ -11,6 +11,9 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 namespace osu.Game.Overlays.Profile.Sections
 {
+    /// <summary>
+    /// Display artist/title/mapper information, commonly used as the left portion of a profile or score display row (see <see cref="DrawableProfileRow"/>).
+    /// </summary>
     public class BeatmapMetadataContainer : OsuHoverContainer, IHasTooltip
     {
         private readonly BeatmapInfo beatmap;
