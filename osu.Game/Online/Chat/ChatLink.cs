@@ -23,6 +23,10 @@ namespace osu.Game.Online.Chat
 {
     public class ChatLink : OsuLinkSpriteText, IHasTooltip
     {
+        /// <summary>
+        /// Identifier unique to every link in a message.
+        /// <para>A value of -1 means that this <see cref="ChatLink"/> instance does not contain a link.</para>
+        /// </summary>
         public int LinkId = -1;
 
         private APIAccess api;
@@ -32,7 +36,6 @@ namespace osu.Game.Online.Chat
         private Color4 hoverColour;
         private Color4 urlColour;
 
-        private readonly Container content;
         private readonly HoverClickSounds hoverClickSounds;
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         protected IEnumerable<ChatLink> SameLinkSprites { get; private set; }
 
-        protected override Container<Drawable> Content => content ?? base.Content;
+        public override bool HandleInput => LinkId != -1;
 
         protected override bool OnClick(InputState state)
         {
@@ -175,11 +178,6 @@ namespace osu.Game.Online.Chat
         public ChatLink()
         {
             hoverClickSounds = new HoverClickSounds();
-
-            AddInternal(content = new Container
-            {
-                AutoSizeAxes = Axes.Both,
-            });
 
             OnLoadComplete = d =>
             {
