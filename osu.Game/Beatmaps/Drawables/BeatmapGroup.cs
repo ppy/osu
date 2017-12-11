@@ -40,6 +40,7 @@ namespace osu.Game.Beatmaps.Drawables
         public BeatmapSetInfo BeatmapSet;
 
         private BeatmapGroupState state;
+
         public BeatmapGroupState State
         {
             get { return state; }
@@ -52,7 +53,8 @@ namespace osu.Game.Beatmaps.Drawables
                     case BeatmapGroupState.Expanded:
                         Header.State = PanelSelectedState.Selected;
                         foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.State = panel == SelectedPanel ? PanelSelectedState.Selected : PanelSelectedState.NotSelected;
+                            panel.State = panel == SelectedPanel ? PanelSelectedState.Selected :
+                                !panel.Filtered ? PanelSelectedState.NotSelected : PanelSelectedState.Hidden;
                         break;
                     case BeatmapGroupState.Collapsed:
                         Header.State = PanelSelectedState.NotSelected;
@@ -108,7 +110,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             //we want to make sure one of our children is selected in the case none have been selected yet.
             if (SelectedPanel == null)
-                BeatmapPanels.First().State = PanelSelectedState.Selected;
+                BeatmapPanels.First(p => !p.Filtered).State = PanelSelectedState.Selected;
         }
 
         private void panelGainedSelection(BeatmapPanel panel)

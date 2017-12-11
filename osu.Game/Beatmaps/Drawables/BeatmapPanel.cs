@@ -61,6 +61,8 @@ namespace osu.Game.Beatmaps.Drawables
             return base.OnClick(state);
         }
 
+        public bool Filtered { get; set; }
+
         protected override void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
         {
             if (!IsLoaded) return;
