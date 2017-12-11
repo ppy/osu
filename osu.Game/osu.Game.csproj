@@ -285,6 +285,10 @@
     <Compile Include="Migrations\20171119065731_AddBeatmapOnlineIDUniqueConstraint.Designer.cs">
       <DependentUpon>20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20171209034410_AddRulesetInfoShortName.cs" />
+    <Compile Include="Migrations\20171209034410_AddRulesetInfoShortName.Designer.cs">
+      <DependentUpon>20171209034410_AddRulesetInfoShortName.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\APIResponseBeatmapSet.cs" />

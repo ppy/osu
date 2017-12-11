@@ -23,13 +23,12 @@ namespace osu.Game.Rulesets
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
         public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
-                                                // Get all mod types as an IEnumerable<ModType>
-                                                .SelectMany(GetModsFor)
-                                                // Confine all mods of each mod type into a single IEnumerable<Mod>
-                                                .Where(mod => mod != null)
-                                                // Filter out all null mods
-                                                .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
-                                                // Resolve MultiMods as their .Mods property
+                                                    // Confine all mods of each mod type into a single IEnumerable<Mod>
+                                                    .SelectMany(GetModsFor)
+                                                    // Filter out all null mods
+                                                    .Where(mod => mod != null)
+                                                    // Resolve MultiMods as their .Mods property
+                                                    .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
@@ -65,6 +64,11 @@ namespace osu.Game.Rulesets
         /// Do not override this unless you are a legacy mode.
         /// </summary>
         public virtual int LegacyID => -1;
+
+        /// <summary>
+        /// A unique short name to reference this ruleset in online requests.
+        /// </summary>
+        public abstract string ShortName { get; }
 
         /// <summary>
         /// A list of available variant ids.
