@@ -15,7 +15,14 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseHistoricalSection : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new [] { typeof(HistoricalSection), typeof(PaginatedMostPlayedBeatmapContainer), typeof(DrawableMostPlayedRow) };
+        public override IReadOnlyList<Type> RequiredTypes =>
+            new[]
+            {
+                typeof(HistoricalSection),
+                typeof(PaginatedMostPlayedBeatmapContainer),
+                typeof(DrawableMostPlayedRow),
+                typeof(DrawableProfileRow)
+            };
 
         public TestCaseHistoricalSection()
         {
