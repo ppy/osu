@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using System.Threading;
 using OpenTK;
 using OpenTK.Input;
@@ -203,8 +204,23 @@ namespace osu.Game.Screens.Select
             Push(new Editor());
         }
 
-        private void onBeatmapRestored(BeatmapInfo b) => Schedule(() => carousel.UpdateBeatmap(b));
-        private void onBeatmapHidden(BeatmapInfo b) => Schedule(() => carousel.UpdateBeatmap(b));
+        private void onBeatmapRestored(BeatmapInfo beatmap)
+        {
+            Schedule(() =>
+            {
+                var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
+                carousel.UpdateBeatmapSet(beatmapSet);
+            });
+        }
+
+        private void onBeatmapHidden(BeatmapInfo beatmap)
+        {
+            Schedule(() =>
+            {
+                var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
+                carousel.UpdateBeatmapSet(beatmapSet);
+            });
+        }
 
         private void carouselBeatmapsLoaded()
         {
@@ -255,10 +271,10 @@ namespace osu.Game.Screens.Select
                 UpdateBeatmap(Beatmap.Value);
             };
 
-            selectionChangedDebounce?.Cancel();
-
             if (beatmap?.Equals(beatmapNoDebounce) == true)
                 return;
+
+            selectionChangedDebounce?.Cancel();
 
             beatmapNoDebounce = beatmap;
 
@@ -293,7 +309,14 @@ namespace osu.Game.Screens.Select
             carousel.Filter(criteria, debounce);
         }
 
-        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => addBeatmapSet(s));
+        private void onBeatmapSetAdded(BeatmapSetInfo s)
+        {
+            Schedule(() =>
+            {
+                carousel.UpdateBeatmapSet(s);
+                carousel.SelectBeatmap(s.Beatmaps.First());
+            });
+        }
 
         private void onBeatmapSetRemoved(BeatmapSetInfo s) => Schedule(() => removeBeatmapSet(s));
 
@@ -435,8 +458,6 @@ namespace osu.Game.Screens.Select
                 track.Start();
             }
         }
-
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet) => carousel.AddBeatmap(beatmapSet);
 
         private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
         {
