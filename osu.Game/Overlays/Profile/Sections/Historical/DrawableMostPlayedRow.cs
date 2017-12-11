@@ -4,13 +4,11 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
@@ -26,24 +24,19 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             this.playCount = playCount;
         }
 
-        protected override Drawable CreateLeftVisual() => new Container
+        protected override Drawable CreateLeftVisual() => new DelayedLoadWrapper(new BeatmapSetCover(beatmap.BeatmapSet, BeatmapSetCoverType.List)
         {
-            Anchor = Anchor.CentreLeft,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            FillMode = FillMode.Fit,
+            RelativeSizeAxes = Axes.Both,
+            OnLoadComplete = d => d.FadeInFromZero(500, Easing.OutQuint)
+        })
+        {
             Origin = Anchor.CentreLeft,
-            AutoSizeAxes = Axes.Both,
-            Children = new Drawable[]
-            {
-                new Box //Image Background while loading
-                {
-                    Size = new Vector2(80, 50),
-                    Colour = Color4.Black,
-                },
-                new DelayedLoadWrapper(new BeatmapSetCover(beatmap.BeatmapSet, BeatmapSetCoverType.List)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fit,
-                }),
-            },
+            Anchor = Anchor.CentreLeft,
+            RelativeSizeAxes = Axes.None,
+            Size = new Vector2(80, 50),
         };
 
         [BackgroundDependencyLoader(true)]
@@ -105,7 +98,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 }
             });
 
-            if(profileOverlay != null)
+            if (profileOverlay != null)
                 mapperContainer.Action = () => profileOverlay.ShowUser(beatmap.BeatmapSet.Metadata.Author);
         }
     }
