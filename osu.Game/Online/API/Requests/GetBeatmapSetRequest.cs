@@ -3,7 +3,7 @@
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetBeatmapSetRequest : APIRequest<GetBeatmapSetsResponse>
+    public class GetBeatmapSetRequest : APIRequest<APIResponseBeatmapSet>
     {
         private readonly int beatmapSetId;
 
