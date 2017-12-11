@@ -17,6 +17,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -490,8 +491,20 @@ namespace osu.Game.Overlays.Profile
         {
             public string TooltipText => "View Profile in Browser";
 
+            private readonly OsuHoverContainer content;
+
+            protected override Container<Drawable> Content => content ?? (Container<Drawable>)this;
+
+            public override bool HandleInput => true;
+
             public ProfileLink(User user)
             {
+                AddInternal(content = new OsuHoverContainer
+                {
+                    Action = OnLinkClicked,
+                    AutoSizeAxes = Axes.Both,
+                });
+
                 Text = user.Username;
                 Url = $@"https://osu.ppy.sh/users/{user.Id}";
                 Font = @"Exo2.0-RegularItalic";
