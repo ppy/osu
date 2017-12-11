@@ -84,24 +84,36 @@ namespace osu.Game.Rulesets.Edit
 
             InternalChildren = new Drawable[]
             {
-                borderMask = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    BorderColour = Color4.White,
-                    BorderThickness = 2,
-                    MaskingSmoothness = 1,
-                    Child = background = new Box
+                    Padding = new MarginPadding(-1),
+                    Child = borderMask = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.1f,
-                        AlwaysPresent = true
-                    },
+                        Masking = true,
+                        BorderColour = Color4.White,
+                        BorderThickness = 2,
+                        MaskingSmoothness = 1,
+                        Child = background = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0.1f,
+                            AlwaysPresent = true
+                        },
+                    }
                 },
                 markers = new MarkerContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0
+                    Alpha = 0,
+                    GetCaptureRectangle = () => trackingRectangle,
+                    UpdateCapture = r =>
+                    {
+                        trackRectangle(r);
+                        UpdateCapture();
+                    },
+                    FinishCapture = FinishCapture
                 }
             };
         }
@@ -112,16 +124,20 @@ namespace osu.Game.Rulesets.Edit
             captureFinishedColour = colours.Yellow;
         }
 
-        public void Track(Vector2 position)
-        {
-            var trackingRectangle = RectangleF.FromLTRB(
-                Math.Min(startPos.X, position.X),
-                Math.Min(startPos.Y, position.Y),
-                Math.Max(startPos.X, position.X),
-                Math.Max(startPos.Y, position.Y));
+        public void Track(Vector2 position) => trackRectangle(RectangleF.FromLTRB(startPos.X, startPos.Y, position.X, position.Y));
 
-            Position = trackingRectangle.Location;
-            Size = trackingRectangle.Size;
+        private RectangleF trackingRectangle;
+        private void trackRectangle(RectangleF rectangle)
+        {
+            trackingRectangle = rectangle;
+
+            Position = new Vector2(
+                Math.Min(rectangle.Left, rectangle.Right),
+                Math.Min(rectangle.Top, rectangle.Bottom));
+
+            Size = new Vector2(
+                Math.Max(rectangle.Left, rectangle.Right) - Position.X,
+                Math.Max(rectangle.Top, rectangle.Bottom) - Position.Y);
         }
 
         private List<DrawableHitObject> capturedHitObjects = new List<DrawableHitObject>();
@@ -144,6 +160,12 @@ namespace osu.Game.Rulesets.Edit
 
         public void FinishCapture()
         {
+            if (CapturedHitObjects.Count == 0)
+            {
+                Hide();
+                return;
+            }
+
             // Move the rectangle to cover the hitobjects
             var topLeft = new Vector2(float.MaxValue, float.MaxValue);
             var bottomRight = new Vector2(float.MinValue, float.MinValue);
@@ -158,10 +180,12 @@ namespace osu.Game.Rulesets.Edit
             bottomRight += new Vector2(5);
 
             this.MoveTo(topLeft, 200, Easing.OutQuint)
-                .ResizeTo(bottomRight - topLeft, 200, Easing.OutQuint)
-                .FadeColour(captureFinishedColour, 200);
+                .ResizeTo(bottomRight - topLeft, 200, Easing.OutQuint);
+
+            trackingRectangle = RectangleF.FromLTRB(topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y);
 
             borderMask.BorderThickness = 3;
+            borderMask.FadeColour(captureFinishedColour, 200);
 
             background.Delay(50).FadeOut(200);
             markers.FadeIn(200);
@@ -179,12 +203,12 @@ namespace osu.Game.Rulesets.Edit
 
     public class MarkerContainer : CompositeDrawable
     {
-        public Action<RectangleF> ResizeRequested;
+        public Func<RectangleF> GetCaptureRectangle;
+        public Action<RectangleF> UpdateCapture;
+        public Action FinishCapture;
 
         public MarkerContainer()
         {
-            Padding = new MarginPadding(1);
-
             InternalChildren = new Drawable[]
             {
                 new Marker
@@ -194,7 +218,17 @@ namespace osu.Game.Rulesets.Edit
                 },
                 new Marker
                 {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.Centre
+                },
+                new Marker
+                {
                     Anchor = Anchor.TopRight,
+                    Origin = Anchor.Centre
+                },
+                new Marker
+                {
+                    Anchor = Anchor.CentreLeft,
                     Origin = Anchor.Centre
                 },
                 new Marker
@@ -204,7 +238,17 @@ namespace osu.Game.Rulesets.Edit
                 },
                 new Marker
                 {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.Centre
+                },
+                new Marker
+                {
                     Anchor = Anchor.BottomRight,
+                    Origin = Anchor.Centre
+                },
+                new Marker
+                {
+                    Anchor = Anchor.BottomCentre,
                     Origin = Anchor.Centre
                 },
                 new CentreMarker
@@ -213,11 +257,22 @@ namespace osu.Game.Rulesets.Edit
                     Origin = Anchor.Centre
                 }
             };
+
+            InternalChildren.OfType<Marker>().ForEach(m =>
+            {
+                m.GetCaptureRectangle = () => GetCaptureRectangle();
+                m.UpdateCapture = r => UpdateCapture(r);
+                m.FinishCapture = () => FinishCapture();
+            });
         }
     }
 
     public class Marker : CompositeDrawable
     {
+        public Func<RectangleF> GetCaptureRectangle;
+        public Action<RectangleF> UpdateCapture;
+        public Action FinishCapture;
+
         private float marker_size = 10;
 
         public Marker()
@@ -230,6 +285,44 @@ namespace osu.Game.Rulesets.Edit
                 Masking = true,
                 Child = new Box { RelativeSizeAxes = Axes.Both }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            Colour = colours.Yellow;
+        }
+
+        protected override bool OnDragStart(InputState state) => true;
+
+        protected override bool OnDrag(InputState state)
+        {
+            var currentRectangle = GetCaptureRectangle();
+
+            float left = currentRectangle.Left;
+            float right = currentRectangle.Right;
+            float top = currentRectangle.Top;
+            float bottom = currentRectangle.Bottom;
+
+            // Apply modifications to the capture rectangle
+            if ((Anchor & Anchor.y0) > 0)
+                top += state.Mouse.Delta.Y;
+            else if ((Anchor & Anchor.y2) > 0)
+                bottom += state.Mouse.Delta.Y;
+
+            if ((Anchor & Anchor.x0) > 0)
+                left += state.Mouse.Delta.X;
+            else if ((Anchor & Anchor.x2) > 0)
+                right += state.Mouse.Delta.X;
+
+            UpdateCapture(RectangleF.FromLTRB(left, top, right, bottom));
+            return true;
+        }
+
+        protected override bool OnDragEnd(InputState state)
+        {
+            FinishCapture();
+            return true;
         }
     }
 
@@ -259,6 +352,12 @@ namespace osu.Game.Rulesets.Edit
                     Width = line_width
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            Colour = colours.Yellow;
         }
     }
 }
