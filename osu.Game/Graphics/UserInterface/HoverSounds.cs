@@ -30,8 +30,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(InputState state)
         {
-            // If Parent does not implement the interface, still play the sample
-            if ((Parent as ICanDisableHoverSounds)?.ShouldPlayHoverSound != false) sampleHover?.Play();
+            sampleHover?.Play();
             return base.OnHover(state);
         }
 
@@ -50,14 +49,5 @@ namespace osu.Game.Graphics.UserInterface
         Normal,
         [Description("-softer")]
         Soft
-    }
-
-    /// <summary>
-    /// Classes implementing this interface can choose whether or not the HoverSounds should be played.
-    /// <para>If this is not implemented, the sounds will always be played when OnHover is triggered.</para>
-    /// </summary>
-    public interface ICanDisableHoverSounds
-    {
-        bool ShouldPlayHoverSound { get; }
     }
 }
