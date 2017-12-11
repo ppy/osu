@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserMostPlayedBeatmapsRequest : APIRequest<List<UserMostPlayedBeatmapsResponse>>
+    public class GetUserMostPlayedBeatmapsRequest : APIRequest<List<MostPlayedBeatmap>>
     {
         private readonly long userId;
         private readonly int offset;
@@ -22,7 +22,7 @@ namespace osu.Game.Online.API.Requests
         protected override string Target => $@"users/{userId}/beatmapsets/most_played?offset={offset}";
     }
 
-    public class UserMostPlayedBeatmapsResponse
+    public class MostPlayedBeatmap
     {
         [JsonProperty("beatmap_id")]
         public int BeatmapID;
