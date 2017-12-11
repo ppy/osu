@@ -327,6 +327,8 @@ namespace osu.Game.Screens.Select
 
                 computeYPositions();
 
+                selectedGroup?.UpdateState();
+
                 if (selectedGroup == null || selectedGroup.State == BeatmapGroupState.Hidden)
                     SelectNext();
                 else
@@ -441,11 +443,13 @@ namespace osu.Game.Screens.Select
 
                         panel.MoveToX(-50, 500, Easing.OutExpo);
 
+                        bool isHidden = panel.State == PanelSelectedState.Hidden;
+
                         //on first display we want to begin hidden under our group's header.
-                        if (panel.Filtered || panel.Alpha == 0)
+                        if (isHidden || panel.Alpha == 0)
                             panel.MoveToY(headerY);
 
-                        movePanel(panel, !panel.Filtered, animated, ref currentY);
+                        movePanel(panel, !isHidden, animated, ref currentY);
                     }
                 }
                 else
@@ -479,7 +483,7 @@ namespace osu.Game.Screens.Select
         {
             try
             {
-                if (panel == null)
+                if (panel == null || panel.Filtered == true)
                     panel = group.BeatmapPanels.First(p => !p.Filtered);
 
                 if (selectedPanel == panel) return;
