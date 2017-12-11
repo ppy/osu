@@ -141,8 +141,6 @@ namespace osu.Game.Screens.Play
 
             public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
-            public override bool HandleInput => true;
-
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyDown(state, args));
 
             protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyUp(state, args));
