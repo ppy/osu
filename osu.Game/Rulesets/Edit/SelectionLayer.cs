@@ -269,11 +269,14 @@ namespace osu.Game.Rulesets.Edit
 
     public class Marker : CompositeDrawable
     {
+        private const float marker_size = 10;
+
         public Func<RectangleF> GetCaptureRectangle;
         public Action<RectangleF> UpdateCapture;
         public Action FinishCapture;
 
-        private float marker_size = 10;
+        private Color4 normalColour;
+        private Color4 hoverColour;
 
         public Marker()
         {
@@ -290,7 +293,8 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Colour = colours.Yellow;
+            Colour = normalColour = colours.Yellow;
+            hoverColour = colours.YellowDarker;
         }
 
         protected override bool OnDragStart(InputState state) => true;
@@ -324,12 +328,23 @@ namespace osu.Game.Rulesets.Edit
             FinishCapture();
             return true;
         }
+
+        protected override bool OnHover(InputState state)
+        {
+            this.FadeColour(hoverColour, 100);
+            return true;
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            this.FadeColour(normalColour, 100);
+        }
     }
 
     public class CentreMarker : CompositeDrawable
     {
-        private float marker_size = 10;
-        private float line_width = 2;
+        private const float marker_size = 10;
+        private const float line_width = 2;
 
         public CentreMarker()
         {
