@@ -115,8 +115,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
                 if (!obj.IsAlive || !obj.IsPresent)
                     continue;
 
-                var objectPosition = obj.ToScreenSpace(obj.SelectionPoint);
-                if (ScreenSpaceDrawQuad.Contains(objectPosition))
+                if (ScreenSpaceDrawQuad.Contains(obj.SelectionPoint))
                     capturedHitObjects.Add(obj);
             }
         }
