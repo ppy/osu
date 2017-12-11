@@ -7,12 +7,10 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Tests.Visual
 {
@@ -22,22 +20,24 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseEditorSelectionLayer()
         {
-            var playfield = new OsuEditPlayfield();
-            playfield.Add(new DrawableHitCircle(new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f }));
-            playfield.Add(new DrawableHitCircle(new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f }));
-            playfield.Add(new DrawableSlider(new Slider
+            var playfield = new OsuEditPlayfield
             {
-                ControlPoints = new List<Vector2>
+                new DrawableHitCircle(new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f }),
+                new DrawableHitCircle(new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f }),
+                new DrawableSlider(new Slider
                 {
-                    new Vector2(128, 256),
-                    new Vector2(344, 256),
-                },
-                Distance = 400,
-                Position = new Vector2(128, 256),
-                Velocity = 1,
-                TickDistance = 100,
-                Scale = 0.5f
-            }));
+                    ControlPoints = new List<Vector2>
+                    {
+                        new Vector2(128, 256),
+                        new Vector2(344, 256),
+                    },
+                    Distance = 400,
+                    Position = new Vector2(128, 256),
+                    Velocity = 1,
+                    TickDistance = 100,
+                    Scale = 0.5f
+                })
+            };
 
             Children = new Drawable[]
             {
