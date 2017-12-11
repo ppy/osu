@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawableTotalScore : DrawableScore
+    public class DrawableTotalScore : DrawableProfileScore
     {
         public DrawableTotalScore(Score score)
             : base(score)

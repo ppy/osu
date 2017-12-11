@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawablePerformanceScore : DrawableScore
+    public class DrawablePerformanceScore : DrawableProfileScore
     {
         private readonly double? weight;
 

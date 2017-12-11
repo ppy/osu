@@ -488,7 +488,7 @@
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
-    <Compile Include="Overlays\Profile\Sections\Ranks\DrawableScore.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\DrawableProfileScore.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />
     <Compile Include="Overlays\Profile\ProfileSection.cs" />
     <Compile Include="Overlays\Profile\RankChart.cs" />
