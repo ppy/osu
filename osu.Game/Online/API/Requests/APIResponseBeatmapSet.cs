@@ -45,7 +45,7 @@ namespace osu.Game.Online.API.Requests
         }
 
         [JsonProperty(@"beatmaps")]
-        private IEnumerable<APIResponseSetsBeatmap> beatmaps { get; set; }
+        private IEnumerable<APIResponseBeatmap> beatmaps { get; set; }
 
         public BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
         {
@@ -69,7 +69,7 @@ namespace osu.Game.Online.API.Requests
             };
         }
 
-        private class APIResponseSetsBeatmap : BeatmapMetadata
+        private class APIResponseBeatmap : BeatmapMetadata
         {
             [JsonProperty(@"id")]
             private int onlineBeatmapID { get; set; }
