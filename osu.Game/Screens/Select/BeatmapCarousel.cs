@@ -436,18 +436,16 @@ namespace osu.Game.Screens.Select
 
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
                     {
-                        if (panel.Filtered) continue;
-
                         if (panel == selectedPanel)
                             selectedY = currentY + panel.DrawHeight / 2 - DrawHeight / 2;
 
                         panel.MoveToX(-50, 500, Easing.OutExpo);
 
                         //on first display we want to begin hidden under our group's header.
-                        if (panel.Alpha == 0)
+                        if (panel.Filtered || panel.Alpha == 0)
                             panel.MoveToY(headerY);
 
-                        movePanel(panel, true, animated, ref currentY);
+                        movePanel(panel, !panel.Filtered, animated, ref currentY);
                     }
                 }
                 else
