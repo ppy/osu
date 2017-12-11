@@ -93,7 +93,7 @@ namespace osu.Game.Beatmaps.Drawables
                 RelativeSizeAxes = Axes.X,
             };
 
-            BeatmapPanels = BeatmapSet.Beatmaps.Where(b => !b.Hidden).OrderBy(b => b.StarDifficulty).Select(b => new BeatmapPanel(b)
+            BeatmapPanels = BeatmapSet.Beatmaps.Where(b => !b.Hidden).OrderBy(b => b.RulesetID).ThenBy(b => b.StarDifficulty).Select(b => new BeatmapPanel(b)
             {
                 Alpha = 0,
                 GainedSelection = panelGainedSelection,
