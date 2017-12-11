@@ -47,28 +47,31 @@ namespace osu.Game.Beatmaps.Drawables
             set
             {
                 state = value;
-
-                switch (value)
-                {
-                    case BeatmapGroupState.Expanded:
-                        Header.State = PanelSelectedState.Selected;
-                        foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.State = panel == SelectedPanel ? PanelSelectedState.Selected :
-                                !panel.Filtered ? PanelSelectedState.NotSelected : PanelSelectedState.Hidden;
-                        break;
-                    case BeatmapGroupState.Collapsed:
-                        Header.State = PanelSelectedState.NotSelected;
-                        foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.State = PanelSelectedState.Hidden;
-                        break;
-                    case BeatmapGroupState.Hidden:
-                        Header.State = PanelSelectedState.Hidden;
-                        foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.State = PanelSelectedState.Hidden;
-                        break;
-                }
-
+                UpdateState();
                 StateChanged?.Invoke(state);
+            }
+        }
+
+        public void UpdateState()
+        {
+            switch (state)
+            {
+                case BeatmapGroupState.Expanded:
+                    Header.State = PanelSelectedState.Selected;
+                    foreach (BeatmapPanel panel in BeatmapPanels)
+                        panel.State = panel == SelectedPanel ? PanelSelectedState.Selected :
+                            !panel.Filtered ? PanelSelectedState.NotSelected : PanelSelectedState.Hidden;
+                    break;
+                case BeatmapGroupState.Collapsed:
+                    Header.State = PanelSelectedState.NotSelected;
+                    foreach (BeatmapPanel panel in BeatmapPanels)
+                        panel.State = PanelSelectedState.Hidden;
+                    break;
+                case BeatmapGroupState.Hidden:
+                    Header.State = PanelSelectedState.Hidden;
+                    foreach (BeatmapPanel panel in BeatmapPanels)
+                        panel.State = PanelSelectedState.Hidden;
+                    break;
             }
         }
 
