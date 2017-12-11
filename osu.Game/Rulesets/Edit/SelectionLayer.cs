@@ -14,6 +14,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using System.Linq;
 using osu.Game.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -28,45 +30,32 @@ namespace osu.Game.Rulesets.Edit
             RelativeSizeAxes = Axes.Both;
         }
 
-        private DragBox dragBox;
+        private DragContainer dragBox;
 
         protected override bool OnDragStart(InputState state)
         {
             dragBox?.Hide();
-            AddInternal(dragBox = new DragBox(ToLocalSpace(state.Mouse.NativeState.Position)));
+            AddInternal(dragBox = new DragContainer(ToLocalSpace(state.Mouse.NativeState.Position))
+            {
+                CapturableObjects = playfield.HitObjects.Objects
+            });
+
             return true;
         }
 
         protected override bool OnDrag(InputState state)
         {
-            dragBox.ExpandTo(ToLocalSpace(state.Mouse.NativeState.Position));
-
-            updateCapturedHitObjects();
+            dragBox.Track(ToLocalSpace(state.Mouse.NativeState.Position));
+            dragBox.UpdateCapture();
             return true;
-        }
-
-        private List<DrawableHitObject> capturedHitObjects = new List<DrawableHitObject>();
-        private void updateCapturedHitObjects()
-        {
-            capturedHitObjects.Clear();
-
-            foreach (var obj in playfield.HitObjects.Objects)
-            {
-                if (!obj.IsAlive || !obj.IsPresent)
-                    continue;
-
-                var objectPosition = obj.ToScreenSpace(obj.SelectionPoint);
-                if (dragBox.ScreenSpaceDrawQuad.Contains(objectPosition))
-                    capturedHitObjects.Add(obj);
-            }
         }
 
         protected override bool OnDragEnd(InputState state)
         {
-            if (capturedHitObjects.Count == 0)
+            if (dragBox.CapturedHitObjects.Count == 0)
                 dragBox.Hide();
             else
-                dragBox.Capture(capturedHitObjects);
+                dragBox.FinishCapture();
             return true;
         }
 
@@ -77,28 +66,53 @@ namespace osu.Game.Rulesets.Edit
         }
     }
 
-    public class DragBox : CompositeDrawable
+    public class DragContainer : CompositeDrawable
     {
+        public IEnumerable<DrawableHitObject> CapturableObjects;
+
+        private readonly Container borderMask;
         private readonly Drawable background;
+        private readonly MarkerContainer markers;
+
+        private Color4 captureFinishedColour;
+
         private readonly Vector2 startPos;
 
-        public DragBox(Vector2 startPos)
+        public DragContainer(Vector2 startPos)
         {
             this.startPos = startPos;
 
-            Masking = true;
-            BorderColour = Color4.White;
-            BorderThickness = 2;
-            MaskingSmoothness = 1;
-            InternalChild = background = new Box
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0.1f,
-                AlwaysPresent = true
+                borderMask = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    BorderColour = Color4.White,
+                    BorderThickness = 2,
+                    MaskingSmoothness = 1,
+                    Child = background = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.1f,
+                        AlwaysPresent = true
+                    },
+                },
+                markers = new MarkerContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0
+                }
             };
         }
 
-        public void ExpandTo(Vector2 position)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            captureFinishedColour = colours.Yellow;
+        }
+
+        public void Track(Vector2 position)
         {
             var trackingRectangle = RectangleF.FromLTRB(
                 Math.Min(startPos.X, position.X),
@@ -110,13 +124,31 @@ namespace osu.Game.Rulesets.Edit
             Size = trackingRectangle.Size;
         }
 
-        public void Capture(IEnumerable<DrawableHitObject> hitObjects)
+        private List<DrawableHitObject> capturedHitObjects = new List<DrawableHitObject>();
+        public IReadOnlyList<DrawableHitObject> CapturedHitObjects => capturedHitObjects;
+
+        public void UpdateCapture()
+        {
+            capturedHitObjects.Clear();
+
+            foreach (var obj in CapturableObjects)
+            {
+                if (!obj.IsAlive || !obj.IsPresent)
+                    continue;
+
+                var objectPosition = obj.ToScreenSpace(obj.SelectionPoint);
+                if (ScreenSpaceDrawQuad.Contains(objectPosition))
+                    capturedHitObjects.Add(obj);
+            }
+        }
+
+        public void FinishCapture()
         {
             // Move the rectangle to cover the hitobjects
             var topLeft = new Vector2(float.MaxValue, float.MaxValue);
             var bottomRight = new Vector2(float.MinValue, float.MinValue);
 
-            foreach (var obj in hitObjects)
+            foreach (var obj in capturedHitObjects)
             {
                 topLeft = Vector2.ComponentMin(topLeft, Parent.ToLocalSpace(obj.SelectionQuad.TopLeft));
                 bottomRight = Vector2.ComponentMax(bottomRight, Parent.ToLocalSpace(obj.SelectionQuad.BottomRight));
@@ -126,11 +158,13 @@ namespace osu.Game.Rulesets.Edit
             bottomRight += new Vector2(5);
 
             this.MoveTo(topLeft, 200, Easing.OutQuint)
-                .ResizeTo(bottomRight - topLeft, 200, Easing.OutQuint);
+                .ResizeTo(bottomRight - topLeft, 200, Easing.OutQuint)
+                .FadeColour(captureFinishedColour, 200);
 
-            background.FadeOut(200);
+            borderMask.BorderThickness = 3;
 
-            BorderThickness = 3;
+            background.Delay(50).FadeOut(200);
+            markers.FadeIn(200);
         }
 
         private bool isActive = true;
@@ -140,6 +174,91 @@ namespace osu.Game.Rulesets.Edit
         {
             isActive = false;
             this.FadeOut(400, Easing.OutQuint).Expire();
+        }
+    }
+
+    public class MarkerContainer : CompositeDrawable
+    {
+        public Action<RectangleF> ResizeRequested;
+
+        public MarkerContainer()
+        {
+            Padding = new MarginPadding(1);
+
+            InternalChildren = new Drawable[]
+            {
+                new Marker
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.Centre
+                },
+                new Marker
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.Centre
+                },
+                new Marker
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.Centre
+                },
+                new Marker
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.Centre
+                },
+                new CentreMarker
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                }
+            };
+        }
+    }
+
+    public class Marker : CompositeDrawable
+    {
+        private float marker_size = 10;
+
+        public Marker()
+        {
+            Size = new Vector2(marker_size);
+
+            InternalChild = new CircularContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Child = new Box { RelativeSizeAxes = Axes.Both }
+            };
+        }
+    }
+
+    public class CentreMarker : CompositeDrawable
+    {
+        private float marker_size = 10;
+        private float line_width = 2;
+
+        public CentreMarker()
+        {
+            Size = new Vector2(marker_size);
+
+            InternalChildren = new[]
+            {
+                new Box
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.X,
+                    Height = line_width
+                },
+                new Box
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = line_width
+                },
+            };
         }
     }
 }
