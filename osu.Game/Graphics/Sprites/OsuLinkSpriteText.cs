@@ -13,18 +13,12 @@ namespace osu.Game.Graphics.Sprites
 {
     public class OsuLinkSpriteText : OsuSpriteText
     {
-        private readonly OsuClickableContainer content;
-
-        public override bool HandleInput => content.Action != null;
-
-        protected override Container<Drawable> Content => content ?? (Container<Drawable>)this;
-
         protected override IEnumerable<Drawable> FlowingChildren => Children;
 
         protected override bool OnClick(InputState state)
         {
             OnLinkClicked();
-            return true;
+            return base.OnClick(state);
         }
 
         private string url;
@@ -40,14 +34,6 @@ namespace osu.Game.Graphics.Sprites
                 if (!string.IsNullOrEmpty(value))
                     url = value;
             }
-        }
-
-        public OsuLinkSpriteText()
-        {
-            AddInternal(content = new OsuClickableContainer
-            {
-                AutoSizeAxes = Axes.Both,
-            });
         }
 
         public ColourInfo TextColour
