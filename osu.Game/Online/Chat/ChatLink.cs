@@ -18,6 +18,7 @@ using osu.Game.Overlays;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace osu.Game.Online.Chat
 {
@@ -133,23 +134,7 @@ namespace osu.Game.Online.Chat
                 base.OnLinkClicked();
         }
 
-        private int getIdFromUrl(string url)
-        {
-            var lastSlashIndex = url.LastIndexOf('/');
-            // Remove possible trailing slash
-            if (lastSlashIndex == url.Length)
-            {
-                url = url.Remove(url.Length - 1);
-                lastSlashIndex = url.LastIndexOf('/');
-            }
-
-            var lastQuestionMarkIndex = url.LastIndexOf('?');
-            // Filter out possible queries like mode specifications (e.g. /b/252238?m=0)
-            if (lastQuestionMarkIndex > lastSlashIndex)
-                url = url.Remove(lastQuestionMarkIndex);
-
-            return int.Parse(url.Substring(lastSlashIndex + 1));
-        }
+        private int getIdFromUrl(string url) => int.Parse(Regex.Match(url, @"\/(\d+)\/?").Groups[1].Value);
 
         public string TooltipText
         {
