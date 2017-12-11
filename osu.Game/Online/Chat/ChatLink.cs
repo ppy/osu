@@ -32,7 +32,8 @@ namespace osu.Game.Online.Chat
         private Color4 hoverColour;
         private Color4 urlColour;
 
-        private readonly ChatHoverContainer content;
+        private readonly Container content;
+        private readonly HoverClickSounds hoverClickSounds;
 
         /// <summary>
         /// Every other sprite in the containing ChatLine that represents the same link.
@@ -40,6 +41,12 @@ namespace osu.Game.Online.Chat
         protected IEnumerable<ChatLink> SameLinkSprites { get; private set; }
 
         protected override Container<Drawable> Content => content ?? base.Content;
+
+        protected override bool OnClick(InputState state)
+        {
+            hoverClickSounds.TriggerOnClick(state);
+            return base.OnClick(state);
+        }
 
         protected override void OnLinkClicked()
         {
@@ -167,7 +174,9 @@ namespace osu.Game.Online.Chat
 
         public ChatLink()
         {
-            AddInternal(content = new ChatHoverContainer
+            hoverClickSounds = new HoverClickSounds();
+
+            AddInternal(content = new Container
             {
                 AutoSizeAxes = Axes.Both,
             });
@@ -182,8 +191,12 @@ namespace osu.Game.Online.Chat
         protected override bool OnHover(InputState state)
         {
             if (!SameLinkSprites.Any(sprite => sprite.IsHovered))
+            {
+                hoverClickSounds.TriggerOnHover(state);
+
                 foreach (ChatLink sprite in SameLinkSprites)
                     sprite.TriggerOnHover(state);
+            }
 
             Content.FadeColour(hoverColour, 500, Easing.OutQuint);
 
@@ -210,6 +223,9 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load(APIAccess api, BeatmapSetOverlay beatmapSetOverlay, ChatOverlay chat, OsuColour colours)
         {
+            // Should be ok, inexpensive operation
+            LoadComponentAsync(hoverClickSounds);
+
             this.api = api;
             this.beatmapSetOverlay = beatmapSetOverlay;
             this.chat = chat;
@@ -218,11 +234,6 @@ namespace osu.Game.Online.Chat
             urlColour = colours.Blue;
             if (LinkId != -1)
                 Content.Colour = urlColour;
-        }
-
-        private class ChatHoverContainer : OsuHoverContainer
-        {
-            
         }
     }
 }

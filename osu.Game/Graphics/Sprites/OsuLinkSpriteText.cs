@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Game.Graphics.Containers;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,13 +13,19 @@ namespace osu.Game.Graphics.Sprites
 {
     public class OsuLinkSpriteText : OsuSpriteText
     {
-        private readonly OsuHoverContainer content;
+        private readonly OsuClickableContainer content;
 
         public override bool HandleInput => content.Action != null;
 
         protected override Container<Drawable> Content => content ?? (Container<Drawable>)this;
 
         protected override IEnumerable<Drawable> FlowingChildren => Children;
+
+        protected override bool OnClick(InputState state)
+        {
+            OnLinkClicked();
+            return true;
+        }
 
         private string url;
 
@@ -31,17 +38,13 @@ namespace osu.Game.Graphics.Sprites
             set
             {
                 if (!string.IsNullOrEmpty(value))
-                {
                     url = value;
-
-                    content.Action = OnLinkClicked;
-                }
             }
         }
 
         public OsuLinkSpriteText()
         {
-            AddInternal(content = new OsuHoverContainer
+            AddInternal(content = new OsuClickableContainer
             {
                 AutoSizeAxes = Axes.Both,
             });
