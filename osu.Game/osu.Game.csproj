@@ -310,6 +310,11 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\CentreMarker.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\DragSelector.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\Marker.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\MarkerContainer.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionLayer.cs" />
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
     <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
     <Compile Include="Screens\Edit\Components\TimeInfoContainer.cs" />
@@ -573,7 +578,6 @@
     <Compile Include="Rulesets\Edit\Tools\HitObjectCompositionTool.cs" />
     <Compile Include="Rulesets\Edit\Tools\ICompositionTool.cs" />
     <Compile Include="Rulesets\Edit\HitObjectComposer.cs" />
-    <Compile Include="Rulesets\Edit\SelectionLayer.cs" />
     <Compile Include="Rulesets\Edit\ToolboxGroup.cs" />
     <Compile Include="Rulesets\Judgements\DrawableJudgement.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
