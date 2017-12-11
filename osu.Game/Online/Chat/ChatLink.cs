@@ -4,6 +4,7 @@
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
@@ -180,15 +181,13 @@ namespace osu.Game.Online.Chat
 
         protected override bool OnHover(InputState state)
         {
-            var hoverResult = base.OnHover(state);
-
             if (!SameLinkSprites.Any(sprite => sprite.IsHovered))
                 foreach (ChatLink sprite in SameLinkSprites)
                     sprite.TriggerOnHover(state);
 
             Content.FadeColour(hoverColour, 500, Easing.OutQuint);
 
-            return hoverResult;
+            return true;
         }
 
         protected override void OnHoverLost(InputState state)
@@ -221,9 +220,9 @@ namespace osu.Game.Online.Chat
                 Content.Colour = urlColour;
         }
 
-        private class ChatHoverContainer : OsuHoverContainer, ICanDisableHoverSounds
+        private class ChatHoverContainer : OsuHoverContainer
         {
-            public bool ShouldPlayHoverSound => ((ChatLink)Parent).SameLinkSprites.All(sprite => !sprite.IsHovered);
+            
         }
     }
 }
