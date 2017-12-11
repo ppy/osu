@@ -14,13 +14,13 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public abstract class DrawableScore : DrawableProfileRow
+    public abstract class DrawableProfileScore : DrawableProfileRow
     {
         private readonly FillFlowContainer metadata;
         private readonly ScoreModsContainer modsContainer;
         protected readonly Score Score;
 
-        protected DrawableScore(Score score)
+        protected DrawableProfileScore(Score score)
         {
             Score = score;
 
