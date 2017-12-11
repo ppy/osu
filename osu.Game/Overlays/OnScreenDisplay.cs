@@ -21,6 +21,8 @@ namespace osu.Game.Overlays
     {
         private readonly Container box;
 
+        public override bool HandleInput => false;
+
         private readonly SpriteText textLine1;
         private readonly SpriteText textLine2;
         private readonly SpriteText textLine3;
