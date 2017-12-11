@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public Drawable ProxiedLayer => initialCircle.ApproachCircle;
 
-        public override Vector2 SelectionPoint => body.Position;
+        public override Vector2 SelectionPoint => ToScreenSpace(body.Position);
         public override Quad SelectionQuad => body.PathDrawQuad;
     }
 

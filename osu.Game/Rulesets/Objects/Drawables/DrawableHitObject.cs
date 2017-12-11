@@ -42,12 +42,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// The local point that causes this <see cref="DrawableHitObject"/> to be selected in the Editor.
+        /// The screen-space point that causes this <see cref="DrawableHitObject"/> to be selected in the Editor.
         /// </summary>
-        public virtual Vector2 SelectionPoint => DrawSize / 2f;
+        public virtual Vector2 SelectionPoint => ScreenSpaceDrawQuad.Centre;
 
         /// <summary>
-        /// The local rectangle that outlines this <see cref="DrawableHitObject"/> for selections in the Editor.
+        /// The screen-space quad that outlines this <see cref="DrawableHitObject"/> for selections in the Editor.
         /// </summary>
         public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
     }
