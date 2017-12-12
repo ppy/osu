@@ -262,10 +262,7 @@
     <Compile Include="Beatmaps\ControlPoints\TimingControlPoint.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
@@ -316,7 +313,6 @@
     <Compile Include="Rulesets\Mods\IApplicableToScoreProcessor.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
-    <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
     <Compile Include="Beatmaps\Formats\Decoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoder.cs" />
@@ -756,6 +752,14 @@
     <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
     <Compile Include="Screens\Select\BeatmapDetails.cs" />
     <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselBeatmap.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselBeatmapSet.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselGroup.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselGroupEagerSelect.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselItem.cs" />
+    <Compile Include="Screens\Select\Carousel\DrawableCarouselBeatmap.cs" />
+    <Compile Include="Screens\Select\Carousel\DrawableCarouselBeatmapSet.cs" />
+    <Compile Include="Screens\Select\Carousel\DrawableCarouselItem.cs" />
     <Compile Include="Screens\Select\Details\AdvancedStats.cs" />
     <Compile Include="Screens\Select\Details\FailRetryGraph.cs" />
     <Compile Include="Screens\Select\Details\UserRatings.cs" />
