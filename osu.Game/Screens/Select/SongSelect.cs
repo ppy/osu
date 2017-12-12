@@ -309,14 +309,7 @@ namespace osu.Game.Screens.Select
             carousel.Filter(criteria, debounce);
         }
 
-        private void onBeatmapSetAdded(BeatmapSetInfo s)
-        {
-            Schedule(() =>
-            {
-                carousel.UpdateBeatmapSet(s);
-                carousel.SelectBeatmap(s.Beatmaps.First());
-            });
-        }
+        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => carousel.UpdateBeatmapSet(s));
 
         private void onBeatmapSetRemoved(BeatmapSetInfo s) => Schedule(() => removeBeatmapSet(s));
 
