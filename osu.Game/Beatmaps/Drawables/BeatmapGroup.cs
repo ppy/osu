@@ -59,8 +59,12 @@ namespace osu.Game.Beatmaps.Drawables
                 case BeatmapGroupState.Expanded:
                     Header.State = PanelSelectedState.Selected;
                     foreach (BeatmapPanel panel in BeatmapPanels)
-                        panel.State = panel == SelectedPanel ? PanelSelectedState.Selected :
-                            !panel.Filtered ? PanelSelectedState.NotSelected : PanelSelectedState.Hidden;
+                        if (panel == SelectedPanel)
+                            panel.State = PanelSelectedState.Selected;
+                        else if (panel.Filtered)
+                            panel.State = PanelSelectedState.Hidden;
+                        else
+                            panel.State = PanelSelectedState.NotSelected;
                     break;
                 case BeatmapGroupState.Collapsed:
                     Header.State = PanelSelectedState.NotSelected;
