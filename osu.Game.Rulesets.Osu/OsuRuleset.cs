@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.OsuDifficulty;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
@@ -18,6 +17,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Legacy.Osu;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -37,14 +37,14 @@ namespace osu.Game.Rulesets.Osu
         {
             new BeatmapStatistic
             {
-                Name = @"Circle count",
-                Content = beatmap.Beatmap.HitObjects.Count(h => h is HitCircle).ToString(),
+                Name = @"Circle Count",
+                Content = beatmap.Beatmap.HitObjects.Count(h => h is ConvertHit).ToString(),
                 Icon = FontAwesome.fa_dot_circle_o
             },
             new BeatmapStatistic
             {
-                Name = @"Slider count",
-                Content = beatmap.Beatmap.HitObjects.Count(h => h is Slider).ToString(),
+                Name = @"Slider Count",
+                Content = beatmap.Beatmap.HitObjects.Count(h => h is ConvertSlider).ToString(),
                 Icon = FontAwesome.fa_circle_o
             }
         };
