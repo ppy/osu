@@ -34,10 +34,10 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                     KeyboardStep = 1f
                 },
-                new SettingsEnumDropdown<SongSelectRandomMode>
+                new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
-                    LabelText = "Random beatmap selection",
-                    Bindable = config.GetBindable<SongSelectRandomMode>(OsuSetting.SelectionRandomType),
+                    LabelText = "Random selection algorithm",
+                    Bindable = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
                 }
             };
         }

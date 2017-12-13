@@ -343,7 +343,7 @@
     <Compile Include="Configuration\ReleaseStream.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ScreenshotFormat.cs" />
-    <Compile Include="Configuration\SongSelectRandomMode.cs" />
+    <Compile Include="Configuration\RandomSelectAlgorithm.cs" />
     <Compile Include="Database\DatabaseBackedStore.cs" />
     <Compile Include="Database\OsuDbContext.cs" />
     <Compile Include="Graphics\Backgrounds\Background.cs" />

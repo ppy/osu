@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Select
 
         private readonly List<CarouselBeatmapSet> carouselSets = new List<CarouselBeatmapSet>();
 
-        private Bindable<SongSelectRandomMode> randomType;
+        private Bindable<RandomSelectAlgorithm> randomSelectAlgorithm;
         private readonly List<CarouselBeatmapSet> seenSets = new List<CarouselBeatmapSet>();
 
         private List<DrawableCarouselItem> items = new List<DrawableCarouselItem>();
@@ -221,7 +221,7 @@ namespace osu.Game.Screens.Select
 
             CarouselBeatmapSet group;
 
-            if (randomType == SongSelectRandomMode.RandomPermutation)
+            if (randomSelectAlgorithm == RandomSelectAlgorithm.RandomPermutation)
             {
                 var notSeenGroups = visibleGroups.Except(seenSets);
                 if (!notSeenGroups.Any())
@@ -338,7 +338,6 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config)
         {
-            randomType = config.GetBindable<SongSelectRandomMode>(OsuSetting.SelectionRandomType);
         }
 
         private void addBeatmapSet(CarouselBeatmapSet set)
@@ -350,6 +349,7 @@ namespace osu.Game.Screens.Select
 
             //todo: add to root
             carouselSets.Add(set);
+            randomSelectAlgorithm = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm);
         }
 
         private void removeBeatmapSet(CarouselBeatmapSet set)
