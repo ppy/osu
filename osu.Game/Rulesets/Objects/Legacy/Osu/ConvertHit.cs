@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
     /// <summary>
     /// Legacy osu! Hit-type, used for parsing Beatmaps.
     /// </summary>
-    public sealed class ConvertHit : HitObject, IHasPosition, IHasCombo
+    internal sealed class ConvertHit : HitObject, IHasPosition, IHasCombo
     {
         public Vector2 Position { get; set; }
 
