@@ -9,7 +9,6 @@ using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
@@ -18,7 +17,7 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseBeatmapCarousel : OsuTestCase
     {
-        private BeatmapCarousel carousel;
+        private TestBeatmapCarousel carousel;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -38,7 +37,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(carousel = new BeatmapCarousel
+            Add(carousel = new TestBeatmapCarousel
             {
                 RelativeSizeAxes = Axes.Both,
             });
@@ -47,36 +46,66 @@ namespace osu.Game.Tests.Visual
             {
                 carousel.Beatmaps = new[]
                 {
-                    createTestBeatmapSet(0),
                     createTestBeatmapSet(1),
                     createTestBeatmapSet(2),
                     createTestBeatmapSet(3),
+                    createTestBeatmapSet(4),
                 };
             });
 
+            void checkSelected(int set, int diff) =>
+                AddAssert($"selected is set{set} diff{diff}", () =>
+                    carousel.SelectedBeatmap == carousel.Beatmaps.Skip(set - 1).First().Beatmaps.Skip(diff - 1).First());
+
+            void advanceSelection(bool diff, int direction = 1, int count = 1)
+            {
+                if (count == 1)
+                    AddStep($"select {(direction > 0 ? "next" : "prev")} {(diff ? "diff" : "set")}", () =>
+                        carousel.SelectNext(direction, !diff));
+                else
+                {
+                    AddRepeatStep($"select {(direction > 0 ? "next" : "prev")} {(diff ? "diff" : "set")}", () =>
+                        carousel.SelectNext(direction, !diff), count);
+                }
+            }
+
+            void checkVisibleItemCount(bool diff, int count) =>
+                AddAssert($"{count} {(diff ? "diff" : "set")} visible", () =>
+                    carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
+
             AddUntilStep(() => carousel.Beatmaps.Any(), "Wait for load");
 
-            AddStep("SelectNext set", () => carousel.SelectNext());
-            AddAssert("set1 diff1", () => carousel.SelectedBeatmap == carousel.Beatmaps.First().Beatmaps.First());
+            advanceSelection(direction: 1, diff: false);
+            checkSelected(1, 1);
 
-            AddStep("SelectNext diff", () => carousel.SelectNext(1, false));
-            AddAssert("set1 diff2", () => carousel.SelectedBeatmap == carousel.Beatmaps.First().Beatmaps.Skip(1).First());
+            advanceSelection(direction: 1, diff: true);
+            checkSelected(1, 2);
 
-            AddStep("SelectNext backwards", () => carousel.SelectNext(-1));
-            AddAssert("set4 diff1", () => carousel.SelectedBeatmap == carousel.Beatmaps.Last().Beatmaps.First());
+            advanceSelection(direction: -1, diff: false);
+            checkSelected(4, 1);
 
-            AddStep("SelectNext diff backwards", () => carousel.SelectNext(-1, false));
-            AddAssert("set3 diff3", () => carousel.SelectedBeatmap == carousel.Beatmaps.Reverse().Skip(1).First().Beatmaps.Last());
+            advanceSelection(direction: -1, diff: true);
+            checkSelected(3, 3);
 
-            AddStep("SelectNext", () => carousel.SelectNext());
-            AddStep("SelectNext", () => carousel.SelectNext());
-            AddAssert("set1 diff1", () => carousel.SelectedBeatmap == carousel.Beatmaps.First().Beatmaps.First());
+            advanceSelection(diff: false);
+            advanceSelection(diff: false);
+            checkSelected(1, 1);
 
-            AddStep("SelectNext diff backwards", () => carousel.SelectNext(-1, false));
-            AddAssert("set4 diff3", () => carousel.SelectedBeatmap == carousel.Beatmaps.Last().Beatmaps.Last());
+            advanceSelection(direction: -1, diff: true);
+            checkSelected(4, 3);
 
-            // AddStep("Clear beatmaps", () => carousel.Beatmaps = new BeatmapSetInfo[] { });
-            // AddStep("SelectNext (noop)", () => carousel.SelectNext());
+            AddStep("Filter", () => carousel.Filter(new FilterCriteria { SearchText = "set #3" }, false));
+            checkVisibleItemCount(diff: false, count: 1);
+            checkVisibleItemCount(diff: true, count: 3);
+            checkSelected(3, 1);
+
+            advanceSelection(diff: true, count: 4);
+            checkSelected(3, 2);
+
+            AddStep("Un-filter (debounce)", () => carousel.Filter(new FilterCriteria()));
+            AddUntilStep(() => !carousel.PendingFilterTask, "Wait for debounce");
+            checkVisibleItemCount(diff: false, count: 4);
+            checkVisibleItemCount(diff: true, count: 3);
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
@@ -89,9 +118,9 @@ namespace osu.Game.Tests.Visual
                 {
                     OnlineBeatmapSetID = 1234 + i,
                     // Create random metadata, then we can check if sorting works based on these
-                    Artist = "MONACA " + RNG.Next(0, 9),
-                    Title = "Black Song " + RNG.Next(0, 9),
-                    AuthorString = "Some Guy " + RNG.Next(0, 9),
+                    Artist = "peppy",
+                    Title = "test set #" + i,
+                    AuthorString = "peppy"
                 },
                 Beatmaps = new List<BeatmapInfo>(new[]
                 {
@@ -127,6 +156,13 @@ namespace osu.Game.Tests.Visual
                     },
                 }),
             };
+        }
+
+        private class TestBeatmapCarousel : BeatmapCarousel
+        {
+            public new List<DrawableCarouselItem> Items => base.Items;
+
+            public bool PendingFilterTask => FilterTask != null;
         }
     }
 }
