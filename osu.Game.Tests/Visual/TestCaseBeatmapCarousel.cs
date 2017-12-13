@@ -57,6 +57,10 @@ namespace osu.Game.Tests.Visual
                 AddAssert($"selected is set{set} diff{diff}", () =>
                     carousel.SelectedBeatmap == carousel.Beatmaps.Skip(set - 1).First().Beatmaps.Skip(diff - 1).First());
 
+            void setSelected(int set, int diff) =>
+                AddStep($"select set{set} diff{diff}", () =>
+                    carousel.SelectBeatmap(carousel.Beatmaps.Skip(set - 1).First().Beatmaps.Skip(diff - 1).First()));
+
             void advanceSelection(bool diff, int direction = 1, int count = 1)
             {
                 if (count == 1)
@@ -106,6 +110,8 @@ namespace osu.Game.Tests.Visual
             AddUntilStep(() => !carousel.PendingFilterTask, "Wait for debounce");
             checkVisibleItemCount(diff: false, count: 4);
             checkVisibleItemCount(diff: true, count: 3);
+
+            setSelected(1, diff: 2);
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
