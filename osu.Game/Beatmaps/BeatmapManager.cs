@@ -64,6 +64,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public WorkingBeatmap DefaultBeatmap { private get; set; }
 
+        public bool IsConsoleLogger {get; set;}
         private readonly Storage storage;
 
         private BeatmapStore createBeatmapStore(Func<OsuDbContext> context)
@@ -131,29 +132,37 @@ namespace osu.Game.Beatmaps
         /// <param name="paths">One or more beatmap locations on disk.</param>
         public void Import(params string[] paths)
         {
-            var notification = new ProgressNotification
+            ProgressNotification notification = null;
+            if(IsConsoleLogger == false)
             {
-                Text = "Beatmap import is initialising...",
-                Progress = 0,
-                State = ProgressNotificationState.Active,
-            };
+                notification =  new ProgressNotification
+                {
+                    Text = "Beatmap import is initialising...",
+                    Progress = 0,
+                    State = ProgressNotificationState.Active,
+                };
+                  PostNotification?.Invoke(notification);
 
-            PostNotification?.Invoke(notification);
+            }
 
             int i = 0;
             foreach (string path in paths)
             {
-                if (notification.State == ProgressNotificationState.Cancelled)
+                if (notification!=null && notification.State == ProgressNotificationState.Cancelled)
                     // user requested abort
                     return;
-
+                i++;
                 try
                 {
-                    notification.Text = $"Importing ({i} of {paths.Length})\n{Path.GetFileName(path)}";
+                    if(notification != null)
+                        notification.Text = $"Importing ({i} of {paths.Length})\n{Path.GetFileName(path)}";
+                    else
+                        Console.WriteLine("Importing {0} {1}/{2}", Path.GetFileName(path), i, paths.Length);
                     using (ArchiveReader reader = getReaderFrom(path))
                         Import(reader);
 
-                    notification.Progress = (float)++i / paths.Length;
+                    if(notification != null)
+                        notification.Progress = (float)++i / paths.Length;
 
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with beatmaps from default storage.
@@ -175,8 +184,10 @@ namespace osu.Game.Beatmaps
                     Logger.Error(e, $@"Could not import beatmap set ({Path.GetFileName(path)})");
                 }
             }
-
-            notification.State = ProgressNotificationState.Completed;
+            if(notification != null)
+                notification.State = ProgressNotificationState.Completed;
+            else
+                Console.WriteLine("Import Complate!");
         }
 
         private readonly Lazy<OsuDbContext> importContext;
