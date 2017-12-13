@@ -454,7 +454,7 @@ namespace osu.Game.Screens.Select
 
         private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            carousel.RemoveBeatmap(beatmapSet);
+            carousel.RemoveBeatmapSet(beatmapSet);
             if (carousel.SelectedBeatmap == null)
                 Beatmap.SetDefault();
         }

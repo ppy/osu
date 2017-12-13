@@ -46,12 +46,10 @@ namespace osu.Game.Screens.Select.Carousel
             RestoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
             DeleteRequested = manager.Delete;
 
-            var working = manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault());
-
             Children = new Drawable[]
             {
                 new DelayedLoadWrapper(
-                    new PanelBackground(working)
+                    new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                     {
                         RelativeSizeAxes = Axes.Both,
                         OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
