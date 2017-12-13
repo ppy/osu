@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     scrollableContent.Clear(false);
-                    items.Clear();
+                    Items.Clear();
                     carouselSets.Clear();
                     yPositionsCache.Invalidate();
                 });
@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select
                         carouselSets.AddRange(newSets);
 
                         root = new CarouselGroup(newSets.OfType<CarouselItem>().ToList());
-                        items = root.Drawables.Value.ToList();
+                        Items = root.Drawables.Value.ToList();
 
                         yPositionsCache.Invalidate();
                         BeatmapsChanged?.Invoke();
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Select
         private Bindable<RandomSelectAlgorithm> randomSelectAlgorithm;
         private readonly List<CarouselBeatmapSet> seenSets = new List<CarouselBeatmapSet>();
 
-        private List<DrawableCarouselItem> items = new List<DrawableCarouselItem>();
+        protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
         private CarouselGroup root = new CarouselGroup();
 
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
@@ -192,15 +192,15 @@ namespace osu.Game.Screens.Select
                 return;
             }
 
-            int originalIndex = items.IndexOf(selectedBeatmap?.Drawables.Value.First());
+            int originalIndex = Items.IndexOf(selectedBeatmap?.Drawables.Value.First());
             int currentIndex = originalIndex;
 
             // local function to increment the index in the required direction, wrapping over extremities.
-            int incrementIndex() => currentIndex = (currentIndex + direction + items.Count) % items.Count;
+            int incrementIndex() => currentIndex = (currentIndex + direction + Items.Count) % Items.Count;
 
             while (incrementIndex() != originalIndex)
             {
-                var item = items[currentIndex].Item;
+                var item = Items[currentIndex].Item;
 
                 if (item.Filtered || item.State == CarouselItemState.Selected) continue;
 
@@ -272,13 +272,13 @@ namespace osu.Game.Screens.Select
 
         private FilterCriteria criteria = new FilterCriteria();
 
-        private ScheduledDelegate filterTask;
+        protected ScheduledDelegate FilterTask;
 
         public bool AllowSelection = true;
 
         public void FlushPendingFilters()
         {
-            if (filterTask?.Completed == false)
+            if (FilterTask?.Completed == false)
                 Filter(null, false);
         }
 
@@ -289,7 +289,7 @@ namespace osu.Game.Screens.Select
 
             Action perform = delegate
             {
-                filterTask = null;
+                FilterTask = null;
 
                 carouselSets.ForEach(s => s.Filter(criteria));
 
@@ -301,11 +301,11 @@ namespace osu.Game.Screens.Select
                     select(selectedBeatmap);
             };
 
-            filterTask?.Cancel();
-            filterTask = null;
+            FilterTask?.Cancel();
+            FilterTask = null;
 
             if (debounce)
-                filterTask = Scheduler.AddDelayed(perform, 250);
+                FilterTask = Scheduler.AddDelayed(perform, 250);
             else
                 perform();
         }
@@ -362,7 +362,7 @@ namespace osu.Game.Screens.Select
 
             foreach (var d in set.Drawables.Value)
             {
-                items.Remove(d);
+                Items.Remove(d);
                 scrollableContent.Remove(d);
             }
 
@@ -385,7 +385,7 @@ namespace osu.Game.Screens.Select
 
             float lastSetY = 0;
 
-            foreach (DrawableCarouselItem d in items)
+            foreach (DrawableCarouselItem d in Items)
             {
                 switch (d)
                 {
@@ -474,7 +474,7 @@ namespace osu.Game.Screens.Select
             });
 
             // Find index range of all items that should be on-screen
-            Trace.Assert(items.Count == yPositions.Count);
+            Trace.Assert(Items.Count == yPositions.Count);
 
             int firstIndex = yPositions.BinarySearch(Current - DrawableCarouselItem.MAX_HEIGHT);
             if (firstIndex < 0) firstIndex = ~firstIndex;
@@ -484,21 +484,21 @@ namespace osu.Game.Screens.Select
                 lastIndex = ~lastIndex;
 
                 // Add the first item of the last visible beatmap group to preload its data.
-                if (lastIndex != 0 && items[lastIndex - 1] is DrawableCarouselBeatmapSet)
+                if (lastIndex != 0 && Items[lastIndex - 1] is DrawableCarouselBeatmapSet)
                     lastIndex++;
             }
 
             // Add those items within the previously found index range that should be displayed.
             for (int i = firstIndex; i < lastIndex; ++i)
             {
-                DrawableCarouselItem item = items[i];
+                DrawableCarouselItem item = Items[i];
 
                 // Only add if we're not already part of the content.
                 if (!scrollableContent.Contains(item))
                 {
                     // Makes sure headers are always _below_ items,
                     // and depth flows downward.
-                    item.Depth = i + (item is DrawableCarouselBeatmapSet ? items.Count : 0);
+                    item.Depth = i + (item is DrawableCarouselBeatmapSet ? Items.Count : 0);
 
                     switch (item.LoadState)
                     {
