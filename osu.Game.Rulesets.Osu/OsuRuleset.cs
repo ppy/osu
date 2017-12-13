@@ -17,7 +17,8 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects.Legacy.Osu;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -33,21 +34,29 @@ namespace osu.Game.Rulesets.Osu
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
 
-        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
+        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap)
         {
-            new BeatmapStatistic
+            IEnumerable<HitObject> hitObjects = beatmap.Beatmap.HitObjects;
+            IEnumerable<HitObject> durationObjects = hitObjects.Where(d => d is IHasEndTime);
+            IEnumerable<HitObject> circles = hitObjects.Except(durationObjects);
+            IEnumerable<HitObject> sliders = hitObjects.Where(s => s is IHasCurve);
+
+            return new[]
             {
-                Name = @"Circle Count",
-                Content = beatmap.Beatmap.HitObjects.Count(h => h is ConvertHit).ToString(),
-                Icon = FontAwesome.fa_dot_circle_o
-            },
-            new BeatmapStatistic
-            {
-                Name = @"Slider Count",
-                Content = beatmap.Beatmap.HitObjects.Count(h => h is ConvertSlider).ToString(),
-                Icon = FontAwesome.fa_circle_o
-            }
-        };
+                new BeatmapStatistic
+                {
+                    Name = @"Circle Count",
+                    Content = circles.Count().ToString(),
+                    Icon = FontAwesome.fa_circle_o
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Slider Count",
+                    Content = sliders.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                }
+            };
+        }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
