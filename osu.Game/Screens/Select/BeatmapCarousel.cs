@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Select
                     Schedule(() =>
                     {
                         foreach (var g in newSets)
-                            addGroup(g);
+                            addBeatmapSet(g);
 
                         root = new CarouselGroup(newSets.OfType<CarouselItem>().ToList());
                         items = root.Drawables.Value.ToList();
@@ -65,12 +65,13 @@ namespace osu.Game.Screens.Select
         }
 
         private readonly List<float> yPositions = new List<float>();
+        private Cached yPositionsCache = new Cached();
 
         private readonly Container<DrawableCarouselItem> scrollableContent;
 
         private readonly List<CarouselBeatmapSet> carouselSets = new List<CarouselBeatmapSet>();
 
-        private Bindable<SelectionRandomType> randomType;
+        private Bindable<SongSelectRandomMode> randomType;
         private readonly List<CarouselBeatmapSet> seenSets = new List<CarouselBeatmapSet>();
 
         private List<DrawableCarouselItem> items = new List<DrawableCarouselItem>();
@@ -95,7 +96,7 @@ namespace osu.Game.Screens.Select
 
         public void RemoveBeatmap(BeatmapSetInfo beatmapSet)
         {
-            Schedule(() => removeGroup(carouselSets.Find(b => b.BeatmapSet.ID == beatmapSet.ID)));
+            Schedule(() => removeBeatmapSet(carouselSets.Find(b => b.BeatmapSet.ID == beatmapSet.ID)));
         }
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -116,7 +117,7 @@ namespace osu.Game.Screens.Select
                 if (index >= 0)
                     carouselSets.Insert(index, newSet);
                 else
-                    addGroup(newSet);
+                    addBeatmapSet(newSet);
             }
 
             if (hadSelection && newSet == null)
@@ -151,7 +152,7 @@ namespace osu.Game.Screens.Select
                 var item = group.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
                 if (item != null)
                 {
-                    select(item, animated);
+                    select(item);
                     return;
                 }
             }
@@ -220,7 +221,7 @@ namespace osu.Game.Screens.Select
 
             CarouselBeatmapSet group;
 
-            if (randomType == SelectionRandomType.RandomPermutation)
+            if (randomType == SongSelectRandomMode.RandomPermutation)
             {
                 var notSeenGroups = visibleGroups.Except(seenSets);
                 if (!notSeenGroups.Any())
@@ -337,10 +338,10 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config)
         {
-            randomType = config.GetBindable<SelectionRandomType>(OsuSetting.SelectionRandomType);
+            randomType = config.GetBindable<SongSelectRandomMode>(OsuSetting.SelectionRandomType);
         }
 
-        private void addGroup(CarouselBeatmapSet set)
+        private void addBeatmapSet(CarouselBeatmapSet set)
         {
             // prevent duplicates by concurrent independent actions trying to add a group
             //todo: check this
@@ -351,18 +352,10 @@ namespace osu.Game.Screens.Select
             carouselSets.Add(set);
         }
 
-        private void removeGroup(CarouselBeatmapSet set)
+        private void removeBeatmapSet(CarouselBeatmapSet set)
         {
             if (set == null)
                 return;
-
-            if (set.State == CarouselItemState.Selected)
-            {
-                if (getVisibleGroups().Count() == 1)
-                    selectNullBeatmap();
-                else
-                    SelectNext();
-            }
 
             carouselSets.Remove(set);
 
@@ -372,10 +365,11 @@ namespace osu.Game.Screens.Select
                 scrollableContent.Remove(d);
             }
 
+            if (set.State == CarouselItemState.Selected)
+                SelectNext();
+
             yPositionsCache.Invalidate();
         }
-
-        private Cached yPositionsCache = new Cached();
 
         /// <summary>
         /// Computes the target Y positions for every item in the carousel.
@@ -396,10 +390,7 @@ namespace osu.Game.Screens.Select
                 {
                     case DrawableCarouselBeatmapSet set:
                         set.MoveToX(set.Item.State == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
-
                         lastSetY = set.Position.Y;
-
-                        movePanel(set, set.Item.Visible, animated, ref currentY);
                         break;
                     case DrawableCarouselBeatmap beatmap:
                         beatmap.MoveToX(beatmap.Item.State == CarouselItemState.Selected ? -50 : 0, 500, Easing.OutExpo);
@@ -410,10 +401,14 @@ namespace osu.Game.Screens.Select
                         // on first display we want to begin hidden under our group's header.
                         if (animated && !beatmap.IsPresent)
                             beatmap.MoveToY(lastSetY);
-
-                        movePanel(beatmap, beatmap.Item.Visible, animated, ref currentY);
                         break;
                 }
+
+                yPositions.Add(currentY);
+                d.MoveToY(currentY, animated ? 750 : 0, Easing.OutExpo);
+
+                if (d.Item.Visible)
+                    currentY += d.DrawHeight + 5;
             }
 
             currentY += DrawHeight / 2;
@@ -424,25 +419,11 @@ namespace osu.Game.Screens.Select
             return selectedY;
         }
 
-        private void movePanel(DrawableCarouselItem item, bool advance, bool animated, ref float currentY)
+        private void select(CarouselItem item)
         {
-            yPositions.Add(currentY);
-            item.MoveToY(currentY, animated ? 750 : 0, Easing.OutExpo);
+            if (item == null) return;
 
-            if (advance)
-                currentY += item.DrawHeight + 5;
-        }
-
-        private void select(CarouselBeatmapSet beatmapSet = null)
-        {
-            if (beatmapSet == null) return;
-            beatmapSet.State.Value = CarouselItemState.Selected;
-        }
-
-        private void select(CarouselBeatmap beatmap = null, bool animated = true)
-        {
-            if (beatmap == null) return;
-            beatmap.State.Value = CarouselItemState.Selected;
+            item.State.Value = CarouselItemState.Selected;
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)

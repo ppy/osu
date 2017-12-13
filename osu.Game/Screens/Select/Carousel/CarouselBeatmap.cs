@@ -17,19 +17,13 @@ namespace osu.Game.Screens.Select.Carousel
             State.Value = CarouselItemState.Hidden;
         }
 
-        protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmap(this)
-        {
-            /*GainedSelection = panelGainedSelection,
-            HideRequested = p => HideDifficultyRequested?.Invoke(p),
-            StartRequested = p => StartRequested?.Invoke(p.beatmap),
-            EditRequested = p => EditRequested?.Invoke(p.beatmap),*/
-        };
+        protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmap(this);
 
         public override void Filter(FilterCriteria criteria)
         {
             base.Filter(criteria);
 
-            bool match = criteria.Ruleset == null || (Beatmap.RulesetID == criteria.Ruleset.ID || Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
+            bool match = criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps;
 
             if (!string.IsNullOrEmpty(criteria.SearchText))
                 match &=

@@ -24,10 +24,7 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
-        public Action<DrawableCarouselBeatmapSet> GainedSelection;
-
         public Action<BeatmapSetInfo> DeleteRequested;
-
         public Action<BeatmapSetInfo> RestoreHiddenRequested;
 
         private readonly BeatmapSetInfo beatmapSet;
@@ -40,17 +37,14 @@ namespace osu.Game.Screens.Select.Carousel
             beatmapSet = set.BeatmapSet;
         }
 
-        protected override void Selected()
-        {
-            base.Selected();
-            GainedSelection?.Invoke(this);
-        }
-
         [BackgroundDependencyLoader]
         private void load(LocalisationEngine localisation, BeatmapManager manager)
         {
             if (localisation == null)
                 throw new ArgumentNullException(nameof(localisation));
+
+            RestoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
+            DeleteRequested = manager.Delete;
 
             var working = manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault());
 
@@ -61,7 +55,8 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         RelativeSizeAxes = Axes.Both,
                         OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    }, 300),
+                    }, 300
+                ),
                 new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
@@ -92,6 +87,24 @@ namespace osu.Game.Screens.Select.Carousel
                     }
                 }
             };
+        }
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (Item.State == CarouselItemState.NotSelected)
+                    items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
+
+                if (beatmapSet.Beatmaps.Any(b => b.Hidden))
+                    items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => RestoreHiddenRequested?.Invoke(beatmapSet)));
+
+                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke(beatmapSet)));
+
+                return items.ToArray();
+            }
         }
 
         private class PanelBackground : BufferedContainer
@@ -130,45 +143,24 @@ namespace osu.Game.Screens.Select.Carousel
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(
-                                    Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
+                                Colour = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
                                 Width = 0.05f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(
-                                    new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
+                                Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
                                 Width = 0.2f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(
-                                    new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
+                                Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
                                 Width = 0.05f,
                             },
                         }
                     },
                 };
-            }
-        }
-
-        public MenuItem[] ContextMenuItems
-        {
-            get
-            {
-                List<MenuItem> items = new List<MenuItem>();
-
-                if (Item.State == CarouselItemState.NotSelected)
-                    items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
-
-                if (beatmapSet.Beatmaps.Any(b => b.Hidden))
-                    items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => RestoreHiddenRequested?.Invoke(beatmapSet)));
-
-                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke(beatmapSet)));
-
-                return items.ToArray();
             }
         }
 
