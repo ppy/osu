@@ -6,6 +6,9 @@ using System.IO;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Platform;
+using osu.Game.Database;
+using osu.Game.Rulesets;
+using osu.Game.Beatmaps;
 using osu.Game.IPC;
 
 namespace osu.Desktop
@@ -34,18 +37,38 @@ namespace osu.Desktop
                 }
                 else
                 {
-                    switch (args.FirstOrDefault() ?? string.Empty)
-                    {
-                        case "--tests":
-                            host.Run(new OsuTestBrowser());
-                            break;
-                        default:
-                            host.Run(new OsuGameDesktop(args));
-                            break;
-                    }
-
+                    parsingCommends(host, args);
                 }
                 return 0;
+            }
+        }
+
+        private static void parsingCommends(DesktopGameHost host, string[] args)
+        {
+
+            switch (args.FirstOrDefault() ?? string.Empty)
+            {
+                case "--tests":
+                host.Run(new OsuTestBrowser());
+                break;
+                case "--import-beatmap":
+                case "-ib":
+                Console.WriteLine();
+                if(args.Length == 1)
+                {
+                    Console.WriteLine(args[0] + " Option require .osz files.");
+                    break;
+                }
+                string[] files = Array.FindAll(args, f => Path.GetExtension(f) == @".osz");
+                DatabaseContextFactory contextFactory = new DatabaseContextFactory(host);
+                RulesetStore rulesetStore = new RulesetStore(contextFactory.GetContext);
+                BeatmapManager beatmapManager = new BeatmapManager(host.Storage, contextFactory.GetContext, rulesetStore, null, host){ IsConsoleLogger = true};
+                beatmapManager.Import(files);
+
+                break;
+                default:
+                host.Run(new OsuGameDesktop(args));
+                break;
             }
         }
     }
