@@ -11,6 +11,36 @@ This is still heavily under development and is not intended for end-user use. Th
 - A desktop platform which can compile .NET 4.5 (tested on macOS, linux and windows). We recommend using [Visual Studio Code](https://code.visualstudio.com/) (all platforms) or [Visual Studio Community Edition](https://www.visualstudio.com/) (windows only), both of which are free.
 - Make sure you initialise and keep submodules up-to-date.
 
+# Build
+
+### Build on ubuntu with commend line
+
+**1. clone the proejct**
+
+```git clone https://github.com/ppy/osu --recurse-submodules```
+
+**2. Install require packages**
+
+```sudo apt-get install nuget msbuild mono-complete libsdl2-dev```
+
+**3. Install nuget submodules**
+  
+  In osu directory
+    
+```nuget restore```
+    
+**4. Build Project**
+  
+  In osu directory
+
+```msbuild```
+    
+**5. Launch osu!.exe**
+  
+   In osu directory
+   
+ ```mono osu.Desktop/bin/Debug.osu\!.exe```
+
 # Contributing
 
 We welcome all contributions, but keep in mind that we already have a lot of the UI designed. If you wish to work on something with the intention on having it included in the official distribution, please open an issue for discussion and we will give you what you need from a design perspective to proceed. If you want to make *changes* to the design, we recommend you open an issue with your intentions before spending too much time, to ensure no effort is wasted.
