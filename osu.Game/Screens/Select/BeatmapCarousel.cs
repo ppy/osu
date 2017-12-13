@@ -94,6 +94,7 @@ namespace osu.Game.Screens.Select
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
 
         private CarouselBeatmap selectedBeatmap;
+        private CarouselBeatmapSet selectedBeatmapSet => carouselSets.FirstOrDefault(s => s.State == CarouselItemState.Selected);
 
         public BeatmapCarousel()
         {
@@ -291,14 +292,28 @@ namespace osu.Game.Screens.Select
             {
                 FilterTask = null;
 
+                var lastSet = selectedBeatmapSet;
+                var lastBeatmap = selectedBeatmap;
+
                 carouselSets.ForEach(s => s.Filter(criteria));
 
                 yPositionsCache.Invalidate();
 
-                if (selectedBeatmap?.Visible != true)
-                    SelectNext();
-                else
+                if (selectedBeatmap?.Filtered == false)
                     select(selectedBeatmap);
+                else if (lastBeatmap != null && !lastSet.Filtered)
+                {
+                    var searchable = lastSet.Beatmaps.AsEnumerable();
+
+                    // search forwards first then backwards if nothing found.
+                    var nextAvailable =
+                        searchable.SkipWhile(b => b != lastBeatmap).FirstOrDefault(b => !b.Filtered) ??
+                        searchable.Reverse().SkipWhile(b => b != lastBeatmap).FirstOrDefault(b => !b.Filtered);
+
+                    select(nextAvailable);
+                }
+                else
+                    SelectNext();
             };
 
             FilterTask?.Cancel();

@@ -79,6 +79,8 @@ namespace osu.Game.Tests.Visual
 
             AddUntilStep(() => carousel.Beatmaps.Any(), "Wait for load");
 
+            // test traversal
+
             advanceSelection(direction: 1, diff: false);
             checkSelected(1, 1);
 
@@ -98,6 +100,8 @@ namespace osu.Game.Tests.Visual
             advanceSelection(direction: -1, diff: true);
             checkSelected(4, 3);
 
+            // test basic filtering
+
             AddStep("Filter", () => carousel.Filter(new FilterCriteria { SearchText = "set #3" }, false));
             checkVisibleItemCount(diff: false, count: 1);
             checkVisibleItemCount(diff: true, count: 3);
@@ -111,7 +115,13 @@ namespace osu.Game.Tests.Visual
             checkVisibleItemCount(diff: false, count: 4);
             checkVisibleItemCount(diff: true, count: 3);
 
-            setSelected(1, diff: 2);
+            // test filtering some difficulties (and keeping current beatmap set selected).
+
+            setSelected(1, 2);
+            AddStep("Filter some difficulties", () => carousel.Filter(new FilterCriteria { SearchText = "Normal" }, false));
+            checkSelected(1, 1);
+            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            checkSelected(1, 1);
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
