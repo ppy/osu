@@ -8,30 +8,20 @@ using System.Linq;
 using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
-using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
-using osu.Game.Screens.Select.Filter;
-using osu.Game.Tests.Platform;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCasePlaySongSelect : OsuTestCase
+    internal class TestCaseBeatmapCarousel : OsuTestCase
     {
-        private BeatmapManager manager;
-
-        private RulesetStore rulesets;
-
-        private DependencyContainer dependencies;
+        private BeatmapCarousel carousel;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(SongSelect),
-            typeof(BeatmapCarousel),
-
             typeof(CarouselItem),
             typeof(CarouselGroup),
             typeof(CarouselGroupEagerSelect),
@@ -45,38 +35,48 @@ namespace osu.Game.Tests.Visual
             typeof(DrawableCarouselBeatmapSet),
         };
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
-
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager baseMaanger)
+        private void load()
         {
-            PlaySongSelect songSelect;
-
-            if (manager == null)
+            Add(carousel = new BeatmapCarousel
             {
-                var storage = new TestStorage(@"TestCasePlaySongSelect");
+                RelativeSizeAxes = Axes.Both,
+            });
 
-                // this is by no means clean. should be replacing inside of OsuGameBase somehow.
-                var context = new OsuDbContext();
-
-                Func<OsuDbContext> contextFactory = () => context;
-
-                dependencies.Cache(rulesets = new RulesetStore(contextFactory));
-                dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
+            AddStep("Load Beatmaps", () =>
+            {
+                carousel.Beatmaps = new[]
                 {
-                    DefaultBeatmap = baseMaanger.GetWorkingBeatmap(null)
-                });
+                    createTestBeatmapSet(0),
+                    createTestBeatmapSet(1),
+                    createTestBeatmapSet(2),
+                    createTestBeatmapSet(3),
+                };
+            });
 
-                for (int i = 0; i < 100; i += 10)
-                    manager.Import(createTestBeatmapSet(i));
-            }
+            AddUntilStep(() => carousel.Beatmaps.Any(), "Wait for load");
 
-            Add(songSelect = new PlaySongSelect());
+            AddStep("SelectNext set", () => carousel.SelectNext());
+            AddAssert("set1 diff1", () => carousel.SelectedBeatmap == carousel.Beatmaps.First().Beatmaps.First());
 
-            AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
-            AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });
-            AddStep(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
-            AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
+            AddStep("SelectNext diff", () => carousel.SelectNext(1, false));
+            AddAssert("set1 diff2", () => carousel.SelectedBeatmap == carousel.Beatmaps.First().Beatmaps.Skip(1).First());
+
+            AddStep("SelectNext backwards", () => carousel.SelectNext(-1));
+            AddAssert("set4 diff1", () => carousel.SelectedBeatmap == carousel.Beatmaps.Last().Beatmaps.First());
+
+            AddStep("SelectNext diff backwards", () => carousel.SelectNext(-1, false));
+            AddAssert("set3 diff3", () => carousel.SelectedBeatmap == carousel.Beatmaps.Reverse().Skip(1).First().Beatmaps.Last());
+
+            AddStep("SelectNext", () => carousel.SelectNext());
+            AddStep("SelectNext", () => carousel.SelectNext());
+            AddAssert("set1 diff1", () => carousel.SelectedBeatmap == carousel.Beatmaps.First().Beatmaps.First());
+
+            AddStep("SelectNext diff backwards", () => carousel.SelectNext(-1, false));
+            AddAssert("set4 diff3", () => carousel.SelectedBeatmap == carousel.Beatmaps.Last().Beatmaps.Last());
+
+            // AddStep("Clear beatmaps", () => carousel.Beatmaps = new BeatmapSetInfo[] { });
+            // AddStep("SelectNext (noop)", () => carousel.SelectNext());
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
@@ -98,7 +98,6 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1234 + i,
-                        Ruleset = rulesets.AvailableRulesets.First(),
                         Path = "normal.osu",
                         Version = "Normal",
                         BaseDifficulty = new BeatmapDifficulty
@@ -109,7 +108,6 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1235 + i,
-                        Ruleset = rulesets.AvailableRulesets.First(),
                         Path = "hard.osu",
                         Version = "Hard",
                         BaseDifficulty = new BeatmapDifficulty
@@ -120,7 +118,6 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1236 + i,
-                        Ruleset = rulesets.AvailableRulesets.First(),
                         Path = "insane.osu",
                         Version = "Insane",
                         BaseDifficulty = new BeatmapDifficulty

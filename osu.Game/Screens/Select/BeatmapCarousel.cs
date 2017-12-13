@@ -26,20 +26,35 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapCarousel : OsuScrollContainer
     {
+        /// <summary>
+        /// Triggered when the <see cref="Beatmaps"/> loaded change and are completely loaded.
+        /// </summary>
+        public Action BeatmapsChanged;
+
+        /// <summary>
+        /// The currently selected beatmap.
+        /// </summary>
         public BeatmapInfo SelectedBeatmap => selectedBeatmap?.Beatmap;
 
-        public override bool HandleInput => AllowSelection;
+        /// <summary>
+        /// Raised when the <see cref="SelectedBeatmap"/> is changed.
+        /// </summary>
+        public Action<BeatmapInfo> SelectionChanged;
 
-        public Action BeatmapsChanged;
+        public override bool HandleInput => AllowSelection;
 
         public IEnumerable<BeatmapSetInfo> Beatmaps
         {
             get { return carouselSets.Select(g => g.BeatmapSet); }
             set
             {
-                scrollableContent.Clear(false);
-                items.Clear();
-                carouselSets.Clear();
+                Schedule(() =>
+                {
+                    scrollableContent.Clear(false);
+                    items.Clear();
+                    carouselSets.Clear();
+                    yPositionsCache.Invalidate();
+                });
 
                 List<CarouselBeatmapSet> newSets = null;
 
@@ -51,8 +66,7 @@ namespace osu.Game.Screens.Select
                 {
                     Schedule(() =>
                     {
-                        foreach (var g in newSets)
-                            addBeatmapSet(g);
+                        carouselSets.AddRange(newSets);
 
                         root = new CarouselGroup(newSets.OfType<CarouselItem>().ToList());
                         items = root.Drawables.Value.ToList();
@@ -94,7 +108,7 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public void RemoveBeatmap(BeatmapSetInfo beatmapSet)
+        public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             Schedule(() => removeBeatmapSet(carouselSets.Find(b => b.BeatmapSet.ID == beatmapSet.ID)));
         }
@@ -116,8 +130,8 @@ namespace osu.Game.Screens.Select
             {
                 if (index >= 0)
                     carouselSets.Insert(index, newSet);
-                else
-                    addBeatmapSet(newSet);
+                //else
+                //    addBeatmapSet(newSet);
             }
 
             if (hadSelection && newSet == null)
@@ -158,8 +172,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public Action<BeatmapInfo> SelectionChanged;
-
         private void selectNullBeatmap()
         {
             selectedBeatmap = null;
@@ -180,7 +192,7 @@ namespace osu.Game.Screens.Select
                 return;
             }
 
-            int originalIndex = Math.Max(0, items.IndexOf(selectedBeatmap?.Drawables.Value.First()));
+            int originalIndex = items.IndexOf(selectedBeatmap?.Drawables.Value.First());
             int currentIndex = originalIndex;
 
             // local function to increment the index in the required direction, wrapping over extremities.
@@ -338,17 +350,6 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config)
         {
-        }
-
-        private void addBeatmapSet(CarouselBeatmapSet set)
-        {
-            // prevent duplicates by concurrent independent actions trying to add a group
-            //todo: check this
-            if (carouselSets.Any(g => g.BeatmapSet.ID == set.BeatmapSet.ID))
-                return;
-
-            //todo: add to root
-            carouselSets.Add(set);
             randomSelectAlgorithm = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm);
         }
 
@@ -422,7 +423,6 @@ namespace osu.Game.Screens.Select
         private void select(CarouselItem item)
         {
             if (item == null) return;
-
             item.State.Value = CarouselItemState.Selected;
         }
 
@@ -466,7 +466,7 @@ namespace osu.Game.Screens.Select
                 computeYPositions();
 
             // Remove all items that should no longer be on-screen
-            scrollableContent.RemoveAll(delegate (DrawableCarouselItem p)
+            scrollableContent.RemoveAll(delegate(DrawableCarouselItem p)
             {
                 float itemPosY = p.Position.Y;
                 bool remove = itemPosY < Current - p.DrawHeight || itemPosY > Current + drawHeight || !p.IsPresent;

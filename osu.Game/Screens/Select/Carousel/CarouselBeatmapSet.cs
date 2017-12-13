@@ -52,11 +52,4 @@ namespace osu.Game.Screens.Select.Carousel
             }*/
         }
     }
-
-    public enum CarouselItemState
-    {
-        Hidden,
-        NotSelected,
-        Selected,
-    }
 }

@@ -54,4 +54,11 @@ namespace osu.Game.Screens.Select.Carousel
 
         public virtual void Filter(FilterCriteria criteria) => Children?.ForEach(c => c.Filter(criteria));
     }
+
+    public enum CarouselItemState
+    {
+        Hidden,
+        NotSelected,
+        Selected,
+    }
 }

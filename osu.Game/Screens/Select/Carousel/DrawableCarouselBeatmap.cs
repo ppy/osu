@@ -35,12 +35,17 @@ namespace osu.Game.Screens.Select.Carousel
         private readonly Triangles triangles;
         private readonly StarCounter starCounter;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(SongSelect songSelect, BeatmapManager manager)
         {
-            StartRequested = songSelect.Start;
-            EditRequested = songSelect.Edit;
-            HideRequested = manager.Hide;
+            if (songSelect != null)
+            {
+                StartRequested = songSelect.Start;
+                EditRequested = songSelect.Edit;
+            }
+
+            if (manager != null)
+                HideRequested = manager.Hide;
         }
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)

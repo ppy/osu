@@ -42,6 +42,8 @@ namespace osu.Game.Screens.Select.Carousel
             Height = MAX_HEIGHT;
             RelativeSizeAxes = Axes.X;
 
+            Alpha = 0;
+
             AddInternal(borderContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
