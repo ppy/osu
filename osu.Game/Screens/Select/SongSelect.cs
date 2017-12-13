@@ -76,68 +76,68 @@ namespace osu.Game.Screens.Select
             const float carousel_width = 640;
             const float filter_height = 100;
 
-            Add(new ParallaxContainer
+            AddRange(new Drawable[]
             {
-                Padding = new MarginPadding { Top = filter_height },
-                ParallaxAmount = 0.005f,
-                RelativeSizeAxes = Axes.Both,
-                Children = new[]
+                new ParallaxContainer
                 {
-                    new WedgeBackground
+                    Padding = new MarginPadding { Top = filter_height },
+                    ParallaxAmount = 0.005f,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Right = carousel_width * 0.76f },
+                        new WedgeBackground
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Right = carousel_width * 0.76f },
+                        }
                     }
-                }
-            });
-            Add(LeftContent = new Container
-            {
-                Origin = Anchor.BottomLeft,
-                Anchor = Anchor.BottomLeft,
-                RelativeSizeAxes = Axes.Both,
-                Size = new Vector2(wedged_container_size.X, 1),
-                Padding = new MarginPadding
-                {
-                    Bottom = 50,
-                    Top = wedged_container_size.Y + left_area_padding,
-                    Left = left_area_padding,
-                    Right = left_area_padding * 2,
-                }
-            });
-            Add(carousel = new BeatmapCarousel
-            {
-                RelativeSizeAxes = Axes.Y,
-                Size = new Vector2(carousel_width, 1),
-                Anchor = Anchor.CentreRight,
-                Origin = Anchor.CentreRight,
-
-                //todo: clicking play on another map doesn't work bindable disabled
-                SelectionChanged = carouselSelectionChanged,
-                BeatmapsChanged = carouselBeatmapsLoaded,
-                //RestoreRequested = s => { foreach (var b in s.Beatmaps) beatmaps.Restore(b); },
-            });
-            Add(FilterControl = new FilterControl
-            {
-                RelativeSizeAxes = Axes.X,
-                Height = filter_height,
-                FilterChanged = criteria => filterChanged(criteria),
-                Exit = Exit,
-            });
-            Add(beatmapInfoWedge = new BeatmapInfoWedge
-            {
-                Alpha = 0,
-                Size = wedged_container_size,
-                RelativeSizeAxes = Axes.X,
-                Margin = new MarginPadding
-                {
-                    Top = left_area_padding,
-                    Right = left_area_padding,
                 },
-            });
-            Add(new ResetScrollContainer(() => carousel.ScrollToSelected())
-            {
-                RelativeSizeAxes = Axes.Y,
-                Width = 250,
+                LeftContent = new Container
+                {
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(wedged_container_size.X, 1),
+                    Padding = new MarginPadding
+                    {
+                        Bottom = 50,
+                        Top = wedged_container_size.Y + left_area_padding,
+                        Left = left_area_padding,
+                        Right = left_area_padding * 2,
+                    }
+                },
+                carousel = new BeatmapCarousel
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Size = new Vector2(carousel_width, 1),
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    SelectionChanged = carouselSelectionChanged,
+                    BeatmapsChanged = carouselBeatmapsLoaded,
+                },
+                FilterControl = new FilterControl
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = filter_height,
+                    FilterChanged = c => carousel.Filter(c),
+                    Exit = Exit,
+                },
+                beatmapInfoWedge = new BeatmapInfoWedge
+                {
+                    Alpha = 0,
+                    Size = wedged_container_size,
+                    RelativeSizeAxes = Axes.X,
+                    Margin = new MarginPadding
+                    {
+                        Top = left_area_padding,
+                        Right = left_area_padding,
+                    },
+                },
+                new ResetScrollContainer(() => carousel.ScrollToSelected())
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 250,
+                }
             });
 
             if (ShowFooter)
@@ -308,11 +308,6 @@ namespace osu.Game.Screens.Select
         }
 
         protected abstract void Start();
-
-        private void filterChanged(FilterCriteria criteria, bool debounce = true)
-        {
-            carousel.Filter(criteria, debounce);
-        }
 
         private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => carousel.UpdateBeatmapSet(s));
 
@@ -489,6 +484,7 @@ namespace osu.Game.Screens.Select
                             Delete(Beatmap.Value.BeatmapSetInfo);
                         return true;
                     }
+
                     break;
             }
 

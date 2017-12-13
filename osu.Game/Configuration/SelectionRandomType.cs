@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace osu.Game.Configuration
 {
-   public enum SelectionRandomType
+   public enum SongSelectRandomMode
     {
         [Description("Never repeat")]
         RandomPermutation,
