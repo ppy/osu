@@ -16,11 +16,11 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 if (v == CarouselItemState.Selected)
                 {
-                    foreach (var c in Children.Where(c => c.State.Value == CarouselItemState.Hidden))
+                    foreach (var c in InternalChildren.Where(c => c.State.Value == CarouselItemState.Hidden))
                         c.State.Value = CarouselItemState.NotSelected;
 
-                    if (Children.Any(c => c.Visible) && Children.All(c => c.State != CarouselItemState.Selected))
-                        Children.First(c => c.Visible).State.Value = CarouselItemState.Selected;
+                    if (InternalChildren.Any(c => c.Visible) && InternalChildren.All(c => c.State != CarouselItemState.Selected))
+                        InternalChildren.First(c => c.Visible).State.Value = CarouselItemState.Selected;
                 }
             };
         }
