@@ -6,15 +6,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Ionic.Zip;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
@@ -63,6 +64,8 @@ namespace osu.Game.Beatmaps
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
         public WorkingBeatmap DefaultBeatmap { private get; set; }
+
+        private BackgroundTaskManager backgroundTaskManager;
 
         private readonly Storage storage;
 
@@ -122,6 +125,12 @@ namespace osu.Game.Beatmaps
                 ipc = new BeatmapIPCChannel(importHost, this);
 
             beatmaps.Cleanup();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(BackgroundTaskManager backgroundTaskManager)
+        {
+            this.backgroundTaskManager = backgroundTaskManager;
         }
 
         /// <summary>
@@ -262,7 +271,7 @@ namespace osu.Game.Beatmaps
             {
                 downloadNotification.Text = $"Importing {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}";
 
-                Task.Factory.StartNew(() =>
+                backgroundTaskManager.StartNew(() =>
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
                     using (var stream = new MemoryStream(data))
@@ -270,7 +279,7 @@ namespace osu.Game.Beatmaps
                         Import(archive);
 
                     downloadNotification.State = ProgressNotificationState.Completed;
-                }, TaskCreationOptions.LongRunning);
+                }, true);
 
                 currentDownloads.Remove(request);
             };
@@ -294,7 +303,7 @@ namespace osu.Game.Beatmaps
             PostNotification?.Invoke(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
-            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
+            backgroundTaskManager.StartNew(() => request.Perform(api), true);
             BeatmapDownloadBegan?.Invoke(request);
         }
 

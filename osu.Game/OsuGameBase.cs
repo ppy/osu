@@ -19,6 +19,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
@@ -31,6 +32,8 @@ namespace osu.Game
     public class OsuGameBase : Framework.Game, IOnlineComponent
     {
         protected OsuConfigManager LocalConfig;
+
+        protected BackgroundTaskManager BackgroundTaskManager;
 
         protected BeatmapManager BeatmapManager;
 
@@ -91,6 +94,7 @@ namespace osu.Game
 
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
+            dependencies.Cache(BackgroundTaskManager = new BackgroundTaskManager());
 
             runMigrations();
 

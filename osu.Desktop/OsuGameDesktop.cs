@@ -6,7 +6,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
@@ -109,12 +108,12 @@ namespace osu.Desktop
 
         private void fileDrop(object sender, FileDropEventArgs e)
         {
-            var filePaths = new [] { e.FileName };
+            var filePaths = new[] { e.FileName };
 
             if (filePaths.All(f => Path.GetExtension(f) == @".osz"))
-                Task.Factory.StartNew(() => BeatmapManager.Import(filePaths), TaskCreationOptions.LongRunning);
+                BackgroundTaskManager.StartNew(() => BeatmapManager.Import(filePaths), true);
             else if (filePaths.All(f => Path.GetExtension(f) == @".osr"))
-                Task.Run(() =>
+                BackgroundTaskManager.StartNew(() =>
                 {
                     var score = ScoreStore.ReadReplayFile(filePaths.First());
                     Schedule(() => LoadScore(score));
