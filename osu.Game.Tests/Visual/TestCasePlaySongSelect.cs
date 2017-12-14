@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager baseMaanger)
+        private void load(BeatmapManager baseManager)
         {
             PlaySongSelect songSelect;
 
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual
                 dependencies.Cache(rulesets = new RulesetStore(contextFactory));
                 dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
                 {
-                    DefaultBeatmap = baseMaanger.GetWorkingBeatmap(null)
+                    DefaultBeatmap = baseManager.GetWorkingBeatmap(null)
                 });
 
                 for (int i = 0; i < 100; i += 10)
