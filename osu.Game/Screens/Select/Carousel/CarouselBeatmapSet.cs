@@ -4,52 +4,53 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmapSet : CarouselGroupEagerSelect
     {
-        public readonly List<CarouselBeatmap> Beatmaps;
+        public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
 
         public BeatmapSetInfo BeatmapSet;
 
         public CarouselBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            if (beatmapSet == null) throw new ArgumentNullException(nameof(beatmapSet));
+            BeatmapSet = beatmapSet ?? throw new ArgumentNullException(nameof(beatmapSet));
 
-            BeatmapSet = beatmapSet;
-
-            Children = Beatmaps = beatmapSet.Beatmaps
-                                            .Where(b => !b.Hidden)
-                                            .OrderBy(b => b.RulesetID).ThenBy(b => b.StarDifficulty)
-                                            .Select(b => new CarouselBeatmap(b))
-                                            .ToList();
+            beatmapSet.Beatmaps
+                      .Where(b => !b.Hidden)
+                      .Select(b => new CarouselBeatmap(b))
+                      .ForEach(AddChild);
         }
 
         protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmapSet(this);
 
-        public override void Filter(FilterCriteria criteria)
+        public override int CompareTo(FilterCriteria criteria, CarouselItem other)
         {
-            base.Filter(criteria);
-            Filtered.Value = Children.All(i => i.Filtered);
+            if (!(other is CarouselBeatmapSet otherSet))
+                return base.CompareTo(criteria, other);
 
-            /*switch (criteria.Sort)
+            switch (criteria.Sort)
             {
                 default:
                 case SortMode.Artist:
-                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist, StringComparison.InvariantCultureIgnoreCase));
-                    break;
+                    return string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.InvariantCultureIgnoreCase);
                 case SortMode.Title:
-                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title, StringComparison.InvariantCultureIgnoreCase));
-                    break;
+                    return string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.InvariantCultureIgnoreCase);
                 case SortMode.Author:
-                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author.Username, y.BeatmapSet.Metadata.Author.Username, StringComparison.InvariantCultureIgnoreCase));
-                    break;
+                    return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.InvariantCultureIgnoreCase);
                 case SortMode.Difficulty:
-                    groups.Sort((x, y) => x.BeatmapSet.MaxStarDifficulty.CompareTo(y.BeatmapSet.MaxStarDifficulty));
-                    break;
-            }*/
+                    return BeatmapSet.MaxStarDifficulty.CompareTo(otherSet.BeatmapSet.MaxStarDifficulty);
+            }
+        }
+
+        public override void Filter(FilterCriteria criteria)
+        {
+            base.Filter(criteria);
+            Filtered.Value = InternalChildren.All(i => i.Filtered);
         }
     }
 }

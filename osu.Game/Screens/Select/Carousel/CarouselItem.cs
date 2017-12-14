@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -14,45 +13,62 @@ namespace osu.Game.Screens.Select.Carousel
 
         public readonly Bindable<CarouselItemState> State = new Bindable<CarouselItemState>(CarouselItemState.NotSelected);
 
-        protected virtual IEnumerable<CarouselItem> Children { get; set; }
+        public IReadOnlyList<CarouselItem> Children => InternalChildren;
+
+        protected List<CarouselItem> InternalChildren { get; set; }
 
         public bool Visible => State.Value != CarouselItemState.Hidden && !Filtered.Value;
 
-        public readonly Lazy<IEnumerable<DrawableCarouselItem>> Drawables;
-
-        protected CarouselItem()
+        public IEnumerable<DrawableCarouselItem> Drawables
         {
-            Drawables = new Lazy<IEnumerable<DrawableCarouselItem>>(() =>
+            get
             {
                 List<DrawableCarouselItem> items = new List<DrawableCarouselItem>();
 
-                var self = CreateDrawableRepresentation();
+                var self = drawableRepresentation.Value;
                 if (self != null) items.Add(self);
 
-                if (Children != null)
-                    foreach (var c in Children)
-                        items.AddRange(c.Drawables.Value);
+                if (InternalChildren != null)
+                    foreach (var c in InternalChildren)
+                        items.AddRange(c.Drawables);
 
                 return items;
-            });
+            }
+        }
+
+        public virtual void AddChild(CarouselItem i) => (InternalChildren ?? (InternalChildren = new List<CarouselItem>())).Add(i);
+
+        public virtual void RemoveChild(CarouselItem i) => InternalChildren?.Remove(i);
+
+        protected CarouselItem()
+        {
+            drawableRepresentation = new Lazy<DrawableCarouselItem>(CreateDrawableRepresentation);
 
             State.ValueChanged += v =>
             {
-                if (Children == null) return;
+                if (InternalChildren == null) return;
 
                 switch (v)
                 {
                     case CarouselItemState.Hidden:
                     case CarouselItemState.NotSelected:
-                        Children.ForEach(c => c.State.Value = CarouselItemState.Hidden);
+                        InternalChildren.ForEach(c => c.State.Value = CarouselItemState.Hidden);
                         break;
                 }
             };
         }
 
+        private readonly Lazy<DrawableCarouselItem> drawableRepresentation;
+
         protected abstract DrawableCarouselItem CreateDrawableRepresentation();
 
-        public virtual void Filter(FilterCriteria criteria) => Children?.ForEach(c => c.Filter(criteria));
+        public virtual void Filter(FilterCriteria criteria)
+        {
+            InternalChildren?.Sort((x, y) => x.CompareTo(criteria, y));
+            InternalChildren?.ForEach(c => c.Filter(criteria));
+        }
+
+        public virtual int CompareTo(FilterCriteria criteria, CarouselItem other) => GetHashCode().CompareTo(other.GetHashCode());
     }
 
     public enum CarouselItemState

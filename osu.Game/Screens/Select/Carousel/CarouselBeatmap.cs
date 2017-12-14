@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -31,6 +32,22 @@ namespace osu.Game.Screens.Select.Carousel
                     Beatmap.Version.IndexOf(criteria.SearchText, StringComparison.InvariantCultureIgnoreCase) >= 0;
 
             Filtered.Value = !match;
+        }
+
+        public override int CompareTo(FilterCriteria criteria, CarouselItem other)
+        {
+            if (!(other is CarouselBeatmap otherBeatmap))
+                return base.CompareTo(criteria, other);
+
+            switch (criteria.Sort)
+            {
+                default:
+                case SortMode.Difficulty:
+                    var ruleset = Beatmap.RulesetID.CompareTo(otherBeatmap.Beatmap.RulesetID);
+                    if (ruleset != 0) return ruleset;
+
+                    return Beatmap.StarDifficulty.CompareTo(otherBeatmap.Beatmap.StarDifficulty);
+            }
         }
     }
 }

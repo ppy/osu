@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -18,19 +17,15 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override DrawableCarouselItem CreateDrawableRepresentation() => null;
 
-        protected override IEnumerable<CarouselItem> Children
+        public override void AddChild(CarouselItem i)
         {
-            get { return base.Children; }
-            set
-            {
-                base.Children = value;
-                value.ForEach(i => i.State.ValueChanged += v => itemStateChanged(i, v));
-            }
+            i.State.ValueChanged += v => itemStateChanged(i, v);
+            base.AddChild(i);
         }
 
         public CarouselGroup(List<CarouselItem> items = null)
         {
-            if (items != null) Children = items;
+            if (items != null) InternalChildren = items;
         }
 
         private void itemStateChanged(CarouselItem item, CarouselItemState value)
@@ -40,7 +35,7 @@ namespace osu.Game.Screens.Select.Carousel
             // ensure we are the only item selected
             if (value == CarouselItemState.Selected)
             {
-                foreach (var b in Children)
+                foreach (var b in InternalChildren)
                 {
                     if (item == b) continue;
                     b.State.Value = CarouselItemState.NotSelected;
