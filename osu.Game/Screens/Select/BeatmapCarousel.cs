@@ -387,6 +387,8 @@ namespace osu.Game.Screens.Select
 
             float lastSetY = 0;
 
+            var selected = selectedBeatmap;
+
             foreach (DrawableCarouselItem d in Items)
             {
                 switch (d)
@@ -398,7 +400,7 @@ namespace osu.Game.Screens.Select
                     case DrawableCarouselBeatmap beatmap:
                         beatmap.MoveToX(beatmap.Item.State == CarouselItemState.Selected ? -50 : 0, 500, Easing.OutExpo);
 
-                        if (beatmap.Item == selectedBeatmap)
+                        if (beatmap.Item == selected)
                             selectedY = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;
 
                         // on first display we want to begin hidden under our group's header.
