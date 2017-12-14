@@ -55,11 +55,11 @@ namespace osu.Game.Rulesets.UI
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
-        private Playfield playfield;
+        private readonly Lazy<Playfield> playfield;
         /// <summary>
         /// The playfield.
         /// </summary>
-        public Playfield Playfield => playfield ?? (playfield = CreatePlayfield());
+        public Playfield Playfield => playfield.Value;
 
         protected readonly Ruleset Ruleset;
 
@@ -70,6 +70,7 @@ namespace osu.Game.Rulesets.UI
         protected RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
+            playfield = new Lazy<Playfield>(CreatePlayfield);
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
