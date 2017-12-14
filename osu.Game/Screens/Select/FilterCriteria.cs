@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Filter;
@@ -18,18 +19,25 @@ namespace osu.Game.Screens.Select
         public RulesetInfo Ruleset;
         public bool AllowConvertedBeatmaps;
 
+        private bool canConvert(BeatmapInfo beatmapInfo) => beatmapInfo.RulesetID == Ruleset.ID || beatmapInfo.RulesetID == 0 && Ruleset.ID > 0 && AllowConvertedBeatmaps;
+
         public void Filter(List<BeatmapGroup> groups)
         {
             foreach (var g in groups)
             {
                 var set = g.BeatmapSet;
 
-                bool hasCurrentMode = AllowConvertedBeatmaps || set.Beatmaps.Any(bm => bm.RulesetID == (Ruleset?.ID ?? 0));
+                // we only support converts from osu! mode to other modes for now.
+                // in the future this will have to change, at which point this condition will become a touch more complicated.
+                bool hasCurrentMode = set.Beatmaps.Any(canConvert);
 
                 bool match = hasCurrentMode;
 
                 if (!string.IsNullOrEmpty(SearchText))
                     match &= set.Metadata.SearchableTerms.Any(term => term.IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) >= 0);
+
+                foreach (var panel in g.BeatmapPanels)
+                    panel.Filtered.Value = !canConvert(panel.Beatmap);
 
                 switch (g.State)
                 {
