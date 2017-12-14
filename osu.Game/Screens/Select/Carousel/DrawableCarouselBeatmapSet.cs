@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Select.Carousel
                     new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                     {
                         RelativeSizeAxes = Axes.Both,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
+                        OnLoadComplete = d => d.FadeInFromZero(1000, Easing.OutQuint),
                     }, 300
                 ),
                 new FillFlowContainer

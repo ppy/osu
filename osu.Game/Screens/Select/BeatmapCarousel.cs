@@ -71,22 +71,31 @@ namespace osu.Game.Screens.Select
 
                 Task.Run(() =>
                 {
-                    newSets = value.Select(createGroup).Where(g => g != null).ToList();
+                    newSets = value.Select(createCarouselSet).Where(g => g != null).ToList();
                     newSets.ForEach(g => g.Filter(criteria));
                 }).ContinueWith(t =>
                 {
                     Schedule(() =>
                     {
                         beatmapSets.AddRange(newSets);
-
-                        root = new CarouselGroup(newSets.OfType<CarouselItem>().ToList());
-                        Items = root.Drawables.Value.ToList();
-
-                        yPositionsCache.Invalidate();
-                        BeatmapSetsChanged?.Invoke();
+                        updateItems();
                     });
                 });
             }
+        }
+
+        /// <summary>
+        /// Call after altering <see cref="BeatmapSets"/> in any way.
+        /// </summary>
+        private void updateItems()
+        {
+            scrollableContent.Clear(false);
+
+            root = new CarouselGroup(beatmapSets.OfType<CarouselItem>().ToList());
+            Items = root.Drawables.Value.ToList();
+
+            yPositionsCache.Invalidate();
+            BeatmapSetsChanged?.Invoke();
         }
 
         private readonly List<float> yPositions = new List<float>();
@@ -94,15 +103,12 @@ namespace osu.Game.Screens.Select
 
         private readonly Container<DrawableCarouselItem> scrollableContent;
 
-
-
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
+        private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
         private CarouselGroup root = new CarouselGroup();
-
-        private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
 
         public BeatmapCarousel()
         {
@@ -119,19 +125,28 @@ namespace osu.Game.Screens.Select
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            Schedule(() => removeBeatmapSet(beatmapSets.Find(b => b.BeatmapSet.ID == beatmapSet.ID)));
+            var existingSet = beatmapSets.Find(b => b.BeatmapSet.ID == beatmapSet.ID);
+
+            if (existingSet == null)
+                return;
+
+            beatmapSets.Remove(existingSet);
+
+            updateItems();
+
+            if (existingSet.State == CarouselItemState.Selected)
+                SelectNext();
         }
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            // todo: this method should be smarter as to not recreate items that haven't changed, etc.
-            var oldGroup = beatmapSets.Find(b => b.BeatmapSet.ID == beatmapSet.ID);
+            CarouselBeatmapSet existingSet = beatmapSets.Find(b => b.BeatmapSet.ID == beatmapSet.ID);
 
-            bool hadSelection = oldGroup?.State == CarouselItemState.Selected;
+            bool hadSelection = existingSet?.State?.Value == CarouselItemState.Selected;
 
-            var newSet = createGroup(beatmapSet);
+            var newSet = createCarouselSet(beatmapSet);
 
-            int index = beatmapSets.IndexOf(oldGroup);
+            int index = beatmapSets.IndexOf(existingSet);
             if (index >= 0)
                 beatmapSets.RemoveAt(index);
 
@@ -139,8 +154,8 @@ namespace osu.Game.Screens.Select
             {
                 if (index >= 0)
                     beatmapSets.Insert(index, newSet);
-                //else
-                //    addBeatmapSet(newSet);
+                else
+                    beatmapSets.Add(newSet);
             }
 
             if (hadSelection && newSet == null)
@@ -154,10 +169,12 @@ namespace osu.Game.Screens.Select
                 var newSelection = newSet.Beatmaps.Find(b => b.Beatmap.ID == selectedBeatmap?.Beatmap.ID);
 
                 if (newSelection == null && selectedBeatmap != null)
-                    newSelection = newSet.Beatmaps[Math.Min(newSet.Beatmaps.Count - 1, oldGroup.Beatmaps.IndexOf(selectedBeatmap))];
+                    newSelection = newSet.Beatmaps[Math.Min(newSet.Beatmaps.Count - 1, existingSet.Beatmaps.IndexOf(selectedBeatmap))];
 
                 select(newSelection);
             }
+
+            updateItems();
         }
 
         public void SelectBeatmap(BeatmapInfo beatmap, bool animated = true)
@@ -252,11 +269,11 @@ namespace osu.Game.Screens.Select
                     notYetVisitedSets = visible;
                 }
 
-                set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count()));
+                set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
                 previouslyVisitedRandomSets.Add(set);
             }
             else
-                set = visible.ElementAt(RNG.Next(visible.Count()));
+                set = visible.ElementAt(RNG.Next(visible.Count));
 
             select(set.Beatmaps[RNG.Next(set.Beatmaps.Count)]);
         }
@@ -337,7 +354,7 @@ namespace osu.Game.Screens.Select
             ScrollTo(selectedY, animated);
         }
 
-        private CarouselBeatmapSet createGroup(BeatmapSetInfo beatmapSet)
+        private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
         {
             if (beatmapSet.Beatmaps.All(b => b.Hidden))
                 return null;
@@ -371,25 +388,6 @@ namespace osu.Game.Screens.Select
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
-        }
-
-        private void removeBeatmapSet(CarouselBeatmapSet set)
-        {
-            if (set == null)
-                return;
-
-            beatmapSets.Remove(set);
-
-            foreach (var d in set.Drawables.Value)
-            {
-                Items.Remove(d);
-                scrollableContent.Remove(d);
-            }
-
-            if (set.State == CarouselItemState.Selected)
-                SelectNext();
-
-            yPositionsCache.Invalidate();
         }
 
         /// <summary>

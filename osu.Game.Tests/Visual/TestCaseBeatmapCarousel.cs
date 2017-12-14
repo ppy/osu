@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Visual
                 });
 
             void ensureRandomDidntRepeat() =>
-                AddAssert("ensure no repeats", () => selectedSets.Distinct().Count() == selectedSets.Count());
+                AddAssert("ensure no repeats", () => selectedSets.Distinct().Count() == selectedSets.Count);
 
             void prevRandom() => AddStep("select random last", () =>
             {
@@ -153,6 +153,7 @@ namespace osu.Game.Tests.Visual
                 AddAssert("ensure prev random fetch worked", () => selectedSets.Peek() == carousel.SelectedBeatmapSet);
 
             setSelected(1, 1);
+
             nextRandom();
             ensureRandomDidntRepeat();
             nextRandom();
@@ -172,29 +173,44 @@ namespace osu.Game.Tests.Visual
 
             nextRandom();
             AddAssert("ensure repeat", () => selectedSets.Contains(carousel.SelectedBeatmapSet));
+
+            // test adding and removing
+
+            AddStep("Add new set #5", () => carousel.UpdateBeatmapSet(createTestBeatmapSet(5)));
+            AddStep("Add new set #6", () => carousel.UpdateBeatmapSet(createTestBeatmapSet(6)));
+
+            checkVisibleItemCount(false, 6);
+
+            AddStep("Remove set #4", () => carousel.RemoveBeatmapSet(createTestBeatmapSet(4)));
+
+            checkVisibleItemCount(false, 5);
+
+
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
         {
             return new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = 1234 + i,
+                ID = i,
+                OnlineBeatmapSetID = i,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
-                    OnlineBeatmapSetID = 1234 + i,
+                    OnlineBeatmapSetID = i,
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = "peppy",
                     Title = "test set #" + i,
-                    AuthorString = "peppy"
+                    AuthorString = "peppy",
                 },
                 Beatmaps = new List<BeatmapInfo>(new[]
                 {
                     new BeatmapInfo
                     {
-                        OnlineBeatmapID = 1234 + i,
+                        OnlineBeatmapID = i * 10,
                         Path = "normal.osu",
                         Version = "Normal",
+                        StarDifficulty = 2,
                         BaseDifficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 3.5f,
@@ -202,9 +218,10 @@ namespace osu.Game.Tests.Visual
                     },
                     new BeatmapInfo
                     {
-                        OnlineBeatmapID = 1235 + i,
+                        OnlineBeatmapID = i * 10 + 1,
                         Path = "hard.osu",
                         Version = "Hard",
+                        StarDifficulty = 5,
                         BaseDifficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 5,
@@ -212,9 +229,10 @@ namespace osu.Game.Tests.Visual
                     },
                     new BeatmapInfo
                     {
-                        OnlineBeatmapID = 1236 + i,
+                        OnlineBeatmapID = i * 10 + 2,
                         Path = "insane.osu",
                         Version = "Insane",
+                        StarDifficulty = 6,
                         BaseDifficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 7,
