@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.OsuDifficulty;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
@@ -18,6 +17,8 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -33,21 +34,28 @@ namespace osu.Game.Rulesets.Osu
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
 
-        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
+        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap)
         {
-            new BeatmapStatistic
+            IEnumerable<HitObject> hitObjects = beatmap.Beatmap.HitObjects;
+            IEnumerable<HitObject> circles = hitObjects.Where(d => !(d is IHasEndTime));
+            IEnumerable<HitObject> sliders = hitObjects.Where(s => s is IHasCurve);
+
+            return new[]
             {
-                Name = @"Circle count",
-                Content = beatmap.Beatmap.HitObjects.Count(h => h is HitCircle).ToString(),
-                Icon = FontAwesome.fa_dot_circle_o
-            },
-            new BeatmapStatistic
-            {
-                Name = @"Slider count",
-                Content = beatmap.Beatmap.HitObjects.Count(h => h is Slider).ToString(),
-                Icon = FontAwesome.fa_circle_o
-            }
-        };
+                new BeatmapStatistic
+                {
+                    Name = @"Circle Count",
+                    Content = circles.Count().ToString(),
+                    Icon = FontAwesome.fa_circle_o
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Slider Count",
+                    Content = sliders.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                }
+            };
+        }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {

@@ -90,6 +90,7 @@
     <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoderTest.cs" />
     <Compile Include="Visual\TestCaseBeatmapDetailArea.cs" />
     <Compile Include="Visual\TestCaseBeatmapDetails.cs" />
+    <Compile Include="Visual\TestCaseBeatmapInfoWedge.cs" />
     <Compile Include="Visual\TestCaseBeatmapOptionsOverlay.cs" />
     <Compile Include="Visual\TestCaseBeatmapScoresContainer.cs" />
     <Compile Include="Visual\TestCaseBeatmapSetOverlay.cs" />
