@@ -27,14 +27,23 @@ namespace osu.Game.Screens.Select
     public class BeatmapCarousel : OsuScrollContainer
     {
         /// <summary>
-        /// Triggered when the <see cref="Beatmaps"/> loaded change and are completely loaded.
+        /// Triggered when the <see cref="BeatmapSets"/> loaded change and are completely loaded.
         /// </summary>
-        public Action BeatmapsChanged;
+        public Action BeatmapSetsChanged;
 
         /// <summary>
         /// The currently selected beatmap.
         /// </summary>
         public BeatmapInfo SelectedBeatmap => selectedBeatmap?.Beatmap;
+
+        private CarouselBeatmap selectedBeatmap => selectedBeatmapSet?.Beatmaps.FirstOrDefault(s => s.State == CarouselItemState.Selected);
+
+        /// <summary>
+        /// The currently selected beatmap set.
+        /// </summary>
+        public BeatmapSetInfo SelectedBeatmapSet => selectedBeatmapSet?.BeatmapSet;
+
+        private CarouselBeatmapSet selectedBeatmapSet => carouselSets.FirstOrDefault(s => s.State == CarouselItemState.Selected);
 
         /// <summary>
         /// Raised when the <see cref="SelectedBeatmap"/> is changed.
@@ -43,7 +52,7 @@ namespace osu.Game.Screens.Select
 
         public override bool HandleInput => AllowSelection;
 
-        public IEnumerable<BeatmapSetInfo> Beatmaps
+        public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
             get { return carouselSets.Select(g => g.BeatmapSet); }
             set
@@ -72,7 +81,7 @@ namespace osu.Game.Screens.Select
                         Items = root.Drawables.Value.ToList();
 
                         yPositionsCache.Invalidate();
-                        BeatmapsChanged?.Invoke();
+                        BeatmapSetsChanged?.Invoke();
                     });
                 });
             }
@@ -85,16 +94,13 @@ namespace osu.Game.Screens.Select
 
         private readonly List<CarouselBeatmapSet> carouselSets = new List<CarouselBeatmapSet>();
 
-        private Bindable<RandomSelectAlgorithm> randomSelectAlgorithm;
-        private readonly List<CarouselBeatmapSet> seenSets = new List<CarouselBeatmapSet>();
+        public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
+        private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
         private CarouselGroup root = new CarouselGroup();
 
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
-
-        private CarouselBeatmap selectedBeatmap;
-        private CarouselBeatmapSet selectedBeatmapSet => carouselSets.FirstOrDefault(s => s.State == CarouselItemState.Selected);
 
         public BeatmapCarousel()
         {
@@ -173,12 +179,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void selectNullBeatmap()
-        {
-            selectedBeatmap = null;
-            SelectionChanged?.Invoke(null);
-        }
-
         /// <summary>
         /// Increment selection in the carousel in a chosen direction.
         /// </summary>
@@ -187,9 +187,9 @@ namespace osu.Game.Screens.Select
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
             // todo: we may want to refactor and remove this as an optimisation in the future.
-            if (carouselSets.All(g => g.State == CarouselItemState.Hidden))
+            if (carouselSets.All(g => !g.Visible))
             {
-                selectNullBeatmap();
+                SelectionChanged?.Invoke(null);
                 return;
             }
 
@@ -218,53 +218,57 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private IEnumerable<CarouselBeatmapSet> getVisibleGroups() => carouselSets.Where(select => select.State != CarouselItemState.NotSelected);
+        private IEnumerable<CarouselBeatmapSet> getVisibleSets() => carouselSets.Where(select => select.Visible);
 
         public void SelectNextRandom()
         {
             if (carouselSets.Count == 0)
                 return;
 
-            var visibleGroups = getVisibleGroups();
-            if (!visibleGroups.Any())
+            var visible = getVisibleSets().ToList();
+            if (!visible.Any())
                 return;
 
             if (selectedBeatmap != null)
+            {
                 randomSelectedBeatmaps.Push(selectedBeatmap);
 
-            CarouselBeatmapSet group;
+                // when performing a random, we want to add the current set to the previously visited list
+                // else the user may be "randomised" to the existing selection.
+                if (previouslyVisitedRandomSets.LastOrDefault() != selectedBeatmapSet)
+                    previouslyVisitedRandomSets.Add(selectedBeatmapSet);
+            }
 
-            if (randomSelectAlgorithm == RandomSelectAlgorithm.RandomPermutation)
+            CarouselBeatmapSet set;
+
+            if (RandomAlgorithm == RandomSelectAlgorithm.RandomPermutation)
             {
-                var notSeenGroups = visibleGroups.Except(seenSets);
-                if (!notSeenGroups.Any())
+                var notYetVisitedSets = visible.Except(previouslyVisitedRandomSets).ToList();
+                if (!notYetVisitedSets.Any())
                 {
-                    seenSets.Clear();
-                    notSeenGroups = visibleGroups;
+                    previouslyVisitedRandomSets.Clear();
+                    notYetVisitedSets = visible;
                 }
 
-                group = notSeenGroups.ElementAt(RNG.Next(notSeenGroups.Count()));
-                seenSets.Add(group);
+                set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count()));
+                previouslyVisitedRandomSets.Add(set);
             }
             else
-                group = visibleGroups.ElementAt(RNG.Next(visibleGroups.Count()));
+                set = visible.ElementAt(RNG.Next(visible.Count()));
 
-            CarouselBeatmap item = group.Beatmaps[RNG.Next(group.Beatmaps.Count)];
-
-            select(item);
+            select(set.Beatmaps[RNG.Next(set.Beatmaps.Count)]);
         }
 
         public void SelectPreviousRandom()
         {
-            if (!randomSelectedBeatmaps.Any())
-                return;
-
             while (randomSelectedBeatmaps.Any())
             {
                 var beatmap = randomSelectedBeatmaps.Pop();
 
-                if (beatmap.Visible)
+                if (!beatmap.Filtered)
                 {
+                    if (RandomAlgorithm == RandomSelectAlgorithm.RandomPermutation)
+                        previouslyVisitedRandomSets.Remove(selectedBeatmapSet);
                     select(beatmap);
                     break;
                 }
@@ -351,7 +355,6 @@ namespace osu.Game.Screens.Select
                 {
                     if (v == CarouselItemState.Selected)
                     {
-                        selectedBeatmap = c;
                         SelectionChanged?.Invoke(c.Beatmap);
                         yPositionsCache.Invalidate();
                         Schedule(() => ScrollToSelected());
@@ -365,7 +368,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config)
         {
-            randomSelectAlgorithm = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm);
+            config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
         }
 
         private void removeBeatmapSet(CarouselBeatmapSet set)

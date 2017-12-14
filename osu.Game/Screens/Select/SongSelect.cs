@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     SelectionChanged = carouselSelectionChanged,
-                    BeatmapsChanged = carouselBeatmapsLoaded,
+                    BeatmapSetsChanged = carouselBeatmapsLoaded,
                 },
                 FilterControl = new FilterControl
                 {
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Select
 
             initialAddSetsTask = new CancellationTokenSource();
 
-            carousel.Beatmaps = this.beatmaps.GetAllUsableBeatmapSets();
+            carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSets();
 
             Beatmap.ValueChanged += beatmap_ValueChanged;
 
