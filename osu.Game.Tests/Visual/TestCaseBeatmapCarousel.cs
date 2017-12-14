@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Load Beatmaps", () =>
             {
-                carousel.Beatmaps = new[]
+                carousel.BeatmapSets = new[]
                 {
                     createTestBeatmapSet(1),
                     createTestBeatmapSet(2),
@@ -55,11 +56,11 @@ namespace osu.Game.Tests.Visual
 
             void checkSelected(int set, int diff) =>
                 AddAssert($"selected is set{set} diff{diff}", () =>
-                    carousel.SelectedBeatmap == carousel.Beatmaps.Skip(set - 1).First().Beatmaps.Skip(diff - 1).First());
+                    carousel.SelectedBeatmap == carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff - 1).First());
 
             void setSelected(int set, int diff) =>
                 AddStep($"select set{set} diff{diff}", () =>
-                    carousel.SelectBeatmap(carousel.Beatmaps.Skip(set - 1).First().Beatmaps.Skip(diff - 1).First()));
+                    carousel.SelectBeatmap(carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff - 1).First()));
 
             void advanceSelection(bool diff, int direction = 1, int count = 1)
             {
@@ -77,7 +78,7 @@ namespace osu.Game.Tests.Visual
                 AddAssert($"{count} {(diff ? "diff" : "set")} visible", () =>
                     carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
 
-            AddUntilStep(() => carousel.Beatmaps.Any(), "Wait for load");
+            AddUntilStep(() => carousel.BeatmapSets.Any(), "Wait for load");
 
             // test traversal
 
@@ -122,6 +123,55 @@ namespace osu.Game.Tests.Visual
             checkSelected(1, 1);
             AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
             checkSelected(1, 1);
+
+            // test random non-repeating algorithm
+
+            Stack<BeatmapSetInfo> selectedSets = new Stack<BeatmapSetInfo>();
+
+            void nextRandom() =>
+                AddStep("select random next", () =>
+                {
+                    carousel.RandomAlgorithm.Value = RandomSelectAlgorithm.RandomPermutation;
+
+                    if (!selectedSets.Any() && carousel.SelectedBeatmap != null)
+                        selectedSets.Push(carousel.SelectedBeatmapSet);
+
+                    carousel.SelectNextRandom();
+                    selectedSets.Push(carousel.SelectedBeatmapSet);
+                });
+
+            void ensureRandomDidntRepeat() =>
+                AddAssert("ensure no repeats", () => selectedSets.Distinct().Count() == selectedSets.Count());
+
+            void prevRandom() => AddStep("select random last", () =>
+            {
+                carousel.SelectPreviousRandom();
+                selectedSets.Pop();
+            });
+
+            void ensureRandomFetchSuccess() =>
+                AddAssert("ensure prev random fetch worked", () => selectedSets.Peek() == carousel.SelectedBeatmapSet);
+
+            setSelected(1, 1);
+            nextRandom();
+            ensureRandomDidntRepeat();
+            nextRandom();
+            ensureRandomDidntRepeat();
+            nextRandom();
+            ensureRandomDidntRepeat();
+
+            prevRandom();
+            ensureRandomFetchSuccess();
+            prevRandom();
+            ensureRandomFetchSuccess();
+
+            nextRandom();
+            ensureRandomDidntRepeat();
+            nextRandom();
+            ensureRandomDidntRepeat();
+
+            nextRandom();
+            AddAssert("ensure repeat", () => selectedSets.Contains(carousel.SelectedBeatmapSet));
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
