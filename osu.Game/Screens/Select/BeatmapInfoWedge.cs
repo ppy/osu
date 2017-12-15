@@ -19,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Screens.Select
 {
@@ -217,8 +218,8 @@ namespace osu.Game.Screens.Select
                             },
                             new FillFlowContainer
                             {
-                                Margin = new MarginPadding { Top = 20, Left = 10 },
-                                Spacing = new Vector2(40, 0),
+                                Margin = new MarginPadding { Top = 20 },
+                                Spacing = new Vector2(20, 0),
                                 AutoSizeAxes = Axes.Both,
                                 Children = labels
                             },
@@ -232,43 +233,59 @@ namespace osu.Game.Screens.Select
                 double bpmMax = beatmap.ControlPointInfo.BPMMaximum;
                 double bpmMin = beatmap.ControlPointInfo.BPMMinimum;
 
-                if (Precision.AlmostEquals(bpmMin, bpmMax)) return $"{bpmMin:0}bpm";
+                if (Precision.AlmostEquals(bpmMin, bpmMax)) return $"{bpmMin:0}";
 
-                return $"{bpmMin:0}-{bpmMax:0}bpm (mostly {beatmap.ControlPointInfo.BPMMode:0}bpm)";
+                return $"{bpmMin:0}-{bpmMax:0} (mostly {beatmap.ControlPointInfo.BPMMode:0})";
             }
 
-            public class InfoLabel : Container
+            public class InfoLabel : Container, IHasTooltip
             {
+                public string TooltipText { get; private set; }
+
                 public InfoLabel(BeatmapStatistic statistic)
                 {
+                    TooltipText = statistic.Name;
                     AutoSizeAxes = Axes.Both;
+
                     Children = new Drawable[]
                     {
-                        new SpriteIcon
+                        new Container
                         {
-                            Icon = FontAwesome.fa_square,
-                            Origin = Anchor.Centre,
-                            Colour = new Color4(68, 17, 136, 255),
-                            Rotation = 45,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             Size = new Vector2(20),
-                        },
-                        new SpriteIcon
-                        {
-                            Icon = statistic.Icon,
-                            Origin = Anchor.Centre,
-                            Colour = new Color4(255, 221, 85, 255),
-                            Scale = new Vector2(0.8f),
-                            Size = new Vector2(20),
+                            Children = new[]
+                            {
+                                new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = OsuColour.FromHex(@"441288"),
+                                    Icon = FontAwesome.fa_square,
+                                    Rotation = 45,
+                                },
+                                new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Scale = new Vector2(0.8f),
+                                    Colour = OsuColour.FromHex(@"f7dd55"),
+                                    Icon = statistic.Icon,
+                                },
+                            }
                         },
                         new OsuSpriteText
                         {
-                            Margin = new MarginPadding { Left = 13 },
-                            Font = @"Exo2.0-Bold",
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             Colour = new Color4(255, 221, 85, 255),
+                            Font = @"Exo2.0-Bold",
+                            Margin = new MarginPadding { Left = 30 },
                             Text = statistic.Content,
                             TextSize = 17,
-                            Origin = Anchor.CentreLeft
-                        },
+                        }
                     };
                 }
             }
