@@ -12,7 +12,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseBeatmapInfoWedge : OsuTestCase
+    internal class TestCaseBeatmapInfoWedge : OsuTestCase
     {
         private BeatmapManager beatmaps;
         private readonly Random random;
