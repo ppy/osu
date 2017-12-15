@@ -117,18 +117,19 @@ namespace osu.Game.Screens.Select
         {
             if (player != null) return;
 
-            //if (state?.Keyboard.ControlPressed == true)
-            //{
-            //    var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
-            //    var autoType = auto.GetType();
+            // Ctrl+Enter should start map with autoplay enabled.
+            if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
+            {
+                var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
+                var autoType = auto.GetType();
 
-            //    var mods = modSelect.SelectedMods.Value;
-            //    if (mods.All(m => m.GetType() != autoType))
-            //    {
-            //        modSelect.SelectedMods.Value = mods.Concat(new[] { auto });
-            //        removeAutoModOnResume = true;
-            //    }
-            //}
+                var mods = modSelect.SelectedMods.Value;
+                if (mods.All(m => m.GetType() != autoType))
+                {
+                    modSelect.SelectedMods.Value = mods.Concat(new[] { auto });
+                    removeAutoModOnResume = true;
+                }
+            }
 
             Beatmap.Value.Track.Looping = false;
             Beatmap.Disabled = true;
