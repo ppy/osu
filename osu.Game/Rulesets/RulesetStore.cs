@@ -83,7 +83,11 @@ namespace osu.Game.Rulesets
             {
                 try
                 {
-                    r.CreateInstance();
+                    var instance = r.CreateInstance();
+
+                    r.Name = instance.Description;
+                    r.ShortName = instance.ShortName;
+
                     r.Available = true;
                 }
                 catch
@@ -117,6 +121,7 @@ namespace osu.Game.Rulesets
         private RulesetInfo createRulesetInfo(Ruleset ruleset) => new RulesetInfo
         {
             Name = ruleset.Description,
+            ShortName = ruleset.ShortName,
             InstantiationInfo = ruleset.GetType().AssemblyQualifiedName,
             ID = ruleset.LegacyID
         };
