@@ -27,25 +27,11 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen
     {
-        private BeatmapManager beatmaps;
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
-
-        private readonly BeatmapCarousel carousel;
-        private DialogOverlay dialogOverlay;
-
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
-
+        private static readonly Vector2 background_blur = new Vector2(20);
         private const float left_area_padding = 20;
 
-        private readonly BeatmapInfoWedge beatmapInfoWedge;
-
-        protected Container LeftContent;
-
-        private static readonly Vector2 background_blur = new Vector2(20);
-        private CancellationTokenSource initialAddSetsTask;
-
-        private SampleChannel sampleChangeDifficulty;
-        private SampleChannel sampleChangeBeatmap;
+        public readonly FilterControl FilterControl;
 
         protected virtual bool ShowFooter => true;
 
@@ -65,10 +51,21 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected readonly Container FooterPanels;
 
-        public readonly FilterControl FilterControl;
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
+
+        protected Container LeftContent;
+
+        private readonly BeatmapCarousel carousel;
+        private readonly BeatmapInfoWedge beatmapInfoWedge;
+        private DialogOverlay dialogOverlay;
+        private BeatmapManager beatmaps;
+
+        private SampleChannel sampleChangeDifficulty;
+        private SampleChannel sampleChangeBeatmap;
+
+        private CancellationTokenSource initialAddSetsTask;
 
         private DependencyContainer dependencies;
-
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
 
         protected SongSelect()
@@ -172,7 +169,7 @@ namespace osu.Game.Screens.Select
                 Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions, Key.F3);
 
-                BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, () => Delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
+                BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
             }
 
             if (this.beatmaps == null)
@@ -195,42 +192,20 @@ namespace osu.Game.Screens.Select
 
             carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSets();
 
-            Beatmap.ValueChanged += beatmap_ValueChanged;
-
             Beatmap.DisabledChanged += disabled => carousel.AllowSelection = !disabled;
-            carousel.AllowSelection = !Beatmap.Disabled;
+            Beatmap.TriggerChange();
+
+            Beatmap.ValueChanged += b =>
+            {
+                if (!IsCurrentScreen) return;
+                carousel.SelectBeatmap(b?.BeatmapInfo);
+            };
         }
 
         public void Edit(BeatmapInfo beatmap)
         {
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap);
             Push(new Editor());
-        }
-
-        private void onBeatmapRestored(BeatmapInfo beatmap)
-        {
-            Schedule(() =>
-            {
-                var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
-                carousel.UpdateBeatmapSet(beatmapSet);
-            });
-        }
-
-        private void onBeatmapHidden(BeatmapInfo beatmap)
-        {
-            Schedule(() =>
-            {
-                var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
-                carousel.UpdateBeatmapSet(beatmapSet);
-            });
-        }
-
-        private void carouselBeatmapsLoaded()
-        {
-            if (Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
-                carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false);
-            else
-                carousel.SelectNextRandom();
         }
 
         public void Start(BeatmapInfo beatmap)
@@ -250,6 +225,11 @@ namespace osu.Game.Screens.Select
 
             Start();
         }
+
+        /// <summary>
+        /// Called when a selection is made.
+        /// </summary>
+        protected abstract void Start();
 
         private ScheduledDelegate selectionChangedDebounce;
 
@@ -307,18 +287,11 @@ namespace osu.Game.Screens.Select
                 carousel.SelectNextRandom();
         }
 
-        protected abstract void Start();
-
-        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => carousel.UpdateBeatmapSet(s));
-
-        private void onBeatmapSetRemoved(BeatmapSetInfo s) => Schedule(() => removeBeatmapSet(s));
-
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
             Content.FadeInFromZero(250);
-
             FilterControl.Activate();
         }
 
@@ -357,13 +330,6 @@ namespace osu.Game.Screens.Select
             base.LogoExiting(logo);
             logo.ScaleTo(0.2f, logo_transition / 2, Easing.Out);
             logo.FadeOut(logo_transition / 2, Easing.Out);
-        }
-
-        private void beatmap_ValueChanged(WorkingBeatmap beatmap)
-        {
-            if (!IsCurrentScreen) return;
-
-            carousel.SelectBeatmap(beatmap?.BeatmapInfo);
         }
 
         protected override void OnResuming(Screen last)
@@ -426,8 +392,7 @@ namespace osu.Game.Screens.Select
         /// <param name="beatmap">The working beatmap.</param>
         protected virtual void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            var backgroundModeBeatmap = Background as BackgroundScreenBeatmap;
-            if (backgroundModeBeatmap != null)
+            if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
                 backgroundModeBeatmap.BlurTo(background_blur, 750, Easing.OutQuint);
@@ -452,18 +417,44 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
+        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => carousel.UpdateBeatmapSet(s));
+
+        private void onBeatmapSetRemoved(BeatmapSetInfo s) => Schedule(() =>
         {
-            carousel.RemoveBeatmapSet(beatmapSet);
+            carousel.RemoveBeatmapSet(s);
             if (carousel.SelectedBeatmap == null)
                 Beatmap.SetDefault();
+        });
+
+        private void onBeatmapRestored(BeatmapInfo beatmap)
+        {
+            Schedule(() =>
+            {
+                var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
+                carousel.UpdateBeatmapSet(beatmapSet);
+            });
         }
 
-        public void Delete(BeatmapSetInfo beatmap)
+        private void onBeatmapHidden(BeatmapInfo beatmap)
         {
-            if (beatmap == null)
-                return;
+            Schedule(() =>
+            {
+                var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
+                carousel.UpdateBeatmapSet(beatmapSet);
+            });
+        }
 
+        private void carouselBeatmapsLoaded()
+        {
+            if (Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
+                carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false);
+            else
+                carousel.SelectNextRandom();
+        }
+
+        private void delete(BeatmapSetInfo beatmap)
+        {
+            if (beatmap == null) return;
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
@@ -481,7 +472,7 @@ namespace osu.Game.Screens.Select
                     if (state.Keyboard.ShiftPressed)
                     {
                         if (!Beatmap.IsDefault)
-                            Delete(Beatmap.Value.BeatmapSetInfo);
+                            delete(Beatmap.Value.BeatmapSetInfo);
                         return true;
                     }
 
