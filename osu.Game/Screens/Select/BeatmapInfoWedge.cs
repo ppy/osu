@@ -246,35 +246,43 @@ namespace osu.Game.Screens.Select
                 {
                     TooltipText = statistic.Name;
                     AutoSizeAxes = Axes.Both;
-                    Padding = new MarginPadding { Left = 16 };
 
                     Children = new Drawable[]
                     {
-                        new SpriteIcon
+                        new Container
                         {
                             Anchor = Anchor.CentreLeft,
-                            Colour = OsuColour.FromHex(@"441288"),
-                            Icon = FontAwesome.fa_square,
-                            Origin = Anchor.Centre,
-                            Rotation = 45,
+                            Origin = Anchor.CentreLeft,
                             Size = new Vector2(20),
-                        },
-                        new SpriteIcon
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Colour = OsuColour.FromHex(@"f7dd55"),
-                            Icon = statistic.Icon,
-                            Origin = Anchor.Centre,
-                            Scale = new Vector2(0.8f),
-                            Size = new Vector2(20),
+                            Children = new[]
+                            {
+                                new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = OsuColour.FromHex(@"441288"),
+                                    Icon = FontAwesome.fa_square,
+                                    Rotation = 45,
+                                },
+                                new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Scale = new Vector2(0.8f),
+                                    Colour = OsuColour.FromHex(@"f7dd55"),
+                                    Icon = statistic.Icon,
+                                },
+                            }
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             Colour = new Color4(255, 221, 85, 255),
                             Font = @"Exo2.0-Bold",
-                            Margin = new MarginPadding { Left = 13 },
-                            Origin = Anchor.CentreLeft,
+                            Margin = new MarginPadding { Left = 30 },
                             Text = statistic.Content,
                             TextSize = 17,
                         }
