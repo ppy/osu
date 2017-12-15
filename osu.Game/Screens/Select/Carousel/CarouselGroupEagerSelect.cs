@@ -24,5 +24,22 @@ namespace osu.Game.Screens.Select.Carousel
                 }
             };
         }
+
+        protected override void ItemStateChanged(CarouselItem item, CarouselItemState value)
+        {
+            base.ItemStateChanged(item, value);
+
+            if (value == CarouselItemState.NotSelected)
+            {
+                if (Children.All(i => i.State != CarouselItemState.Selected))
+                {
+                    var first = Children.FirstOrDefault(i => !i.Filtered);
+                    if (first != null)
+                    {
+                        first.State.Value = CarouselItemState.Selected;
+                    }
+                }
+            }
+        }
     }
 }

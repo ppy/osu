@@ -39,7 +39,9 @@ namespace osu.Game.Tests.Visual
 
         private readonly Stack<BeatmapSetInfo> selectedSets = new Stack<BeatmapSetInfo>();
 
-        private const int set_count = 1000;
+        private BeatmapInfo currentSelection;
+
+        private const int set_count = 5;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -54,6 +56,8 @@ namespace osu.Game.Tests.Visual
             for (int i = 1; i <= set_count; i++)
                 beatmapSets.Add(createTestBeatmapSet(i));
 
+            carousel.SelectionChanged = s => currentSelection = s;
+
             AddStep("Load Beatmaps", () => { carousel.BeatmapSets = beatmapSets; });
 
             AddUntilStep(() => carousel.BeatmapSets.Any(), "Wait for load");
@@ -63,6 +67,8 @@ namespace osu.Game.Tests.Visual
             testRandom();
             testAddRemove();
             testSorting();
+
+            testRemoveAll();
         }
 
         private void ensureRandomFetchSuccess() =>
@@ -145,6 +151,8 @@ namespace osu.Game.Tests.Visual
         {
             // basic filtering
 
+            setSelected(1, 1);
+
             AddStep("Filter", () => carousel.Filter(new FilterCriteria { SearchText = "set #3!" }, false));
             checkVisibleItemCount(diff: false, count: 1);
             checkVisibleItemCount(diff: true, count: 3);
@@ -163,8 +171,19 @@ namespace osu.Game.Tests.Visual
             setSelected(1, 2);
             AddStep("Filter some difficulties", () => carousel.Filter(new FilterCriteria { SearchText = "Normal" }, false));
             checkSelected(1, 1);
+
             AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
             checkSelected(1, 1);
+
+            AddStep("Filter all", () => carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false));
+
+            checkVisibleItemCount(false, 0);
+            checkVisibleItemCount(true, 0);
+            AddAssert("Selection is null", () => currentSelection == null);
+
+            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+
+            AddAssert("Selection is non-null", () => currentSelection != null);
         }
 
         /// <summary>
@@ -225,6 +244,21 @@ namespace osu.Game.Tests.Visual
             AddAssert($"Check #{set_count} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Title.EndsWith($"#{set_count}!"));
         }
 
+        private void testRemoveAll()
+        {
+            setSelected(2, 1);
+
+            AddAssert("Selection is non-null", () => currentSelection != null);
+
+            AddUntilStep(() =>
+            {
+                carousel.RemoveBeatmapSet(carousel.BeatmapSets.Last());
+                return !carousel.BeatmapSets.Any();
+            }, "Remove all");
+
+            AddAssert("Selection is null", () => currentSelection == null);
+        }
+
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
         {
@@ -237,9 +271,9 @@ namespace osu.Game.Tests.Visual
                 {
                     OnlineBeatmapSetID = i,
                     // Create random metadata, then we can check if sorting works based on these
-                    Artist = $"peppy{i.ToString().PadLeft(6,'0')}",
+                    Artist = $"peppy{i.ToString().PadLeft(6, '0')}",
                     Title = $"test set #{i}!",
-                    AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25,i - 1)), 5))
+                    AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, i - 1)), 5))
                 },
                 Beatmaps = new List<BeatmapInfo>(new[]
                 {
