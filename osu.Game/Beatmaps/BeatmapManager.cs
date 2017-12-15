@@ -497,15 +497,21 @@ namespace osu.Game.Beatmaps
             using (var stream = new StreamReader(reader.GetStream(mapName)))
                 metadata = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
 
+
             // check if a set already exists with the same online id.
-            beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) ?? new BeatmapSetInfo
-            {
-                OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
-                Beatmaps = new List<BeatmapInfo>(),
-                Hash = hash,
-                Files = fileInfos,
-                Metadata = metadata
-            };
+            if (metadata.OnlineBeatmapSetID != null)
+                beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID);
+
+            if (beatmapSet == null)
+                beatmapSet = new BeatmapSetInfo
+                {
+                    OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
+                    Beatmaps = new List<BeatmapInfo>(),
+                    Hash = hash,
+                    Files = fileInfos,
+                    Metadata = metadata
+                };
+
 
             var mapNames = reader.Filenames.Where(f => f.EndsWith(".osu"));
 
@@ -525,12 +531,13 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
-                    var existing = beatmaps.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.BeatmapInfo.Hash || b.OnlineBeatmapID == beatmap.BeatmapInfo.OnlineBeatmapID);
+                    var existing = beatmaps.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.BeatmapInfo.Hash || beatmap.BeatmapInfo.OnlineBeatmapID != null && b.OnlineBeatmapID == beatmap.BeatmapInfo.OnlineBeatmapID);
 
                     if (existing == null)
                     {
-                        // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
-                        beatmap.BeatmapInfo.Metadata = null;
+                        // Exclude beatmap-metadata if it's equal to beatmapset-metadata
+                        if (metadata.Equals(beatmap.Metadata))
+                            beatmap.BeatmapInfo.Metadata = null;
 
                         RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
 
