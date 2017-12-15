@@ -314,6 +314,7 @@
     <Compile Include="Rulesets\Edit\Layers\Selection\DragSelector.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\Marker.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\MarkerContainer.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionInfo.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\SelectionLayer.cs" />
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
     <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
