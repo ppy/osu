@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Edit.Layers.Selection
 {
@@ -20,6 +21,8 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
     /// </summary>
     public class DragSelector : CompositeDrawable
     {
+        public readonly Bindable<SelectionInfo> Selection = new Bindable<SelectionInfo>();
+
         /// <summary>
         /// The <see cref="DrawableHitObject"/>s that can be selected through a drag-selection.
         /// </summary>
@@ -103,7 +106,6 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         }
 
         private readonly List<DrawableHitObject> capturedHitObjects = new List<DrawableHitObject>();
-        public IReadOnlyList<DrawableHitObject> CapturedHitObjects => capturedHitObjects;
 
         /// <summary>
         /// Processes hitobjects to determine which ones are captured by the drag selection.
@@ -128,7 +130,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         /// </summary>
         public void FinishCapture()
         {
-            if (CapturedHitObjects.Count == 0)
+            if (capturedHitObjects.Count == 0)
             {
                 Hide();
                 return;
@@ -158,6 +160,12 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             // Transform into markers to let the user modify the drag selection further.
             background.Delay(50).FadeOut(200);
             markers.FadeIn(200);
+
+            Selection.Value = new SelectionInfo
+            {
+                Objects = capturedHitObjects,
+                SelectionQuad = Parent.ToScreenSpace(dragRectangle)
+            };
         }
 
         private bool isActive = true;
@@ -167,6 +175,8 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         {
             isActive = false;
             this.FadeOut(400, Easing.OutQuint).Expire();
+
+            Selection.Value = null;
         }
     }
 }
