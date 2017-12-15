@@ -26,14 +26,20 @@ namespace osu.Game.Screens.Select.Carousel
     {
         private readonly BeatmapInfo beatmap;
 
-        private readonly Sprite background;
+        private Sprite background;
 
         public Action<BeatmapInfo> StartRequested;
         public Action<BeatmapInfo> EditRequested;
         public Action<BeatmapInfo> HideRequested;
 
-        private readonly Triangles triangles;
-        private readonly StarCounter starCounter;
+        private Triangles triangles;
+        private StarCounter starCounter;
+
+        public DrawableCarouselBeatmap(CarouselBeatmap panel) : base(panel)
+        {
+            beatmap = panel.Beatmap;
+            Height *= 0.60f;
+        }
 
         [BackgroundDependencyLoader(true)]
         private void load(SongSelect songSelect, BeatmapManager manager)
@@ -46,13 +52,6 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (manager != null)
                 HideRequested = manager.Hide;
-        }
-
-        public DrawableCarouselBeatmap(CarouselBeatmap panel)
-            : base(panel)
-        {
-            beatmap = panel.Beatmap;
-            Height *= 0.60f;
 
             Children = new Drawable[]
             {
