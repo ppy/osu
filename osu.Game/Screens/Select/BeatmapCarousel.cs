@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Select
             {
                 List<CarouselBeatmapSet> newSets = null;
 
-                CarouselGroup newRoot = new CarouselGroup();
+                CarouselGroup newRoot = new CarouselGroupEagerSelect();
 
                 Task.Run(() =>
                 {
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Select
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
-        private CarouselGroup root = new CarouselGroup();
+        private CarouselGroup root = new CarouselGroupEagerSelect();
 
         public BeatmapCarousel()
         {
@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Select
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
             // todo: we may want to refactor and remove this as an optimisation in the future.
-            if (beatmapSets.All(g => !g.Visible))
+            if (beatmapSets.All(g => g.Filtered))
             {
                 SelectionChanged?.Invoke(null);
                 return;
@@ -304,7 +304,7 @@ namespace osu.Game.Screens.Select
                 root.Filter(criteria);
                 updateItems();
 
-                if (selectedBeatmap?.Filtered == false)
+                if (selectedBeatmap != null && !selectedBeatmap.Filtered)
                     select(selectedBeatmap);
                 else if (lastBeatmap != null && !lastSet.Filtered)
                 {

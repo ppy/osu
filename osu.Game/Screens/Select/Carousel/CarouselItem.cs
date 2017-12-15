@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
+using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -48,6 +49,8 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 if (InternalChildren == null) return;
 
+                Logger.Log($"State changed to {v}");
+
                 switch (v)
                 {
                     case CarouselItemState.Hidden:
@@ -55,6 +58,12 @@ namespace osu.Game.Screens.Select.Carousel
                         InternalChildren.ForEach(c => c.State.Value = CarouselItemState.Hidden);
                         break;
                 }
+            };
+
+            Filtered.ValueChanged += v =>
+            {
+                if (v && State == CarouselItemState.Selected)
+                    State.Value = CarouselItemState.NotSelected;
             };
         }
 

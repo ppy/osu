@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         public override void AddChild(CarouselItem i)
         {
-            i.State.ValueChanged += v => itemStateChanged(i, v);
+            i.State.ValueChanged += v => ItemStateChanged(i, v);
             base.AddChild(i);
         }
 
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (items != null) InternalChildren = items;
         }
 
-        private void itemStateChanged(CarouselItem item, CarouselItemState value)
+        protected virtual void ItemStateChanged(CarouselItem item, CarouselItemState value)
         {
             // todo: check state of selected item.
 
