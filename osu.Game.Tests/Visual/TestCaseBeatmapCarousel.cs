@@ -240,7 +240,7 @@ namespace osu.Game.Tests.Visual
 
             checkVisibleItemCount(false, set_count);
 
-            checkSelected(set_count, 2);
+            checkSelected(set_count);
         }
 
         /// <summary>
