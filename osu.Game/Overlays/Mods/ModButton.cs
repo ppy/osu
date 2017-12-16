@@ -35,7 +35,6 @@ namespace osu.Game.Overlays.Mods
         public Action<Mod> Action; // Passed the selected mod or null if none
 
         public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
-        public bool IgnoreTooltip => false;
 
         private const Easing mod_switch_easing = Easing.InOutSine;
         private const double mod_switch_duration = 120;
@@ -263,10 +262,10 @@ namespace osu.Game.Overlays.Mods
 
         private class DisplayableModIcon : ModIcon {
 
-            public override bool IgnoreTooltip { get; }
-
+            public override string TooltipText { get; }
+                
             public DisplayableModIcon(Mod mod) : base(mod) {
-                IgnoreTooltip = true;
+                TooltipText = null;
             }
 
         }
