@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
-using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -57,8 +56,6 @@ namespace osu.Game.Screens.Select.Carousel
 
             State.ValueChanged += v =>
             {
-                Logger.Log($"State of {this} changed to {v}");
-
                 if (InternalChildren == null) return;
 
                 switch (v)
