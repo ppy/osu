@@ -29,12 +29,11 @@ namespace osu.Game.Screens.Select.Carousel
                 List<DrawableCarouselItem> items = new List<DrawableCarouselItem>();
 
                 var self = drawableRepresentation.Value;
-                if (self != null) items.Add(self);
+                if (self?.IsPresent == true) items.Add(self);
 
                 if (InternalChildren != null)
                     foreach (var c in InternalChildren)
-                        // if (!c.Filtered) <- potential optimisation at the cost of no fade out animations.
-                            items.AddRange(c.Drawables);
+                        items.AddRange(c.Drawables);
 
                 return items;
             }
@@ -48,7 +47,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             // it's important we do the deselection after removing, so any further actions based on
             // State.ValueChanged make decisions post-removal.
-            if (i.State.Value == CarouselItemState.Selected) i.State.Value = CarouselItemState.NotSelected;
+            i.State.Value = CarouselItemState.Collapsed;
         }
 
         protected CarouselItem()

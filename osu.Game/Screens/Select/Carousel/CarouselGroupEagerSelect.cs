@@ -67,6 +67,7 @@ namespace osu.Game.Screens.Select.Carousel
                     updateSelected(item);
                     break;
                 case CarouselItemState.NotSelected:
+                case CarouselItemState.Collapsed:
                     attemptSelection();
                     break;
             }
