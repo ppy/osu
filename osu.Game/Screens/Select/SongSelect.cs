@@ -197,8 +197,8 @@ namespace osu.Game.Screens.Select
 
             Beatmap.ValueChanged += b =>
             {
-                if (!IsCurrentScreen) return;
-                carousel.SelectBeatmap(b?.BeatmapInfo);
+                if (IsCurrentScreen)
+                    carousel.SelectBeatmap(b?.BeatmapInfo);
             };
         }
 

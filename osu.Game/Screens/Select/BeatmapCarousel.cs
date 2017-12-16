@@ -160,13 +160,8 @@ namespace osu.Game.Screens.Select
 
         public void SelectBeatmap(BeatmapInfo beatmap)
         {
-            if (beatmap == null || beatmap.Hidden)
-            {
-                SelectNext();
+            if (beatmap?.Hidden != false)
                 return;
-            }
-
-            if (beatmap == SelectedBeatmap) return;
 
             foreach (CarouselBeatmapSet group in beatmapSets)
             {
