@@ -284,7 +284,9 @@ namespace osu.Game.Screens.Select
 
         private void applyActiveCriteria(bool debounce, bool scroll)
         {
-            Action perform = delegate
+            if (root.Children?.Any() != true) return;
+
+            void perform()
             {
                 FilterTask = null;
 
@@ -292,7 +294,7 @@ namespace osu.Game.Screens.Select
                 updateItems();
 
                 if (scroll) ScrollToSelected(false);
-            };
+            }
 
             FilterTask?.Cancel();
             FilterTask = null;
