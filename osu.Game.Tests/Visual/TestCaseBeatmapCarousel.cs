@@ -74,9 +74,14 @@ namespace osu.Game.Tests.Visual
         private void ensureRandomFetchSuccess() =>
             AddAssert("ensure prev random fetch worked", () => selectedSets.Peek() == carousel.SelectedBeatmapSet);
 
-        private void checkSelected(int set, int diff) =>
-            AddAssert($"selected is set{set} diff{diff}", () =>
-                carousel.SelectedBeatmap == carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff - 1).First());
+        private void checkSelected(int set, int? diff = null) =>
+            AddAssert($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
+            {
+                if (diff != null)
+                    return carousel.SelectedBeatmap == carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff.Value - 1).First();
+
+                return carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Contains(carousel.SelectedBeatmap);
+            });
 
         private void setSelected(int set, int diff) =>
             AddStep($"select set{set} diff{diff}", () =>
@@ -95,7 +100,7 @@ namespace osu.Game.Tests.Visual
         }
 
         private void checkVisibleItemCount(bool diff, int count) =>
-            AddAssert($"{count} {(diff ? "diff" : "set")} visible", () =>
+            AddAssert($"{count} {(diff ? "diffs" : "sets")} visible", () =>
                 carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
 
         private void nextRandom() =>
@@ -138,8 +143,9 @@ namespace osu.Game.Tests.Visual
 
             advanceSelection(diff: false);
             advanceSelection(diff: false);
-            checkSelected(1, 1);
+            checkSelected(1, 2);
 
+            advanceSelection(direction: -1, diff: true);
             advanceSelection(direction: -1, diff: true);
             checkSelected(set_count, 3);
         }
@@ -234,7 +240,7 @@ namespace osu.Game.Tests.Visual
 
             checkVisibleItemCount(false, set_count);
 
-            checkSelected(set_count, 1);
+            checkSelected(set_count, 2);
         }
 
         /// <summary>

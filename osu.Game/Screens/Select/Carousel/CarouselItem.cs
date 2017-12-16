@@ -18,7 +18,10 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected List<CarouselItem> InternalChildren { get; set; }
 
-        public bool Visible => State.Value != CarouselItemState.Hidden && !Filtered.Value;
+        /// <summary>
+        /// This item is not in a hidden state.
+        /// </summary>
+        public bool Visible => State.Value != CarouselItemState.Hidden && !Filtered;
 
         public IEnumerable<DrawableCarouselItem> Drawables
         {
@@ -39,7 +42,14 @@ namespace osu.Game.Screens.Select.Carousel
 
         public virtual void AddChild(CarouselItem i) => (InternalChildren ?? (InternalChildren = new List<CarouselItem>())).Add(i);
 
-        public virtual void RemoveChild(CarouselItem i) => InternalChildren?.Remove(i);
+        public virtual void RemoveChild(CarouselItem i)
+        {
+            InternalChildren?.Remove(i);
+
+            // it's important we do the deselection after removing, so any further actions based on
+            // State.ValueChanged make decisions post-removal.
+            if (i.State.Value == CarouselItemState.Selected) i.State.Value = CarouselItemState.NotSelected;
+        }
 
         protected CarouselItem()
         {
@@ -47,15 +57,21 @@ namespace osu.Game.Screens.Select.Carousel
 
             State.ValueChanged += v =>
             {
-                if (InternalChildren == null) return;
+                Logger.Log($"State of {this} changed to {v}");
 
-                Logger.Log($"State changed to {v}");
+                if (InternalChildren == null) return;
 
                 switch (v)
                 {
                     case CarouselItemState.Hidden:
                     case CarouselItemState.NotSelected:
                         InternalChildren.ForEach(c => c.State.Value = CarouselItemState.Hidden);
+                        break;
+                    case CarouselItemState.Selected:
+                        InternalChildren.ForEach(c =>
+                        {
+                            if (c.State == CarouselItemState.Hidden) c.State.Value = CarouselItemState.NotSelected;
+                        });
                         break;
                 }
             };

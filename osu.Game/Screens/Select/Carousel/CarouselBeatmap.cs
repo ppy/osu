@@ -49,5 +49,7 @@ namespace osu.Game.Screens.Select.Carousel
                     return Beatmap.StarDifficulty.CompareTo(otherBeatmap.Beatmap.StarDifficulty);
             }
         }
+
+        public override string ToString() => Beatmap.ToString();
     }
 }

@@ -15,31 +15,47 @@ namespace osu.Game.Screens.Select.Carousel
             State.ValueChanged += v =>
             {
                 if (v == CarouselItemState.Selected)
-                {
-                    foreach (var c in InternalChildren.Where(c => c.State.Value == CarouselItemState.Hidden))
-                        c.State.Value = CarouselItemState.NotSelected;
-
-                    if (InternalChildren.Any(c => c.Visible) && InternalChildren.All(c => c.State != CarouselItemState.Selected))
-                        InternalChildren.First(c => c.Visible).State.Value = CarouselItemState.Selected;
-                }
+                    attemptSelection();
             };
         }
 
-        protected override void ItemStateChanged(CarouselItem item, CarouselItemState value)
-        {
-            base.ItemStateChanged(item, value);
+        private int lastSelectedIndex;
 
-            if (value == CarouselItemState.NotSelected)
+        public override void Filter(FilterCriteria criteria)
+        {
+            base.Filter(criteria);
+            attemptSelection();
+        }
+
+        protected override void ChildItemStateChanged(CarouselItem item, CarouselItemState value)
+        {
+            base.ChildItemStateChanged(item, value);
+
+            switch (value)
             {
-                if (Children.All(i => i.State != CarouselItemState.Selected))
-                {
-                    var first = Children.FirstOrDefault(i => !i.Filtered);
-                    if (first != null)
-                    {
-                        first.State.Value = CarouselItemState.Selected;
-                    }
-                }
+                case CarouselItemState.Selected:
+                    lastSelectedIndex = InternalChildren.IndexOf(item);
+                    break;
+                case CarouselItemState.NotSelected:
+                    attemptSelection();
+                    break;
             }
+        }
+
+        private void attemptSelection()
+        {
+            // we only perform eager selection if we are a currently selected group.
+            if (State != CarouselItemState.Selected) return;
+
+            // we only perform eager selection if none of our children are in a selected state already.
+            if (Children.Any(i => i.State == CarouselItemState.Selected)) return;
+
+            CarouselItem nextToSelect =
+                Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered) ??
+                Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered);
+
+            if (nextToSelect != null)
+                nextToSelect.State.Value = CarouselItemState.Selected;
         }
     }
 }

@@ -52,5 +52,7 @@ namespace osu.Game.Screens.Select.Carousel
             base.Filter(criteria);
             Filtered.Value = InternalChildren.All(i => i.Filtered);
         }
+
+        public override string ToString() => BeatmapSet.ToString();
     }
 }

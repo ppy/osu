@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework.Configuration;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -13,13 +12,11 @@ namespace osu.Game.Screens.Select.Carousel
     {
         private readonly List<CarouselItem> items;
 
-        public readonly Bindable<CarouselItem> Selected = new Bindable<CarouselItem>();
-
         protected override DrawableCarouselItem CreateDrawableRepresentation() => null;
 
         public override void AddChild(CarouselItem i)
         {
-            i.State.ValueChanged += v => ItemStateChanged(i, v);
+            i.State.ValueChanged += v => ChildItemStateChanged(i, v);
             base.AddChild(i);
         }
 
@@ -28,7 +25,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (items != null) InternalChildren = items;
         }
 
-        protected virtual void ItemStateChanged(CarouselItem item, CarouselItemState value)
+        protected virtual void ChildItemStateChanged(CarouselItem item, CarouselItemState value)
         {
             // todo: check state of selected item.
 
@@ -42,7 +39,6 @@ namespace osu.Game.Screens.Select.Carousel
                 }
 
                 State.Value = CarouselItemState.Selected;
-                Selected.Value = item;
             }
         }
     }
