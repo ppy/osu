@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override void ApplyState()
         {
-            if (Item.State.Value != CarouselItemState.Hidden && Alpha == 0)
+            if (Item.State.Value != CarouselItemState.Collapsed && Alpha == 0)
                 starCounter.ReplayAnimation();
 
             base.ApplyState();

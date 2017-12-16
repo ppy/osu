@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Select.Carousel
         public CarouselBeatmap(BeatmapInfo beatmap)
         {
             Beatmap = beatmap;
-            State.Value = CarouselItemState.Hidden;
+            State.Value = CarouselItemState.Collapsed;
         }
 
         protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmap(this);
