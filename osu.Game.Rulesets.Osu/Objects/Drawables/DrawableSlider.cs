@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly SliderBody body;
         private readonly SliderBall ball;
 
-        public bool GraduallyFadeOut;
-
         public DrawableSlider(Slider s) : base(s)
         {
             slider = s;
@@ -58,6 +56,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
                     Samples = s.Samples,
+                    FadeInSpeed = HitObject.FadeInSpeed,
+                    FadeOutSpeed = HitObject.FadeOutSpeed,
+                    PreemptFadeOut = HitObject.PreemptFadeOut,
+                    ShowApproachCircle = HitObject.ShowApproachCircle,
+                    PlayHitAnimation = HitObject.PlayHitAnimation,
+                    FadeOutGradually = HitObject.FadeOutGradually,
+                    HideSpinnerDetails = HitObject.HideSpinnerDetails
                 })
             };
 
@@ -156,26 +161,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             ball.FadeIn();
 
-            using (BeginDelayedSequence(slider.Duration + EarlyFadeOutTime, true))
-            {
-                body.FadeOut(160 / FadeOutSpeed);
-                ball.FadeOut(160 / FadeOutSpeed);
+            if (HitObject.FadeOutGradually)
+                body.FadeOut(slider.Duration + HitObject.PreemptFadeOut);
 
-                this.FadeTo(FadeOutAlpha, 800 / FadeOutSpeed);
-            }
-        }
-
-        protected override void UpdatePostState()
-        {
-            if (GraduallyFadeOut)
+            using (BeginDelayedSequence(slider.Duration + HitObject.PreemptFadeOut, true))
             {
-                var duration = slider.Duration + EarlyFadeOutTime;
-                body.FadeOut(duration);
-                repeatPoints.FadeOut(duration);
-                ticks.FadeOut(duration);
+                if(!HitObject.FadeOutGradually)
+                    body.FadeOut(160 / HitObject.FadeOutSpeed);
+                ball.FadeOut(160 / HitObject.FadeOutSpeed);
+
+                this.FadeOut(800 / HitObject.FadeOutSpeed).Expire();
             }
-            else
-                base.UpdatePostState();
         }
 
         public Drawable ProxiedLayer => InitialCircle.ApproachCircle;

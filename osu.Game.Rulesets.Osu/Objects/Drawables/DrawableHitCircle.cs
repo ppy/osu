@@ -20,9 +20,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
-        public bool ShowApproachCircle = true;
-        public bool PlayHitAnimation = true;
-
         public DrawableHitCircle(OsuHitObject h) : base(h)
         {
             Origin = Anchor.Centre;
@@ -90,30 +87,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            if (ShowApproachCircle)
+            if (HitObject.ShowApproachCircle)
             {
-                ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT) / FadeInSpeed);
-                ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT / FadeInSpeed);
+                ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT) / HitObject.FadeInSpeed);
+                ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT / HitObject.FadeInSpeed);
             }
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            glow.FadeOut(400 / FadeOutSpeed);
+            glow.Delay(HitObject.PreemptFadeOut).FadeOut(400 / HitObject.FadeOutSpeed);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.FadeTo(FadeOutAlpha, TIME_FADEOUT / FadeOutSpeed);
+                    this.FadeTo(FadeOutAlpha, TIME_FADEOUT / HitObject.FadeOutSpeed).Delay(HitObject.PreemptFadeOut).Expire();
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
-                    this.FadeTo(FadeOutAlpha, TIME_FADEOUT / 5 / FadeOutSpeed);
+                    this.FadeOut(TIME_FADEOUT / 5 / HitObject.FadeOutSpeed).Expire();
                     break;
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
 
-                    if (PlayHitAnimation)
+                    if (HitObject.PlayHitAnimation)
                     {
                         const double flash_in = 40;
                         flash.FadeTo(0.8f, flash_in)
@@ -129,21 +126,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             circle.FadeOut();
                             number.FadeOut();
 
-                            this.FadeTo(FadeOutAlpha, 800 / FadeOutSpeed)
+                            this.FadeOut(800 / HitObject.FadeOutSpeed)
                                 .ScaleTo(Scale * 1.5f, 400, Easing.OutQuad);
                         }
                     }
                     else
-                        this.FadeTo(FadeOutAlpha, TIME_FADEOUT / 5 / FadeOutSpeed);
-
+                        this.FadeOut(TIME_FADEOUT / 5 / HitObject.FadeOutSpeed);
+                    Expire();
                     break;
             }
-        }
-
-        protected override void UpdatePostState()
-        {
-            base.UpdatePostState();
-            ApproachCircle.FadeOut();
         }
 
         public Drawable ProxiedLayer => ApproachCircle;

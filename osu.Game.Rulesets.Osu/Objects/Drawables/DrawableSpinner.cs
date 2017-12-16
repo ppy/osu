@@ -39,8 +39,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Color4 normalColour;
         private Color4 completeColour;
 
-        public bool HideSpinnerDetails;
-
         public DrawableSpinner(Spinner s) : base(s)
         {
             Origin = Anchor.Centre;
@@ -191,7 +189,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            if (HideSpinnerDetails)
+            if (HitObject.HideSpinnerDetails)
             {
                 glow.FadeOut();
                 ticks.FadeOut();
@@ -215,7 +213,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            var sequence = this.Delay(spinner.Duration + EarlyFadeOutTime).FadeTo(FadeOutAlpha, 160 / FadeOutSpeed);
+            var sequence = this.Delay(spinner.Duration + HitObject.PreemptFadeOut).FadeOut(160 / HitObject.FadeOutSpeed);
 
             switch (state)
             {

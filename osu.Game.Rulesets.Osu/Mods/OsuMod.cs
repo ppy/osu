@@ -12,8 +12,6 @@ using System.Linq;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using OpenTK;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -27,42 +25,20 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     }
 
-    public class OsuModHidden : ModHidden, IApplicableToDrawableHitObjects
+    public class OsuModHidden : ModHidden, IApplicableToHitObject<OsuHitObject>
     {
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public void ApplyToHitObject(OsuHitObject hitObject)
         {
-            foreach (DrawableHitObject drawable in drawables)
-            {
-                if (drawable is DrawableOsuHitObject osuDrawable)
-                {
-                    osuDrawable.FadeInSpeed = 2;
-                    osuDrawable.FadeOutSpeed = 2;
-                    osuDrawable.EarlyFadeOutTime = 400;
-
-                    if (osuDrawable is DrawableHitCircle circle)
-                    {
-                        circle.ShowApproachCircle = false;
-                        circle.PlayHitAnimation = false;
-                    }
-
-                    if (osuDrawable is DrawableSlider slider)
-                    {
-                        slider.GraduallyFadeOut = true;
-
-                        slider.InitialCircle.ShowApproachCircle = false;
-                        slider.InitialCircle.PlayHitAnimation = false;
-                        slider.InitialCircle.FadeInSpeed = osuDrawable.FadeInSpeed;
-                        slider.InitialCircle.FadeOutSpeed = osuDrawable.FadeOutSpeed;
-                        slider.InitialCircle.EarlyFadeOutTime = osuDrawable.EarlyFadeOutTime;
-                    }
-
-                    if (osuDrawable is DrawableSpinner spinner)
-                        spinner.HideSpinnerDetails = true;
-                }
-            }
+            hitObject.FadeInSpeed = 2;
+            hitObject.FadeOutSpeed = 2;
+            hitObject.PreemptFadeOut = 400;
+            hitObject.ShowApproachCircle = false;
+            hitObject.PlayHitAnimation = false;
+            hitObject.FadeOutGradually = true;
+            hitObject.HideSpinnerDetails = true;
         }
     }
 
