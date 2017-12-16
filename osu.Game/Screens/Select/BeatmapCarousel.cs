@@ -305,11 +305,9 @@ namespace osu.Game.Screens.Select
                 perform();
         }
 
-        public void ScrollToSelected(bool animated = true)
-        {
-            float selectedY = computeYPositions(animated);
-            ScrollTo(selectedY, animated);
-        }
+        private float? scrollTarget;
+
+        public void ScrollToSelected(bool animated = true) => Schedule(() => { if (scrollTarget != null) ScrollTo(scrollTarget.Value, animated); });
 
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
         {
@@ -351,39 +349,56 @@ namespace osu.Game.Screens.Select
         /// Computes the target Y positions for every item in the carousel.
         /// </summary>
         /// <returns>The Y position of the currently selected item.</returns>
-        private float computeYPositions(bool animated = true)
+        private void computeYPositions(bool animated = true)
         {
             yPositions.Clear();
 
             float currentY = DrawHeight / 2;
-            float selectedY = currentY;
+            DrawableCarouselBeatmapSet lastSet = null;
 
-            float lastSetY = 0;
-
-            var selected = selectedBeatmap;
+            scrollTarget = null;
 
             foreach (DrawableCarouselItem d in Items)
             {
-                switch (d)
+                if (d.IsPresent)
                 {
-                    case DrawableCarouselBeatmapSet set:
-                        set.MoveToX(set.Item.State == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
-                        lastSetY = set.Position.Y;
-                        break;
-                    case DrawableCarouselBeatmap beatmap:
-                        beatmap.MoveToX(beatmap.Item.State == CarouselItemState.Selected ? -50 : 0, 500, Easing.OutExpo);
+                    switch (d)
+                    {
+                        case DrawableCarouselBeatmapSet set:
+                            lastSet = set;
 
-                        if (beatmap.Item == selected)
-                            selectedY = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;
+                            set.MoveToX(set.Item.State == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
+                            set.MoveToY(currentY, animated ? 750 : 0, Easing.OutExpo);
+                            break;
+                        case DrawableCarouselBeatmap beatmap:
+                            if (beatmap.Item.State.Value == CarouselItemState.Selected)
+                                scrollTarget = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;
 
-                        // on first display we want to begin hidden under our group's header.
-                        if (animated && !beatmap.IsPresent)
-                            beatmap.MoveToY(lastSetY);
-                        break;
+                            void performMove(float y, float? startY = null)
+                            {
+                                if (startY != null) beatmap.MoveTo(new Vector2(0, startY.Value));
+                                beatmap.MoveToX(beatmap.Item.State == CarouselItemState.Selected ? -50 : 0, 500, Easing.OutExpo);
+                                beatmap.MoveToY(y, animated ? 750 : 0, Easing.OutExpo);
+                            }
+
+                            Debug.Assert(lastSet != null);
+
+                            float? setY = null;
+                            if (!d.IsLoaded || beatmap.Alpha == 0) // can't use IsPresent due to DrawableCarouselItem override.
+                                setY = lastSet.Y + lastSet.DrawHeight + 5;
+
+                            if (d.IsLoaded)
+                                performMove(currentY, setY);
+                            else
+                            {
+                                float y = currentY;
+                                d.OnLoadComplete = _ => performMove(y, setY);
+                            }
+                            break;
+                    }
                 }
 
                 yPositions.Add(currentY);
-                d.MoveToY(currentY, animated ? 750 : 0, Easing.OutExpo);
 
                 if (d.Item.Visible)
                     currentY += d.DrawHeight + 5;
@@ -393,8 +408,6 @@ namespace osu.Game.Screens.Select
             scrollableContent.Height = currentY;
 
             yPositionsCache.Validate();
-
-            return selectedY;
         }
 
         private void select(CarouselItem item)
@@ -477,7 +490,7 @@ namespace osu.Game.Screens.Select
 
                     // Makes sure headers are always _below_ items,
                     // and depth flows downward.
-                    item.Depth = i + (item is DrawableCarouselBeatmapSet ? Items.Count : 0);
+                    item.Depth = i + (item is DrawableCarouselBeatmapSet ? -Items.Count : 0);
 
                     switch (item.LoadState)
                     {
