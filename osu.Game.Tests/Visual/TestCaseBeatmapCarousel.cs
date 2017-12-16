@@ -257,8 +257,14 @@ namespace osu.Game.Tests.Visual
         private void testRemoveAll()
         {
             setSelected(2, 1);
-
             AddAssert("Selection is non-null", () => currentSelection != null);
+
+            AddStep("Remove selected", () => carousel.RemoveBeatmapSet(carousel.SelectedBeatmapSet));
+            checkSelected(2);
+
+            AddStep("Remove first", () => carousel.RemoveBeatmapSet(carousel.BeatmapSets.First()));
+            AddStep("Remove first", () => carousel.RemoveBeatmapSet(carousel.BeatmapSets.First()));
+            checkSelected(1);
 
             AddUntilStep(() =>
             {
