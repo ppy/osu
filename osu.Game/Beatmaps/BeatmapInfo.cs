@@ -118,6 +118,8 @@ namespace osu.Game.Beatmaps
         [JsonProperty("difficulty_rating")]
         public double StarDifficulty { get; set; }
 
+        public override string ToString() => $"{Metadata} [{Version}]";
+
         public bool Equals(BeatmapInfo other)
         {
             if (ID == 0 || other?.ID == 0)
