@@ -17,20 +17,18 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
-        private const int button_duration = 700;
-        private const int ranked_multiplier_duration = 700;
         private const float content_width = 0.8f;
 
         private Color4 lowMultiplierColour, highMultiplierColour;
 
-        private readonly OsuSpriteText rankedLabel;
         private readonly OsuSpriteText multiplierLabel;
-        private readonly FillFlowContainer rankedMultiplerContainer;
+        private readonly FillFlowContainer footerContainer;
 
         private readonly FillFlowContainer<ModSection> modSectionsContainer;
 
@@ -66,14 +64,14 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopOut();
 
-            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, APPEAR_DURATION, Easing.InSine);
-            rankedMultiplerContainer.FadeOut(APPEAR_DURATION, Easing.InSine);
+            footerContainer.MoveToX(footerContainer.DrawSize.X, DISAPPEAR_DURATION, Easing.InSine);
+            footerContainer.FadeOut(DISAPPEAR_DURATION, Easing.InSine);
 
             foreach (ModSection section in modSectionsContainer.Children)
             {
-                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), APPEAR_DURATION, Easing.InSine);
-                section.ButtonsContainer.MoveToX(100f, APPEAR_DURATION, Easing.InSine);
-                section.ButtonsContainer.FadeOut(APPEAR_DURATION, Easing.InSine);
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), DISAPPEAR_DURATION, Easing.InSine);
+                section.ButtonsContainer.MoveToX(100f, DISAPPEAR_DURATION, Easing.InSine);
+                section.ButtonsContainer.FadeOut(DISAPPEAR_DURATION, Easing.InSine);
             }
         }
 
@@ -81,14 +79,14 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopIn();
 
-            rankedMultiplerContainer.MoveToX(0, ranked_multiplier_duration, Easing.OutQuint);
-            rankedMultiplerContainer.FadeIn(ranked_multiplier_duration, Easing.OutQuint);
+            footerContainer.MoveToX(0, APPEAR_DURATION, Easing.OutQuint);
+            footerContainer.FadeIn(APPEAR_DURATION, Easing.OutQuint);
 
             foreach (ModSection section in modSectionsContainer.Children)
             {
-                section.ButtonsContainer.TransformSpacingTo(new Vector2(50f, 0f), button_duration, Easing.OutQuint);
-                section.ButtonsContainer.MoveToX(0, button_duration, Easing.OutQuint);
-                section.ButtonsContainer.FadeIn(button_duration, Easing.OutQuint);
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(50f, 0f), APPEAR_DURATION, Easing.OutQuint);
+                section.ButtonsContainer.MoveToX(0, APPEAR_DURATION, Easing.OutQuint);
+                section.ButtonsContainer.FadeIn(APPEAR_DURATION, Easing.OutQuint);
             }
         }
 
@@ -96,6 +94,8 @@ namespace osu.Game.Overlays.Mods
         {
             foreach (ModSection section in modSectionsContainer.Children)
                 section.DeselectAll();
+
+            refreshSelectedMods();
         }
 
         public void DeselectTypes(Type[] modTypes)
@@ -130,8 +130,8 @@ namespace osu.Game.Overlays.Mods
             // 1.20x
 
             multiplierLabel.Text = $"{multiplier:N2}x";
-            string rankedString = ranked ? "Ranked" : "Unranked";
-            rankedLabel.Text = $@"{rankedString}, Score Multiplier: ";
+            if (!ranked)
+                multiplierLabel.Text += " (Unranked)";
 
             if (multiplier > 1.0)
                 multiplierLabel.FadeColour(highMultiplierColour, 200);
@@ -232,7 +232,7 @@ namespace osu.Game.Overlays.Mods
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = @"Others are just for fun",
+                                            Text = @"Others are just for fun.",
                                             TextSize = 18,
                                             Shadow = true,
                                         },
@@ -289,7 +289,7 @@ namespace osu.Game.Overlays.Mods
                                     Colour = new Color4(172, 20, 116, 255),
                                     Alpha = 0.5f,
                                 },
-                                rankedMultiplerContainer = new FillFlowContainer
+                                footerContainer = new FillFlowContainer
                                 {
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.BottomCentre,
@@ -299,26 +299,42 @@ namespace osu.Game.Overlays.Mods
                                     Direction = FillDirection.Horizontal,
                                     Padding = new MarginPadding
                                     {
-                                        Top = 20,
-                                        Bottom = 20,
+                                        Vertical = 15
                                     },
                                     Children = new Drawable[]
                                     {
-                                        rankedLabel = new OsuSpriteText
+                                        new TriangleButton
                                         {
-                                            Text = @"Ranked, Score Multiplier: ",
+                                            Width = 180,
+                                            Text = "Deselect All",
+                                            Action = DeselectAll,
+                                            Margin = new MarginPadding
+                                            {
+                                                Right = 20
+                                            }
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Text = @"Score Multiplier: ",
                                             TextSize = 30,
                                             Shadow = true,
+                                            Margin = new MarginPadding
+                                            {
+                                                Top = 5
+                                            }
                                         },
                                         multiplierLabel = new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-Bold",
-                                            Text = @"1.00x",
                                             TextSize = 30,
                                             Shadow = true,
-                                        },
-                                    },
-                                },
+                                            Margin = new MarginPadding
+                                            {
+                                                Top = 5
+                                            }
+                                        }
+                                    }
+                                }
                             },
                         },
                     },
