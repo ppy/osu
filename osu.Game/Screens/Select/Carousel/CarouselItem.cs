@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Select.Carousel
         /// <summary>
         /// This item is not in a hidden state.
         /// </summary>
-        public bool Visible => State.Value != CarouselItemState.Hidden && !Filtered;
+        public bool Visible => State.Value != CarouselItemState.Collapsed && !Filtered;
 
         public IEnumerable<DrawableCarouselItem> Drawables
         {
@@ -63,14 +63,14 @@ namespace osu.Game.Screens.Select.Carousel
 
                 switch (v)
                 {
-                    case CarouselItemState.Hidden:
+                    case CarouselItemState.Collapsed:
                     case CarouselItemState.NotSelected:
-                        InternalChildren.ForEach(c => c.State.Value = CarouselItemState.Hidden);
+                        InternalChildren.ForEach(c => c.State.Value = CarouselItemState.Collapsed);
                         break;
                     case CarouselItemState.Selected:
                         InternalChildren.ForEach(c =>
                         {
-                            if (c.State == CarouselItemState.Hidden) c.State.Value = CarouselItemState.NotSelected;
+                            if (c.State == CarouselItemState.Collapsed) c.State.Value = CarouselItemState.NotSelected;
                         });
                         break;
                 }
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Select.Carousel
 
     public enum CarouselItemState
     {
-        Hidden,
+        Collapsed,
         NotSelected,
         Selected,
     }
