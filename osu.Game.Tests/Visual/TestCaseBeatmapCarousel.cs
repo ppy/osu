@@ -228,9 +228,13 @@ namespace osu.Game.Tests.Visual
 
             checkVisibleItemCount(false, set_count + 1);
 
+            setSelected(set_count + 1, 1);
+
             AddStep("Remove set", () => carousel.RemoveBeatmapSet(createTestBeatmapSet(set_count + 1)));
 
             checkVisibleItemCount(false, set_count);
+
+            checkSelected(set_count, 1);
         }
 
         /// <summary>
