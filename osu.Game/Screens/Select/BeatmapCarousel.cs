@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Select
                 Task.Run(() =>
                 {
                     value.Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
-                    newRoot.Filter(criteria);
+                    newRoot.Filter(activeCriteria);
                 }).ContinueWith(t =>
                 {
                     Schedule(() =>
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Select
 
             root.AddChild(newSet);
 
-            Filter(debounce: false);
+            applyActiveCriteria(false);
 
             //check if we can/need to maintain our current selection.
             if (hadSelection)
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Select
             updateItems();
         }
 
-        public void SelectBeatmap(BeatmapInfo beatmap, bool animated = true)
+        public void SelectBeatmap(BeatmapInfo beatmap)
         {
             if (beatmap == null || beatmap.Hidden)
             {
@@ -212,14 +212,12 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private IEnumerable<CarouselBeatmapSet> getVisibleSets() => beatmapSets.Where(select => !select.Filtered);
-
         public void SelectNextRandom()
         {
             if (!beatmapSets.Any())
                 return;
 
-            var visible = getVisibleSets().ToList();
+            var visible = beatmapSets.Where(select => !select.Filtered).ToList();
             if (!visible.Any())
                 return;
 
@@ -269,28 +267,33 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private FilterCriteria criteria = new FilterCriteria();
+        private FilterCriteria activeCriteria = new FilterCriteria();
 
         protected ScheduledDelegate FilterTask;
 
         public bool AllowSelection = true;
 
-        public void FlushPendingFilters()
+        public void FlushPendingFilterOperations()
         {
             if (FilterTask?.Completed == false)
-                Filter(debounce: false);
+                applyActiveCriteria(false);
         }
 
-        public void Filter(FilterCriteria newCriteria = null, bool debounce = true)
+        public void Filter(FilterCriteria newCriteria, bool debounce = true)
         {
             if (newCriteria != null)
-                criteria = newCriteria;
+                activeCriteria = newCriteria;
 
+            applyActiveCriteria(debounce);
+        }
+
+        private void applyActiveCriteria(bool debounce)
+        {
             Action perform = delegate
             {
                 FilterTask = null;
 
-                root.Filter(criteria);
+                root.Filter(activeCriteria);
                 updateItems();
 
                 ScrollToSelected(false);

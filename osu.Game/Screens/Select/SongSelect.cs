@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Select
         {
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
-            carousel.FlushPendingFilters();
+            carousel.FlushPendingFilterOperations();
 
             if (selectionChangedDebounce?.Completed == false)
             {
@@ -447,7 +447,7 @@ namespace osu.Game.Screens.Select
         private void carouselBeatmapsLoaded()
         {
             if (Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
-                carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false);
+                carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo);
             else
                 carousel.SelectNextRandom();
         }
