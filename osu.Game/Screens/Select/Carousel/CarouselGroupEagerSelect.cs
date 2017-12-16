@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 
 namespace osu.Game.Screens.Select.Carousel
@@ -19,12 +20,31 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
+        /// <summary>
+        /// We need to keep track of the index for cases where the selection is removed but we want to select a new item based on its old location.
+        /// </summary>
         private int lastSelectedIndex;
+
+        private CarouselItem lastSelected;
 
         public override void Filter(FilterCriteria criteria)
         {
             base.Filter(criteria);
             attemptSelection();
+        }
+
+        public override void RemoveChild(CarouselItem i)
+        {
+            base.RemoveChild(i);
+
+            if (i != lastSelected)
+                updateSelectedIndex();
+        }
+
+        public override void AddChild(CarouselItem i)
+        {
+            base.AddChild(i);
+            updateSelectedIndex();
         }
 
         protected override void ChildItemStateChanged(CarouselItem item, CarouselItemState value)
@@ -34,7 +54,7 @@ namespace osu.Game.Screens.Select.Carousel
             switch (value)
             {
                 case CarouselItemState.Selected:
-                    lastSelectedIndex = InternalChildren.IndexOf(item);
+                    updateSelected(item);
                     break;
                 case CarouselItemState.NotSelected:
                     attemptSelection();
@@ -56,6 +76,16 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (nextToSelect != null)
                 nextToSelect.State.Value = CarouselItemState.Selected;
+            else
+                updateSelected(null);
         }
+
+        private void updateSelected(CarouselItem newSelection)
+        {
+            lastSelected = newSelection;
+            updateSelectedIndex();
+        }
+
+        private void updateSelectedIndex() => lastSelectedIndex = Math.Max(0, InternalChildren.IndexOf(lastSelected));
     }
 }
