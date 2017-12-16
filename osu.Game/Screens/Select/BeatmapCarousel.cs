@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Select
 
             root.AddChild(newSet);
 
-            applyActiveCriteria(false);
+            applyActiveCriteria(false, false);
 
             //check if we can/need to maintain our current selection.
             if (hadSelection)
@@ -276,7 +276,7 @@ namespace osu.Game.Screens.Select
         public void FlushPendingFilterOperations()
         {
             if (FilterTask?.Completed == false)
-                applyActiveCriteria(false);
+                applyActiveCriteria(false, false);
         }
 
         public void Filter(FilterCriteria newCriteria, bool debounce = true)
@@ -284,10 +284,10 @@ namespace osu.Game.Screens.Select
             if (newCriteria != null)
                 activeCriteria = newCriteria;
 
-            applyActiveCriteria(debounce);
+            applyActiveCriteria(debounce, true);
         }
 
-        private void applyActiveCriteria(bool debounce)
+        private void applyActiveCriteria(bool debounce, bool scroll)
         {
             Action perform = delegate
             {
@@ -296,7 +296,7 @@ namespace osu.Game.Screens.Select
                 root.Filter(activeCriteria);
                 updateItems();
 
-                ScrollToSelected(false);
+                if (scroll) ScrollToSelected(false);
             };
 
             FilterTask?.Cancel();
@@ -446,7 +446,7 @@ namespace osu.Game.Screens.Select
                 computeYPositions();
 
             // Remove all items that should no longer be on-screen
-            scrollableContent.RemoveAll(delegate(DrawableCarouselItem p)
+            scrollableContent.RemoveAll(delegate (DrawableCarouselItem p)
             {
                 float itemPosY = p.Position.Y;
                 bool remove = itemPosY < Current - p.DrawHeight || itemPosY > Current + drawHeight || !p.IsPresent;
