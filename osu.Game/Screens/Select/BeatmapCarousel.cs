@@ -74,6 +74,7 @@ namespace osu.Game.Screens.Select
                     {
                         root = newRoot;
                         updateItems();
+                        BeatmapSetsChanged?.Invoke();
                     });
                 });
             }
@@ -85,11 +86,11 @@ namespace osu.Game.Screens.Select
         private void updateItems()
         {
             scrollableContent.Clear(false);
-
             Items = root.Drawables.ToList();
-
             yPositionsCache.Invalidate();
-            BeatmapSetsChanged?.Invoke();
+
+            if (root.Children == null || root.Children.All(c => c.Filtered))
+                SelectionChanged?.Invoke(null);
         }
 
         private readonly List<float> yPositions = new List<float>();
@@ -126,9 +127,6 @@ namespace osu.Game.Screens.Select
 
             root.RemoveChild(existingSet);
             updateItems();
-
-            if (existingSet.State == CarouselItemState.Selected)
-                SelectNext();
         }
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -188,13 +186,6 @@ namespace osu.Game.Screens.Select
         /// <param name="skipDifficulties">Whether to skip individual difficulties and only increment over full groups.</param>
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            // todo: we may want to refactor and remove this as an optimisation in the future.
-            if (beatmapSets.All(g => g.Filtered))
-            {
-                SelectionChanged?.Invoke(null);
-                return;
-            }
-
             int originalIndex = Items.IndexOf(selectedBeatmap?.Drawables.First());
             int currentIndex = originalIndex;
 
@@ -214,13 +205,14 @@ namespace osu.Game.Screens.Select
                         select(beatmap);
                         return;
                     case CarouselBeatmapSet set:
+                        if (!skipDifficulties) continue;
                         select(set);
                         return;
                 }
             }
         }
 
-        private IEnumerable<CarouselBeatmapSet> getVisibleSets() => beatmapSets.Where(select => select.Visible);
+        private IEnumerable<CarouselBeatmapSet> getVisibleSets() => beatmapSets.Where(select => !select.Filtered);
 
         public void SelectNextRandom()
         {
@@ -298,27 +290,8 @@ namespace osu.Game.Screens.Select
             {
                 FilterTask = null;
 
-                var lastSet = selectedBeatmapSet;
-                var lastBeatmap = selectedBeatmap;
-
                 root.Filter(criteria);
                 updateItems();
-
-                if (selectedBeatmap != null && !selectedBeatmap.Filtered)
-                    select(selectedBeatmap);
-                else if (lastBeatmap != null && !lastSet.Filtered)
-                {
-                    var searchable = lastSet.Beatmaps.AsEnumerable();
-
-                    // search forwards first then backwards if nothing found.
-                    var nextAvailable =
-                        searchable.SkipWhile(b => b != lastBeatmap).FirstOrDefault(b => !b.Filtered) ??
-                        searchable.Reverse().SkipWhile(b => b != lastBeatmap).FirstOrDefault(b => !b.Filtered);
-
-                    select(nextAvailable);
-                }
-                else
-                    SelectNext();
 
                 ScrollToSelected(false);
             };
