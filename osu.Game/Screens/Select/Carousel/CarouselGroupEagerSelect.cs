@@ -27,9 +27,19 @@ namespace osu.Game.Screens.Select.Carousel
 
         private CarouselItem lastSelected;
 
+        /// <summary>
+        /// To avoid overhead during filter operations, we don't attempt any selections until after all
+        /// children have been filtered. This bool will be true during the base <see cref="Filter(FilterCriteria)"/>
+        /// operation.
+        /// </summary>
+        private bool filteringChildren;
+
         public override void Filter(FilterCriteria criteria)
         {
+            filteringChildren = true;
             base.Filter(criteria);
+            filteringChildren = false;
+
             attemptSelection();
         }
 
@@ -64,6 +74,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void attemptSelection()
         {
+            if (filteringChildren) return;
+
             // we only perform eager selection if we are a currently selected group.
             if (State != CarouselItemState.Selected) return;
 

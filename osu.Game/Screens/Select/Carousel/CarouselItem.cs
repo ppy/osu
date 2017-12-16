@@ -33,7 +33,8 @@ namespace osu.Game.Screens.Select.Carousel
 
                 if (InternalChildren != null)
                     foreach (var c in InternalChildren)
-                        items.AddRange(c.Drawables);
+                        // if (!c.Filtered) <- potential optimisation at the cost of no fade out animations.
+                            items.AddRange(c.Drawables);
 
                 return items;
             }

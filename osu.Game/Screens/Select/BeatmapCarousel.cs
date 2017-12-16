@@ -483,11 +483,11 @@ namespace osu.Game.Screens.Select
             {
                 DrawableCarouselItem item = Items[i];
 
+                if (!item.Item.Visible) continue;
+
                 // Only add if we're not already part of the content.
                 if (!scrollableContent.Contains(item))
                 {
-                    if (!item.Item.Visible) continue;
-
                     // Makes sure headers are always _below_ items,
                     // and depth flows downward.
                     item.Depth = i + (item is DrawableCarouselBeatmapSet ? -Items.Count : 0);
