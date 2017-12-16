@@ -16,7 +16,6 @@ namespace osu.Game.Screens.Multiplayer
         private readonly GameType type;
 
         public string TooltipText => type.Name;
-        public bool IgnoreTooltip => false;
 
         public DrawableGameType(GameType type)
         {

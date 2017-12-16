@@ -103,7 +103,6 @@ namespace osu.Game.Graphics.UserInterface
         private class CapsWarning : SpriteIcon, IHasTooltip
         {
             public string TooltipText => @"Caps lock is active";
-            public bool IgnoreTooltip => false;
 
             public CapsWarning()
             {

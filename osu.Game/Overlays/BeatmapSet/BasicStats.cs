@@ -68,7 +68,6 @@ namespace osu.Game.Overlays.BeatmapSet
             private readonly OsuSpriteText value;
 
             public string TooltipText => name;
-            public bool IgnoreTooltip => false;
             public string Value
             {
                 get { return value.Text; }

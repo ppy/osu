@@ -144,7 +144,6 @@ namespace osu.Game.Tests.Visual
                 private bool isSelected;
 
                 public string TooltipText => text.Text;
-                public bool IgnoreTooltip => false;
 
                 public BeatmapDisplay(BeatmapInfo beatmap)
                 {

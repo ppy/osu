@@ -384,7 +384,6 @@ namespace osu.Game.Screens.Multiplayer
             private readonly User user;
 
             public string TooltipText => user.Username;
-            public bool IgnoreTooltip => false;
 
             public UserTile(User user)
             {
