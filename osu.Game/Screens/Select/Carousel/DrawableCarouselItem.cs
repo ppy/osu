@@ -36,8 +36,8 @@ namespace osu.Game.Screens.Select.Carousel
         protected DrawableCarouselItem(CarouselItem item)
         {
             Item = item;
-            Item.Filtered.ValueChanged += v => Schedule(ApplyState);
-            Item.State.ValueChanged += v => Schedule(ApplyState);
+            Item.Filtered.ValueChanged += _ => Schedule(ApplyState);
+            Item.State.ValueChanged += _ => Schedule(ApplyState);
 
             Height = MAX_HEIGHT;
             RelativeSizeAxes = Axes.X;
