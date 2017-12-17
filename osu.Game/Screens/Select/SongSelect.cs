@@ -417,32 +417,10 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => carousel.UpdateBeatmapSet(s));
-
-        private void onBeatmapSetRemoved(BeatmapSetInfo s) => Schedule(() =>
-        {
-            carousel.RemoveBeatmapSet(s);
-            if (carousel.SelectedBeatmap == null)
-                Beatmap.SetDefault();
-        });
-
-        private void onBeatmapRestored(BeatmapInfo beatmap)
-        {
-            Schedule(() =>
-            {
-                var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
-                carousel.UpdateBeatmapSet(beatmapSet);
-            });
-        }
-
-        private void onBeatmapHidden(BeatmapInfo beatmap)
-        {
-            Schedule(() =>
-            {
-                var beatmapSet = beatmaps.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
-                carousel.UpdateBeatmapSet(beatmapSet);
-            });
-        }
+        private void onBeatmapSetAdded(BeatmapSetInfo s) => carousel.UpdateBeatmapSet(s);
+        private void onBeatmapSetRemoved(BeatmapSetInfo s) => carousel.RemoveBeatmapSet(s);
+        private void onBeatmapRestored(BeatmapInfo b) => carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+        private void onBeatmapHidden(BeatmapInfo b) => carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
 
         private void carouselBeatmapsLoaded()
         {
