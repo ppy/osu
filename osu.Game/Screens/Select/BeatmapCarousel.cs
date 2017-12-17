@@ -70,18 +70,15 @@ namespace osu.Game.Screens.Select
                     newRoot.Filter(activeCriteria);
 
                     // preload drawables as the ctor overhead is quite high currently.
-                    var drawables = newRoot.Drawables;
-                }).ContinueWith(t =>
+                    var _ = newRoot.Drawables;
+                }).ContinueWith(_ => Schedule(() =>
                 {
-                    Schedule(() =>
-                    {
-                        root = newRoot;
-                        scrollableContent.Clear(false);
-                        itemsCache.Invalidate();
-                        scrollPositionCache.Invalidate();
-                        BeatmapSetsChanged?.Invoke();
-                    });
-                });
+                    root = newRoot;
+                    scrollableContent.Clear(false);
+                    itemsCache.Invalidate();
+                    scrollPositionCache.Invalidate();
+                    BeatmapSetsChanged?.Invoke();
+                }));
             }
         }
 
