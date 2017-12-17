@@ -110,42 +110,48 @@ namespace osu.Game.Screens.Select
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            var existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
+            Schedule(() =>
+            {
+                var existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
 
-            if (existingSet == null)
-                return;
+                if (existingSet == null)
+                    return;
 
-            root.RemoveChild(existingSet);
-            itemsCache.Invalidate();
+                root.RemoveChild(existingSet);
+                itemsCache.Invalidate();
+            });
         }
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            CarouselBeatmapSet existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
-
-            bool hadSelection = existingSet?.State?.Value == CarouselItemState.Selected;
-
-            var newSet = createCarouselSet(beatmapSet);
-
-            if (existingSet != null)
-                root.RemoveChild(existingSet);
-
-            if (newSet == null)
+            Schedule(() =>
             {
+                CarouselBeatmapSet existingSet = beatmapSets.FirstOrDefault(b => b.BeatmapSet.ID == beatmapSet.ID);
+
+                bool hadSelection = existingSet?.State?.Value == CarouselItemState.Selected;
+
+                var newSet = createCarouselSet(beatmapSet);
+
+                if (existingSet != null)
+                    root.RemoveChild(existingSet);
+
+                if (newSet == null)
+                {
+                    itemsCache.Invalidate();
+                    SelectNext();
+                    return;
+                }
+
+                root.AddChild(newSet);
+
+                applyActiveCriteria(false, false);
+
+                //check if we can/need to maintain our current selection.
+                if (hadSelection)
+                    select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == selectedBeatmap?.Beatmap.ID) ?? newSet);
+
                 itemsCache.Invalidate();
-                SelectNext();
-                return;
-            }
-
-            root.AddChild(newSet);
-
-            applyActiveCriteria(false, false);
-
-            //check if we can/need to maintain our current selection.
-            if (hadSelection)
-                select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == selectedBeatmap?.Beatmap.ID) ?? newSet);
-
-            itemsCache.Invalidate();
+            });
         }
 
         public void SelectBeatmap(BeatmapInfo beatmap)
