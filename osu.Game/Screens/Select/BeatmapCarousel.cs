@@ -68,6 +68,9 @@ namespace osu.Game.Screens.Select
                 {
                     value.Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
                     newRoot.Filter(activeCriteria);
+
+                    // preload drawables as the ctor overhead is quite high currently.
+                    var drawables = newRoot.Drawables;
                 }).ContinueWith(t =>
                 {
                     Schedule(() =>
