@@ -26,25 +26,28 @@ namespace osu.Game.Screens.Select.Carousel
 
         public readonly CarouselItem Item;
 
-        private readonly Container nestedContainer;
-        private readonly Container borderContainer;
+        private Container nestedContainer;
+        private Container borderContainer;
 
-        private readonly Box hoverLayer;
+        private Box hoverLayer;
 
         protected override Container<Drawable> Content => nestedContainer;
 
         protected DrawableCarouselItem(CarouselItem item)
         {
             Item = item;
-            Item.Filtered.ValueChanged += _ => Schedule(ApplyState);
-            Item.State.ValueChanged += _ => Schedule(ApplyState);
 
             Height = MAX_HEIGHT;
             RelativeSizeAxes = Axes.X;
-
             Alpha = 0;
+        }
 
-            AddInternal(borderContainer = new Container
+        private SampleChannel sampleHover;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, OsuColour colours)
+        {
+            InternalChild = borderContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
@@ -63,14 +66,8 @@ namespace osu.Game.Screens.Select.Carousel
                         Blending = BlendingMode.Additive,
                     },
                 }
-            });
-        }
+            };
 
-        private SampleChannel sampleHover;
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
-        {
             sampleHover = audio.Sample.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
             hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
@@ -94,7 +91,10 @@ namespace osu.Game.Screens.Select.Carousel
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             ApplyState();
+            Item.Filtered.ValueChanged += _ => Schedule(ApplyState);
+            Item.State.ValueChanged += _ => Schedule(ApplyState);
         }
 
         protected virtual void ApplyState()
