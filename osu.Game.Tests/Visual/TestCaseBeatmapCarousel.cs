@@ -268,8 +268,10 @@ namespace osu.Game.Tests.Visual
 
             AddUntilStep(() =>
             {
+                if (!carousel.BeatmapSets.Any()) return true;
+
                 carousel.RemoveBeatmapSet(carousel.BeatmapSets.Last());
-                return !carousel.BeatmapSets.Any();
+                return false;
             }, "Remove all");
 
             AddAssert("Selection is null", () => currentSelection == null);
