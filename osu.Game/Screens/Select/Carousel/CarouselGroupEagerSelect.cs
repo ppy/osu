@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Select.Carousel
         public override void AddChild(CarouselItem i)
         {
             base.AddChild(i);
-            updateSelectedIndex();
+            attemptSelection();
         }
 
         protected override void ChildItemStateChanged(CarouselItem item, CarouselItemState value)
@@ -99,6 +99,6 @@ namespace osu.Game.Screens.Select.Carousel
             updateSelectedIndex();
         }
 
-        private void updateSelectedIndex() => lastSelectedIndex = Math.Max(0, InternalChildren.IndexOf(lastSelected));
+        private void updateSelectedIndex() => lastSelectedIndex = lastSelected == null ? 0 : Math.Max(0, InternalChildren.IndexOf(lastSelected));
     }
 }
