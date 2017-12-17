@@ -74,7 +74,8 @@ namespace osu.Game.Screens.Select
                     {
                         root = newRoot;
                         scrollableContent.Clear(false);
-                        yPositionsCache.Invalidate();
+                        itemsCache.Invalidate();
+                        scrollPositionCache.Invalidate();
                         BeatmapSetsChanged?.Invoke();
                     });
                 });
@@ -82,7 +83,8 @@ namespace osu.Game.Screens.Select
         }
 
         private readonly List<float> yPositions = new List<float>();
-        private Cached yPositionsCache = new Cached();
+        private Cached itemsCache = new Cached();
+        private Cached scrollPositionCache = new Cached();
 
         private readonly Container<DrawableCarouselItem> scrollableContent;
 
@@ -114,7 +116,7 @@ namespace osu.Game.Screens.Select
                 return;
 
             root.RemoveChild(existingSet);
-            yPositionsCache.Invalidate();
+            itemsCache.Invalidate();
         }
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -130,7 +132,7 @@ namespace osu.Game.Screens.Select
 
             if (newSet == null)
             {
-                yPositionsCache.Invalidate();
+                itemsCache.Invalidate();
                 SelectNext();
                 return;
             }
@@ -143,7 +145,7 @@ namespace osu.Game.Screens.Select
             if (hadSelection)
                 select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == selectedBeatmap?.Beatmap.ID) ?? newSet);
 
-            yPositionsCache.Invalidate();
+            itemsCache.Invalidate();
         }
 
         public void SelectBeatmap(BeatmapInfo beatmap)
@@ -278,9 +280,16 @@ namespace osu.Game.Screens.Select
                 FilterTask = null;
 
                 root.Filter(activeCriteria);
-                yPositionsCache.Invalidate();
+                itemsCache.Invalidate();
 
-                if (scroll) ScrollToSelected(false);
+                if (scroll)
+                {
+                    Schedule(() =>
+                    {
+                        updateItems(false);
+                        updateScrollPosition(false);
+                    });
+                }
             }
 
             FilterTask?.Cancel();
@@ -294,7 +303,7 @@ namespace osu.Game.Screens.Select
 
         private float? scrollTarget;
 
-        public void ScrollToSelected(bool animated = true) => Schedule(() => { if (scrollTarget != null) ScrollTo(scrollTarget.Value, animated); });
+        public void ScrollToSelected() => scrollPositionCache.Invalidate();
 
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
         {
@@ -318,8 +327,9 @@ namespace osu.Game.Screens.Select
                     {
                         selectedBeatmapSet = set;
                         SelectionChanged?.Invoke(c.Beatmap);
-                        yPositionsCache.Invalidate();
-                        Schedule(() => ScrollToSelected());
+
+                        itemsCache.Invalidate();
+                        scrollPositionCache.Invalidate();
                     }
                 };
             }
@@ -337,8 +347,10 @@ namespace osu.Game.Screens.Select
         /// Computes the target Y positions for every item in the carousel.
         /// </summary>
         /// <returns>The Y position of the currently selected item.</returns>
-        private void computeYPositions(bool animated = true)
+        private void updateItems(bool animated = true)
         {
+            Items = root.Drawables.ToList();
+
             yPositions.Clear();
 
             float currentY = DrawHeight / 2;
@@ -395,13 +407,19 @@ namespace osu.Game.Screens.Select
             currentY += DrawHeight / 2;
             scrollableContent.Height = currentY;
 
-            yPositionsCache.Validate();
+            if (selectedBeatmapSet?.Filtered.Value == true)
+            {
+                selectedBeatmapSet = null;
+                SelectionChanged?.Invoke(null);
+            }
+
+            itemsCache.Validate();
         }
 
-        private void noSelection()
+        private void updateScrollPosition(bool animated = true)
         {
-            if (root.Children == null || root.Children.All(c => c.Filtered))
-                SelectionChanged?.Invoke(null);
+            if (scrollTarget != null) ScrollTo(scrollTarget.Value, animated);
+            scrollPositionCache.Validate();
         }
 
         private void select(CarouselItem item)
@@ -444,15 +462,11 @@ namespace osu.Game.Screens.Select
         {
             base.Update();
 
-            // todo: scheduled scrolls...
-            if (!yPositionsCache.IsValid)
-            {
-                Items = root.Drawables.ToList();
-                computeYPositions();
+            if (!itemsCache.IsValid)
+                updateItems();
 
-                if (selectedBeatmapSet != null && beatmapSets.All(s => s.Filtered))
-                    SelectionChanged?.Invoke(null);
-            }
+            if (!scrollPositionCache.IsValid)
+                updateScrollPosition();
 
             float drawHeight = DrawHeight;
 
@@ -509,7 +523,7 @@ namespace osu.Game.Screens.Select
 
             // this is not actually useful right now, but once we have groups may well be.
             if (notVisibleCount > 50)
-                yPositionsCache.Invalidate();
+                itemsCache.Invalidate();
 
             // Update externally controlled state of currently visible items
             // (e.g. x-offset and opacity).
