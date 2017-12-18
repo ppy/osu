@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using OpenTK.Input;
+using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
 {
@@ -31,7 +32,8 @@ namespace osu.Game.Screens.Play
         public abstract string Header { get; }
         public abstract string Description { get; }
 
-        protected FillFlowContainer<DialogButton> Buttons;
+        protected internal FillFlowContainer<DialogButton> InternalButtons;
+        public IReadOnlyList<DialogButton> Buttons => InternalButtons;
 
         private FillFlowContainer retryCounterContainer;
 
@@ -95,7 +97,7 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                        Buttons = new FillFlowContainer<DialogButton>
+                        InternalButtons = new FillFlowContainer<DialogButton>
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
@@ -191,7 +193,7 @@ namespace osu.Game.Screens.Play
 
             button.Selected.ValueChanged += s => buttonSelectionChanged(button, s);
 
-            Buttons.Add(button);
+            InternalButtons.Add(button);
         }
 
         private int _selectionIndex = -1;
@@ -205,13 +207,13 @@ namespace osu.Game.Screens.Play
 
                 // Deselect the previously-selected button
                 if (_selectionIndex != -1)
-                    Buttons[_selectionIndex].Selected.Value = false;
+                    InternalButtons[_selectionIndex].Selected.Value = false;
 
                 _selectionIndex = value;
 
                 // Select the newly-selected button
                 if (_selectionIndex != -1)
-                    Buttons[_selectionIndex].Selected.Value = true;
+                    InternalButtons[_selectionIndex].Selected.Value = true;
             }
         }
 
@@ -224,12 +226,12 @@ namespace osu.Game.Screens.Play
             {
                 case Key.Up:
                     if (selectionIndex == -1 || selectionIndex == 0)
-                        selectionIndex = Buttons.Count - 1;
+                        selectionIndex = InternalButtons.Count - 1;
                     else
                         selectionIndex--;
                     return true;
                 case Key.Down:
-                    if (selectionIndex == -1 || selectionIndex == Buttons.Count - 1)
+                    if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
                         selectionIndex = 0;
                     else
                         selectionIndex++;
@@ -244,7 +246,7 @@ namespace osu.Game.Screens.Play
             if (!isSelected)
                 selectionIndex = -1;
             else
-                selectionIndex = Buttons.IndexOf(button);
+                selectionIndex = InternalButtons.IndexOf(button);
         }
 
         private class Button : DialogButton
