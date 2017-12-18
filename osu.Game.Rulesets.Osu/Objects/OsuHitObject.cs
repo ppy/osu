@@ -42,14 +42,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         public virtual bool NewCombo { get; set; }
         public int ComboIndex { get; set; }
 
-        public double FadeInSpeed = 1;
-        public double FadeOutSpeed = 1;
-        public double PreemptFadeOut = 0;
-        public bool ShowApproachCircle = true;
-        public bool PlayHitAnimation = true;
-        public bool FadeOutGradually;
-        public bool HideSpinnerDetails;
-
         public double HitWindowFor(HitResult result)
         {
             switch (result)

@@ -14,6 +14,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public const float TIME_FADEIN = 400;
         public const float TIME_FADEOUT = 500;
 
+        public double FadeInSpeed = 1;
+        public double FadeOutSpeed = 1;
+        public double PreemptFadeOut = 0;
         protected float FadeOutAlpha = 0.001f;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
@@ -34,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 UpdatePreemptState();
 
-                var delay = TIME_PREEMPT + (Judgements.FirstOrDefault()?.TimeOffset ?? 0) - HitObject.PreemptFadeOut;
+                var delay = TIME_PREEMPT + (Judgements.FirstOrDefault()?.TimeOffset ?? 0) - PreemptFadeOut;
                 using (BeginDelayedSequence(delay, true))
                     UpdateCurrentState(state);
             }
@@ -42,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected virtual void UpdatePreemptState()
         {
-            this.FadeIn(TIME_FADEIN / HitObject.FadeInSpeed);
+            this.FadeIn(TIME_FADEIN / FadeInSpeed);
         }
 
         protected virtual void UpdateCurrentState(ArmedState state)

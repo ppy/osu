@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         private readonly Slider slider;
 
-        private readonly DrawableHitCircle initialCircle;
+        public readonly DrawableHitCircle InitialCircle;
 
         private readonly List<ISliderProgress> components = new List<ISliderProgress>();
 
@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly SliderBody body;
         private readonly SliderBall ball;
+
+        public bool FadeOutGradually;
 
         public DrawableSlider(Slider s) : base(s)
         {
@@ -47,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                initialCircle = new DrawableHitCircle(new HitCircle
+                InitialCircle = new DrawableHitCircle(new HitCircle
                 {
                     //todo: avoid creating this temporary HitCircle.
                     StartTime = s.StartTime,
@@ -55,21 +57,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     ComboIndex = s.ComboIndex,
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
-                    Samples = s.Samples,
-                    FadeInSpeed = HitObject.FadeInSpeed,
-                    FadeOutSpeed = HitObject.FadeOutSpeed,
-                    PreemptFadeOut = HitObject.PreemptFadeOut,
-                    ShowApproachCircle = HitObject.ShowApproachCircle,
-                    PlayHitAnimation = HitObject.PlayHitAnimation,
-                    FadeOutGradually = HitObject.FadeOutGradually,
-                    HideSpinnerDetails = HitObject.HideSpinnerDetails
+                    Samples = s.Samples
                 })
             };
 
             components.Add(body);
             components.Add(ball);
 
-            AddNested(initialCircle);
+            AddNested(InitialCircle);
 
             var repeatDuration = s.Curve.Distance / s.Velocity;
             foreach (var tick in s.Ticks)
@@ -129,8 +124,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (!initialCircle.Judgements.Any(j => j.IsHit))
-                initialCircle.Position = slider.Curve.PositionAt(progress);
+            if (!InitialCircle.Judgements.Any(j => j.IsHit))
+                InitialCircle.Position = slider.Curve.PositionAt(progress);
 
             foreach (var c in components) c.UpdateProgress(progress, repeat);
             foreach (var t in ticks.Children) t.Tracking = ball.Tracking;
@@ -142,13 +137,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 var judgementsCount = ticks.Children.Count + repeatPoints.Children.Count + 1;
                 var judgementsHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit)) + repeatPoints.Children.Count(t => t.Judgements.Any(j => j.IsHit));
-                if (initialCircle.Judgements.Any(j => j.IsHit))
+                if (InitialCircle.Judgements.Any(j => j.IsHit))
                     judgementsHit++;
 
                 var hitFraction = (double)judgementsHit / judgementsCount;
-                if (hitFraction == 1 && initialCircle.Judgements.Any(j => j.Result == HitResult.Great))
+                if (hitFraction == 1 && InitialCircle.Judgements.Any(j => j.Result == HitResult.Great))
                     AddJudgement(new OsuJudgement { Result = HitResult.Great });
-                else if (hitFraction >= 0.5 && initialCircle.Judgements.Any(j => j.Result >= HitResult.Good))
+                else if (hitFraction >= 0.5 && InitialCircle.Judgements.Any(j => j.Result >= HitResult.Good))
                     AddJudgement(new OsuJudgement { Result = HitResult.Good });
                 else if (hitFraction > 0)
                     AddJudgement(new OsuJudgement { Result = HitResult.Meh });
@@ -161,20 +156,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             ball.FadeIn();
 
-            if (HitObject.FadeOutGradually)
-                body.FadeOut(slider.Duration + HitObject.PreemptFadeOut);
+            if (FadeOutGradually)
+                body.FadeOut(slider.Duration + PreemptFadeOut);
 
-            using (BeginDelayedSequence(slider.Duration + HitObject.PreemptFadeOut, true))
+            using (BeginDelayedSequence(slider.Duration + PreemptFadeOut, true))
             {
-                if(!HitObject.FadeOutGradually)
-                    body.FadeOut(160 / HitObject.FadeOutSpeed);
-                ball.FadeOut(160 / HitObject.FadeOutSpeed);
+                if(!FadeOutGradually)
+                    body.FadeOut(160 / FadeOutSpeed);
+                ball.FadeOut(160 / FadeOutSpeed);
 
-                this.FadeOut(800 / HitObject.FadeOutSpeed).Expire();
+                this.FadeOut(800 / FadeOutSpeed).Expire();
             }
         }
 
-        public Drawable ProxiedLayer => initialCircle.ApproachCircle;
+        public Drawable ProxiedLayer => InitialCircle.ApproachCircle;
     }
 
     internal interface ISliderProgress

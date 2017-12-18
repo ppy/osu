@@ -12,6 +12,8 @@ using System.Linq;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using OpenTK;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -25,20 +27,43 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     }
 
-    public class OsuModHidden : ModHidden, IApplicableToHitObject<OsuHitObject>
+    public class OsuModHidden : ModHidden, IApplicableToDrawableHitObjects
     {
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
 
-        public void ApplyToHitObject(OsuHitObject hitObject)
+        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            hitObject.FadeInSpeed = 2;
-            hitObject.FadeOutSpeed = 2;
-            hitObject.PreemptFadeOut = 400;
-            hitObject.ShowApproachCircle = false;
-            hitObject.PlayHitAnimation = false;
-            hitObject.FadeOutGradually = true;
-            hitObject.HideSpinnerDetails = true;
+            foreach (DrawableHitObject drawable in drawables)
+            {
+                if (drawable is DrawableOsuHitObject osuDrawable)
+                {
+                    osuDrawable.FadeInSpeed = 2;
+                    osuDrawable.FadeOutSpeed = 2;
+                    osuDrawable.PreemptFadeOut = 400;
+
+                    if (osuDrawable is DrawableHitCircle hitCircle)
+                    {
+                        hitCircle.ShowApproachCircle = false;
+                        hitCircle.PlayHitAnimation = false;
+                    }
+
+                    if (osuDrawable is DrawableSlider slider)
+                    {
+                        slider.FadeOutGradually = true;
+
+                        // we need to set the values for the InitialCircle too
+                        slider.InitialCircle.ShowApproachCircle = false;
+                        slider.InitialCircle.PlayHitAnimation = false;
+                        slider.InitialCircle.FadeInSpeed = osuDrawable.FadeInSpeed;
+                        slider.InitialCircle.FadeOutSpeed = osuDrawable.FadeOutSpeed;
+                        slider.InitialCircle.PreemptFadeOut = osuDrawable.PreemptFadeOut;
+                    }
+
+                    if (osuDrawable is DrawableSpinner spinner)
+                        spinner.HideSpinnerDetails = true;
+                }
+            }
         }
     }
 
