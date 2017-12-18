@@ -24,8 +24,8 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
-        public Action<BeatmapSetInfo> DeleteRequested;
-        public Action<BeatmapSetInfo> RestoreHiddenRequested;
+        private Action<BeatmapSetInfo> deleteRequested;
+        private Action<BeatmapSetInfo> restoreHiddenRequested;
 
         private readonly BeatmapSetInfo beatmapSet;
 
@@ -43,8 +43,8 @@ namespace osu.Game.Screens.Select.Carousel
             if (localisation == null)
                 throw new ArgumentNullException(nameof(localisation));
 
-            RestoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
-            DeleteRequested = manager.Delete;
+            restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
+            deleteRequested = manager.Delete;
 
             Children = new Drawable[]
             {
@@ -97,9 +97,9 @@ namespace osu.Game.Screens.Select.Carousel
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
-                    items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => RestoreHiddenRequested?.Invoke(beatmapSet)));
+                    items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested?.Invoke(beatmapSet)));
 
-                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke(beatmapSet)));
+                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => deleteRequested?.Invoke(beatmapSet)));
 
                 return items.ToArray();
             }

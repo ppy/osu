@@ -28,9 +28,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         private Sprite background;
 
-        public Action<BeatmapInfo> StartRequested;
-        public Action<BeatmapInfo> EditRequested;
-        public Action<BeatmapInfo> HideRequested;
+        private Action<BeatmapInfo> startRequested;
+        private Action<BeatmapInfo> editRequested;
+        private Action<BeatmapInfo> hideRequested;
 
         private Triangles triangles;
         private StarCounter starCounter;
@@ -46,12 +46,12 @@ namespace osu.Game.Screens.Select.Carousel
         {
             if (songSelect != null)
             {
-                StartRequested = songSelect.Start;
-                EditRequested = songSelect.Edit;
+                startRequested = songSelect.Start;
+                editRequested = songSelect.Edit;
             }
 
             if (manager != null)
-                HideRequested = manager.Hide;
+                hideRequested = manager.Hide;
 
             Children = new Drawable[]
             {
@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Select.Carousel
         protected override bool OnClick(InputState state)
         {
             if (Item.State == CarouselItemState.Selected)
-                StartRequested?.Invoke(beatmap);
+                startRequested?.Invoke(beatmap);
 
             return base.OnClick(state);
         }
@@ -168,9 +168,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Play", MenuItemType.Highlighted, () => StartRequested?.Invoke(beatmap)),
-            new OsuMenuItem("Edit", MenuItemType.Standard, () => EditRequested?.Invoke(beatmap)),
-            new OsuMenuItem("Hide", MenuItemType.Destructive, () => HideRequested?.Invoke(beatmap)),
+            new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested?.Invoke(beatmap)),
+            new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)),
+            new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)),
         };
     }
 }
