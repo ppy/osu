@@ -725,7 +725,7 @@
     <Compile Include="Screens\Play\KeyCounterCollection.cs" />
     <Compile Include="Screens\Play\KeyCounterKeyboard.cs" />
     <Compile Include="Screens\Play\KeyCounterMouse.cs" />
-    <Compile Include="Screens\Play\MenuOverlay.cs" />
+    <Compile Include="Screens\Play\GameplayMenuOverlay.cs" />
     <Compile Include="Screens\Play\PauseContainer.cs" />
     <Compile Include="Screens\Play\Player.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
