@@ -60,8 +60,6 @@ namespace osu.Game.Screens.Select
             get { return beatmapSets.Select(g => g.BeatmapSet); }
             set
             {
-                List<CarouselBeatmapSet> newSets = null;
-
                 CarouselGroup newRoot = new CarouselGroupEagerSelect();
 
                 Task.Run(() =>
