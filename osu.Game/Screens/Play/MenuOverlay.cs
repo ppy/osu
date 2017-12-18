@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -37,6 +38,8 @@ namespace osu.Game.Screens.Play
         protected MenuOverlay()
         {
             RelativeSizeAxes = Axes.Both;
+
+            StateChanged += s => selectionIndex = -1;
         }
 
         [BackgroundDependencyLoader]
@@ -172,7 +175,7 @@ namespace osu.Game.Screens.Play
 
         protected void AddButton(string text, Color4 colour, Action action)
         {
-            Buttons.Add(new Button
+            var button = new MenuOverlayButton
             {
                 Text = text,
                 ButtonColour = colour,
@@ -184,11 +187,74 @@ namespace osu.Game.Screens.Play
                     action?.Invoke();
                     Hide();
                 }
-            });
+            };
+
+            button.Selected.ValueChanged += s => buttonSelectionChanged(button, s);
+
+            Buttons.Add(button);
         }
 
-        public class Button : DialogButton
+        private int _selectionIndex = -1;
+        private int selectionIndex
         {
+            get { return _selectionIndex; }
+            set
+            {
+                if (_selectionIndex == value)
+                    return;
+
+                if (_selectionIndex != -1)
+                    Buttons[_selectionIndex].Selected.Value = false;
+
+                _selectionIndex = value;
+
+                if (_selectionIndex != -1)
+                    Buttons[_selectionIndex].Selected.Value = true;
+            }
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat)
+                return false;
+
+            switch (args.Key)
+            {
+                case Key.Up:
+                    if (selectionIndex == -1 || selectionIndex == 0)
+                        selectionIndex = Buttons.Count - 1;
+                    else
+                        selectionIndex--;
+                    return true;
+                case Key.Down:
+                    if (selectionIndex == -1 || selectionIndex == Buttons.Count - 1)
+                        selectionIndex = 0;
+                    else
+                        selectionIndex++;
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void buttonSelectionChanged(DialogButton button, bool isSelected)
+        {
+            if (!isSelected)
+                selectionIndex = -1;
+            else
+                selectionIndex = Buttons.IndexOf(button);
+        }
+
+        private class MenuOverlayButton : DialogButton
+        {
+            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+            {
+                if (args.Repeat || args.Key != Key.Enter || !Selected)
+                    return false;
+
+                OnClick(state);
+                return true;
+            }
         }
     }
 }
