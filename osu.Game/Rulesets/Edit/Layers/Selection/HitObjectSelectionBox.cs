@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
                         updateDragRectangle(r);
                         BeginCapture();
                     },
-                    FinishCapture = FinishCapture
+                    FinishDrag = FinishCapture
                 }
             };
         }
