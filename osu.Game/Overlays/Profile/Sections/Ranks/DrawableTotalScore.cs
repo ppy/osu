@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawableTotalScore : DrawableScore
+    public class DrawableTotalScore : DrawableProfileScore
     {
         public DrawableTotalScore(Score score)
             : base(score)
@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load()
         {
-            Stats.Add(new OsuSpriteText
+            RightFlowContainer.Add(new OsuSpriteText
             {
                 Text = Score.TotalScore.ToString("#,###"),
                 Anchor = Anchor.TopRight,
