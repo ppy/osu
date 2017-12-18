@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         /// <summary>
         /// Invoked when this <see cref="Handle"/> has finished updates to the drag rectangle.
         /// </summary>
-        public Action FinishCapture;
+        public Action FinishDrag;
 
         private Color4 normalColour;
         private Color4 hoverColour;
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
         protected override bool OnDragEnd(InputState state)
         {
-            FinishCapture();
+            FinishDrag();
             return true;
         }
 

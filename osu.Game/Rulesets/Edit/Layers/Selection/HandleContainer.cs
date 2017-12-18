@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         /// <summary>
         /// Invoked when a <see cref="Handle"/> has finished updates to the drag rectangle.
         /// </summary>
-        public Action FinishCapture;
+        public Action FinishDrag;
 
         public HandleContainer()
         {
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             {
                 m.GetDragRectangle = () => GetDragRectangle();
                 m.UpdateDragRectangle = r => UpdateDragRectangle(r);
-                m.FinishCapture = () => FinishCapture();
+                m.FinishDrag = () => FinishDrag();
             });
         }
     }
