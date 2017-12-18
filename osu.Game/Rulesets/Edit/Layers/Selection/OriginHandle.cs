@@ -11,14 +11,14 @@ using OpenTK;
 namespace osu.Game.Rulesets.Edit.Layers.Selection
 {
     /// <summary>
-    /// Represents the centre of a <see cref="MarkerContainer"/>.
+    /// Represents the origin of a <see cref="HandleContainer"/>.
     /// </summary>
-    public class CentreMarker : CompositeDrawable
+    public class OriginHandle : CompositeDrawable
     {
         private const float marker_size = 10;
         private const float line_width = 2;
 
-        public CentreMarker()
+        public OriginHandle()
         {
             Size = new Vector2(marker_size);
 
