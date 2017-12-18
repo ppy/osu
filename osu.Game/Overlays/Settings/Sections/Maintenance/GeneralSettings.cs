@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             .ContinueWith(t => Schedule(() => importButton.Enabled.Value = true), TaskContinuationOptions.LongRunning);
                     }
                 },
-                deleteButton = new SettingsButton
+                deleteButton = new DangerousSettingsButton
                 {
                     Text = "Delete ALL beatmaps",
                     Action = () =>
