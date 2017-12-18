@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -9,9 +11,11 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Tests.Visual
 {
     [Description("player pause/fail screens")]
-    internal class TestCaseMenuOverlays : OsuTestCase
+    internal class TestCaseMenuOverlay : OsuTestCase
     {
-        public TestCaseMenuOverlays()
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(FailOverlay), typeof(PauseContainer.PauseOverlay) };
+
+        public TestCaseMenuOverlay()
         {
             FailOverlay failOverlay;
             PauseContainer.PauseOverlay pauseOverlay;
