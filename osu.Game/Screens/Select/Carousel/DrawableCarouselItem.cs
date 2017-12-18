@@ -1,45 +1,53 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
+using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.MathUtils;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 
-namespace osu.Game.Beatmaps.Drawables
+namespace osu.Game.Screens.Select.Carousel
 {
-    public class Panel : Container, IStateful<PanelSelectedState>
+    public abstract class DrawableCarouselItem : Container
     {
         public const float MAX_HEIGHT = 80;
 
-        public event Action<PanelSelectedState> StateChanged;
-
         public override bool RemoveWhenNotAlive => false;
 
-        private readonly Container nestedContainer;
+        public override bool IsPresent => base.IsPresent || Item.Visible;
 
-        private readonly Container borderContainer;
+        public readonly CarouselItem Item;
 
-        private readonly Box hoverLayer;
+        private Container nestedContainer;
+        private Container borderContainer;
+
+        private Box hoverLayer;
 
         protected override Container<Drawable> Content => nestedContainer;
 
-        protected Panel()
+        protected DrawableCarouselItem(CarouselItem item)
         {
+            Item = item;
+
             Height = MAX_HEIGHT;
             RelativeSizeAxes = Axes.X;
+            Alpha = 0;
+        }
 
-            AddInternal(borderContainer = new Container
+        private SampleChannel sampleHover;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, OsuColour colours)
+        {
+            InternalChild = borderContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
@@ -58,16 +66,8 @@ namespace osu.Game.Beatmaps.Drawables
                         Blending = BlendingMode.Additive,
                     },
                 }
-            });
+            };
 
-            Alpha = 0;
-        }
-
-        private SampleChannel sampleHover;
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
-        {
             sampleHover = audio.Sample.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
             hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
@@ -86,60 +86,41 @@ namespace osu.Game.Beatmaps.Drawables
             base.OnHoverLost(state);
         }
 
-        public void SetMultiplicativeAlpha(float alpha)
-        {
-            borderContainer.Alpha = alpha;
-        }
+        public void SetMultiplicativeAlpha(float alpha) => borderContainer.Alpha = alpha;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             ApplyState();
+            Item.Filtered.ValueChanged += _ => Schedule(ApplyState);
+            Item.State.ValueChanged += _ => Schedule(ApplyState);
         }
 
-        protected virtual void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
+        protected virtual void ApplyState()
         {
             if (!IsLoaded) return;
 
-            switch (state)
+            switch (Item.State.Value)
             {
-                case PanelSelectedState.Hidden:
-                case PanelSelectedState.NotSelected:
+                case CarouselItemState.NotSelected:
                     Deselected();
                     break;
-                case PanelSelectedState.Selected:
+                case CarouselItemState.Selected:
                     Selected();
                     break;
             }
 
-            if (state == PanelSelectedState.Hidden)
+            if (!Item.Visible)
                 this.FadeOut(300, Easing.OutQuint);
             else
                 this.FadeIn(250);
         }
 
-        private PanelSelectedState state = PanelSelectedState.NotSelected;
-
-        public PanelSelectedState State
-        {
-            get { return state; }
-
-            set
-            {
-                if (state == value)
-                    return;
-
-                var last = state;
-                state = value;
-
-                ApplyState(last);
-
-                StateChanged?.Invoke(State);
-            }
-        }
-
         protected virtual void Selected()
         {
+            Item.State.Value = CarouselItemState.Selected;
+
             borderContainer.BorderThickness = 2.5f;
             borderContainer.EdgeEffect = new EdgeEffectParameters
             {
@@ -152,6 +133,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected virtual void Deselected()
         {
+            Item.State.Value = CarouselItemState.NotSelected;
+
             borderContainer.BorderThickness = 0;
             borderContainer.EdgeEffect = new EdgeEffectParameters
             {
@@ -164,15 +147,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected override bool OnClick(InputState state)
         {
-            State = PanelSelectedState.Selected;
+            Item.State.Value = CarouselItemState.Selected;
             return true;
         }
-    }
-
-    public enum PanelSelectedState
-    {
-        Hidden,
-        NotSelected,
-        Selected
     }
 }

@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using System;
+using System.Linq;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -72,16 +73,9 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(star_spacing),
+                    ChildrenEnumerable = Enumerable.Range(0, StarCount).Select(i => new Star { Alpha = minStarAlpha })
                 }
             };
-
-            for (int i = 0; i < StarCount; i++)
-            {
-                stars.Add(new Star
-                {
-                    Alpha = minStarAlpha,
-                });
-            }
         }
 
         protected override void LoadComplete()
@@ -147,15 +141,12 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Size = new Vector2(star_size);
 
-                Children = new[]
+                Child = Icon = new SpriteIcon
                 {
-                    Icon = new SpriteIcon
-                    {
-                        Size = new Vector2(star_size),
-                        Icon = FontAwesome.fa_star,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
+                    Size = new Vector2(star_size),
+                    Icon = FontAwesome.fa_star,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                 };
             }
         }
