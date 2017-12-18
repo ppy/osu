@@ -88,6 +88,7 @@
     <Compile Include="Beatmaps\IO\ImportBeatmapTest.cs" />
     <Compile Include="Resources\Resource.cs" />
     <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoderTest.cs" />
+    <Compile Include="Visual\TestCaseBeatmapCarousel.cs" />
     <Compile Include="Visual\TestCaseBeatmapDetailArea.cs" />
     <Compile Include="Visual\TestCaseBeatmapDetails.cs" />
     <Compile Include="Visual\TestCaseBeatmapInfoWedge.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Visual\TestCaseEditorComposeTimeline.cs" />
     <Compile Include="Visual\TestCaseEditorMenuBar.cs" />
     <Compile Include="Visual\TestCaseEditorSummaryTimeline.cs" />
+    <Compile Include="Visual\TestCaseEditorSelectionLayer.cs" />
     <Compile Include="Visual\TestCaseGamefield.cs" />
     <Compile Include="Visual\TestCaseGraph.cs" />
     <Compile Include="Visual\TestCaseHistoricalSection.cs" />
@@ -119,7 +121,7 @@
     <Compile Include="Visual\TestCaseLeaderboard.cs" />
     <Compile Include="Visual\TestCaseMedalOverlay.cs" />
     <Compile Include="Visual\TestCaseButtonSystem.cs" />
-    <Compile Include="Visual\TestCaseMenuOverlays.cs" />
+    <Compile Include="Visual\TestCaseGameplayMenuOverlay.cs" />
     <Compile Include="Visual\TestCaseMods.cs" />
     <Compile Include="Visual\TestCaseMusicController.cs" />
     <Compile Include="Visual\TestCaseNotificationOverlay.cs" />

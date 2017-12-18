@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
@@ -77,7 +78,8 @@ namespace osu.Game.Rulesets.Edit
                                     Alpha = 0,
                                     AlwaysPresent = true,
                                 },
-                                rulesetContainer
+                                rulesetContainer,
+                                new SelectionLayer(rulesetContainer.Playfield)
                             }
                         }
                     },
