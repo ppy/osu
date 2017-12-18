@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual
     [Description("player pause/fail screens")]
     internal class TestCaseMenuOverlay : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(FailOverlay), typeof(PauseContainer.PauseOverlay) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(FailOverlay), typeof(PauseContainer) };
 
         public TestCaseMenuOverlay()
         {
