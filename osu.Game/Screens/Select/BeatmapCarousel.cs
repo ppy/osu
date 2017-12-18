@@ -197,7 +197,7 @@ namespace osu.Game.Screens.Select
                         if (skipDifficulties)
                             select(set);
                         else
-                            select(direction > 0 ? set.Beatmaps.First() : set.Beatmaps.Last());
+                            select(direction > 0 ? set.Beatmaps.First(b => !b.Filtered) : set.Beatmaps.Last(b => !b.Filtered));
                         return;
                 }
             }
