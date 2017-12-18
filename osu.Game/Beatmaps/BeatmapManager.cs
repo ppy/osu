@@ -343,7 +343,7 @@ namespace osu.Game.Beatmaps
         {
             var mapSets = QueryBeatmapSets(bs => bs.DeletePending);
 
-            if (mapSets.Count() == 0) return;
+            if (!mapSets.Any()) return;
 
             var notification = new ProgressNotification
             {
