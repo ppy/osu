@@ -32,73 +32,11 @@ namespace osu.Game.Screens.Play
 
         protected FillFlowContainer<DialogButton> Buttons;
 
-        public int Retries
-        {
-            set
-            {
-                if (retryCounterContainer != null)
-                {
-                    // "You've retried 1,065 times in this session"
-                    // "You've retried 1 time in this session"
-
-                    retryCounterContainer.Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Text = "You've retried ",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = $"{value:n0}",
-                            Font = @"Exo2.0-Bold",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = $" time{(value == 1 ? "" : "s")} in this session",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        }
-                    };
-                }
-            }
-        }
-
         private FillFlowContainer retryCounterContainer;
 
-        public override bool HandleInput => State == Visibility.Visible;
-
-        protected override void PopIn() => this.FadeIn(transition_duration, Easing.In);
-        protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);
-
-        // Don't let mouse down events through the overlay or people can click circles while paused.
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
-
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
-
-        protected override bool OnMouseMove(InputState state) => true;
-
-        protected void AddButton(string text, Color4 colour, Action action)
+        protected MenuOverlay()
         {
-            Buttons.Add(new Button
-            {
-                Text = text,
-                ButtonColour = colour,
-                Origin = Anchor.TopCentre,
-                Anchor = Anchor.TopCentre,
-                Height = button_height,
-                Action = delegate
-                {
-                    action?.Invoke();
-                    Hide();
-                }
-            });
+            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
@@ -182,9 +120,71 @@ namespace osu.Game.Screens.Play
             Retries = 0;
         }
 
-        protected MenuOverlay()
+        public int Retries
         {
-            RelativeSizeAxes = Axes.Both;
+            set
+            {
+                if (retryCounterContainer != null)
+                {
+                    // "You've retried 1,065 times in this session"
+                    // "You've retried 1 time in this session"
+
+                    retryCounterContainer.Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = "You've retried ",
+                            Shadow = true,
+                            ShadowColour = new Color4(0, 0, 0, 0.25f),
+                            TextSize = 18
+                        },
+                        new OsuSpriteText
+                        {
+                            Text = $"{value:n0}",
+                            Font = @"Exo2.0-Bold",
+                            Shadow = true,
+                            ShadowColour = new Color4(0, 0, 0, 0.25f),
+                            TextSize = 18
+                        },
+                        new OsuSpriteText
+                        {
+                            Text = $" time{(value == 1 ? "" : "s")} in this session",
+                            Shadow = true,
+                            ShadowColour = new Color4(0, 0, 0, 0.25f),
+                            TextSize = 18
+                        }
+                    };
+                }
+            }
+        }
+
+        public override bool HandleInput => State == Visibility.Visible;
+
+        protected override void PopIn() => this.FadeIn(transition_duration, Easing.In);
+        protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);
+
+        // Don't let mouse down events through the overlay or people can click circles while paused.
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
+
+        protected override bool OnMouseMove(InputState state) => true;
+
+        protected void AddButton(string text, Color4 colour, Action action)
+        {
+            Buttons.Add(new Button
+            {
+                Text = text,
+                ButtonColour = colour,
+                Origin = Anchor.TopCentre,
+                Anchor = Anchor.TopCentre,
+                Height = button_height,
+                Action = delegate
+                {
+                    action?.Invoke();
+                    Hide();
+                }
+            });
         }
 
         public class Button : DialogButton
