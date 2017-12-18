@@ -140,9 +140,9 @@ namespace osu.Game.Screens.Play
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                AddButton("Continue", colours.Green, OnResume);
-                AddButton("Retry", colours.YellowDark, OnRetry);
-                AddButton("Quit", new Color4(170, 27, 39, 255), OnQuit);
+                AddButton("Continue", colours.Green, () => OnResume?.Invoke());
+                AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
+                AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
             }
         }
     }
