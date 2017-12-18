@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Play
             base.Update();
         }
 
-        public class PauseOverlay : MenuOverlay
+        public class PauseOverlay : GameplayMenuOverlay
         {
             public Action OnResume;
 
