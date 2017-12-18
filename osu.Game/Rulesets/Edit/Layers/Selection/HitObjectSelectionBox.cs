@@ -70,11 +70,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
                     GetDragRectangle = () => dragRectangle,
-                    UpdateDragRectangle = r =>
-                    {
-                        updateDragRectangle(r);
-                        BeginCapture();
-                    },
+                    UpdateDragRectangle = updateDragRectangle,
                     FinishDrag = FinishCapture
                 }
             };
