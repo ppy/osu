@@ -35,8 +35,6 @@ namespace osu.Game.Graphics.UserInterface
         private readonly SpriteText spriteText;
         private Vector2 hoverSpacing => new Vector2(3f, 0f);
 
-        private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's when clicking
-
         public DialogButton()
         {
             RelativeSizeAxes = Axes.X;
@@ -216,7 +214,6 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(Framework.Input.InputState state)
         {
-            didClick = true;
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, Easing.In);
             flash();
 
@@ -252,7 +249,7 @@ namespace osu.Game.Graphics.UserInterface
                 colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);
                 glowContainer.FadeIn(glow_fade_duration, Easing.Out);
             }
-            else if (!didClick)
+            else
             {
                 colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, Easing.OutElastic);
                 spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
