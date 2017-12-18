@@ -203,11 +203,13 @@ namespace osu.Game.Screens.Play
                 if (_selectionIndex == value)
                     return;
 
+                // Deselect the previously-selected button
                 if (_selectionIndex != -1)
                     Buttons[_selectionIndex].Selected.Value = false;
 
                 _selectionIndex = value;
 
+                // Select the newly-selected button
                 if (_selectionIndex != -1)
                     Buttons[_selectionIndex].Selected.Value = true;
             }
