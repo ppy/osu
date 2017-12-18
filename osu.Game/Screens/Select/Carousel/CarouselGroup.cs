@@ -27,8 +27,6 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected virtual void ChildItemStateChanged(CarouselItem item, CarouselItemState value)
         {
-            // todo: check state of selected item.
-
             // ensure we are the only item selected
             if (value == CarouselItemState.Selected)
             {
