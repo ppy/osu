@@ -214,14 +214,14 @@ namespace osu.Game.Screens.Select
             // it could change selection (ie. if the ruleset has been changed).
             carousel.FlushPendingFilterOperations();
 
+            carousel.SelectBeatmap(beatmap);
+
             if (selectionChangedDebounce?.Completed == false)
             {
                 selectionChangedDebounce.RunTask();
                 selectionChangedDebounce.Cancel(); // cancel the already scheduled task.
                 selectionChangedDebounce = null;
             }
-
-            carousel.SelectBeatmap(beatmap);
 
             Start();
         }
