@@ -106,6 +106,12 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
+        }
+
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             Schedule(() =>
@@ -255,6 +261,12 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        private void select(CarouselItem item)
+        {
+            if (item == null) return;
+            item.State.Value = CarouselItemState.Selected;
+        }
+
         private FilterCriteria activeCriteria = new FilterCriteria();
 
         protected ScheduledDelegate FilterTask;
@@ -285,15 +297,7 @@ namespace osu.Game.Screens.Select
 
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
-
-                if (scroll)
-                {
-                    Schedule(() =>
-                    {
-                        updateItems(false);
-                        updateScrollPosition(false);
-                    });
-                }
+                if (scroll) scrollPositionCache.Invalidate();
             }
 
             FilterTask?.Cancel();
@@ -308,129 +312,6 @@ namespace osu.Game.Screens.Select
         private float? scrollTarget;
 
         public void ScrollToSelected() => scrollPositionCache.Invalidate();
-
-        private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
-        {
-            if (beatmapSet.Beatmaps.All(b => b.Hidden))
-                return null;
-
-            // todo: remove the need for this.
-            foreach (var b in beatmapSet.Beatmaps)
-            {
-                if (b.Metadata == null)
-                    b.Metadata = beatmapSet.Metadata;
-            }
-
-            var set = new CarouselBeatmapSet(beatmapSet);
-
-            foreach (var c in set.Beatmaps)
-            {
-                c.State.ValueChanged += v =>
-                {
-                    if (v == CarouselItemState.Selected)
-                    {
-                        selectedBeatmapSet = set;
-                        SelectionChanged?.Invoke(c.Beatmap);
-
-                        itemsCache.Invalidate();
-                        scrollPositionCache.Invalidate();
-                    }
-                };
-            }
-
-            return set;
-        }
-
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuConfigManager config)
-        {
-            config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
-        }
-
-        /// <summary>
-        /// Computes the target Y positions for every item in the carousel.
-        /// </summary>
-        /// <returns>The Y position of the currently selected item.</returns>
-        private void updateItems(bool animated = true)
-        {
-            Items = root.Drawables.ToList();
-
-            yPositions.Clear();
-
-            float currentY = DrawHeight / 2;
-            DrawableCarouselBeatmapSet lastSet = null;
-
-            scrollTarget = null;
-
-            foreach (DrawableCarouselItem d in Items)
-            {
-                if (d.IsPresent)
-                {
-                    switch (d)
-                    {
-                        case DrawableCarouselBeatmapSet set:
-                            lastSet = set;
-
-                            set.MoveToX(set.Item.State == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
-                            set.MoveToY(currentY, animated ? 750 : 0, Easing.OutExpo);
-                            break;
-                        case DrawableCarouselBeatmap beatmap:
-                            if (beatmap.Item.State.Value == CarouselItemState.Selected)
-                                scrollTarget = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;
-
-                            void performMove(float y, float? startY = null)
-                            {
-                                if (startY != null) beatmap.MoveTo(new Vector2(0, startY.Value));
-                                beatmap.MoveToX(beatmap.Item.State == CarouselItemState.Selected ? -50 : 0, 500, Easing.OutExpo);
-                                beatmap.MoveToY(y, animated ? 750 : 0, Easing.OutExpo);
-                            }
-
-                            Debug.Assert(lastSet != null);
-
-                            float? setY = null;
-                            if (!d.IsLoaded || beatmap.Alpha == 0) // can't use IsPresent due to DrawableCarouselItem override.
-                                setY = lastSet.Y + lastSet.DrawHeight + 5;
-
-                            if (d.IsLoaded)
-                                performMove(currentY, setY);
-                            else
-                            {
-                                float y = currentY;
-                                d.OnLoadComplete = _ => performMove(y, setY);
-                            }
-                            break;
-                    }
-                }
-
-                yPositions.Add(currentY);
-
-                if (d.Item.Visible)
-                    currentY += d.DrawHeight + 5;
-            }
-
-            currentY += DrawHeight / 2;
-            scrollableContent.Height = currentY;
-
-            if (selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected)
-            {
-                selectedBeatmapSet = null;
-                SelectionChanged?.Invoke(null);
-            }
-
-            itemsCache.Validate();
-        }
-
-        private void updateScrollPosition(bool animated = true)
-        {
-            if (scrollTarget != null) ScrollTo(scrollTarget.Value, animated);
-            scrollPositionCache.Validate();
-        }
-
-        private void select(CarouselItem item)
-        {
-            if (item == null) return;
-            item.State.Value = CarouselItemState.Selected;
-        }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -529,6 +410,118 @@ namespace osu.Game.Screens.Select
             float halfHeight = drawHeight / 2;
             foreach (DrawableCarouselItem p in scrollableContent.Children)
                 updateItem(p, halfHeight);
+        }
+
+        private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
+        {
+            if (beatmapSet.Beatmaps.All(b => b.Hidden))
+                return null;
+
+            // todo: remove the need for this.
+            foreach (var b in beatmapSet.Beatmaps)
+            {
+                if (b.Metadata == null)
+                    b.Metadata = beatmapSet.Metadata;
+            }
+
+            var set = new CarouselBeatmapSet(beatmapSet);
+
+            foreach (var c in set.Beatmaps)
+            {
+                c.State.ValueChanged += v =>
+                {
+                    if (v == CarouselItemState.Selected)
+                    {
+                        selectedBeatmapSet = set;
+                        SelectionChanged?.Invoke(c.Beatmap);
+
+                        itemsCache.Invalidate();
+                        scrollPositionCache.Invalidate();
+                    }
+                };
+            }
+
+            return set;
+        }
+
+        /// <summary>
+        /// Computes the target Y positions for every item in the carousel.
+        /// </summary>
+        /// <returns>The Y position of the currently selected item.</returns>
+        private void updateItems()
+        {
+            Items = root.Drawables.ToList();
+
+            yPositions.Clear();
+
+            float currentY = DrawHeight / 2;
+            DrawableCarouselBeatmapSet lastSet = null;
+
+            scrollTarget = null;
+
+            foreach (DrawableCarouselItem d in Items)
+            {
+                if (d.IsPresent)
+                {
+                    switch (d)
+                    {
+                        case DrawableCarouselBeatmapSet set:
+                            lastSet = set;
+
+                            set.MoveToX(set.Item.State == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
+                            set.MoveToY(currentY, 750, Easing.OutExpo);
+                            break;
+                        case DrawableCarouselBeatmap beatmap:
+                            if (beatmap.Item.State.Value == CarouselItemState.Selected)
+                                scrollTarget = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;
+
+                            void performMove(float y, float? startY = null)
+                            {
+                                if (startY != null) beatmap.MoveTo(new Vector2(0, startY.Value));
+                                beatmap.MoveToX(beatmap.Item.State == CarouselItemState.Selected ? -50 : 0, 500, Easing.OutExpo);
+                                beatmap.MoveToY(y, 750, Easing.OutExpo);
+                            }
+
+                            Debug.Assert(lastSet != null);
+
+                            float? setY = null;
+                            if (!d.IsLoaded || beatmap.Alpha == 0) // can't use IsPresent due to DrawableCarouselItem override.
+                                setY = lastSet.Y + lastSet.DrawHeight + 5;
+
+                            if (d.IsLoaded)
+                                performMove(currentY, setY);
+                            else
+                            {
+                                float y = currentY;
+                                d.OnLoadComplete = _ => performMove(y, setY);
+                            }
+
+                            break;
+                    }
+                }
+
+                yPositions.Add(currentY);
+
+                if (d.Item.Visible)
+                    currentY += d.DrawHeight + 5;
+            }
+
+            currentY += DrawHeight / 2;
+            scrollableContent.Height = currentY;
+
+            if (selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected)
+            {
+                selectedBeatmapSet = null;
+                SelectionChanged?.Invoke(null);
+            }
+
+            itemsCache.Validate();
+        }
+
+        private void updateScrollPosition()
+        {
+            if (scrollTarget != null) ScrollTo(scrollTarget.Value);
+            scrollPositionCache.Validate();
         }
 
         /// <summary>
