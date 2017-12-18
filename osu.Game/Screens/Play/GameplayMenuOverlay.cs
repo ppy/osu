@@ -17,7 +17,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class MenuOverlay : OverlayContainer, IRequireHighFrequencyMousePosition
+    public abstract class GameplayMenuOverlay : OverlayContainer, IRequireHighFrequencyMousePosition
     {
         private const int transition_duration = 200;
         private const int button_height = 70;
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
 
         private FillFlowContainer retryCounterContainer;
 
-        protected MenuOverlay()
+        protected GameplayMenuOverlay()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Play
 
         protected void AddButton(string text, Color4 colour, Action action)
         {
-            var button = new MenuOverlayButton
+            var button = new Button
             {
                 Text = text,
                 ButtonColour = colour,
@@ -247,7 +247,7 @@ namespace osu.Game.Screens.Play
                 selectionIndex = Buttons.IndexOf(button);
         }
 
-        private class MenuOverlayButton : DialogButton
+        private class Button : DialogButton
         {
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
             {

@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace osu.Game.Screens.Play
 {
-    public class FailOverlay : MenuOverlay
+    public class FailOverlay : GameplayMenuOverlay
     {
         public override string Header => "failed";
         public override string Description => "you're dead, try again?";

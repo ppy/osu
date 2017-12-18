@@ -11,11 +11,11 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Tests.Visual
 {
     [Description("player pause/fail screens")]
-    internal class TestCaseMenuOverlay : OsuTestCase
+    internal class TestCaseGameplayMenuOverlay : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(FailOverlay), typeof(PauseContainer) };
 
-        public TestCaseMenuOverlay()
+        public TestCaseGameplayMenuOverlay()
         {
             FailOverlay failOverlay;
             PauseContainer.PauseOverlay pauseOverlay;
