@@ -22,39 +22,39 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             RelativeSizeAxes = Axes.Both;
         }
 
-        private DragSelector selector;
+        private HitObjectSelectionBox selectionBoxBox;
 
         protected override bool OnDragStart(InputState state)
         {
             // Hide the previous drag box - we won't be working with it any longer
-            selector?.Hide();
+            selectionBoxBox?.Hide();
 
-            AddInternal(selector = new DragSelector(ToLocalSpace(state.Mouse.NativeState.Position))
+            AddInternal(selectionBoxBox = new HitObjectSelectionBox(ToLocalSpace(state.Mouse.NativeState.Position))
             {
                 CapturableObjects = playfield.HitObjects.Objects,
             });
 
-            Selection.BindTo(selector.Selection);
+            Selection.BindTo(selectionBoxBox.Selection);
 
             return true;
         }
 
         protected override bool OnDrag(InputState state)
         {
-            selector.DragEndPosition = ToLocalSpace(state.Mouse.NativeState.Position);
-            selector.BeginCapture();
+            selectionBoxBox.DragEndPosition = ToLocalSpace(state.Mouse.NativeState.Position);
+            selectionBoxBox.BeginCapture();
             return true;
         }
 
         protected override bool OnDragEnd(InputState state)
         {
-            selector.FinishCapture();
+            selectionBoxBox.FinishCapture();
             return true;
         }
 
         protected override bool OnClick(InputState state)
         {
-            selector?.Hide();
+            selectionBoxBox?.Hide();
             return true;
         }
     }

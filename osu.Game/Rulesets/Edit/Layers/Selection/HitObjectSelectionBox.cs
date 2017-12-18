@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
     /// <summary>
     /// A box that represents a drag selection.
     /// </summary>
-    public class DragSelector : CompositeDrawable
+    public class HitObjectSelectionBox : CompositeDrawable
     {
         public readonly Bindable<SelectionInfo> Selection = new Bindable<SelectionInfo>();
 
@@ -37,10 +37,10 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         private readonly Vector2 startPos;
 
         /// <summary>
-        /// Creates a new <see cref="DragSelector"/>.
+        /// Creates a new <see cref="HitObjectSelectionBox"/>.
         /// </summary>
         /// <param name="startPos">The point at which the drag was initiated, in the parent's coordinates.</param>
-        public DragSelector(Vector2 startPos)
+        public HitObjectSelectionBox(Vector2 startPos)
         {
             this.startPos = startPos;
 

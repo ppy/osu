@@ -308,7 +308,7 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\CentreMarker.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\DragSelector.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectSelectionBox.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\Marker.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\MarkerContainer.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\SelectionInfo.cs" />
