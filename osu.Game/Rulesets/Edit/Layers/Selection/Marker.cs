@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 {
     /// <summary>
     /// Represents a marker visible on the border of a <see cref="MarkerContainer"/> which exposes
-    /// properties that are used to resize a <see cref="DragSelector"/>.
+    /// properties that are used to resize a <see cref="HitObjectSelectionBox"/>.
     /// </summary>
     public class Marker : CompositeDrawable
     {
