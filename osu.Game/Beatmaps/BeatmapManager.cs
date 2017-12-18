@@ -339,6 +339,36 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        public void UndeleteAll()
+        {
+            var mapSets = QueryBeatmapSets(bs => bs.DeletePending);
+
+            if (mapSets.Count() == 0) return;
+
+            var notification = new ProgressNotification
+            {
+                Progress = 0,
+                State = ProgressNotificationState.Active,
+            };
+
+            PostNotification?.Invoke(notification);
+
+            int i = 0;
+
+            foreach (var bs in mapSets)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
+                notification.Text = $"Restoring ({i} of {mapSets.Count()})";
+                notification.Progress = (float)++i / mapSets.Count();
+                Undelete(bs);
+            }
+
+            notification.State = ProgressNotificationState.Completed;
+        }
+
         public void Undelete(BeatmapSetInfo beatmapSet)
         {
             if (beatmapSet.Protected)
