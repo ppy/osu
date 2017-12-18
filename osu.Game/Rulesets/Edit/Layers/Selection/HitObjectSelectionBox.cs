@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
         private readonly Container borderMask;
         private readonly Drawable background;
-        private readonly MarkerContainer markers;
+        private readonly HandleContainer handles;
 
         private Color4 captureFinishedColour;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
                         },
                     }
                 },
-                markers = new MarkerContainer
+                handles = new HandleContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
             // Transform into markers to let the user modify the drag selection further.
             background.Delay(50).FadeOut(200);
-            markers.FadeIn(200);
+            handles.FadeIn(200);
 
             Selection.Value = new SelectionInfo
             {
