@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Select
 
         public override bool HandleInput => AllowSelection;
 
-        private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children?.OfType<CarouselBeatmapSet>() ?? new CarouselBeatmapSet[] { };
+        private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
@@ -277,7 +277,7 @@ namespace osu.Game.Screens.Select
 
         private void applyActiveCriteria(bool debounce, bool scroll)
         {
-            if (root.Children?.Any() != true) return;
+            if (root.Children.Any() != true) return;
 
             void perform()
             {
