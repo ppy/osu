@@ -79,6 +79,47 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        private bool isSelectedMouse;
+        public bool IsSelectedMouse
+        {
+            get
+            {
+                return isSelectedMouse;
+            }
+            set
+            {
+                isSelectedMouse = value;
+                if (value)
+                {
+                    spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
+                    colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);
+                    glowContainer.FadeIn(glow_fade_duration, Easing.Out);
+                }
+                else
+                {
+                    colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, Easing.OutElastic);
+                    spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
+                    glowContainer.FadeOut(glow_fade_duration, Easing.Out);
+                }
+            }
+        }
+
+        private bool isSelectedKeyboard;
+        public bool IsSelectedKeyboard
+        {
+            get
+            {
+                return isSelectedKeyboard;
+            }
+            set
+            {
+                isSelectedKeyboard = value;
+                spriteText.Scale = value ? new Vector2(1.3f, 1.3f) : Vector2.One;
+            }
+        }
+
+        public bool IsSelected => isSelectedMouse || isSelectedKeyboard;
+
         private readonly Container backgroundContainer;
         private readonly Container colourContainer;
         private readonly Container glowContainer;
@@ -111,10 +152,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
-
-            colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);
-            glowContainer.FadeIn(glow_fade_duration, Easing.Out);
+            IsSelectedMouse = true;
             base.OnHover(state);
             return true;
         }
@@ -123,9 +161,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (!didClick)
             {
-                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, Easing.OutElastic);
-                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
-                glowContainer.FadeOut(glow_fade_duration, Easing.Out);
+                IsSelectedMouse = false;
             }
 
             didClick = false;

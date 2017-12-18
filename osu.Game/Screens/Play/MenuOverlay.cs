@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -31,6 +32,7 @@ namespace osu.Game.Screens.Play
         public abstract string Description { get; }
 
         protected FillFlowContainer<DialogButton> Buttons;
+        private int selectedButton = -1;
 
         public int Retries
         {
@@ -181,6 +183,56 @@ namespace osu.Game.Screens.Play
 
             Retries = 0;
         }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!args.Repeat && args.Key == Key.Up)
+            {
+                if(selectedButton == -1)
+                {
+                    selectedButton = Buttons.Count - 1;
+                    Buttons[selectedButton].IsSelectedKeyboard = true;
+                }
+                else
+                {
+                    Buttons[selectedButton].IsSelectedKeyboard = false;
+                    selectedButton--;
+                    if (selectedButton < 0)
+                        selectedButton = Buttons.Count - 1;
+                    Buttons[selectedButton].IsSelectedKeyboard = true;
+                    return true;
+                }
+            }
+
+            if (!args.Repeat && args.Key == Key.Down)
+            {
+                if (selectedButton == -1)
+                {
+                    selectedButton = 0;
+                    Buttons[selectedButton].IsSelectedKeyboard = true;
+                }
+                else
+                {
+                    Buttons[selectedButton].IsSelectedKeyboard = false;
+                    selectedButton++;
+                    if (selectedButton > Buttons.Count - 1)
+                        selectedButton = 0;
+                    Buttons[selectedButton].IsSelectedKeyboard = true;
+                    return true;
+                }
+                return true;
+            }
+
+            if (!args.Repeat && args.Key == Key.Enter)
+            {
+                if (Buttons[selectedButton].IsSelectedKeyboard)
+                    Buttons[selectedButton].Action();
+            }
+
+            return base.OnKeyDown(state, args);
+        }
+
+
 
         protected MenuOverlay()
         {
