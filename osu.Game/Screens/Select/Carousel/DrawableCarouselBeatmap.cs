@@ -2,85 +2,56 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Configuration;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Input;
-using osu.Game.Graphics.Sprites;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 
-namespace osu.Game.Beatmaps.Drawables
+namespace osu.Game.Screens.Select.Carousel
 {
-    public class BeatmapPanel : Panel, IHasContextMenu
+    public class DrawableCarouselBeatmap : DrawableCarouselItem, IHasContextMenu
     {
-        public BeatmapInfo Beatmap;
-        private readonly Sprite background;
+        private readonly BeatmapInfo beatmap;
 
-        public Action<BeatmapPanel> GainedSelection;
-        public Action<BeatmapPanel> StartRequested;
-        public Action<BeatmapPanel> EditRequested;
-        public Action<BeatmapInfo> HideRequested;
+        private Sprite background;
 
-        private readonly Triangles triangles;
-        private readonly StarCounter starCounter;
+        private Action<BeatmapInfo> startRequested;
+        private Action<BeatmapInfo> editRequested;
+        private Action<BeatmapInfo> hideRequested;
 
-        protected override void Selected()
+        private Triangles triangles;
+        private StarCounter starCounter;
+
+        public DrawableCarouselBeatmap(CarouselBeatmap panel) : base(panel)
         {
-            base.Selected();
-
-            GainedSelection?.Invoke(this);
-
-            background.Colour = ColourInfo.GradientVertical(
-                new Color4(20, 43, 51, 255),
-                new Color4(40, 86, 102, 255));
-
-            triangles.Colour = Color4.White;
-        }
-
-        protected override void Deselected()
-        {
-            base.Deselected();
-
-            background.Colour = new Color4(20, 43, 51, 255);
-            triangles.Colour = OsuColour.Gray(0.5f);
-        }
-
-        protected override bool OnClick(InputState state)
-        {
-            if (State == PanelSelectedState.Selected)
-                StartRequested?.Invoke(this);
-
-            return base.OnClick(state);
-        }
-
-        public BindableBool Filtered = new BindableBool();
-
-        protected override void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
-        {
-            if (!IsLoaded) return;
-
-            base.ApplyState(last);
-
-            if (last == PanelSelectedState.Hidden && State != last)
-                starCounter.ReplayAnimation();
-        }
-
-        public BeatmapPanel(BeatmapInfo beatmap)
-        {
-            if (beatmap == null)
-                throw new ArgumentNullException(nameof(beatmap));
-
-            Beatmap = beatmap;
+            beatmap = panel.Beatmap;
             Height *= 0.60f;
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(SongSelect songSelect, BeatmapManager manager)
+        {
+            if (songSelect != null)
+            {
+                startRequested = songSelect.Start;
+                editRequested = songSelect.Edit;
+            }
+
+            if (manager != null)
+                hideRequested = manager.Hide;
 
             Children = new Drawable[]
             {
@@ -160,11 +131,46 @@ namespace osu.Game.Beatmaps.Drawables
             };
         }
 
+        protected override void Selected()
+        {
+            base.Selected();
+
+            background.Colour = ColourInfo.GradientVertical(
+                new Color4(20, 43, 51, 255),
+                new Color4(40, 86, 102, 255));
+
+            triangles.Colour = Color4.White;
+        }
+
+        protected override void Deselected()
+        {
+            base.Deselected();
+
+            background.Colour = new Color4(20, 43, 51, 255);
+            triangles.Colour = OsuColour.Gray(0.5f);
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            if (Item.State == CarouselItemState.Selected)
+                startRequested?.Invoke(beatmap);
+
+            return base.OnClick(state);
+        }
+
+        protected override void ApplyState()
+        {
+            if (Item.State.Value != CarouselItemState.Collapsed && Alpha == 0)
+                starCounter.ReplayAnimation();
+
+            base.ApplyState();
+        }
+
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Play", MenuItemType.Highlighted, () => StartRequested?.Invoke(this)),
-            new OsuMenuItem("Edit", MenuItemType.Standard, () => EditRequested?.Invoke(this)),
-            new OsuMenuItem("Hide", MenuItemType.Destructive, () => HideRequested?.Invoke(Beatmap)),
+            new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested?.Invoke(beatmap)),
+            new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)),
+            new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)),
         };
     }
 }
