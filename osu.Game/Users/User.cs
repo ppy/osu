@@ -136,5 +136,7 @@ namespace osu.Game.Users
 
         [JsonProperty(@"rankHistory")]
         public RankHistoryData RankHistory;
+
+        public override string ToString() => Username;
     }
 }
