@@ -262,10 +262,7 @@
     <Compile Include="Beatmaps\ControlPoints\TimingControlPoint.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
@@ -285,15 +282,24 @@
     <Compile Include="Migrations\20171119065731_AddBeatmapOnlineIDUniqueConstraint.Designer.cs">
       <DependentUpon>20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20171209034410_AddRulesetInfoShortName.cs" />
+    <Compile Include="Migrations\20171209034410_AddRulesetInfoShortName.Designer.cs">
+      <DependentUpon>20171209034410_AddRulesetInfoShortName.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
-    <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
+    <Compile Include="Online\API\Requests\APIResponseBeatmapSet.cs" />
+    <Compile Include="Online\API\Requests\GetUserMostPlayedBeatmapsRequest.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ClickableUsername.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableScore.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableTopScore.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ScoresContainer.cs" />
     <Compile Include="Online\API\Requests\GetUserBeatmapsRequest.cs" />
+    <Compile Include="Overlays\Profile\Sections\BeatmapMetadataContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Beatmaps\PaginatedBeatmapContainer.cs" />
+    <Compile Include="Overlays\Profile\Sections\DrawableProfileRow.cs" />
+    <Compile Include="Overlays\Profile\Sections\Historical\DrawableMostPlayedRow.cs" />
+    <Compile Include="Overlays\Profile\Sections\Historical\PaginatedMostPlayedBeatmapContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Kudosu\KudosuInfo.cs" />
     <Compile Include="Overlays\Profile\Sections\PaginatedContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawablePerformanceScore.cs" />
@@ -307,7 +313,6 @@
     <Compile Include="Rulesets\Mods\IApplicableToScoreProcessor.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
-    <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
     <Compile Include="Beatmaps\Formats\Decoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoder.cs" />
@@ -338,7 +343,7 @@
     <Compile Include="Configuration\ReleaseStream.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ScreenshotFormat.cs" />
-    <Compile Include="Configuration\SelectionRandomType.cs" />
+    <Compile Include="Configuration\RandomSelectAlgorithm.cs" />
     <Compile Include="Database\DatabaseBackedStore.cs" />
     <Compile Include="Database\OsuDbContext.cs" />
     <Compile Include="Graphics\Backgrounds\Background.cs" />
@@ -483,7 +488,7 @@
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
-    <Compile Include="Overlays\Profile\Sections\Ranks\DrawableScore.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\DrawableProfileScore.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />
     <Compile Include="Overlays\Profile\ProfileSection.cs" />
     <Compile Include="Overlays\Profile\RankChart.cs" />
@@ -747,6 +752,14 @@
     <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
     <Compile Include="Screens\Select\BeatmapDetails.cs" />
     <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselBeatmap.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselBeatmapSet.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselGroup.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselGroupEagerSelect.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselItem.cs" />
+    <Compile Include="Screens\Select\Carousel\DrawableCarouselBeatmap.cs" />
+    <Compile Include="Screens\Select\Carousel\DrawableCarouselBeatmapSet.cs" />
+    <Compile Include="Screens\Select\Carousel\DrawableCarouselItem.cs" />
     <Compile Include="Screens\Select\Details\AdvancedStats.cs" />
     <Compile Include="Screens\Select\Details\FailRetryGraph.cs" />
     <Compile Include="Screens\Select\Details\UserRatings.cs" />
@@ -819,6 +832,9 @@
     <Compile Include="Overlays\BeatmapSet\BasicStats.cs" />
     <Compile Include="Overlays\BeatmapSet\SuccessRate.cs" />
     <Compile Include="Overlays\BeatmapSet\PreviewButton.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

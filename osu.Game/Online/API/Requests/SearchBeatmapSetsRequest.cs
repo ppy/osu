@@ -9,7 +9,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class SearchBeatmapSetsRequest : APIRequest<IEnumerable<GetBeatmapSetsResponse>>
+    public class SearchBeatmapSetsRequest : APIRequest<IEnumerable<APIResponseBeatmapSet>>
     {
         private readonly string query;
         private readonly RulesetInfo ruleset;
