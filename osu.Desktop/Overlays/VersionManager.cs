@@ -156,11 +156,7 @@ namespace osu.Desktop.Overlays
 
                 if (notification == null)
                 {
-                    notification = new UpdateProgressNotification
-                    {
-                        CompletionText = "Successfully updated the game!",
-                        State = ProgressNotificationState.Active
-                    };
+                    notification = new UpdateProgressNotification { State = ProgressNotificationState.Active };
                     Schedule(() => notificationOverlay.Post(notification));
                 }
 
