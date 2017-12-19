@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             base.Update();
 
-            if (Playing.Value && preview != null && preview.Length > 0)
+            if (Playing.Value && preview != null)
             {
                 progress.Width = (float)(preview.CurrentTime / preview.Length);
             }
