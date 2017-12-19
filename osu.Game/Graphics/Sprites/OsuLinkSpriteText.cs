@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.Sprites
         protected override bool OnClick(InputState state)
         {
             OnLinkClicked();
-            return base.OnClick(state);
+            return true;
         }
 
         private string url;
