@@ -307,6 +307,12 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\OriginHandle.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectSelectionBox.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\Handle.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\HandleContainer.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionInfo.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionLayer.cs" />
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
     <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
     <Compile Include="Screens\Edit\Components\TimeInfoContainer.cs" />
@@ -719,7 +725,7 @@
     <Compile Include="Screens\Play\KeyCounterCollection.cs" />
     <Compile Include="Screens\Play\KeyCounterKeyboard.cs" />
     <Compile Include="Screens\Play\KeyCounterMouse.cs" />
-    <Compile Include="Screens\Play\MenuOverlay.cs" />
+    <Compile Include="Screens\Play\GameplayMenuOverlay.cs" />
     <Compile Include="Screens\Play\PauseContainer.cs" />
     <Compile Include="Screens\Play\Player.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
