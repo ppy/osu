@@ -248,7 +248,7 @@ namespace osu.Game.Beatmaps
 
             var downloadNotification = new ProgressNotification
             {
-                CompletionText = $"Installed {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
+                CompletionText = $"Imported {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
                 Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
             };
 
