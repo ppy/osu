@@ -53,6 +53,7 @@ namespace osu.Game.Overlays.Profile
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = cover_height,
+                    Masking = true,
                     Children = new Drawable[]
                     {
                         new Box
@@ -324,8 +325,7 @@ namespace osu.Game.Overlays.Profile
                 FillMode = FillMode.Fill,
                 OnLoadComplete = d => d.FadeInFromZero(200),
                 Depth = float.MaxValue,
-            },
-            coverContainer.Add);
+            }, coverContainer.Add);
 
             if (user.IsSupporter) supporterTag.Show();
 
@@ -514,7 +514,7 @@ namespace osu.Game.Overlays.Profile
                 {
                     set
                     {
-                        if(value != null)
+                        if (value != null)
                             content.Action = () => Process.Start(value);
                     }
                 }
