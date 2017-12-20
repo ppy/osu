@@ -52,8 +52,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                 scores = value;
 
                 placeholderContainer.FadeOut(fade_duration);
+
                 scrollFlow?.FadeOut(fade_duration).Expire();
-                scrollContainer.Clear(true); // scores stick around in scrollFlow in VisualTests without this for some reason
                 scrollFlow = null;
 
                 loading.Hide();
