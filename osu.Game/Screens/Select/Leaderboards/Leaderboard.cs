@@ -215,7 +215,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return;
             }
 
-            getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value, Scope);
+            getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value ?? Beatmap.Ruleset, Scope);
             getScoresRequest.Success += r =>
             {
                 Scores = r.Scores;
