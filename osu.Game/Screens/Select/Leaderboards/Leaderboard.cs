@@ -178,13 +178,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                 // No need to respond to API state change while current scope is local
                 return;
 
-            if (newState == APIState.Offline)
-            {
-                Scores = null;
-                replacePlaceholder(new MessagePlaceholder(@"Please login to view online leaderboards!"));
-                return;
-            }
-
             if (newState == APIState.Online)
                 UpdateScores();
         }

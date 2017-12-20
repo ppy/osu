@@ -46,6 +46,7 @@ namespace osu.Game.Online.API.Requests
         {
             var req = base.CreateWebRequest();
 
+            req.Timeout = 30000;
             req.AddParameter(@"type", scope.ToString().ToLowerInvariant());
             req.AddParameter(@"mode", ruleset.ShortName);
 
