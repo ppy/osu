@@ -191,7 +191,20 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             Scores = null;
 
-            if (api == null || Beatmap?.OnlineBeatmapID == null)
+            if (Scope == LeaderboardScope.Local)
+            {
+                // TODO: get local scores from wherever here.
+                Scores = Enumerable.Empty<Score>();
+                return;
+            }
+
+            if (api?.IsLoggedIn != true)
+            {
+                replacePlaceholder(new MessagePlaceholder(@"Please login to view online leaderboards!"));
+                return;
+            }
+
+            if (Beatmap?.OnlineBeatmapID == null)
             {
                 replacePlaceholder(new RetrievalFailurePlaceholder
                 {
@@ -201,20 +214,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
 
             loading.Show();
-
-            if (Scope == LeaderboardScope.Local)
-            {
-                // TODO: get local scores from wherever here.
-                Scores = Enumerable.Empty<Score>();
-                return;
-            }
-
-            if (!api.IsLoggedIn)
-            {
-                loading.Hide();
-                replacePlaceholder(new MessagePlaceholder(@"Please login to view online leaderboards!"));
-                return;
-            }
 
             if (Scope != LeaderboardScope.Global && !api.LocalUser.Value.IsSupporter)
             {
