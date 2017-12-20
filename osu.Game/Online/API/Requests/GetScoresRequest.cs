@@ -56,22 +56,7 @@ namespace osu.Game.Online.API.Requests
         {
             var req = base.CreateWebRequest();
 
-            switch(scope)
-            {
-                default:
-                case LeaderboardScope.Global:
-                    req.AddParameter(@"type", @"global");
-                    break;
-
-                case LeaderboardScope.Friends:
-                    req.AddParameter(@"type", @"friend");
-                    break;
-
-                case LeaderboardScope.Country:
-                    req.AddParameter(@"type", @"country");
-                    break;
-            }
-
+            req.AddParameter(@"type", scope.ToString().ToLowerInvariant());
             req.AddParameter(@"mode", ruleset?.ShortName ?? @"osu");
 
             return req;
