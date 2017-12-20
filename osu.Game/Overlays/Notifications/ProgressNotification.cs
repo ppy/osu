@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
+        public string CompletionText { get; set; } = "Task has completed!";
+
         public float Progress
         {
             get { return progressBar.Progress; }
@@ -87,7 +89,7 @@ namespace osu.Game.Overlays.Notifications
         protected virtual Notification CreateCompletionNotification() => new ProgressCompletionNotification
         {
             Activated = CompletionClickAction,
-            Text = "Task has completed!"
+            Text = CompletionText
         };
 
         protected virtual void Completed()
