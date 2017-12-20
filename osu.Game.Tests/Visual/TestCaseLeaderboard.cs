@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual
 
         private void networkFailure()
         {
-            leaderboard.Beatmap = new BeatmapInfo();
+            leaderboard.Beatmap = new BeatmapInfo { Ruleset = rulesets.GetRuleset(0) };
         }
 
         private class FailableLeaderboard : Leaderboard
