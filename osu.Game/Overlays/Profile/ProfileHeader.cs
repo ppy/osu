@@ -51,6 +51,7 @@ namespace osu.Game.Overlays.Profile
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = cover_height,
+                    Masking = true,
                     Children = new Drawable[]
                     {
                         new Box
@@ -300,10 +301,7 @@ namespace osu.Game.Overlays.Profile
 
         public User User
         {
-            get
-            {
-                return user;
-            }
+            get { return user; }
 
             set
             {
@@ -322,8 +320,7 @@ namespace osu.Game.Overlays.Profile
                 FillMode = FillMode.Fill,
                 OnLoadComplete = d => d.FadeInFromZero(200),
                 Depth = float.MaxValue,
-            },
-            coverContainer.Add);
+            }, coverContainer.Add);
 
             if (user.IsSupporter) supporterTag.Show();
 
@@ -343,12 +340,14 @@ namespace osu.Game.Overlays.Profile
             {
                 infoTextLeft.AddText($"{user.Age} years old ", boldItalic);
             }
+
             if (user.Country != null)
             {
                 infoTextLeft.AddText("from ");
                 infoTextLeft.AddText(user.Country.FullName, boldItalic);
                 countryFlag.FlagName = user.Country.FlagName;
             }
+
             infoTextLeft.NewParagraph();
 
             if (user.JoinDate.ToUniversalTime().Year < 2008)
@@ -360,6 +359,7 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText("Joined ");
                 infoTextLeft.AddText(user.JoinDate.LocalDateTime.ToShortDateString(), boldItalic);
             }
+
             infoTextLeft.NewLine();
             infoTextLeft.AddText("Last seen ");
             infoTextLeft.AddText(user.LastVisit.LocalDateTime.ToShortDateString(), boldItalic);
@@ -492,17 +492,13 @@ namespace osu.Game.Overlays.Profile
 
             private readonly OsuHoverContainer content;
 
-            protected override Container<Drawable> Content => content ?? (Container<Drawable>)this;
+            protected override Container<Drawable> Content => content;
 
             public override bool HandleInput => true;
 
             public ProfileLink(User user)
             {
-                AddInternal(content = new OsuHoverContainer
-                {
-                    Action = OnLinkClicked,
-                    AutoSizeAxes = Axes.Both,
-                });
+                AddInternal(content = new OsuHoverContainer { AutoSizeAxes = Axes.Both });
 
                 Text = user.Username;
                 Url = $@"https://osu.ppy.sh/users/{user.Id}";
