@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -165,6 +166,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         public Drawable ProxiedLayer => initialCircle.ApproachCircle;
+
+        public override Vector2 SelectionPoint => ToScreenSpace(body.Position);
+        public override Quad SelectionQuad => body.PathDrawQuad;
     }
 
     internal interface ISliderProgress

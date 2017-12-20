@@ -20,7 +20,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
             Set(OsuSetting.DisplayStarsMaximum, 10.0, 0, 10, 0.1);
 
-            Set(OsuSetting.SelectionRandomType, SelectionRandomType.RandomPermutation);
+            Set(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
 
             Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1);
 
@@ -108,7 +108,7 @@ namespace osu.Game.Configuration
         SaveUsername,
         DisplayStarsMinimum,
         DisplayStarsMaximum,
-        SelectionRandomType,
+        RandomSelectAlgorithm,
         SnakingInSliders,
         SnakingOutSliders,
         ShowFpsDisplay,

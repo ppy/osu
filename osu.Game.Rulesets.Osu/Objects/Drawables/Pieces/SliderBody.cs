@@ -14,6 +14,7 @@ using osu.Game.Configuration;
 using OpenTK;
 using OpenTK.Graphics.ES30;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -48,6 +49,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Schedule(reloadTexture);
             }
         }
+
+        public Quad PathDrawQuad => container.ScreenSpaceDrawQuad;
 
         private int textureWidth => (int)PathWidth * 2;
 
