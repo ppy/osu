@@ -8,7 +8,7 @@ using OpenTK;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseUserPanel : OsuTestCase
+    public class TestCaseUserPanel : OsuTestCase
     {
         public TestCaseUserPanel()
         {

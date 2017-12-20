@@ -13,7 +13,7 @@ using osu.Game.Overlays.Notifications;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    internal class TestCaseNotificationOverlay : OsuTestCase
+    public class TestCaseNotificationOverlay : OsuTestCase
     {
         private readonly NotificationOverlay manager;
 
