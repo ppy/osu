@@ -191,7 +191,14 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             Scores = null;
 
-            if (api == null || Beatmap?.OnlineBeatmapID == null) return;
+            if (api == null || Beatmap?.OnlineBeatmapID == null)
+            {
+                replacePlaceholder(new RetrievalFailurePlaceholder
+                {
+                    OnRetry = UpdateScores,
+                });
+                return;
+            }
 
             loading.Show();
 
