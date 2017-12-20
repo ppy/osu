@@ -12,7 +12,7 @@ using OpenTK;
 namespace osu.Game.Tests.Visual
 {
     [Description("mod select and icon display")]
-    internal class TestCaseMods : OsuTestCase
+    public class TestCaseMods : OsuTestCase
     {
         private ModSelectOverlay modSelect;
         private ModDisplay modDisplay;

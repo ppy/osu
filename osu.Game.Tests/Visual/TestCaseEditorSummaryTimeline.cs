@@ -14,7 +14,7 @@ using osu.Framework.Configuration;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseEditorSummaryTimeline : OsuTestCase
+    public class TestCaseEditorSummaryTimeline : OsuTestCase
     {
         private const int length = 60000;
         private readonly Random random;

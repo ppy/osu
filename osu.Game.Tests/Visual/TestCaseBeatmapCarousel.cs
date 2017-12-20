@@ -17,7 +17,7 @@ using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseBeatmapCarousel : OsuTestCase
+    public class TestCaseBeatmapCarousel : OsuTestCase
     {
         private TestBeatmapCarousel carousel;
 
