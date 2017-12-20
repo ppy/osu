@@ -332,13 +332,11 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        private class RetryButton : BeatSyncedContainer
+        private class RetryButton : OsuHoverContainer
         {
             private readonly SpriteIcon icon;
 
             public Action Action;
-
-            private OsuColour colours;
 
             public RetryButton()
             {
@@ -359,47 +357,15 @@ namespace osu.Game.Screens.Select.Leaderboards
                 };
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                this.colours = colours;
-            }
-
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
-            {
-                var duration = timingPoint.BeatLength / 2;
-
-                icon.Animate(
-                    i => i.MoveToY(-3, duration, Easing.Out),
-                    i => i.ScaleTo(IsHovered ? 1.3f : 1.1f, duration, Easing.Out)
-                ).Then(
-                    i => i.MoveToY(0, duration, Easing.In),
-                    i => i.ScaleTo(IsHovered ? 1.4f : 1f, duration, Easing.In)
-                );
-            }
-
-            protected override bool OnHover(InputState state)
-            {
-                icon.ScaleTo(1.4f, 400, Easing.OutQuint);
-                return base.OnHover(state);
-            }
-
-            protected override void OnHoverLost(InputState state)
-            {
-                icon.ClearTransforms();
-                icon.ScaleTo(1f, 400, Easing.OutQuint);
-                base.OnHoverLost(state);
-            }
-
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                icon.FadeColour(colours.Yellow, 400);
+                icon.ScaleTo(0.8f, 400, Easing.OutQuint);
                 return base.OnMouseDown(state, args);
             }
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                icon.FadeColour(Color4.White, 400);
+                icon.ScaleTo(1, 400, Easing.OutElastic);
                 return base.OnMouseUp(state, args);
             }
         }
