@@ -23,8 +23,6 @@ using osu.Game.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Rulesets;
 using osu.Framework.Input;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Framework.Audio.Track;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
