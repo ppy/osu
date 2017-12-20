@@ -21,16 +21,6 @@ namespace osu.Game.Online.API.Requests
         private readonly LeaderboardScope scope;
         private readonly RulesetInfo ruleset;
 
-        public GetScoresRequest(BeatmapInfo beatmap)
-        {
-            if (!beatmap.OnlineBeatmapID.HasValue)
-                throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.OnlineBeatmapID)}.");
-
-            this.beatmap = beatmap;
-
-            Success += onSuccess;
-        }
-
         public GetScoresRequest(BeatmapInfo beatmap, RulesetInfo ruleset, LeaderboardScope scope = LeaderboardScope.Global)
         {
             if (!beatmap.OnlineBeatmapID.HasValue)
@@ -41,7 +31,7 @@ namespace osu.Game.Online.API.Requests
 
             this.beatmap = beatmap;
             this.scope = scope;
-            this.ruleset = ruleset;
+            this.ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
 
             Success += onSuccess;
         }
@@ -57,7 +47,7 @@ namespace osu.Game.Online.API.Requests
             var req = base.CreateWebRequest();
 
             req.AddParameter(@"type", scope.ToString().ToLowerInvariant());
-            req.AddParameter(@"mode", ruleset?.ShortName ?? @"osu");
+            req.AddParameter(@"mode", ruleset.ShortName);
 
             return req;
         }
