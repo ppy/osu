@@ -490,16 +490,10 @@ namespace osu.Game.Overlays.Profile
         {
             public string TooltipText => "View Profile in Browser";
 
-            private readonly OsuHoverContainer content;
-
-            protected override Container<Drawable> Content => content;
-
             public override bool HandleInput => true;
 
             public ProfileLink(User user)
             {
-                AddInternal(content = new OsuHoverContainer { AutoSizeAxes = Axes.Both });
-
                 Text = user.Username;
                 Url = $@"https://osu.ppy.sh/users/{user.Id}";
                 Font = @"Exo2.0-RegularItalic";

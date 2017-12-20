@@ -6,12 +6,23 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Input;
 using System.Collections.Generic;
 using System.Diagnostics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.Sprites
 {
     public class OsuLinkSpriteText : OsuSpriteText
     {
         protected override IEnumerable<Drawable> FlowingChildren => Children;
+
+        protected override Container<Drawable> Content => content;
+
+        private readonly Container content;
+
+        public OsuLinkSpriteText()
+        {
+            AddInternal(content = new OsuHoverContainer { AutoSizeAxes = Axes.Both });
+        }
 
         protected override bool OnClick(InputState state)
         {
