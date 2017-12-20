@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Tests.Platform;
 
@@ -26,10 +27,28 @@ namespace osu.Game.Tests.Visual
 
         private DependencyContainer dependencies;
 
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(SongSelect),
+            typeof(BeatmapCarousel),
+
+            typeof(CarouselItem),
+            typeof(CarouselGroup),
+            typeof(CarouselGroupEagerSelect),
+            typeof(CarouselBeatmap),
+            typeof(CarouselBeatmapSet),
+
+            typeof(DrawableCarouselItem),
+            typeof(CarouselItemState),
+
+            typeof(DrawableCarouselBeatmap),
+            typeof(DrawableCarouselBeatmapSet),
+        };
+
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(BeatmapManager baseManager)
         {
             PlaySongSelect songSelect;
 
@@ -43,7 +62,10 @@ namespace osu.Game.Tests.Visual
                 Func<OsuDbContext> contextFactory = () => context;
 
                 dependencies.Cache(rulesets = new RulesetStore(contextFactory));
-                dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null));
+                dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
+                {
+                    DefaultBeatmap = baseManager.GetWorkingBeatmap(null)
+                });
 
                 for (int i = 0; i < 100; i += 10)
                     manager.Import(createTestBeatmapSet(i));

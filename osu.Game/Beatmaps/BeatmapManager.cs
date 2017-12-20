@@ -134,6 +134,7 @@ namespace osu.Game.Beatmaps
             var notification = new ProgressNotification
             {
                 Text = "Beatmap import is initialising...",
+                CompletionText = "Import successful!",
                 Progress = 0,
                 State = ProgressNotificationState.Active,
             };
@@ -245,8 +246,9 @@ namespace osu.Game.Beatmaps
                 return;
             }
 
-            ProgressNotification downloadNotification = new ProgressNotification
+            var downloadNotification = new ProgressNotification
             {
+                CompletionText = $"Imported {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
                 Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
             };
 
@@ -374,11 +376,8 @@ namespace osu.Game.Beatmaps
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
-            if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
+            if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
-
-            if (beatmapInfo.BeatmapSet == null)
-                throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
 
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
@@ -668,6 +667,7 @@ namespace osu.Game.Beatmaps
             var notification = new ProgressNotification
             {
                 Progress = 0,
+                CompletionText = "Deleted all beatmaps!",
                 State = ProgressNotificationState.Active,
             };
 

@@ -55,10 +55,11 @@ namespace osu.Game.Rulesets.UI
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
+        private readonly Lazy<Playfield> playfield;
         /// <summary>
         /// The playfield.
         /// </summary>
-        public Playfield Playfield { get; protected set; }
+        public Playfield Playfield => playfield.Value;
 
         protected readonly Ruleset Ruleset;
 
@@ -69,6 +70,7 @@ namespace osu.Game.Rulesets.UI
         protected RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
+            playfield = new Lazy<Playfield>(CreatePlayfield);
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -95,6 +97,12 @@ namespace osu.Game.Rulesets.UI
             Replay = replay;
             ReplayInputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
         }
+
+        /// <summary>
+        /// Creates a Playfield.
+        /// </summary>
+        /// <returns>The Playfield.</returns>
+        protected abstract Playfield CreatePlayfield();
     }
 
     /// <summary>
@@ -198,7 +206,7 @@ namespace osu.Game.Rulesets.UI
             });
 
             AddInternal(KeyBindingInputManager);
-            KeyBindingInputManager.Add(Playfield = CreatePlayfield());
+            KeyBindingInputManager.Add(Playfield);
 
             loadObjects();
         }
@@ -286,12 +294,6 @@ namespace osu.Game.Rulesets.UI
         /// <param name="h">The HitObject to make drawable.</param>
         /// <returns>The DrawableHitObject.</returns>
         protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
-
-        /// <summary>
-        /// Creates a Playfield.
-        /// </summary>
-        /// <returns>The Playfield.</returns>
-        protected abstract Playfield CreatePlayfield();
     }
 
     /// <summary>
