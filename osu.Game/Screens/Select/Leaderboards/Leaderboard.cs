@@ -355,6 +355,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         Local,
         Country,
         Global,
-        Friends,
+        Friend,
     }
 }
