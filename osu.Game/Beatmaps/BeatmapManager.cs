@@ -134,6 +134,7 @@ namespace osu.Game.Beatmaps
             var notification = new ProgressNotification
             {
                 Text = "Beatmap import is initialising...",
+                CompletionText = "Import successful!",
                 Progress = 0,
                 State = ProgressNotificationState.Active,
             };
@@ -245,8 +246,9 @@ namespace osu.Game.Beatmaps
                 return;
             }
 
-            ProgressNotification downloadNotification = new ProgressNotification
+            var downloadNotification = new ProgressNotification
             {
+                CompletionText = $"Imported {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
                 Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
             };
 
@@ -665,6 +667,7 @@ namespace osu.Game.Beatmaps
             var notification = new ProgressNotification
             {
                 Progress = 0,
+                CompletionText = "Deleted all beatmaps!",
                 State = ProgressNotificationState.Active,
             };
 

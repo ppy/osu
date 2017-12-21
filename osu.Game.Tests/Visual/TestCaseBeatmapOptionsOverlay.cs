@@ -10,7 +10,7 @@ using OpenTK.Input;
 namespace osu.Game.Tests.Visual
 {
     [Description("bottom beatmap details")]
-    internal class TestCaseBeatmapOptionsOverlay : OsuTestCase
+    public class TestCaseBeatmapOptionsOverlay : OsuTestCase
     {
         public TestCaseBeatmapOptionsOverlay()
         {
