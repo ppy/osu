@@ -93,6 +93,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
             float approxFollowCircleRadius = (float)(slider.Radius * 3);
             var computeVertex = new Action<double>(t =>
             {
+                // ReSharper disable once PossibleInvalidOperationException (bugged in current r# version)
                 var diff = slider.PositionAt(t) - slider.LazyEndPosition.Value;
                 float dist = diff.Length;
 
