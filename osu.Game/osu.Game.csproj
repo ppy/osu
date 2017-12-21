@@ -267,6 +267,7 @@
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
+    <Compile Include="Overlays\Settings\DangerousSettingsButton.cs" />
     <Compile Include="Graphics\UserInterface\HoverClickSounds.cs" />
     <Compile Include="Graphics\UserInterface\HoverSounds.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
@@ -306,6 +307,7 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\PaginatedScoreContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
+    <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\OriginHandle.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectSelectionBox.cs" />
