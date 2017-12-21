@@ -197,6 +197,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (osuGame != null)
                 osuGame.Ruleset.ValueChanged -= handleRulesetChange;
+
+            if (api != null)
+                api.OnStateChange -= handleApiStateChange;
         }
 
         private GetScoresRequest getScoresRequest;
