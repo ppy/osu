@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -26,6 +27,7 @@ namespace osu.Game.Screens.Select.Carousel
     {
         private Action<BeatmapSetInfo> deleteRequested;
         private Action<BeatmapSetInfo> restoreHiddenRequested;
+        private Action<int> viewDetails;
 
         private readonly BeatmapSetInfo beatmapSet;
 
@@ -37,14 +39,16 @@ namespace osu.Game.Screens.Select.Carousel
             beatmapSet = set.BeatmapSet;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation, BeatmapManager manager)
+        [BackgroundDependencyLoader(true)]
+        private void load(LocalisationEngine localisation, BeatmapManager manager, BeatmapSetOverlay beatmapOverlay)
         {
             if (localisation == null)
                 throw new ArgumentNullException(nameof(localisation));
 
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
             deleteRequested = manager.Delete;
+            if (beatmapOverlay != null)
+                viewDetails = beatmapOverlay.ShowBeatmapSet;
 
             Children = new Drawable[]
             {
@@ -95,6 +99,9 @@ namespace osu.Game.Screens.Select.Carousel
 
                 if (Item.State == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
+
+                if (beatmapSet.OnlineBeatmapSetID != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails?.Invoke(beatmapSet.OnlineBeatmapSetID.Value)));
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested?.Invoke(beatmapSet)));
