@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly SliderBody body;
         private readonly SliderBall ball;
 
-        public bool FadeOutGradually;
-
         public DrawableSlider(Slider s) : base(s)
         {
             slider = s;
@@ -157,12 +155,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             ball.FadeIn();
 
-            if (FadeOutGradually)
+            if (PreemptFadeOut > 0)
                 body.FadeOut(slider.Duration + PreemptFadeOut);
 
             using (BeginDelayedSequence(slider.Duration + PreemptFadeOut, true))
             {
-                if(!FadeOutGradually)
+                if(PreemptFadeOut <= 0)
                     body.FadeOut(160 / FadeOutSpeedMultiplier);
                 ball.FadeOut(160 / FadeOutSpeedMultiplier);
 

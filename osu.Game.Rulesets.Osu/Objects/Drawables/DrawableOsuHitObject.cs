@@ -5,7 +5,7 @@ using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using System.Linq;
-using osu.Game.Rulesets.Objects;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -18,10 +18,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public double FadeInSpeedMultiplier = 1;
         public double FadeOutSpeedMultiplier = 1;
 
+        private double preemptFadeOut;
+
         /// <summary>
-        /// The number of milliseconds before <see cref="HitObject.StartTime"/> that we should fade out.
+        /// The number of milliseconds before <see cref="HitObject.StartTime"/> that we should fade out. Clamped between 0 and 1000 milliseconds.
         /// </summary>
-        public double PreemptFadeOut = 0;
+        public double PreemptFadeOut
+        {
+            get => preemptFadeOut;
+            set
+            {
+                if (preemptFadeOut == value)
+                    return;
+
+                preemptFadeOut = MathHelper.Clamp(value, 0, 1000);
+            }
+        }
 
         public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Time.Current >= HitObject.StartTime - TIME_PREEMPT;
 

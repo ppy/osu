@@ -40,25 +40,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                 d.FadeOutSpeedMultiplier = 2;
                 d.PreemptFadeOut = 400;
 
-                switch (d)
+                if (d is DrawableSlider slider)
                 {
-                    case DrawableHitCircle hitCircle:
-                        hitCircle.ShowApproachCircle = false;
-                        hitCircle.PlayHitAnimation = false;
-                        break;
-                    case DrawableSlider slider:
-                        slider.FadeOutGradually = true;
-
-                        // we need to set the values for the InitialCircle too
-                        slider.InitialCircle.ShowApproachCircle = false;
-                        slider.InitialCircle.PlayHitAnimation = false;
-                        slider.InitialCircle.FadeInSpeedMultiplier = d.FadeInSpeedMultiplier;
-                        slider.InitialCircle.FadeOutSpeedMultiplier = d.FadeOutSpeedMultiplier;
-                        slider.InitialCircle.PreemptFadeOut = d.PreemptFadeOut;
-                        break;
-                    case DrawableSpinner spinner:
-                        spinner.HideSpinnerDetails = true;
-                        break;
+                    // we need to set the values for the InitialCircle
+                    slider.InitialCircle.FadeInSpeedMultiplier = d.FadeInSpeedMultiplier;
+                    slider.InitialCircle.FadeOutSpeedMultiplier = d.FadeOutSpeedMultiplier;
+                    slider.InitialCircle.PreemptFadeOut = d.PreemptFadeOut;
                 }
             }
         }

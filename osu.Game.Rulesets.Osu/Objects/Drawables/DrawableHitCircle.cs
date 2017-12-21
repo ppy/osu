@@ -20,9 +20,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
-        public bool ShowApproachCircle = true;
-        public bool PlayHitAnimation = true;
-
         public DrawableHitCircle(OsuHitObject h) : base(h)
         {
             Origin = Anchor.Centre;
@@ -90,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            if (ShowApproachCircle)
+            if (PreemptFadeOut <= 0)
             {
                 ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT) / FadeInSpeedMultiplier);
                 ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT / FadeInSpeedMultiplier);
@@ -113,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
 
-                    if (PlayHitAnimation)
+                    if (PreemptFadeOut <= 0)
                     {
                         const double flash_in = 40;
                         flash.FadeTo(0.8f, flash_in)
