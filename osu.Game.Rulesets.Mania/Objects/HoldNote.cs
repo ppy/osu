@@ -101,7 +101,8 @@ namespace osu.Game.Rulesets.Mania.Objects
                     Column = Column
                 };
 
-                tick.ApplyDefaults(controlPointInfo, difficulty);
+                if (controlPointInfo != null && difficulty != null)
+                    tick.ApplyDefaults(controlPointInfo, difficulty);
 
                 ret.Add(tick);
             }

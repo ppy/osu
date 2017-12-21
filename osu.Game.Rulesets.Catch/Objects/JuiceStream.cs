@@ -130,7 +130,8 @@ namespace osu.Game.Rulesets.Catch.Objects
                     });
                 }
 
-                ticks.ForEach(t => t.ApplyDefaults(controlPointInfo, difficulty));
+                if (controlPointInfo != null && difficulty != null)
+                    ticks.ForEach(t => t.ApplyDefaults(controlPointInfo, difficulty));
 
                 return ticks;
             }

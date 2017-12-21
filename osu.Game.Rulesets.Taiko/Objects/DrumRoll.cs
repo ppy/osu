@@ -96,7 +96,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
                     }))
                 };
 
-                tick.ApplyDefaults(controlPointInfo, difficulty);
+                if (controlPointInfo != null && difficulty != null)
+                    tick.ApplyDefaults(controlPointInfo, difficulty);
 
                 ret.Add(tick);
                 first = false;
