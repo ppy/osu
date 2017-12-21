@@ -10,7 +10,7 @@ using OpenTK;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseTextAwesome : OsuTestCase
+    public class TestCaseTextAwesome : OsuTestCase
     {
         public TestCaseTextAwesome()
         {

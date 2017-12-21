@@ -12,7 +12,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseBeatmapSetOverlay : OsuTestCase
+    public class TestCaseBeatmapSetOverlay : OsuTestCase
     {
         private readonly BeatmapSetOverlay overlay;
 
