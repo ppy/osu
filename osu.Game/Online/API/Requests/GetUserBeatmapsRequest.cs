@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserBeatmapsRequest : APIRequest<List<GetBeatmapSetsResponse>>
+    public class GetUserBeatmapsRequest : APIRequest<List<APIResponseBeatmapSet>>
     {
         private readonly long userId;
         private readonly int offset;
@@ -24,7 +24,6 @@ namespace osu.Game.Online.API.Requests
 
     public enum BeatmapSetType
     {
-        MostPlayed,
         Favourite,
         RankedAndApproved,
         Unranked,

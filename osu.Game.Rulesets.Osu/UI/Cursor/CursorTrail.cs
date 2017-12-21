@@ -20,8 +20,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
     internal class CursorTrail : Drawable
     {
-        public override bool HandleInput => true;
-
         private int currentIndex;
 
         private Shader shader;

@@ -87,12 +87,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\Formats\OsuJsonDecoderTest.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoderTest.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReaderTest.cs" />
     <Compile Include="Beatmaps\IO\ImportBeatmapTest.cs" />
     <Compile Include="Resources\Resource.cs" />
-    <Compile Include="Beatmaps\Formats\OsuLegacyDecoderTest.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoderTest.cs" />
+    <Compile Include="Visual\TestCaseBeatmapCarousel.cs" />
     <Compile Include="Visual\TestCaseBeatmapDetailArea.cs" />
     <Compile Include="Visual\TestCaseBeatmapDetails.cs" />
+    <Compile Include="Visual\TestCaseBeatmapInfoWedge.cs" />
     <Compile Include="Visual\TestCaseBeatmapOptionsOverlay.cs" />
     <Compile Include="Visual\TestCaseBeatmapScoresContainer.cs" />
     <Compile Include="Visual\TestCaseBeatmapSetOverlay.cs" />
@@ -111,8 +114,10 @@
     <Compile Include="Visual\TestCaseEditorComposeTimeline.cs" />
     <Compile Include="Visual\TestCaseEditorMenuBar.cs" />
     <Compile Include="Visual\TestCaseEditorSummaryTimeline.cs" />
+    <Compile Include="Visual\TestCaseEditorSelectionLayer.cs" />
     <Compile Include="Visual\TestCaseGamefield.cs" />
     <Compile Include="Visual\TestCaseGraph.cs" />
+    <Compile Include="Visual\TestCaseHistoricalSection.cs" />
     <Compile Include="Visual\TestCaseIconButton.cs" />
     <Compile Include="Visual\TestCaseIntroSequence.cs" />
     <Compile Include="Visual\TestCaseKeyConfiguration.cs" />
@@ -120,7 +125,7 @@
     <Compile Include="Visual\TestCaseLeaderboard.cs" />
     <Compile Include="Visual\TestCaseMedalOverlay.cs" />
     <Compile Include="Visual\TestCaseButtonSystem.cs" />
-    <Compile Include="Visual\TestCaseMenuOverlays.cs" />
+    <Compile Include="Visual\TestCaseGameplayMenuOverlay.cs" />
     <Compile Include="Visual\TestCaseMods.cs" />
     <Compile Include="Visual\TestCaseMusicController.cs" />
     <Compile Include="Visual\TestCaseNotificationOverlay.cs" />
@@ -150,6 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Soleily - Renatus %28Gamu%29 [Insane].osu" />
+    <EmbeddedResource Include="Resources\Himeringo - Yotsuya-san ni Yoroshiku %28RLC%29 [Winber1%27s Extreme].osu" />
     <EmbeddedResource Include="Resources\Within Temptation - The Unforgiving %28Armin%29 [Marathon].osu" />
     <EmbeddedResource Include="Resources\Kozato snow - Rengetsu Ouka %28_Kiva%29 [Yuki YukI].osu" />
   </ItemGroup>

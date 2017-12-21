@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace osu.Game.Screens.Play
 {
-    public class FailOverlay : MenuOverlay
+    public class FailOverlay : GameplayMenuOverlay
     {
         public override string Header => "failed";
         public override string Description => "you're dead, try again?";
@@ -18,15 +18,15 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AddButton("Retry", colours.YellowDark, OnRetry);
-            AddButton("Quit", new Color4(170, 27, 39, 255), OnQuit);
+            AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
+            AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (!args.Repeat && args.Key == Key.Escape)
             {
-                Buttons.Children.Last().TriggerOnClick();
+                InternalButtons.Children.Last().TriggerOnClick();
                 return true;
             }
 

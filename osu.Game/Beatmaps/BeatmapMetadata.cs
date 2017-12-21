@@ -11,7 +11,7 @@ using osu.Game.Users;
 namespace osu.Game.Beatmaps
 {
     [Serializable]
-    public class BeatmapMetadata
+    public class BeatmapMetadata : IEquatable<BeatmapMetadata>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [JsonIgnore]
@@ -63,6 +63,8 @@ namespace osu.Game.Beatmaps
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
 
+        public override string ToString() => $"{Artist} - {Title} ({Author})";
+
         [JsonIgnore]
         public string[] SearchableTerms => new[]
         {
@@ -74,5 +76,23 @@ namespace osu.Game.Beatmaps
             Source,
             Tags
         }.Where(s => !string.IsNullOrEmpty(s)).ToArray();
+
+        public bool Equals(BeatmapMetadata other)
+        {
+            if (other == null)
+                return false;
+
+            return onlineBeatmapSetID == other.onlineBeatmapSetID
+                && Title == other.Title
+                && TitleUnicode == other.TitleUnicode
+                && Artist == other.Artist
+                && ArtistUnicode == other.ArtistUnicode
+                && AuthorString == other.AuthorString
+                && Source == other.Source
+                && Tags == other.Tags
+                && PreviewTime == other.PreviewTime
+                && AudioFile == other.AudioFile
+                && BackgroundFile == other.BackgroundFile;
+        }
     }
 }

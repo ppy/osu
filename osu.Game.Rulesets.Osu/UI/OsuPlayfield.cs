@@ -31,6 +31,9 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             get
             {
+                if (Parent == null)
+                    return Vector2.Zero;
+
                 var parentSize = Parent.DrawSize;
                 var aspectSize = parentSize.X * 0.75f < parentSize.Y ? new Vector2(parentSize.X, parentSize.X * 0.75f) : new Vector2(parentSize.Y * 4f / 3f, parentSize.Y);
 
