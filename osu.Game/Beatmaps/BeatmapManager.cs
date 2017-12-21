@@ -349,6 +349,7 @@ namespace osu.Game.Beatmaps
 
             var notification = new ProgressNotification
             {
+                CompletionText = "Restored all deleted beatmaps!",
                 Progress = 0,
                 State = ProgressNotificationState.Active,
             };
