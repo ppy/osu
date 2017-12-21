@@ -124,44 +124,21 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            Retries = 0;
+            updateRetryCount();
         }
+
+        private int retries;
 
         public int Retries
         {
             set
             {
-                if (retryCounterContainer != null)
-                {
-                    // "You've retried 1,065 times in this session"
-                    // "You've retried 1 time in this session"
+                if (value == retries)
+                    return;
 
-                    retryCounterContainer.Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Text = "You've retried ",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = $"{value:n0}",
-                            Font = @"Exo2.0-Bold",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = $" time{(value == 1 ? "" : "s")} in this session",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        }
-                    };
-                }
+                retries = value;
+                if (retryCounterContainer != null)
+                    updateRetryCount();
             }
         }
 
@@ -250,6 +227,38 @@ namespace osu.Game.Screens.Play
                 selectionIndex = -1;
             else
                 selectionIndex = InternalButtons.IndexOf(button);
+        }
+
+        private void updateRetryCount()
+        {
+            // "You've retried 1,065 times in this session"
+            // "You've retried 1 time in this session"
+
+            retryCounterContainer.Children = new Drawable[]
+            {
+                new OsuSpriteText
+                {
+                    Text = "You've retried ",
+                    Shadow = true,
+                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    TextSize = 18
+                },
+                new OsuSpriteText
+                {
+                    Text = $"{retries:n0}",
+                    Font = @"Exo2.0-Bold",
+                    Shadow = true,
+                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    TextSize = 18
+                },
+                new OsuSpriteText
+                {
+                    Text = $" time{(retries == 1 ? "" : "s")} in this session",
+                    Shadow = true,
+                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    TextSize = 18
+                }
+            };
         }
 
         private class Button : DialogButton

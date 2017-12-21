@@ -15,11 +15,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton importButton;
         private TriangleButton deleteButton;
         private TriangleButton restoreButton;
+        private TriangleButton undeleteButton;
 
         protected override string Header => "General";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps)
+        private void load(BeatmapManager beatmaps, DialogOverlay dialogOverlay)
         {
             Children = new Drawable[]
             {
@@ -33,13 +34,16 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             .ContinueWith(t => Schedule(() => importButton.Enabled.Value = true), TaskContinuationOptions.LongRunning);
                     }
                 },
-                deleteButton = new SettingsButton
+                deleteButton = new DangerousSettingsButton
                 {
                     Text = "Delete ALL beatmaps",
                     Action = () =>
                     {
-                        deleteButton.Enabled.Value = false;
-                        Task.Run(() => beatmaps.DeleteAll()).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
+                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
+                        {
+                            deleteButton.Enabled.Value = false;
+                            Task.Run(() => beatmaps.DeleteAll()).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
+                        }));
                     }
                 },
                 restoreButton = new SettingsButton
@@ -53,6 +57,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
                                 beatmaps.Restore(b);
                         }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
+                    }
+                },
+                undeleteButton = new SettingsButton
+                {
+                    Text = "Restore all recently deleted beatmaps",
+                    Action = () =>
+                    {
+                        undeleteButton.Enabled.Value = false;
+                        Task.Run(() => beatmaps.UndeleteAll()).ContinueWith(t => Schedule(() => undeleteButton.Enabled.Value = true));
                     }
                 },
             };
