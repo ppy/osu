@@ -7,7 +7,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseOnScreenDisplay : OsuTestCase
+    public class TestCaseOnScreenDisplay : OsuTestCase
     {
         private FrameworkConfigManager config;
         private Bindable<FrameSync> frameSyncMode;

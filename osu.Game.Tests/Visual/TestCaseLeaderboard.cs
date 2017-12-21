@@ -11,7 +11,7 @@ using OpenTK;
 namespace osu.Game.Tests.Visual
 {
     [Description("PlaySongSelect leaderboard")]
-    internal class TestCaseLeaderboard : OsuTestCase
+    public class TestCaseLeaderboard : OsuTestCase
     {
         private readonly Leaderboard leaderboard;
 

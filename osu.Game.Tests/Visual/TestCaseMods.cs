@@ -20,7 +20,7 @@ using OpenTK.Graphics;
 namespace osu.Game.Tests.Visual
 {
     [Description("mod select and icon display")]
-    internal class TestCaseMods : OsuTestCase
+    public class TestCaseMods : OsuTestCase
     {
         private const string unranked_suffix = " (Unranked)";
 

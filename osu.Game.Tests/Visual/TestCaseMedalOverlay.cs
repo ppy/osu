@@ -9,7 +9,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseMedalOverlay : OsuTestCase
+    public class TestCaseMedalOverlay : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {

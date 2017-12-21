@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
     [Ignore("getting CI working")]
-    internal class TestCaseManiaPlayfield : OsuTestCase
+    public class TestCaseManiaPlayfield : OsuTestCase
     {
         private const double start_time = 500;
         private const double duration = 500;
