@@ -9,7 +9,7 @@ using osu.Game.Screens.Tournament.Teams;
 namespace osu.Game.Tests.Visual
 {
     [Description("for tournament use")]
-    internal class TestCaseDrawings : OsuTestCase
+    public class TestCaseDrawings : OsuTestCase
     {
         public TestCaseDrawings()
         {

@@ -26,6 +26,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool BlockPassThroughKeyboard => true;
 
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+
         public Action OnRetry;
         public Action OnQuit;
 
@@ -173,6 +175,7 @@ namespace osu.Game.Screens.Play
         }
 
         private int _selectionIndex = -1;
+
         private int selectionIndex
         {
             get { return _selectionIndex; }
@@ -195,26 +198,26 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Repeat)
-                return false;
-
-            switch (args.Key)
+            if (!args.Repeat)
             {
-                case Key.Up:
-                    if (selectionIndex == -1 || selectionIndex == 0)
-                        selectionIndex = InternalButtons.Count - 1;
-                    else
-                        selectionIndex--;
-                    return true;
-                case Key.Down:
-                    if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
-                        selectionIndex = 0;
-                    else
-                        selectionIndex++;
-                    return true;
+                switch (args.Key)
+                {
+                    case Key.Up:
+                        if (selectionIndex == -1 || selectionIndex == 0)
+                            selectionIndex = InternalButtons.Count - 1;
+                        else
+                            selectionIndex--;
+                        return true;
+                    case Key.Down:
+                        if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
+                            selectionIndex = 0;
+                        else
+                            selectionIndex++;
+                        return true;
+                }
             }
 
-            return false;
+            return base.OnKeyDown(state, args);
         }
 
         private void buttonSelectionChanged(DialogButton button, bool isSelected)
