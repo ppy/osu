@@ -63,9 +63,15 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// </summary>
         private double tickSpacing = 50;
 
+        private ControlPointInfo controlPointInfo;
+        private BeatmapDifficulty difficulty;
+
         public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaults(controlPointInfo, difficulty);
+
+            this.controlPointInfo = controlPointInfo;
+            this.difficulty = difficulty;
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
@@ -89,11 +95,15 @@ namespace osu.Game.Rulesets.Mania.Objects
 
             for (double t = StartTime + tickSpacing; t <= EndTime - tickSpacing; t += tickSpacing)
             {
-                ret.Add(new HoldNoteTick
+                var tick = new HoldNoteTick
                 {
                     StartTime = t,
                     Column = Column
-                });
+                };
+
+                tick.ApplyDefaults(controlPointInfo, difficulty);
+
+                ret.Add(tick);
             }
 
             return ret;

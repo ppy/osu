@@ -10,6 +10,7 @@ using System.Linq;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -74,9 +75,15 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double Velocity;
         public double TickDistance;
 
+        private ControlPointInfo controlPointInfo;
+        private BeatmapDifficulty difficulty;
+
         public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaults(controlPointInfo, difficulty);
+
+            this.controlPointInfo = controlPointInfo;
+            this.difficulty = difficulty;
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
@@ -124,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         var distanceProgress = d / length;
                         var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
 
-                        yield return new SliderTick
+                        var ret = new SliderTick
                         {
                             RepeatIndex = repeat,
                             StartTime = repeatStartTime + timeProgress * repeatDuration,
@@ -139,6 +146,10 @@ namespace osu.Game.Rulesets.Osu.Objects
                                 Volume = s.Volume
                             }))
                         };
+
+                        ret.ApplyDefaults(controlPointInfo, difficulty);
+
+                        yield return ret;
                     }
                 }
             }
@@ -158,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         var repeatStartTime = StartTime + repeat * repeatDuration;
                         var distanceProgress = d / length;
 
-                        yield return new RepeatPoint
+                        var ret = new RepeatPoint
                         {
                             RepeatIndex = repeat,
                             StartTime = repeatStartTime,
@@ -167,6 +178,10 @@ namespace osu.Game.Rulesets.Osu.Objects
                             Scale = Scale,
                             ComboColour = ComboColour,
                         };
+
+                        ret.ApplyDefaults(controlPointInfo, difficulty);
+
+                        yield return ret;
                     }
                 }
             }

@@ -31,6 +31,9 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public SampleInfoList Samples = new SampleInfoList();
 
+        [JsonIgnore]
+        public SoundControlPoint SoundControlPoint;
+
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
         /// </summary>
@@ -48,13 +51,7 @@ namespace osu.Game.Rulesets.Objects
             EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
 
             Kiai = effectPoint.KiaiMode;
-
-            // Initialize first sample
-            Samples.ForEach(s => s.ControlPoint = soundPoint);
-
-            // Initialize any repeat samples
-            var repeatData = this as IHasRepeats;
-            repeatData?.RepeatSamples?.ForEach(r => r.ForEach(s => s.ControlPoint = soundPoint));
+            SoundControlPoint = soundPoint;
         }
     }
 }

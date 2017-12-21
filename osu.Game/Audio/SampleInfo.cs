@@ -16,39 +16,18 @@ namespace osu.Game.Audio
         public const string HIT_CLAP = @"hitclap";
 
         /// <summary>
-        /// The <see cref="SoundControlPoint"/> that is used for <see cref="Bank"/> and <see cref="Volume"/>
-        /// if the values have not already been provided by the hitobject.
-        /// </summary>
-        [JsonIgnore]
-        public SoundControlPoint ControlPoint;
-
-        private string bank;
-        /// <summary>
         /// The bank to load the sample from.
         /// </summary>
-        public string Bank
-        {
-            get { return string.IsNullOrEmpty(bank) ? (ControlPoint?.SampleBank ?? "normal") : bank; }
-            set { bank = value; }
-        }
-
-        public bool ShouldSerializeBank() => Bank != ControlPoint.SampleBank;
+        public string Bank;
 
         /// <summary>
         /// The name of the sample to load.
         /// </summary>
-        public string Name { get; set; }
+        public string Name;
 
-        private int volume;
         /// <summary>
         /// The sample volume.
         /// </summary>
-        public int Volume
-        {
-            get { return volume == 0 ? (ControlPoint?.SampleVolume ?? 0) : volume; }
-            set { volume = value; }
-        }
-
-        public bool ShouldSerializeVolume() => Volume != ControlPoint.SampleVolume;
+        public int Volume;
     }
 }

@@ -55,9 +55,14 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         private double tickSpacing = 100;
 
+        private ControlPointInfo controlPointInfo;
+        private BeatmapDifficulty difficulty;
+
         public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaults(controlPointInfo, difficulty);
+            this.controlPointInfo = controlPointInfo;
+            this.difficulty = difficulty;
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
@@ -77,7 +82,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             bool first = true;
             for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
-                ret.Add(new DrumRollTick
+                var tick = new DrumRollTick
                 {
                     FirstTick = first,
                     TickSpacing = tickSpacing,
@@ -89,8 +94,11 @@ namespace osu.Game.Rulesets.Taiko.Objects
                         Name = @"slidertick",
                         Volume = s.Volume
                     }))
-                });
+                };
 
+                tick.ApplyDefaults(controlPointInfo, difficulty);
+
+                ret.Add(tick);
                 first = false;
             }
 

@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 using osu.Framework.Lists;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
@@ -29,9 +30,14 @@ namespace osu.Game.Rulesets.Catch.Objects
         public double Velocity;
         public double TickDistance;
 
+        private ControlPointInfo controlPointInfo;
+        private BeatmapDifficulty difficulty;
+
         public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaults(controlPointInfo, difficulty);
+            this.controlPointInfo = controlPointInfo;
+            this.difficulty = difficulty;
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
@@ -123,6 +129,8 @@ namespace osu.Game.Rulesets.Catch.Objects
                         X = Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
                     });
                 }
+
+                ticks.ForEach(t => t.ApplyDefaults(controlPointInfo, difficulty));
 
                 return ticks;
             }

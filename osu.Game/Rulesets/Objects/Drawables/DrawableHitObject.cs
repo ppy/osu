@@ -86,12 +86,23 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             foreach (SampleInfo sample in HitObject.Samples)
             {
-                SampleChannel channel = audio.Sample.Get($@"Gameplay/{sample.Bank}-{sample.Name}");
+                if (HitObject.SoundControlPoint == null)
+                    throw new ArgumentNullException(nameof(HitObject.SoundControlPoint), $"{nameof(HitObject)} must always have an attached {nameof(HitObject.SoundControlPoint)}.");
+
+                var bank = sample.Bank;
+                if (string.IsNullOrEmpty(bank))
+                    bank = HitObject.SoundControlPoint.SampleBank;
+
+                int volume = sample.Volume;
+                if (volume == 0)
+                    volume = HitObject.SoundControlPoint.SampleVolume;
+
+                SampleChannel channel = audio.Sample.Get($@"Gameplay/{bank}-{sample.Name}");
 
                 if (channel == null)
                     continue;
 
-                channel.Volume.Value = sample.Volume;
+                channel.Volume.Value = volume;
                 Samples.Add(channel);
             }
         }
