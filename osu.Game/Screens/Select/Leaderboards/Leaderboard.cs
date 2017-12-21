@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using System.Linq;
+using osu.Framework.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Framework.Logging;
@@ -34,6 +35,8 @@ namespace osu.Game.Screens.Select.Leaderboards
         private readonly Container placeholderContainer;
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
+
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public Action<Score> ScoreSelected;
 
@@ -185,7 +188,9 @@ namespace osu.Game.Screens.Select.Leaderboards
             this.osuGame = osuGame;
 
             if (osuGame != null)
-                osuGame.Ruleset.ValueChanged += handleRulesetChange;
+                ruleset.BindTo(osuGame.Ruleset);
+
+            ruleset.ValueChanged += r => updateScores();
 
             if (api != null)
                 api.OnStateChange += handleApiStateChange;
@@ -195,16 +200,11 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             base.Dispose(isDisposing);
 
-            if (osuGame != null)
-                osuGame.Ruleset.ValueChanged -= handleRulesetChange;
-
             if (api != null)
                 api.OnStateChange -= handleApiStateChange;
         }
 
         private GetScoresRequest getScoresRequest;
-
-        private void handleRulesetChange(RulesetInfo ruleset) => updateScores();
 
         private void handleApiStateChange(APIState oldState, APIState newState)
         {
