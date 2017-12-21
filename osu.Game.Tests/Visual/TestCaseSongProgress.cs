@@ -10,7 +10,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseSongProgress : OsuTestCase
+    public class TestCaseSongProgress : OsuTestCase
     {
         private readonly SongProgress progress;
         private readonly SongProgressGraph graph;

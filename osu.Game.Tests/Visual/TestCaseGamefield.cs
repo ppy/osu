@@ -5,7 +5,7 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseGamefield : OsuTestCase
+    public class TestCaseGamefield : OsuTestCase
     {
         protected override void LoadComplete()
         {
