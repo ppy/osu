@@ -218,8 +218,6 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void updateScores()
         {
-            if (!IsLoaded) return;
-
             getScoresRequest?.Cancel();
             getScoresRequest = null;
             Scores = null;
