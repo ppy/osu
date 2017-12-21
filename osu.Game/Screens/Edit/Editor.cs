@@ -68,6 +68,7 @@ namespace osu.Game.Screens.Edit
                                 Items = new[]
                                 {
                                     new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap),
+                                    new EditorMenuItemSpacer(),
                                     new EditorMenuItem("Exit", MenuItemType.Standard, Exit)
                                 }
                             }
