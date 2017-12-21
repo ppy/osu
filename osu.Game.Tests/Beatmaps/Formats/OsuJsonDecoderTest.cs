@@ -158,8 +158,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = Resource.OpenResource(filename))
             using (var sr = new StreamReader(stream))
             {
-                var legacyDecoded = new OsuLegacyDecoder().Decode(sr);
 
+                var legacyDecoded = new LegacyBeatmapDecoder().DecodeBeatmap(sr);
                 using (var ms = new MemoryStream())
                 using (var sw = new StreamWriter(ms))
                 using (var sr2 = new StreamReader(ms))
@@ -168,7 +168,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     sw.Flush();
 
                     ms.Position = 0;
-                    return (legacyDecoded, new OsuJsonDecoder().Decode(sr2));
+                    return (legacyDecoded, new OsuJsonDecoder().DecodeBeatmap(sr2));
                 }
             }
         }
