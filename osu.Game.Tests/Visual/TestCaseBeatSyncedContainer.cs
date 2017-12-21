@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -14,6 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using OpenTK.Graphics;
+using osu.Framework.Lists;
 
 namespace osu.Game.Tests.Visual
 {
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual
                 };
             }
 
-            private List<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints;
+            private SortedList<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints;
             private TimingControlPoint getNextTimingPoint(TimingControlPoint current)
             {
                 if (timingPoints[timingPoints.Count - 1] == current)

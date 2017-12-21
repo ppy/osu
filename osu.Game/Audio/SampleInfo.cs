@@ -2,8 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using Newtonsoft.Json;
-using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Audio
 {
