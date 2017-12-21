@@ -6,7 +6,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseBreadcrumbs : OsuTestCase
+    public class TestCaseBreadcrumbs : OsuTestCase
     {
         public TestCaseBreadcrumbs()
         {
