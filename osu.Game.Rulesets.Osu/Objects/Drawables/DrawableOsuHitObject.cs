@@ -5,6 +5,7 @@ using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using System.Linq;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -14,8 +15,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public const float TIME_FADEIN = 400;
         public const float TIME_FADEOUT = 500;
 
-        public double FadeInSpeed = 1;
-        public double FadeOutSpeed = 1;
+        public double FadeInSpeedMultiplier = 1;
+        public double FadeOutSpeedMultiplier = 1;
+
+        /// <summary>
+        /// The number of milliseconds before <see cref="HitObject.StartTime"/> that we should fade out.
+        /// </summary>
         public double PreemptFadeOut = 0;
 
         public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Time.Current >= HitObject.StartTime - TIME_PREEMPT;
@@ -46,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected virtual void UpdatePreemptState()
         {
-            this.FadeIn(TIME_FADEIN / FadeInSpeed);
+            this.FadeIn(TIME_FADEIN / FadeInSpeedMultiplier);
         }
 
         protected virtual void UpdateCurrentState(ArmedState state)

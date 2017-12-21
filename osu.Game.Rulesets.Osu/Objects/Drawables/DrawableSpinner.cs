@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            var sequence = this.Delay(spinner.Duration + PreemptFadeOut).FadeOut(160 / FadeOutSpeed);
+            var sequence = this.Delay(spinner.Duration + PreemptFadeOut).FadeOut(160 / FadeOutSpeedMultiplier);
 
             switch (state)
             {

@@ -163,10 +163,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             using (BeginDelayedSequence(slider.Duration + PreemptFadeOut, true))
             {
                 if(!FadeOutGradually)
-                    body.FadeOut(160 / FadeOutSpeed);
-                ball.FadeOut(160 / FadeOutSpeed);
+                    body.FadeOut(160 / FadeOutSpeedMultiplier);
+                ball.FadeOut(160 / FadeOutSpeedMultiplier);
 
-                this.FadeOut(800 / FadeOutSpeed).Expire();
+                this.FadeOut(800 / FadeOutSpeedMultiplier).Expire();
             }
         }
 

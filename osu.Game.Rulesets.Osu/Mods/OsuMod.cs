@@ -36,8 +36,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
-                d.FadeInSpeed = 2;
-                d.FadeOutSpeed = 2;
+                d.FadeInSpeedMultiplier = 2;
+                d.FadeOutSpeedMultiplier = 2;
                 d.PreemptFadeOut = 400;
 
                 switch (d)
@@ -52,8 +52,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                         // we need to set the values for the InitialCircle too
                         slider.InitialCircle.ShowApproachCircle = false;
                         slider.InitialCircle.PlayHitAnimation = false;
-                        slider.InitialCircle.FadeInSpeed = d.FadeInSpeed;
-                        slider.InitialCircle.FadeOutSpeed = d.FadeOutSpeed;
+                        slider.InitialCircle.FadeInSpeedMultiplier = d.FadeInSpeedMultiplier;
+                        slider.InitialCircle.FadeOutSpeedMultiplier = d.FadeOutSpeedMultiplier;
                         slider.InitialCircle.PreemptFadeOut = d.PreemptFadeOut;
                         break;
                     case DrawableSpinner spinner:

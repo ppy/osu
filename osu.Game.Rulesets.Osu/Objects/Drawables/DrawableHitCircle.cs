@@ -92,23 +92,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (ShowApproachCircle)
             {
-                ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT) / FadeInSpeed);
-                ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT / FadeInSpeed);
+                ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT) / FadeInSpeedMultiplier);
+                ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT / FadeInSpeedMultiplier);
             }
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            glow.Delay(PreemptFadeOut).FadeOut(400 / FadeOutSpeed);
+            glow.FadeOut(400 / FadeOutSpeedMultiplier);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.FadeTo(FadeOutAlpha, TIME_FADEOUT / FadeOutSpeed).Delay(PreemptFadeOut * 2).Expire();
+                    this.FadeOut(TIME_FADEOUT / FadeOutSpeedMultiplier).Delay(PreemptFadeOut + TIME_FADEOUT).Expire();
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
-                    this.FadeOut(TIME_FADEOUT / 5 / FadeOutSpeed).Expire();
+                    this.FadeOut(TIME_FADEOUT / 5 / FadeOutSpeedMultiplier).Expire();
                     break;
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
@@ -129,12 +129,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             circle.FadeOut();
                             number.FadeOut();
 
-                            this.FadeOut(800 / FadeOutSpeed)
+                            this.FadeOut(800 / FadeOutSpeedMultiplier)
                                 .ScaleTo(Scale * 1.5f, 400, Easing.OutQuad);
                         }
                     }
                     else
-                        this.FadeOut(TIME_FADEOUT / 5 / FadeOutSpeed);
+                        this.FadeOut(TIME_FADEOUT / 5 / FadeOutSpeedMultiplier);
                     Expire();
                     break;
             }
