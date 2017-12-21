@@ -403,13 +403,13 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
                 {
-                    icon.ScaleTo(0.8f, 400, Easing.OutQuint);
+                    icon.ScaleTo(0.8f, 4000, Easing.OutQuint);
                     return base.OnMouseDown(state, args);
                 }
 
                 protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
                 {
-                    icon.ScaleTo(1, 400, Easing.OutElastic);
+                    icon.ScaleTo(1, 1000, Easing.OutElastic);
                     return base.OnMouseUp(state, args);
                 }
             }
