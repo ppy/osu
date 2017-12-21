@@ -17,7 +17,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public double FadeInSpeed = 1;
         public double FadeOutSpeed = 1;
         public double PreemptFadeOut = 0;
-        protected float FadeOutAlpha = 0.001f;
+
+        public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Time.Current >= HitObject.StartTime - TIME_PREEMPT;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)

@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ticks.FadeOut();
                 circle.FadeOut();
                 background.FadeOut();
-                disc.FadeTo(FadeOutAlpha); // we still need it to be able to spin
+                disc.FadeOut(); // we still need it to be able to spin
             }
 
             circleContainer.ScaleTo(spinner.Scale * 0.3f);
