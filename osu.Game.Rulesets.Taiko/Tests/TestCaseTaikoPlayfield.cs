@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
     [Ignore("getting CI working")]
-    internal class TestCaseTaikoPlayfield : OsuTestCase
+    public class TestCaseTaikoPlayfield : OsuTestCase
     {
         private const double default_duration = 1000;
         private const float scroll_time = 1000;

@@ -13,7 +13,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseHistoricalSection : OsuTestCase
+    public class TestCaseHistoricalSection : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes =>
             new[]
