@@ -5,11 +5,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Input.Bindings
 {
-    public class GlobalKeyBindingInputManager : DatabasedKeyBindingInputManager<GlobalAction>
+    public class GlobalKeyBindingInputManager : DatabasedKeyBindingInputManager<GlobalAction>, IHandleGlobalInput
     {
         private readonly Drawable handler;
 
