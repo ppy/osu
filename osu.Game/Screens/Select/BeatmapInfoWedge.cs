@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Select
 
                 List<InfoLabel> labels = new List<InfoLabel>();
 
-                if (beatmap != null)
+                if (beatmap != null && !(working is DummyWorkingBeatmap))
                 {
                     HitObject lastObject = beatmap.HitObjects.LastOrDefault();
                     double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
@@ -200,21 +200,7 @@ namespace osu.Game.Screens.Select
                                 Margin = new MarginPadding { Top = 10 },
                                 Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
-                                Children = new[]
-                                {
-                                    new OsuSpriteText
-                                    {
-                                        Font = @"Exo2.0-Medium",
-                                        Text = "mapped by ",
-                                        TextSize = 15,
-                                    },
-                                    new OsuSpriteText
-                                    {
-                                        Font = @"Exo2.0-Bold",
-                                        Text = metadata.Author.Username,
-                                        TextSize = 15,
-                                    },
-                                }
+                                Children = working is DummyWorkingBeatmap ? Array.Empty<Drawable>() : getMapper(metadata)
                             },
                             new FillFlowContainer
                             {
@@ -227,6 +213,22 @@ namespace osu.Game.Screens.Select
                     },
                 };
             }
+
+            private OsuSpriteText[] getMapper(BeatmapMetadata metadata) => new[]
+            {
+                new OsuSpriteText
+                {
+                    Font = @"Exo2.0-Medium",
+                    Text = "mapped by ",
+                    TextSize = 15,
+                },
+                new OsuSpriteText
+                {
+                    Font = @"Exo2.0-Bold",
+                    Text = metadata.Author.Username,
+                    TextSize = 15,
+                }
+            };
 
             private string getBPMRange(Beatmap beatmap)
             {
