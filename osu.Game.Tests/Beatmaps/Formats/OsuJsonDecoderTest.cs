@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
         /// <summary>
         /// Reads a .osu file first with a <see cref="OsuLegacyDecoder"/>, serializes the resulting <see cref="Beatmap"/> to JSON
-        /// and then deserializes the result back into a <see cref="Beatmap"/> through an <see cref="OsuJsonDecoder"/>.
+        /// and then deserializes the result back into a <see cref="Beatmap"/> through an <see cref="JsonBeatmapDecoder"/>.
         /// </summary>
         /// <param name="filename">The .osu file to decode.</param>
         /// <returns>The <see cref="Beatmap"/> after being decoded by an <see cref="OsuLegacyDecoder"/>.</returns>
@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
         /// <summary>
         /// Reads a .osu file first with a <see cref="OsuLegacyDecoder"/>, serializes the resulting <see cref="Beatmap"/> to JSON
-        /// and then deserializes the result back into a <see cref="Beatmap"/> through an <see cref="OsuJsonDecoder"/>.
+        /// and then deserializes the result back into a <see cref="Beatmap"/> through an <see cref="JsonBeatmapDecoder"/>.
         /// </summary>
         /// <param name="filename">The .osu file to decode.</param>
         /// <returns>The <see cref="Beatmap"/> after being decoded by an <see cref="OsuLegacyDecoder"/>.</returns>
@@ -168,7 +168,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     sw.Flush();
 
                     ms.Position = 0;
-                    return (legacyDecoded, new OsuJsonDecoder().DecodeBeatmap(sr2));
+                    return (legacyDecoded, new JsonBeatmapDecoder().DecodeBeatmap(sr2));
                 }
             }
         }
