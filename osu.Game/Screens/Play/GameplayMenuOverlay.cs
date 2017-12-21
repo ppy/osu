@@ -26,6 +26,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool BlockPassThroughKeyboard => true;
 
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+
         public Action OnRetry;
         public Action OnQuit;
 
@@ -122,44 +124,21 @@ namespace osu.Game.Screens.Play
                 },
             };
 
-            Retries = 0;
+            updateRetryCount();
         }
+
+        private int retries;
 
         public int Retries
         {
             set
             {
-                if (retryCounterContainer != null)
-                {
-                    // "You've retried 1,065 times in this session"
-                    // "You've retried 1 time in this session"
+                if (value == retries)
+                    return;
 
-                    retryCounterContainer.Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Text = "You've retried ",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = $"{value:n0}",
-                            Font = @"Exo2.0-Bold",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = $" time{(value == 1 ? "" : "s")} in this session",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        }
-                    };
-                }
+                retries = value;
+                if (retryCounterContainer != null)
+                    updateRetryCount();
             }
         }
 
@@ -197,6 +176,7 @@ namespace osu.Game.Screens.Play
         }
 
         private int _selectionIndex = -1;
+
         private int selectionIndex
         {
             get { return _selectionIndex; }
@@ -219,26 +199,26 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Repeat)
-                return false;
-
-            switch (args.Key)
+            if (!args.Repeat)
             {
-                case Key.Up:
-                    if (selectionIndex == -1 || selectionIndex == 0)
-                        selectionIndex = InternalButtons.Count - 1;
-                    else
-                        selectionIndex--;
-                    return true;
-                case Key.Down:
-                    if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
-                        selectionIndex = 0;
-                    else
-                        selectionIndex++;
-                    return true;
+                switch (args.Key)
+                {
+                    case Key.Up:
+                        if (selectionIndex == -1 || selectionIndex == 0)
+                            selectionIndex = InternalButtons.Count - 1;
+                        else
+                            selectionIndex--;
+                        return true;
+                    case Key.Down:
+                        if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
+                            selectionIndex = 0;
+                        else
+                            selectionIndex++;
+                        return true;
+                }
             }
 
-            return false;
+            return base.OnKeyDown(state, args);
         }
 
         private void buttonSelectionChanged(DialogButton button, bool isSelected)
@@ -247,6 +227,38 @@ namespace osu.Game.Screens.Play
                 selectionIndex = -1;
             else
                 selectionIndex = InternalButtons.IndexOf(button);
+        }
+
+        private void updateRetryCount()
+        {
+            // "You've retried 1,065 times in this session"
+            // "You've retried 1 time in this session"
+
+            retryCounterContainer.Children = new Drawable[]
+            {
+                new OsuSpriteText
+                {
+                    Text = "You've retried ",
+                    Shadow = true,
+                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    TextSize = 18
+                },
+                new OsuSpriteText
+                {
+                    Text = $"{retries:n0}",
+                    Font = @"Exo2.0-Bold",
+                    Shadow = true,
+                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    TextSize = 18
+                },
+                new OsuSpriteText
+                {
+                    Text = $" time{(retries == 1 ? "" : "s")} in this session",
+                    Shadow = true,
+                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    TextSize = 18
+                }
+            };
         }
 
         private class Button : DialogButton

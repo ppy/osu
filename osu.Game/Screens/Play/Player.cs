@@ -161,8 +161,8 @@ namespace osu.Game.Screens.Play
                     OnRetry = Restart,
                     OnQuit = Exit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
-                    Retries = RestartCount,
                     OnPause = () => {
+                        pauseContainer.Retries = RestartCount;
                         hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
                     },
                     OnResume = () => {
