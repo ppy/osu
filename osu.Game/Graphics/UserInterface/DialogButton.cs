@@ -12,6 +12,8 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Configuration;
+using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -22,62 +24,7 @@ namespace osu.Game.Graphics.UserInterface
         private const float glow_fade_duration = 250;
         private const float click_duration = 200;
 
-        private Color4 buttonColour;
-        public Color4 ButtonColour
-        {
-            get
-            {
-                return buttonColour;
-            }
-            set
-            {
-                buttonColour = value;
-                updateGlow();
-                colourContainer.Colour = value;
-            }
-        }
-
-        private Color4 backgroundColour = OsuColour.Gray(34);
-        public Color4 BackgroundColour
-        {
-            get
-            {
-                return backgroundColour;
-            }
-            set
-            {
-                backgroundColour = value;
-                background.Colour = value;
-            }
-        }
-
-        private string text;
-        public string Text
-        {
-            get
-            {
-                return text;
-            }
-            set
-            {
-                text = value;
-                spriteText.Text = Text;
-            }
-        }
-
-        private float textSize = 28;
-        public float TextSize
-        {
-            get
-            {
-                return textSize;
-            }
-            set
-            {
-                textSize = value;
-                spriteText.TextSize = value;
-            }
-        }
+        public readonly BindableBool Selected = new BindableBool();
 
         private readonly Container backgroundContainer;
         private readonly Container colourContainer;
@@ -88,71 +35,6 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box background;
         private readonly SpriteText spriteText;
         private Vector2 hoverSpacing => new Vector2(3f, 0f);
-
-        private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's when clicking
-
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceiveMouseInputAt(screenSpacePos);
-
-        protected override bool OnClick(Framework.Input.InputState state)
-        {
-            didClick = true;
-            colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, Easing.In);
-            flash();
-
-            this.Delay(click_duration).Schedule(delegate
-            {
-                colourContainer.ResizeTo(new Vector2(0.8f, 1f));
-                spriteText.Spacing = Vector2.Zero;
-                glowContainer.FadeOut();
-            });
-
-            return base.OnClick(state);
-        }
-
-        protected override bool OnHover(Framework.Input.InputState state)
-        {
-            spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
-
-            colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);
-            glowContainer.FadeIn(glow_fade_duration, Easing.Out);
-            base.OnHover(state);
-            return true;
-        }
-
-        protected override void OnHoverLost(Framework.Input.InputState state)
-        {
-            if (!didClick)
-            {
-                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, Easing.OutElastic);
-                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
-                glowContainer.FadeOut(glow_fade_duration, Easing.Out);
-            }
-
-            didClick = false;
-        }
-
-        private void flash()
-        {
-            var flash = new Box
-            {
-                RelativeSizeAxes = Axes.Both
-            };
-
-            colourContainer.Add(flash);
-
-            flash.Colour = ButtonColour;
-            flash.Blending = BlendingMode.Additive;
-            flash.Alpha = 0.3f;
-            flash.FadeOutFromOne(click_duration);
-            flash.Expire();
-        }
-
-        private void updateGlow()
-        {
-            leftGlow.Colour = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
-            centerGlow.Colour = ButtonColour;
-            rightGlow.Colour = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
-        }
 
         public DialogButton()
         {
@@ -268,6 +150,135 @@ namespace osu.Game.Graphics.UserInterface
             };
 
             updateGlow();
+
+            Selected.ValueChanged += selectionChanged;
+        }
+
+        private Color4 buttonColour;
+        public Color4 ButtonColour
+        {
+            get
+            {
+                return buttonColour;
+            }
+            set
+            {
+                buttonColour = value;
+                updateGlow();
+                colourContainer.Colour = value;
+            }
+        }
+
+        private Color4 backgroundColour = OsuColour.Gray(34);
+        public Color4 BackgroundColour
+        {
+            get
+            {
+                return backgroundColour;
+            }
+            set
+            {
+                backgroundColour = value;
+                background.Colour = value;
+            }
+        }
+
+        private string text;
+        public string Text
+        {
+            get
+            {
+                return text;
+            }
+            set
+            {
+                text = value;
+                spriteText.Text = Text;
+            }
+        }
+
+        private float textSize = 28;
+        public float TextSize
+        {
+            get
+            {
+                return textSize;
+            }
+            set
+            {
+                textSize = value;
+                spriteText.TextSize = value;
+            }
+        }
+
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceiveMouseInputAt(screenSpacePos);
+
+        protected override bool OnClick(InputState state)
+        {
+            colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, Easing.In);
+            flash();
+
+            this.Delay(click_duration).Schedule(delegate
+            {
+                colourContainer.ResizeTo(new Vector2(0.8f, 1f));
+                spriteText.Spacing = Vector2.Zero;
+                glowContainer.FadeOut();
+            });
+
+            return base.OnClick(state);
+        }
+
+        protected override bool OnHover(InputState state)
+        {
+            base.OnHover(state);
+
+            Selected.Value = true;
+            return true;
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            base.OnHoverLost(state);
+            Selected.Value = false;
+        }
+
+        private void selectionChanged(bool isSelected)
+        {
+            if (isSelected)
+            {
+                spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
+                colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);
+                glowContainer.FadeIn(glow_fade_duration, Easing.Out);
+            }
+            else
+            {
+                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, Easing.OutElastic);
+                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
+                glowContainer.FadeOut(glow_fade_duration, Easing.Out);
+            }
+        }
+
+        private void flash()
+        {
+            var flash = new Box
+            {
+                RelativeSizeAxes = Axes.Both
+            };
+
+            colourContainer.Add(flash);
+
+            flash.Colour = ButtonColour;
+            flash.Blending = BlendingMode.Additive;
+            flash.Alpha = 0.3f;
+            flash.FadeOutFromOne(click_duration);
+            flash.Expire();
+        }
+
+        private void updateGlow()
+        {
+            leftGlow.Colour = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
+            centerGlow.Colour = ButtonColour;
+            rightGlow.Colour = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
         }
     }
 }
