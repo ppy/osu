@@ -67,6 +67,7 @@ namespace osu.Game.Screens.Edit
                             {
                                 Items = new[]
                                 {
+                                    new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap),
                                     new EditorMenuItem("Exit", MenuItemType.Standard, Exit)
                                 }
                             }
@@ -134,6 +135,11 @@ namespace osu.Game.Screens.Edit
         private void load(OsuColour colours)
         {
             bottomBackground.Colour = colours.Gray2;
+        }
+
+        private void exportBeatmap()
+        {
+            Beatmap.Value.Save();
         }
 
         private void onModeChanged(EditorScreenMode mode)

@@ -58,18 +58,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             };
 
-            if (!osuGame.IsDeployedBuild)
-            {
-                Add(migrateButton = new SettingsButton
-                {
-                    Text = "Migrate all beatmaps to the new format",
-                    Action = () =>
-                    {
-                        migrateButton.Enabled.Value = false;
-                        Task.Factory.StartNew(beatmaps.MigrateAllToNewFormat).ContinueWith(t => Schedule(() => migrateButton.Enabled.Value = true), TaskContinuationOptions.LongRunning);
-                    }
-                });
-            }
         }
     }
 }
