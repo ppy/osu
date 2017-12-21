@@ -17,7 +17,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Mods;
