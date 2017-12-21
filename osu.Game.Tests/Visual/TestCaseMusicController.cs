@@ -11,7 +11,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseMusicController : OsuTestCase
+    public class TestCaseMusicController : OsuTestCase
     {
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 

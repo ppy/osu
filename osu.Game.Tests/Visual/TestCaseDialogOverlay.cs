@@ -7,7 +7,7 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseDialogOverlay : OsuTestCase
+    public class TestCaseDialogOverlay : OsuTestCase
     {
         public TestCaseDialogOverlay()
         {

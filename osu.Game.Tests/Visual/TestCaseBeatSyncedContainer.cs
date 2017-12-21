@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseBeatSyncedContainer : OsuTestCase
+    public class TestCaseBeatSyncedContainer : OsuTestCase
     {
         private readonly MusicController mc;
 

@@ -14,6 +14,8 @@ using osu.Game.Audio;
 using System.Linq;
 using osu.Game.Graphics;
 using osu.Framework.Configuration;
+using OpenTK;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -38,6 +40,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             HitObject = hitObject;
         }
+
+        /// <summary>
+        /// The screen-space point that causes this <see cref="DrawableHitObject"/> to be selected in the Editor.
+        /// </summary>
+        public virtual Vector2 SelectionPoint => ScreenSpaceDrawQuad.Centre;
+
+        /// <summary>
+        /// The screen-space quad that outlines this <see cref="DrawableHitObject"/> for selections in the Editor.
+        /// </summary>
+        public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject

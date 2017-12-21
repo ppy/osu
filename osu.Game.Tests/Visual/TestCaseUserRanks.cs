@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseUserRanks : OsuTestCase
+    public class TestCaseUserRanks : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(DrawableProfileScore), typeof(RanksSection) };
 

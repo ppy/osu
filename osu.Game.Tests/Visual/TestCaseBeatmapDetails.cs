@@ -10,7 +10,7 @@ using osu.Game.Screens.Select;
 namespace osu.Game.Tests.Visual
 {
     [Description("PlaySongSelect beatmap details")]
-    internal class TestCaseBeatmapDetails : OsuTestCase
+    public class TestCaseBeatmapDetails : OsuTestCase
     {
         public TestCaseBeatmapDetails()
         {
