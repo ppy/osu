@@ -34,34 +34,31 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (DrawableHitObject drawable in drawables)
+            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
-                if (drawable is DrawableOsuHitObject osuDrawable)
-                {
-                    osuDrawable.FadeInSpeed = 2;
-                    osuDrawable.FadeOutSpeed = 2;
-                    osuDrawable.PreemptFadeOut = 400;
+                d.FadeInSpeed = 2;
+                d.FadeOutSpeed = 2;
+                d.PreemptFadeOut = 400;
 
-                    if (osuDrawable is DrawableHitCircle hitCircle)
-                    {
+                switch (d)
+                {
+                    case DrawableHitCircle hitCircle:
                         hitCircle.ShowApproachCircle = false;
                         hitCircle.PlayHitAnimation = false;
-                    }
-
-                    if (osuDrawable is DrawableSlider slider)
-                    {
+                        break;
+                    case DrawableSlider slider:
                         slider.FadeOutGradually = true;
 
                         // we need to set the values for the InitialCircle too
                         slider.InitialCircle.ShowApproachCircle = false;
                         slider.InitialCircle.PlayHitAnimation = false;
-                        slider.InitialCircle.FadeInSpeed = osuDrawable.FadeInSpeed;
-                        slider.InitialCircle.FadeOutSpeed = osuDrawable.FadeOutSpeed;
-                        slider.InitialCircle.PreemptFadeOut = osuDrawable.PreemptFadeOut;
-                    }
-
-                    if (osuDrawable is DrawableSpinner spinner)
+                        slider.InitialCircle.FadeInSpeed = d.FadeInSpeed;
+                        slider.InitialCircle.FadeOutSpeed = d.FadeOutSpeed;
+                        slider.InitialCircle.PreemptFadeOut = d.PreemptFadeOut;
+                        break;
+                    case DrawableSpinner spinner:
                         spinner.HideSpinnerDetails = true;
+                        break;
                 }
             }
         }
