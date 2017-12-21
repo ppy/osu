@@ -11,7 +11,7 @@ namespace osu.Game.Beatmaps.Formats
     {
         public static void Register()
         {
-            AddDecoder<JsonBeatmapDecoder>("{");
+            AddDecoder("{", m => new JsonBeatmapDecoder());
         }
 
         public override Decoder GetStoryboardDecoder() => this;
