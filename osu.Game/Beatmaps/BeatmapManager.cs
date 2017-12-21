@@ -343,9 +343,9 @@ namespace osu.Game.Beatmaps
 
         public void UndeleteAll()
         {
-            var mapSets = QueryBeatmapSets(bs => bs.DeletePending);
+            var deleteMaps = QueryBeatmapSets(bs => bs.DeletePending).ToList();
 
-            if (!mapSets.Any()) return;
+            if (!deleteMaps.Any()) return;
 
             var notification = new ProgressNotification
             {
@@ -358,14 +358,14 @@ namespace osu.Game.Beatmaps
 
             int i = 0;
 
-            foreach (var bs in mapSets)
+            foreach (var bs in deleteMaps)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)
                     // user requested abort
                     return;
 
-                notification.Text = $"Restoring ({i} of {mapSets.Count()})";
-                notification.Progress = (float)++i / mapSets.Count();
+                notification.Text = $"Restoring ({i} of {deleteMaps.Count})";
+                notification.Progress = (float)++i / deleteMaps.Count;
                 Undelete(bs);
             }
 
