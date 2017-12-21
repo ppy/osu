@@ -31,6 +31,8 @@ namespace osu.Game.Overlays.Mods
         protected readonly OsuSpriteText MultiplierLabel;
         private readonly FillFlowContainer footerContainer;
 
+        protected override bool BlockPassThroughKeyboard => false;
+
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
