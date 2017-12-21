@@ -123,7 +123,6 @@ namespace osu.Game.Beatmaps
 
         [JsonProperty("difficulty_rating")]
         public double StarDifficulty { get; set; }
-        public bool ShouldSerializeStarDifficulty() => false;
 
         public override string ToString() => $"{Metadata} [{Version}]";
 
