@@ -7,11 +7,11 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps.Formats
 {
-    public class OsuJsonDecoder : Decoder
+    public class JsonBeatmapDecoder : Decoder
     {
         public static void Register()
         {
-            AddDecoder<OsuJsonDecoder>("{");
+            AddDecoder<JsonBeatmapDecoder>("{");
         }
 
         public override Decoder GetStoryboardDecoder() => this;
