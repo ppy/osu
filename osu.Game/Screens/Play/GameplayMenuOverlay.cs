@@ -128,6 +128,7 @@ namespace osu.Game.Screens.Play
         }
 
         private int retries;
+
         public int Retries
         {
             set
@@ -235,28 +236,28 @@ namespace osu.Game.Screens.Play
 
             retryCounterContainer.Children = new Drawable[]
             {
-                        new OsuSpriteText
-                        {
-                            Text = "You've retried ",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = $"{retries:n0}",
-                            Font = @"Exo2.0-Bold",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = $" time{(retries == 1 ? "" : "s")} in this session",
-                            Shadow = true,
-                            ShadowColour = new Color4(0, 0, 0, 0.25f),
-                            TextSize = 18
-                        }
+                new OsuSpriteText
+                {
+                    Text = "You've retried ",
+                    Shadow = true,
+                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    TextSize = 18
+                },
+                new OsuSpriteText
+                {
+                    Text = $"{retries:n0}",
+                    Font = @"Exo2.0-Bold",
+                    Shadow = true,
+                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    TextSize = 18
+                },
+                new OsuSpriteText
+                {
+                    Text = $" time{(retries == 1 ? "" : "s")} in this session",
+                    Shadow = true,
+                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                    TextSize = 18
+                }
             };
         }
 
