@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets
 
         public string Name { get; set; }
 
+        public string ShortName { get; set; }
+
         public string InstantiationInfo { get; set; }
 
         [JsonIgnore]

@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Timing;
@@ -16,11 +18,24 @@ using OpenTK.Input;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : DatabasedKeyBindingInputManager<T>, ICanAttachKeyCounter, IHasReplayHandler
+    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler
         where T : struct
     {
-        protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique) : base(ruleset, variant, unique)
+        public class RulesetKeyBindingContainer : DatabasedKeyBindingInputManager<T>
         {
+            public RulesetKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+                : base(ruleset, variant, unique)
+            {
+            }
+        }
+
+        protected readonly KeyBindingContainer<T> KeyBindingContainer;
+
+        protected override Container<Drawable> Content => KeyBindingContainer;
+
+        protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+        {
+            InternalChild = KeyBindingContainer = new RulesetKeyBindingContainer(ruleset, variant, unique);
         }
 
         #region Action mapping (for replays)
@@ -41,10 +56,10 @@ namespace osu.Game.Rulesets.UI
             List<T> newActions = replayState.PressedActions;
 
             foreach (var released in lastPressedActions.Except(newActions))
-                PropagateReleased(KeyBindingInputQueue, released);
+                KeyBindingContainer.TriggerReleased(released);
 
             foreach (var pressed in newActions.Except(lastPressedActions))
-                PropagatePressed(KeyBindingInputQueue, pressed);
+                KeyBindingContainer.TriggerPressed(pressed);
 
             lastPressedActions = newActions;
         }
@@ -203,7 +218,7 @@ namespace osu.Game.Rulesets.UI
             Add(receptor);
             keyCounter.SetReceptor(receptor);
 
-            keyCounter.AddRange(DefaultKeyBindings.Select(b => b.GetAction<T>()).Distinct().Select(b => new KeyCounterAction<T>(b)));
+            keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings.Select(b => b.GetAction<T>()).Distinct().Select(b => new KeyCounterAction<T>(b)));
         }
 
         public class ActionReceptor : KeyCounterCollection.Receptor, IKeyBindingHandler<T>

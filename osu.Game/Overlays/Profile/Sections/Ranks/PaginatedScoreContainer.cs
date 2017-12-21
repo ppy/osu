@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
                 foreach (OnlineScore score in scores)
                 {
-                    DrawableScore drawableScore;
+                    DrawableProfileScore drawableScore;
 
                     switch (type)
                     {
