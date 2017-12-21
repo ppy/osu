@@ -15,6 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton importButton;
         private TriangleButton deleteButton;
         private TriangleButton restoreButton;
+        private TriangleButton undeleteButton;
 
         protected override string Header => "General";
 
@@ -56,6 +57,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
                                 beatmaps.Restore(b);
                         }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
+                    }
+                },
+                undeleteButton = new SettingsButton
+                {
+                    Text = "Restore all recently deleted beatmaps",
+                    Action = () =>
+                    {
+                        undeleteButton.Enabled.Value = false;
+                        Task.Run(() => beatmaps.UndeleteAll()).ContinueWith(t => Schedule(() => undeleteButton.Enabled.Value = true));
                     }
                 },
             };
