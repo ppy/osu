@@ -146,7 +146,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                             }))
                         };
 
-                        ret.ApplyDefaults(controlPointInfo, difficulty);
+                        if (controlPointInfo != null && difficulty != null)
+                            ret.ApplyDefaults(controlPointInfo, difficulty);
 
                         yield return ret;
                     }
@@ -178,7 +179,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                             ComboColour = ComboColour,
                         };
 
-                        ret.ApplyDefaults(controlPointInfo, difficulty);
+                        if (controlPointInfo != null && difficulty != null)
+                            ret.ApplyDefaults(controlPointInfo, difficulty);
 
                         yield return ret;
                     }
