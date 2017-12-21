@@ -5,7 +5,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseSettings : OsuTestCase
+    public class TestCaseSettings : OsuTestCase
     {
         private readonly SettingsOverlay settings;
 

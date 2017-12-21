@@ -15,7 +15,7 @@ using osu.Game.Rulesets;
 namespace osu.Game.Tests.Visual
 {
     [Description("PlaySongSelect leaderboard")]
-    internal class TestCaseLeaderboard : OsuTestCase
+    public class TestCaseLeaderboard : OsuTestCase
     {
         private RulesetStore rulesets;
 
