@@ -13,7 +13,7 @@ using osu.Game.Overlays.Notifications;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    internal class TestCaseNotificationOverlay : OsuTestCase
+    public class TestCaseNotificationOverlay : OsuTestCase
     {
         private readonly NotificationOverlay manager;
 
@@ -82,7 +82,11 @@ namespace osu.Game.Tests.Visual
 
         private void sendProgress2()
         {
-            var n = new ProgressNotification { Text = @"Downloading Haitai..." };
+            var n = new ProgressNotification
+            {
+                Text = @"Downloading Haitai...",
+                CompletionText = "Downloaded Haitai!",
+            };
             manager.Post(n);
             progressingNotifications.Add(n);
         }
@@ -91,7 +95,11 @@ namespace osu.Game.Tests.Visual
 
         private void sendProgress1()
         {
-            var n = new ProgressNotification { Text = @"Uploading to BSS..." };
+            var n = new ProgressNotification
+            {
+                Text = @"Uploading to BSS...",
+                CompletionText = "Uploaded to BSS!",
+            };
             manager.Post(n);
             progressingNotifications.Add(n);
         }

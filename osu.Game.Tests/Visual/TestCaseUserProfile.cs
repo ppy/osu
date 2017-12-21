@@ -8,7 +8,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseUserProfile : OsuTestCase
+    public class TestCaseUserProfile : OsuTestCase
     {
         public TestCaseUserProfile()
         {

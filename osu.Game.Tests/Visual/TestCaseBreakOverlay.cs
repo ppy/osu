@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseBreakOverlay : OsuTestCase
+    public class TestCaseBreakOverlay : OsuTestCase
     {
         private readonly BreakOverlay breakOverlay;
 

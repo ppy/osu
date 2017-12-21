@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseStoryboard : OsuTestCase
+    public class TestCaseStoryboard : OsuTestCase
     {
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
