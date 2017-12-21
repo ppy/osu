@@ -327,11 +327,6 @@ namespace osu.Game.Screens.Play
             {
                 adjustableSourceClock.Reset();
 
-                // this is temporary until we have blocking (async.Wait()) audio component methods.
-                // then we can call ResetAsync().Wait() or the blocking version above.
-                while (adjustableSourceClock.IsRunning)
-                    Thread.Sleep(1);
-
                 Schedule(() =>
                 {
                     decoupledClock.ChangeSource(adjustableSourceClock);
