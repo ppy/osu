@@ -5,35 +5,36 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Lists;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
     [Serializable]
     public class ControlPointInfo
     {
-        [JsonProperty]
         /// <summary>
         /// All timing points.
         /// </summary>
-        public List<TimingControlPoint> TimingPoints { get; private set; } = new List<TimingControlPoint>();
-
         [JsonProperty]
+        public SortedList<TimingControlPoint> TimingPoints { get; private set; } = new SortedList<TimingControlPoint>(Comparer<TimingControlPoint>.Default);
+
         /// <summary>
         /// All difficulty points.
         /// </summary>
-        public List<DifficultyControlPoint> DifficultyPoints { get; private set; } = new List<DifficultyControlPoint>();
-
         [JsonProperty]
+        public SortedList<DifficultyControlPoint> DifficultyPoints { get; private set; } = new SortedList<DifficultyControlPoint>(Comparer<DifficultyControlPoint>.Default);
+
         /// <summary>
         /// All sound points.
         /// </summary>
-        public List<SoundControlPoint> SoundPoints { get; private set; } = new List<SoundControlPoint>();
-
         [JsonProperty]
+        public SortedList<SoundControlPoint> SoundPoints { get; private set; } = new SortedList<SoundControlPoint>(Comparer<SoundControlPoint>.Default);
+
         /// <summary>
         /// All effect points.
         /// </summary>
-        public List<EffectControlPoint> EffectPoints { get; private set; } = new List<EffectControlPoint>();
+        [JsonProperty]
+        public SortedList<EffectControlPoint> EffectPoints { get; private set; } = new SortedList<EffectControlPoint>(Comparer<EffectControlPoint>.Default);
 
         /// <summary>
         /// Finds the difficulty control point that is active at <paramref name="time"/>.
@@ -91,7 +92,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the control point at.</param>
         /// <param name="prePoint">The control point to use when <paramref name="time"/> is before any control points. If null, a new control point will be constructed.</param>
         /// <returns>The active control point at <paramref name="time"/>.</returns>
-        private T binarySearch<T>(List<T> list, double time, T prePoint = null)
+        private T binarySearch<T>(SortedList<T> list, double time, T prePoint = null)
             where T : ControlPoint, new()
         {
             if (list == null)

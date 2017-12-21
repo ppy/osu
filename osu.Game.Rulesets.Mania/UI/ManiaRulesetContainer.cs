@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.UI
             // Generate the bar lines
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
 
-            List<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
+            var timingPoints = Beatmap.ControlPointInfo.TimingPoints;
             var barLines = new List<DrawableBarLine>();
 
             for (int i = 0; i < timingPoints.Count; i++)
