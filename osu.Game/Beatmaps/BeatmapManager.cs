@@ -20,7 +20,6 @@ using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.IO;
-using osu.Game.IO.Serialization;
 using osu.Game.IPC;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
