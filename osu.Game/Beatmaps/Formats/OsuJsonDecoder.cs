@@ -3,34 +3,33 @@
 
 using System.IO;
 using osu.Game.IO.Serialization;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps.Formats
 {
-    public class OsuJsonDecoder : BeatmapDecoder
+    public class OsuJsonDecoder : Decoder
     {
         public static void Register()
         {
             AddDecoder<OsuJsonDecoder>("{");
         }
 
-        protected override void ParseFile(StreamReader stream, Beatmap beatmap)
+        public override Decoder GetStoryboardDecoder() => this;
+
+        protected override void ParseBeatmap(StreamReader stream, Beatmap beatmap)
         {
             stream.BaseStream.Position = 0;
             stream.DiscardBufferedData();
 
-            try
-            {
-                string fullText = stream.ReadToEnd();
-                fullText.DeserializeInto(beatmap);
-            }
-            catch
-            {
-                // Temporary because storyboards are deserialized into beatmaps at the moment
-                // This try-catch shouldn't exist in the future
-            }
+            stream.ReadToEnd().DeserializeInto(beatmap);
 
             foreach (var hitObject in beatmap.HitObjects)
                 hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
+        }
+
+        protected override void ParseStoryboard(StreamReader stream, Storyboard storyboard)
+        {
+            // throw new System.NotImplementedException();
         }
     }
 }
