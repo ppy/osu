@@ -9,7 +9,6 @@ using osu.Game.Users;
 using osu.Framework.Allocation;
 using OpenTK;
 using System.Linq;
-using System.Net;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 
@@ -33,8 +32,10 @@ namespace osu.Game.Tests.Visual
             });
 
             AddStep(@"New Scores", newScores);
-            AddStep(@"Empty Scores", () => leaderboard.Scores = Enumerable.Empty<Score>());
-            AddStep(@"Network failure", networkFailure);
+            AddStep(@"Empty Scores", () => leaderboard.SetRetrievalState(PlaceholderState.NoScores));
+            AddStep(@"Network failure", () => leaderboard.SetRetrievalState(PlaceholderState.NetworkFailure));
+            AddStep(@"No supporter", () => leaderboard.SetRetrievalState(PlaceholderState.NotSupporter));
+            AddStep(@"Not logged in", () => leaderboard.SetRetrievalState(PlaceholderState.NotLoggedIn));
             AddStep(@"Real beatmap", realBeatmap);
         }
 
@@ -265,19 +266,11 @@ namespace osu.Game.Tests.Visual
             };
         }
 
-        private void networkFailure()
-        {
-            leaderboard.Beatmap = new BeatmapInfo { Ruleset = rulesets.GetRuleset(0) };
-        }
-
         private class FailableLeaderboard : Leaderboard
         {
-            protected override void UpdateScores()
+            public void SetRetrievalState(PlaceholderState state)
             {
-                if (Beatmap?.OnlineBeatmapID == null)
-                    OnUpdateFailed(new WebException());
-                else
-                    base.UpdateScores();
+                PlaceholderState = state;
             }
         }
     }
