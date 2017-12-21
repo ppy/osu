@@ -5,6 +5,7 @@ using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using System.Linq;
+using osu.Game.Rulesets.Objects;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
