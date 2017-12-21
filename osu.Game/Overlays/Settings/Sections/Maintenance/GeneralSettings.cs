@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         protected override string Header => "General";
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, BeatmapManager beatmaps)
+        private void load(BeatmapManager beatmaps)
         {
             Children = new Drawable[]
             {
@@ -57,7 +57,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     }
                 }
             };
-
         }
     }
 }
