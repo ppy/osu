@@ -48,21 +48,16 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 scores = value;
 
-                placeholderContainer.FadeOut(fade_duration);
-
                 scrollFlow?.FadeOut(fade_duration).Expire();
                 scrollFlow = null;
 
                 loading.Hide();
 
-                if (scores == null)
+                if (scores == null || !scores.Any())
                     return;
 
-                if (!scores.Any())
-                {
-                    replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
-                    return;
-                }
+                // ensure placeholder is hidden when displaying scores
+                PlaceholderState = PlaceholderState.Successful;
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
                 Schedule(() =>
@@ -100,7 +95,43 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (value == scope) return;
 
                 scope = value;
-                UpdateScores();
+                updateScores();
+            }
+        }
+
+        private PlaceholderState placeholderState;
+        protected PlaceholderState PlaceholderState
+        {
+            get { return placeholderState; }
+            set
+            {
+                if (value == placeholderState) return;
+
+                switch (placeholderState = value)
+                {
+                    case PlaceholderState.NetworkFailure:
+                        replacePlaceholder(new RetrievalFailurePlaceholder
+                        {
+                            OnRetry = updateScores,
+                        });
+                        break;
+
+                    case PlaceholderState.NoScores:
+                        replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
+                        break;
+
+                    case PlaceholderState.NotLoggedIn:
+                        replacePlaceholder(new MessagePlaceholder(@"Please login to view online leaderboards!"));
+                        break;
+
+                    case PlaceholderState.NotSupporter:
+                        replacePlaceholder(new MessagePlaceholder(@"Please invest in a supporter tag to view this leaderboard!"));
+                        break;
+
+                    default:
+                        replacePlaceholder(null);
+                        break;
+                }
             }
         }
 
@@ -143,7 +174,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 Scores = null;
 
                 pendingBeatmapSwitch?.Cancel();
-                pendingBeatmapSwitch = Schedule(UpdateScores);
+                pendingBeatmapSwitch = Schedule(updateScores);
             }
         }
 
@@ -170,7 +201,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private GetScoresRequest getScoresRequest;
 
-        private void handleRulesetChange(RulesetInfo ruleset) => UpdateScores();
+        private void handleRulesetChange(RulesetInfo ruleset) => updateScores();
 
         private void handleApiStateChange(APIState oldState, APIState newState)
         {
@@ -179,46 +210,43 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return;
 
             if (newState == APIState.Online)
-                UpdateScores();
+                updateScores();
         }
 
-        protected virtual void UpdateScores()
+        private void updateScores()
         {
             if (!IsLoaded) return;
 
             getScoresRequest?.Cancel();
             getScoresRequest = null;
-
             Scores = null;
 
             if (Scope == LeaderboardScope.Local)
             {
                 // TODO: get local scores from wherever here.
-                Scores = Enumerable.Empty<Score>();
+                PlaceholderState = PlaceholderState.NoScores;
                 return;
             }
 
             if (api?.IsLoggedIn != true)
             {
-                replacePlaceholder(new MessagePlaceholder(@"Please login to view online leaderboards!"));
+                PlaceholderState = PlaceholderState.NotLoggedIn;
                 return;
             }
 
             if (Beatmap?.OnlineBeatmapID == null)
             {
-                replacePlaceholder(new RetrievalFailurePlaceholder
-                {
-                    OnRetry = UpdateScores,
-                });
+                PlaceholderState = PlaceholderState.NetworkFailure;
                 return;
             }
 
+            PlaceholderState = PlaceholderState.Retrieving;
             loading.Show();
 
             if (Scope != LeaderboardScope.Global && !api.LocalUser.Value.IsSupporter)
             {
                 loading.Hide();
-                replacePlaceholder(new MessagePlaceholder(@"Please invest in a supporter tag to view this leaderboard!"));
+                PlaceholderState = PlaceholderState.NotSupporter;
                 return;
             }
 
@@ -226,27 +254,37 @@ namespace osu.Game.Screens.Select.Leaderboards
             getScoresRequest.Success += r =>
             {
                 Scores = r.Scores;
+                PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
             };
-            getScoresRequest.Failure += OnUpdateFailed;
+            getScoresRequest.Failure += onUpdateFailed;
 
             api.Queue(getScoresRequest);
         }
 
-        protected void OnUpdateFailed(Exception e)
+        private void onUpdateFailed(Exception e)
         {
             if (e is OperationCanceledException) return;
 
-            Scores = null;
-            replacePlaceholder(new RetrievalFailurePlaceholder
-            {
-                OnRetry = UpdateScores,
-            });
+            PlaceholderState = PlaceholderState.NetworkFailure;
             Logger.Error(e, @"Couldn't fetch beatmap scores!");
         }
 
-        private void replacePlaceholder(Drawable placeholder)
+        private void replacePlaceholder(Placeholder placeholder)
         {
-            placeholderContainer.FadeOutFromOne(fade_duration, Easing.OutQuint);
+            if (placeholder == null)
+            {
+                placeholderContainer.FadeOutFromOne(fade_duration, Easing.OutQuint);
+                placeholderContainer.Clear(true);
+                return;
+            }
+
+            var existingPlaceholder = placeholderContainer.Children.FirstOrDefault() as Placeholder;
+
+            if (placeholder.Equals(existingPlaceholder))
+                return;
+
+            Scores = null;
+
             placeholderContainer.Clear(true);
             placeholderContainer.Child = placeholder;
             placeholderContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
@@ -281,8 +319,15 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        private class MessagePlaceholder : FillFlowContainer
+        private abstract class Placeholder : FillFlowContainer, IEquatable<Placeholder>
         {
+            public virtual bool Equals(Placeholder other) => GetType() == other?.GetType();
+        }
+
+        private class MessagePlaceholder : Placeholder
+        {
+            private readonly string message;
+
             public MessagePlaceholder(string message)
             {
                 Direction = FillDirection.Horizontal;
@@ -297,14 +342,16 @@ namespace osu.Game.Screens.Select.Leaderboards
                     },
                     new OsuSpriteText
                     {
-                        Text = message,
+                        Text = this.message = message,
                         TextSize = 22,
                     },
                 };
             }
+
+            public override bool Equals(Placeholder other) => (other as MessagePlaceholder)?.message == message;
         }
 
-        private class RetrievalFailurePlaceholder : FillFlowContainer
+        private class RetrievalFailurePlaceholder : Placeholder
         {
             public Action OnRetry;
 
@@ -327,43 +374,43 @@ namespace osu.Game.Screens.Select.Leaderboards
                     },
                 };
             }
-        }
 
-        private class RetryButton : OsuHoverContainer
-        {
-            private readonly SpriteIcon icon;
-
-            public Action Action;
-
-            public RetryButton()
+            private class RetryButton : OsuHoverContainer
             {
-                Height = 26;
-                Width = 26;
-                Child = new OsuClickableContainer
+                private readonly SpriteIcon icon;
+
+                public Action Action;
+
+                public RetryButton()
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Action = () => Action?.Invoke(),
-                    Child = icon = new SpriteIcon
+                    Height = 26;
+                    Width = 26;
+                    Child = new OsuClickableContainer
                     {
-                        Icon = FontAwesome.fa_refresh,
-                        Size = new Vector2(26),
-                        Shadow = true,
-                    },
-                };
-            }
+                        AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Action = () => Action?.Invoke(),
+                        Child = icon = new SpriteIcon
+                        {
+                            Icon = FontAwesome.fa_refresh,
+                            Size = new Vector2(26),
+                            Shadow = true,
+                        },
+                    };
+                }
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-            {
-                icon.ScaleTo(0.8f, 400, Easing.OutQuint);
-                return base.OnMouseDown(state, args);
-            }
+                protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+                {
+                    icon.ScaleTo(0.8f, 400, Easing.OutQuint);
+                    return base.OnMouseDown(state, args);
+                }
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-            {
-                icon.ScaleTo(1, 400, Easing.OutElastic);
-                return base.OnMouseUp(state, args);
+                protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+                {
+                    icon.ScaleTo(1, 400, Easing.OutElastic);
+                    return base.OnMouseUp(state, args);
+                }
             }
         }
     }
@@ -374,5 +421,15 @@ namespace osu.Game.Screens.Select.Leaderboards
         Country,
         Global,
         Friend,
+    }
+
+    public enum PlaceholderState
+    {
+        Successful,
+        Retrieving,
+        NetworkFailure,
+        NoScores,
+        NotLoggedIn,
+        NotSupporter,
     }
 }
