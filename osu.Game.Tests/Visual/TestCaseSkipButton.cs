@@ -5,7 +5,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseSkipButton : OsuTestCase
+    public class TestCaseSkipButton : OsuTestCase
     {
         protected override void LoadComplete()
         {

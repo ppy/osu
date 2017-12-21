@@ -9,7 +9,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseButtonSystem : OsuTestCase
+    public class TestCaseButtonSystem : OsuTestCase
     {
         public TestCaseButtonSystem()
         {

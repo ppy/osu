@@ -19,7 +19,7 @@ using osu.Game.Tests.Platform;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCasePlaySongSelect : OsuTestCase
+    public class TestCasePlaySongSelect : OsuTestCase
     {
         private BeatmapManager manager;
 
