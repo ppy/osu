@@ -19,11 +19,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using System.Linq;
 using osu.Framework.Configuration;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Rulesets;
-using osu.Framework.Input;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -157,9 +154,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         private APIAccess api;
-
         private BeatmapInfo beatmap;
-
         private OsuGame osuGame;
 
         private ScheduledDelegate pendingBeatmapSwitch;
@@ -313,107 +308,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                     c.Colour = ColourInfo.GradientVertical(
                         Color4.White.Opacity(Math.Min(1 - (topY - fadeStart) / LeaderboardScore.HEIGHT, 1)),
                         Color4.White.Opacity(Math.Min(1 - (bottomY - fadeStart) / LeaderboardScore.HEIGHT, 1)));
-                }
-            }
-        }
-
-        private abstract class Placeholder : FillFlowContainer, IEquatable<Placeholder>
-        {
-            protected Placeholder()
-            {
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-            }
-
-            public virtual bool Equals(Placeholder other) => GetType() == other?.GetType();
-        }
-
-        private class MessagePlaceholder : Placeholder
-        {
-            private readonly string message;
-
-            public MessagePlaceholder(string message)
-            {
-                Direction = FillDirection.Horizontal;
-                AutoSizeAxes = Axes.Both;
-                Children = new Drawable[]
-                {
-                    new SpriteIcon
-                    {
-                        Icon = FontAwesome.fa_exclamation_circle,
-                        Size = new Vector2(26),
-                        Margin = new MarginPadding { Right = 10 },
-                    },
-                    new OsuSpriteText
-                    {
-                        Text = this.message = message,
-                        TextSize = 22,
-                    },
-                };
-            }
-
-            public override bool Equals(Placeholder other) => (other as MessagePlaceholder)?.message == message;
-        }
-
-        private class RetrievalFailurePlaceholder : Placeholder
-        {
-            public Action OnRetry;
-
-            public RetrievalFailurePlaceholder()
-            {
-                Direction = FillDirection.Horizontal;
-                AutoSizeAxes = Axes.Both;
-                Children = new Drawable[]
-                {
-                    new RetryButton
-                    {
-                        Action = () => OnRetry?.Invoke(),
-                        Margin = new MarginPadding { Right = 10 },
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopLeft,
-                        Text = @"Couldn't retrieve scores!",
-                        TextSize = 22,
-                    },
-                };
-            }
-
-            private class RetryButton : OsuHoverContainer
-            {
-                private readonly SpriteIcon icon;
-
-                public Action Action;
-
-                public RetryButton()
-                {
-                    Height = 26;
-                    Width = 26;
-                    Child = new OsuClickableContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Action = () => Action?.Invoke(),
-                        Child = icon = new SpriteIcon
-                        {
-                            Icon = FontAwesome.fa_refresh,
-                            Size = new Vector2(26),
-                            Shadow = true,
-                        },
-                    };
-                }
-
-                protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-                {
-                    icon.ScaleTo(0.8f, 4000, Easing.OutQuint);
-                    return base.OnMouseDown(state, args);
-                }
-
-                protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-                {
-                    icon.ScaleTo(1, 1000, Easing.OutElastic);
-                    return base.OnMouseUp(state, args);
                 }
             }
         }
