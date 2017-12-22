@@ -9,23 +9,28 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using System.Collections.Generic;
 using System;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
     public class TestCaseRankGraph : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(RankChart) };
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(RankGraph),
+            typeof(LineGraph)
+        };
 
         public TestCaseRankGraph()
         {
-            RankChart graph;
+            RankGraph graph;
 
             var data = new int[89];
             var dataWithZeros = new int[89];
             var smallData = new int[89];
 
-            for(int i = 0; i < 89; i++)
+            for (int i = 0; i < 89; i++)
                 data[i] = dataWithZeros[i] = (i + 1) * 1000;
 
             for (int i = 20; i < 60; i++)
@@ -46,7 +51,7 @@ namespace osu.Game.Tests.Visual
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(0.2f)
                     },
-                    graph = new RankChart
+                    graph = new RankGraph
                     {
                         RelativeSizeAxes = Axes.Both,
                     }
