@@ -91,11 +91,11 @@ namespace osu.Game.Overlays.Profile
             graph.Colour = colours.Yellow;
         }
 
-        private void userChanged(User newUser)
+        private void userChanged(User user)
         {
             placeholder.FadeIn(fade_duration, Easing.Out);
 
-            if (newUser == null)
+            if (user == null)
             {
                 rankText.Text = string.Empty;
                 performanceText.Text = string.Empty;
@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.Profile
                 return;
             }
 
-            int[] userRanks = newUser.RankHistory?.Data ?? new[] { newUser.Statistics.Rank };
+            int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
             ranks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
 
             if (ranks.Length > 1)
