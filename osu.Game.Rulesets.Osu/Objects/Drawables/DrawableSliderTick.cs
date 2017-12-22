@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdatePreemptState()
         {
-            var animIn = Math.Min(150, sliderTick.StartTime - FadeInTime) / FadeInSpeedMultiplier;
+            var animIn = Math.Min(150, sliderTick.StartTime - FadeInTime) * FadeInSpeedMultiplier;
 
             this.Animate(
                 d => d.FadeIn(animIn),
@@ -73,12 +73,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     this.Delay(FadeOutTime - sliderTick.StartTime).FadeOut();
                     break;
                 case ArmedState.Miss:
-                    this.FadeOut(160 / FadeOutSpeedMultiplier)
-                        .FadeColour(Color4.Red, 80);
+                    this.FadeOut(160 * FadeOutSpeedMultiplier)
+                        .FadeColour(Color4.Red, 80 * FadeOutSpeedMultiplier);
                     break;
                 case ArmedState.Hit:
-                    this.FadeOut(120 / FadeOutSpeedMultiplier, Easing.OutQuint)
-                        .ScaleTo(Scale * 1.5f, 120, Easing.OutQuint);
+                    this.FadeOut(120 * FadeOutSpeedMultiplier, Easing.OutQuint)
+                        .ScaleTo(Scale * 1.5f, 120 * FadeOutSpeedMultiplier, Easing.OutQuint);
                     break;
             }
         }

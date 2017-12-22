@@ -36,16 +36,16 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
-                d.FadeInSpeedMultiplier = 2;
-                d.FadeOutSpeedMultiplier = 2;
-                d.PreemptFadeOut = 400;
+                d.HiddenMod = true;
+                d.FadeInSpeedMultiplier = 0.6;
+                d.FadeOutSpeedMultiplier = 0.3;
 
                 if (d is DrawableSlider slider)
                 {
                     // we need to set the values for the InitialCircle
+                    slider.InitialCircle.HiddenMod = true;
                     slider.InitialCircle.FadeInSpeedMultiplier = d.FadeInSpeedMultiplier;
                     slider.InitialCircle.FadeOutSpeedMultiplier = d.FadeOutSpeedMultiplier;
-                    slider.InitialCircle.PreemptFadeOut = d.PreemptFadeOut;
                 }
             }
         }

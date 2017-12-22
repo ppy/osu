@@ -5,36 +5,27 @@ using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using System.Linq;
-using osu.Game.Rulesets.Objects;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
+        /// <summary>
+        /// This should be calculated in the future.
+        /// </summary>
         public const float TIME_PREEMPT = 600;
+
         public const float TIME_FADEIN = 400;
         public const float TIME_FADEOUT = 500;
 
+        public bool HiddenMod;
         public double FadeInSpeedMultiplier = 1;
         public double FadeOutSpeedMultiplier = 1;
 
-        private double preemptFadeOut;
-
         /// <summary>
-        /// The number of milliseconds before <see cref="HitObject.StartTime"/> that we should fade out. Clamped between 0 and 1000 milliseconds.
+        /// The number of milliseconds the expiration should be delayed.
         /// </summary>
-        public double PreemptFadeOut
-        {
-            get => preemptFadeOut;
-            set
-            {
-                if (preemptFadeOut == value)
-                    return;
-
-                preemptFadeOut = MathHelper.Clamp(value, 0, 1000);
-            }
-        }
+        protected double ExpireAfter;
 
         public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Time.Current >= HitObject.StartTime - TIME_PREEMPT;
 
@@ -56,7 +47,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 UpdatePreemptState();
 
-                var delay = TIME_PREEMPT + (Judgements.FirstOrDefault()?.TimeOffset ?? 0) - PreemptFadeOut;
+                double delay = TIME_PREEMPT;
+                if (HiddenMod)
+                {
+                    delay *= FadeInSpeedMultiplier;
+                    // If we shorten the delay we fade out earlier than we actually play the HitObject
+                    // We need to keep some DrawableHitObjects alive for a bit longer so they stay playable.
+                    ExpireAfter = TIME_PREEMPT - TIME_PREEMPT * FadeInSpeedMultiplier;
+                }
+
+                delay += Judgements.FirstOrDefault()?.TimeOffset ?? 0;
                 using (BeginDelayedSequence(delay, true))
                     UpdateCurrentState(state);
             }
@@ -64,11 +64,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected virtual void UpdatePreemptState()
         {
-            this.FadeIn(TIME_FADEIN / FadeInSpeedMultiplier);
+            double duration;
+            if (HiddenMod)
+                duration = HitObject.StartTime - TIME_PREEMPT * FadeInSpeedMultiplier - (HitObject.StartTime - TIME_PREEMPT);
+            else
+                duration = TIME_FADEIN * FadeInSpeedMultiplier;
+
+            this.FadeIn(duration);
         }
 
         protected virtual void UpdateCurrentState(ArmedState state)
         {
+
         }
 
         // Todo: At some point we need to move these to DrawableHitObject after ensuring that all other Rulesets apply

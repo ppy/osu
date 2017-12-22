@@ -87,35 +87,38 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            if (PreemptFadeOut <= 0)
+            if (!HiddenMod)
             {
-                ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT) / FadeInSpeedMultiplier);
-                ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT / FadeInSpeedMultiplier);
+                ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT) * FadeInSpeedMultiplier);
+                ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT * FadeInSpeedMultiplier);
             }
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            glow.FadeOut(400 / FadeOutSpeedMultiplier);
-
-            switch (state)
+            if (HiddenMod)
+                // TODO: without +300 it's expiring too soon?
+                this.FadeOut(TIME_PREEMPT * FadeOutSpeedMultiplier).Delay(ExpireAfter + 300).Expire();
+            else
             {
-                case ArmedState.Idle:
-                    this.FadeOut(TIME_FADEOUT / FadeOutSpeedMultiplier).Delay(PreemptFadeOut + TIME_FADEOUT).Expire();
-                    break;
-                case ArmedState.Miss:
-                    ApproachCircle.FadeOut(50);
-                    this.FadeOut(TIME_FADEOUT / 5 / FadeOutSpeedMultiplier).Expire();
-                    break;
-                case ArmedState.Hit:
-                    ApproachCircle.FadeOut(50);
+                glow.FadeOut(400 * FadeOutSpeedMultiplier);
 
-                    if (PreemptFadeOut <= 0)
-                    {
+                switch (state)
+                {
+                    case ArmedState.Idle:
+                        this.FadeOut(TIME_FADEOUT * FadeOutSpeedMultiplier).Expire();
+                        break;
+                    case ArmedState.Miss:
+                        ApproachCircle.FadeOut(50);
+                        this.FadeOut(TIME_FADEOUT / 5 * FadeOutSpeedMultiplier).Expire();
+                        break;
+                    case ArmedState.Hit:
+                        ApproachCircle.FadeOut(50);
+
                         const double flash_in = 40;
                         flash.FadeTo(0.8f, flash_in)
-                             .Then()
-                             .FadeOut(100);
+                                .Then()
+                                .FadeOut(100);
 
                         explode.FadeIn(flash_in);
 
@@ -126,14 +129,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             circle.FadeOut();
                             number.FadeOut();
 
-                            this.FadeOut(800 / FadeOutSpeedMultiplier)
-                                .ScaleTo(Scale * 1.5f, 400, Easing.OutQuad);
+                            this.FadeOut(800 * FadeOutSpeedMultiplier)
+                                .ScaleTo(Scale * 1.5f, 400 * FadeOutSpeedMultiplier, Easing.OutQuad).Expire();
                         }
-                    }
-                    else
-                        this.FadeOut(TIME_FADEOUT / 5 / FadeOutSpeedMultiplier);
-                    Expire();
-                    break;
+                        break;
+                }
             }
         }
 

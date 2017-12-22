@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            if (PreemptFadeOut > 0)
+            if (HiddenMod)
             {
                 glow.FadeOut();
                 ticks.FadeOut();
@@ -213,15 +213,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            var sequence = this.Delay(spinner.Duration + PreemptFadeOut).FadeOut(160 / FadeOutSpeedMultiplier);
+            var sequence = this.Delay(spinner.Duration + ExpireAfter).FadeOut(160 * FadeOutSpeedMultiplier);
 
             switch (state)
             {
                 case ArmedState.Hit:
-                    sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
+                    sequence.ScaleTo(Scale * 1.2f, 320 * FadeOutSpeedMultiplier, Easing.Out);
                     break;
                 case ArmedState.Miss:
-                    sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
+                    sequence.ScaleTo(Scale * 0.8f, 320 * FadeOutSpeedMultiplier, Easing.In);
                     break;
             }
 

@@ -155,16 +155,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             ball.FadeIn();
 
-            if (PreemptFadeOut > 0)
-                body.FadeOut(slider.Duration + PreemptFadeOut);
+            if (HiddenMod)
+                body.FadeOut(slider.Duration + ExpireAfter, Easing.Out);
 
-            using (BeginDelayedSequence(slider.Duration + PreemptFadeOut, true))
+            using (BeginDelayedSequence(slider.Duration + ExpireAfter, true))
             {
-                if(PreemptFadeOut <= 0)
-                    body.FadeOut(160 / FadeOutSpeedMultiplier);
-                ball.FadeOut(160 / FadeOutSpeedMultiplier);
+                if (!HiddenMod)
+                    body.FadeOut(160 * FadeOutSpeedMultiplier);
+                ball.FadeOut(160 * FadeOutSpeedMultiplier);
 
-                this.FadeOut(800 / FadeOutSpeedMultiplier).Expire();
+                this.FadeOut(800 * FadeOutSpeedMultiplier).Expire();
             }
         }
 
