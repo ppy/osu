@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 }
             });
 
-            foreach (var tick in HitObject.Ticks)
+            foreach (var tick in HitObject.NestedHitObjects.OfType<HoldNoteTick>())
             {
                 var drawableTick = new DrawableHoldNoteTick(tick)
                 {

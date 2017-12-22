@@ -10,6 +10,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Game.Storyboards;
+using osu.Framework.IO.File;
+using System.IO;
+using osu.Game.IO.Serialization;
+using System.Diagnostics;
 
 namespace osu.Game.Beatmaps
 {
@@ -36,6 +40,17 @@ namespace osu.Game.Beatmaps
             track = new AsyncLazy<Track>(populateTrack);
             waveform = new AsyncLazy<Waveform>(populateWaveform);
             storyboard = new AsyncLazy<Storyboard>(populateStoryboard);
+        }
+
+        /// <summary>
+        /// Saves the <see cref="Beatmap"/>.
+        /// </summary>
+        public void Save()
+        {
+            var path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
+            using (var sw = new StreamWriter(path))
+                sw.WriteLine(Beatmap.Serialize());
+            Process.Start(path);
         }
 
         protected abstract Beatmap GetBeatmap();
