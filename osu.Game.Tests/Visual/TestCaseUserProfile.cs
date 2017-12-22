@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual
         {
             typeof(ProfileHeader),
             typeof(UserProfileOverlay),
-            typeof(RankChart),
+            typeof(RankGraph),
             typeof(LineGraph),
         };
 
