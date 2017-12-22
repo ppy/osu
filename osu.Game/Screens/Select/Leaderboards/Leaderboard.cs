@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public class Leaderboard : Container
     {
-        private const double fade_duration = 200;
+        private const double fade_duration = 300;
 
         private readonly ScrollContainer scrollContainer;
         private readonly Container placeholderContainer;
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 scores = value;
 
-                scrollFlow?.FadeOut(fade_duration).Expire();
+                scrollFlow?.FadeOut(fade_duration, Easing.OutQuint).Expire();
                 scrollFlow = null;
 
                 loading.Hide();
@@ -90,6 +90,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         private LeaderboardScope scope;
+
         public LeaderboardScope Scope
         {
             get { return scope; }
@@ -103,6 +104,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         private PlaceholderState placeholderState;
+
         protected PlaceholderState PlaceholderState
         {
             get { return placeholderState; }
@@ -118,19 +120,18 @@ namespace osu.Game.Screens.Select.Leaderboards
                             OnRetry = updateScores,
                         });
                         break;
-
+                    case PlaceholderState.Unavailable:
+                        replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
+                        break;
                     case PlaceholderState.NoScores:
                         replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
                         break;
-
                     case PlaceholderState.NotLoggedIn:
                         replacePlaceholder(new MessagePlaceholder(@"Please login to view online leaderboards!"));
                         break;
-
                     case PlaceholderState.NotSupporter:
                         replacePlaceholder(new MessagePlaceholder(@"Please invest in a supporter tag to view this leaderboard!"));
                         break;
-
                     default:
                         replacePlaceholder(null);
                         break;
@@ -150,10 +151,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 loading = new LoadingAnimation(),
                 placeholderContainer = new Container
                 {
-                    Alpha = 0,
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both
                 },
             };
         }
@@ -229,15 +227,15 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return;
             }
 
-            if (api?.IsLoggedIn != true)
+            if (Beatmap?.OnlineBeatmapID == null)
             {
-                PlaceholderState = PlaceholderState.NotLoggedIn;
+                PlaceholderState = PlaceholderState.Unavailable;
                 return;
             }
 
-            if (Beatmap?.OnlineBeatmapID == null)
+            if (api?.IsLoggedIn != true)
             {
-                PlaceholderState = PlaceholderState.NetworkFailure;
+                PlaceholderState = PlaceholderState.NotLoggedIn;
                 return;
             }
 
@@ -272,23 +270,22 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void replacePlaceholder(Placeholder placeholder)
         {
-            if (placeholder == null)
-            {
-                placeholderContainer.FadeOutFromOne(fade_duration, Easing.OutQuint);
-                placeholderContainer.Clear(true);
+            var existingPlaceholder = placeholderContainer.Children.LastOrDefault() as Placeholder;
+
+            if (placeholder != null && placeholder.Equals(existingPlaceholder))
                 return;
-            }
 
-            var existingPlaceholder = placeholderContainer.Children.FirstOrDefault() as Placeholder;
+            existingPlaceholder?.FadeOut(150, Easing.OutQuint).Expire();
 
-            if (placeholder.Equals(existingPlaceholder))
+            if (placeholder == null)
                 return;
 
             Scores = null;
 
-            placeholderContainer.Clear(true);
-            placeholderContainer.Child = placeholder;
-            placeholderContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
+            placeholderContainer.Add(placeholder);
+
+            placeholder.ScaleTo(0.8f).Then().ScaleTo(1, fade_duration * 3, Easing.OutQuint);
+            placeholder.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 
         protected override void Update()
@@ -322,6 +319,12 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private abstract class Placeholder : FillFlowContainer, IEquatable<Placeholder>
         {
+            protected Placeholder()
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
             public virtual bool Equals(Placeholder other) => GetType() == other?.GetType();
         }
 
@@ -429,6 +432,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         Successful,
         Retrieving,
         NetworkFailure,
+        Unavailable,
         NoScores,
         NotLoggedIn,
         NotSupporter,
