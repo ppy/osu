@@ -9,5 +9,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     public class OsuEditPlayfield : OsuPlayfield
     {
         protected override CursorContainer CreateCursor() => null;
+
+        protected override bool ProxyApproachCircles => false;
     }
 }
