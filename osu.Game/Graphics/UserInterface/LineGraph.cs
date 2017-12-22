@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Caching;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -47,7 +48,16 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 values = value.ToArray();
-                applyPath();
+
+                float max = values.Max(), min = values.Min();
+                if (MaxValue > max) max = MaxValue.Value;
+                if (MinValue < min) min = MinValue.Value;
+
+                ActualMaxValue = max;
+                ActualMinValue = min;
+
+                pathCached.Invalidate();
+
                 maskingContainer.Width = 0;
                 maskingContainer.ResizeWidthTo(1, transform_duration, Easing.OutQuint);
             }
@@ -63,11 +73,26 @@ namespace osu.Game.Graphics.UserInterface
             });
         }
 
+        private bool pending;
+
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {
-            if ((invalidation & Invalidation.DrawSize) != 0)
-                applyPath();
+            if ((invalidation & Invalidation.DrawSize) > 0)
+                pathCached.Invalidate();
+
             return base.Invalidate(invalidation, source, shallPropagate);
+        }
+
+        private Cached pathCached = new Cached();
+
+        protected override void Update()
+        {
+            base.Update();
+            if (!pathCached.IsValid)
+            {
+                applyPath();
+                pathCached.Validate();
+            }
         }
 
         private void applyPath()
@@ -76,13 +101,6 @@ namespace osu.Game.Graphics.UserInterface
             if (values == null) return;
 
             int count = Math.Max(values.Length, DefaultValueCount);
-
-            float max = values.Max(), min = values.Min();
-            if (MaxValue > max) max = MaxValue.Value;
-            if (MinValue < min) min = MinValue.Value;
-
-            ActualMaxValue = max;
-            ActualMinValue = min;
 
             for (int i = 0; i < values.Length; i++)
             {

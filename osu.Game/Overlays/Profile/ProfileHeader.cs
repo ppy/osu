@@ -27,8 +27,9 @@ namespace osu.Game.Overlays.Profile
         private readonly OsuTextFlowContainer infoTextLeft;
         private readonly LinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
+        private readonly RankGraph rankGraph;
 
-        private readonly Container coverContainer, chartContainer, supporterTag;
+        private readonly Container coverContainer, supporterTag;
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
@@ -273,7 +274,7 @@ namespace osu.Game.Overlays.Profile
                                 }
                             }
                         },
-                        chartContainer = new Container
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.BottomCentre,
@@ -284,6 +285,10 @@ namespace osu.Game.Overlays.Profile
                                 new Box
                                 {
                                     Colour = Color4.Black.Opacity(0.25f),
+                                    RelativeSizeAxes = Axes.Both
+                                },
+                                rankGraph = new RankGraph
+                                {
                                     RelativeSizeAxes = Axes.Both
                                 }
                             }
@@ -303,11 +308,7 @@ namespace osu.Game.Overlays.Profile
 
         public User User
         {
-            get
-            {
-                return user;
-            }
-
+            get { return user; }
             set
             {
                 user = value;
@@ -420,7 +421,7 @@ namespace osu.Game.Overlays.Profile
                 gradeSPlus.DisplayCount = 0;
                 gradeSSPlus.DisplayCount = 0;
 
-                chartContainer.Add(new RankChart(user) { RelativeSizeAxes = Axes.Both });
+                rankGraph.User.Value = user;
             }
         }
 
