@@ -499,7 +499,7 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableProfileScore.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />
     <Compile Include="Overlays\Profile\ProfileSection.cs" />
-    <Compile Include="Overlays\Profile\RankChart.cs" />
+    <Compile Include="Overlays\Profile\RankGraph.cs" />
     <Compile Include="Overlays\Profile\Sections\AboutSection.cs" />
     <Compile Include="Overlays\Profile\Sections\BeatmapsSection.cs" />
     <Compile Include="Overlays\Profile\Sections\HistoricalSection.cs" />
