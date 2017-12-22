@@ -1,7 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -40,12 +43,26 @@ namespace osu.Game.Rulesets.Objects
         [JsonIgnore]
         public bool Kiai { get; private set; }
 
+        private readonly SortedList<HitObject> nestedHitObjects = new SortedList<HitObject>((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
+
+        [JsonIgnore]
+        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
+
         /// <summary>
         /// Applies default values to this HitObject.
         /// </summary>
         /// <param name="controlPointInfo">The control points.</param>
         /// <param name="difficulty">The difficulty settings to use.</param>
-        public virtual void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        {
+            ApplyDefaultsToSelf(controlPointInfo, difficulty);
+
+            nestedHitObjects.Clear();
+            CreateNestedHitObjects();
+            nestedHitObjects.ForEach(h => h.ApplyDefaults(controlPointInfo, difficulty));
+        }
+
+        protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             SoundControlPoint soundPoint = controlPointInfo.SoundPointAt(StartTime);
             EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
@@ -53,5 +70,11 @@ namespace osu.Game.Rulesets.Objects
             Kiai = effectPoint.KiaiMode;
             SoundControlPoint = soundPoint;
         }
+
+        protected virtual void CreateNestedHitObjects()
+        {
+        }
+
+        protected void AddNested(HitObject hitObject) => nestedHitObjects.Add(hitObject);
     }
 }

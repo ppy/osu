@@ -74,15 +74,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double Velocity;
         public double TickDistance;
 
-        private ControlPointInfo controlPointInfo;
-        private BeatmapDifficulty difficulty;
-
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
-
-            this.controlPointInfo = controlPointInfo;
-            this.difficulty = difficulty;
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
@@ -105,85 +99,78 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public int RepeatAt(double progress) => (int)(progress * RepeatCount);
 
-        public IEnumerable<SliderTick> Ticks
+        protected override void CreateNestedHitObjects()
         {
-            get
+            base.CreateNestedHitObjects();
+
+            createTicks();
+            createRepeatPoints();
+        }
+
+        private void createTicks()
+        {
+            if (TickDistance == 0) return;
+
+            var length = Curve.Distance;
+            var tickDistance = Math.Min(TickDistance, length);
+            var repeatDuration = length / Velocity;
+
+            var minDistanceFromEnd = Velocity * 0.01;
+
+            for (var repeat = 0; repeat < RepeatCount; repeat++)
             {
-                if (TickDistance == 0) yield break;
+                var repeatStartTime = StartTime + repeat * repeatDuration;
+                var reversed = repeat % 2 == 1;
 
-                var length = Curve.Distance;
-                var tickDistance = Math.Min(TickDistance, length);
-                var repeatDuration = length / Velocity;
-
-                var minDistanceFromEnd = Velocity * 0.01;
-
-                for (var repeat = 0; repeat < RepeatCount; repeat++)
+                for (var d = tickDistance; d <= length; d += tickDistance)
                 {
-                    var repeatStartTime = StartTime + repeat * repeatDuration;
-                    var reversed = repeat % 2 == 1;
+                    if (d > length - minDistanceFromEnd)
+                        break;
 
-                    for (var d = tickDistance; d <= length; d += tickDistance)
+                    var distanceProgress = d / length;
+                    var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
+
+                    AddNested(new SliderTick
                     {
-                        if (d > length - minDistanceFromEnd)
-                            break;
-
-                        var distanceProgress = d / length;
-                        var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
-
-                        var ret = new SliderTick
+                        RepeatIndex = repeat,
+                        StartTime = repeatStartTime + timeProgress * repeatDuration,
+                        Position = Curve.PositionAt(distanceProgress),
+                        StackHeight = StackHeight,
+                        Scale = Scale,
+                        ComboColour = ComboColour,
+                        Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
                         {
-                            RepeatIndex = repeat,
-                            StartTime = repeatStartTime + timeProgress * repeatDuration,
-                            Position = Curve.PositionAt(distanceProgress),
-                            StackHeight = StackHeight,
-                            Scale = Scale,
-                            ComboColour = ComboColour,
-                            Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
-                            {
-                                Bank = s.Bank,
-                                Name = @"slidertick",
-                                Volume = s.Volume
-                            }))
-                        };
-
-                        if (controlPointInfo != null && difficulty != null)
-                            ret.ApplyDefaults(controlPointInfo, difficulty);
-
-                        yield return ret;
-                    }
+                            Bank = s.Bank,
+                            Name = @"slidertick",
+                            Volume = s.Volume
+                        }))
+                    });
                 }
             }
         }
-        public IEnumerable<RepeatPoint> RepeatPoints
+
+        private void createRepeatPoints()
         {
-            get
+            var length = Curve.Distance;
+            var repeatPointDistance = Math.Min(Distance, length);
+            var repeatDuration = length / Velocity;
+
+            for (var repeat = 1; repeat < RepeatCount; repeat++)
             {
-                var length = Curve.Distance;
-                var repeatPointDistance = Math.Min(Distance, length);
-                var repeatDuration = length / Velocity;
-
-                for (var repeat = 1; repeat < RepeatCount; repeat++)
+                for (var d = repeatPointDistance; d <= length; d += repeatPointDistance)
                 {
-                    for (var d = repeatPointDistance; d <= length; d += repeatPointDistance)
+                    var repeatStartTime = StartTime + repeat * repeatDuration;
+                    var distanceProgress = d / length;
+
+                    AddNested(new RepeatPoint
                     {
-                        var repeatStartTime = StartTime + repeat * repeatDuration;
-                        var distanceProgress = d / length;
-
-                        var ret = new RepeatPoint
-                        {
-                            RepeatIndex = repeat,
-                            StartTime = repeatStartTime,
-                            Position = Curve.PositionAt(distanceProgress),
-                            StackHeight = StackHeight,
-                            Scale = Scale,
-                            ComboColour = ComboColour,
-                        };
-
-                        if (controlPointInfo != null && difficulty != null)
-                            ret.ApplyDefaults(controlPointInfo, difficulty);
-
-                        yield return ret;
-                    }
+                        RepeatIndex = repeat,
+                        StartTime = repeatStartTime,
+                        Position = Curve.PositionAt(distanceProgress),
+                        StackHeight = StackHeight,
+                        Scale = Scale,
+                        ComboColour = ComboColour,
+                    });
                 }
             }
         }

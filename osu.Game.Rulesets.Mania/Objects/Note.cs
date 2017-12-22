@@ -19,9 +19,9 @@ namespace osu.Game.Rulesets.Mania.Objects
         [JsonIgnore]
         public HitWindows HitWindows { get; protected set; } = new HitWindows();
 
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             HitWindows = new HitWindows(difficulty.OverallDifficulty);
         }

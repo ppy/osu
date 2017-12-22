@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 RelativeChildSize = new Vector2((float)HitObject.Duration, 1)
             });
 
-            foreach (var tick in drumRoll.Ticks)
+            foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
             {
                 var newTick = new DrawableDrumRollTick(tick);
                 newTick.OnJudgement += onTickJudgement;
