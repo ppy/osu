@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Judgements;
@@ -15,11 +16,12 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The key-press hit window for this note.
         /// </summary>
+        [JsonIgnore]
         public HitWindows HitWindows { get; protected set; } = new HitWindows();
 
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             HitWindows = new HitWindows(difficulty.OverallDifficulty);
         }
