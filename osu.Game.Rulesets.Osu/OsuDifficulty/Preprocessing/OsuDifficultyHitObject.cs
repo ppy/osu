@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
                 }
             });
 
-            var scoringTimes = slider.Ticks.Select(t => t.StartTime).Concat(slider.RepeatPoints.Select(r => r.StartTime)).OrderBy(t => t);
+            var scoringTimes = slider.NestedHitObjects.Select(t => t.StartTime);
             foreach (var time in scoringTimes)
                 computeVertex(time);
             computeVertex(slider.EndTime);
