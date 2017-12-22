@@ -89,34 +89,8 @@ namespace osu.Game.Screens.Select
             [BackgroundDependencyLoader]
             private void load()
             {
-                BeatmapInfo beatmapInfo = working.BeatmapInfo;
-                BeatmapMetadata metadata = beatmapInfo.Metadata ?? working.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
-                Beatmap beatmap = working.Beatmap;
-
-                List<InfoLabel> labels = new List<InfoLabel>();
-
-                if (beatmap != null && !(working is DummyWorkingBeatmap))
-                {
-                    HitObject lastObject = beatmap.HitObjects.LastOrDefault();
-                    double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
-
-                    labels.Add(new InfoLabel(new BeatmapStatistic
-                    {
-                        Name = "Length",
-                        Icon = FontAwesome.fa_clock_o,
-                        Content = beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(endTime - beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
-                    }));
-
-                    labels.Add(new InfoLabel(new BeatmapStatistic
-                    {
-                        Name = "BPM",
-                        Icon = FontAwesome.fa_circle,
-                        Content = getBPMRange(beatmap),
-                    }));
-
-                    //get statistics from the current ruleset.
-                    labels.AddRange(beatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(working).Select(s => new InfoLabel(s)));
-                }
+                var beatmapInfo = working.BeatmapInfo;
+                var metadata = beatmapInfo.Metadata ?? working.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
                 PixelSnapping = true;
                 CacheDrawnFrameBuffer = true;
@@ -186,7 +160,7 @@ namespace osu.Game.Screens.Select
                             new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
-                                Text = !string.IsNullOrEmpty(metadata.Source) ? metadata.Source + " — " + metadata.Title : metadata.Title,
+                                Text = string.IsNullOrEmpty(metadata.Source) ? metadata.Title : metadata.Source + " — " + metadata.Title,
                                 TextSize = 28,
                             },
                             new OsuSpriteText
@@ -200,44 +174,84 @@ namespace osu.Game.Screens.Select
                                 Margin = new MarginPadding { Top = 10 },
                                 Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
-                                Children = working is DummyWorkingBeatmap ? Array.Empty<Drawable>() : getMapper(metadata)
+                                Children = getMapper(metadata)
                             },
                             new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 20 },
                                 Spacing = new Vector2(20, 0),
                                 AutoSizeAxes = Axes.Both,
-                                Children = labels
-                            },
+                                Children = getInfoLabels()
+                            }
                         }
-                    },
+                    }
                 };
             }
 
-            private OsuSpriteText[] getMapper(BeatmapMetadata metadata) => new[]
+            private InfoLabel[] getInfoLabels()
             {
-                new OsuSpriteText
+                var beatmap = working.Beatmap;
+                var info = working.BeatmapInfo;
+
+                List<InfoLabel> labels = new List<InfoLabel>();
+
+                if (beatmap?.HitObjects?.Count > 0)
                 {
-                    Font = @"Exo2.0-Medium",
-                    Text = "mapped by ",
-                    TextSize = 15,
-                },
-                new OsuSpriteText
-                {
-                    Font = @"Exo2.0-Bold",
-                    Text = metadata.Author.Username,
-                    TextSize = 15,
+                    HitObject lastObject = beatmap.HitObjects.LastOrDefault();
+                    double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
+
+                    labels.Add(new InfoLabel(new BeatmapStatistic
+                    {
+                        Name = "Length",
+                        Icon = FontAwesome.fa_clock_o,
+                        Content = beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(endTime - beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                    }));
+
+                    labels.Add(new InfoLabel(new BeatmapStatistic
+                    {
+                        Name = "BPM",
+                        Icon = FontAwesome.fa_circle,
+                        Content = getBPMRange(beatmap),
+                    }));
+
+                    //get statistics from the current ruleset.
+                    labels.AddRange(info.Ruleset.CreateInstance().GetBeatmapStatistics(working).Select(s => new InfoLabel(s)));
                 }
-            };
+
+                return labels.ToArray();
+            }
 
             private string getBPMRange(Beatmap beatmap)
             {
                 double bpmMax = beatmap.ControlPointInfo.BPMMaximum;
                 double bpmMin = beatmap.ControlPointInfo.BPMMinimum;
 
-                if (Precision.AlmostEquals(bpmMin, bpmMax)) return $"{bpmMin:0}";
+                if (Precision.AlmostEquals(bpmMin, bpmMax))
+                    return $"{bpmMin:0}";
 
                 return $"{bpmMin:0}-{bpmMax:0} (mostly {beatmap.ControlPointInfo.BPMMode:0})";
+            }
+
+            private OsuSpriteText[] getMapper(BeatmapMetadata metadata)
+            {
+                if (string.IsNullOrEmpty(metadata.Author?.Username))
+                    return Array.Empty<OsuSpriteText>();
+
+                return new[]
+                {
+                    new OsuSpriteText
+                    {
+                        Font = @"Exo2.0-Medium",
+                        Text = "mapped by ",
+                        TextSize = 15,
+                    },
+                    new OsuSpriteText
+                    {
+                        Font = @"Exo2.0-Bold",
+                        Text = metadata.Author.Username,
+                        TextSize = 15,
+                    }
+                };
             }
 
             public class InfoLabel : Container, IHasTooltip
