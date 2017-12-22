@@ -275,7 +275,7 @@ namespace osu.Game.Screens.Select
                 if (beatmap == Beatmap.Value.BeatmapInfo)
                     performLoad();
                 else
-                    selectionChangedDebounce = Scheduler.AddDelayed(performLoad, 100);
+                    selectionChangedDebounce = Scheduler.AddDelayed(performLoad, 200);
             }
         }
 

@@ -56,7 +56,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     ComboIndex = s.ComboIndex,
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
-                    Samples = s.Samples
+                    Samples = s.Samples,
+                    SoundControlPoint = s.SoundControlPoint
                 })
             };
 
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AddNested(InitialCircle);
 
             var repeatDuration = s.Curve.Distance / s.Velocity;
-            foreach (var tick in s.Ticks)
+            foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
                 var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
                 var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? TIME_FADEIN : TIME_FADEIN / 2);
@@ -83,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 AddNested(drawableTick);
             }
 
-            foreach (var repeatPoint in s.RepeatPoints)
+            foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
                 var repeatStartTime = s.StartTime + repeatPoint.RepeatIndex * repeatDuration;
                 var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? TIME_FADEIN : TIME_FADEIN / 2);

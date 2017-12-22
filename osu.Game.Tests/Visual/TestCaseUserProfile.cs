@@ -2,14 +2,25 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Profile;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
     public class TestCaseUserProfile : OsuTestCase
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(ProfileHeader),
+            typeof(UserProfileOverlay),
+            typeof(RankGraph),
+            typeof(LineGraph),
+        };
+
         public TestCaseUserProfile()
         {
             var profile = new UserProfileOverlay();
