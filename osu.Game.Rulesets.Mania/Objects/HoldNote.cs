@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects.Types;
@@ -63,15 +62,9 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// </summary>
         private double tickSpacing = 50;
 
-        private ControlPointInfo controlPointInfo;
-        private BeatmapDifficulty difficulty;
-
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
-
-            this.controlPointInfo = controlPointInfo;
-            this.difficulty = difficulty;
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
@@ -80,34 +73,27 @@ namespace osu.Game.Rulesets.Mania.Objects
             Tail.ApplyDefaults(controlPointInfo, difficulty);
         }
 
-        /// <summary>
-        /// The scoring scoring ticks of the hold note.
-        /// </summary>
-        public IEnumerable<HoldNoteTick> Ticks => ticks ?? (ticks = createTicks());
-        private List<HoldNoteTick> ticks;
-
-        private List<HoldNoteTick> createTicks()
+        protected override void CreateNestedHitObjects()
         {
-            var ret = new List<HoldNoteTick>();
+            base.CreateNestedHitObjects();
 
+            createTicks();
+        }
+
+        private void createTicks()
+        {
             if (tickSpacing == 0)
-                return ret;
+                return;
 
             for (double t = StartTime + tickSpacing; t <= EndTime - tickSpacing; t += tickSpacing)
             {
-                var tick = new HoldNoteTick
+                AddNested(new HoldNoteTick
                 {
                     StartTime = t,
                     Column = Column
-                };
-
-                if (controlPointInfo != null && difficulty != null)
-                    tick.ApplyDefaults(controlPointInfo, difficulty);
-
-                ret.Add(tick);
+                });
             }
 
-            return ret;
         }
 
         /// <summary>
@@ -121,9 +107,9 @@ namespace osu.Game.Rulesets.Mania.Objects
             /// </summary>
             private const double release_window_lenience = 1.5;
 
-            public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
             {
-                base.ApplyDefaults(controlPointInfo, difficulty);
+                base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
                 HitWindows *= release_window_lenience;
             }
