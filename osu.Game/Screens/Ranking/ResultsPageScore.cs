@@ -324,7 +324,14 @@ namespace osu.Game.Screens.Ranking
                 title.Colour = artist.Colour = colours.BlueDarker;
                 versionMapper.Colour = colours.Gray8;
 
-                versionMapper.Text = $"{beatmap.Version} - mapped by {beatmap.Metadata.Author.Username}";
+                var creator = beatmap.Metadata.Author?.Username;
+                if (!string.IsNullOrEmpty(creator)) {
+                    versionMapper.Text = $"mapped by {creator}";
+
+                    if (!string.IsNullOrEmpty(beatmap.Version))
+                        versionMapper.Text = $"{beatmap.Version} - " + versionMapper.Text;
+                }
+
                 title.Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title);
                 artist.Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist);
             }

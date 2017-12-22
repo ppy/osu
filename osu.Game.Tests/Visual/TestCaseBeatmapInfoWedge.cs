@@ -20,6 +20,7 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseBeatmapInfoWedge : OsuTestCase
     {
+        private RulesetStore rulesets;
         private TestBeatmapInfoWedge infoWedge;
         private readonly List<Beatmap> beatmaps = new List<Beatmap>();
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
@@ -27,7 +28,14 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, RulesetStore rulesets)
         {
+            this.rulesets = rulesets;
+
             beatmap.BindTo(game.Beatmap);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             Add(infoWedge = new TestBeatmapInfoWedge
             {
