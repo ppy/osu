@@ -399,7 +399,6 @@ namespace osu.Game.Screens.Select
                 backgroundModeBeatmap.FadeTo(1, 250);
             }
 
-            beatmapInfoWedge.State = Visibility.Visible;
             beatmapInfoWedge.UpdateBeatmap(beatmap);
         }
 

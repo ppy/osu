@@ -66,6 +66,8 @@ namespace osu.Game.Screens.Select
                 Depth = info?.Depth + 1 ?? 0,
             }, newInfo =>
             {
+                State = beatmap == null ? Visibility.Hidden : Visibility.Visible;
+
                 // ensure we ourselves are visible if not already.
                 if (!IsPresent)
                     this.FadeIn(250);
