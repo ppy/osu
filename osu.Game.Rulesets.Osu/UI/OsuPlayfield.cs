@@ -25,6 +25,10 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override bool ProvidingUserCursor => true;
 
+        // Todo: This should not be a thing, but is currently required for the editor
+        // https://github.com/ppy/osu-framework/issues/1283
+        protected virtual bool ProxyApproachCircles => true;
+
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
         public override Vector2 Size
@@ -80,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.UI
             h.Depth = (float)h.HitObject.StartTime;
 
             var c = h as IDrawableHitObjectWithProxiedApproach;
-            if (c != null)
+            if (c != null && ProxyApproachCircles)
                 approachCircles.Add(c.ProxiedLayer.CreateProxy());
 
             base.Add(h);
