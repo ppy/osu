@@ -1,36 +1,48 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Select;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
     public class TestCaseBeatmapInfoWedge : OsuTestCase
     {
-        private BeatmapManager beatmaps;
-        private readonly Random random;
-        private readonly BeatmapInfoWedge infoWedge;
+        private TestBeatmapInfoWedge infoWedge;
+        private readonly List<Beatmap> beatmaps = new List<Beatmap>();
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
-        public TestCaseBeatmapInfoWedge()
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase game, RulesetStore rulesets)
         {
-            random = new Random(0123);
+            beatmap.BindTo(game.Beatmap);
 
-            Add(infoWedge = new BeatmapInfoWedge
+            Add(infoWedge = new TestBeatmapInfoWedge
             {
                 Size = new Vector2(0.5f, 245),
                 RelativeSizeAxes = Axes.X,
                 Margin = new MarginPadding
                 {
                     Top = 20,
-                },
+                }
+            });
+
+            AddStep("hide", () =>
+            {
+                infoWedge.State = Visibility.Hidden;
+                Content.FadeOut(100);
             });
 
             AddStep("show", () =>
@@ -39,31 +51,88 @@ namespace osu.Game.Tests.Visual
                 infoWedge.State = Visibility.Visible;
                 infoWedge.UpdateBeatmap(beatmap);
             });
-            AddStep("hide", () =>
+
+            foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
-                infoWedge.State = Visibility.Hidden;
-                Content.FadeOut(100);
+                var ruleset = rulesetInfo.CreateInstance();
+                beatmaps.Add(createTestBeatmap(rulesetInfo));
+
+                var name = rulesetInfo.ShortName;
+                selectBeatmap(name);
+
+                // TODO: check InfoLabels of other rulesets
+                switch (ruleset)
+                {
+                    case OsuRuleset osu:
+                        testOsuBeatmap(osu);
+                        break;
+                }
+            }
+
+            testNullBeatmap();
+        }
+
+        private void testOsuBeatmap(OsuRuleset ruleset)
+        {
+            AddAssert("check version", () => infoWedge.Info.VersionLabel.Text == $"{ruleset.ShortName}Version");
+            AddAssert("check title", () => infoWedge.Info.TitleLabel.Text == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
+            AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Text == $"{ruleset.ShortName}Artist");
+            AddAssert("check author", () => infoWedge.Info.MapperContainer.Children.OfType<OsuSpriteText>().Any(s => s.Text == $"{ruleset.ShortName}Author"));
+            // TODO: check InfoLabels
+        }
+
+        private void testNullBeatmap()
+        {
+            selectNullBeatmap();
+            AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text));
+            AddAssert("check default title", () => infoWedge.Info.TitleLabel.Text == beatmap.Default.BeatmapInfo.Metadata.Title);
+            AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == beatmap.Default.BeatmapInfo.Metadata.Artist);
+            AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
+            AddAssert("check empty infos", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
+        }
+
+        private void selectBeatmap(string name)
+        {
+            AddStep($"select {name} beatmap", () =>
+            {
+                beatmap.Value = new TestWorkingBeatmap(beatmaps.First(b => b.BeatmapInfo.Ruleset.ShortName == name));
+                infoWedge.UpdateBeatmap(beatmap);
             });
-            AddStep("random beatmap", randomBeatmap);
-            AddStep("null beatmap", () => infoWedge.UpdateBeatmap(beatmap.Default));
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, BeatmapManager beatmaps)
+        private void selectNullBeatmap()
         {
-            this.beatmaps = beatmaps;
-            beatmap.BindTo(game.Beatmap);
+            AddStep("select null beatmap", () =>
+            {
+                beatmap.Value = beatmap.Default;
+                infoWedge.UpdateBeatmap(beatmap);
+            });
         }
 
-        private void randomBeatmap()
+        private Beatmap createTestBeatmap(RulesetInfo ruleset)
         {
-            var sets = beatmaps.GetAllUsableBeatmapSets();
-            if (sets.Count == 0)
-                return;
+            return new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Metadata = new BeatmapMetadata
+                    {
+                        AuthorString = $"{ruleset.ShortName}Author",
+                        Artist = $"{ruleset.ShortName}Artist",
+                        Source = $"{ruleset.ShortName}Source",
+                        Title = $"{ruleset.ShortName}Title"
+                    },
+                    Ruleset = ruleset,
+                    StarDifficulty = 6,
+                    Version = $"{ruleset.ShortName}Version"
+                },
+                HitObjects = new List<HitObject>() // TODO: Fill it with something depending on ruleset?
+            };
+        }
 
-            var b = sets[random.Next(0, sets.Count)].Beatmaps[0];
-            beatmap.Value = beatmaps.GetWorkingBeatmap(b);
-            infoWedge.UpdateBeatmap(beatmap);
+        private class TestBeatmapInfoWedge : BeatmapInfoWedge
+        {
+            public new BufferedWedgeInfo Info => base.Info;
         }
     }
 }

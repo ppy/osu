@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Select
     {
         private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
 
-        private Drawable info;
+        protected BufferedWedgeInfo Info;
 
         public BeatmapInfoWedge()
         {
@@ -63,23 +63,28 @@ namespace osu.Game.Screens.Select
             LoadComponentAsync(new BufferedWedgeInfo(beatmap)
             {
                 Shear = -Shear,
-                Depth = info?.Depth + 1 ?? 0,
+                Depth = Info?.Depth + 1 ?? 0,
             }, newInfo =>
             {
                 // ensure we ourselves are visible if not already.
                 if (!IsPresent)
                     this.FadeIn(250);
 
-                info?.FadeOut(250);
-                info?.Expire();
+                Info?.FadeOut(250);
+                Info?.Expire();
 
-                Add(info = newInfo);
+                Add(Info = newInfo);
             });
         }
 
         public class BufferedWedgeInfo : BufferedContainer
         {
             private readonly WorkingBeatmap working;
+            public OsuSpriteText VersionLabel { get; private set; }
+            public OsuSpriteText TitleLabel { get; private set; }
+            public OsuSpriteText ArtistLabel { get; private set; }
+            public FillFlowContainer MapperContainer { get; private set; }
+            public FillFlowContainer InfoLabelContainer { get; private set; }
 
             public BufferedWedgeInfo(WorkingBeatmap working)
             {
@@ -139,7 +144,7 @@ namespace osu.Game.Screens.Select
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new OsuSpriteText
+                            VersionLabel = new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
                                 Text = beatmapInfo.Version,
@@ -157,26 +162,26 @@ namespace osu.Game.Screens.Select
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new OsuSpriteText
+                            TitleLabel = new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
                                 Text = string.IsNullOrEmpty(metadata.Source) ? metadata.Title : metadata.Source + " — " + metadata.Title,
                                 TextSize = 28,
                             },
-                            new OsuSpriteText
+                            ArtistLabel = new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
                                 Text = metadata.Artist,
                                 TextSize = 17,
                             },
-                            new FillFlowContainer
+                            MapperContainer = new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 10 },
                                 Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
                                 Children = getMapper(metadata)
                             },
-                            new FillFlowContainer
+                            InfoLabelContainer = new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 20 },
                                 Spacing = new Vector2(20, 0),
