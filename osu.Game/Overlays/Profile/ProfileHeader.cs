@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Profile
         private readonly OsuTextFlowContainer infoTextLeft;
         private readonly LinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
-        private readonly RankChart rankGraph;
+        private readonly RankGraph rankGraph;
 
         private readonly Container coverContainer, supporterTag;
         private readonly Sprite levelBadge;
@@ -287,7 +287,7 @@ namespace osu.Game.Overlays.Profile
                                     Colour = Color4.Black.Opacity(0.25f),
                                     RelativeSizeAxes = Axes.Both
                                 },
-                                rankGraph = new RankChart
+                                rankGraph = new RankGraph
                                 {
                                     RelativeSizeAxes = Axes.Both
                                 }

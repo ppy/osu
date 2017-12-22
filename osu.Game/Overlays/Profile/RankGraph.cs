@@ -19,7 +19,7 @@ using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class RankChart : Container
+    public class RankGraph : Container
     {
         private const float primary_textsize = 25;
         private const float secondary_textsize = 13;
@@ -34,19 +34,18 @@ namespace osu.Game.Overlays.Profile
         private KeyValuePair<int, int>[] ranks;
         public Bindable<User> User = new Bindable<User>();
 
-        public RankChart()
+        public RankGraph()
         {
             Padding = new MarginPadding { Vertical = padding };
             Children = new Drawable[]
             {
                 placeholder = new OsuSpriteText
                 {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Text = "No recent plays",
                     TextSize = 14,
                     Font = @"Exo2.0-RegularItalic",
-                    Padding = new MarginPadding { Bottom = padding }
                 },
                 rankText = new OsuSpriteText
                 {
@@ -75,6 +74,7 @@ namespace osu.Game.Overlays.Profile
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
+                    Height = 75,
                     Y = -secondary_textsize,
                     Alpha = 0,
                 }
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Profile
 
         private void userChanged(User newUser)
         {
-            placeholder.FadeTo(newUser == null ? 1 : 0, fade_duration, Easing.Out);
+            placeholder.FadeIn(fade_duration, Easing.Out);
 
             if (newUser == null)
             {
@@ -110,6 +110,8 @@ namespace osu.Game.Overlays.Profile
 
             if (ranks.Length > 1)
             {
+                placeholder.FadeOut(fade_duration, Easing.Out);
+
                 graph.DefaultValueCount = ranks.Length;
                 graph.Values = ranks.Select(x => -(float)Math.Log(x.Value));
                 graph.SetStaticBallPosition();
@@ -131,16 +133,6 @@ namespace osu.Game.Overlays.Profile
         {
             rankText.Text = $"#{ranks[dayIndex].Value:#,0}";
             relativeText.Text = dayIndex + 1 == ranks.Length ? "Now" : $"{ranked_days - ranks[dayIndex].Key} days ago";
-        }
-
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            if ((invalidation & Invalidation.DrawSize) != 0)
-            {
-                graph.Height = DrawHeight - padding * 2 - primary_textsize - secondary_textsize * 2;
-            }
-
-            return base.Invalidate(invalidation, source, shallPropagate);
         }
 
         protected override bool OnHover(InputState state)
