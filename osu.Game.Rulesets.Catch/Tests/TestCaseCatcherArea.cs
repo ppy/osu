@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
     [Ignore("getting CI working")]
-    internal class TestCaseCatcherArea : OsuTestCase
+    public class TestCaseCatcherArea : OsuTestCase
     {
         private RulesetInfo catchRuleset;
         private TestCatcherArea catcherArea;

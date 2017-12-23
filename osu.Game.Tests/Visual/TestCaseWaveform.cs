@@ -15,7 +15,7 @@ using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseWaveform : OsuTestCase
+    public class TestCaseWaveform : OsuTestCase
     {
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 

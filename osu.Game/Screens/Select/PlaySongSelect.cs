@@ -8,7 +8,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -114,11 +113,12 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        protected override void OnSelected(InputState state)
+        protected override void Start()
         {
             if (player != null) return;
 
-            if (state?.Keyboard.ControlPressed == true)
+            // Ctrl+Enter should start map with autoplay enabled.
+            if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
                 var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
                 var autoType = auto.GetType();

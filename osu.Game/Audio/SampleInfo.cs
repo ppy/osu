@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
@@ -8,6 +9,7 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Audio
 {
+    [Serializable]
     public class SampleInfo
     {
         public const string HIT_WHISTLE = @"hitwhistle";

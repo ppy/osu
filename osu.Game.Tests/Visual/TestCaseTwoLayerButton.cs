@@ -7,7 +7,7 @@ using osu.Game.Graphics.UserInterface;
 namespace osu.Game.Tests.Visual
 {
     [Description("mostly back button")]
-    internal class TestCaseTwoLayerButton : OsuTestCase
+    public class TestCaseTwoLayerButton : OsuTestCase
     {
         public TestCaseTwoLayerButton()
         {

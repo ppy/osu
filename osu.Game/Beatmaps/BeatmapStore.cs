@@ -32,6 +32,18 @@ namespace osu.Game.Beatmaps
         {
             var context = GetContext();
 
+            foreach (var beatmap in beatmapSet.Beatmaps.Where(b => b.Metadata != null))
+            {
+                // If we detect a new metadata object it'll be attached to the current context so it can be reused
+                // to prevent duplicate entries when persisting. To accomplish this we look in the cache (.Local)
+                // of the corresponding table (.Set<BeatmapMetadata>()) for matching entries to our criteria.
+                var contextMetadata = context.Set<BeatmapMetadata>().Local.SingleOrDefault(e => e.Equals(beatmap.Metadata));
+                if (contextMetadata != null)
+                    beatmap.Metadata = contextMetadata;
+                else
+                    context.BeatmapMetadata.Attach(beatmap.Metadata);
+            }
+
             context.BeatmapSetInfo.Attach(beatmapSet);
             context.SaveChanges();
 

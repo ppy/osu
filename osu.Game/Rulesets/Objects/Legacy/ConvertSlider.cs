@@ -46,9 +46,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
             throw new NotImplementedException();
         }
 
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
