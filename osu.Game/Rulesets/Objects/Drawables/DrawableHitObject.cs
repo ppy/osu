@@ -71,7 +71,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private readonly List<Judgement> judgements = new List<Judgement>();
         public IReadOnlyList<Judgement> Judgements => judgements;
 
-
         protected List<SampleChannel> Samples = new List<SampleChannel>();
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
