@@ -181,6 +181,9 @@ namespace osu.Game.Screens.Select
         /// <param name="skipDifficulties">Whether to skip individual difficulties and only increment over full groups.</param>
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
+            if (!Items.Any())
+                return;
+
             int originalIndex = Items.IndexOf(selectedBeatmap?.Drawables.First());
             int currentIndex = originalIndex;
 

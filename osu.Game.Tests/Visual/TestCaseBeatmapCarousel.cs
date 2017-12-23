@@ -69,6 +69,7 @@ namespace osu.Game.Tests.Visual
             testSorting();
 
             testRemoveAll();
+            testEmptyTraversal();
         }
 
         private void ensureRandomFetchSuccess() =>
@@ -102,6 +103,8 @@ namespace osu.Game.Tests.Visual
         private void checkVisibleItemCount(bool diff, int count) =>
             AddAssert($"{count} {(diff ? "diffs" : "sets")} visible", () =>
                 carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
+
+        private void checkNoSelection() => AddAssert("Selection is null", () => currentSelection == null);
 
         private void nextRandom() =>
             AddStep("select random next", () =>
@@ -274,9 +277,23 @@ namespace osu.Game.Tests.Visual
                 return false;
             }, "Remove all");
 
-            AddAssert("Selection is null", () => currentSelection == null);
+            checkNoSelection();
         }
 
+        private void testEmptyTraversal()
+        {
+            advanceSelection(direction: 1, diff: false);
+            checkNoSelection();
+
+            advanceSelection(direction: 1, diff: true);
+            checkNoSelection();
+
+            advanceSelection(direction: -1, diff: false);
+            checkNoSelection();
+
+            advanceSelection(direction: -1, diff: true);
+            checkNoSelection();
+        }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
         {
