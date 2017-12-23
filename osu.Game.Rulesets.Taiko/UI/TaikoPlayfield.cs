@@ -291,9 +291,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                 throw new InvalidOperationException("Current sample set not found.");
 
             if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
-                samples.Item1.Play();
+                samples.Centre.Play();
             else
-                samples.Item2.Play();
+                samples.Rim.Play();
 
             return true;
         }
