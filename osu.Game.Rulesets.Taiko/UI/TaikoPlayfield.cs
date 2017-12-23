@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         private readonly ControlPointInfo controlPointInfo;
-        private Dictionary<SampleControlPoint, Tuple<SampleChannel, SampleChannel>> drumSampleMappings;
+        private Dictionary<SampleControlPoint, DrumSamples> drumSampleMappings;
 
         public TaikoPlayfield(ControlPointInfo controlPointInfo)
             : base(Axes.X)
@@ -207,12 +207,15 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            drumSampleMappings = new Dictionary<SampleControlPoint, Tuple<SampleChannel, SampleChannel>>();
+            drumSampleMappings = new Dictionary<SampleControlPoint, DrumSamples>();
             foreach (var s in controlPointInfo.SamplePoints)
             {
-                var normalSample = s.GetSampleInfo().GetChannel(audio.Sample);
-                var clapSample = s.GetSampleInfo(SampleInfo.HIT_CLAP).GetChannel(audio.Sample);
-                drumSampleMappings.Add(s, new Tuple<SampleChannel, SampleChannel>(normalSample, clapSample));
+                drumSampleMappings.Add(s,
+                    new DrumSamples
+                    {
+                        Centre = s.GetSampleInfo().GetChannel(audio.Sample),
+                        Rim = s.GetSampleInfo(SampleInfo.HIT_CLAP).GetChannel(audio.Sample)
+                    });
             }
 
             overlayBackgroundContainer.BorderColour = colours.Gray0;
@@ -296,5 +299,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         public bool OnReleased(TaikoAction action) => false;
+
+        private class DrumSamples
+        {
+            public SampleChannel Centre;
+            public SampleChannel Rim;
+        }
     }
 }
