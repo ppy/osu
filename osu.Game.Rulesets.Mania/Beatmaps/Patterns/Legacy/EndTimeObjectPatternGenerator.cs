@@ -76,10 +76,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     Duration = endTime - HitObject.StartTime
                 };
 
-                hold.Head.Samples.Add(new SampleInfo
-                {
-                    Name = SampleInfo.HIT_NORMAL
-                });
+                if (hold.Head.Samples == null)
+                    hold.Head.Samples = new SampleInfoList();
+
+                hold.Head.Samples.Add(new SampleInfo { Name = SampleInfo.HIT_NORMAL });
 
                 hold.Tail.Samples = HitObject.Samples;
 

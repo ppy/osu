@@ -84,26 +84,27 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            foreach (SampleInfo sample in HitObject.Samples)
+            if (HitObject.Samples != null)
             {
-                if (HitObject.SoundControlPoint == null)
-                    throw new ArgumentNullException(nameof(HitObject.SoundControlPoint), $"{nameof(HitObject)} must always have an attached {nameof(HitObject.SoundControlPoint)}.");
+                if (HitObject.SampleControlPoint == null)
+                    throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)} must always have an attached {nameof(HitObject.SampleControlPoint)}.");
 
-                var bank = sample.Bank;
-                if (string.IsNullOrEmpty(bank))
-                    bank = HitObject.SoundControlPoint.SampleBank;
+                foreach (SampleInfo s in HitObject.Samples)
+                {
+                    SampleInfo localSampleInfo = new SampleInfo
+                    {
+                        Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
+                        Name = s.Name,
+                        Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
+                    };
 
-                int volume = sample.Volume;
-                if (volume == 0)
-                    volume = HitObject.SoundControlPoint.SampleVolume;
+                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample);
 
-                SampleChannel channel = audio.Sample.Get($@"Gameplay/{bank}-{sample.Name}");
+                    if (channel == null)
+                        continue;
 
-                if (channel == null)
-                    continue;
-
-                channel.Volume.Value = volume;
-                Samples.Add(channel);
+                    Samples.Add(channel);
+                }
             }
         }
 
