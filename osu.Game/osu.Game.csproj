@@ -785,6 +785,9 @@
     <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Screens\Select\Leaderboards\Leaderboard.cs" />
     <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
+    <Compile Include="Screens\Select\Leaderboards\MessagePlaceholder.cs" />
+    <Compile Include="Screens\Select\Leaderboards\Placeholder.cs" />
+    <Compile Include="Screens\Select\Leaderboards\RetrievalFailurePlaceholder.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
