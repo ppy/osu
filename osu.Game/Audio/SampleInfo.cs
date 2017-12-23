@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Audio
 {
@@ -12,6 +13,13 @@ namespace osu.Game.Audio
         public const string HIT_FINISH = @"hitfinish";
         public const string HIT_NORMAL = @"hitnormal";
         public const string HIT_CLAP = @"hitclap";
+
+        public SampleChannel GetChannel(SampleManager manager)
+        {
+            var channel = manager.Get($"Gameplay/{Bank}-{Name}");
+            channel.Volume.Value = Volume / 100.0;
+            return channel;
+        }
 
         /// <summary>
         /// The bank to load the sample from.

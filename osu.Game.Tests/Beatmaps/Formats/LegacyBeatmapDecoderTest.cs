@@ -146,8 +146,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(116999, difficultyPoint.Time);
                 Assert.AreEqual(0.75000000000000189d, difficultyPoint.SpeedMultiplier);
 
-                Assert.AreEqual(34, controlPoints.SoundPoints.Count);
-                var soundPoint = controlPoints.SoundPoints[0];
+                Assert.AreEqual(34, controlPoints.SamplePoints.Count);
+                var soundPoint = controlPoints.SamplePoints[0];
                 Assert.AreEqual(956, soundPoint.Time);
                 Assert.AreEqual("soft", soundPoint.SampleBank);
                 Assert.AreEqual(60, soundPoint.SampleVolume);

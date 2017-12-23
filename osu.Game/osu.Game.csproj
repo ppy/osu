@@ -258,7 +258,7 @@
     <Compile Include="Beatmaps\ControlPoints\ControlPointInfo.cs" />
     <Compile Include="Beatmaps\ControlPoints\DifficultyControlPoint.cs" />
     <Compile Include="Beatmaps\ControlPoints\EffectControlPoint.cs" />
-    <Compile Include="Beatmaps\ControlPoints\SoundControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\SampleControlPoint.cs" />
     <Compile Include="Beatmaps\ControlPoints\TimingControlPoint.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
@@ -785,6 +785,9 @@
     <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Screens\Select\Leaderboards\Leaderboard.cs" />
     <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
+    <Compile Include="Screens\Select\Leaderboards\MessagePlaceholder.cs" />
+    <Compile Include="Screens\Select\Leaderboards\Placeholder.cs" />
+    <Compile Include="Screens\Select\Leaderboards\RetrievalFailurePlaceholder.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
