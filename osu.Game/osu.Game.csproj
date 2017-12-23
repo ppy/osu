@@ -258,7 +258,7 @@
     <Compile Include="Beatmaps\ControlPoints\ControlPointInfo.cs" />
     <Compile Include="Beatmaps\ControlPoints\DifficultyControlPoint.cs" />
     <Compile Include="Beatmaps\ControlPoints\EffectControlPoint.cs" />
-    <Compile Include="Beatmaps\ControlPoints\SoundControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\SampleControlPoint.cs" />
     <Compile Include="Beatmaps\ControlPoints\TimingControlPoint.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
