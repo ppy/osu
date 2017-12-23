@@ -68,11 +68,15 @@ namespace osu.Game.Tests.Visual
                 var name = rulesetInfo.ShortName;
                 selectBeatmap(name);
 
-                // TODO: check InfoLabels of other rulesets
+                // TODO: adjust cases once more info is shown for other gamemodes
                 switch (ruleset)
                 {
                     case OsuRuleset osu:
                         testOsuBeatmap(osu);
+                        testInfoLabels(5);
+                        break;
+                    default:
+                        testInfoLabels(2);
                         break;
                 }
             }
@@ -86,7 +90,12 @@ namespace osu.Game.Tests.Visual
             AddAssert("check title", () => infoWedge.Info.TitleLabel.Text == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
             AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Text == $"{ruleset.ShortName}Artist");
             AddAssert("check author", () => infoWedge.Info.MapperContainer.Children.OfType<OsuSpriteText>().Any(s => s.Text == $"{ruleset.ShortName}Author"));
-            // TODO: check InfoLabels
+        }
+
+        private void testInfoLabels(int expectedCount)
+        {
+            AddAssert("check infolabels exists", () => infoWedge.Info.InfoLabelContainer.Children.Any());
+            AddAssert("check infolabels count", () => infoWedge.Info.InfoLabelContainer.Children.Count == expectedCount);
         }
 
         private void testNullBeatmap()
@@ -96,7 +105,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("check default title", () => infoWedge.Info.TitleLabel.Text == beatmap.Default.BeatmapInfo.Metadata.Title);
             AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == beatmap.Default.BeatmapInfo.Metadata.Artist);
             AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
-            AddAssert("check empty infos", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
+            AddAssert("check no infolabels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
         private void selectBeatmap(string name)
@@ -119,6 +128,10 @@ namespace osu.Game.Tests.Visual
 
         private Beatmap createTestBeatmap(RulesetInfo ruleset)
         {
+            List<HitObject> objects = new List<HitObject>();
+            for (double i = 0; i < 50000; i += 1000)
+                objects.Add(new HitObject { StartTime = i });
+
             return new Beatmap
             {
                 BeatmapInfo = new BeatmapInfo
@@ -134,7 +147,7 @@ namespace osu.Game.Tests.Visual
                     StarDifficulty = 6,
                     Version = $"{ruleset.ShortName}Version"
                 },
-                HitObjects = new List<HitObject>() // TODO: Fill it with something depending on ruleset?
+                HitObjects = objects
             };
         }
 
