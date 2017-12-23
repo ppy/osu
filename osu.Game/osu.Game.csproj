@@ -258,11 +258,12 @@
     <Compile Include="Beatmaps\ControlPoints\ControlPointInfo.cs" />
     <Compile Include="Beatmaps\ControlPoints\DifficultyControlPoint.cs" />
     <Compile Include="Beatmaps\ControlPoints\EffectControlPoint.cs" />
-    <Compile Include="Beatmaps\ControlPoints\SoundControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\SampleControlPoint.cs" />
     <Compile Include="Beatmaps\ControlPoints\TimingControlPoint.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
+    <Compile Include="Beatmaps\Formats\JsonBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
@@ -271,6 +272,7 @@
     <Compile Include="Graphics\UserInterface\HoverClickSounds.cs" />
     <Compile Include="Graphics\UserInterface\HoverSounds.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
+    <Compile Include="IO\Serialization\KeyContractResolver.cs" />
     <Compile Include="Migrations\20171019041408_InitialCreate.cs" />
     <Compile Include="Migrations\20171019041408_InitialCreate.Designer.cs">
       <DependentUpon>20171019041408_InitialCreate.cs</DependentUpon>
@@ -418,6 +420,8 @@
     <Compile Include="IO\Legacy\ILegacySerializable.cs" />
     <Compile Include="IO\Legacy\SerializationReader.cs" />
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
+    <Compile Include="IO\Serialization\Converters\TypedListConverter.cs" />
+    <Compile Include="IO\Serialization\Converters\Vector2Converter.cs" />
     <Compile Include="IO\Serialization\IJsonSerializable.cs" />
     <Compile Include="IPC\BeatmapIPCChannel.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />

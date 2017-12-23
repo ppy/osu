@@ -30,6 +30,9 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DeepEqual, Version=1.6.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(SolutionDir)\packages\DeepEqual.1.6.0.0\lib\net40\DeepEqual.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -83,6 +86,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beatmaps\Formats\OsuJsonDecoderTest.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoderTest.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReaderTest.cs" />
     <Compile Include="Beatmaps\IO\ImportBeatmapTest.cs" />
@@ -153,6 +157,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Soleily - Renatus %28Gamu%29 [Insane].osu" />
     <EmbeddedResource Include="Resources\Himeringo - Yotsuya-san ni Yoroshiku %28RLC%29 [Winber1%27s Extreme].osu" />
+    <EmbeddedResource Include="Resources\Within Temptation - The Unforgiving %28Armin%29 [Marathon].osu" />
+    <EmbeddedResource Include="Resources\Kozato snow - Rengetsu Ouka %28_Kiva%29 [Yuki YukI].osu" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
