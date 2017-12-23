@@ -81,12 +81,12 @@ namespace osu.Game.Overlays.Profile
         {
             rankText.Text = user.Statistics.Rank > 0 ? $"#{user.Statistics.Rank:#,0}" : "no rank";
             performanceText.Text = user.Statistics.PP != null ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
-            relativeText.Text = $"{user.Country?.FullName} #{user.CountryRank:#,0}";
+            relativeText.Text = user.CountryRank > 0 ? $"{user.Country?.FullName} #{user.CountryRank:#,0}" : $"{user.Country?.FullName}";
         }
 
         private void showHistoryRankTexts(int dayIndex)
         {
-            rankText.Text = $"#{ranks[dayIndex]:#,0}";
+            rankText.Text = ranks[dayIndex] > 0 ? $"#{ranks[dayIndex]:#,0}" : "no rank";
             dayIndex++;
             relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
             //plural should be handled in a general way
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Profile
             {
                 graph.Colour = colours.Yellow;
                 // use logarithmic coordinates
-                graph.Values = ranks.Select(x => -(float)Math.Log(x));
+                graph.Values = ranks.Select(x => x == 0 ? float.MinValue : -(float)Math.Log(x));
                 graph.SetStaticBallPosition();
             }
 

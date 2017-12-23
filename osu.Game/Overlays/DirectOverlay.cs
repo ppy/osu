@@ -43,6 +43,7 @@ namespace osu.Game.Overlays
         protected override SearchableListFilterControl<DirectSortCriteria, RankStatus> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<BeatmapSetInfo> beatmapSets;
+
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
             get { return beatmapSets; }
@@ -69,6 +70,7 @@ namespace osu.Game.Overlays
         }
 
         private ResultCounts resultAmounts;
+
         public ResultCounts ResultAmounts
         {
             get { return resultAmounts; }
@@ -115,7 +117,23 @@ namespace osu.Game.Overlays
                 },
             };
 
-            Filter.Search.Current.ValueChanged += text => { if (text != string.Empty) Header.Tabs.Current.Value = DirectTab.Search; };
+            Filter.Search.Current.ValueChanged += text =>
+            {
+                if (text != string.Empty)
+                {
+                    Header.Tabs.Current.Value = DirectTab.Search;
+
+                    if (Filter.Tabs.Current.Value == DirectSortCriteria.Ranked)
+                        Filter.Tabs.Current.Value = DirectSortCriteria.Relevance;
+                }
+                else
+                {
+                    Header.Tabs.Current.Value = DirectTab.NewestMaps;
+
+                    if (Filter.Tabs.Current.Value == DirectSortCriteria.Relevance)
+                        Filter.Tabs.Current.Value = DirectSortCriteria.Ranked;
+                }
+            };
             ((FilterControl)Filter).Ruleset.ValueChanged += ruleset => Scheduler.AddOnce(updateSearch);
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
             Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => Scheduler.AddOnce(updateSearch);
@@ -271,9 +289,9 @@ namespace osu.Game.Overlays
             if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty)) return;
 
             getSetsRequest = new SearchBeatmapSetsRequest(currentQuery.Value ?? string.Empty,
-                                                       ((FilterControl)Filter).Ruleset.Value,
-                                                       Filter.DisplayStyleControl.Dropdown.Current.Value,
-                                                       Filter.Tabs.Current.Value); //todo: sort direction (?)
+                ((FilterControl)Filter).Ruleset.Value,
+                Filter.DisplayStyleControl.Dropdown.Current.Value,
+                Filter.Tabs.Current.Value); //todo: sort direction (?)
 
             getSetsRequest.Success += response =>
             {

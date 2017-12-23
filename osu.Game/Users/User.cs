@@ -75,7 +75,7 @@ namespace osu.Game.Users
         public bool Active;
 
         [JsonProperty(@"interests")]
-        public string Intrerests;
+        public string Interests;
 
         [JsonProperty(@"occupation")]
         public string Occupation;
