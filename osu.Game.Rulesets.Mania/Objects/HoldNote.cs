@@ -50,7 +50,10 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The head note of the hold.
         /// </summary>
-        public readonly Note Head = new Note();
+        public readonly Note Head = new Note
+        {
+            Samples = new Audio.SampleInfoList()
+        };
 
         /// <summary>
         /// The tail note of the hold.

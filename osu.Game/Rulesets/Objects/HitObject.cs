@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Objects
         /// and can be treated as the default samples for the hit object.
         /// </para>
         /// </summary>
-        public SampleInfoList Samples = new SampleInfoList();
+        public SampleInfoList Samples;
 
         [JsonIgnore]
         public SampleControlPoint SampleControlPoint;
