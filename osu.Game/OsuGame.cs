@@ -75,6 +75,8 @@ namespace osu.Game
 
         private SettingsOverlay settings;
 
+        private float backgroundOffset;
+
         public OsuGame(string[] args = null)
         {
             this.args = args;
@@ -276,12 +278,27 @@ namespace osu.Game
                 switch (settings.State)
                 {
                     case Visibility.Hidden:
-                        intro.MoveToX(0, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
+                        backgroundOffset -= ToolbarButton.WIDTH / 2;
                         break;
                     case Visibility.Visible:
-                        intro.MoveToX(SettingsOverlay.SIDEBAR_WIDTH / 2, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
+                        backgroundOffset += ToolbarButton.WIDTH / 2;
                         break;
                 }
+                intro.MoveToX(backgroundOffset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
+            };
+
+            notificationOverlay.StateChanged += delegate
+            {
+                switch (notificationOverlay.State)
+                {
+                    case Visibility.Hidden:
+                        backgroundOffset += ToolbarButton.WIDTH / 2;
+                        break;
+                    case Visibility.Visible:
+                        backgroundOffset -= ToolbarButton.WIDTH / 2;
+                        break;
+                }
+                intro.MoveToX(backgroundOffset, NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint);
             };
 
             Cursor.State = Visibility.Hidden;
