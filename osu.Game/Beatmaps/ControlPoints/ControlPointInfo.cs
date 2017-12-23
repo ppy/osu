@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the sound control point at.</param>
         /// <returns>The sound control point.</returns>
-        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time);
+        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, SamplePoints.FirstOrDefault());
 
         /// <summary>
         /// Finds the timing control point that is active at <paramref name="time"/>.

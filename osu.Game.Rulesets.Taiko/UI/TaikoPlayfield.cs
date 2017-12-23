@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         private readonly ControlPointInfo controlPointInfo;
-        private Dictionary<double, Tuple<SampleChannel, SampleChannel>> allSamples;
+        private Dictionary<SampleControlPoint, Tuple<SampleChannel, SampleChannel>> drumSampleMappings;
 
         public TaikoPlayfield(ControlPointInfo controlPointInfo)
             : base(Axes.X)
@@ -207,12 +207,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            allSamples = new Dictionary<double, Tuple<SampleChannel, SampleChannel>>();
+            drumSampleMappings = new Dictionary<SampleControlPoint, Tuple<SampleChannel, SampleChannel>>();
             foreach (var s in controlPointInfo.SamplePoints)
             {
-                var normalSample = SampleInfo.FromSoundPoint(s).GetChannel(audio.Sample);
-                var clapSample = SampleInfo.FromSoundPoint(s, SampleInfo.HIT_CLAP).GetChannel(audio.Sample);
-                allSamples.Add(s.Time, new Tuple<SampleChannel, SampleChannel>(normalSample, clapSample));
+                var normalSample = s.GetSampleInfo().GetChannel(audio.Sample);
+                var clapSample = s.GetSampleInfo(SampleInfo.HIT_CLAP).GetChannel(audio.Sample);
+                drumSampleMappings.Add(s, new Tuple<SampleChannel, SampleChannel>(normalSample, clapSample));
             }
 
             overlayBackgroundContainer.BorderColour = colours.Gray0;
@@ -268,7 +268,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                     {
                         topLevelHitContainer.Add(judgedObject.CreateProxy());
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                 }
 
                 hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
@@ -280,10 +282,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public bool OnPressed(TaikoAction action)
         {
-            var currentTime = Clock.CurrentTime;
-            var soundPoint = currentTime < controlPointInfo.SamplePoints[0].Time ? controlPointInfo.SamplePoints[0] : controlPointInfo.SamplePointAt(currentTime);
+            var samplePoint = controlPointInfo.SamplePointAt(Clock.CurrentTime);
 
-            if (!allSamples.TryGetValue(soundPoint.Time, out Tuple<SampleChannel, SampleChannel> samples))
+            if (!drumSampleMappings.TryGetValue(samplePoint, out var samples))
                 throw new InvalidOperationException("Current sample set not found.");
 
             if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)

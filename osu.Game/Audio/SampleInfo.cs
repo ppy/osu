@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
-using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Audio
 {
@@ -16,16 +15,6 @@ namespace osu.Game.Audio
         public const string HIT_FINISH = @"hitfinish";
         public const string HIT_NORMAL = @"hitnormal";
         public const string HIT_CLAP = @"hitclap";
-
-        public static SampleInfo FromSoundPoint(SampleControlPoint samplePoint, string sampleName = HIT_NORMAL)
-        {
-            return new SampleInfo
-            {
-                Bank = samplePoint.SampleBank,
-                Name = sampleName,
-                Volume = samplePoint.SampleVolume,
-            };
-        }
 
         public SampleChannel GetChannel(SampleManager manager)
         {
