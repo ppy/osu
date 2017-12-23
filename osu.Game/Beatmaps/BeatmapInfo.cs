@@ -12,9 +12,11 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Beatmaps
 {
+    [Serializable]
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonIgnore]
         public int ID { get; set; }
 
         //TODO: should be in database
@@ -38,13 +40,16 @@ namespace osu.Game.Beatmaps
             set { onlineBeatmapSetID = value > 0 ? value : null; }
         }
 
+        [JsonIgnore]
         public int BeatmapSetInfoID { get; set; }
 
         [Required]
+        [JsonIgnore]
         public BeatmapSetInfo BeatmapSet { get; set; }
 
         public BeatmapMetadata Metadata { get; set; }
 
+        [JsonIgnore]
         public int BaseDifficultyID { get; set; }
 
         public BeatmapDifficulty BaseDifficulty { get; set; }
@@ -60,6 +65,7 @@ namespace osu.Game.Beatmaps
         [JsonProperty("file_sha2")]
         public string Hash { get; set; }
 
+        [JsonIgnore]
         public bool Hidden { get; set; }
 
         /// <summary>

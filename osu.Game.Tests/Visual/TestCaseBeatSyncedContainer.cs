@@ -7,13 +7,13 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Lists;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using OpenTK.Graphics;
+using osu.Framework.Lists;
 
 namespace osu.Game.Tests.Visual
 {

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
@@ -28,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
                     AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
                     AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
 
-                    foreach (var unused in stream.Ticks)
+                    foreach (var unused in stream.NestedHitObjects.OfType<CatchHitObject>())
                         AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
 
                     continue;
