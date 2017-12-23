@@ -3,7 +3,7 @@
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class SoundControlPoint : ControlPoint
+    public class SampleControlPoint : ControlPoint
     {
         public const string DEFAULT_BANK = "normal";
 

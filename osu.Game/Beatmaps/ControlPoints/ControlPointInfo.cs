@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// All sound points.
         /// </summary>
         [JsonProperty]
-        public SortedList<SoundControlPoint> SoundPoints { get; private set; } = new SortedList<SoundControlPoint>(Comparer<SoundControlPoint>.Default);
+        public SortedList<SampleControlPoint> SamplePoints { get; private set; } = new SortedList<SampleControlPoint>(Comparer<SampleControlPoint>.Default);
 
         /// <summary>
         /// All effect points.
@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the sound control point at.</param>
         /// <returns>The sound control point.</returns>
-        public SoundControlPoint SoundPointAt(double time) => binarySearch(SoundPoints, time);
+        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time);
 
         /// <summary>
         /// Finds the timing control point that is active at <paramref name="time"/>.

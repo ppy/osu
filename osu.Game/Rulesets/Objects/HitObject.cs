@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Objects
         public SampleInfoList Samples = new SampleInfoList();
 
         [JsonIgnore]
-        public SoundControlPoint SoundControlPoint;
+        public SampleControlPoint SampleControlPoint;
 
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
@@ -64,11 +64,11 @@ namespace osu.Game.Rulesets.Objects
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            SoundControlPoint soundPoint = controlPointInfo.SoundPointAt(StartTime);
+            SampleControlPoint samplePoint = controlPointInfo.SamplePointAt(StartTime);
             EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
 
             Kiai = effectPoint.KiaiMode;
-            SoundControlPoint = soundPoint;
+            SampleControlPoint = samplePoint;
         }
 
         protected virtual void CreateNestedHitObjects()

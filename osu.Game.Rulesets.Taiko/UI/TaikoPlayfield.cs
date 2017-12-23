@@ -208,11 +208,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         private void load(OsuColour colours, AudioManager audio)
         {
             allSamples = new Dictionary<double, Tuple<SampleChannel, SampleChannel>>();
-            foreach (var soundPoint in controlPointInfo.SoundPoints)
+            foreach (var s in controlPointInfo.SamplePoints)
             {
-                var normalSample = SampleInfo.FromSoundPoint(soundPoint).GetChannel(audio.Sample);
-                var clapSample = SampleInfo.FromSoundPoint(soundPoint, SampleInfo.HIT_CLAP).GetChannel(audio.Sample);
-                allSamples.Add(soundPoint.Time, new Tuple<SampleChannel, SampleChannel>(normalSample, clapSample));
+                var normalSample = SampleInfo.FromSoundPoint(s).GetChannel(audio.Sample);
+                var clapSample = SampleInfo.FromSoundPoint(s, SampleInfo.HIT_CLAP).GetChannel(audio.Sample);
+                allSamples.Add(s.Time, new Tuple<SampleChannel, SampleChannel>(normalSample, clapSample));
             }
 
             overlayBackgroundContainer.BorderColour = colours.Gray0;
@@ -281,7 +281,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         public bool OnPressed(TaikoAction action)
         {
             var currentTime = Clock.CurrentTime;
-            var soundPoint = currentTime < controlPointInfo.SoundPoints[0].Time ? controlPointInfo.SoundPoints[0] : controlPointInfo.SoundPointAt(currentTime);
+            var soundPoint = currentTime < controlPointInfo.SamplePoints[0].Time ? controlPointInfo.SamplePoints[0] : controlPointInfo.SamplePointAt(currentTime);
 
             if (!allSamples.TryGetValue(soundPoint.Time, out Tuple<SampleChannel, SampleChannel> samples))
                 throw new InvalidOperationException("Current sample set not found.");
