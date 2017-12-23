@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
                     Samples = s.Samples,
-                    SoundControlPoint = s.SoundControlPoint
+                    SampleControlPoint = s.SampleControlPoint
                 })
             };
 
