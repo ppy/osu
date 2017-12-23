@@ -14,6 +14,8 @@ using osu.Game.Audio;
 using System.Linq;
 using osu.Game.Graphics;
 using osu.Framework.Configuration;
+using OpenTK;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -38,6 +40,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             HitObject = hitObject;
         }
+
+        /// <summary>
+        /// The screen-space point that causes this <see cref="DrawableHitObject"/> to be selected in the Editor.
+        /// </summary>
+        public virtual Vector2 SelectionPoint => ScreenSpaceDrawQuad.Centre;
+
+        /// <summary>
+        /// The screen-space quad that outlines this <see cref="DrawableHitObject"/> for selections in the Editor.
+        /// </summary>
+        public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject
@@ -75,12 +87,23 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             foreach (SampleInfo sample in HitObject.Samples)
             {
-                SampleChannel channel = audio.Sample.Get($@"Gameplay/{sample.Bank}-{sample.Name}");
+                if (HitObject.SoundControlPoint == null)
+                    throw new ArgumentNullException(nameof(HitObject.SoundControlPoint), $"{nameof(HitObject)} must always have an attached {nameof(HitObject.SoundControlPoint)}.");
+
+                var bank = sample.Bank;
+                if (string.IsNullOrEmpty(bank))
+                    bank = HitObject.SoundControlPoint.SampleBank;
+
+                int volume = sample.Volume;
+                if (volume == 0)
+                    volume = HitObject.SoundControlPoint.SampleVolume;
+
+                SampleChannel channel = audio.Sample.Get($@"Gameplay/{bank}-{sample.Name}");
 
                 if (channel == null)
                     continue;
 
-                channel.Volume.Value = sample.Volume;
+                channel.Volume.Value = volume;
                 Samples.Add(channel);
             }
         }

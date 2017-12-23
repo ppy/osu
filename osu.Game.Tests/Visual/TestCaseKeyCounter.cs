@@ -8,7 +8,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseKeyCounter : OsuTestCase
+    public class TestCaseKeyCounter : OsuTestCase
     {
         public TestCaseKeyCounter()
         {

@@ -134,6 +134,7 @@ namespace osu.Game.Beatmaps
             var notification = new ProgressNotification
             {
                 Text = "Beatmap import is initialising...",
+                CompletionText = "Import successful!",
                 Progress = 0,
                 State = ProgressNotificationState.Active,
             };
@@ -245,8 +246,9 @@ namespace osu.Game.Beatmaps
                 return;
             }
 
-            ProgressNotification downloadNotification = new ProgressNotification
+            var downloadNotification = new ProgressNotification
             {
+                CompletionText = $"Imported {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
                 Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
             };
 
@@ -339,6 +341,61 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        public void UndeleteAll()
+        {
+            var deleteMaps = QueryBeatmapSets(bs => bs.DeletePending).ToList();
+
+            if (!deleteMaps.Any()) return;
+
+            var notification = new ProgressNotification
+            {
+                CompletionText = "Restored all deleted beatmaps!",
+                Progress = 0,
+                State = ProgressNotificationState.Active,
+            };
+
+            PostNotification?.Invoke(notification);
+
+            int i = 0;
+
+            foreach (var bs in deleteMaps)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
+                notification.Text = $"Restoring ({i} of {deleteMaps.Count})";
+                notification.Progress = (float)++i / deleteMaps.Count;
+                Undelete(bs);
+            }
+
+            notification.State = ProgressNotificationState.Completed;
+        }
+
+        public void Undelete(BeatmapSetInfo beatmapSet)
+        {
+            if (beatmapSet.Protected)
+                return;
+
+            lock (importContext)
+            {
+                var context = importContext.Value;
+
+                using (var transaction = context.BeginTransaction())
+                {
+                    context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                    var iFiles = new FileStore(() => context, storage);
+                    var iBeatmaps = createBeatmapStore(() => context);
+
+                    undelete(iBeatmaps, iFiles, beatmapSet);
+
+                    context.ChangeTracker.AutoDetectChangesEnabled = true;
+                    context.SaveChanges(transaction);
+                }
+            }
+        }
+
         /// <summary>
         /// Delete a beatmap difficulty.
         /// </summary>
@@ -374,11 +431,8 @@ namespace osu.Game.Beatmaps
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
-            if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
+            if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
-
-            if (beatmapInfo.BeatmapSet == null)
-                throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
 
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
@@ -535,8 +589,9 @@ namespace osu.Game.Beatmaps
 
                     if (existing == null)
                     {
-                        // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
-                        beatmap.BeatmapInfo.Metadata = null;
+                        // Exclude beatmap-metadata if it's equal to beatmapset-metadata
+                        if (metadata.Equals(beatmap.Metadata))
+                            beatmap.BeatmapInfo.Metadata = null;
 
                         RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
 
@@ -667,6 +722,7 @@ namespace osu.Game.Beatmaps
             var notification = new ProgressNotification
             {
                 Progress = 0,
+                CompletionText = "Deleted all beatmaps!",
                 State = ProgressNotificationState.Active,
             };
 

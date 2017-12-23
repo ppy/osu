@@ -28,6 +28,8 @@ namespace osu.Game.Overlays
 
         private readonly Container contentContainer;
 
+        protected override bool BlockPassThroughKeyboard => true;
+
         protected override Container<Drawable> Content => contentContainer;
 
         protected Color4 FirstWaveColour

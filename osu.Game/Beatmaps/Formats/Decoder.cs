@@ -10,11 +10,12 @@ namespace osu.Game.Beatmaps.Formats
 {
     public abstract class Decoder
     {
-        private static readonly Dictionary<string, Type> decoders = new Dictionary<string, Type>();
+        private static readonly Dictionary<string, Func<string, Decoder>> decoders = new Dictionary<string, Func<string, Decoder>>();
 
         static Decoder()
         {
             LegacyDecoder.Register();
+            JsonBeatmapDecoder.Register();
         }
 
         /// <summary>
@@ -33,17 +34,18 @@ namespace osu.Game.Beatmaps.Formats
 
             if (line == null || !decoders.ContainsKey(line))
                 throw new IOException(@"Unknown file format");
-            return (Decoder)Activator.CreateInstance(decoders[line], line);
+
+            return decoders[line](line);
         }
 
         /// <summary>
-        /// Adds the <see cref="Decoder"/> to the list of <see cref="Beatmap"/> and <see cref="Storyboard"/> decoder.
+        /// Registers an instantiation function for a <see cref="Decoder"/>.
         /// </summary>
-        /// <typeparam name="T">Type to decode a <see cref="Beatmap"/> with.</typeparam>
-        /// <param name="version">A string representation of the version.</param>
-        protected static void AddDecoder<T>(string version) where T : Decoder
+        /// <param name="magic">A string in the file which triggers this decoder to be used.</param>
+        /// <param name="constructor">A function which constructs the <see cref="Decoder"/> given <paramref name="magic"/>.</param>
+        protected static void AddDecoder(string magic, Func<string, Decoder> constructor)
         {
-            decoders[version] = typeof(T);
+            decoders[magic] = constructor;
         }
 
         /// <summary>

@@ -244,7 +244,7 @@ namespace osu.Game.Tests.Visual
                 if (!api.IsLoggedIn)
                     return;
 
-                lastRequest = new GetScoresRequest(newBeatmap.BeatmapInfo);
+                lastRequest = new GetScoresRequest(newBeatmap.BeatmapInfo, newBeatmap.BeatmapInfo.Ruleset);
                 lastRequest.Success += res => res.Scores.ForEach(s => scores.Add(new PerformanceDisplay(s, newBeatmap.Beatmap)));
                 api.Queue(lastRequest);
             }
