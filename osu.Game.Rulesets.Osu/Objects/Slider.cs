@@ -170,6 +170,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         StackHeight = StackHeight,
                         Scale = Scale,
                         ComboColour = ComboColour,
+                        Samples = new SampleInfoList(RepeatSamples.ElementAt(repeat))
                     });
                 }
             }
