@@ -189,13 +189,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            if (HiddenMod)
+            if (Hidden)
             {
-                glow.FadeOut();
-                ticks.FadeOut();
-                circle.FadeOut();
-                background.FadeOut();
                 disc.FadeOut();
+                ticks.FadeOut();
+                background.FadeOut();
             }
 
             circleContainer.ScaleTo(spinner.Scale * 0.3f);

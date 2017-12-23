@@ -156,13 +156,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             ball.FadeIn();
 
-            if (HiddenMod)
-                body.FadeOut(slider.Duration + ExpireAfter, Easing.Out);
+            var duration = slider.Duration + ExpireAfter;
 
-            using (BeginDelayedSequence(slider.Duration + ExpireAfter, true))
+            if (Hidden)
+                body.FadeOut(duration, Easing.Out);
+
+            using (BeginDelayedSequence(duration, true))
             {
-                if (!HiddenMod)
+                if (!Hidden)
                     body.FadeOut(160 * FadeOutSpeedMultiplier);
+
                 ball.FadeOut(160 * FadeOutSpeedMultiplier);
 
                 this.FadeOut(800 * FadeOutSpeedMultiplier).Expire();

@@ -11,19 +11,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
         /// <summary>
-        /// This should be calculated in the future.
+        /// The number of milliseconds before <see cref="Rulesets.Objects.HitObject.StartTime"/> we should start fading in.
+        /// <para>This should be calculated in the future.</para>
         /// </summary>
         public const float TIME_PREEMPT = 600;
-
         public const float TIME_FADEIN = 400;
-        public const float TIME_FADEOUT = 500;
 
-        public bool HiddenMod;
+        public bool Hidden;
         public double FadeInSpeedMultiplier = 1;
         public double FadeOutSpeedMultiplier = 1;
 
         /// <summary>
-        /// The number of milliseconds the expiration should be delayed.
+        /// The number of milliseconds the expiration should be delayed to guarantee correct lifetimes of <see cref="Rulesets.Objects.HitObject"/>s.
         /// </summary>
         protected double ExpireAfter;
 
@@ -48,11 +47,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 UpdatePreemptState();
 
                 double delay = TIME_PREEMPT;
-                if (HiddenMod)
+                if (Hidden)
                 {
                     delay *= FadeInSpeedMultiplier;
-                    // If we shorten the delay we fade out earlier than we actually play the HitObject
-                    // We need to keep some DrawableHitObjects alive for a bit longer so they stay playable.
+                    // If we shorten the delay we fade out earlier than we actually play the HitObject.
+                    // We need to keep some DrawableHitObjects alive for a bit longer so they stay playable
+                    // and don't break their animations.
                     ExpireAfter = TIME_PREEMPT - TIME_PREEMPT * FadeInSpeedMultiplier;
                 }
 
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected virtual void UpdatePreemptState()
         {
             double duration;
-            if (HiddenMod)
+            if (Hidden)
                 duration = HitObject.StartTime - TIME_PREEMPT * FadeInSpeedMultiplier - (HitObject.StartTime - TIME_PREEMPT);
             else
                 duration = TIME_FADEIN * FadeInSpeedMultiplier;

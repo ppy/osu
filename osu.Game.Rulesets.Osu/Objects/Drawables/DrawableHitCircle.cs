@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            if (!HiddenMod)
+            if (!Hidden)
             {
                 ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT) * FadeInSpeedMultiplier);
                 ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT * FadeInSpeedMultiplier);
@@ -96,8 +96,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            if (HiddenMod)
-                // TODO: without +300 it's expiring too soon?
+            if (Hidden)
+                // TODO: figure out a smarter way to include the hit window so we are able to miss but don't keep
+                // it alive unnecessarily long.
                 this.FadeOut(TIME_PREEMPT * FadeOutSpeedMultiplier).Delay(ExpireAfter + 300).Expire();
             else
             {
@@ -106,11 +107,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 switch (state)
                 {
                     case ArmedState.Idle:
-                        this.FadeOut(TIME_FADEOUT * FadeOutSpeedMultiplier).Expire();
+                        this.FadeOut(500 * FadeOutSpeedMultiplier).Expire();
                         break;
                     case ArmedState.Miss:
                         ApproachCircle.FadeOut(50);
-                        this.FadeOut(TIME_FADEOUT / 5 * FadeOutSpeedMultiplier).Expire();
+                        this.FadeOut(100 * FadeOutSpeedMultiplier).Expire();
                         break;
                     case ArmedState.Hit:
                         ApproachCircle.FadeOut(50);
