@@ -2,9 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
 
 namespace osu.Game.Audio
 {
@@ -19,8 +17,7 @@ namespace osu.Game.Audio
         public SampleChannel GetChannel(SampleManager manager)
         {
             var channel = manager.Get($"Gameplay/{Bank}-{Name}");
-
-            channel.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(Volume / 100.0));
+            channel.Volume.Value = Volume / 100.0;
             return channel;
         }
 
