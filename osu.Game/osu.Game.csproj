@@ -285,15 +285,24 @@
     <Compile Include="Migrations\20171119065731_AddBeatmapOnlineIDUniqueConstraint.Designer.cs">
       <DependentUpon>20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20171209034410_AddRulesetInfoShortName.cs" />
+    <Compile Include="Migrations\20171209034410_AddRulesetInfoShortName.Designer.cs">
+      <DependentUpon>20171209034410_AddRulesetInfoShortName.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
-    <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
+    <Compile Include="Online\API\Requests\APIResponseBeatmapSet.cs" />
+    <Compile Include="Online\API\Requests\GetUserMostPlayedBeatmapsRequest.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ClickableUsername.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableScore.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\DrawableTopScore.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ScoresContainer.cs" />
     <Compile Include="Online\API\Requests\GetUserBeatmapsRequest.cs" />
+    <Compile Include="Overlays\Profile\Sections\BeatmapMetadataContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Beatmaps\PaginatedBeatmapContainer.cs" />
+    <Compile Include="Overlays\Profile\Sections\DrawableProfileRow.cs" />
+    <Compile Include="Overlays\Profile\Sections\Historical\DrawableMostPlayedRow.cs" />
+    <Compile Include="Overlays\Profile\Sections\Historical\PaginatedMostPlayedBeatmapContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Kudosu\KudosuInfo.cs" />
     <Compile Include="Overlays\Profile\Sections\PaginatedContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawablePerformanceScore.cs" />
@@ -483,7 +492,7 @@
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
-    <Compile Include="Overlays\Profile\Sections\Ranks\DrawableScore.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\DrawableProfileScore.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />
     <Compile Include="Overlays\Profile\ProfileSection.cs" />
     <Compile Include="Overlays\Profile\RankChart.cs" />
@@ -819,6 +828,9 @@
     <Compile Include="Overlays\BeatmapSet\BasicStats.cs" />
     <Compile Include="Overlays\BeatmapSet\SuccessRate.cs" />
     <Compile Include="Overlays\BeatmapSet\PreviewButton.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
