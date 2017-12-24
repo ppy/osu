@@ -51,11 +51,11 @@ namespace osu.Game.Rulesets.Osu.Objects
                 default:
                     return 300;
                 case HitResult.Meh:
-                    return 199.5f - (Od * 10);
+                    return 199.5f - Od * 10;
                 case HitResult.Good:
-                    return 139.5f - (Od * 8);
+                    return 139.5f - Od * 8;
                 case HitResult.Great:
-                    return 79.5f - (Od * 6);
+                    return 79.5f - Od * 6;
             }
         }
 
