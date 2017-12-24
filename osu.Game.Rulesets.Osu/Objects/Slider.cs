@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         Position = Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
                         Scale = Scale,
-                        Od = Od,
+                        OverallDifficulty = OverallDifficulty,
                         ComboColour = ComboColour,
                         Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
                         {
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         Position = Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
                         Scale = Scale,
-                        Od = Od,
+                        OverallDifficulty = OverallDifficulty,
                         ComboColour = ComboColour,
                         Samples = new SampleInfoList(RepeatSamples[repeat])
                     });

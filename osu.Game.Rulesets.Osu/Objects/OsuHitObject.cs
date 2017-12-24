@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double Radius => OBJECT_RADIUS * Scale;
 
-        public float Od { get; set; } = 6;
+        public float OverallDifficulty { get; set; } = 6;
 
         public float Scale { get; set; } = 1;
 
@@ -51,11 +51,11 @@ namespace osu.Game.Rulesets.Osu.Objects
                 default:
                     return 300;
                 case HitResult.Meh:
-                    return 199.5f - Od * 10;
+                    return 199.5f - OverallDifficulty * 10;
                 case HitResult.Good:
-                    return 139.5f - Od * 8;
+                    return 139.5f - OverallDifficulty * 8;
                 case HitResult.Great:
-                    return 79.5f - Od * 6;
+                    return 79.5f - OverallDifficulty * 6;
             }
         }
 
