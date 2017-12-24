@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             ReplayFrame lastFrame = Frames[Frames.Count - 1];
 
             // Wait until Auto could "see and react" to the next note.
-            double waitTime = targetTime - Math.Max(0.0, DrawableOsuHitObject.TIME_PREEMPT - reactionTime);
+            double waitTime = targetTime - Math.Max(0.0, DrawableOsuHitObject.TimePreempt - reactionTime);
             if (waitTime > lastFrame.Time)
             {
                 lastFrame = new ReplayFrame(waitTime, lastFrame.MouseX, lastFrame.MouseY, lastFrame.ButtonState);

@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         private void applyStacking(Beatmap<OsuHitObject> beatmap)
         {
             const int stack_distance = 3;
-            float stackThreshold = DrawableOsuHitObject.TIME_PREEMPT * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
+            float stackThreshold = DrawableOsuHitObject.TimePreempt * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
 
             // Reset stacking
             for (int i = 0; i <= beatmap.HitObjects.Count - 1; i++)
