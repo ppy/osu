@@ -37,7 +37,7 @@ namespace osu.Game
 
         private MusicController musicController;
 
-        private NotificationOverlay notificationOverlay;
+        private NotificationOverlay notifications;
 
         private DialogOverlay dialogOverlay;
 
@@ -74,8 +74,6 @@ namespace osu.Game
         private readonly string[] args;
 
         private SettingsOverlay settings;
-
-        private float backgroundOffset;
 
         public OsuGame(string[] args = null)
         {
@@ -138,7 +136,7 @@ namespace osu.Game
 
             if (s.Beatmap == null)
             {
-                notificationOverlay.Post(new SimpleNotification
+                notifications.Post(new SimpleNotification
                 {
                     Text = @"Tried to load a score for a beatmap we don't have!",
                     Icon = FontAwesome.fa_life_saver,
@@ -156,7 +154,7 @@ namespace osu.Game
             base.LoadComplete();
 
             // hook up notifications to components.
-            BeatmapManager.PostNotification = n => notificationOverlay?.Post(n);
+            BeatmapManager.PostNotification = n => notifications?.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
 
             AddRange(new Drawable[]
@@ -209,7 +207,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
-            loadComponentSingleFile(notificationOverlay = new NotificationOverlay
+            loadComponentSingleFile(notifications = new NotificationOverlay
             {
                 Depth = -4,
                 Anchor = Anchor.TopRight,
@@ -225,7 +223,7 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important) return;
 
-                notificationOverlay.Post(new SimpleNotification
+                notifications.Post(new SimpleNotification
                 {
                     Text = $@"{entry.Level}: {entry.Message}"
                 });
@@ -238,7 +236,7 @@ namespace osu.Game
             dependencies.Cache(userProfile);
             dependencies.Cache(musicController);
             dependencies.Cache(beatmapSetOverlay);
-            dependencies.Cache(notificationOverlay);
+            dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
 
             // ensure only one of these overlays are open at once.
@@ -273,33 +271,20 @@ namespace osu.Game
                 };
             }
 
-            settings.StateChanged += delegate
+            Action<Visibility> stateChanged = delegate
             {
-                switch (settings.State)
-                {
-                    case Visibility.Hidden:
-                        backgroundOffset -= ToolbarButton.WIDTH / 2;
-                        break;
-                    case Visibility.Visible:
-                        backgroundOffset += ToolbarButton.WIDTH / 2;
-                        break;
-                }
-                intro.MoveToX(backgroundOffset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
+                float offset = intro.X;
+
+                if (settings.State == Visibility.Hidden || notifications.State == Visibility.Visible)
+                    offset -= ToolbarButton.WIDTH / 2;
+                else if (settings.State == Visibility.Visible || notifications.State == Visibility.Hidden)
+                    offset += ToolbarButton.WIDTH / 2;
+
+                intro.MoveToX(offset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
             };
 
-            notificationOverlay.StateChanged += delegate
-            {
-                switch (notificationOverlay.State)
-                {
-                    case Visibility.Hidden:
-                        backgroundOffset += ToolbarButton.WIDTH / 2;
-                        break;
-                    case Visibility.Visible:
-                        backgroundOffset -= ToolbarButton.WIDTH / 2;
-                        break;
-                }
-                intro.MoveToX(backgroundOffset, NotificationOverlay.TRANSITION_LENGTH, Easing.OutQuint);
-            };
+            settings.StateChanged += stateChanged;
+            notifications.StateChanged += stateChanged;
 
             Cursor.State = Visibility.Hidden;
         }
@@ -368,7 +353,7 @@ namespace osu.Game
             direct.State = Visibility.Hidden;
             social.State = Visibility.Hidden;
             userProfile.State = Visibility.Hidden;
-            notificationOverlay.State = Visibility.Hidden;
+            notifications.State = Visibility.Hidden;
         }
 
         private void screenChanged(Screen newScreen)
