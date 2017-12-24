@@ -209,6 +209,7 @@ namespace osu.Game
 
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
+                GetToolbarHeight = () => ToolbarOffset,
                 Depth = -4,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
