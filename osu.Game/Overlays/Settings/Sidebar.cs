@@ -18,8 +18,8 @@ namespace osu.Game.Overlays.Settings
     public class Sidebar : Container<SidebarButton>, IStateful<ExpandedState>
     {
         private readonly FillFlowContainer<SidebarButton> content;
-        internal const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
-        internal const int EXPANDED_WIDTH = 200;
+        public const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
+        public const int EXPANDED_WIDTH = 200;
 
         public event Action<ExpandedState> StateChanged;
 

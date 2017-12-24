@@ -4,9 +4,10 @@
 using System.Linq;
 using OpenTK.Input;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -42,9 +43,13 @@ namespace osu.Game.Screens.Select
             beatmapDetails.Leaderboard.ScoreSelected += s => Push(new Results(s));
         }
 
+        private SampleChannel sampleConfirm;
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
+            sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
+
             Footer.AddButton(@"mods", colours.Yellow, modSelect, Key.F1, float.MaxValue);
 
             BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
@@ -108,11 +113,12 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        protected override void OnSelected(InputState state)
+        protected override void Start()
         {
             if (player != null) return;
 
-            if (state?.Keyboard.ControlPressed == true)
+            // Ctrl+Enter should start map with autoplay enabled.
+            if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
                 var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
                 var autoType = auto.GetType();
@@ -127,6 +133,8 @@ namespace osu.Game.Screens.Select
 
             Beatmap.Value.Track.Looping = false;
             Beatmap.Disabled = true;
+
+            sampleConfirm?.Play();
 
             LoadComponentAsync(player = new PlayerLoader(new Player()), l => Push(player));
         }

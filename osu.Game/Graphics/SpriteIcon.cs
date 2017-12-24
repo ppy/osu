@@ -15,14 +15,19 @@ namespace osu.Game.Graphics
 {
     public class SpriteIcon : CompositeDrawable
     {
-        private readonly Sprite spriteShadow;
-        private readonly Sprite spriteMain;
+        private Sprite spriteShadow;
+        private Sprite spriteMain;
 
         private Cached layout = new Cached();
-        private readonly Container shadowVisibility;
+        private Container shadowVisibility;
 
-        public SpriteIcon()
+        private FontStore store;
+
+        [BackgroundDependencyLoader]
+        private void load(FontStore store)
         {
+            this.store = store;
+
             InternalChildren = new Drawable[]
             {
                 shadowVisibility = new Container
@@ -39,7 +44,7 @@ namespace osu.Game.Graphics
                         Y = 2,
                         Colour = new Color4(0f, 0f, 0f, 0.2f),
                     },
-                    Alpha = 0,
+                    Alpha = shadow ? 1 : 0,
                 },
                 spriteMain = new Sprite
                 {
@@ -49,32 +54,32 @@ namespace osu.Game.Graphics
                     FillMode = FillMode.Fit
                 },
             };
-        }
 
-        private FontStore store;
-
-        [BackgroundDependencyLoader]
-        private void load(FontStore store)
-        {
-            this.store = store;
+            updateTexture();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             updateTexture();
         }
 
+        private FontAwesome loadedIcon;
         private void updateTexture()
         {
-            var texture = store?.Get(((char)icon).ToString());
+            var loadableIcon = icon;
+
+            if (loadableIcon == loadedIcon) return;
+
+            var texture = store?.Get(((char)loadableIcon).ToString());
 
             spriteMain.Texture = texture;
             spriteShadow.Texture = texture;
 
             if (Size == Vector2.Zero)
                 Size = new Vector2(texture?.DisplayWidth ?? 0, texture?.DisplayHeight ?? 0);
+
+            loadedIcon = loadableIcon;
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
@@ -98,12 +103,15 @@ namespace osu.Game.Graphics
             }
         }
 
+        private bool shadow;
         public bool Shadow
         {
-            get { return spriteShadow.IsPresent; }
+            get { return shadow; }
             set
             {
-                shadowVisibility.Alpha = value ? 1 : 0;
+                shadow = value;
+                if (shadowVisibility != null)
+                    shadowVisibility.Alpha = value ? 1 : 0;
             }
         }
 

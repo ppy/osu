@@ -11,8 +11,11 @@ namespace osu.Game.Tests.Visual
     {
         public override void RunTest()
         {
-            using (var host = new HeadlessGameHost(AppDomain.CurrentDomain.FriendlyName.Replace(' ', '-'), realtime: false))
+            using (var host = new HeadlessGameHost($"test-{Guid.NewGuid()}", realtime: false))
+            {
+                host.Storage.DeleteDirectory(string.Empty);
                 host.Run(new OsuTestCaseTestRunner(this));
+            }
         }
 
         public class OsuTestCaseTestRunner : OsuGameBase

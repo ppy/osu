@@ -7,7 +7,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Users;
 using OpenTK.Graphics;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -18,7 +20,10 @@ namespace osu.Game.Overlays.Profile
         public abstract string Identifier { get; }
 
         private readonly FillFlowContainer content;
+
         protected override Container<Drawable> Content => content;
+
+        public readonly Bindable<User> User = new Bindable<User>();
 
         protected ProfileSection()
         {

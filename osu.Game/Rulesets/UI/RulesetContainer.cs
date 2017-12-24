@@ -55,15 +55,22 @@ namespace osu.Game.Rulesets.UI
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
+        private readonly Lazy<Playfield> playfield;
+        /// <summary>
+        /// The playfield.
+        /// </summary>
+        public Playfield Playfield => playfield.Value;
+
         protected readonly Ruleset Ruleset;
 
         /// <summary>
         /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
         /// </summary>
         /// <param name="ruleset">The ruleset being repesented.</param>
-        internal RulesetContainer(Ruleset ruleset)
+        protected RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
+            playfield = new Lazy<Playfield>(CreatePlayfield);
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -90,6 +97,12 @@ namespace osu.Game.Rulesets.UI
             Replay = replay;
             ReplayInputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
         }
+
+        /// <summary>
+        /// Creates a Playfield.
+        /// </summary>
+        /// <returns>The Playfield.</returns>
+        protected abstract Playfield CreatePlayfield();
     }
 
     /// <summary>
@@ -104,6 +117,7 @@ namespace osu.Game.Rulesets.UI
         where TObject : HitObject
     {
         public event Action<Judgement> OnJudgement;
+        public event Action<Judgement> OnJudgementRemoved;
 
         /// <summary>
         /// The Beatmap
@@ -133,11 +147,6 @@ namespace osu.Game.Rulesets.UI
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
-
-        /// <summary>
-        /// The playfield.
-        /// </summary>
-        public Playfield Playfield { get; private set; }
 
         protected override Container<Drawable> Content => content;
         private Container content;
@@ -172,11 +181,11 @@ namespace osu.Game.Rulesets.UI
 
             // Apply difficulty adjustments from mods before using Difficulty.
             foreach (var mod in Mods.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(Beatmap.BeatmapInfo.Difficulty);
+                mod.ApplyToDifficulty(Beatmap.BeatmapInfo.BaseDifficulty);
 
             // Apply defaults
             foreach (var h in Beatmap.HitObjects)
-                h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.Difficulty);
+                h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
 
             // Post-process the beatmap
             processor.PostProcess(Beatmap);
@@ -197,7 +206,7 @@ namespace osu.Game.Rulesets.UI
             });
 
             AddInternal(KeyBindingInputManager);
-            KeyBindingInputManager.Add(Playfield = CreatePlayfield());
+            KeyBindingInputManager.Add(Playfield);
 
             loadObjects();
         }
@@ -211,7 +220,11 @@ namespace osu.Game.Rulesets.UI
             if (mods == null)
                 return;
 
-            foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
+            foreach (var mod in mods.OfType<IApplicableToHitObject<TObject>>())
+                foreach (var obj in Beatmap.HitObjects)
+                    mod.ApplyToHitObject(obj);
+
+            foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);
         }
 
@@ -240,6 +253,8 @@ namespace osu.Game.Rulesets.UI
                     Playfield.OnJudgement(d, j);
                     OnJudgement?.Invoke(j);
                 };
+
+                drawableObject.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(j);
 
                 Playfield.Add(drawableObject);
             }
@@ -279,12 +294,6 @@ namespace osu.Game.Rulesets.UI
         /// <param name="h">The HitObject to make drawable.</param>
         /// <returns>The DrawableHitObject.</returns>
         protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
-
-        /// <summary>
-        /// Creates a Playfield.
-        /// </summary>
-        /// <returns>The Playfield.</returns>
-        protected abstract Playfield CreatePlayfield();
     }
 
     /// <summary>

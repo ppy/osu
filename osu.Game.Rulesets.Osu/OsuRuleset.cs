@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.OsuDifficulty;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
@@ -14,6 +13,12 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.Edit;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -29,21 +34,35 @@ namespace osu.Game.Rulesets.Osu
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
 
-        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
+        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap)
+        {
+            IEnumerable<HitObject> hitObjects = beatmap.Beatmap.HitObjects;
+            IEnumerable<HitObject> circles = hitObjects.Where(c => !(c is IHasEndTime));
+            IEnumerable<HitObject> sliders = hitObjects.Where(s => s is IHasCurve);
+            IEnumerable<HitObject> spinners = hitObjects.Where(s => s is IHasEndTime && !(s is IHasCurve));
+
+            return new[]
             {
-            new BeatmapStatistic
-            {
-                Name = @"Circle count",
-                Content = beatmap.Beatmap.HitObjects.Count(h => h is HitCircle).ToString(),
-                Icon = FontAwesome.fa_dot_circle_o
-            },
-            new BeatmapStatistic
-            {
-                Name = @"Slider count",
-                Content = beatmap.Beatmap.HitObjects.Count(h => h is Slider).ToString(),
-                Icon = FontAwesome.fa_circle_o
-            }
-        };
+                new BeatmapStatistic
+                {
+                    Name = @"Circle Count",
+                    Content = circles.Count().ToString(),
+                    Icon = FontAwesome.fa_circle_o
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Slider Count",
+                    Content = sliders.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Spinner Count",
+                    Content = spinners.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                }
+            };
+        }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
@@ -112,9 +131,15 @@ namespace osu.Game.Rulesets.Osu
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_osu_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new OsuDifficultyCalculator(beatmap, mods);
+
+        public override PerformanceCalculator CreatePerformanceCalculator(Beatmap beatmap, Score score) => new OsuPerformanceCalculator(this, beatmap, score);
+
+        public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
         public override string Description => "osu!";
+
+        public override string ShortName => "osu";
 
         public override SettingsSubsection CreateSettings() => new OsuSettings();
 

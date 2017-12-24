@@ -17,21 +17,28 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new Drawable[]
             {
+                new SettingsCheckbox
+                {
+                    LabelText = "Show converted beatmaps",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
+                },
                 new SettingsSlider<double, StarSlider>
                 {
                     LabelText = "Display beatmaps from",
-                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum)
+                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
+                    KeyboardStep = 1f
                 },
                 new SettingsSlider<double, StarSlider>
                 {
                     LabelText = "up to",
-                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum)
+                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
+                    KeyboardStep = 1f
                 },
-                new SettingsEnumDropdown<SelectionRandomType>
+                new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
-                    LabelText = "Random beatmap selection",
-                    Bindable = config.GetBindable<SelectionRandomType>(OsuSetting.SelectionRandomType),
-                },
+                    LabelText = "Random selection algorithm",
+                    Bindable = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
+                }
             };
         }
 

@@ -32,6 +32,11 @@ namespace osu.Game.Rulesets.Scoring
         public event Action<Judgement> NewJudgement;
 
         /// <summary>
+        /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
+        /// </summary>
+        public event Func<ScoreProcessor, bool> FailConditions;
+
+        /// <summary>
         /// The current total score.
         /// </summary>
         public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
@@ -52,6 +57,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
+        /// The current rank.
+        /// </summary>
+        public readonly Bindable<ScoreRank> Rank = new Bindable<ScoreRank>(ScoreRank.X);
+
+        /// <summary>
         /// THe highest combo achieved by this score.
         /// </summary>
         public readonly BindableInt HighestCombo = new BindableInt();
@@ -62,18 +72,19 @@ namespace osu.Game.Rulesets.Scoring
         protected virtual bool HasCompleted => false;
 
         /// <summary>
-        /// Whether the score is in a failed state.
-        /// </summary>
-        public virtual bool HasFailed => Health.Value == Health.MinValue;
-
-        /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
         /// </summary>
-        private bool alreadyFailed;
+        public virtual bool HasFailed { get; private set; }
+
+        /// <summary>
+        /// The default conditions for failing.
+        /// </summary>
+        protected virtual bool DefaultFailCondition => Health.Value == Health.MinValue;
 
         protected ScoreProcessor()
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
+            Accuracy.ValueChanged += delegate { Rank.Value = rankFrom(Accuracy.Value); };
         }
 
         private ScoreRank rankFrom(double acc)
@@ -101,9 +112,10 @@ namespace osu.Game.Rulesets.Scoring
             Accuracy.Value = 1;
             Health.Value = 1;
             Combo.Value = 0;
+            Rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
 
-            alreadyFailed = false;
+            HasFailed = false;
         }
 
         /// <summary>
@@ -114,11 +126,14 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected void UpdateFailed()
         {
-            if (alreadyFailed || !HasFailed)
+            if (HasFailed)
+                return;
+
+            if (!DefaultFailCondition && FailConditions?.Invoke(this) != true)
                 return;
 
             if (Failed?.Invoke() != false)
-                alreadyFailed = true;
+                HasFailed = true;
         }
 
         /// <summary>
@@ -142,7 +157,7 @@ namespace osu.Game.Rulesets.Scoring
             score.Combo = Combo;
             score.MaxCombo = HighestCombo;
             score.Accuracy = Accuracy;
-            score.Rank = rankFrom(Accuracy);
+            score.Rank = Rank;
             score.Date = DateTimeOffset.Now;
             score.Health = Health;
         }
@@ -167,6 +182,7 @@ namespace osu.Game.Rulesets.Scoring
         private double maxBaseScore;
         private double rollingMaxBaseScore;
         private double baseScore;
+        private double bonusScore;
 
         protected ScoreProcessor()
         {
@@ -177,6 +193,7 @@ namespace osu.Game.Rulesets.Scoring
             Debug.Assert(base_portion + combo_portion == 1.0);
 
             rulesetContainer.OnJudgement += AddJudgement;
+            rulesetContainer.OnJudgementRemoved += RemoveJudgement;
 
             SimulateAutoplay(rulesetContainer.Beatmap);
             Reset(true);
@@ -205,14 +222,26 @@ namespace osu.Game.Rulesets.Scoring
         protected void AddJudgement(Judgement judgement)
         {
             OnNewJudgement(judgement);
-            NotifyNewJudgement(judgement);
+            updateScore();
 
             UpdateFailed();
+            NotifyNewJudgement(judgement);
         }
 
+        protected void RemoveJudgement(Judgement judgement)
+        {
+            OnJudgementRemoved(judgement);
+            updateScore();
+        }
+
+        /// <summary>
+        /// Applies a judgement.
+        /// </summary>
+        /// <param name="judgement">The judgement to apply/</param>
         protected virtual void OnNewJudgement(Judgement judgement)
         {
-            double bonusScore = 0;
+            judgement.ComboAtJudgement = Combo;
+            judgement.HighestComboAtJudgement = HighestCombo;
 
             if (judgement.AffectsCombo)
             {
@@ -235,7 +264,30 @@ namespace osu.Game.Rulesets.Scoring
             }
             else if (judgement.IsHit)
                 bonusScore += judgement.NumericResult;
+        }
 
+        /// <summary>
+        /// Removes a judgement. This should reverse everything in <see cref="OnNewJudgement(Judgement)"/>.
+        /// </summary>
+        /// <param name="judgement">The judgement to remove.</param>
+        protected virtual void OnJudgementRemoved(Judgement judgement)
+        {
+            Combo.Value = judgement.ComboAtJudgement;
+            HighestCombo.Value = judgement.HighestComboAtJudgement;
+
+            if (judgement.AffectsCombo)
+            {
+                baseScore -= judgement.NumericResult;
+                rollingMaxBaseScore -= judgement.MaxNumericResult;
+
+                Hits--;
+            }
+            else if (judgement.IsHit)
+                bonusScore -= judgement.NumericResult;
+        }
+
+        private void updateScore()
+        {
             if (rollingMaxBaseScore != 0)
                 Accuracy.Value = baseScore / rollingMaxBaseScore;
 
@@ -264,6 +316,7 @@ namespace osu.Game.Rulesets.Scoring
             Hits = 0;
             baseScore = 0;
             rollingMaxBaseScore = 0;
+            bonusScore = 0;
         }
     }
 

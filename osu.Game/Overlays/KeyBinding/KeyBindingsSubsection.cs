@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.KeyBinding
             this.variant = variant;
 
             FlowContent.Spacing = new Vector2(0, 1);
+            FlowContent.Padding = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS, Right = SettingsOverlay.CONTENT_MARGINS };
         }
 
         [BackgroundDependencyLoader]
@@ -37,8 +38,10 @@ namespace osu.Game.Overlays.KeyBinding
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
+                int intKey = (int)defaultGroup.Key;
+
                 // one row per valid action.
-                Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => b.Action.Equals((int)defaultGroup.Key)))
+                Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => ((int)b.Action).Equals(intKey)))
                 {
                     AllowMainMouseButtons = Ruleset != null,
                     Defaults = defaultGroup.Select(d => d.KeyCombination)
@@ -52,7 +55,7 @@ namespace osu.Game.Overlays.KeyBinding
         }
     }
 
-    internal class ResetButton : OsuButton
+    public class ResetButton : TriangleButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

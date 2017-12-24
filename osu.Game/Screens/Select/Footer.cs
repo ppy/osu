@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Menu;
 
 namespace osu.Game.Screens.Select
 {
@@ -31,11 +30,8 @@ namespace osu.Game.Screens.Select
         private const float padding = 80;
 
         public Action OnBack;
-        public Action OnStart;
 
         private readonly FillFlowContainer<FooterButton> buttons;
-
-        public OsuLogo StartButton;
 
         /// <param name="text">Text on the button.</param>
         /// <param name="colour">Colour of the button.</param>
@@ -106,13 +102,6 @@ namespace osu.Game.Screens.Select
                     Height = 3,
                     Position = new Vector2(0, -3),
                 },
-                StartButton = new OsuLogo
-                {
-                    Anchor = Anchor.BottomRight,
-                    Scale = new Vector2(0.4f),
-                    Position = new Vector2(-70, -25),
-                    Action = () => OnStart?.Invoke()
-                },
                 new BackButton
                 {
                     Anchor = Anchor.BottomLeft,
@@ -142,8 +131,6 @@ namespace osu.Game.Screens.Select
 
             updateModeLight();
         }
-
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => base.ReceiveMouseInputAt(screenSpacePos) || StartButton.ReceiveMouseInputAt(screenSpacePos);
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 

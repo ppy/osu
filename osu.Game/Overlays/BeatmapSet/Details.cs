@@ -88,6 +88,8 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
+        public void StopPreview() => preview.Playing.Value = false;
+
         private class DetailBox : Container
         {
             private readonly Container content;

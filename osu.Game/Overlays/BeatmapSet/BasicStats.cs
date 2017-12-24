@@ -39,9 +39,9 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmap) return;
                 beatmap = value;
 
-                length.Value = TimeSpan.FromMilliseconds(beatmap.OnlineInfo.Length).ToString(@"m\:ss");
-                circleCount.Value = beatmap.OnlineInfo.CircleCount.ToString("N0");
-                sliderCount.Value = beatmap.OnlineInfo.SliderCount.ToString("N0");
+                length.Value = TimeSpan.FromSeconds(beatmap.OnlineInfo.Length).ToString(@"m\:ss");
+                circleCount.Value = beatmap.OnlineInfo.CircleCount.ToString();
+                sliderCount.Value = beatmap.OnlineInfo.SliderCount.ToString();
             }
         }
 

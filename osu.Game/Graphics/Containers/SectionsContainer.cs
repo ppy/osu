@@ -139,6 +139,8 @@ namespace osu.Game.Graphics.Containers
 
         public void ScrollTo(Drawable section) => scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - (FixedHeader?.BoundingBox.Height ?? 0));
 
+        public void ScrollToTop() => scrollContainer.ScrollTo(0);
+
         private float lastKnownScroll;
         protected override void UpdateAfterChildren()
         {

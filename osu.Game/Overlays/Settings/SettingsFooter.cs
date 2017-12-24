@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings
 
             var modes = new List<Drawable>();
 
-            foreach (var ruleset in rulesets.AllRulesets)
+            foreach (var ruleset in rulesets.AvailableRulesets)
             {
                 var icon = new ConstrainedIconContainer
                 {

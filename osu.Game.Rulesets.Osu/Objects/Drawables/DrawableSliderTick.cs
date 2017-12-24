@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public bool Tracking;
 
-        public override bool RemoveWhenNotAlive => false;
+        public override bool DisplayJudgement => false;
 
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {

@@ -3,7 +3,6 @@
 
 using OpenTK;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -12,8 +11,6 @@ namespace osu.Game.Overlays.Mods
     /// </summary>
     public class ModButtonEmpty : Container
     {
-        public virtual Mod SelectedMod => null;
-
         public ModButtonEmpty()
         {
             Size = new Vector2(100f);

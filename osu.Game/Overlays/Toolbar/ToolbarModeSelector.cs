@@ -14,7 +14,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    internal class ToolbarModeSelector : Container
+    public class ToolbarModeSelector : Container
     {
         private const float padding = 10;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets, OsuGame game)
         {
-            foreach (var r in rulesets.AllRulesets)
+            foreach (var r in rulesets.AvailableRulesets)
             {
                 modeButtons.Add(new ToolbarModeButton
                 {

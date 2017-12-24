@@ -19,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Overlays.KeyBinding
 {
-    internal class KeyBindingRow : Container, IFilterable
+    public class KeyBindingRow : Container, IFilterable
     {
         private readonly object action;
         private readonly IEnumerable<Framework.Input.Bindings.KeyBinding> bindings;

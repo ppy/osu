@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
     /// <summary>
     /// A HitObjectParser to parse legacy Beatmaps.
     /// </summary>
-    internal abstract class ConvertHitObjectParser : HitObjectParser
+    public abstract class ConvertHitObjectParser : HitObjectParser
     {
         public override HitObject Parse(string text)
         {
@@ -177,8 +177,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             string[] split = str.Split(':');
 
-            var bank = (OsuLegacyDecoder.LegacySampleBank)Convert.ToInt32(split[0]);
-            var addbank = (OsuLegacyDecoder.LegacySampleBank)Convert.ToInt32(split[1]);
+            var bank = (LegacyDecoder.LegacySampleBank)Convert.ToInt32(split[0]);
+            var addbank = (LegacyDecoder.LegacySampleBank)Convert.ToInt32(split[1]);
 
             // Let's not implement this for now, because this doesn't fit nicely into the bank structure
             //string sampleFile = split2.Length > 4 ? split2[4] : string.Empty;

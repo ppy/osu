@@ -159,7 +159,7 @@ namespace osu.Game.Overlays
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                RelativeSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Both,
             });
         }
 

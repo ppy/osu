@@ -16,7 +16,8 @@ using OpenTK;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    internal class TestCaseHitObjects : OsuTestCase
+    [Ignore("getting CI working")]
+    public class TestCaseHitObjects : OsuTestCase
     {
         private FramedClock framedClock;
 
@@ -110,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             h.Depth = depth++;
 
             if (auto)
-                h.State = ArmedState.Hit;
+                h.State.Value = ArmedState.Hit;
 
             playfieldContainer.Add(h);
             var proxyable = h as IDrawableHitObjectWithProxiedApproach;

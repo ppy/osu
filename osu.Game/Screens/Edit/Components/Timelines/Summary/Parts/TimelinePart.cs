@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// Represents a part of the summary timeline..
     /// </summary>
-    internal abstract class TimelinePart : CompositeDrawable
+    public abstract class TimelinePart : CompositeDrawable
     {
         public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
@@ -25,16 +25,30 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
             Beatmap.ValueChanged += b =>
             {
-                timeline.Clear();
-                timeline.RelativeChildSize = new Vector2((float)Math.Max(1, b.Track.Length), 1);
+                updateRelativeChildSize();
                 LoadBeatmap(b);
             };
+        }
+
+        private void updateRelativeChildSize()
+        {
+            // the track may not be loaded completely (only has a length once it is).
+            if (!Beatmap.Value.Track.IsLoaded)
+            {
+                timeline.RelativeChildSize = Vector2.One;
+                Schedule(updateRelativeChildSize);
+                return;
+            }
+
+            // Todo: This should be handled more gracefully
+            timeline.RelativeChildSize = Beatmap.Value.Track.Length == double.PositiveInfinity ? Vector2.One : new Vector2((float)Math.Max(1, Beatmap.Value.Track.Length), 1);
         }
 
         protected void Add(Drawable visualisation) => timeline.Add(visualisation);
 
         protected virtual void LoadBeatmap(WorkingBeatmap beatmap)
         {
+            timeline.Clear();
         }
     }
 }

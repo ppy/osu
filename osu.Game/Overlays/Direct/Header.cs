@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Direct
 
         public Header()
         {
-            Tabs.Current.Value = DirectTab.Search;
+            Tabs.Current.Value = DirectTab.NewestMaps;
             Tabs.Current.TriggerChange();
         }
     }

@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
-            switch (State)
+            switch (State.Value)
             {
                 case ArmedState.Hit:
                     AccentColour = Color4.Green;

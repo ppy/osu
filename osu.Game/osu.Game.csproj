@@ -1,13 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <Import Project="..\osu.Game.props" />
   <PropertyGroup>
     <ProjectGuid>{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>osu.Game</RootNamespace>
-    <AssemblyName>osu!</AssemblyName>
+    <AssemblyName>osu.Game</AssemblyName>
     <ManifestCertificateThumbprint>3CF060CD28877D0E3112948951A64B2A7CEEC909</ManifestCertificateThumbprint>
     <ManifestKeyFile>codesigning.pfx</ManifestKeyFile>
     <GenerateManifests>false</GenerateManifests>
@@ -18,7 +19,6 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <StartupObject>osu.Game.Program</StartupObject>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <SignAssembly>false</SignAssembly>
     <TargetZone>LocalIntranet</TargetZone>
@@ -57,13 +57,11 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <Commandlineparameters>
     </Commandlineparameters>
-    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -77,7 +75,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
@@ -85,69 +82,61 @@
     <Win32Resource>
     </Win32Resource>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>lazer.ico</ApplicationIcon>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'VisualTests|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <WarningLevel>0</WarningLevel>
-    <NoStdLib>true</NoStdLib>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <LangVersion>6</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <StartArguments>--tests</StartArguments>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
-    <Reference Include="DeltaCompressionDotNet, Version=1.1.0.0, Culture=neutral, PublicKeyToken=1d14d6e5194e7f4a, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\DeltaCompressionDotNet.1.1.0\lib\net20\DeltaCompressionDotNet.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="DeltaCompressionDotNet.MsDelta, Version=1.1.0.0, Culture=neutral, PublicKeyToken=46b2138a390abf55, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\DeltaCompressionDotNet.1.1.0\lib\net20\DeltaCompressionDotNet.MsDelta.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="DeltaCompressionDotNet.PatchApi, Version=1.1.0.0, Culture=neutral, PublicKeyToken=3e8888ee913ed789, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\DeltaCompressionDotNet.1.1.0\lib\net20\DeltaCompressionDotNet.PatchApi.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Humanizer, Version=2.2.0.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Humanizer.Core.2.2.0\lib\netstandard1.0\Humanizer.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Cecil.Mdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.Mdb.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Data.Sqlite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.Data.Sqlite.Core.2.0.0\lib\netstandard2.0\Microsoft.Data.Sqlite.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Cecil.Pdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.Pdb.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.EntityFrameworkCore, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.EntityFrameworkCore.2.0.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Cecil.Rocks, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.Rocks.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.EntityFrameworkCore.Design">
+      <HintPath>$(SolutionDir)\packages\Microsoft.EntityFrameworkCore.Design.2.0.0\lib\net461\Microsoft.EntityFrameworkCore.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore.Relational, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.EntityFrameworkCore.Relational.2.0.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Relational.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore.Sqlite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.EntityFrameworkCore.Sqlite.Core.2.0.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.Extensions.Caching.Abstractions.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.Extensions.Caching.Memory.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.Extensions.Configuration.Abstractions.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.Extensions.DependencyInjection.2.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.Extensions.DependencyInjection.Abstractions.2.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.Extensions.Logging.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.Extensions.Logging.Abstractions.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Options, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.Extensions.Options.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Microsoft.Extensions.Primitives.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NuGet.Squirrel, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\squirrel.windows.1.7.8\lib\Net45\NuGet.Squirrel.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
@@ -158,48 +147,58 @@
       <HintPath>$(SolutionDir)\packages\OpenTK.3.0.0-git00009\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Remotion.Linq, Version=2.1.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Remotion.Linq.2.1.2\lib\net45\Remotion.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="SharpCompress, Version=0.18.1.0, Culture=neutral, PublicKeyToken=afb0a02973931d96, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\SharpCompress.0.18.1\lib\net45\SharpCompress.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Splat, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\Splat.2.0.0\lib\Net45\Splat.dll</HintPath>
+    <Reference Include="SQLitePCLRaw.batteries_green, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a84b7dcfb1391f7f, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\net45\SQLitePCLRaw.batteries_green.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SQLite.Net, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net.Core-PCL.3.1.1\lib\portable-win8+net45+wp8+wpa81+MonoAndroid1+MonoTouch1\SQLite.Net.dll</HintPath>
+    <Reference Include="SQLitePCLRaw.batteries_v2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8226ea5df37bcae9, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\net45\SQLitePCLRaw.batteries_v2.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SQLite.Net.Platform.Generic, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.1.1\lib\net40\SQLite.Net.Platform.Generic.dll</HintPath>
+    <Reference Include="SQLitePCLRaw.core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1488e028ca7ab535, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.core.1.1.8\lib\net45\SQLitePCLRaw.core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SQLite.Net.Platform.Win32, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.1.1\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="SQLiteNetExtensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\SQLiteNetExtensions.1.3.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\SQLiteNetExtensions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Squirrel, Version=1.7.8.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\squirrel.windows.1.7.8\lib\Net45\Squirrel.dll</HintPath>
+    <Reference Include="SQLitePCLRaw.provider.e_sqlite3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9c301db686d0bd12, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.provider.e_sqlite3.net45.1.1.8\lib\net45\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\System.Collections.Immutable.1.4.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\System.ComponentModel.Annotations.4.4.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.2.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\System.Diagnostics.DiagnosticSource.4.4.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Interactive.Async, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\System.Interactive.Async.3.1.1\lib\net46\System.Interactive.Async.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\System.Runtime.CompilerServices.Unsafe.4.4.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>$(SolutionDir)\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
     <None Include="app.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="osu!.res" />
     <None Include="packages.config" />
-    <None Include="Properties\app.manifest" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -259,22 +258,90 @@
     <Compile Include="Beatmaps\ControlPoints\ControlPointInfo.cs" />
     <Compile Include="Beatmaps\ControlPoints\DifficultyControlPoint.cs" />
     <Compile Include="Beatmaps\ControlPoints\EffectControlPoint.cs" />
-    <Compile Include="Beatmaps\ControlPoints\SoundControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\SampleControlPoint.cs" />
     <Compile Include="Beatmaps\ControlPoints\TimingControlPoint.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
+    <Compile Include="Beatmaps\Formats\JsonBeatmapDecoder.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
+    <Compile Include="Database\DatabaseContextFactory.cs" />
+    <Compile Include="Database\IHasPrimaryKey.cs" />
+    <Compile Include="Overlays\Settings\DangerousSettingsButton.cs" />
+    <Compile Include="Graphics\UserInterface\HoverClickSounds.cs" />
+    <Compile Include="Graphics\UserInterface\HoverSounds.cs" />
+    <Compile Include="Graphics\UserInterface\OsuButton.cs" />
+    <Compile Include="IO\Serialization\KeyContractResolver.cs" />
+    <Compile Include="Migrations\20171019041408_InitialCreate.cs" />
+    <Compile Include="Migrations\20171019041408_InitialCreate.Designer.cs">
+      <DependentUpon>20171019041408_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20171025071459_AddMissingIndexRules.cs" />
+    <Compile Include="Migrations\20171025071459_AddMissingIndexRules.Designer.cs">
+      <DependentUpon>20171025071459_AddMissingIndexRules.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs" />
+    <Compile Include="Migrations\20171119065731_AddBeatmapOnlineIDUniqueConstraint.Designer.cs">
+      <DependentUpon>20171119065731_AddBeatmapOnlineIDUniqueConstraint.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20171209034410_AddRulesetInfoShortName.cs" />
+    <Compile Include="Migrations\20171209034410_AddRulesetInfoShortName.Designer.cs">
+      <DependentUpon>20171209034410_AddRulesetInfoShortName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
+    <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
+    <Compile Include="Online\API\Requests\APIResponseBeatmapSet.cs" />
+    <Compile Include="Online\API\Requests\GetUserMostPlayedBeatmapsRequest.cs" />
+    <Compile Include="Overlays\BeatmapSet\Scores\ClickableUsername.cs" />
+    <Compile Include="Overlays\BeatmapSet\Scores\DrawableScore.cs" />
+    <Compile Include="Overlays\BeatmapSet\Scores\DrawableTopScore.cs" />
+    <Compile Include="Overlays\BeatmapSet\Scores\ScoresContainer.cs" />
+    <Compile Include="Online\API\Requests\GetUserBeatmapsRequest.cs" />
+    <Compile Include="Overlays\Profile\Sections\BeatmapMetadataContainer.cs" />
+    <Compile Include="Overlays\Profile\Sections\Beatmaps\PaginatedBeatmapContainer.cs" />
+    <Compile Include="Overlays\Profile\Sections\DrawableProfileRow.cs" />
+    <Compile Include="Overlays\Profile\Sections\Historical\DrawableMostPlayedRow.cs" />
+    <Compile Include="Overlays\Profile\Sections\Historical\PaginatedMostPlayedBeatmapContainer.cs" />
+    <Compile Include="Overlays\Profile\Sections\Kudosu\KudosuInfo.cs" />
+    <Compile Include="Overlays\Profile\Sections\PaginatedContainer.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\DrawablePerformanceScore.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\PaginatedScoreContainer.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
+    <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
+    <Compile Include="Overlays\Settings\SettingsButton.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\OriginHandle.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectSelectionBox.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\Handle.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\HandleContainer.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionInfo.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionLayer.cs" />
+    <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
+    <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
+    <Compile Include="Screens\Edit\Components\TimeInfoContainer.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToScoreProcessor.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
-    <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
-    <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
-    <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
+    <Compile Include="Beatmaps\Formats\Decoder.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
+    <Compile Include="Online\API\Requests\GetUserScoresRequest.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\RadioButtons\DrawableRadioButton.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\RadioButtons\RadioButton.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\RadioButtons\RadioButtonCollection.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\TimelineButton.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\ArrowsOverlay.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\BlurredIcon.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\BreakOverlay.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\GlowIcon.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\InfoContainer.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\InfoLine.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\LetterboxOverlay.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\RemainingTimeCounter.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
     <Compile Include="Beatmaps\RankStatus.cs" />
@@ -286,15 +353,16 @@
     <Compile Include="Configuration\ReleaseStream.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ScreenshotFormat.cs" />
-    <Compile Include="Configuration\SelectionRandomType.cs" />
+    <Compile Include="Configuration\RandomSelectAlgorithm.cs" />
     <Compile Include="Database\DatabaseBackedStore.cs" />
-    <Compile Include="Database\StoreVersion.cs" />
+    <Compile Include="Database\OsuDbContext.cs" />
     <Compile Include="Graphics\Backgrounds\Background.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Containers\BeatSyncedContainer.cs" />
     <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
     <Compile Include="Graphics\Containers\OsuClickableContainer.cs" />
     <Compile Include="Graphics\Containers\OsuFocusedOverlayContainer.cs" />
+    <Compile Include="Graphics\Containers\OsuHoverContainer.cs" />
     <Compile Include="Graphics\Containers\OsuScrollContainer.cs" />
     <Compile Include="Graphics\Containers\OsuTextFlowContainer.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
@@ -305,7 +373,6 @@
     <Compile Include="Graphics\Cursor\OsuTooltipContainer.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
-    <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\SpriteIcon.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
@@ -319,7 +386,7 @@
     <Compile Include="Graphics\UserInterface\LoadingAnimation.cs" />
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
     <Compile Include="Graphics\UserInterface\Nub.cs" />
-    <Compile Include="Graphics\UserInterface\OsuButton.cs" />
+    <Compile Include="Graphics\UserInterface\TriangleButton.cs" />
     <Compile Include="Graphics\UserInterface\OsuCheckbox.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuDropdown.cs" />
@@ -353,6 +420,8 @@
     <Compile Include="IO\Legacy\ILegacySerializable.cs" />
     <Compile Include="IO\Legacy\SerializationReader.cs" />
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
+    <Compile Include="IO\Serialization\Converters\TypedListConverter.cs" />
+    <Compile Include="IO\Serialization\Converters\Vector2Converter.cs" />
     <Compile Include="IO\Serialization\IJsonSerializable.cs" />
     <Compile Include="IPC\BeatmapIPCChannel.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
@@ -363,7 +432,7 @@
     <Compile Include="Online\API\OAuthToken.cs" />
     <Compile Include="Online\API\Requests\DownloadBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapDetailsRequest.cs" />
-    <Compile Include="Online\API\Requests\GetBeatmapSetsRequest.cs" />
+    <Compile Include="Online\API\Requests\SearchBeatmapSetsRequest.cs" />
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
     <Compile Include="Online\API\Requests\GetScoresRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
@@ -380,14 +449,13 @@
     <Compile Include="Online\Multiplayer\RoomStatus.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
-    <Compile Include="OsuGameDesktop.cs" />
-    <Compile Include="OsuTestBrowser.cs" />
     <Compile Include="Overlays\ChatOverlay.cs" />
     <Compile Include="Overlays\Chat\ChannelListItem.cs" />
     <Compile Include="Overlays\Chat\ChannelSection.cs" />
     <Compile Include="Overlays\Chat\ChannelSelectionOverlay.cs" />
     <Compile Include="Overlays\Chat\ChatLine.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
+    <Compile Include="Overlays\Direct\PlayButton.cs" />
     <Compile Include="Overlays\Chat\DrawableChannel.cs" />
     <Compile Include="Overlays\DialogOverlay.cs" />
     <Compile Include="Overlays\Dialog\PopupDialog.cs" />
@@ -432,9 +500,10 @@
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\DrawableProfileScore.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />
     <Compile Include="Overlays\Profile\ProfileSection.cs" />
-    <Compile Include="Overlays\Profile\RankChart.cs" />
+    <Compile Include="Overlays\Profile\RankGraph.cs" />
     <Compile Include="Overlays\Profile\Sections\AboutSection.cs" />
     <Compile Include="Overlays\Profile\Sections\BeatmapsSection.cs" />
     <Compile Include="Overlays\Profile\Sections\HistoricalSection.cs" />
@@ -507,15 +576,18 @@
     <Compile Include="Overlays\Toolbar\ToolbarUserArea.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarUserButton.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />
-    <Compile Include="Overlays\VersionManager.cs" />
     <Compile Include="Overlays\WaveOverlayContainer.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rulesets\Edit\Tools\HitObjectCompositionTool.cs" />
+    <Compile Include="Rulesets\Edit\Tools\ICompositionTool.cs" />
+    <Compile Include="Rulesets\Edit\HitObjectComposer.cs" />
+    <Compile Include="Rulesets\Edit\ToolboxGroup.cs" />
     <Compile Include="Rulesets\Judgements\DrawableJudgement.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
-    <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToClock.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToHitObject.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToRulesetContainer.cs" />
     <Compile Include="Rulesets\Mods\Mod.cs" />
     <Compile Include="Rulesets\Mods\ModAutoplay.cs" />
     <Compile Include="Rulesets\Mods\ModCinema.cs" />
@@ -583,6 +655,7 @@
     <Compile Include="Rulesets\Ruleset.cs" />
     <Compile Include="Rulesets\RulesetInfo.cs" />
     <Compile Include="Rulesets\RulesetStore.cs" />
+    <Compile Include="Rulesets\Scoring\PerformanceCalculator.cs" />
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
     <Compile Include="Rulesets\Scoring\ScoreRank.cs" />
@@ -614,16 +687,23 @@
     <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\DurationVisualisation.cs" />
     <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\PointVisualisation.cs" />
     <Compile Include="Screens\Edit\Components\Timelines\Summary\SummaryTimeline.cs" />
+    <Compile Include="Screens\Edit\Screens\EditorScreenMode.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuBar.cs" />
-    <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItemSpacer.cs" />
+    <Compile Include="Screens\Edit\Menus\ScreenSelectionTabControl.cs" />
+    <Compile Include="Screens\Edit\Screens\Design\Design.cs" />
+    <Compile Include="Screens\Edit\Screens\EditorScreen.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Compose.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\ScrollableTimeline.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\ScrollingTimelineContainer.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
     <Compile Include="Screens\Menu\Disclaimer.cs" />
     <Compile Include="Screens\Menu\FlowContainerWithOrigin.cs" />
     <Compile Include="Screens\Menu\Intro.cs" />
+    <Compile Include="Screens\Menu\IntroSequence.cs" />
     <Compile Include="Screens\Menu\LogoVisualisation.cs" />
     <Compile Include="Screens\Menu\MainMenu.cs" />
     <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
@@ -651,12 +731,12 @@
     <Compile Include="Screens\Play\KeyCounterCollection.cs" />
     <Compile Include="Screens\Play\KeyCounterKeyboard.cs" />
     <Compile Include="Screens\Play\KeyCounterMouse.cs" />
-    <Compile Include="Screens\Play\MenuOverlay.cs" />
+    <Compile Include="Screens\Play\GameplayMenuOverlay.cs" />
     <Compile Include="Screens\Play\PauseContainer.cs" />
     <Compile Include="Screens\Play\Player.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\ReplayPlayer.cs" />
-    <Compile Include="Screens\Play\ReplaySettingsOverlay.cs" />
+    <Compile Include="Screens\Play\HUD\ReplaySettingsOverlay.cs" />
     <Compile Include="Screens\Play\ReplaySettings\CollectionSettings.cs" />
     <Compile Include="Screens\Play\ReplaySettings\DiscussionSettings.cs" />
     <Compile Include="Screens\Play\ReplaySettings\PlaybackSettings.cs" />
@@ -684,6 +764,14 @@
     <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
     <Compile Include="Screens\Select\BeatmapDetails.cs" />
     <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselBeatmap.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselBeatmapSet.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselGroup.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselGroupEagerSelect.cs" />
+    <Compile Include="Screens\Select\Carousel\CarouselItem.cs" />
+    <Compile Include="Screens\Select\Carousel\DrawableCarouselBeatmap.cs" />
+    <Compile Include="Screens\Select\Carousel\DrawableCarouselBeatmapSet.cs" />
+    <Compile Include="Screens\Select\Carousel\DrawableCarouselItem.cs" />
     <Compile Include="Screens\Select\Details\AdvancedStats.cs" />
     <Compile Include="Screens\Select\Details\FailRetryGraph.cs" />
     <Compile Include="Screens\Select\Details\UserRatings.cs" />
@@ -697,6 +785,9 @@
     <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
     <Compile Include="Screens\Select\Leaderboards\Leaderboard.cs" />
     <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
+    <Compile Include="Screens\Select\Leaderboards\MessagePlaceholder.cs" />
+    <Compile Include="Screens\Select\Leaderboards\Placeholder.cs" />
+    <Compile Include="Screens\Select\Leaderboards\RetrievalFailurePlaceholder.cs" />
     <Compile Include="Screens\Select\MatchSongSelect.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
@@ -731,49 +822,9 @@
     <Compile Include="Tests\Beatmaps\TestWorkingBeatmap.cs" />
     <Compile Include="Tests\Platform\TestStorage.cs" />
     <Compile Include="Tests\Visual\OsuTestCase.cs" />
-    <Compile Include="Tests\Visual\TestCaseBeatmapDetailArea.cs" />
-    <Compile Include="Tests\Visual\TestCaseBeatmapDetails.cs" />
-    <Compile Include="Tests\Visual\TestCaseBeatmapOptionsOverlay.cs" />
-    <Compile Include="Tests\Visual\TestCaseBeatSyncedContainer.cs" />
-    <Compile Include="Tests\Visual\TestCaseBreadcrumbs.cs" />
-    <Compile Include="Tests\Visual\TestCaseChatDisplay.cs" />
-    <Compile Include="Tests\Visual\TestCaseContextMenu.cs" />
-    <Compile Include="Tests\Visual\TestCaseDialogOverlay.cs" />
-    <Compile Include="Tests\Visual\TestCaseDirect.cs" />
-    <Compile Include="Tests\Visual\TestCaseDrawableRoom.cs" />
-    <Compile Include="Tests\Visual\TestCaseDrawings.cs" />
-    <Compile Include="Tests\Visual\TestCaseEditorMenuBar.cs" />
-    <Compile Include="Tests\Visual\TestCaseEditorSummaryTimeline.cs" />
-    <Compile Include="Tests\Visual\TestCaseGamefield.cs" />
-    <Compile Include="Tests\Visual\TestCaseGraph.cs" />
-    <Compile Include="Tests\Visual\TestCaseKeyConfiguration.cs" />
-    <Compile Include="Tests\Visual\TestCaseKeyCounter.cs" />
-    <Compile Include="Tests\Visual\TestCaseLeaderboard.cs" />
-    <Compile Include="Tests\Visual\TestCaseMedalOverlay.cs" />
-    <Compile Include="Tests\Visual\TestCaseMenuButtonSystem.cs" />
-    <Compile Include="Tests\Visual\TestCaseMenuOverlays.cs" />
-    <Compile Include="Tests\Visual\TestCaseMods.cs" />
-    <Compile Include="Tests\Visual\TestCaseMusicController.cs" />
-    <Compile Include="Tests\Visual\TestCaseNotificationOverlay.cs" />
-    <Compile Include="Tests\Visual\TestCaseOnScreenDisplay.cs" />
+    <Compile Include="Tests\Visual\TestCasePerformancePoints.cs" />
+    <Compile Include="Tests\Visual\ScreenTestCase.cs" />
     <Compile Include="Tests\Visual\TestCasePlayer.cs" />
-    <Compile Include="Tests\Visual\TestCasePlaySongSelect.cs" />
-    <Compile Include="Tests\Visual\TestCaseReplay.cs" />
-    <Compile Include="Tests\Visual\TestCaseReplaySettingsOverlay.cs" />
-    <Compile Include="Tests\Visual\TestCaseResults.cs" />
-    <Compile Include="Tests\Visual\TestCaseRoomInspector.cs" />
-    <Compile Include="Tests\Visual\TestCaseScoreCounter.cs" />
-    <Compile Include="Tests\Visual\TestCaseScrollingPlayfield.cs" />
-    <Compile Include="Tests\Visual\TestCaseSettings.cs" />
-    <Compile Include="Tests\Visual\TestCaseSkipButton.cs" />
-    <Compile Include="Tests\Visual\TestCaseSocial.cs" />
-    <Compile Include="Tests\Visual\TestCaseSongProgress.cs" />
-    <Compile Include="Tests\Visual\TestCaseStoryboard.cs" />
-    <Compile Include="Tests\Visual\TestCaseTabControl.cs" />
-    <Compile Include="Tests\Visual\TestCaseTextAwesome.cs" />
-    <Compile Include="Tests\Visual\TestCaseTwoLayerButton.cs" />
-    <Compile Include="Tests\Visual\TestCaseUserPanel.cs" />
-    <Compile Include="Tests\Visual\TestCaseUserProfile.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Users\Country.cs" />
     <Compile Include="Users\Medal.cs" />
@@ -796,10 +847,9 @@
     <Compile Include="Overlays\BeatmapSet\BasicStats.cs" />
     <Compile Include="Overlays\BeatmapSet\SuccessRate.cs" />
     <Compile Include="Overlays\BeatmapSet\PreviewButton.cs" />
-    <Compile Include="Tests\Visual\TestCaseBeatmapSetOverlay.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="lazer.ico" />
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
@@ -821,4 +871,7 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets" Condition="Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets')" />
+  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets" Condition="Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" />
+  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets" Condition="Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets')" />
 </Project>

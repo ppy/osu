@@ -13,6 +13,7 @@ using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -24,12 +25,19 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override bool ProvidingUserCursor => true;
 
+        // Todo: This should not be a thing, but is currently required for the editor
+        // https://github.com/ppy/osu-framework/issues/1283
+        protected virtual bool ProxyApproachCircles => true;
+
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
         public override Vector2 Size
         {
             get
             {
+                if (Parent == null)
+                    return Vector2.Zero;
+
                 var parentSize = Parent.DrawSize;
                 var aspectSize = parentSize.X * 0.75f < parentSize.Y ? new Vector2(parentSize.X, parentSize.X * 0.75f) : new Vector2(parentSize.Y * 4f / 3f, parentSize.Y);
 
@@ -65,7 +73,10 @@ namespace osu.Game.Rulesets.Osu.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            AddInternal(new GameplayCursor());
+
+            var cursor = CreateCursor();
+            if (cursor != null)
+                AddInternal(cursor);
         }
 
         public override void Add(DrawableHitObject h)
@@ -73,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.UI
             h.Depth = (float)h.HitObject.StartTime;
 
             var c = h as IDrawableHitObjectWithProxiedApproach;
-            if (c != null)
+            if (c != null && ProxyApproachCircles)
                 approachCircles.Add(c.ProxiedLayer.CreateProxy());
 
             base.Add(h);
@@ -91,6 +102,9 @@ namespace osu.Game.Rulesets.Osu.UI
             var osuJudgement = (OsuJudgement)judgement;
             var osuObject = (OsuHitObject)judgedObject.HitObject;
 
+            if (!judgedObject.DisplayJudgement)
+                return;
+
             DrawableOsuJudgement explosion = new DrawableOsuJudgement(osuJudgement)
             {
                 Origin = Anchor.Centre,
@@ -99,5 +113,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             judgementLayer.Add(explosion);
         }
+
+        protected virtual CursorContainer CreateCursor() => new GameplayCursor();
     }
 }
