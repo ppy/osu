@@ -117,10 +117,17 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             var minDistanceFromEnd = Velocity * 0.01;
 
+            bool sliderStart = false;
+
             for (var repeat = 0; repeat < RepeatCount; repeat++)
             {
                 var repeatStartTime = StartTime + repeat * repeatDuration;
                 var reversed = repeat % 2 == 1;
+
+                if (!sliderStart)
+                    sliderStart = true;
+                else
+                    sliderStart = false;
 
                 for (var d = tickDistance; d <= length; d += tickDistance)
                 {
@@ -129,6 +136,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                     var distanceProgress = d / length;
                     var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
+
+                    if (sliderStart)
+                        distanceProgress = 0;
 
                     AddNested(new SliderTick
                     {
