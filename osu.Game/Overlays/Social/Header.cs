@@ -55,8 +55,8 @@ namespace osu.Game.Overlays.Social
     {
         [Description("Online Players")]
         OnlinePlayers,
-        //[Description("Online Friends")]
-        //OnlineFriends,
+        [Description("Online Friends")]
+        OnlineFriends,
         //[Description("Online Team Members")]
         //OnlineTeamMembers,
         //[Description("Chat Channels")]
