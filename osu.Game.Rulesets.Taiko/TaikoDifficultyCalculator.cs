@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 using System.Collections.Generic;
-using System.Globalization;
 using System;
 
 namespace osu.Game.Rulesets.Taiko
@@ -36,12 +35,12 @@ namespace osu.Game.Rulesets.Taiko
         {
         }
 
-        protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
+        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
             // Fill our custom DifficultyHitObject class, that carries additional information
             difficultyHitObjects.Clear();
 
-            foreach (var hitObject in Objects)
+            foreach (var hitObject in Beatmap.HitObjects)
                 difficultyHitObjects.Add(new TaikoHitObjectDifficulty(hitObject));
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
@@ -53,8 +52,8 @@ namespace osu.Game.Rulesets.Taiko
 
             if (categoryDifficulty != null)
             {
-                categoryDifficulty.Add("Strain", starRating.ToString("0.00", CultureInfo.InvariantCulture));
-                categoryDifficulty.Add("Hit window 300", (35 /*HitObjectManager.HitWindow300*/ / TimeRate).ToString("0.00", CultureInfo.InvariantCulture));
+                categoryDifficulty.Add("Strain", starRating);
+                categoryDifficulty.Add("Hit window 300", 35 /*HitObjectManager.HitWindow300*/ / TimeRate);
             }
 
             return starRating;
@@ -134,6 +133,6 @@ namespace osu.Game.Rulesets.Taiko
             return difficulty;
         }
 
-        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter(true);
+        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter(Beatmap beatmap) => new TaikoBeatmapConverter(true);
     }
 }

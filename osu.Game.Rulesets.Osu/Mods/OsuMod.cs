@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -33,22 +32,29 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1.06;
     }
 
-    public class OsuModHardRock : ModHardRock, IApplicableMod<OsuHitObject>
+    public class OsuModHardRock : ModHardRock, IApplicableToHitObject<OsuHitObject>
     {
         public override double ScoreMultiplier => 1.06;
         public override bool Ranked => true;
 
-        public void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)
+        public void ApplyToHitObject(OsuHitObject hitObject)
         {
-            rulesetContainer.Objects.OfType<OsuHitObject>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Y));
-            rulesetContainer.Objects.OfType<Slider>().ForEach(s =>
-            {
-                var newControlPoints = new List<Vector2>();
-                s.ControlPoints.ForEach(c => newControlPoints.Add(new Vector2(c.X, OsuPlayfield.BASE_SIZE.Y - c.Y)));
+            hitObject.Position = new Vector2(hitObject.Position.X, OsuPlayfield.BASE_SIZE.Y - hitObject.Y);
 
-                s.ControlPoints = newControlPoints;
-                s.Curve?.Calculate(); // Recalculate the slider curve
-            });
+            var slider = hitObject as Slider;
+            if (slider == null)
+                return;
+
+            var newControlPoints = new List<Vector2>();
+            slider.ControlPoints.ForEach(c => newControlPoints.Add(new Vector2(c.X, OsuPlayfield.BASE_SIZE.Y - c.Y)));
+
+            slider.ControlPoints = newControlPoints;
+            slider.Curve?.Calculate(); // Recalculate the slider curve
+        }
+
+        public void ApplyToHitObjects(RulesetContainer<OsuHitObject> rulesetContainer)
+        {
+
         }
     }
 

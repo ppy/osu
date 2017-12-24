@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\osu.Game.props" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -19,7 +20,6 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -30,6 +30,9 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DeepEqual, Version=1.6.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(SolutionDir)\packages\DeepEqual.1.6.0.0\lib\net40\DeepEqual.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -39,20 +42,12 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="SQLite.Net">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net.Core-PCL.3.1.1\lib\portable-win8+net45+wp8+wpa81+MonoAndroid1+MonoTouch1\SQLite.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLite.Net.Platform.Win32">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.1.1\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLite.Net.Platform.Generic">
-      <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.1.1\lib\net40\SQLite.Net.Platform.Generic.dll</HintPath>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>$(SolutionDir)\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="OpenTK.dll.config" />
@@ -79,7 +74,7 @@
       <Name>osu.Game.Rulesets.Taiko</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>
+      <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
       <Name>osu.Game</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
@@ -91,13 +86,79 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beatmaps\Formats\OsuJsonDecoderTest.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoderTest.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReaderTest.cs" />
     <Compile Include="Beatmaps\IO\ImportBeatmapTest.cs" />
     <Compile Include="Resources\Resource.cs" />
-    <Compile Include="Beatmaps\Formats\OsuLegacyDecoderTest.cs" />
+    <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoderTest.cs" />
+    <Compile Include="Visual\TestCaseBeatmapCarousel.cs" />
+    <Compile Include="Visual\TestCaseBeatmapDetailArea.cs" />
+    <Compile Include="Visual\TestCaseBeatmapDetails.cs" />
+    <Compile Include="Visual\TestCaseBeatmapInfoWedge.cs" />
+    <Compile Include="Visual\TestCaseBeatmapOptionsOverlay.cs" />
+    <Compile Include="Visual\TestCaseBeatmapScoresContainer.cs" />
+    <Compile Include="Visual\TestCaseBeatmapSetOverlay.cs" />
+    <Compile Include="Visual\TestCaseBeatSyncedContainer.cs" />
+    <Compile Include="Visual\TestCaseBreadcrumbs.cs" />
+    <Compile Include="Visual\TestCaseBreakOverlay.cs" />
+    <Compile Include="Visual\TestCaseChatDisplay.cs" />
+    <Compile Include="Visual\TestCaseContextMenu.cs" />
+    <Compile Include="Visual\TestCaseDialogOverlay.cs" />
+    <Compile Include="Visual\TestCaseDirect.cs" />
+    <Compile Include="Visual\TestCaseDrawableRoom.cs" />
+    <Compile Include="Visual\TestCaseDrawings.cs" />
+    <Compile Include="Visual\TestCaseEditor.cs" />
+    <Compile Include="Visual\TestCaseEditorCompose.cs" />
+    <Compile Include="Visual\TestCaseEditorComposeRadioButtons.cs" />
+    <Compile Include="Visual\TestCaseEditorComposeTimeline.cs" />
+    <Compile Include="Visual\TestCaseEditorMenuBar.cs" />
+    <Compile Include="Visual\TestCaseEditorSummaryTimeline.cs" />
+    <Compile Include="Visual\TestCaseEditorSelectionLayer.cs" />
+    <Compile Include="Visual\TestCaseGamefield.cs" />
+    <Compile Include="Visual\TestCaseGraph.cs" />
+    <Compile Include="Visual\TestCaseHistoricalSection.cs" />
+    <Compile Include="Visual\TestCaseIconButton.cs" />
+    <Compile Include="Visual\TestCaseIntroSequence.cs" />
+    <Compile Include="Visual\TestCaseKeyConfiguration.cs" />
+    <Compile Include="Visual\TestCaseKeyCounter.cs" />
+    <Compile Include="Visual\TestCaseLeaderboard.cs" />
+    <Compile Include="Visual\TestCaseMedalOverlay.cs" />
+    <Compile Include="Visual\TestCaseButtonSystem.cs" />
+    <Compile Include="Visual\TestCaseGameplayMenuOverlay.cs" />
+    <Compile Include="Visual\TestCaseMods.cs" />
+    <Compile Include="Visual\TestCaseMusicController.cs" />
+    <Compile Include="Visual\TestCaseNotificationOverlay.cs" />
+    <Compile Include="Visual\TestCaseOnScreenDisplay.cs" />
+    <Compile Include="Visual\TestCaseAllPlayers.cs" />
+    <Compile Include="Visual\TestCaseOsuGame.cs" />
+    <Compile Include="Visual\TestCasePlaybackControl.cs" />
+    <Compile Include="Visual\TestCasePlaySongSelect.cs" />
+    <Compile Include="Visual\TestCaseRankGraph.cs" />
+    <Compile Include="Visual\TestCaseReplay.cs" />
+    <Compile Include="Visual\TestCaseReplaySettingsOverlay.cs" />
+    <Compile Include="Visual\TestCaseResults.cs" />
+    <Compile Include="Visual\TestCaseRoomInspector.cs" />
+    <Compile Include="Visual\TestCaseScoreCounter.cs" />
+    <Compile Include="Visual\TestCaseScrollingPlayfield.cs" />
+    <Compile Include="Visual\TestCaseSettings.cs" />
+    <Compile Include="Visual\TestCaseSkipButton.cs" />
+    <Compile Include="Visual\TestCaseSocial.cs" />
+    <Compile Include="Visual\TestCaseSongProgress.cs" />
+    <Compile Include="Visual\TestCaseStoryboard.cs" />
+    <Compile Include="Visual\TestCaseTabControl.cs" />
+    <Compile Include="Visual\TestCaseTextAwesome.cs" />
+    <Compile Include="Visual\TestCaseTwoLayerButton.cs" />
+    <Compile Include="Visual\TestCaseUserPanel.cs" />
+    <Compile Include="Visual\TestCaseUserProfile.cs" />
+    <Compile Include="Visual\TestCaseUserRanks.cs" />
+    <Compile Include="Visual\TestCaseWaveform.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Soleily - Renatus %28Gamu%29 [Insane].osu" />
+    <EmbeddedResource Include="Resources\Himeringo - Yotsuya-san ni Yoroshiku %28RLC%29 [Winber1%27s Extreme].osu" />
+    <EmbeddedResource Include="Resources\Within Temptation - The Unforgiving %28Armin%29 [Marathon].osu" />
+    <EmbeddedResource Include="Resources\Kozato snow - Rengetsu Ouka %28_Kiva%29 [Yuki YukI].osu" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

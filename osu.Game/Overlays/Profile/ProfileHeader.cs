@@ -12,13 +12,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using System.Diagnostics;
-using System.Globalization;
+using System.Collections.Generic;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -27,8 +27,9 @@ namespace osu.Game.Overlays.Profile
         private readonly OsuTextFlowContainer infoTextLeft;
         private readonly LinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
+        private readonly RankGraph rankGraph;
 
-        private readonly Container coverContainer, chartContainer, supporterTag;
+        private readonly Container coverContainer, supporterTag;
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
@@ -53,6 +54,7 @@ namespace osu.Game.Overlays.Profile
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = cover_height,
+                    Masking = true,
                     Children = new Drawable[]
                     {
                         new Box
@@ -119,15 +121,11 @@ namespace osu.Game.Overlays.Profile
                                                 }
                                             }
                                         },
-                                        new LinkFlowContainer.LinkText
+                                        new LinkFlowContainer.ProfileLink(user)
                                         {
-                                            Text = user.Username,
-                                            Url = $@"https://osu.ppy.sh/users/{user.Id}",
-                                            TextSize = 30,
-                                            Font = @"Exo2.0-RegularItalic",
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            Y = -48
+                                            Y = -48,
                                         },
                                         countryFlag = new DrawableFlag(user.Country?.FlagName)
                                         {
@@ -276,7 +274,7 @@ namespace osu.Game.Overlays.Profile
                                 }
                             }
                         },
-                        chartContainer = new Container
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.BottomCentre,
@@ -287,6 +285,10 @@ namespace osu.Game.Overlays.Profile
                                 new Box
                                 {
                                     Colour = Color4.Black.Opacity(0.25f),
+                                    RelativeSizeAxes = Axes.Both
+                                },
+                                rankGraph = new RankGraph
+                                {
                                     RelativeSizeAxes = Axes.Both
                                 }
                             }
@@ -306,11 +308,7 @@ namespace osu.Game.Overlays.Profile
 
         public User User
         {
-            get
-            {
-                return user;
-            }
-
+            get { return user; }
             set
             {
                 user = value;
@@ -320,19 +318,15 @@ namespace osu.Game.Overlays.Profile
 
         private void loadUser()
         {
-            coverContainer.Add(new AsyncLoadWrapper(new UserCoverBackground(user)
+            LoadComponentAsync(new UserCoverBackground(user)
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 FillMode = FillMode.Fill,
-                OnLoadComplete = d => d.FadeInFromZero(200)
-            })
-            {
-                Masking = true,
-                RelativeSizeAxes = Axes.Both,
-                Depth = float.MaxValue
-            });
+                OnLoadComplete = d => d.FadeInFromZero(200),
+                Depth = float.MaxValue,
+            }, coverContainer.Add);
 
             if (user.IsSupporter) supporterTag.Show();
 
@@ -389,7 +383,7 @@ namespace osu.Game.Overlays.Profile
             }
 
             tryAddInfoRightLine(FontAwesome.fa_map_marker, user.Location);
-            tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Intrerests);
+            tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Interests);
             tryAddInfoRightLine(FontAwesome.fa_suitcase, user.Occupation);
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))
@@ -405,7 +399,7 @@ namespace osu.Game.Overlays.Profile
                 scoreText.Add(createScoreText("Ranked Score"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.RankedScore.ToString(@"#,0")));
                 scoreText.Add(createScoreText("Accuracy"));
-                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy.ToString("0.##", CultureInfo.CurrentCulture)}%"));
+                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy:0.##}%"));
                 scoreText.Add(createScoreText("Play Count"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.PlayCount.ToString(@"#,0")));
                 scoreText.Add(createScoreText("Total Score"));
@@ -427,7 +421,7 @@ namespace osu.Game.Overlays.Profile
                 gradeSPlus.DisplayCount = 0;
                 gradeSSPlus.DisplayCount = 0;
 
-                chartContainer.Add(new RankChart(user) { RelativeSizeAxes = Axes.Both });
+                rankGraph.User.Value = user;
             }
         }
 
@@ -509,34 +503,42 @@ namespace osu.Game.Overlays.Profile
 
             public class LinkText : OsuSpriteText
             {
-                public override bool HandleInput => Url != null;
+                private readonly OsuHoverContainer content;
 
-                public string Url;
+                public override bool HandleInput => content.Action != null;
 
-                private Color4 hoverColour;
+                protected override Container<Drawable> Content => content ?? (Container<Drawable>)this;
 
-                protected override bool OnHover(InputState state)
+                protected override IEnumerable<Drawable> FlowingChildren => Children;
+
+                public string Url
                 {
-                    this.FadeColour(hoverColour, 500, Easing.OutQuint);
-                    return base.OnHover(state);
+                    set
+                    {
+                        if (value != null)
+                            content.Action = () => Process.Start(value);
+                    }
                 }
 
-                protected override void OnHoverLost(InputState state)
+                public LinkText()
                 {
-                    this.FadeColour(Color4.White, 500, Easing.OutQuint);
-                    base.OnHoverLost(state);
+                    AddInternal(content = new OsuHoverContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                    });
                 }
+            }
 
-                protected override bool OnClick(InputState state)
-                {
-                    Process.Start(Url);
-                    return true;
-                }
+            public class ProfileLink : LinkText, IHasTooltip
+            {
+                public string TooltipText => "View Profile in Browser";
 
-                [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
+                public ProfileLink(User user)
                 {
-                    hoverColour = colours.Yellow;
+                    Text = user.Username;
+                    Url = $@"https://osu.ppy.sh/users/{user.Id}";
+                    Font = @"Exo2.0-RegularItalic";
+                    TextSize = 30;
                 }
             }
         }

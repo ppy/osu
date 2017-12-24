@@ -58,6 +58,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 ApproachCircle = new ApproachCircle
                 {
+                    Alpha = 0,
+                    Scale = new Vector2(4),
                     Colour = AccentColour,
                 }
             };
@@ -80,21 +82,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Result = HitObject.ScoreResultForOffset(Math.Abs(timeOffset)),
                 PositionOffset = Vector2.Zero //todo: set to correct value
             });
-        }
-
-        protected override void UpdateInitialState()
-        {
-            base.UpdateInitialState();
-
-            // sane defaults
-            ring.Show();
-            circle.Show();
-            number.Show();
-            glow.Show();
-
-            ApproachCircle.Hide();
-            ApproachCircle.ScaleTo(new Vector2(4));
-            explode.Hide();
         }
 
         protected override void UpdatePreemptState()

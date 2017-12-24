@@ -20,6 +20,7 @@ namespace osu.Game.Graphics.UserInterface
         private const Easing easing = Easing.InOutCubic;
 
         private float length;
+
         /// <summary>
         /// Length of the bar, ranges from 0 to 1
         /// </summary>

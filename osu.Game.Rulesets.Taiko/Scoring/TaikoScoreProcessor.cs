@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -53,7 +54,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// <summary>
         /// Taiko fails at the end of the map if the player has not half-filled their HP bar.
         /// </summary>
-        public override bool HasFailed => Hits == MaxHits && Health.Value <= 0.5;
+        protected override bool DefaultFailCondition => Hits == MaxHits && Health.Value <= 0.5;
 
         private double hpIncreaseTick;
         private double hpIncreaseGreat;
@@ -71,12 +72,12 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
         protected override void SimulateAutoplay(Beatmap<TaikoHitObject> beatmap)
         {
-            double hpMultiplierNormal = 1 / (hp_hit_great * beatmap.HitObjects.FindAll(o => o is Hit).Count * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, 0.5, 0.75, 0.98));
+            double hpMultiplierNormal = 1 / (hp_hit_great * beatmap.HitObjects.FindAll(o => o is Hit).Count * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98));
 
             hpIncreaseTick = hp_hit_tick;
             hpIncreaseGreat = hpMultiplierNormal * hp_hit_great;
             hpIncreaseGood = hpMultiplierNormal * hp_hit_good;
-            hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
+            hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
 
             foreach (var obj in beatmap.HitObjects)
             {
@@ -88,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                 }
                 else if (obj is DrumRoll)
                 {
-                    for (int i = 0; i < ((DrumRoll)obj).TotalTicks; i++)
+                    for (int i = 0; i < ((DrumRoll)obj).NestedHitObjects.OfType<DrumRollTick>().Count(); i++)
                     {
                         AddJudgement(new TaikoDrumRollTickJudgement { Result = HitResult.Great });
 

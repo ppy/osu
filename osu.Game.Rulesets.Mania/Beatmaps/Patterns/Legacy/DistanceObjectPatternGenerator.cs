@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             // The true distance, accounting for any repeats
             double distance = (distanceData?.Distance ?? 0) * repeatCount;
             // The velocity of the osu! hit object - calculated as the velocity of a slider
-            double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / timingPoint.BeatLength;
+            double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / timingPoint.BeatLength;
             // The duration of the osu! hit object
             double osuDuration = distance / osuVelocity;
 

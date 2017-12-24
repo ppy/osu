@@ -12,14 +12,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SidebarButton : Container
+    public class SidebarButton : OsuButton
     {
         private readonly SpriteIcon drawableIcon;
         private readonly SpriteText headerText;
-        private readonly Box backgroundBox;
         private readonly Box selectionIndicator;
         private readonly Container text;
         public Action<SettingsSection> Action;
@@ -61,17 +61,14 @@ namespace osu.Game.Overlays.Settings
 
         public SidebarButton()
         {
+            BackgroundColour = OsuColour.Gray(60);
+            Background.Alpha = 0;
+
             Height = Sidebar.DEFAULT_WIDTH;
             RelativeSizeAxes = Axes.X;
-            Children = new Drawable[]
+
+            AddRange(new Drawable[]
             {
-                backgroundBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingMode.Additive,
-                    Colour = OsuColour.Gray(60),
-                    Alpha = 0,
-                },
                 text = new Container
                 {
                     Width = Sidebar.DEFAULT_WIDTH,
@@ -101,7 +98,7 @@ namespace osu.Game.Overlays.Settings
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                 }
-            };
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -113,19 +110,18 @@ namespace osu.Game.Overlays.Settings
         protected override bool OnClick(InputState state)
         {
             Action?.Invoke(section);
-            backgroundBox.FlashColour(Color4.White, 400);
-            return true;
+            return base.OnClick(state);
         }
 
         protected override bool OnHover(InputState state)
         {
-            backgroundBox.FadeTo(0.4f, 200);
+            Background.FadeTo(0.4f, 200);
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            backgroundBox.FadeTo(0, 200);
+            Background.FadeTo(0, 200);
             base.OnHoverLost(state);
         }
     }

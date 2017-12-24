@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -28,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         protected override void SimulateAutoplay(Beatmap<OsuHitObject> beatmap)
         {
-            hpDrainRate = beatmap.BeatmapInfo.Difficulty.DrainRate;
+            hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
 
             foreach (var obj in beatmap.HitObjects)
             {
@@ -39,7 +40,11 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     AddJudgement(new OsuJudgement { Result = HitResult.Great });
 
                     // Ticks
-                    foreach (var unused in slider.Ticks)
+                    foreach (var unused in slider.NestedHitObjects.OfType<SliderTick>())
+                        AddJudgement(new OsuJudgement { Result = HitResult.Great });
+
+                    //Repeats
+                    foreach (var unused in slider.NestedHitObjects.OfType<RepeatPoint>())
                         AddJudgement(new OsuJudgement { Result = HitResult.Great });
                 }
 

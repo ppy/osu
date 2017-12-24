@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -15,6 +16,9 @@ namespace osu.Game.Beatmaps.Drawables
 
         public DifficultyIcon(BeatmapInfo beatmap) : base(beatmap)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+
             this.beatmap = beatmap;
             Size = new Vector2(20);
         }
@@ -35,7 +39,8 @@ namespace osu.Game.Beatmaps.Drawables
                 new ConstrainedIconContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Icon = beatmap.Ruleset.CreateInstance().CreateIcon()
+                    // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
+                    Icon = beatmap.Ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.fa_question_circle_o }
                 }
             };
         }

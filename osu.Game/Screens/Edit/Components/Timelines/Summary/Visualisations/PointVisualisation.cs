@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
     /// <summary>
     /// Represents a singular point on a timeline part.
     /// </summary>
-    internal class PointVisualisation : Box
+    public class PointVisualisation : Box
     {
         protected PointVisualisation(double startTime)
         {

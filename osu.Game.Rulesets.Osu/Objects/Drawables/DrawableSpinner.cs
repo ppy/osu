@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly SpinnerDisc disc;
         private readonly SpinnerTicks ticks;
+        private readonly SpinnerSpmCounter spmCounter;
 
         private readonly Container mainContainer;
 
@@ -103,6 +104,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         },
                     }
                 },
+                spmCounter = new SpinnerSpmCounter
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Y = 120,
+                    Alpha = 0
+                }
             };
         }
 
@@ -157,6 +165,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void Update()
         {
             disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
+            if (!spmCounter.IsPresent && disc.Tracking)
+                spmCounter.FadeIn(TIME_FADEIN);
 
             base.Update();
         }
@@ -167,6 +177,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             circle.Rotation = disc.Rotation;
             ticks.Rotation = disc.Rotation;
+            spmCounter.SetRotation(disc.RotationAbsolute);
 
             float relativeCircleScale = spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);

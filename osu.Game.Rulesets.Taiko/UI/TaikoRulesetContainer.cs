@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     StartTime = time,
                 };
 
-                barLine.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.Difficulty);
+                barLine.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
 
                 bool isMajor = currentBeat % (int)currentPoint.TimeSignature == 0;
                 Playfield.Add(isMajor ? new DrawableBarLineMajor(barLine) : new DrawableBarLine(barLine));
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
-        protected override Playfield CreatePlayfield() => new TaikoPlayfield
+        protected override Playfield CreatePlayfield() => new TaikoPlayfield(Beatmap.ControlPointInfo)
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft

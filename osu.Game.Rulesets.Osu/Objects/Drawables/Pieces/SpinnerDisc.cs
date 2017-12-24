@@ -77,7 +77,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private float lastAngle;
         private float currentRotation;
         public float RotationAbsolute;
-
         private int completeTick;
 
         private bool updateCompleteTick() => completeTick != (completeTick = (int)(RotationAbsolute / 360));

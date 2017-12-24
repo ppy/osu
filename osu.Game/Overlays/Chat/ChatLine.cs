@@ -222,7 +222,7 @@ namespace osu.Game.Overlays.Chat
 
         }
 
-        private class MessageSender : ClickableContainer, IHasContextMenu
+        private class MessageSender : OsuClickableContainer, IHasContextMenu
         {
             private readonly User sender;
 

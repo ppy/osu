@@ -14,7 +14,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {
-    internal class PlaylistList : CompositeDrawable
+    public class PlaylistList : CompositeDrawable
     {
         public Action<BeatmapSetInfo> OnSelect;
 
@@ -35,7 +35,11 @@ namespace osu.Game.Overlays.Music
             set { base.Padding = value; }
         }
 
-        public IEnumerable<BeatmapSetInfo> BeatmapSets { set { items.Sets = value; } }
+        public IEnumerable<BeatmapSetInfo> BeatmapSets
+        {
+            get { return items.Sets; }
+            set { items.Sets = value; }
+        }
 
         public BeatmapSetInfo FirstVisibleSet => items.FirstVisibleSet;
         public BeatmapSetInfo NextSet => items.NextSet;
@@ -48,7 +52,7 @@ namespace osu.Game.Overlays.Music
         }
 
         public void AddBeatmapSet(BeatmapSetInfo beatmapSet) => items.AddBeatmapSet(beatmapSet);
-        public bool RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => items.RemoveBeatmapSet(beatmapSet);
+        public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => items.RemoveBeatmapSet(beatmapSet);
 
         public void Filter(string searchTerm) => items.SearchTerm = searchTerm;
 
@@ -81,6 +85,7 @@ namespace osu.Game.Overlays.Music
 
             public IEnumerable<BeatmapSetInfo> Sets
             {
+                get { return items.Select(x => x.BeatmapSetInfo).ToList(); }
                 set
                 {
                     items.Clear();
@@ -103,12 +108,11 @@ namespace osu.Game.Overlays.Music
                 });
             }
 
-            public bool RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
+            public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
             {
                 var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == beatmapSet.ID);
-                if (itemToRemove == null)
-                    return false;
-                return items.Remove(itemToRemove);
+                if (itemToRemove != null)
+                    items.Remove(itemToRemove);
             }
 
             public BeatmapSetInfo SelectedSet
@@ -230,6 +234,7 @@ namespace osu.Game.Overlays.Music
             private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
             {
                 public IEnumerable<string> FilterTerms => new string[] { };
+
                 public bool MatchingFilter
                 {
                     set

@@ -37,7 +37,7 @@ namespace osu.Game.Overlays
 
         private const float bottom_black_area_height = 55;
 
-        private Drawable currentBackground;
+        private Drawable background;
         private ProgressBar progressBar;
 
         private IconButton prevButton;
@@ -120,7 +120,7 @@ namespace osu.Game.Overlays
                             },
                             Children = new[]
                             {
-                                currentBackground = new Background(),
+                                background = new Background(),
                                 title = new OsuSpriteText
                                 {
                                     Origin = Anchor.BottomCentre,
@@ -161,11 +161,15 @@ namespace osu.Game.Overlays
                                             {
                                                 prevButton = new IconButton
                                                 {
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
                                                     Action = prev,
                                                     Icon = FontAwesome.fa_step_backward,
                                                 },
                                                 playButton = new IconButton
                                                 {
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
                                                     Action = play,
@@ -173,6 +177,8 @@ namespace osu.Game.Overlays
                                                 },
                                                 nextButton = new IconButton
                                                 {
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
                                                     Action = next,
                                                     Icon = FontAwesome.fa_step_forward,
                                                 },
@@ -245,7 +251,7 @@ namespace osu.Game.Overlays
 
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping && !beatmapBacking.Disabled)
+                if (track.HasCompleted && !track.Looping && !beatmapBacking.Disabled && playlist.BeatmapSets.Any())
                     next();
             }
             else
@@ -328,6 +334,7 @@ namespace osu.Game.Overlays
 
             pendingBeatmapSwitch = Schedule(delegate
             {
+                // todo: this can likely be replaced with WorkingBeatmap.GetBeatmapAsync()
                 Task.Run(() =>
                 {
                     if (beatmap?.Beatmap == null) //this is not needed if a placeholder exists
@@ -346,29 +353,26 @@ namespace osu.Game.Overlays
                     }
                 });
 
-                playerContainer.Add(new AsyncLoadWrapper(new Background(beatmap)
+                LoadComponentAsync(new Background(beatmap) { Depth = float.MaxValue }, newBackground =>
                 {
-                    OnLoadComplete = newBackground =>
+                    switch (direction)
                     {
-                        switch (direction)
-                        {
-                            case TransformDirection.Next:
-                                newBackground.Position = new Vector2(400, 0);
-                                newBackground.MoveToX(0, 500, Easing.OutCubic);
-                                currentBackground.MoveToX(-400, 500, Easing.OutCubic);
-                                break;
-                            case TransformDirection.Prev:
-                                newBackground.Position = new Vector2(-400, 0);
-                                newBackground.MoveToX(0, 500, Easing.OutCubic);
-                                currentBackground.MoveToX(400, 500, Easing.OutCubic);
-                                break;
-                        }
-                        currentBackground.Expire();
-                        currentBackground = newBackground;
+                        case TransformDirection.Next:
+                            newBackground.Position = new Vector2(400, 0);
+                            newBackground.MoveToX(0, 500, Easing.OutCubic);
+                            background.MoveToX(-400, 500, Easing.OutCubic);
+                            break;
+                        case TransformDirection.Prev:
+                            newBackground.Position = new Vector2(-400, 0);
+                            newBackground.MoveToX(0, 500, Easing.OutCubic);
+                            background.MoveToX(400, 500, Easing.OutCubic);
+                            break;
                     }
-                })
-                {
-                    Depth = float.MaxValue,
+
+                    background.Expire();
+                    background = newBackground;
+
+                    playerContainer.Add(newBackground);
                 });
             });
         }

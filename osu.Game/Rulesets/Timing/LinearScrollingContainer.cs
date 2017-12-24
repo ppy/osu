@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Timing
     /// <summary>
     /// A <see cref="ScrollingContainer"/> which scrolls linearly relative to the <see cref="MultiplierControlPoint"/> start time.
     /// </summary>
-    internal class LinearScrollingContainer : ScrollingContainer
+    public class LinearScrollingContainer : ScrollingContainer
     {
         private readonly MultiplierControlPoint controlPoint;
 

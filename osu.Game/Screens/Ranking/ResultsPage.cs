@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
-    internal class ResultsPage : Container
+    public class ResultsPage : Container
     {
         protected readonly Score Score;
         protected readonly WorkingBeatmap Beatmap;

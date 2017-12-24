@@ -74,20 +74,18 @@ namespace osu.Game.Overlays.BeatmapSet
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Right = metadata_width + BeatmapSetOverlay.RIGHT_WIDTH + spacing * 2 },
-                            Child = new ScrollContainer
+                            Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ScrollbarVisible = false,
                                 Child = description = new MetadataSection("Description"),
                             },
                         },
-                        new ScrollContainer
+                        new Container
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.Y,
                             Width = metadata_width,
-                            ScrollbarVisible = false,
                             Padding = new MarginPadding { Horizontal = 10 },
                             Margin = new MarginPadding { Right = BeatmapSetOverlay.RIGHT_WIDTH + spacing },
                             Child = new FillFlowContainer

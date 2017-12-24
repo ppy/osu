@@ -11,10 +11,11 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// The part of the timeline that displays bookmarks.
     /// </summary>
-    internal class BookmarkPart : TimelinePart
+    public class BookmarkPart : TimelinePart
     {
         protected override void LoadBeatmap(WorkingBeatmap beatmap)
         {
+            base.LoadBeatmap(beatmap);
             foreach (int bookmark in beatmap.BeatmapInfo.Bookmarks)
                 Add(new BookmarkVisualisation(bookmark));
         }

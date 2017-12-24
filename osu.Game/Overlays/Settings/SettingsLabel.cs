@@ -7,7 +7,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
-    internal class SettingsLabel : SettingsItem<string>
+    public class SettingsLabel : SettingsItem<string>
     {
         protected override Drawable CreateControl() => null;
 

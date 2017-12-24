@@ -13,7 +13,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
-    internal class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
+    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
     {
         private readonly Box meterFill;
         public BindableDouble Bindable { get; } = new BindableDouble();

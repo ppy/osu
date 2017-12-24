@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Graphics.Sprites
 {
@@ -39,5 +40,24 @@ namespace osu.Game.Graphics.Sprites
 
             return base.CreateFallbackCharacterDrawable();
         }
+    }
+
+    public static class OsuSpriteTextTransformExtensions
+    {
+        /// <summary>
+        /// Sets <see cref="OsuSpriteText.Text"/> to a new value after a duration.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public static TransformSequence<T> TransformTextTo<T>(this T spriteText, string newText, double duration = 0, Easing easing = Easing.None)
+            where T : OsuSpriteText
+            => spriteText.TransformTo(nameof(OsuSpriteText.Text), newText, duration, easing);
+
+        /// <summary>
+        /// Sets <see cref="OsuSpriteText.Text"/> to a new value after a duration.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public static TransformSequence<T> TransformTextTo<T>(this TransformSequence<T> t, string newText, double duration = 0, Easing easing = Easing.None)
+            where T : OsuSpriteText
+            => t.Append(o => o.TransformTextTo(newText, duration, easing));
     }
 }

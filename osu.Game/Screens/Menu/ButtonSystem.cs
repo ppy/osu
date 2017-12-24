@@ -17,6 +17,7 @@ using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Menu
 {
@@ -38,13 +39,28 @@ namespace osu.Game.Screens.Menu
         private readonly FlowContainerWithOrigin buttonFlow;
 
         //todo: make these non-internal somehow.
-        internal const float BUTTON_AREA_HEIGHT = 100;
-        internal const float BUTTON_WIDTH = 140f;
-        internal const float WEDGE_WIDTH = 20;
+        public const float BUTTON_AREA_HEIGHT = 100;
 
-        public const int EXIT_DELAY = 3000;
+        public const float BUTTON_WIDTH = 140f;
+        public const float WEDGE_WIDTH = 20;
 
-        private readonly OsuLogo osuLogo;
+        private OsuLogo logo;
+
+        public void SetOsuLogo(OsuLogo logo)
+        {
+            this.logo = logo;
+
+            if (this.logo != null)
+            {
+                this.logo.Action = onOsuLogo;
+
+                // osuLogo.SizeForFlow relies on loading to be complete.
+                buttonFlow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + this.logo.SizeForFlow / 4), 0);
+
+                updateLogoState();
+            }
+        }
+
         private readonly Drawable iconFacade;
         private readonly Container buttonArea;
         private readonly Box buttonAreaBackground;
@@ -99,21 +115,15 @@ namespace osu.Game.Screens.Menu
                         }
                     }
                 },
-                osuLogo = new OsuLogo
-                {
-                    Action = onOsuLogo,
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                }
             };
 
-            buttonsPlay.Add(new Button(@"solo", @"select-6", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new Button(@"multi", @"select-5", FontAwesome.fa_users, new Color4(94, 63, 186, 255), () => OnMulti?.Invoke(), 0, Key.M));
-            buttonsPlay.Add(new Button(@"chart", @"select-5", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
+            buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
+            buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.fa_users, new Color4(94, 63, 186, 255), () => OnMulti?.Invoke(), 0, Key.M));
+            buttonsPlay.Add(new Button(@"chart", @"button-generic-select", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
 
-            buttonsTopLevel.Add(new Button(@"play", @"select-1", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, WEDGE_WIDTH, Key.P));
-            buttonsTopLevel.Add(new Button(@"osu!editor", @"select-5", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new Button(@"osu!direct", string.Empty, FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
+            buttonsTopLevel.Add(new Button(@"play", @"button-play-select", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, WEDGE_WIDTH, Key.P));
+            buttonsTopLevel.Add(new Button(@"osu!editor", @"button-generic-select", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
+            buttonsTopLevel.Add(new Button(@"osu!direct", @"button-direct-select", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
             buttonsTopLevel.Add(new Button(@"exit", string.Empty, FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), onExit, 0, Key.Q));
 
             buttonFlow.AddRange(buttonsPlay);
@@ -124,15 +134,7 @@ namespace osu.Game.Screens.Menu
         private void load(AudioManager audio, OsuGame game = null)
         {
             toolbar = game?.Toolbar;
-            sampleBack = audio.Sample.Get(@"Menu/select-4");
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // osuLogo.SizeForFlow relies on loading to be complete.
-            buttonFlow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + osuLogo.SizeForFlow / 4), 0);
+            sampleBack = audio.Sample.Get(@"Menu/button-back-select");
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -142,7 +144,7 @@ namespace osu.Game.Screens.Menu
             switch (args.Key)
             {
                 case Key.Space:
-                    osuLogo.TriggerOnClick(state);
+                    logo?.TriggerOnClick(state);
                     return true;
                 case Key.Escape:
                     switch (State)
@@ -178,19 +180,21 @@ namespace osu.Game.Screens.Menu
             State = MenuState.TopLevel;
         }
 
-        private void onOsuLogo()
+        private bool onOsuLogo()
         {
             switch (state)
             {
+                default:
+                    return true;
                 case MenuState.Initial:
                     State = MenuState.TopLevel;
-                    return;
+                    return true;
                 case MenuState.TopLevel:
                     buttonsTopLevel.First().TriggerOnClick();
-                    return;
+                    return false;
                 case MenuState.Play:
                     buttonsPlay.First().TriggerOnClick();
-                    return;
+                    return false;
             }
         }
 
@@ -215,12 +219,12 @@ namespace osu.Game.Screens.Menu
                 backButton.ContractStyle = 0;
                 settingsButton.ContractStyle = 0;
 
-                bool fromInitial = lastState == MenuState.Initial;
-
                 if (state == MenuState.TopLevel)
                     buttonArea.FinishTransforms(true);
 
-                using (buttonArea.BeginDelayedSequence(fromInitial ? 150 : 0, true))
+                updateLogoState(lastState);
+
+                using (buttonArea.BeginDelayedSequence(lastState == MenuState.Initial ? 150 : 0, true))
                 {
                     switch (state)
                     {
@@ -229,38 +233,17 @@ namespace osu.Game.Screens.Menu
                             buttonAreaBackground.ScaleTo(Vector2.One, 500, Easing.Out);
                             buttonArea.FadeOut(300);
 
-                            osuLogo.Delay(150)
-                                .Schedule(() => toolbar?.Hide())
-                                .ScaleTo(1, 800, Easing.OutExpo)
-                                .MoveTo(Vector2.Zero, 800, Easing.OutExpo);
-
                             foreach (Button b in buttonsTopLevel)
                                 b.State = ButtonState.Contracted;
 
                             foreach (Button b in buttonsPlay)
                                 b.State = ButtonState.Contracted;
 
-                            if (state == MenuState.Exit)
-                            {
-                                osuLogo.RotateTo(20, EXIT_DELAY * 1.5f);
-                                osuLogo.FadeOut(EXIT_DELAY);
-                            }
-                            else if (lastState == MenuState.TopLevel)
+                            if (state != MenuState.Exit && lastState == MenuState.TopLevel)
                                 sampleBack?.Play();
                             break;
                         case MenuState.TopLevel:
                             buttonAreaBackground.ScaleTo(Vector2.One, 200, Easing.Out);
-
-                            var sequence = osuLogo
-                                .ScaleTo(0.5f, 200, Easing.In)
-                                .MoveTo(buttonFlow.DrawPosition, 200, Easing.In);
-
-                            if (fromInitial && osuLogo.Scale.X > 0.5f)
-                                sequence.OnComplete(o =>
-                                {
-                                    o.Impact();
-                                    toolbar?.Show();
-                                });
 
                             buttonArea.FadeIn(300);
 
@@ -301,15 +284,84 @@ namespace osu.Game.Screens.Menu
             }
         }
 
+        private ScheduledDelegate logoDelayedAction;
+
+        private void updateLogoState(MenuState lastState = MenuState.Initial)
+        {
+            if (logo == null) return;
+
+            logoDelayedAction?.Cancel();
+
+            switch (state)
+            {
+                case MenuState.Exit:
+                case MenuState.Initial:
+                    logoTracking = false;
+
+                    logoDelayedAction = Scheduler.AddDelayed(() =>
+                    {
+                        toolbar?.Hide();
+
+                        logo.ClearTransforms(targetMember: nameof(Position));
+                        logo.RelativePositionAxes = Axes.Both;
+
+                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                        logo.ScaleTo(1, 800, Easing.OutExpo);
+                    }, 150);
+
+                    break;
+                case MenuState.TopLevel:
+                case MenuState.Play:
+                    logo.ClearTransforms(targetMember: nameof(Position));
+                    logo.RelativePositionAxes = Axes.None;
+
+                    switch (lastState)
+                    {
+                        case MenuState.TopLevel: // coming from toplevel to play
+                        case MenuState.Initial:
+                            logoTracking = false;
+                            logo.ScaleTo(0.5f, 200, Easing.In);
+
+                            logo.MoveTo(logoTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In);
+
+                            logoDelayedAction = Scheduler.AddDelayed(() =>
+                            {
+                                logoTracking = true;
+
+                                logo.Impact();
+                                toolbar?.Show();
+                            }, 200);
+                            break;
+                        default:
+                            logoTracking = true;
+                            logo.ScaleTo(0.5f, 200, Easing.OutQuint);
+                            break;
+                    }
+                    break;
+                case MenuState.EnteringMode:
+                    logoTracking = true;
+                    break;
+            }
+        }
+
+        private Vector2 logoTrackingPosition => logo.Parent.ToLocalSpace(iconFacade.ScreenSpaceDrawQuad.Centre);
+
+        private bool logoTracking;
+
         protected override void Update()
         {
             //if (OsuGame.IdleTime > 6000 && State != MenuState.Exit)
             //    State = MenuState.Initial;
 
-            osuLogo.Interactive = Alpha > 0.2f;
-
-            iconFacade.Width = osuLogo.SizeForFlow * 0.5f;
             base.Update();
+
+            if (logo != null)
+            {
+                if (logoTracking)
+                    logo.Position = logoTrackingPosition;
+
+                iconFacade.Width = logo.SizeForFlow * 0.5f;
+            }
         }
     }
 

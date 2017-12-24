@@ -11,7 +11,7 @@ namespace osu.Game.Users
     /// </summary>
     public class UpdateableAvatar : Container
     {
-        private Container displayedAvatar;
+        private Drawable displayedAvatar;
 
         private User user;
 
@@ -40,11 +40,13 @@ namespace osu.Game.Users
         {
             displayedAvatar?.FadeOut(300);
             displayedAvatar?.Expire();
-            Add(displayedAvatar = new AsyncLoadWrapper(new Avatar(user)
-            {
-                RelativeSizeAxes = Axes.Both,
-                OnLoadComplete = d => d.FadeInFromZero(200),
-            }));
+            Add(displayedAvatar = new DelayedLoadWrapper(
+                new Avatar(user)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    OnLoadComplete = d => d.FadeInFromZero(200),
+                })
+            );
         }
     }
 }

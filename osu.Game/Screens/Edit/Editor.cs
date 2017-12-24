@@ -8,230 +8,160 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
-using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Edit.Screens;
+using osu.Game.Screens.Edit.Screens.Compose;
+using osu.Game.Screens.Edit.Screens.Design;
+using osu.Game.Screens.Edit.Components;
 
 namespace osu.Game.Screens.Edit
 {
-    internal class Editor : OsuScreen
+    public class Editor : OsuScreen
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
-        internal override bool ShowOverlays => false;
+        public override bool ShowOverlays => false;
 
         private readonly Box bottomBackground;
+        private readonly Container screenContainer;
+
+        private EditorScreen currentScreen;
 
         public Editor()
         {
-            Add(new Container
+            EditorMenuBar menuBar;
+            TimeInfoContainer timeInfo;
+            SummaryTimeline timeline;
+            PlaybackControl playback;
+
+            Children = new[]
             {
-                RelativeSizeAxes = Axes.X,
-                Height = 40,
-                Children = new Drawable[]
+                new Container
                 {
-                    new Box
+                    Name = "Screen container",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = 40, Bottom = 60 },
+                    Child = screenContainer = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.FromHex("111")
-                    },
-                    new EditorMenuBar
+                        Masking = true
+                    }
+                },
+                new Container
+                {
+                    Name = "Top bar",
+                    RelativeSizeAxes = Axes.X,
+                    Height = 40,
+                    Child = menuBar = new EditorMenuBar
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        X = 100,
+                        RelativeSizeAxes = Axes.Both,
                         Items = new[]
                         {
-                            new EditorMenuBarItem("File")
+                            new MenuItem("File")
                             {
                                 Items = new[]
                                 {
-                                    new EditorMenuItem("Clear all notes"),
-                                    new EditorMenuItem("Open difficulty..."),
-                                    new EditorMenuItem("Save"),
-                                    new EditorMenuItem("Create new difficulty..."),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Revert to saved"),
-                                    new EditorMenuItem("Revert to saved (full"),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Test beatmap"),
-                                    new EditorMenuItem("Open AiMod"),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Upload Beatmap..."),
-                                    new EditorMenuItem("Export package"),
-                                    new EditorMenuItem("Export map package"),
-                                    new EditorMenuItem("Import from..."),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Open song folder"),
-                                    new EditorMenuItem("Open .osu in Notepad"),
-                                    new EditorMenuItem("Open .osb in Notepad"),
+                                    new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap),
                                     new EditorMenuItemSpacer(),
                                     new EditorMenuItem("Exit", MenuItemType.Standard, Exit)
                                 }
-                            },
-                            new EditorMenuBarItem("Edit")
-                            {
-                                Items = new[]
-                                {
-                                    new EditorMenuItem("Undo"),
-                                    new EditorMenuItem("Redo"),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Cut"),
-                                    new EditorMenuItem("Copy"),
-                                    new EditorMenuItem("Paste"),
-                                    new EditorMenuItem("Delete"),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Select all"),
-                                    new EditorMenuItem("Clone"),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Reverse selection"),
-                                    new EditorMenuItem("Flip horizontally"),
-                                    new EditorMenuItem("Flip vertically"),
-                                    new EditorMenuItem("Rotate 90deg clockwise"),
-                                    new EditorMenuItem("Rotate 90deg anticlockwise"),
-                                    new EditorMenuItem("Rotate by..."),
-                                    new EditorMenuItem("Scale by..."),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Reset selected objects' samples"),
-                                    new EditorMenuItem("Reset all samples", MenuItemType.Destructive),
-                                    new EditorMenuItem("Reset combo colours", MenuItemType.Destructive),
-                                    new EditorMenuItem("Reset breaks", MenuItemType.Destructive),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Nudge backward"),
-                                    new EditorMenuItem("Nudge forward")
-                                }
-                            },
-                            new EditorMenuBarItem("View")
-                            {
-                                Items = new[]
-                                {
-                                    new EditorMenuItem("Compose"),
-                                    new EditorMenuItem("Design"),
-                                    new EditorMenuItem("Timing"),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Song setup..."),
-                                    new EditorMenuItem("Timing setup..."),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Volume"),
-                                    new EditorMenuItem("Grid level"),
-                                    new EditorMenuItem("Show video"),
-                                    new EditorMenuItem("Show sample name"),
-                                    new EditorMenuItem("Snaking sliders"),
-                                    new EditorMenuItem("Hit animations"),
-                                    new EditorMenuItem("Follow points"),
-                                    new EditorMenuItem("Stacking")
-                                }
-                            },
-                            new EditorMenuBarItem("Compose")
-                            {
-                                Items = new[]
-                                {
-                                    new EditorMenuItem("Snap divisor"),
-                                    new EditorMenuItem("Audio rate"),
-                                    new EditorMenuItem("Grid snapping"),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Create polygon cricles..."),
-                                    new EditorMenuItem("Convert slider to stream"),
-                                    new EditorMenuItem("Enable live mapping mode"),
-                                    new EditorMenuItem("Sample import")
-                                }
-                            },
-                            new EditorMenuBarItem("Design")
-                            {
-                                Items = new[]
-                                {
-                                    new EditorMenuItem("Move all elements in time...")
-                                }
-                            },
-                            new EditorMenuBarItem("Timing")
-                            {
-                                Items = new[]
-                                {
-                                    new EditorMenuItem("Time signature"),
-                                    new EditorMenuItem("Metronome clicks"),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Add timing section"),
-                                    new EditorMenuItem("Add inheriting section"),
-                                    new EditorMenuItem("Reset current section"),
-                                    new EditorMenuItem("Delete timing section"),
-                                    new EditorMenuItem("Resnap current section"),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Timing setup..."),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Resnap all notes", MenuItemType.Destructive),
-                                    new EditorMenuItem("Move all notes in time...", MenuItemType.Destructive),
-                                    new EditorMenuItem("Recalculate slider lengths", MenuItemType.Destructive),
-                                    new EditorMenuItem("Delete all timing sections", MenuItemType.Destructive),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Set current position as preview point")
-                                }
-                            },
-                            new EditorMenuBarItem("Web")
-                            {
-                                Items = new[]
-                                {
-                                    new EditorMenuItem("This Beatmap's information page"),
-                                    new EditorMenuItem("This Beatmap's thread"),
-                                    new EditorMenuItem("Quick reply")
-                                }
-                            },
-                            new EditorMenuBarItem("Help")
-                            {
-                                Items = new[]
-                                {
-                                    new EditorMenuItem("Show in-game help"),
-                                    new EditorMenuItem("View FAQ")
-                                }
                             }
                         }
                     }
-                }
-            });
-
-            SummaryTimeline summaryTimeline;
-            Add(new Container
-            {
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
-                RelativeSizeAxes = Axes.X,
-                Height = 60,
-                Children = new Drawable[]
+                },
+                new Container
                 {
-                    bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
-                    new Container
+                    Name = "Bottom bar",
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 60,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 10 },
-                        Child = new FillFlowContainer
+                        bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
+                        new Container
                         {
-                            Name = "Bottom bar",
                             RelativeSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(10, 0),
-                            Children = new[]
+                            Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
+                            Child = new GridContainer
                             {
-                                summaryTimeline = new SummaryTimeline
+                                RelativeSizeAxes = Axes.Both,
+                                ColumnDimensions = new[]
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Width = 0.65f
+                                    new Dimension(GridSizeMode.Absolute, 220),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.Absolute, 220)
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Right = 10 },
+                                            Child = timeInfo = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
+                                        },
+                                        timeline = new SummaryTimeline
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Left = 10 },
+                                            Child = playback = new PlaybackControl { RelativeSizeAxes = Axes.Both },
+                                        }
+                                    },
                                 }
-                            }
+                            },
                         }
                     }
-                }
-            });
+                },
+            };
 
-            summaryTimeline.Beatmap.BindTo(Beatmap);
+            timeInfo.Beatmap.BindTo(Beatmap);
+            timeline.Beatmap.BindTo(Beatmap);
+            playback.Beatmap.BindTo(Beatmap);
+            menuBar.Mode.ValueChanged += onModeChanged;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             bottomBackground.Colour = colours.Gray2;
+        }
+
+        private void exportBeatmap()
+        {
+            Beatmap.Value.Save();
+        }
+
+        private void onModeChanged(EditorScreenMode mode)
+        {
+            currentScreen?.Exit();
+
+            switch (mode)
+            {
+                case EditorScreenMode.Compose:
+                    currentScreen = new Compose();
+                    break;
+                case EditorScreenMode.Design:
+                    currentScreen = new Design();
+                    break;
+                default:
+                    currentScreen = new EditorScreen();
+                    break;
+            }
+
+            currentScreen.Beatmap.BindTo(Beatmap);
+            screenContainer.Add(currentScreen);
         }
 
         protected override void OnResuming(Screen last)
@@ -250,7 +180,11 @@ namespace osu.Game.Screens.Edit
         protected override bool OnExiting(Screen next)
         {
             Background.FadeColour(Color4.White, 500);
-            Beatmap.Value.Track?.Start();
+            if (Beatmap.Value.Track != null)
+            {
+                Beatmap.Value.Track.Tempo.Value = 1;
+                Beatmap.Value.Track.Start();
+            }
             return base.OnExiting(next);
         }
     }

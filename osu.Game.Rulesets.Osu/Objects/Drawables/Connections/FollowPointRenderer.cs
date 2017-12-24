@@ -52,9 +52,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }
         }
 
+        public override bool RemoveCompletedTransforms => false;
+
         private void update()
         {
             Clear();
+
             if (hitObjects == null)
                 return;
 

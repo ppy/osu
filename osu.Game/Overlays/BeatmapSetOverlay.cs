@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,7 +12,11 @@ using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
+using osu.Game.Rulesets;
+using osu.Game.Overlays.BeatmapSet.Scores;
 
 namespace osu.Game.Overlays
 {
@@ -22,6 +27,16 @@ namespace osu.Game.Overlays
 
         private readonly Header header;
         private readonly Info info;
+        private readonly ScoresContainer scores;
+
+        private APIAccess api;
+        private RulesetStore rulesets;
+        private GetScoresRequest getScoresRequest;
+
+        private readonly ScrollContainer scroll;
+
+        // receive input outside our bounds so we can trigger a close event on ourselves.
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
         {
@@ -51,7 +66,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
-                new ScrollContainer
+                scroll = new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -64,12 +79,45 @@ namespace osu.Game.Overlays
                         {
                             header = new Header(),
                             info = new Info(),
+                            scores = new ScoresContainer(),
                         },
                     },
                 },
             };
 
-            header.Picker.Beatmap.ValueChanged += b => info.Beatmap = b;
+            header.Picker.Beatmap.ValueChanged += b =>
+            {
+                info.Beatmap = b;
+                updateScores(b);
+            };
+        }
+
+        private void updateScores(BeatmapInfo beatmap)
+        {
+            getScoresRequest?.Cancel();
+
+            if (!beatmap.OnlineBeatmapID.HasValue)
+            {
+                scores.CleanAllScores();
+                return;
+            }
+
+            scores.IsLoading = true;
+
+            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
+            getScoresRequest.Success += r =>
+            {
+                scores.Scores = r.Scores;
+                scores.IsLoading = false;
+            };
+            api.Queue(getScoresRequest);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api, RulesetStore rulesets)
+        {
+            this.api = api;
+            this.rulesets = rulesets;
         }
 
         protected override void PopIn()
@@ -81,6 +129,7 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
+            header.Details.StopPreview();
             FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
         }
 
@@ -90,10 +139,19 @@ namespace osu.Game.Overlays
             return true;
         }
 
+        public void ShowBeatmapSet(int beatmapSetId)
+        {
+            // todo: display the overlay while we are loading here. we need to support setting BeatmapSet to null for this to work.
+            var req = new GetBeatmapSetRequest(beatmapSetId);
+            req.Success += res => ShowBeatmapSet(res.ToBeatmapSet(rulesets));
+            api.Queue(req);
+        }
+
         public void ShowBeatmapSet(BeatmapSetInfo set)
         {
             header.BeatmapSet = info.BeatmapSet = set;
             Show();
+            scroll.ScrollTo(0);
         }
     }
 }

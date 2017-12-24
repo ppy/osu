@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
     /// <summary>
     /// A HitObjectParser to parse legacy osu!catch Beatmaps.
     /// </summary>
-    internal class ConvertHitObjectParser : Legacy.ConvertHitObjectParser
+    public class ConvertHitObjectParser : Legacy.ConvertHitObjectParser
     {
         protected override HitObject CreateHit(Vector2 position, bool newCombo)
         {

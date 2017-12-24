@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Tournament
     {
         private const string results_filename = "drawings_results.txt";
 
-        internal override bool ShowOverlays => false;
+        public override bool ShowOverlays => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
@@ -193,21 +193,21 @@ namespace osu.Game.Screens.Tournament
 
                                     Children = new Drawable[]
                                     {
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Begin random",
                                             Action = teamsContainer.StartScrolling,
                                         },
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Stop random",
                                             Action = teamsContainer.StopScrolling,
                                         },
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
@@ -232,7 +232,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Children = new Drawable[]
                                     {
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 

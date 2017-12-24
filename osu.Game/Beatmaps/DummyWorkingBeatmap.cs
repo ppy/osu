@@ -11,7 +11,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Beatmaps
 {
-    internal class DummyWorkingBeatmap : WorkingBeatmap
+    public class DummyWorkingBeatmap : WorkingBeatmap
     {
         private readonly OsuGameBase game;
 
@@ -22,10 +22,10 @@ namespace osu.Game.Beatmaps
                 {
                     Artist = "please load a beatmap!",
                     Title = "no beatmaps available!",
-                    Author = "no one",
+                    AuthorString = "no one",
                 },
                 BeatmapSet = new BeatmapSetInfo(),
-                Difficulty = new BeatmapDifficulty
+                BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = 0,
                     CircleSize = 0,
@@ -59,9 +59,11 @@ namespace osu.Game.Beatmaps
                     throw new NotImplementedException();
                 }
 
-                public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => null;
+                public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => null;
 
                 public override string Description => "dummy";
+
+                public override string ShortName => "dummy";
 
                 public DummyRuleset(RulesetInfo rulesetInfo)
                     : base(rulesetInfo)

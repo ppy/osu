@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -23,6 +24,9 @@ namespace osu.Game.Beatmaps.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuColour palette)
         {
+            if (palette == null)
+                throw new ArgumentNullException(nameof(palette));
+
             this.palette = palette;
             AccentColour = getColour(beatmap);
         }
@@ -39,6 +43,9 @@ namespace osu.Game.Beatmaps.Drawables
 
         private DifficultyRating getDifficultyRating(BeatmapInfo beatmap)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+
             var rating = beatmap.StarDifficulty;
 
             if (rating < 1.5) return DifficultyRating.Easy;

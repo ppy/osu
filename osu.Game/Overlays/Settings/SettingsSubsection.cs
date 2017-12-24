@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Settings
                 new OsuSpriteText
                 {
                     Text = Header.ToUpper(),
-                    Margin = new MarginPadding { Bottom = 10 },
+                    Margin = new MarginPadding { Bottom = 10, Left = SettingsOverlay.CONTENT_MARGINS, Right = SettingsOverlay.CONTENT_MARGINS },
                     Font = @"Exo2.0-Black",
                 },
                 FlowContent

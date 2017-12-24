@@ -9,16 +9,17 @@ using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
-using SQLite.Net;
 
 namespace osu.Game.Input
 {
     public class KeyBindingStore : DatabaseBackedStore
     {
-        public KeyBindingStore(SQLiteConnection connection, RulesetStore rulesets, Storage storage = null)
-            : base(connection, storage)
+        public event Action KeyBindingChanged;
+
+        public KeyBindingStore(Func<OsuDbContext> createContext, RulesetStore rulesets, Storage storage = null)
+            : base(createContext, storage)
         {
-            foreach (var info in rulesets.AllRulesets)
+            foreach (var info in rulesets.AvailableRulesets)
             {
                 var ruleset = info.CreateInstance();
                 foreach (var variant in ruleset.AvailableVariants)
@@ -26,68 +27,60 @@ namespace osu.Game.Input
             }
         }
 
-        public void Register(KeyBindingInputManager manager) => insertDefaults(manager.DefaultKeyBindings);
-
-        protected override int StoreVersion => 3;
-
-        protected override void PerformMigration(int currentVersion, int targetVersion)
-        {
-            base.PerformMigration(currentVersion, targetVersion);
-
-            while (currentVersion++ < targetVersion)
-            {
-                switch (currentVersion)
-                {
-                    case 1:
-                    case 2:
-                    case 3:
-                        // cannot migrate; breaking underlying changes.
-                        Reset();
-                        break;
-                }
-            }
-        }
-
-        protected override void Prepare(bool reset = false)
-        {
-            if (reset)
-                Connection.DropTable<DatabasedKeyBinding>();
-
-            Connection.CreateTable<DatabasedKeyBinding>();
-        }
+        public void Register(KeyBindingContainer manager) => insertDefaults(manager.DefaultKeyBindings);
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
-            var query = Query(rulesetId, variant);
+            var context = GetContext();
 
-            // compare counts in database vs defaults
-            foreach (var group in defaults.GroupBy(k => k.Action))
+            using (var transaction = context.BeginTransaction())
             {
-                int count;
-                while (group.Count() > (count = query.Count(k => (int)k.Action == (int)group.Key)))
+                // compare counts in database vs defaults
+                foreach (var group in defaults.GroupBy(k => k.Action))
                 {
-                    var insertable = group.Skip(count).First();
+                    int count = Query(rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
+                    int aimCount = group.Count();
 
-                    // insert any defaults which are missing.
-                    Connection.Insert(new DatabasedKeyBinding
-                    {
-                        KeyCombination = insertable.KeyCombination,
-                        Action = insertable.Action,
-                        RulesetID = rulesetId,
-                        Variant = variant
-                    });
+                    if (aimCount <= count)
+                        continue;
+
+                    foreach (var insertable in group.Skip(count).Take(aimCount - count))
+                        // insert any defaults which are missing.
+                        context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
+                        {
+                            KeyCombination = insertable.KeyCombination,
+                            Action = insertable.Action,
+                            RulesetID = rulesetId,
+                            Variant = variant
+                        });
                 }
+
+                context.SaveChanges(transaction);
             }
         }
 
-        protected override Type[] ValidTypes => new[]
+        /// <summary>
+        /// Retrieve <see cref="DatabasedKeyBinding"/>s for a specified ruleset/variant content.
+        /// </summary>
+        /// <param name="rulesetId">The ruleset's internal ID.</param>
+        /// <param name="variant">An optional variant.</param>
+        /// <returns></returns>
+        public List<DatabasedKeyBinding> Query(int? rulesetId = null, int? variant = null) =>
+            GetContext().DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
+
+        public void Update(KeyBinding keyBinding)
         {
-            typeof(DatabasedKeyBinding)
-        };
+            var dbKeyBinding = (DatabasedKeyBinding)keyBinding;
 
-        public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) =>
-            Query<DatabasedKeyBinding>(b => b.RulesetID == rulesetId && b.Variant == variant);
+            var context = GetContext();
 
-        public void Update(KeyBinding keyBinding) => Connection.Update(keyBinding);
+            Refresh(ref dbKeyBinding);
+
+            dbKeyBinding.KeyCombination = keyBinding.KeyCombination;
+
+            context.SaveChanges();
+
+            KeyBindingChanged?.Invoke();
+        }
     }
 }

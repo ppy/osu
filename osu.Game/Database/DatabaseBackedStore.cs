@@ -4,128 +4,60 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using osu.Framework.Logging;
+using System.Threading;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework.Platform;
-using SQLite.Net;
-using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
 {
     public abstract class DatabaseBackedStore
     {
         protected readonly Storage Storage;
-        protected readonly SQLiteConnection Connection;
 
-        protected virtual int StoreVersion => 1;
+        /// <summary>
+        /// Create a new <see cref="OsuDbContext"/> instance (separate from the shared context via <see cref="GetContext"/> for performing isolated operations.
+        /// </summary>
+        protected readonly Func<OsuDbContext> CreateContext;
 
-        protected DatabaseBackedStore(SQLiteConnection connection, Storage storage = null)
+        private readonly ThreadLocal<OsuDbContext> queryContext;
+
+        /// <summary>
+        /// Refresh an instance potentially from a different thread with a local context-tracked instance.
+        /// </summary>
+        /// <param name="obj">The object to use as a reference when negotiating a local instance.</param>
+        /// <param name="lookupSource">An optional lookup source which will be used to query and populate a freshly retrieved replacement. If not provided, the refreshed object will still be returned but will not have any includes.</param>
+        /// <typeparam name="T">A valid EF-stored type.</typeparam>
+        protected virtual void Refresh<T>(ref T obj, IEnumerable<T> lookupSource = null) where T : class, IHasPrimaryKey
         {
+            var context = GetContext();
+
+            if (context.Entry(obj).State != EntityState.Detached) return;
+
+            var id = obj.ID;
+            obj = lookupSource?.SingleOrDefault(t => t.ID == id) ?? context.Find<T>(id);
+            context.Entry(obj).Reload();
+        }
+
+        /// <summary>
+        /// Retrieve a shared context for performing lookups (or write operations on the update thread, for now).
+        /// </summary>
+        protected OsuDbContext GetContext() => queryContext.Value;
+
+        protected DatabaseBackedStore(Func<OsuDbContext> createContext, Storage storage = null)
+        {
+            CreateContext = createContext;
+
+            // todo: while this seems to work quite well, we need to consider that contexts could enter a state where they are never cleaned up.
+            queryContext = new ThreadLocal<OsuDbContext>(CreateContext);
+
             Storage = storage;
-            Connection = connection;
-
-            try
-            {
-                Prepare();
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, $@"Failed to initialise the {GetType()}! Trying again with a clean database...");
-                Prepare(true);
-            }
-
-            checkMigrations();
-        }
-
-        private void checkMigrations()
-        {
-            var storeName = GetType().Name;
-
-            var reportedVersion = Connection.Table<StoreVersion>().Where(s => s.StoreName == storeName).FirstOrDefault() ?? new StoreVersion
-            {
-                StoreName = storeName,
-                Version = 0
-            };
-
-            if (reportedVersion.Version != StoreVersion)
-                PerformMigration(reportedVersion.Version, reportedVersion.Version = StoreVersion);
-
-            Connection.InsertOrReplace(reportedVersion);
-
-            StartupTasks();
         }
 
         /// <summary>
-        /// Called when the database version of this store doesn't match the local version.
-        /// Any manual migration operations should be performed in this.
+        /// Perform any common clean-up tasks. Should be run when idle, or whenever necessary.
         /// </summary>
-        /// <param name="currentVersion">The current store version. This will be zero on a fresh database initialisation.</param>
-        /// <param name="targetVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
-        protected virtual void PerformMigration(int currentVersion, int targetVersion)
+        public virtual void Cleanup()
         {
         }
-
-        /// <summary>
-        /// Perform any common startup tasks. Runs after <see cref="Prepare(bool)"/> and <see cref="PerformMigration(int, int)"/>.
-        /// </summary>
-        protected virtual void StartupTasks()
-        {
-
-        }
-
-        /// <summary>
-        /// Prepare this database for use. Tables should be created here.
-        /// </summary>
-        protected abstract void Prepare(bool reset = false);
-
-        /// <summary>
-        /// Reset this database to a default state. Undo all changes to database and storage backings.
-        /// </summary>
-        public void Reset() => Prepare(true);
-
-
-        public TableQuery<T> Query<T>(Expression<Func<T, bool>> filter = null) where T : class
-        {
-            checkType(typeof(T));
-
-            var query = Connection.Table<T>();
-
-            if (filter != null)
-                query = query.Where(filter);
-
-            return query;
-        }
-
-        /// <summary>
-        /// Query and populate results.
-        /// </summary>
-        /// <param name="filter">An filter to refine results.</param>
-        /// <returns></returns>
-        public List<T> QueryAndPopulate<T>(Expression<Func<T, bool>> filter)
-            where T : class
-        {
-            checkType(typeof(T));
-
-            return Connection.GetAllWithChildren(filter, true);
-        }
-
-        /// <summary>
-        /// Populate a database-backed item.
-        /// </summary>
-        /// <param name="item"></param>
-        /// <param name="recursive">Whether population should recurse beyond a single level.</param>
-        public void Populate<T>(T item, bool recursive = true)
-        {
-            checkType(item.GetType());
-            Connection.GetChildren(item, recursive);
-        }
-
-        private void checkType(Type type)
-        {
-            if (!ValidTypes.Contains(type))
-                throw new InvalidOperationException($"The requested operation specified a type of {type}, which is invalid for this {nameof(DatabaseBackedStore)}.");
-        }
-
-        protected abstract Type[] ValidTypes { get; }
     }
 }

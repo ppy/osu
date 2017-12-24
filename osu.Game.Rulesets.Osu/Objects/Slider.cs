@@ -45,6 +45,18 @@ namespace osu.Game.Rulesets.Osu.Objects
             set { Curve.Distance = value; }
         }
 
+        /// <summary>
+        /// The position of the cursor at the point of completion of this <see cref="Slider"/> if it was hit
+        /// with as few movements as possible. This is set and used by difficulty calculation.
+        /// </summary>
+        internal Vector2? LazyEndPosition;
+
+        /// <summary>
+        /// The distance travelled by the cursor upon completion of this <see cref="Slider"/> if it was hit
+        /// with as few movements as possible. This is set and used by difficulty calculation.
+        /// </summary>
+        internal float LazyTravelDistance;
+
         public List<SampleInfoList> RepeatSamples { get; set; } = new List<SampleInfoList>();
         public int RepeatCount { get; set; } = 1;
 
@@ -62,9 +74,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double Velocity;
         public double TickDistance;
 
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
@@ -87,47 +99,79 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public int RepeatAt(double progress) => (int)(progress * RepeatCount);
 
-        public IEnumerable<SliderTick> Ticks
+        protected override void CreateNestedHitObjects()
         {
-            get
+            base.CreateNestedHitObjects();
+
+            createTicks();
+            createRepeatPoints();
+        }
+
+        private void createTicks()
+        {
+            if (TickDistance == 0) return;
+
+            var length = Curve.Distance;
+            var tickDistance = Math.Min(TickDistance, length);
+            var repeatDuration = length / Velocity;
+
+            var minDistanceFromEnd = Velocity * 0.01;
+
+            for (var repeat = 0; repeat < RepeatCount; repeat++)
             {
-                if (TickDistance == 0) yield break;
+                var repeatStartTime = StartTime + repeat * repeatDuration;
+                var reversed = repeat % 2 == 1;
 
-                var length = Curve.Distance;
-                var tickDistance = Math.Min(TickDistance, length);
-                var repeatDuration = length / Velocity;
+                for (var d = tickDistance; d <= length; d += tickDistance)
+                {
+                    if (d > length - minDistanceFromEnd)
+                        break;
 
-                var minDistanceFromEnd = Velocity * 0.01;
+                    var distanceProgress = d / length;
+                    var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
 
-                for (var repeat = 0; repeat < RepeatCount; repeat++)
+                    AddNested(new SliderTick
+                    {
+                        RepeatIndex = repeat,
+                        StartTime = repeatStartTime + timeProgress * repeatDuration,
+                        Position = Curve.PositionAt(distanceProgress),
+                        StackHeight = StackHeight,
+                        Scale = Scale,
+                        ComboColour = ComboColour,
+                        Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
+                        {
+                            Bank = s.Bank,
+                            Name = @"slidertick",
+                            Volume = s.Volume
+                        }))
+                    });
+                }
+            }
+        }
+
+        private void createRepeatPoints()
+        {
+            var length = Curve.Distance;
+            var repeatPointDistance = Math.Min(Distance, length);
+            var repeatDuration = length / Velocity;
+
+            for (var repeat = 1; repeat < RepeatCount; repeat++)
+            {
+                for (var d = repeatPointDistance; d <= length; d += repeatPointDistance)
                 {
                     var repeatStartTime = StartTime + repeat * repeatDuration;
-                    var reversed = repeat % 2 == 1;
+                    var distanceProgress = d / length;
 
-                    for (var d = tickDistance; d <= length; d += tickDistance)
+                    AddNested(new RepeatPoint
                     {
-                        if (d > length - minDistanceFromEnd)
-                            break;
-
-                        var distanceProgress = d / length;
-                        var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
-
-                        yield return new SliderTick
-                        {
-                            RepeatIndex = repeat,
-                            StartTime = repeatStartTime + timeProgress * repeatDuration,
-                            Position = Curve.PositionAt(distanceProgress),
-                            StackHeight = StackHeight,
-                            Scale = Scale,
-                            ComboColour = ComboColour,
-                            Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
-                            {
-                                Bank = s.Bank,
-                                Name = @"slidertick",
-                                Volume = s.Volume
-                            }))
-                        };
-                    }
+                        RepeatIndex = repeat,
+                        StartTime = repeatStartTime,
+                        Position = Curve.PositionAt(distanceProgress),
+                        StackHeight = StackHeight,
+                        Scale = Scale,
+                        ComboColour = ComboColour,
+                        Samples = new SampleInfoList(RepeatSamples[repeat])
+                    });
                 }
             }
         }

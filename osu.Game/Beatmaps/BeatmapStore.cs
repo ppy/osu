@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
-using SQLite.Net;
-using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Beatmaps
 {
@@ -19,77 +19,9 @@ namespace osu.Game.Beatmaps
         public event Action<BeatmapInfo> BeatmapHidden;
         public event Action<BeatmapInfo> BeatmapRestored;
 
-        /// <summary>
-        /// The current version of this store. Used for migrations (see <see cref="PerformMigration(int, int)"/>).
-        /// The initial version is 1.
-        /// </summary>
-        protected override int StoreVersion => 4;
-
-        public BeatmapStore(SQLiteConnection connection)
-            : base(connection)
+        public BeatmapStore(Func<OsuDbContext> factory)
+            : base(factory)
         {
-        }
-
-        protected override Type[] ValidTypes => new[]
-        {
-            typeof(BeatmapSetInfo),
-            typeof(BeatmapInfo),
-            typeof(BeatmapMetadata),
-            typeof(BeatmapDifficulty),
-        };
-
-        protected override void Prepare(bool reset = false)
-        {
-            if (reset)
-            {
-                Connection.DropTable<BeatmapMetadata>();
-                Connection.DropTable<BeatmapDifficulty>();
-                Connection.DropTable<BeatmapSetInfo>();
-                Connection.DropTable<BeatmapSetFileInfo>();
-                Connection.DropTable<BeatmapInfo>();
-            }
-
-            Connection.CreateTable<BeatmapMetadata>();
-            Connection.CreateTable<BeatmapDifficulty>();
-            Connection.CreateTable<BeatmapSetInfo>();
-            Connection.CreateTable<BeatmapSetFileInfo>();
-            Connection.CreateTable<BeatmapInfo>();
-        }
-
-        protected override void StartupTasks()
-        {
-            base.StartupTasks();
-            cleanupPendingDeletions();
-        }
-
-        /// <summary>
-        /// Perform migrations between two store versions.
-        /// </summary>
-        /// <param name="currentVersion">The current store version. This will be zero on a fresh database initialisation.</param>
-        /// <param name="targetVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
-        protected override void PerformMigration(int currentVersion, int targetVersion)
-        {
-            base.PerformMigration(currentVersion, targetVersion);
-
-            while (currentVersion++ < targetVersion)
-            {
-                switch (currentVersion)
-                {
-                    case 1:
-                    case 2:
-                        // cannot migrate; breaking underlying changes.
-                        Reset();
-                        break;
-                    case 3:
-                        // Added MD5Hash column to BeatmapInfo
-                        Connection.MigrateTable<BeatmapInfo>();
-                        break;
-                    case 4:
-                        // Added Hidden column to BeatmapInfo
-                        Connection.MigrateTable<BeatmapInfo>();
-                        break;
-                }
-            }
         }
 
         /// <summary>
@@ -98,10 +30,22 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to add.</param>
         public void Add(BeatmapSetInfo beatmapSet)
         {
-            Connection.RunInTransaction(() =>
+            var context = GetContext();
+
+            foreach (var beatmap in beatmapSet.Beatmaps.Where(b => b.Metadata != null))
             {
-                Connection.InsertOrReplaceWithChildren(beatmapSet, true);
-            });
+                // If we detect a new metadata object it'll be attached to the current context so it can be reused
+                // to prevent duplicate entries when persisting. To accomplish this we look in the cache (.Local)
+                // of the corresponding table (.Set<BeatmapMetadata>()) for matching entries to our criteria.
+                var contextMetadata = context.Set<BeatmapMetadata>().Local.SingleOrDefault(e => e.Equals(beatmap.Metadata));
+                if (contextMetadata != null)
+                    beatmap.Metadata = contextMetadata;
+                else
+                    context.BeatmapMetadata.Attach(beatmap.Metadata);
+            }
+
+            context.BeatmapSetInfo.Attach(beatmapSet);
+            context.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
         }
@@ -113,10 +57,13 @@ namespace osu.Game.Beatmaps
         /// <returns>Whether the beatmap's <see cref="BeatmapSetInfo.DeletePending"/> was changed.</returns>
         public bool Delete(BeatmapSetInfo beatmapSet)
         {
-            if (beatmapSet.DeletePending) return false;
+            var context = GetContext();
 
+            Refresh(ref beatmapSet, BeatmapSets);
+
+            if (beatmapSet.DeletePending) return false;
             beatmapSet.DeletePending = true;
-            Connection.Update(beatmapSet);
+            context.SaveChanges();
 
             BeatmapSetRemoved?.Invoke(beatmapSet);
             return true;
@@ -129,10 +76,13 @@ namespace osu.Game.Beatmaps
         /// <returns>Whether the beatmap's <see cref="BeatmapSetInfo.DeletePending"/> was changed.</returns>
         public bool Undelete(BeatmapSetInfo beatmapSet)
         {
-            if (!beatmapSet.DeletePending) return false;
+            var context = GetContext();
 
+            Refresh(ref beatmapSet, BeatmapSets);
+
+            if (!beatmapSet.DeletePending) return false;
             beatmapSet.DeletePending = false;
-            Connection.Update(beatmapSet);
+            context.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
             return true;
@@ -145,10 +95,13 @@ namespace osu.Game.Beatmaps
         /// <returns>Whether the beatmap's <see cref="BeatmapInfo.Hidden"/> was changed.</returns>
         public bool Hide(BeatmapInfo beatmap)
         {
-            if (beatmap.Hidden) return false;
+            var context = GetContext();
 
+            Refresh(ref beatmap, Beatmaps);
+
+            if (beatmap.Hidden) return false;
             beatmap.Hidden = true;
-            Connection.Update(beatmap);
+            context.SaveChanges();
 
             BeatmapHidden?.Invoke(beatmap);
             return true;
@@ -161,22 +114,50 @@ namespace osu.Game.Beatmaps
         /// <returns>Whether the beatmap's <see cref="BeatmapInfo.Hidden"/> was changed.</returns>
         public bool Restore(BeatmapInfo beatmap)
         {
-            if (!beatmap.Hidden) return false;
+            var context = GetContext();
 
+            Refresh(ref beatmap, Beatmaps);
+
+            if (!beatmap.Hidden) return false;
             beatmap.Hidden = false;
-            Connection.Update(beatmap);
+            context.SaveChanges();
 
             BeatmapRestored?.Invoke(beatmap);
             return true;
         }
 
-        private void cleanupPendingDeletions()
+        public override void Cleanup()
         {
-            Connection.RunInTransaction(() =>
-            {
-                foreach (var b in QueryAndPopulate<BeatmapSetInfo>(b => b.DeletePending && !b.Protected))
-                    Connection.Delete(b, true);
-            });
+            var context = GetContext();
+
+            var purgeable = context.BeatmapSetInfo.Where(s => s.DeletePending && !s.Protected)
+                   .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                   .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                   .Include(s => s.Metadata);
+
+            // metadata is M-N so we can't rely on cascades
+            context.BeatmapMetadata.RemoveRange(purgeable.Select(s => s.Metadata));
+            context.BeatmapMetadata.RemoveRange(purgeable.SelectMany(s => s.Beatmaps.Select(b => b.Metadata).Where(m => m != null)));
+
+            // todo: we can probably make cascades work here with a FK in BeatmapDifficulty. just make to make it work correctly.
+            context.BeatmapDifficulty.RemoveRange(purgeable.SelectMany(s => s.Beatmaps.Select(b => b.BaseDifficulty)));
+
+            // cascades down to beatmaps.
+            context.BeatmapSetInfo.RemoveRange(purgeable);
+            context.SaveChanges();
         }
+
+        public IQueryable<BeatmapSetInfo> BeatmapSets => GetContext().BeatmapSetInfo
+                                                                     .Include(s => s.Metadata)
+                                                                     .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
+                                                                     .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                                                                     .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                                                                     .Include(s => s.Files).ThenInclude(f => f.FileInfo);
+
+        public IQueryable<BeatmapInfo> Beatmaps => GetContext().BeatmapInfo
+                                                               .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
+                                                               .Include(b => b.Metadata)
+                                                               .Include(b => b.Ruleset)
+                                                               .Include(b => b.BaseDifficulty);
     }
 }

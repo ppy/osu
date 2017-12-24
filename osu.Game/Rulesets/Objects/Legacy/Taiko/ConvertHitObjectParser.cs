@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
     /// <summary>
     /// A HitObjectParser to parse legacy osu!taiko Beatmaps.
     /// </summary>
-    internal class ConvertHitObjectParser : Legacy.ConvertHitObjectParser
+    public class ConvertHitObjectParser : Legacy.ConvertHitObjectParser
     {
         protected override HitObject CreateHit(Vector2 position, bool newCombo)
         {

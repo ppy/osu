@@ -10,13 +10,17 @@ using osu.Game.Graphics.Containers;
 using OpenTK;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Menu;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Game.Screens
 {
     public abstract class OsuScreen : Screen
     {
-        internal BackgroundScreen Background { get; private set; }
+        public BackgroundScreen Background { get; private set; }
 
         /// <summary>
         /// Override to create a BackgroundMode for the current screen.
@@ -24,17 +28,19 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
 
-        internal virtual bool ShowOverlays => true;
+        public virtual bool ShowOverlays => true;
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        internal virtual bool HasLocalCursorDisplayed => false;
+        public virtual bool HasLocalCursorDisplayed => false;
+
+        private OsuLogo logo;
 
         /// <summary>
         /// Whether the beatmap or ruleset should be allowed to be changed by the user or game.
         /// Used to mark exclusive areas where this is strongly prohibited, like gameplay.
         /// </summary>
-        internal virtual bool AllowBeatmapRulesetChange => true;
+        public virtual bool AllowBeatmapRulesetChange => true;
 
         protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
@@ -66,13 +72,34 @@ namespace osu.Game.Screens
             if (osuGame != null)
                 Ruleset.BindTo(osuGame.Ruleset);
 
-            sampleExit = audio.Sample.Get(@"UI/melodic-1");
+            sampleExit = audio.Sample.Get(@"UI/screen-back");
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat || !IsCurrentScreen) return false;
+
+            switch (args.Key)
+            {
+                case Key.Escape:
+                    Exit();
+                    return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
 
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
+            logo.AppendAnimatingAction(() => LogoArriving(logo, true), true);
             sampleExit?.Play();
+        }
+
+        protected override void OnSuspending(Screen next)
+        {
+            base.OnSuspending(next);
+            onSuspendingLogo();
         }
 
         protected override void OnEntering(Screen last)
@@ -106,11 +133,19 @@ namespace osu.Game.Screens
                 });
             }
 
+            if ((logo = lastOsu?.logo) == null)
+                LoadComponentAsync(logo = new OsuLogo { Alpha = 0 }, AddInternal);
+
+            logo.AppendAnimatingAction(() => LogoArriving(logo, false), true);
+
             base.OnEntering(last);
         }
 
         protected override bool OnExiting(Screen next)
         {
+            if (ValidForResume && logo != null)
+                onExitingLogo();
+
             OsuScreen nextOsu = next as OsuScreen;
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
@@ -127,6 +162,44 @@ namespace osu.Game.Screens
 
             Beatmap.UnbindAll();
             return false;
+        }
+
+        /// <summary>
+        /// Fired when this screen was entered or resumed and the logo state is required to be adjusted.
+        /// </summary>
+        protected virtual void LogoArriving(OsuLogo logo, bool resuming)
+        {
+            logo.Action = null;
+            logo.FadeOut(300, Easing.OutQuint);
+            logo.Anchor = Anchor.TopLeft;
+            logo.Origin = Anchor.Centre;
+            logo.RelativePositionAxes = Axes.None;
+            logo.Triangles = true;
+            logo.Ripple = true;
+        }
+
+        private void onExitingLogo()
+        {
+            logo.AppendAnimatingAction(() => { LogoExiting(logo); }, false);
+        }
+
+        /// <summary>
+        /// Fired when this screen was exited to add any outwards transition to the logo.
+        /// </summary>
+        protected virtual void LogoExiting(OsuLogo logo)
+        {
+        }
+
+        private void onSuspendingLogo()
+        {
+            logo.AppendAnimatingAction(() => { LogoSuspending(logo); }, false);
+        }
+
+        /// <summary>
+        /// Fired when this screen was suspended to add any outwards transition to the logo.
+        /// </summary>
+        protected virtual void LogoSuspending(OsuLogo logo)
+        {
         }
     }
 }

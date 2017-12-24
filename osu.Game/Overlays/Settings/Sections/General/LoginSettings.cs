@@ -230,15 +230,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         LabelText = "Stay logged in",
                         Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
-                    new OsuButton
+                    new SettingsButton
                     {
-                        RelativeSizeAxes = Axes.X,
                         Text = "Sign in",
                         Action = performLogin
                     },
-                    new OsuButton
+                    new SettingsButton
                     {
-                        RelativeSizeAxes = Axes.X,
                         Text = "Register new account",
                         //Action = registerLink
                     }

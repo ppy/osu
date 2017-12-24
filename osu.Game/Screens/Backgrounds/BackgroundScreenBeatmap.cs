@@ -32,9 +32,7 @@ namespace osu.Game.Screens.Backgrounds
 
                 Schedule(() =>
                 {
-                    var newBackground = new BeatmapBackground(beatmap);
-
-                    LoadComponentAsync(newBackground, delegate
+                    LoadComponentAsync(new BeatmapBackground(beatmap), b =>
                     {
                         float newDepth = 0;
                         if (background != null)
@@ -45,8 +43,8 @@ namespace osu.Game.Screens.Backgrounds
                             background.Expire();
                         }
 
-                        newBackground.Depth = newDepth;
-                        Add(background = newBackground);
+                        b.Depth = newDepth;
+                        Add(background = b);
                         background.BlurSigma = blurTarget;
                     });
                 });
