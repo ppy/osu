@@ -104,6 +104,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
             loadNewSongSelect();
+            AddWaitStep(1);
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
             AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
