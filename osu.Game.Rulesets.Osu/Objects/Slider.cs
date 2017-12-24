@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             var minDistanceFromEnd = Velocity * 0.01;
 
-            bool sliderStart = false;
+            bool sliderStart = true;
 
             for (var repeat = 0; repeat < RepeatCount; repeat++)
             {
