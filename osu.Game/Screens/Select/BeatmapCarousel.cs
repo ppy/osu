@@ -142,7 +142,6 @@ namespace osu.Game.Screens.Select
                 if (newSet == null)
                 {
                     itemsCache.Invalidate();
-                    SelectNext();
                     return;
                 }
 
