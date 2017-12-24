@@ -101,9 +101,6 @@ namespace osu.Game.Tests.Visual
             });
 
             AddWaitStep(1);
-            AddStep("select random", () => songSelect.Carousel.SelectNextRandom());
-
-            AddWaitStep(1);
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
             loadNewSongSelect();
