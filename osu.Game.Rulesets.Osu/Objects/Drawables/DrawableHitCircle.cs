@@ -97,9 +97,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void UpdateCurrentState(ArmedState state)
         {
             if (Hidden)
-                // TODO: figure out a smarter way to include the hit window so we are able to miss but don't keep
-                // it alive unnecessarily long.
-                this.FadeOut(TIME_PREEMPT * FadeOutSpeedMultiplier).Delay(ExpireAfter + 300).Expire();
+                this.FadeOut(TIME_PREEMPT * FadeOutSpeedMultiplier).Delay(ExpireAfter + HitObject.HitWindowFor(HitResult.Miss)).Expire();
             else
             {
                 glow.FadeOut(400 * FadeOutSpeedMultiplier);
