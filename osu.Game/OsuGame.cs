@@ -274,12 +274,12 @@ namespace osu.Game
 
             Action<Visibility> stateChanged = delegate
             {
-                float offset = intro.X;
+                float offset = 0;
 
-                if (settings.State == Visibility.Hidden || notifications.State == Visibility.Visible)
-                    offset -= ToolbarButton.WIDTH / 2;
-                else if (settings.State == Visibility.Visible || notifications.State == Visibility.Hidden)
+                if (settings.State == Visibility.Visible)
                     offset += ToolbarButton.WIDTH / 2;
+                if (notifications.State == Visibility.Visible)
+                    offset -= ToolbarButton.WIDTH / 2;
 
                 intro.MoveToX(offset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
             };
