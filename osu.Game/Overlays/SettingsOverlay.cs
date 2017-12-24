@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        public const float SIDEBAR_WIDTH = Sidebar.DEFAULT_WIDTH;
+        private const float sidebar_width = Sidebar.DEFAULT_WIDTH;
 
         protected const float WIDTH = 400;
 
@@ -102,7 +102,7 @@ namespace osu.Game.Overlays
 
             if (showSidebar)
             {
-                AddInternal(Sidebar = new Sidebar { Width = SIDEBAR_WIDTH });
+                AddInternal(Sidebar = new Sidebar { Width = sidebar_width });
 
                 SectionsContainer.SelectedSection.ValueChanged += section =>
                 {
@@ -167,7 +167,7 @@ namespace osu.Game.Overlays
 
             ContentContainer.MoveToX(-WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
 
-            Sidebar?.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
+            Sidebar?.MoveToX(-sidebar_width, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
 
             searchTextBox.HoldFocus = false;
