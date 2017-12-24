@@ -10,13 +10,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
-        public const float TIME_PREEMPT = 600;
-        public const float TIME_FADEIN = 400;
+        public static float TIME_PREEMPT = 600;
+        public static float TIME_FADEIN = 400;
         public const float TIME_FADEOUT = 500;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
+            if (hitObject.Ar >= 5)
+                TIME_PREEMPT = 1200 - (hitObject.Ar - 5) * 150;
+            else
+                TIME_PREEMPT = 1800 - hitObject.Ar * 120;
+
+            TIME_FADEIN = TIME_PREEMPT * 0.66f;
+
             AccentColour = HitObject.ComboColour;
             Alpha = 0;
         }

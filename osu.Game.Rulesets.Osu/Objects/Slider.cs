@@ -138,6 +138,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         StackHeight = StackHeight,
                         Scale = Scale,
                         ComboColour = ComboColour,
+                        Ar = Ar,
                         Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
                         {
                             Bank = s.Bank,
@@ -170,7 +171,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                         StackHeight = StackHeight,
                         Scale = Scale,
                         ComboColour = ComboColour,
-                        Samples = new SampleInfoList(RepeatSamples[repeat])
+                        Samples = new SampleInfoList(RepeatSamples[repeat]),
+                        Ar = Ar
                     });
                 }
             }

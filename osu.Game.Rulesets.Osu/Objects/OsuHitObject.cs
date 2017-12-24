@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         private const double hit_window_100 = 80;
         private const double hit_window_300 = 30;
 
+        public float Ar { get; set; } = 8;
+
         public Vector2 Position { get; set; }
         public float X => Position.X;
         public float Y => Position.Y;
