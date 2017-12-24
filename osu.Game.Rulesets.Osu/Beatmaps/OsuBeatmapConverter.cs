@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     RepeatCount = curveData.RepeatCount,
                     Position = positionData?.Position ?? Vector2.Zero,
                     NewCombo = comboData?.NewCombo ?? false,
-                    Ar = beatmap.BeatmapInfo.BaseDifficulty.ApproachRate
+                    ApproachRate = beatmap.BeatmapInfo.BaseDifficulty.ApproachRate
                 };
             }
             else if (endTimeData != null)
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     StartTime = original.StartTime,
                     Samples = original.Samples,
                     EndTime = endTimeData.EndTime,
-                    Ar = beatmap.BeatmapInfo.BaseDifficulty.ApproachRate,
+                    ApproachRate = beatmap.BeatmapInfo.BaseDifficulty.ApproachRate,
 
                     Position = positionData?.Position ?? OsuPlayfield.BASE_SIZE / 2,
                 };
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     Samples = original.Samples,
                     Position = positionData?.Position ?? Vector2.Zero,
                     NewCombo = comboData?.NewCombo ?? false,
-                    Ar = beatmap.BeatmapInfo.BaseDifficulty.ApproachRate
+                    ApproachRate = beatmap.BeatmapInfo.BaseDifficulty.ApproachRate
                 };
             }
         }
