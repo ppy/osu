@@ -56,6 +56,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     ComboIndex = s.ComboIndex,
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
+                    Od = s.Od,
                     Samples = s.Samples,
                     SampleControlPoint = s.SampleControlPoint
                 })

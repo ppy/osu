@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     RepeatSamples = curveData.RepeatSamples,
                     RepeatCount = curveData.RepeatCount,
                     Position = positionData?.Position ?? Vector2.Zero,
+                    Od = beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty,
                     NewCombo = comboData?.NewCombo ?? false
                 };
             }
@@ -44,6 +45,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 {
                     StartTime = original.StartTime,
                     Samples = original.Samples,
+                    Od = beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty,
                     EndTime = endTimeData.EndTime,
 
                     Position = positionData?.Position ?? OsuPlayfield.BASE_SIZE / 2,
@@ -56,6 +58,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     StartTime = original.StartTime,
                     Samples = original.Samples,
                     Position = positionData?.Position ?? Vector2.Zero,
+                    Od = beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty,
                     NewCombo = comboData?.NewCombo ?? false
                 };
             }
