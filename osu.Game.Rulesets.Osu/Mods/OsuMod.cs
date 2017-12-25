@@ -24,7 +24,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     public class OsuModEasy : ModEasy
     {
-
     }
 
     public class OsuModHidden : ModHidden, IApplicableToDrawableHitObjects
@@ -44,7 +43,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 d.ExtendDuration = DrawableOsuHitObject.TIME_PREEMPT - DrawableOsuHitObject.TIME_PREEMPT * fade_in_speed_multiplier;
                 d.FadeOutSpeedMultiplier = fade_out_speed_multiplier;
 
-                switch(d){
+                switch (d)
+                {
                     case DrawableHitCircle circle:
                         circle.ShowApproachCircle = false;
                         circle.PlayHitAnimation = false;
@@ -127,7 +127,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     public class OsuModPerfect : ModPerfect
     {
-
     }
 
     public class OsuModSpunOut : Mod
