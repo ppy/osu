@@ -112,7 +112,11 @@ namespace osu.Game.Overlays
                 Margin = new MarginPadding { Top = 10 },
                 ChildrenEnumerable = Users.Select(u =>
                 {
-                    UserPanel panel = new UserPanel(u);
+                    UserPanel panel = new UserPanel(u)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre
+                    };
                     switch (displayStyle)
                     {
                         case PanelDisplayStyle.Grid:
