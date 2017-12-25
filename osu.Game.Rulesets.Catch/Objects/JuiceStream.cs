@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
-using osu.Framework.Lists;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
@@ -29,9 +28,9 @@ namespace osu.Game.Rulesets.Catch.Objects
         public double Velocity;
         public double TickDistance;
 
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
@@ -42,91 +41,93 @@ namespace osu.Game.Rulesets.Catch.Objects
             TickDistance = scoringDistance / difficulty.SliderTickRate;
         }
 
-        public IEnumerable<CatchHitObject> Ticks
+        protected override void CreateNestedHitObjects()
         {
-            get
+            base.CreateNestedHitObjects();
+
+            createTicks();
+        }
+
+        private void createTicks()
+        {
+            if (TickDistance == 0)
+                return;
+
+            var length = Curve.Distance;
+            var tickDistance = Math.Min(TickDistance, length);
+            var repeatDuration = length / Velocity;
+
+            var minDistanceFromEnd = Velocity * 0.01;
+
+            AddNested(new Fruit
             {
-                SortedList<CatchHitObject> ticks = new SortedList<CatchHitObject>((a, b) => a.StartTime.CompareTo(b.StartTime));
+                Samples = Samples,
+                ComboColour = ComboColour,
+                StartTime = StartTime,
+                X = X
+            });
 
-                if (TickDistance == 0)
-                    return ticks;
+            for (var repeat = 0; repeat < RepeatCount; repeat++)
+            {
+                var repeatStartTime = StartTime + repeat * repeatDuration;
+                var reversed = repeat % 2 == 1;
 
-                var length = Curve.Distance;
-                var tickDistance = Math.Min(TickDistance, length);
-                var repeatDuration = length / Velocity;
-
-                var minDistanceFromEnd = Velocity * 0.01;
-
-                ticks.Add(new Fruit
+                for (var d = tickDistance; d <= length; d += tickDistance)
                 {
-                    Samples = Samples,
-                    ComboColour = ComboColour,
-                    StartTime = StartTime,
-                    X = X
-                });
+                    if (d > length - minDistanceFromEnd)
+                        break;
 
-                for (var repeat = 0; repeat < RepeatCount; repeat++)
-                {
-                    var repeatStartTime = StartTime + repeat * repeatDuration;
-                    var reversed = repeat % 2 == 1;
+                    var timeProgress = d / length;
+                    var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
 
-                    for (var d = tickDistance; d <= length; d += tickDistance)
+                    var lastTickTime = repeatStartTime + timeProgress * repeatDuration;
+                    AddNested(new Droplet
                     {
-                        if (d > length - minDistanceFromEnd)
-                            break;
-
-                        var timeProgress = d / length;
-                        var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
-
-                        var lastTickTime = repeatStartTime + timeProgress * repeatDuration;
-                        ticks.Add(new Droplet
-                        {
-                            StartTime = lastTickTime,
-                            ComboColour = ComboColour,
-                            X = Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
-                            Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
-                            {
-                                Bank = s.Bank,
-                                Name = @"slidertick",
-                                Volume = s.Volume
-                            }))
-                        });
-                    }
-
-                    double tinyTickInterval = tickDistance / length * repeatDuration;
-                    while (tinyTickInterval > 100)
-                        tinyTickInterval /= 2;
-
-                    for (double t = 0; t < repeatDuration; t += tinyTickInterval)
-                    {
-                        double progress = reversed ? 1 - t / repeatDuration : t / repeatDuration;
-
-                        ticks.Add(new TinyDroplet
-                        {
-                            StartTime = repeatStartTime + t,
-                            ComboColour = ComboColour,
-                            X = Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
-                            Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
-                            {
-                                Bank = s.Bank,
-                                Name = @"slidertick",
-                                Volume = s.Volume
-                            }))
-                        });
-                    }
-
-                    ticks.Add(new Fruit
-                    {
-                        Samples = Samples,
+                        StartTime = lastTickTime,
                         ComboColour = ComboColour,
-                        StartTime = repeatStartTime + repeatDuration,
-                        X = Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
+                        X = Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
+                        Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
+                        {
+                            Bank = s.Bank,
+                            Name = @"slidertick",
+                            Volume = s.Volume
+                        }))
                     });
                 }
 
-                return ticks;
+                double tinyTickInterval = tickDistance / length * repeatDuration;
+                while (tinyTickInterval > 100)
+                    tinyTickInterval /= 2;
+
+                for (double t = 0; t < repeatDuration; t += tinyTickInterval)
+                {
+                    double progress = reversed ? 1 - t / repeatDuration : t / repeatDuration;
+
+                    AddNested(new TinyDroplet
+                    {
+                        StartTime = repeatStartTime + t,
+                        ComboColour = ComboColour,
+                        X = Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
+                        Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
+                        {
+                            Bank = s.Bank,
+                            Name = @"slidertick",
+                            Volume = s.Volume
+                        }))
+                    });
+                }
+
+                AddNested(new Fruit
+                {
+                    Samples = Samples,
+                    ComboColour = ComboColour,
+                    StartTime = repeatStartTime + repeatDuration,
+                    X = Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
+                });
             }
+
         }
+
 
         public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
 

@@ -8,7 +8,7 @@ using osu.Game.Screens.Play.ReplaySettings;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseReplaySettingsOverlay : OsuTestCase
+    public class TestCaseReplaySettingsOverlay : OsuTestCase
     {
         public TestCaseReplaySettingsOverlay()
         {

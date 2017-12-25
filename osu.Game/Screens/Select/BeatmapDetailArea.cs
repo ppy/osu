@@ -52,6 +52,7 @@ namespace osu.Game.Screens.Select
 
                             default:
                                 Details.Hide();
+                                Leaderboard.Scope = (LeaderboardScope)tab - 1;
                                 Leaderboard.Show();
                                 break;
                         }

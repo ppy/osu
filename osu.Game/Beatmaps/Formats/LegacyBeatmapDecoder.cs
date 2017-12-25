@@ -313,7 +313,7 @@ namespace osu.Game.Beatmaps.Formats
                 stringSampleSet = @"normal";
 
             DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(time);
-            SoundControlPoint soundPoint = beatmap.ControlPointInfo.SoundPointAt(time);
+            SampleControlPoint samplePoint = beatmap.ControlPointInfo.SamplePointAt(time);
             EffectControlPoint effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
 
             if (timingChange)
@@ -336,9 +336,9 @@ namespace osu.Game.Beatmaps.Formats
                 });
             }
 
-            if (stringSampleSet != soundPoint.SampleBank || sampleVolume != soundPoint.SampleVolume)
+            if (stringSampleSet != samplePoint.SampleBank || sampleVolume != samplePoint.SampleVolume)
             {
-                beatmap.ControlPointInfo.SoundPoints.Add(new SoundControlPoint
+                beatmap.ControlPointInfo.SamplePoints.Add(new SampleControlPoint
                 {
                     Time = time,
                     SampleBank = stringSampleSet,

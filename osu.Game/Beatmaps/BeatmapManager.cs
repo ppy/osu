@@ -134,6 +134,7 @@ namespace osu.Game.Beatmaps
             var notification = new ProgressNotification
             {
                 Text = "Beatmap import is initialising...",
+                CompletionText = "Import successful!",
                 Progress = 0,
                 State = ProgressNotificationState.Active,
             };
@@ -245,8 +246,9 @@ namespace osu.Game.Beatmaps
                 return;
             }
 
-            ProgressNotification downloadNotification = new ProgressNotification
+            var downloadNotification = new ProgressNotification
             {
+                CompletionText = $"Imported {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
                 Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
             };
 
@@ -332,6 +334,61 @@ namespace osu.Game.Beatmaps
                         if (!beatmapSet.Protected)
                             iFiles.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
                     }
+
+                    context.ChangeTracker.AutoDetectChangesEnabled = true;
+                    context.SaveChanges(transaction);
+                }
+            }
+        }
+
+        public void UndeleteAll()
+        {
+            var deleteMaps = QueryBeatmapSets(bs => bs.DeletePending).ToList();
+
+            if (!deleteMaps.Any()) return;
+
+            var notification = new ProgressNotification
+            {
+                CompletionText = "Restored all deleted beatmaps!",
+                Progress = 0,
+                State = ProgressNotificationState.Active,
+            };
+
+            PostNotification?.Invoke(notification);
+
+            int i = 0;
+
+            foreach (var bs in deleteMaps)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
+                notification.Text = $"Restoring ({i} of {deleteMaps.Count})";
+                notification.Progress = (float)++i / deleteMaps.Count;
+                Undelete(bs);
+            }
+
+            notification.State = ProgressNotificationState.Completed;
+        }
+
+        public void Undelete(BeatmapSetInfo beatmapSet)
+        {
+            if (beatmapSet.Protected)
+                return;
+
+            lock (importContext)
+            {
+                var context = importContext.Value;
+
+                using (var transaction = context.BeginTransaction())
+                {
+                    context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                    var iFiles = new FileStore(() => context, storage);
+                    var iBeatmaps = createBeatmapStore(() => context);
+
+                    undelete(iBeatmaps, iFiles, beatmapSet);
 
                     context.ChangeTracker.AutoDetectChangesEnabled = true;
                     context.SaveChanges(transaction);
@@ -665,6 +722,7 @@ namespace osu.Game.Beatmaps
             var notification = new ProgressNotification
             {
                 Progress = 0,
+                CompletionText = "Deleted all beatmaps!",
                 State = ProgressNotificationState.Active,
             };
 

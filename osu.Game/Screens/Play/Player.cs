@@ -17,7 +17,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Mods;
@@ -161,8 +160,8 @@ namespace osu.Game.Screens.Play
                     OnRetry = Restart,
                     OnQuit = Exit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
-                    Retries = RestartCount,
                     OnPause = () => {
+                        pauseContainer.Retries = RestartCount;
                         hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
                     },
                     OnResume = () => {
@@ -326,11 +325,6 @@ namespace osu.Game.Screens.Play
             Task.Run(() =>
             {
                 adjustableSourceClock.Reset();
-
-                // this is temporary until we have blocking (async.Wait()) audio component methods.
-                // then we can call ResetAsync().Wait() or the blocking version above.
-                while (adjustableSourceClock.IsRunning)
-                    Thread.Sleep(1);
 
                 Schedule(() =>
                 {

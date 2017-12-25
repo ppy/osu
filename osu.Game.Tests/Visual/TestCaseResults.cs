@@ -11,7 +11,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseResults : OsuTestCase
+    public class TestCaseResults : OsuTestCase
     {
         private BeatmapManager beatmaps;
 

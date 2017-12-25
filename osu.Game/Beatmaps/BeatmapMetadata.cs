@@ -10,9 +10,11 @@ using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
+    [Serializable]
     public class BeatmapMetadata : IEquatable<BeatmapMetadata>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonIgnore]
         public int ID { get; set; }
 
         private int? onlineBeatmapSetID;
@@ -30,7 +32,10 @@ namespace osu.Game.Beatmaps
         public string Artist { get; set; }
         public string ArtistUnicode { get; set; }
 
+        [JsonIgnore]
         public List<BeatmapInfo> Beatmaps { get; set; }
+
+        [JsonIgnore]
         public List<BeatmapSetInfo> BeatmapSets { get; set; }
 
         /// <summary>
@@ -47,6 +52,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The author of the beatmaps in this set.
         /// </summary>
+        [JsonIgnore]
         public User Author;
 
         public string Source { get; set; }
@@ -59,6 +65,7 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => $"{Artist} - {Title} ({Author})";
 
+        [JsonIgnore]
         public string[] SearchableTerms => new[]
         {
             Author?.Username,
