@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.FadeOut(500 * FadeOutSpeedMultiplier).Delay(ExtendDuration).Expire();
+                    this.FadeOut(500 * FadeOutSpeedMultiplier).Delay(ExtendDuration + HitObject.HitWindowFor(HitResult.Miss)).Expire();
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);

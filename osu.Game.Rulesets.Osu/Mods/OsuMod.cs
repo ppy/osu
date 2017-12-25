@@ -48,7 +48,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     case DrawableHitCircle circle:
                         circle.ShowApproachCircle = false;
                         circle.PlayHitAnimation = false;
-                        d.ExtendDuration += d.HitObject.HitWindowFor(HitResult.Miss);
                         break;
                     case DrawableSlider slider:
                         slider.GraduallyFadeOut = true;
