@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         StartTime = lastTickTime,
                         ComboColour = ComboColour,
                         X = Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
-                        Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
+                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                         {
                             Bank = s.Bank,
                             Name = @"slidertick",
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         StartTime = repeatStartTime + t,
                         ComboColour = ComboColour,
                         X = Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
-                        Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
+                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                         {
                             Bank = s.Bank,
                             Name = @"slidertick",
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             set { Curve.ControlPoints = value; }
         }
 
-        public List<SampleInfoList> RepeatSamples { get; set; } = new List<SampleInfoList>();
+        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
 
         public CurveType CurveType
         {
