@@ -13,7 +13,7 @@ using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseContextMenu : OsuTestCase
+    public class TestCaseContextMenu : OsuTestCase
     {
         private const int start_time = 0;
         private const int duration = 1000;

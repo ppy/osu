@@ -3,12 +3,14 @@
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace osu.Game.Rulesets
 {
     public class RulesetInfo : IEquatable<RulesetInfo>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonIgnore]
         public int? ID { get; set; }
 
         public string Name { get; set; }
@@ -17,6 +19,7 @@ namespace osu.Game.Rulesets
 
         public string InstantiationInfo { get; set; }
 
+        [JsonIgnore]
         public bool Available { get; set; }
 
         public virtual Ruleset CreateInstance() => (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo), this);
