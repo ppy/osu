@@ -19,10 +19,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using System.Collections.Generic;
-using osu.Game.Audio;
-using System;
 using osu.Game.Rulesets.Taiko.Audio;
 
 namespace osu.Game.Rulesets.Taiko.UI
