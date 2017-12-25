@@ -36,8 +36,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double Radius => OBJECT_RADIUS * Scale;
 
-        public float OverallDifficulty { get; set; } = 6;
-
         public float Scale { get; set; } = 1;
 
         public Color4 ComboColour { get; set; } = Color4.Gray;
@@ -51,11 +49,11 @@ namespace osu.Game.Rulesets.Osu.Objects
                 default:
                     return 300;
                 case HitResult.Meh:
-                    return 199.5f - OverallDifficulty * 10;
+                    return 199.5f - BaseDifficulty.OverallDifficulty * 10;
                 case HitResult.Good:
-                    return 139.5f - OverallDifficulty * 8;
+                    return 139.5f - BaseDifficulty.OverallDifficulty * 8;
                 case HitResult.Great:
-                    return 79.5f - OverallDifficulty * 6;
+                    return 79.5f - BaseDifficulty.OverallDifficulty * 6;
             }
         }
 
