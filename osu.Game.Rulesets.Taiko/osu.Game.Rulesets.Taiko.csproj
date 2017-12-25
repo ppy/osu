@@ -74,6 +74,7 @@
     <Compile Include="Objects\Hit.cs" />
     <Compile Include="Objects\RimHit.cs" />
     <Compile Include="Objects\Swell.cs" />
+    <Compile Include="Objects\SwellSampleMapping.cs" />
     <Compile Include="Replays\TaikoFramedReplayInputHandler.cs" />
     <Compile Include="Replays\TaikoAutoGenerator.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
