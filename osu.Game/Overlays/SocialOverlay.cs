@@ -64,12 +64,7 @@ namespace osu.Game.Overlays
             // TODO sort our list in some way (either locally or with API call)
             //Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => Scheduler.AddOnce(updateSearch);
 
-            Header.Tabs.Current.ValueChanged += tab =>
-            {
-                currentQuery.Value = string.Empty;
-                Filter.Tabs.Current.Value = (SocialSortCriteria)Header.Tabs.Current.Value;
-                Scheduler.AddOnce(updateSearch);
-            };
+            Header.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
 
             currentQuery.ValueChanged += v =>
             {
@@ -86,7 +81,7 @@ namespace osu.Game.Overlays
 
             currentQuery.BindTo(Filter.Search.Current);
 
-            Filter.Tabs.Current.ValueChanged += sortCriteria => Scheduler.AddOnce(updateSearch);
+            Filter.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
 
             Scheduler.AddOnce(updateSearch); // so it displays something once it's first opened
         }
@@ -99,15 +94,15 @@ namespace osu.Game.Overlays
 
         private void recreatePanels(PanelDisplayStyle displayStyle)
         {
-            if (Users == null)
-                return;
-
             if (panels != null)
             {
                 panels.FadeOut(200);
                 panels.Expire();
                 panels = null;
             }
+
+            if (Users == null)
+                return;
 
             var newPanels = new FillFlowContainer<UserPanel>
             {
