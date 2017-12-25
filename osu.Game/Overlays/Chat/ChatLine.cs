@@ -104,6 +104,7 @@ namespace osu.Game.Overlays.Chat
         private void load(OsuColour colours, ChatOverlay chat)
         {
             this.chat = chat;
+            urlColour = colours.Blue;
             customUsernameColour = colours.ChatBlue;
         }
 
@@ -204,6 +205,7 @@ namespace osu.Game.Overlays.Chat
         }
 
         private ChatOverlay chat;
+        private Color4 urlColour;
 
         private void updateMessageContent()
         {
@@ -244,11 +246,10 @@ namespace osu.Game.Overlays.Chat
 
                     contentFlow.AddLink(message.Content.Substring(link.Index, link.Length), link.Url, sprite =>
                     {
+                        ((OsuLinkSpriteText)sprite).TextColour = urlColour;
+
                         if (message.IsAction)
                             sprite.Font = @"Exo2.0-MediumItalic";
-
-                        // We want to use something that is unique to every formatted link PER MESSAGE
-                        ((ChatLink)sprite).LinkId = link.Index;
                     });
                 }
 

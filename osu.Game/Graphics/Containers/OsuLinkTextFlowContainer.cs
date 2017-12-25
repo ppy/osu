@@ -36,6 +36,9 @@ namespace osu.Game.Graphics.Containers
 
         public void AddLink(string text, string url, Action<SpriteText> creationParameters = null)
         {
+            // TODO: Remove this and get word wrapping working
+            text = text.Replace(' ', '_');
+
             AddText(text, link =>
             {
                 creationParameters?.Invoke(link);
