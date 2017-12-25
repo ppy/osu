@@ -21,23 +21,18 @@ namespace osu.Game.Graphics.Sprites
 
         public OsuLinkSpriteText()
         {
-            AddInternal(content = new OsuHoverContainer { AutoSizeAxes = Axes.Both });
-        }
-
-        protected override bool OnClick(InputState state)
-        {
-            OnLinkClicked();
-            return true;
+            AddInternal(content = new OsuHoverContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Action = OnLinkClicked,
+            });
         }
 
         private string url;
 
         public string Url
         {
-            get
-            {
-                return url;
-            }
+            get => url;
             set
             {
                 if (!string.IsNullOrEmpty(value))
@@ -47,8 +42,8 @@ namespace osu.Game.Graphics.Sprites
 
         public ColourInfo TextColour
         {
-            get { return Content.Colour; }
-            set { Content.Colour = value; }
+            get => Content.Colour;
+            set => Content.Colour = value;
         }
 
         protected virtual void OnLinkClicked() => Process.Start(Url);

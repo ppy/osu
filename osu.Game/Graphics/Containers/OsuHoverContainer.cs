@@ -11,6 +11,7 @@ namespace osu.Game.Graphics.Containers
     public class OsuHoverContainer : OsuClickableContainer
     {
         private Color4 hoverColour;
+        private Color4 unhoverColour;
 
         protected override bool OnHover(InputState state)
         {
@@ -20,7 +21,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override void OnHoverLost(InputState state)
         {
-            this.FadeColour(Color4.White, 500, Easing.OutQuint);
+            this.FadeColour(unhoverColour, 500, Easing.OutQuint);
             base.OnHoverLost(state);
         }
 
@@ -28,6 +29,7 @@ namespace osu.Game.Graphics.Containers
         private void load(OsuColour colours)
         {
             hoverColour = colours.Yellow;
+            unhoverColour = Colour;
         }
     }
 }

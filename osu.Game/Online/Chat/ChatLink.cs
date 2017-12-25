@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -22,33 +23,11 @@ namespace osu.Game.Online.Chat
 {
     public class ChatLink : OsuLinkSpriteText, IHasTooltip
     {
-        /// <summary>
-        /// Identifier unique to every link in a message.
-        /// <para>A value of -1 means that this <see cref="ChatLink"/> instance does not contain a link.</para>
-        /// </summary>
-        public int LinkId = -1;
-
         private APIAccess api;
         private BeatmapSetOverlay beatmapSetOverlay;
         private ChatOverlay chat;
 
-        private Color4 hoverColour;
-        private Color4 urlColour;
-
-        private readonly HoverClickSounds hoverClickSounds;
-
-        /// <summary>
-        /// Every other sprite in the containing ChatLine that represents the same link.
-        /// </summary>
-        protected IEnumerable<ChatLink> SameLinkSprites { get; private set; }
-
-        public override bool HandleInput => LinkId != -1;
-
-        protected override bool OnClick(InputState state)
-        {
-            hoverClickSounds.TriggerOnClick(state);
-            return base.OnClick(state);
-        }
+        public override bool HandleInput => !string.IsNullOrEmpty(Url);
 
         protected override void OnLinkClicked()
         {
@@ -145,19 +124,19 @@ namespace osu.Game.Online.Chat
             }
             else
                 base.OnLinkClicked();
-        }
 
-        private int getId(string input)
-        {
-            var index = input.IndexOf('#');
-            return int.Parse(index > 0 ? input.Remove(index) : input);
+            int getId(string input)
+            {
+                var index = input.IndexOf('#');
+                return int.Parse(index > 0 ? input.Remove(index) : input);
+            }
         }
 
         public string TooltipText
         {
             get
             {
-                if (LinkId == -1 || Url == Text)
+                if (Url == Text)
                     return null;
 
                 if (Url.StartsWith("osu://"))
@@ -177,63 +156,12 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        public ChatLink()
-        {
-            hoverClickSounds = new HoverClickSounds();
-
-            OnLoadComplete = d =>
-            {
-                // All sprites in the same chatline that represent the same URL
-                SameLinkSprites = ((Container<Drawable>)d.Parent).Children.Where(child => (child as ChatLink)?.LinkId == LinkId && !d.Equals(child)).Cast<ChatLink>();
-            };
-        }
-
-        protected override bool OnHover(InputState state)
-        {
-            if (!SameLinkSprites.Any(sprite => sprite.IsHovered))
-            {
-                hoverClickSounds.TriggerOnHover(state);
-
-                foreach (ChatLink sprite in SameLinkSprites)
-                    sprite.TriggerOnHover(state);
-            }
-
-            Content.FadeColour(hoverColour, 500, Easing.OutQuint);
-
-            return true;
-        }
-
-        protected override void OnHoverLost(InputState state)
-        {
-            if (SameLinkSprites.Any(sprite => sprite.IsHovered))
-            {
-                // We have to do this so this sprite does not fade its colour back
-                Content.FadeColour(hoverColour, 500, Easing.OutQuint);
-                return;
-            }
-
-            Content.FadeColour(urlColour, 500, Easing.OutQuint);
-
-            foreach (ChatLink sprite in SameLinkSprites)
-                sprite.Content.FadeColour(urlColour, 500, Easing.OutQuint);
-
-            base.OnHoverLost(state);
-        }
-
         [BackgroundDependencyLoader]
         private void load(APIAccess api, BeatmapSetOverlay beatmapSetOverlay, ChatOverlay chat, OsuColour colours)
         {
-            // Should be ok, inexpensive operation
-            LoadComponentAsync(hoverClickSounds);
-
             this.api = api;
             this.beatmapSetOverlay = beatmapSetOverlay;
             this.chat = chat;
-
-            hoverColour = colours.Yellow;
-            urlColour = colours.Blue;
-            if (LinkId != -1)
-                Content.Colour = urlColour;
         }
     }
 }
