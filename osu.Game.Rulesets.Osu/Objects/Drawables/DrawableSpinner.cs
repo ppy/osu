@@ -39,6 +39,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Color4 normalColour;
         private Color4 completeColour;
 
+        /// <summary>
+        /// Determines whether parts (disc, ticks and background) should not be shown.
+        /// </summary>
+        public bool HideSpinnerDetails;
+
         public DrawableSpinner(Spinner s) : base(s)
         {
             Origin = Anchor.Centre;
@@ -189,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            if (Hidden)
+            if (HideSpinnerDetails)
             {
                 disc.FadeOut();
                 ticks.FadeOut();
@@ -211,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            var sequence = this.Delay(spinner.Duration + ExpireAfter).FadeOut(160 * FadeOutSpeedMultiplier);
+            var sequence = this.Delay(spinner.Duration + ExtendDuration).FadeOut(160 * FadeOutSpeedMultiplier);
 
             switch (state)
             {

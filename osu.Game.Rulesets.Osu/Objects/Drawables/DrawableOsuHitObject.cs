@@ -17,14 +17,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public const float TIME_PREEMPT = 600;
         public const float TIME_FADEIN = 400;
 
-        public bool Hidden;
-        public double FadeInSpeedMultiplier = 1;
         public double FadeOutSpeedMultiplier = 1;
 
         /// <summary>
-        /// The number of milliseconds the expiration should be delayed to guarantee correct lifetimes of <see cref="Rulesets.Objects.HitObject"/>s.
+        /// The number of milliseconds to fade in.
         /// </summary>
-        protected double ExpireAfter;
+        public double FadeIn = TIME_FADEIN;
+
+        /// <summary>
+        /// The number of milliseconds, starting at fade in, that the <see cref="UpdateCurrentState(ArmedState)"/> should be delayed with.
+        /// </summary>
+        public double DelayUpdates = TIME_PREEMPT;
+
+        /// <summary>
+        /// The number of milliseconds the duration should be extended to guarantee a correct lifetime.
+        /// </summary>
+        public double ExtendDuration;
 
         public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Time.Current >= HitObject.StartTime - TIME_PREEMPT;
 
@@ -46,32 +54,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 UpdatePreemptState();
 
-                double delay = TIME_PREEMPT;
-                if (Hidden)
-                {
-                    delay *= FadeInSpeedMultiplier;
-                    // If we shorten the delay we fade out earlier than we actually play the HitObject.
-                    // We need to keep some DrawableHitObjects alive for a bit longer so they stay playable
-                    // and don't break their animations.
-                    ExpireAfter = TIME_PREEMPT - TIME_PREEMPT * FadeInSpeedMultiplier;
-                }
-
-                delay += Judgements.FirstOrDefault()?.TimeOffset ?? 0;
+                var delay = DelayUpdates + (Judgements.FirstOrDefault()?.TimeOffset ?? 0);
                 using (BeginDelayedSequence(delay, true))
                     UpdateCurrentState(state);
             }
         }
 
-        protected virtual void UpdatePreemptState()
-        {
-            double duration;
-            if (Hidden)
-                duration = HitObject.StartTime - TIME_PREEMPT * FadeInSpeedMultiplier - (HitObject.StartTime - TIME_PREEMPT);
-            else
-                duration = TIME_FADEIN * FadeInSpeedMultiplier;
-
-            this.FadeIn(duration);
-        }
+        protected virtual void UpdatePreemptState() => this.FadeIn(FadeIn);
 
         protected virtual void UpdateCurrentState(ArmedState state)
         {

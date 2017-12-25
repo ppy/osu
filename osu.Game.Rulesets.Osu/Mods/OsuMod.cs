@@ -32,20 +32,37 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
 
+        private const double fade_in_speed_multiplier = 0.6;
+        private const double fade_out_speed_multiplier = 0.3;
+
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
-                d.Hidden = true;
-                d.FadeInSpeedMultiplier = 0.6;
-                d.FadeOutSpeedMultiplier = 0.3;
+                d.FadeIn = d.HitObject.StartTime - DrawableOsuHitObject.TIME_PREEMPT * fade_in_speed_multiplier - (d.HitObject.StartTime - DrawableOsuHitObject.TIME_PREEMPT);
+                d.DelayUpdates *= fade_in_speed_multiplier;
+                d.ExtendDuration = DrawableOsuHitObject.TIME_PREEMPT - DrawableOsuHitObject.TIME_PREEMPT * fade_in_speed_multiplier;
+                d.FadeOutSpeedMultiplier = fade_out_speed_multiplier;
 
-                if (d is DrawableSlider slider)
-                {
-                    // we need to set the values for the InitialCircle
-                    slider.InitialCircle.Hidden = true;
-                    slider.InitialCircle.FadeInSpeedMultiplier = d.FadeInSpeedMultiplier;
-                    slider.InitialCircle.FadeOutSpeedMultiplier = d.FadeOutSpeedMultiplier;
+                switch(d){
+                    case DrawableHitCircle circle:
+                        circle.ShowApproachCircle = false;
+                        circle.PlayHitAnimation = false;
+                        d.ExtendDuration += d.HitObject.HitWindowFor(HitResult.Miss);
+                        break;
+                    case DrawableSlider slider:
+                        slider.GraduallyFadeOut = true;
+                        // we also need to set the values for the InitialCircle
+                        slider.InitialCircle.ShowApproachCircle = false;
+                        slider.InitialCircle.PlayHitAnimation = false;
+                        slider.InitialCircle.FadeIn = d.FadeIn;
+                        slider.InitialCircle.DelayUpdates = d.DelayUpdates;
+                        slider.InitialCircle.ExtendDuration = d.ExtendDuration;
+                        slider.InitialCircle.FadeOutSpeedMultiplier = d.FadeOutSpeedMultiplier;
+                        break;
+                    case DrawableSpinner spinner:
+                        spinner.HideSpinnerDetails = true;
+                        break;
                 }
             }
         }

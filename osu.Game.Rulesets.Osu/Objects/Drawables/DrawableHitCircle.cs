@@ -20,6 +20,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
+        public double FadeOutTime = 500;
+
+        /// <summary>
+        /// Determines whether the approach circle should be shown.
+        /// </summary>
+        public bool ShowApproachCircle = true;
+
+        /// <summary>
+        /// Determines whether an animation should be played when the HitObject was successfully hit.
+        /// </summary>
+        public bool PlayHitAnimation = true;
+
         public DrawableHitCircle(OsuHitObject h) : base(h)
         {
             Origin = Anchor.Centre;
@@ -87,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            if (!Hidden)
+            if (ShowApproachCircle)
             {
                 ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT));
                 ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
@@ -96,24 +108,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            if (Hidden)
-                this.FadeOut(TIME_PREEMPT * FadeOutSpeedMultiplier).Delay(ExpireAfter + HitObject.HitWindowFor(HitResult.Miss)).Expire();
-            else
+            glow.FadeOut(400 * FadeOutSpeedMultiplier);
+
+            switch (state)
             {
-                glow.FadeOut(400 * FadeOutSpeedMultiplier);
+                case ArmedState.Idle:
+                    this.FadeOut(FadeOutTime * FadeOutSpeedMultiplier).Delay(ExtendDuration).Expire();
+                    break;
+                case ArmedState.Miss:
+                    ApproachCircle.FadeOut(50);
+                    this.FadeOut(100 * FadeOutSpeedMultiplier).Expire();
+                    break;
+                case ArmedState.Hit:
+                    ApproachCircle.FadeOut(50);
 
-                switch (state)
-                {
-                    case ArmedState.Idle:
-                        this.FadeOut(500 * FadeOutSpeedMultiplier).Expire();
-                        break;
-                    case ArmedState.Miss:
-                        ApproachCircle.FadeOut(50);
-                        this.FadeOut(100 * FadeOutSpeedMultiplier).Expire();
-                        break;
-                    case ArmedState.Hit:
-                        ApproachCircle.FadeOut(50);
-
+                    if (PlayHitAnimation)
+                    {
                         const double flash_in = 40;
                         flash.FadeTo(0.8f, flash_in)
                                 .Then()
@@ -129,10 +139,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             number.FadeOut();
 
                             this.FadeOut(800 * FadeOutSpeedMultiplier)
-                                .ScaleTo(Scale * 1.5f, 400 * FadeOutSpeedMultiplier, Easing.OutQuad).Expire();
+                                .ScaleTo(Scale * 1.5f, 400 * FadeOutSpeedMultiplier, Easing.OutQuad);
                         }
-                        break;
-                }
+                    }
+                    else
+                        this.FadeOut(100 * FadeOutSpeedMultiplier);
+
+                    Expire();
+                    break;
             }
         }
 

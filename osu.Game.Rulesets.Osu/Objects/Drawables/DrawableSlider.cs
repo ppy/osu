@@ -27,6 +27,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly SliderBody body;
         private readonly SliderBall ball;
 
+        /// <summary>
+        /// Determines whether the Body should fade out gradually over its duration.
+        /// </summary>
+        public bool GraduallyFadeOut;
+
         public DrawableSlider(Slider s) : base(s)
         {
             slider = s;
@@ -156,14 +161,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             ball.FadeIn();
 
-            var duration = slider.Duration + ExpireAfter;
+            var duration = slider.Duration + ExtendDuration;
 
-            if (Hidden)
+            if (GraduallyFadeOut)
                 body.FadeOut(duration, Easing.Out);
 
             using (BeginDelayedSequence(duration, true))
             {
-                if (!Hidden)
+                if (!GraduallyFadeOut)
                     body.FadeOut(160 * FadeOutSpeedMultiplier);
 
                 ball.FadeOut(160 * FadeOutSpeedMultiplier);
