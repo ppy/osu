@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Input;
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Graphics.Containers;
