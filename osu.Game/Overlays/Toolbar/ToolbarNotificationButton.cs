@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Toolbar
             TooltipSub = "Waiting for 'ya";
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(NotificationOverlay notificationOverlay)
         {
             StateContainer = notificationOverlay;
