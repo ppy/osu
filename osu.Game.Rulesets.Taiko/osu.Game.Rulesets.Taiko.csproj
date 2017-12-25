@@ -44,6 +44,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\DrumSampleMapping.cs" />
     <Compile Include="Beatmaps\TaikoBeatmapConverter.cs" />
     <Compile Include="Judgements\TaikoDrumRollTickJudgement.cs" />
     <Compile Include="Judgements\TaikoStrongHitJudgement.cs" />
@@ -74,7 +75,6 @@
     <Compile Include="Objects\Hit.cs" />
     <Compile Include="Objects\RimHit.cs" />
     <Compile Include="Objects\Swell.cs" />
-    <Compile Include="Objects\SwellSampleMapping.cs" />
     <Compile Include="Replays\TaikoFramedReplayInputHandler.cs" />
     <Compile Include="Replays\TaikoAutoGenerator.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />

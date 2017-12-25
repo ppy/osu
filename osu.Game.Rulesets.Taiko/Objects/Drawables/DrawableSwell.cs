@@ -15,6 +15,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Framework.Audio;
+using osu.Game.Rulesets.Taiko.Audio;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -228,7 +229,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // While the swell hasn't been fully judged, input is still blocked so it doesn't fall through to other hitobjects
             // This causes the playfield to not play sounds, so they need to be handled locally
 
-            var mappingIndex = HitObject.ProgressionSamples.BinarySearch(new SwellSampleMapping { Time = Time.Current });
+            var mappingIndex = HitObject.ProgressionSamples.BinarySearch(new DrumSampleMapping { Time = Time.Current });
             if (mappingIndex < 0)
                 mappingIndex = ~mappingIndex - 1;
 
