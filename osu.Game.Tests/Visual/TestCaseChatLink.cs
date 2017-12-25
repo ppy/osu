@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseChatLink : OsuTestCase
+    public class TestCaseChatLink : OsuTestCase
     {
         private readonly BeatmapSetOverlay beatmapSetOverlay;
         private readonly ChatOverlay chat;

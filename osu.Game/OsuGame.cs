@@ -118,7 +118,7 @@ namespace osu.Game
         // TODO: Implement this properly as soon as the Editor is done
         internal void LoadEditorTimestamp()
         {
-            notificationOverlay.Post(new SimpleNotification
+            notifications.Post(new SimpleNotification
             {
                 Text = @"Sorry, but this is not fully implemented yet!",
                 Icon = FontAwesome.fa_life_saver,
@@ -127,7 +127,7 @@ namespace osu.Game
 
         internal void LoadSpectatorScreen()
         {
-            notificationOverlay.Post(new SimpleNotification
+            notifications.Post(new SimpleNotification
             {
                 Text = @"Sorry, but spectating is not implemented yet!",
                 Icon = FontAwesome.fa_life_saver,
@@ -136,7 +136,7 @@ namespace osu.Game
 
         internal void LoadMultiplayerLobby(int lobbyId)
         {
-            notificationOverlay.Post(new SimpleNotification
+            notifications.Post(new SimpleNotification
             {
                 Text = @"Sorry, but the multiplayer lobby is not implemented yet!",
                 Icon = FontAwesome.fa_life_saver,
