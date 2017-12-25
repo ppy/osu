@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -61,6 +62,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             this.mode = mode;
 
+            BeatmapDifficulty baseDifficulty = new BeatmapDifficulty
+            {
+                ApproachRate =  8,
+                OverallDifficulty = 6
+            };
+
             switch (mode)
             {
                 case HitObjectType.Circle:
@@ -72,6 +79,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         {
                             StartTime = framedClock.CurrentTime + 600 + i * 80,
                             Position = new Vector2((i - count / 2) * 14),
+                            BaseDifficulty = baseDifficulty
                         };
 
                         add(new DrawableHitCircle(h));
@@ -90,6 +98,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         Position = new Vector2(-200, 0),
                         Velocity = 1,
                         TickDistance = 100,
+                        BaseDifficulty = baseDifficulty
                     }));
                     break;
                 case HitObjectType.Spinner:
@@ -98,6 +107,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         StartTime = framedClock.CurrentTime + 600,
                         EndTime = framedClock.CurrentTime + 1600,
                         Position = new Vector2(0, 0),
+                        BaseDifficulty = baseDifficulty
                     }));
                     break;
             }
