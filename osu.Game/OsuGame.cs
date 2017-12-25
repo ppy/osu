@@ -64,6 +64,8 @@ namespace osu.Game
 
         public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
 
+        public readonly BindableBool ShowOverlays = new BindableBool();
+
         private OsuScreen screenStack;
 
         private VolumeControl volume;
@@ -287,6 +289,21 @@ namespace osu.Game
             settings.StateChanged += stateChanged;
             notifications.StateChanged += stateChanged;
 
+            notifications.Enabled.BindTo(ShowOverlays);
+
+            ShowOverlays.ValueChanged += visible =>
+            {
+                //central game screen change logic.
+                if (!visible)
+                {
+                    hideAllOverlays();
+                    musicController.State = Visibility.Hidden;
+                    Toolbar.State = Visibility.Hidden;
+                }
+                else
+                    Toolbar.State = Visibility.Visible;
+            };
+
             Cursor.State = Visibility.Hidden;
         }
 
@@ -357,6 +374,8 @@ namespace osu.Game
             notifications.State = Visibility.Hidden;
         }
 
+        private ScheduledDelegate notificationsEnabler;
+
         private void screenChanged(Screen newScreen)
         {
             currentScreen = newScreen as OsuScreen;
@@ -366,16 +385,6 @@ namespace osu.Game
                 Exit();
                 return;
             }
-
-            //central game screen change logic.
-            if (!currentScreen.ShowOverlays)
-            {
-                hideAllOverlays();
-                musicController.State = Visibility.Hidden;
-                Toolbar.State = Visibility.Hidden;
-            }
-            else
-                Toolbar.State = Visibility.Visible;
 
             ScreenChanged?.Invoke(newScreen);
         }

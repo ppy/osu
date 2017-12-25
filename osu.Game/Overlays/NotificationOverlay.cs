@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,6 +10,9 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
+using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
 {
@@ -20,12 +22,38 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
+        /// <summary>
+        /// Whether posted notifications should be processed.
+        /// </summary>
+        public readonly BindableBool Enabled = new BindableBool(true);
+
         private FlowContainer<NotificationSection> sections;
 
         /// <summary>
         /// Provide a source for the toolbar height.
         /// </summary>
         public Func<float> GetToolbarHeight;
+
+        public NotificationOverlay()
+        {
+            ScheduledDelegate notificationsEnabler = null;
+            Enabled.ValueChanged += v =>
+            {
+                if (!IsLoaded)
+                {
+                    processingPosts = v;
+                    return;
+                }
+
+                notificationsEnabler?.Cancel();
+
+                if (v)
+                    // we want a slight delay before toggling notifications on to avoid the user becoming overwhelmed.
+                    notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, 1000);
+                else
+                    processingPosts = false;
+            };
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -84,9 +112,13 @@ namespace osu.Game.Overlays
                 State = Visibility.Hidden;
         }
 
+        private readonly Scheduler postScheduler = new Scheduler();
+
+        private bool processingPosts = true;
+
         public void Post(Notification notification)
         {
-            Schedule(() =>
+            postScheduler.Add(() =>
             {
                 State = Visibility.Visible;
 
@@ -102,6 +134,13 @@ namespace osu.Game.Overlays
                 var ourType = notification.GetType();
                 sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
             });
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (processingPosts)
+                postScheduler.Update();
         }
 
         protected override void PopIn()
