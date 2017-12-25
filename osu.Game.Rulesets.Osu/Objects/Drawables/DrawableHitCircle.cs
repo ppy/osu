@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (ShowApproachCircle)
             {
-                ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT));
+                ApproachCircle.FadeIn(Math.Min(FadeIn * 2, TIME_PREEMPT));
                 ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
             }
         }

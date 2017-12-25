@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
                 var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? TIME_FADEIN : TIME_FADEIN / 2);
+                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? FadeIn : FadeIn / 2);
                 var fadeOutTime = repeatStartTime + repeatDuration;
 
                 var drawableTick = new DrawableSliderTick(tick)
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
                 var repeatStartTime = s.StartTime + repeatPoint.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? TIME_FADEIN : TIME_FADEIN / 2);
+                var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? FadeIn : FadeIn / 2);
                 var fadeOutTime = repeatStartTime + repeatDuration;
 
                 var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
