@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public double FadeIn = TIME_FADEIN;
 
         /// <summary>
-        /// The number of milliseconds, starting at fade in, that the <see cref="UpdateCurrentState(ArmedState)"/> should be delayed with.
+        /// The number of milliseconds, starting at fade in, that the <see cref="UpdateCurrentState(ArmedState)"/> should be delayed by.
         /// </summary>
         public double DelayUpdates = TIME_PREEMPT;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         }
 
-        // Todo: At some point we need to move these to DrawableHitObject after ensuring that all other Rulesets apply
+        // TODO: At some point we need to move these to DrawableHitObject after ensuring that all other Rulesets apply
         // transforms in the same way and don't rely on them not being cleared
         public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null) { }
         public override void ApplyTransformsAt(double time, bool propagateChildren = false) { }
