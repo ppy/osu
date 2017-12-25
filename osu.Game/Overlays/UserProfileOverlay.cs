@@ -28,7 +28,7 @@ namespace osu.Game.Overlays
         private ProfileSection[] sections;
         private GetUserRequest userReq;
         private APIAccess api;
-        private ProfileHeader header;
+        protected ProfileHeader Header;
         private SectionsContainer<ProfileSection> sectionsContainer;
         private ProfileTabControl tabs;
 
@@ -113,12 +113,12 @@ namespace osu.Game.Overlays
                 Colour = OsuColour.Gray(0.2f)
             });
 
-            header = new ProfileHeader(user);
+            Header = new ProfileHeader(user);
 
             Add(sectionsContainer = new SectionsContainer<ProfileSection>
             {
                 RelativeSizeAxes = Axes.Both,
-                ExpandableHeader = header,
+                ExpandableHeader = Header,
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
@@ -169,7 +169,7 @@ namespace osu.Game.Overlays
 
         private void userLoadComplete(User user)
         {
-            header.User = user;
+            Header.User = user;
 
             foreach (string id in user.ProfileOrder)
             {
