@@ -26,6 +26,11 @@ namespace osu.Game.Tests.Visual
         public TestCaseUserProfile()
         {
             Add(profile = new TestUserProfileOverlay());
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             AddStep("Show offline dummy", () => profile.ShowUser(new User
             {
@@ -77,13 +82,14 @@ namespace osu.Game.Tests.Visual
         private void checkSupporterTag(bool isSupporter)
         {
             AddUntilStep(() => profile.Header.User != null, "wait for load");
-            if(isSupporter)
+            if (isSupporter)
                 AddAssert("is supporter", () => profile.Header.SupporterTag.Alpha == 1);
             else
                 AddAssert("no supporter", () => profile.Header.SupporterTag.Alpha == 0);
         }
 
-        private class TestUserProfileOverlay : UserProfileOverlay {
+        private class TestUserProfileOverlay : UserProfileOverlay
+        {
             public new ProfileHeader Header => base.Header;
         }
     }
