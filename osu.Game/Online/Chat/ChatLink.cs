@@ -1,22 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace osu.Game.Online.Chat
@@ -157,7 +148,7 @@ namespace osu.Game.Online.Chat
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, BeatmapSetOverlay beatmapSetOverlay, ChatOverlay chat, OsuColour colours)
+        private void load(APIAccess api, BeatmapSetOverlay beatmapSetOverlay, ChatOverlay chat)
         {
             this.api = api;
             this.beatmapSetOverlay = beatmapSetOverlay;
