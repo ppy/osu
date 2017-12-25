@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public BindableInt NotificationCount = new BindableInt();
 
-        private CountCircle countDisplay;
+        private readonly CountCircle countDisplay;
 
         public ToolbarNotificationButton()
         {
@@ -32,8 +32,8 @@ namespace osu.Game.Overlays.Toolbar
                 Alpha = 0,
                 Height = 16,
                 RelativePositionAxes = Axes.Both,
-                Origin = Anchor.TopCentre,
-                Position = new Vector2(0.7f, 0.05f),
+                Origin = Anchor.Centre,
+                Position = new Vector2(0.7f, 0.25f),
             });
         }
 
@@ -42,24 +42,34 @@ namespace osu.Game.Overlays.Toolbar
         {
             StateContainer = notificationOverlay;
 
+            if (notificationOverlay != null)
+                NotificationCount.BindTo(notificationOverlay.UnreadCount);
+
             NotificationCount.ValueChanged += count =>
             {
                 if (count == 0)
                     countDisplay.FadeOut(200, Easing.OutQuint);
                 else
+                {
+                    countDisplay.Count = count;
                     countDisplay.FadeIn(200, Easing.OutQuint);
-
-                countDisplay.Count = count;
+                }
             };
         }
 
         private class CountCircle : CompositeDrawable
         {
             private readonly OsuSpriteText count;
+            private readonly Circle circle;
 
             public int Count
             {
-                set { count.Text = value.ToString("#,0"); }
+                set
+                {
+                    count.Text = value.ToString("#,0");
+                    circle.FlashColour(Color4.White, 600, Easing.OutQuint);
+                    this.ScaleTo(1.1f).Then().ScaleTo(1, 600, Easing.OutElastic);
+                }
             }
 
             public CountCircle()
@@ -68,7 +78,7 @@ namespace osu.Game.Overlays.Toolbar
 
                 InternalChildren = new Drawable[]
                 {
-                    new Circle
+                    circle = new Circle
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Red
