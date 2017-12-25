@@ -473,7 +473,7 @@ namespace osu.Game.Overlays.Profile
                     Width = width,
                     Height = 26
                 });
-                Add(numberText = new SpriteText
+                Add(numberText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
