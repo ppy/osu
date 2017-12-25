@@ -14,6 +14,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Taiko.Judgements;
+using osu.Framework.Audio;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -33,10 +34,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
-
-        private readonly TaikoAction[] rimActions = { TaikoAction.LeftRim, TaikoAction.RightRim };
-        private readonly TaikoAction[] centreActions = { TaikoAction.LeftCentre, TaikoAction.RightCentre };
-        private TaikoAction[] lastAction;
 
         /// <summary>
         /// The amount of times the user has hit this swell.
@@ -120,11 +117,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
             MainPiece.AccentColour = colours.YellowDark;
             expandingRing.Colour = colours.YellowLight;
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
+
+            foreach (var mapping in HitObject.ProgressionSamples)
+                mapping.RetrieveChannels(audio);
         }
 
         protected override void LoadComplete()
@@ -205,21 +205,38 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
+        private bool? lastWasCentre;
+
         public override bool OnPressed(TaikoAction action)
         {
             // Don't handle keys before the swell starts
             if (Time.Current < HitObject.StartTime)
                 return false;
 
-            // Find the keyset which this key corresponds to
-            var keySet = rimActions.Contains(action) ? rimActions : centreActions;
+            var isCentre = action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre;
 
-            // Ensure alternating keysets
-            if (keySet == lastAction)
+            // Ensure alternating centre and rim hits
+            if (lastWasCentre == isCentre)
                 return false;
-            lastAction = keySet;
+            lastWasCentre = isCentre;
 
             UpdateJudgement(true);
+
+            if (AllJudged)
+                return true;
+
+            // While the swell hasn't been fully judged, input is still blocked so it doesn't fall through to other hitobjects
+            // This causes the playfield to not play sounds, so they need to be handled locally
+
+            var mappingIndex = HitObject.ProgressionSamples.BinarySearch(new SwellSampleMapping { Time = Time.Current });
+            if (mappingIndex < 0)
+                mappingIndex = ~mappingIndex - 1;
+
+            var mapping = HitObject.ProgressionSamples[mappingIndex];
+            if (isCentre)
+                mapping.CentreChannel.Play();
+            else
+                mapping.RimChannel.Play();
 
             return true;
         }
