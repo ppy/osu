@@ -51,11 +51,11 @@ namespace osu.Game.Rulesets.Osu.Objects
                 default:
                     return 300;
                 case HitResult.Meh:
-                    return 150;
+                    return 199.5f - BaseDifficulty.OverallDifficulty * 10;
                 case HitResult.Good:
-                    return 80;
+                    return 139.5f - BaseDifficulty.OverallDifficulty * 8;
                 case HitResult.Great:
-                    return 30;
+                    return 79.5f - BaseDifficulty.OverallDifficulty * 6;
             }
         }
 
