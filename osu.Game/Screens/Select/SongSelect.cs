@@ -249,7 +249,9 @@ namespace osu.Game.Screens.Select
                 {
                     bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
 
-                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap);
+                    // Ensure we only change the Beatmap if no map is starting/-ed
+                    if (!Beatmap.Disabled)
+                        Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap);
                     ensurePlayingSelected(preview);
                 }
 
