@@ -23,6 +23,7 @@ using osu.Framework.Audio.Sample;
 using System.Collections.Generic;
 using osu.Game.Audio;
 using System;
+using osu.Game.Rulesets.Taiko.Audio;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -62,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         private readonly ControlPointInfo controlPointInfo;
-        private Dictionary<SampleControlPoint, DrumSamples> drumSampleMappings;
+        private readonly List<DrumSampleMapping> drumSampleMappings = new List<DrumSampleMapping>();
 
         public TaikoPlayfield(ControlPointInfo controlPointInfo)
             : base(Axes.X)
@@ -207,15 +208,16 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            drumSampleMappings = new Dictionary<SampleControlPoint, DrumSamples>();
-            foreach (var s in controlPointInfo.SamplePoints)
+            // We may have 0 sample points, but we need at least the default one
+            var samplePoints = new[] { controlPointInfo.SamplePointAt(double.MinValue) }
+                .Concat(controlPointInfo.SamplePoints);
+
+            foreach (var s in samplePoints)
             {
-                drumSampleMappings.Add(s,
-                    new DrumSamples
-                    {
-                        Centre = s.GetSampleInfo().GetChannel(audio.Sample),
-                        Rim = s.GetSampleInfo(SampleInfo.HIT_CLAP).GetChannel(audio.Sample)
-                    });
+                var mapping = new DrumSampleMapping(s);
+                mapping.RetrieveChannels(audio);
+
+                drumSampleMappings.Add(mapping);
             }
 
             overlayBackgroundContainer.BorderColour = colours.Gray0;
@@ -285,25 +287,20 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public bool OnPressed(TaikoAction action)
         {
-            var samplePoint = controlPointInfo.SamplePointAt(Clock.CurrentTime);
+            var mappingIndex = drumSampleMappings.BinarySearch(new DrumSampleMapping { Time = Time.Current });
+            if (mappingIndex < 0)
+                mappingIndex = ~mappingIndex - 1;
 
-            if (!drumSampleMappings.TryGetValue(samplePoint, out var samples))
-                throw new InvalidOperationException("Current sample set not found.");
+            var mapping = drumSampleMappings[mappingIndex];
 
             if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
-                samples.Centre.Play();
+                mapping.CentreChannel.Play();
             else
-                samples.Rim.Play();
+                mapping.RimChannel.Play();
 
             return true;
         }
 
         public bool OnReleased(TaikoAction action) => false;
-
-        private class DrumSamples
-        {
-            public SampleChannel Centre;
-            public SampleChannel Rim;
-        }
     }
 }
