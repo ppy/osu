@@ -20,8 +20,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
-        public double FadeOutTime = 500;
-
         /// <summary>
         /// Determines whether the approach circle should be shown.
         /// </summary>
@@ -113,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.FadeOut(FadeOutTime * FadeOutSpeedMultiplier).Delay(ExtendDuration).Expire();
+                    this.FadeOut(500 * FadeOutSpeedMultiplier).Delay(ExtendDuration).Expire();
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
