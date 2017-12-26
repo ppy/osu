@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Toolbar
             Icon = FontAwesome.fa_users;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(SocialOverlay chat)
         {
             StateContainer = chat;
