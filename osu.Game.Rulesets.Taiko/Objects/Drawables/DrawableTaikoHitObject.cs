@@ -6,7 +6,6 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using OpenTK;
-using System;
 using System.Linq;
 using osu.Game.Audio;
 using System.Collections.Generic;

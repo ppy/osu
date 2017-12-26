@@ -16,11 +16,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
-using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Framework.Audio;
-using System.Collections.Generic;
-using osu.Game.Rulesets.Taiko.Audio;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -199,10 +195,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(OsuColour colours)
         {
-
-
             overlayBackgroundContainer.BorderColour = colours.Gray0;
             overlayBackground.Colour = colours.Gray1;
 

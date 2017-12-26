@@ -14,8 +14,6 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Taiko.Judgements;
-using osu.Framework.Audio;
-using osu.Game.Rulesets.Taiko.Audio;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -118,7 +116,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(OsuColour colours)
         {
             MainPiece.AccentColour = colours.YellowDark;
             expandingRing.Colour = colours.YellowLight;
