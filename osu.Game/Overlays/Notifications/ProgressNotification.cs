@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -114,7 +115,7 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.Both,
             });
 
-            Content.Add(textDrawable = new TextFlowContainer(t =>
+            Content.Add(textDrawable = new OsuTextFlowContainer(t =>
             {
                 t.TextSize = 16;
             })

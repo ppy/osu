@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
@@ -176,7 +177,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Shadow = false,
                         Margin = new MarginPadding { Top = 20 },
                     },
-                    textFlow = new TextFlowContainer
+                    textFlow = new OsuTextFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,

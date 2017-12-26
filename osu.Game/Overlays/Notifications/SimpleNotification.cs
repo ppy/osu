@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using OpenTK;
 
 namespace osu.Game.Overlays.Notifications
@@ -58,7 +59,7 @@ namespace osu.Game.Overlays.Notifications
                 }
             });
 
-            Content.Add(textDrawable = new TextFlowContainer(t => t.TextSize = 16)
+            Content.Add(textDrawable = new OsuTextFlowContainer(t => t.TextSize = 16)
             {
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
