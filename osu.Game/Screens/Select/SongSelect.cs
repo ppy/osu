@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Select
 
         protected Container LeftContent;
 
-        private readonly BeatmapCarousel carousel;
+        protected readonly BeatmapCarousel Carousel;
         private readonly BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
         private BeatmapManager beatmaps;
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Select
                         Width = 0.5f,
                         Children = new Drawable[]
                         {
-                            carousel = new BeatmapCarousel
+                            Carousel = new BeatmapCarousel
                             {
                                 Masking = false,
                                 RelativeSizeAxes = Axes.Y,
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Select
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Height = filter_height,
-                                FilterChanged = c => carousel.Filter(c),
+                                FilterChanged = c => Carousel.Filter(c),
                                 Background = { Width = 2 },
                                 Exit = Exit,
                             },
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Select
                         Right = left_area_padding,
                     },
                 },
-                new ResetScrollContainer(() => carousel.ScrollToSelected())
+                new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = 250,
@@ -210,15 +210,15 @@ namespace osu.Game.Screens.Select
 
             initialAddSetsTask = new CancellationTokenSource();
 
-            carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSets();
+            Carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSets();
 
-            Beatmap.DisabledChanged += disabled => carousel.AllowSelection = !disabled;
+            Beatmap.DisabledChanged += disabled => Carousel.AllowSelection = !disabled;
             Beatmap.TriggerChange();
 
             Beatmap.ValueChanged += b =>
             {
                 if (IsCurrentScreen)
-                    carousel.SelectBeatmap(b?.BeatmapInfo);
+                    Carousel.SelectBeatmap(b?.BeatmapInfo);
             };
         }
 
@@ -232,9 +232,9 @@ namespace osu.Game.Screens.Select
         {
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
-            carousel.FlushPendingFilterOperations();
+            Carousel.FlushPendingFilterOperations();
 
-            carousel.SelectBeatmap(beatmap);
+            Carousel.SelectBeatmap(beatmap);
 
             if (selectionChangedDebounce?.Completed == false)
             {
@@ -302,9 +302,9 @@ namespace osu.Game.Screens.Select
         private void triggerRandom()
         {
             if (GetContainingInputManager().CurrentState.Keyboard.ShiftPressed)
-                carousel.SelectPreviousRandom();
+                Carousel.SelectPreviousRandom();
             else
-                carousel.SelectNextRandom();
+                Carousel.SelectNextRandom();
         }
 
         protected override void OnEntering(Screen last)
@@ -419,7 +419,6 @@ namespace osu.Game.Screens.Select
                 backgroundModeBeatmap.FadeTo(1, 250);
             }
 
-            beatmapInfoWedge.State = Visibility.Visible;
             beatmapInfoWedge.UpdateBeatmap(beatmap);
         }
 
@@ -437,17 +436,17 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void onBeatmapSetAdded(BeatmapSetInfo s) => carousel.UpdateBeatmapSet(s);
-        private void onBeatmapSetRemoved(BeatmapSetInfo s) => carousel.RemoveBeatmapSet(s);
-        private void onBeatmapRestored(BeatmapInfo b) => carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
-        private void onBeatmapHidden(BeatmapInfo b) => carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+        private void onBeatmapSetAdded(BeatmapSetInfo s) => Carousel.UpdateBeatmapSet(s);
+        private void onBeatmapSetRemoved(BeatmapSetInfo s) => Carousel.RemoveBeatmapSet(s);
+        private void onBeatmapRestored(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+        private void onBeatmapHidden(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
 
         private void carouselBeatmapsLoaded()
         {
-            if (Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
-                carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo);
+            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
+                Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo);
             else
-                carousel.SelectNextRandom();
+                Carousel.SelectNextRandom();
         }
 
         private void delete(BeatmapSetInfo beatmap)
