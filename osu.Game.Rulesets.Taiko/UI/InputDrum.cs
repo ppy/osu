@@ -4,12 +4,15 @@
 using System;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Taiko.Audio;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -18,16 +21,26 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     internal class InputDrum : Container
     {
-        public InputDrum()
+        private const float middle_split = 0.025f;
+
+        private readonly ControlPointInfo controlPoints;
+
+        public InputDrum(ControlPointInfo controlPoints)
         {
+            this.controlPoints = controlPoints;
+
             RelativeSizeAxes = Axes.Both;
             FillMode = FillMode.Fit;
+        }
 
-            const float middle_split = 0.025f;
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            var sampleMappings = new DrumSampleMapping(controlPoints, audio);
 
             Children = new Drawable[]
             {
-                new TaikoHalfDrum(false)
+                new TaikoHalfDrum(false, sampleMappings)
                 {
                     Name = "Left Half",
                     Anchor = Anchor.Centre,
@@ -38,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RimAction = TaikoAction.LeftRim,
                     CentreAction = TaikoAction.LeftCentre
                 },
-                new TaikoHalfDrum(true)
+                new TaikoHalfDrum(true, sampleMappings)
                 {
                     Name = "Right Half",
                     Anchor = Anchor.Centre,
@@ -72,8 +85,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             private readonly Sprite centre;
             private readonly Sprite centreHit;
 
-            public TaikoHalfDrum(bool flipped)
+            private readonly DrumSampleMapping sampleMappings;
+
+            public TaikoHalfDrum(bool flipped, DrumSampleMapping sampleMappings)
             {
+                this.sampleMappings = sampleMappings;
+
                 Masking = true;
 
                 Children = new Drawable[]
@@ -128,15 +145,21 @@ namespace osu.Game.Rulesets.Taiko.UI
                 Drawable target = null;
                 Drawable back = null;
 
+                var drumSample = sampleMappings.SampleAt(Time.Current);
+
                 if (action == CentreAction)
                 {
                     target = centreHit;
                     back = centre;
+
+                    drumSample.Centre.Play();
                 }
                 else if (action == RimAction)
                 {
                     target = rimHit;
                     back = rim;
+
+                    drumSample.Rim.Play();
                 }
 
                 if (target != null)

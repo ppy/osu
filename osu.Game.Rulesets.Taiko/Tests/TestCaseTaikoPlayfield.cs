@@ -165,11 +165,15 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private void addSwell(double duration = default_duration)
         {
-            rulesetContainer.Playfield.Add(new DrawableSwell(new Swell
+            var swell = new Swell
             {
                 StartTime = rulesetContainer.Playfield.Time.Current + scroll_time,
                 Duration = duration,
-            }));
+            };
+
+            swell.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+            rulesetContainer.Playfield.Add(new DrawableSwell(swell));
         }
 
         private void addDrumRoll(bool strong, double duration = default_duration)
@@ -184,6 +188,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Duration = duration,
             };
 
+            d.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
             rulesetContainer.Playfield.Add(new DrawableDrumRoll(d));
         }
 
@@ -194,6 +200,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 StartTime = rulesetContainer.Playfield.Time.Current + scroll_time,
                 IsStrong = strong
             };
+
+            h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             if (strong)
                 rulesetContainer.Playfield.Add(new DrawableCentreHitStrong(h));
@@ -208,6 +216,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 StartTime = rulesetContainer.Playfield.Time.Current + scroll_time,
                 IsStrong = strong
             };
+
+            h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             if (strong)
                 rulesetContainer.Playfield.Add(new DrawableRimHitStrong(h));
