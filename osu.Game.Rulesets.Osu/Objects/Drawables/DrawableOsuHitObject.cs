@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
-            TimePreempt = hitObject.TimePreemt;
+            TimePreempt = hitObject.TimePreempt;
             TimeFadein = hitObject.TimeFadein;
 
             AccentColour = HitObject.ComboColour;

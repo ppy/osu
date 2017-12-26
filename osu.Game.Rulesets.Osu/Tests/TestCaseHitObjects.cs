@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -99,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         StartTime = framedClock.CurrentTime + 600,
                         EndTime = framedClock.CurrentTime + 1600,
                         Position = new Vector2(0, 0),
-                     }));
+                    }));
                     break;
             }
         }
