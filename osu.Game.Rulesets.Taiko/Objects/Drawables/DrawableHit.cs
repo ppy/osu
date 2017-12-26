@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             validKeyPressed = HitActions.Contains(action);
 
             // Only count this as handled if the new judgement is a hit
-            return UpdateJudgement(true) && Judgements.LastOrDefault()?.IsHit == true;
+            return UpdateJudgement(true);
         }
 
         protected override void Update()
