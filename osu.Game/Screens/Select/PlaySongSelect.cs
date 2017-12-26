@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
@@ -45,8 +46,8 @@ namespace osu.Game.Screens.Select
 
         private SampleChannel sampleConfirm;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay)
         {
             sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
 
@@ -59,6 +60,16 @@ namespace osu.Game.Screens.Select
                 ValidForResume = false;
                 Push(new Editor());
             }, Key.Number3);
+
+            if (dialogOverlay != null)
+            {
+                Schedule(() =>
+                {
+                    // if we have no beatmaps but osu-stable is found, let's prompt the user to import.
+                    if (!beatmaps.GetAllUsableBeatmapSets().Any() && beatmaps.StableInstallationAvailable)
+                        dialogOverlay.Push(new ImportFromStablePopup(() => beatmaps.ImportFromStable()));
+                });
+            }
         }
 
         protected override void UpdateBeatmap(WorkingBeatmap beatmap)

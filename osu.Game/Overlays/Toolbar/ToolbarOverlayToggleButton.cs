@@ -21,8 +21,11 @@ namespace osu.Game.Overlays.Toolbar
             set
             {
                 stateContainer = value;
-                Action = stateContainer.ToggleVisibility;
-                stateContainer.StateChanged += stateChanged;
+                if (stateContainer != null)
+                {
+                    Action = stateContainer.ToggleVisibility;
+                    stateContainer.StateChanged += stateChanged;
+                }
             }
         }
 
