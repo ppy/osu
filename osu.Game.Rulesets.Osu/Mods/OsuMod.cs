@@ -11,9 +11,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -24,7 +25,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     public class OsuModEasy : ModEasy
     {
-
     }
 
     public class OsuModHidden : ModHidden, IApplicableToDrawableHitObjects
@@ -32,9 +32,54 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
 
+        private const double fade_in_speed_multiplier = 0.6;
+        private const double fade_out_speed_multiplier = 0.3;
+
+        private float preEmpt => DrawableOsuHitObject.TIME_PREEMPT;
+
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
+            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
+                d.ApplyCustomUpdateState += customSequence;
+        }
 
+        private void customSequence(DrawableHitObject drawable, ArmedState state)
+        {
+            if (!(drawable is DrawableOsuHitObject d))
+                return;
+
+            //var duration = (d.HitObject as IHasEndTime)?.Duration ?? 0;
+            var fadeInTime = d.HitObject.StartTime - preEmpt;
+            var fadeIn = d.HitObject.StartTime - preEmpt * fade_in_speed_multiplier - fadeInTime;
+            var fadeOutTime = fadeInTime + fadeIn;
+            var fadeOut = d.HitObject.StartTime - preEmpt * fade_out_speed_multiplier - fadeOutTime;
+
+            d.FadeIn = fadeIn;
+
+            using (drawable.BeginAbsoluteSequence(fadeInTime))
+            {
+                switch (drawable)
+                {
+                    case DrawableHitCircle circle:
+                        circle.ApproachCircle.FadeOut();
+                        circle.LifetimeEnd = circle.HitObject.StartTime + Math.Max(fadeOut, circle.HitObject.HitWindowFor(HitResult.Miss));
+
+                        using (circle.BeginDelayedSequence(fadeIn))
+                            circle.FadeOut(fadeOut);
+                        break;
+                    case DrawableSlider slider:
+                        slider.InitialCircle.ApplyCustomUpdateState += customSequence;
+
+                        //using (slider.BeginDelayedSequence(fadeIn))
+                        //    slider.Body.FadeOut(duration, Easing.Out);
+                        break;
+                    case DrawableSpinner spinner:
+                        spinner.Disc.FadeOut();
+                        spinner.Ticks.FadeOut();
+                        spinner.Background.FadeOut();
+                        break;
+                }
+            }
         }
     }
 
@@ -56,11 +101,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             slider.ControlPoints = newControlPoints;
             slider.Curve?.Calculate(); // Recalculate the slider curve
-        }
-
-        public void ApplyToHitObjects(RulesetContainer<OsuHitObject> rulesetContainer)
-        {
-
         }
     }
 
@@ -102,7 +142,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     public class OsuModPerfect : ModPerfect
     {
-
     }
 
     public class OsuModSpunOut : Mod
