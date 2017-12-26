@@ -95,7 +95,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="list">The list to search.</param>
         /// <param name="time">The time to find the control point at.</param>
-        /// <param name="defaultPoint">The control point to use when there is not control point before <paramref name="time"/>.</param>
+        /// <param name="defaultPoint">The control point to use when there is no control point before <paramref name="time"/>.</param>
         /// <returns>The active control point at <paramref name="time"/>.</returns>
         private T binarySearch<T>(SortedList<T> list, double time, T defaultPoint)
             where T : ControlPoint, new()
