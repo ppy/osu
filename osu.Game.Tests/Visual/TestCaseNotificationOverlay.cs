@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -24,6 +25,12 @@ namespace osu.Game.Tests.Visual
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight
             });
+
+            SpriteText displayedCount = new SpriteText();
+
+            Content.Add(displayedCount);
+
+            manager.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count}"; };
 
             AddStep(@"toggle", manager.ToggleVisibility);
             AddStep(@"simple #1", sendHelloNotification);

@@ -29,7 +29,8 @@ namespace osu.Game.Overlays.Profile
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
         private readonly RankGraph rankGraph;
 
-        private readonly Container coverContainer, supporterTag;
+        public readonly SupporterIcon SupporterTag;
+        private readonly Container coverContainer;
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
@@ -94,32 +95,13 @@ namespace osu.Game.Overlays.Profile
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        supporterTag = new CircularContainer
+                                        SupporterTag = new SupporterIcon
                                         {
+                                            Alpha = 0,
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
                                             Y = -75,
-                                            Size = new Vector2(25, 25),
-                                            Masking = true,
-                                            BorderThickness = 3,
-                                            BorderColour = Color4.White,
-                                            Alpha = 0,
-                                            Children = new Drawable[]
-                                            {
-                                                new Box
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Alpha = 0,
-                                                    AlwaysPresent = true
-                                                },
-                                                new SpriteIcon
-                                                {
-                                                    Icon = FontAwesome.fa_heart,
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    Size = new Vector2(12),
-                                                }
-                                            }
+                                            Size = new Vector2(25, 25)
                                         },
                                         new LinkFlowContainer.ProfileLink(user)
                                         {
@@ -328,7 +310,8 @@ namespace osu.Game.Overlays.Profile
                 Depth = float.MaxValue,
             }, coverContainer.Add);
 
-            if (user.IsSupporter) supporterTag.Show();
+            if (user.IsSupporter)
+                SupporterTag.Show();
 
             if (!string.IsNullOrEmpty(user.Colour))
             {
@@ -473,7 +456,7 @@ namespace osu.Game.Overlays.Profile
                     Width = width,
                     Height = 26
                 });
-                Add(numberText = new SpriteText
+                Add(numberText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
