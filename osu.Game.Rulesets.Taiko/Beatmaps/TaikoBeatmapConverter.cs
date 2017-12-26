@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             var curveData = obj as IHasCurve;
 
             // Old osu! used hit sounding to determine various hit type information
-            SampleInfoList samples = obj.Samples;
+            List<SampleInfo> samples = obj.Samples;
 
             bool strong = samples.Any(s => s.Name == SampleInfo.HIT_FINISH);
 
@@ -115,12 +115,12 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 if (!isForCurrentRuleset && tickSpacing > 0 && osuDuration < 2 * speedAdjustedBeatLength)
                 {
-                    List<SampleInfoList> allSamples = curveData != null ? curveData.RepeatSamples : new List<SampleInfoList>(new[] { samples });
+                    List<List<SampleInfo>> allSamples = curveData != null ? curveData.RepeatSamples : new List<List<SampleInfo>>(new[] { samples });
 
                     int i = 0;
                     for (double j = obj.StartTime; j <= obj.StartTime + taikoDuration + tickSpacing / 8; j += tickSpacing)
                     {
-                        SampleInfoList currentSamples = allSamples[i];
+                        List<SampleInfo> currentSamples = allSamples[i];
                         bool isRim = currentSamples.Any(s => s.Name == SampleInfo.HIT_CLAP || s.Name == SampleInfo.HIT_WHISTLE);
                         strong = currentSamples.Any(s => s.Name == SampleInfo.HIT_FINISH);
 
