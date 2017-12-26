@@ -59,21 +59,18 @@ namespace osu.Game.Tests.Visual
         {
             TestSongSelect songSelect = null;
 
-            if (manager == null)
+            var storage = new TestStorage(@"TestCasePlaySongSelect");
+
+            // this is by no means clean. should be replacing inside of OsuGameBase somehow.
+            var context = new OsuDbContext();
+
+            Func<OsuDbContext> contextFactory = () => context;
+
+            dependencies.Cache(rulesets = new RulesetStore(contextFactory));
+            dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
             {
-                var storage = new TestStorage(@"TestCasePlaySongSelect");
-
-                // this is by no means clean. should be replacing inside of OsuGameBase somehow.
-                var context = new OsuDbContext();
-
-                Func<OsuDbContext> contextFactory = () => context;
-
-                dependencies.Cache(rulesets = new RulesetStore(contextFactory));
-                dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
-                {
-                    DefaultBeatmap = defaultBeatmap = baseManager.GetWorkingBeatmap(null)
-                });
-            }
+                DefaultBeatmap = defaultBeatmap = baseManager.GetWorkingBeatmap(null)
+            });
 
             void loadNewSongSelect(bool deleteMaps = false) => AddStep("reload song select", () =>
             {
