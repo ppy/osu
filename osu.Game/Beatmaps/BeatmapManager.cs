@@ -697,10 +697,12 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
+
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public void ImportFromStable()
+        public async Task ImportFromStable()
         {
             var stable = GetStableStorage?.Invoke();
 
@@ -710,7 +712,7 @@ namespace osu.Game.Beatmaps
                 return;
             }
 
-            Import(stable.GetDirectories("Songs"));
+            await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs")), TaskCreationOptions.LongRunning);
         }
 
         public void DeleteAll()
