@@ -20,18 +20,5 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// The number of hits required to complete the swell successfully.
         /// </summary>
         public int RequiredHits = 10;
-
-        public List<DrumSampleMapping> ProgressionSamples = new List<DrumSampleMapping>();
-
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
-        {
-            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
-
-            var progressionSamplePoints = new[] { controlPointInfo.SamplePointAt(StartTime) }
-                .Concat(controlPointInfo.SamplePoints.Where(p => p.Time > StartTime && p.Time <= EndTime));
-
-            foreach (var point in progressionSamplePoints)
-                ProgressionSamples.Add(new DrumSampleMapping(point));
-        }
     }
 }

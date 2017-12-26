@@ -123,9 +123,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.AccentColour = colours.YellowDark;
             expandingRing.Colour = colours.YellowLight;
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
-
-            foreach (var mapping in HitObject.ProgressionSamples)
-                mapping.RetrieveChannels(audio);
         }
 
         protected override void LoadComplete()
@@ -222,22 +219,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             lastWasCentre = isCentre;
 
             UpdateJudgement(true);
-
-            if (AllJudged)
-                return true;
-
-            // While the swell hasn't been fully judged, input is still blocked so it doesn't fall through to other hitobjects
-            // This causes the playfield to not play sounds, so they need to be handled locally
-
-            var mappingIndex = HitObject.ProgressionSamples.BinarySearch(new DrumSampleMapping { Time = Time.Current });
-            if (mappingIndex < 0)
-                mappingIndex = ~mappingIndex - 1;
-
-            var mapping = HitObject.ProgressionSamples[mappingIndex];
-            if (isCentre)
-                mapping.CentreChannel.Play();
-            else
-                mapping.RimChannel.Play();
 
             return true;
         }
