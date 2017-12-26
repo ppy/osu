@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
@@ -334,7 +335,7 @@ namespace osu.Game.Screens.Select
                                 TextSize = 14,
                             },
                         },
-                        textFlow = new TextFlowContainer
+                        textFlow = new OsuTextFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -359,7 +360,7 @@ namespace osu.Game.Screens.Select
 
             private void setTextAsync(string text)
             {
-                LoadComponentAsync(new TextFlowContainer(s => s.TextSize = 14)
+                LoadComponentAsync(new OsuTextFlowContainer(s => s.TextSize = 14)
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,

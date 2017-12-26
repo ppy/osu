@@ -103,21 +103,41 @@ namespace osu.Game.Screens.Select
                         Right = left_area_padding * 2,
                     }
                 },
-                Carousel = new BeatmapCarousel
+                new Container
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(carousel_width, 1),
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    SelectionChanged = carouselSelectionChanged,
-                    BeatmapSetsChanged = carouselBeatmapsLoaded,
-                },
-                FilterControl = new FilterControl
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = filter_height,
-                    FilterChanged = c => Carousel.Filter(c),
-                    Exit = Exit,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 2, //avoid horizontal masking so the panels don't clip when screen stack is pushed.
+                    Child = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Width = 0.5f,
+                        Children = new Drawable[]
+                        {
+                            Carousel = new BeatmapCarousel
+                            {
+                                Masking = false,
+                                RelativeSizeAxes = Axes.Y,
+                                Size = new Vector2(carousel_width, 1),
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                SelectionChanged = carouselSelectionChanged,
+                                BeatmapSetsChanged = carouselBeatmapsLoaded,
+                            },
+                            FilterControl = new FilterControl
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = filter_height,
+                                FilterChanged = c => Carousel.Filter(c),
+                                Background = { Width = 2 },
+                                Exit = Exit,
+                            },
+                        }
+                    },
                 },
                 beatmapInfoWedge = new BeatmapInfoWedge
                 {
