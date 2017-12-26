@@ -310,6 +310,7 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
+    <Compile Include="Screens\Select\ImportFromStablePopup.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\OriginHandle.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectSelectionBox.cs" />

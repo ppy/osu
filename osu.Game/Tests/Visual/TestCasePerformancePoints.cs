@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
@@ -224,7 +223,7 @@ namespace osu.Game.Tests.Visual
 
                 if (!api.IsLoggedIn)
                 {
-                    InternalChild = new SpriteText
+                    InternalChild = new OsuSpriteText
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
