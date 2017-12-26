@@ -59,16 +59,27 @@ namespace osu.Game.Overlays.Toolbar
 
         private class CountCircle : CompositeDrawable
         {
-            private readonly OsuSpriteText count;
+            private readonly OsuSpriteText countText;
             private readonly Circle circle;
+
+            private int count;
 
             public int Count
             {
+                get { return count; }
                 set
                 {
-                    count.Text = value.ToString("#,0");
-                    circle.FlashColour(Color4.White, 600, Easing.OutQuint);
-                    this.ScaleTo(1.1f).Then().ScaleTo(1, 600, Easing.OutElastic);
+                    if (count == value)
+                        return;
+
+                    if (value > count)
+                    {
+                        circle.FlashColour(Color4.White, 600, Easing.OutQuint);
+                        this.ScaleTo(1.1f).Then().ScaleTo(1, 600, Easing.OutElastic);
+                    }
+
+                    count = value;
+                    countText.Text = value.ToString("#,0");
                 }
             }
 
@@ -83,7 +94,7 @@ namespace osu.Game.Overlays.Toolbar
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Red
                     },
-                    count = new OsuSpriteText
+                    countText = new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
