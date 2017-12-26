@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual
 
             loadNewSongSelect(true);
 
-            AddWaitStep(1);
+            AddWaitStep(3);
 
             AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
 
@@ -100,11 +100,11 @@ namespace osu.Game.Tests.Visual
                     manager.Import(createTestBeatmapSet(i));
             });
 
-            AddWaitStep(1);
+            AddWaitStep(3);
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
             loadNewSongSelect();
-            AddWaitStep(1);
+            AddWaitStep(3);
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
             AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
