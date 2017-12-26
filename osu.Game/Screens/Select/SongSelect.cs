@@ -141,7 +141,6 @@ namespace osu.Game.Screens.Select
                 },
                 beatmapInfoWedge = new BeatmapInfoWedge
                 {
-                    Alpha = 0,
                     Size = wedged_container_size,
                     RelativeSizeAxes = Axes.X,
                     Margin = new MarginPadding
