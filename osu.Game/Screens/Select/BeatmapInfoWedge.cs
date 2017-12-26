@@ -35,6 +35,7 @@ namespace osu.Game.Screens.Select
             Masking = true;
             BorderColour = new Color4(221, 255, 255, 255);
             BorderThickness = 2.5f;
+            Alpha = 0;
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
@@ -50,12 +51,14 @@ namespace osu.Game.Screens.Select
         {
             this.MoveToX(0, 800, Easing.OutQuint);
             this.RotateTo(0, 800, Easing.OutQuint);
+            this.FadeIn(250);
         }
 
         protected override void PopOut()
         {
-            this.MoveToX(-100, 800, Easing.InQuint);
-            this.RotateTo(10, 800, Easing.InQuint);
+            this.MoveToX(-100, 800, Easing.In);
+            this.RotateTo(10, 800, Easing.In);
+            this.FadeOut(500, Easing.In);
         }
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)
@@ -68,7 +71,7 @@ namespace osu.Game.Screens.Select
             {
                 // ensure we ourselves are visible if not already.
                 if (!IsPresent)
-                    this.FadeIn(250);
+                    State = Visibility.Visible;
 
                 Info?.FadeOut(250);
                 Info?.Expire();
