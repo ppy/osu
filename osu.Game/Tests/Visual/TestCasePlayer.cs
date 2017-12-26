@@ -91,7 +91,9 @@ namespace osu.Game.Tests.Visual
         protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset) => new Player
         {
             InitialBeatmap = beatmap,
-            AllowPause = false
+            AllowPause = false,
+            AllowLeadIn = false,
+            AllowResults = false,
         };
 
         private const string test_beatmap_data =
