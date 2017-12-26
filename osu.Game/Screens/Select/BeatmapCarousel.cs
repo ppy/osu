@@ -513,7 +513,7 @@ namespace osu.Game.Screens.Select
             currentY += DrawHeight / 2;
             scrollableContent.Height = currentY;
 
-            if (selectedBeatmapSet == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected)
+            if (selectedBeatmapSet != null && (selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected))
             {
                 selectedBeatmapSet = null;
                 SelectionChanged?.Invoke(null);
