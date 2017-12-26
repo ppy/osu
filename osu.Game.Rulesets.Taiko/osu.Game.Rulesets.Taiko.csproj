@@ -44,6 +44,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\DrumSampleMapping.cs" />
     <Compile Include="Beatmaps\TaikoBeatmapConverter.cs" />
     <Compile Include="Judgements\TaikoDrumRollTickJudgement.cs" />
     <Compile Include="Judgements\TaikoStrongHitJudgement.cs" />
