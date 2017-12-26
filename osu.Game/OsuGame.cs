@@ -274,7 +274,7 @@ namespace osu.Game
                 };
             }
 
-            Action<Visibility> stateChanged = delegate
+            void updateScreenOffset()
             {
                 float offset = 0;
 
@@ -283,11 +283,11 @@ namespace osu.Game
                 if (notifications.State == Visibility.Visible)
                     offset -= ToolbarButton.WIDTH / 2;
 
-                intro.MoveToX(offset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
-            };
+                screenStack.MoveToX(offset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
+            }
 
-            settings.StateChanged += stateChanged;
-            notifications.StateChanged += stateChanged;
+            settings.StateChanged += _ => updateScreenOffset();
+            notifications.StateChanged += _ => updateScreenOffset();
 
             notifications.Enabled.BindTo(ShowOverlays);
 
