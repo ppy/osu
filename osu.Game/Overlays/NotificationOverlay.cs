@@ -103,38 +103,42 @@ namespace osu.Game.Overlays
             };
         }
 
+        private int totalCount => sections.Select(c => c.DisplayedCount).Sum();
+        private int unreadCount => sections.Select(c => c.UnreadCount).Sum();
+
+        public readonly BindableInt UnreadCount = new BindableInt();
+
         private int runningDepth;
 
         private void notificationClosed()
         {
             // hide ourselves if all notifications have been dismissed.
-            if (sections.Select(c => c.DisplayedCount).Sum() == 0)
+            if (totalCount == 0)
                 State = Visibility.Hidden;
+
+            updateCounts();
         }
 
         private readonly Scheduler postScheduler = new Scheduler();
 
         private bool processingPosts = true;
 
-        public void Post(Notification notification)
+        public void Post(Notification notification) => postScheduler.Add(() =>
         {
-            postScheduler.Add(() =>
-            {
-                State = Visibility.Visible;
+            ++runningDepth;
+            notification.Depth = notification.DisplayOnTop ? runningDepth : -runningDepth;
 
-                ++runningDepth;
-                notification.Depth = notification.DisplayOnTop ? runningDepth : -runningDepth;
+            notification.Closed += notificationClosed;
 
-                notification.Closed += notificationClosed;
+            var hasCompletionTarget = notification as IHasCompletionTarget;
+            if (hasCompletionTarget != null)
+                hasCompletionTarget.CompletionTarget = Post;
 
-                var hasCompletionTarget = notification as IHasCompletionTarget;
-                if (hasCompletionTarget != null)
-                    hasCompletionTarget.CompletionTarget = Post;
+            var ourType = notification.GetType();
+            sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
 
-                var ourType = notification.GetType();
-                sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
-            });
-        }
+            updateCounts();
+        });
 
         protected override void Update()
         {
@@ -161,9 +165,16 @@ namespace osu.Game.Overlays
             this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
         }
 
+        private void updateCounts()
+        {
+            UnreadCount.Value = unreadCount;
+        }
+
         private void markAllRead()
         {
             sections.Children.ForEach(s => s.MarkAllRead());
+
+            updateCounts();
         }
 
         protected override void UpdateAfterChildren()
