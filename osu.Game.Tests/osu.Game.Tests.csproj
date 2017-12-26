@@ -134,6 +134,7 @@
     <Compile Include="Visual\TestCaseOsuGame.cs" />
     <Compile Include="Visual\TestCasePlaybackControl.cs" />
     <Compile Include="Visual\TestCasePlaySongSelect.cs" />
+    <Compile Include="Visual\TestCasePopupDialog.cs" />
     <Compile Include="Visual\TestCaseRankGraph.cs" />
     <Compile Include="Visual\TestCaseReplay.cs" />
     <Compile Include="Visual\TestCaseReplaySettingsOverlay.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="Visual\TestCaseStoryboard.cs" />
     <Compile Include="Visual\TestCaseTabControl.cs" />
     <Compile Include="Visual\TestCaseTextAwesome.cs" />
+    <Compile Include="Visual\TestCaseToolbar.cs" />
     <Compile Include="Visual\TestCaseTwoLayerButton.cs" />
     <Compile Include="Visual\TestCaseUserPanel.cs" />
     <Compile Include="Visual\TestCaseUserProfile.cs" />
