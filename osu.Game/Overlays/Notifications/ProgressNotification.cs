@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Notifications
 
         protected virtual void Completed()
         {
-            Expire();
+            base.Close();
             CompletionTarget?.Invoke(CreateCompletionNotification());
         }
 

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -435,7 +436,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// </summary>
         /// <param name="time">The time to retrieve the sample info list from.</param>
         /// <returns></returns>
-        private SampleInfoList sampleInfoListAt(double time)
+        private List<SampleInfo> sampleInfoListAt(double time)
         {
             var curveData = HitObject as IHasCurve;
 
