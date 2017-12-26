@@ -168,9 +168,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             using (BeginDelayedSequence(duration, true))
             {
-                if (!GraduallyFadeOut)
-                    body.FadeOut(160 * FadeOutSpeedMultiplier);
-
+                body.FadeOut(160 * FadeOutSpeedMultiplier);
                 ball.FadeOut(160 * FadeOutSpeedMultiplier);
 
                 this.FadeOut(800 * FadeOutSpeedMultiplier).Expire();
