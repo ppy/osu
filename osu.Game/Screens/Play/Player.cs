@@ -65,6 +65,7 @@ namespace osu.Game.Screens.Play
         #region User Settings
 
         private Bindable<double> dimLevel;
+        private Bindable<double> blurLevel;
         private Bindable<bool> showStoryboard;
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
@@ -74,7 +75,7 @@ namespace osu.Game.Screens.Play
         #endregion
 
         private BreakOverlay breakOverlay;
-        private Container storyboardContainer;
+        private BufferedContainer storyboardContainer;
         private DrawableStoryboard storyboard;
 
         private HUDOverlay hudOverlay;
@@ -88,6 +89,7 @@ namespace osu.Game.Screens.Play
             this.api = api;
 
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            blurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
@@ -147,7 +149,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                storyboardContainer = new Container
+                storyboardContainer = new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Clock = offsetClock,
@@ -309,9 +311,9 @@ namespace osu.Game.Screens.Play
             if (!loadedSuccessfully)
                 return;
 
-            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1000, Easing.OutQuint);
+            dimLevel.ValueChanged += backgroundLevel_ValueChanged;
+            blurLevel.ValueChanged += backgroundLevel_ValueChanged;
 
-            dimLevel.ValueChanged += dimLevel_ValueChanged;
             showStoryboard.ValueChanged += showStoryboard_ValueChanged;
             updateBackgroundElements();
 
@@ -368,7 +370,7 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        private void dimLevel_ValueChanged(double newValue)
+        private void backgroundLevel_ValueChanged(double newValue)
             => updateBackgroundElements();
 
         private void showStoryboard_ValueChanged(bool newValue)
@@ -377,6 +379,7 @@ namespace osu.Game.Screens.Play
         private void updateBackgroundElements()
         {
             var opacity = 1 - (float)dimLevel;
+            var blur = new Vector2((float)blurLevel.Value * 25);
 
             if (showStoryboard && storyboard == null)
                 initializeStoryboard(true);
@@ -385,14 +388,17 @@ namespace osu.Game.Screens.Play
             var storyboardVisible = showStoryboard && beatmap.Storyboard.HasDrawable;
 
             storyboardContainer.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
-            storyboardContainer.FadeTo(storyboardVisible && opacity > 0 ? 1 : 0);
+            storyboardContainer.FadeTo(storyboardVisible && opacity > 0 ? 1 : 0, 800, Easing.OutQuint);
+            storyboardContainer.BlurTo(blur, 800, Easing.OutQuint);
 
             Background?.FadeTo(!storyboardVisible || beatmap.Background == null ? opacity : 0, 800, Easing.OutQuint);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(blur, 800, Easing.OutQuint);
         }
 
         private void fadeOut()
         {
-            dimLevel.ValueChanged -= dimLevel_ValueChanged;
+            dimLevel.ValueChanged -= backgroundLevel_ValueChanged;
+            blurLevel.ValueChanged -= backgroundLevel_ValueChanged;
             showStoryboard.ValueChanged -= showStoryboard_ValueChanged;
 
             const float fade_out_duration = 250;
