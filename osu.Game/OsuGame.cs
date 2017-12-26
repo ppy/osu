@@ -355,8 +355,6 @@ namespace osu.Game
 
         public bool OnReleased(GlobalAction action) => false;
 
-        public event Action<Screen> ScreenChanged;
-
         private Container mainContent;
 
         private Container overlayContent;
@@ -372,19 +370,6 @@ namespace osu.Game
             social.State = Visibility.Hidden;
             userProfile.State = Visibility.Hidden;
             notifications.State = Visibility.Hidden;
-        }
-
-        private void screenChanged(Screen newScreen)
-        {
-            currentScreen = newScreen as OsuScreen;
-
-            if (currentScreen == null)
-            {
-                Exit();
-                return;
-            }
-
-            ScreenChanged?.Invoke(newScreen);
         }
 
         protected override bool OnExiting()
@@ -434,13 +419,12 @@ namespace osu.Game
         {
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
-
-            screenChanged(newScreen);
         }
 
         private void screenRemoved(Screen newScreen)
         {
-            screenChanged(newScreen);
+            if (newScreen == null)
+                Exit();
         }
     }
 }
