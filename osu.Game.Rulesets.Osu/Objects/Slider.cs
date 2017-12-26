@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal float LazyTravelDistance;
 
-        public List<SampleInfoList> RepeatSamples { get; set; } = new List<SampleInfoList>();
+        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
         public int RepeatCount { get; set; } = 1;
 
         private int stackHeight;
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         StackHeight = StackHeight,
                         Scale = Scale,
                         ComboColour = ComboColour,
-                        Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
+                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                         {
                             Bank = s.Bank,
                             Name = @"slidertick",
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         StackHeight = StackHeight,
                         Scale = Scale,
                         ComboColour = ComboColour,
-                        Samples = new SampleInfoList(RepeatSamples[repeat]),
+                        Samples = new List<SampleInfo>(RepeatSamples[repeat])
                     });
                 }
             }
