@@ -41,24 +41,22 @@ namespace osu.Game.Tests.Visual
             {
                 Size = new Vector2(0.5f, 245),
                 RelativeSizeAxes = Axes.X,
-                Margin = new MarginPadding
-                {
-                    Top = 20,
-                }
-            });
-
-            AddStep("hide", () =>
-            {
-                infoWedge.State = Visibility.Hidden;
-                Content.FadeOut(100);
+                Margin = new MarginPadding { Top = 20 }
             });
 
             AddStep("show", () =>
             {
-                Content.FadeInFromZero(250);
                 infoWedge.State = Visibility.Visible;
                 infoWedge.UpdateBeatmap(beatmap);
             });
+
+            AddWaitStep(3);
+
+            AddStep("hide", () => { infoWedge.State = Visibility.Hidden; });
+
+            AddWaitStep(3);
+
+            AddStep("show", () => { infoWedge.State = Visibility.Visible; });
 
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
