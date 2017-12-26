@@ -24,7 +24,7 @@ using osu.Game.Rulesets.Taiko.Audio;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoPlayfield : ScrollingPlayfield, IKeyBindingHandler<TaikoAction>
+    public class TaikoPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoRulesetContainer"/>.
@@ -59,13 +59,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box overlayBackground;
         private readonly Box background;
 
-        private readonly ControlPointInfo controlPointInfo;
-        private readonly List<DrumSampleMapping> drumSampleMappings = new List<DrumSampleMapping>();
-
-        public TaikoPlayfield(ControlPointInfo controlPointInfo)
+        public TaikoPlayfield(ControlPointInfo controlPoints)
             : base(Axes.X)
         {
-            this.controlPointInfo = controlPointInfo;
             AddRangeInternal(new Drawable[]
             {
                 backgroundContainer = new Container
@@ -158,7 +154,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new InputDrum
+                        new InputDrum(controlPoints)
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
@@ -205,17 +201,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            // We may have 0 sample points, but we need at least the default one
-            var samplePoints = new[] { controlPointInfo.SamplePointAt(double.MinValue) }
-                .Concat(controlPointInfo.SamplePoints);
 
-            foreach (var s in samplePoints)
-            {
-                var mapping = new DrumSampleMapping(s);
-                mapping.RetrieveChannels(audio);
-
-                drumSampleMappings.Add(mapping);
-            }
 
             overlayBackgroundContainer.BorderColour = colours.Gray0;
             overlayBackground.Colour = colours.Gray1;
@@ -281,23 +267,5 @@ namespace osu.Game.Rulesets.Taiko.UI
                     kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
             }
         }
-
-        public bool OnPressed(TaikoAction action)
-        {
-            var mappingIndex = drumSampleMappings.BinarySearch(new DrumSampleMapping { Time = Time.Current });
-            if (mappingIndex < 0)
-                mappingIndex = ~mappingIndex - 1;
-
-            var mapping = drumSampleMappings[mappingIndex];
-
-            if (action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre)
-                mapping.CentreChannel.Play();
-            else
-                mapping.RimChannel.Play();
-
-            return true;
-        }
-
-        public bool OnReleased(TaikoAction action) => false;
     }
 }
