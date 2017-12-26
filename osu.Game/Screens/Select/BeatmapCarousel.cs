@@ -75,7 +75,8 @@ namespace osu.Game.Screens.Select
                     scrollableContent.Clear(false);
                     itemsCache.Invalidate();
                     scrollPositionCache.Invalidate();
-                    BeatmapSetsChanged?.Invoke();
+
+                    Schedule(() => BeatmapSetsChanged?.Invoke());
                 }));
             }
         }
@@ -142,7 +143,6 @@ namespace osu.Game.Screens.Select
                 if (newSet == null)
                 {
                     itemsCache.Invalidate();
-                    SelectNext();
                     return;
                 }
 
@@ -155,6 +155,7 @@ namespace osu.Game.Screens.Select
                     select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.Beatmap.ID == selectedBeatmap?.Beatmap.ID) ?? newSet);
 
                 itemsCache.Invalidate();
+                Schedule(() => BeatmapSetsChanged?.Invoke());
             });
         }
 
@@ -181,6 +182,9 @@ namespace osu.Game.Screens.Select
         /// <param name="skipDifficulties">Whether to skip individual difficulties and only increment over full groups.</param>
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
+            if (!Items.Any())
+                return;
+
             int originalIndex = Items.IndexOf(selectedBeatmap?.Drawables.First());
             int currentIndex = originalIndex;
 
@@ -509,7 +513,7 @@ namespace osu.Game.Screens.Select
             currentY += DrawHeight / 2;
             scrollableContent.Height = currentY;
 
-            if (selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected)
+            if (selectedBeatmapSet == null || selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected)
             {
                 selectedBeatmapSet = null;
                 SelectionChanged?.Invoke(null);
