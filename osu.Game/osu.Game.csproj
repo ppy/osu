@@ -239,7 +239,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\SampleInfo.cs" />
-    <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Beatmaps\BeatmapDifficulty.cs" />
