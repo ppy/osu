@@ -374,8 +374,6 @@ namespace osu.Game
             notifications.State = Visibility.Hidden;
         }
 
-        private ScheduledDelegate notificationsEnabler;
-
         private void screenChanged(Screen newScreen)
         {
             currentScreen = newScreen as OsuScreen;
