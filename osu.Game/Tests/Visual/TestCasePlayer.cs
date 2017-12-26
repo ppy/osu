@@ -22,6 +22,8 @@ namespace osu.Game.Tests.Visual
 
         protected Player Player;
 
+        private TestWorkingBeatmap working;
+
         /// <summary>
         /// Create a TestCase which runs through the Player screen.
         /// </summary>
@@ -75,7 +77,7 @@ namespace osu.Game.Tests.Visual
 
             var instance = r.CreateInstance();
 
-            WorkingBeatmap working = new TestWorkingBeatmap(beatmap);
+            working = new TestWorkingBeatmap(beatmap);
             working.Mods.Value = new[] { instance.GetAllMods().First(m => m is ModNoFail) };
 
             if (Player != null)
@@ -86,6 +88,15 @@ namespace osu.Game.Tests.Visual
             LoadComponentAsync(player, LoadScreen);
 
             return player;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (working != null)
+                // note that this will override any mod rate application
+                working.Track.Rate = Clock.Rate;
         }
 
         protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset) => new Player
