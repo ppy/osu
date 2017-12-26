@@ -16,15 +16,16 @@ namespace osu.Game.Rulesets.Osu.Objects
         public const double OBJECT_RADIUS = 64;
 
         private const double hittable_range = 300;
-        private const double hit_window_50 = 150;
-        private const double hit_window_100 = 80;
-        private const double hit_window_300 = 30;
-
-        public BeatmapDifficulty BaseDifficulty { get; set; }
+        private static double hitWindow50 = 150;
+        private static double hitWindow100 = 80;
+        private static double hitWindow300 = 30;
 
         public Vector2 Position { get; set; }
         public float X => Position.X;
         public float Y => Position.Y;
+
+        public float TimePreemt;
+        public float TimeFadein;
 
         public Vector2 StackedPosition => Position + StackOffset;
 
@@ -51,11 +52,11 @@ namespace osu.Game.Rulesets.Osu.Objects
                 default:
                     return 300;
                 case HitResult.Meh:
-                    return 199.5f - BaseDifficulty.OverallDifficulty * 10;
+                    return 150;
                 case HitResult.Good:
-                    return 139.5f - BaseDifficulty.OverallDifficulty * 8;
+                    return 80;
                 case HitResult.Great:
-                    return 79.5f - BaseDifficulty.OverallDifficulty * 6;
+                    return 30;
             }
         }
 
@@ -73,6 +74,12 @@ namespace osu.Game.Rulesets.Osu.Objects
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
+
+            if (difficulty.ApproachRate >= 5)
+                TimePreemt = 1200 - (difficulty.ApproachRate - 5) * 150;
+            else
+                TimePreemt = 1800 - difficulty.ApproachRate * 120;
+            TimeFadein = TimePreemt * 0.66f;
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }

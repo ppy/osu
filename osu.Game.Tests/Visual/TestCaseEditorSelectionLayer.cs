@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
@@ -21,16 +20,10 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseEditorSelectionLayer()
         {
-            BeatmapDifficulty baseDifficulty = new BeatmapDifficulty
-            {
-                ApproachRate = 8,
-                OverallDifficulty = 6
-            };
-
             var playfield = new OsuEditPlayfield
             {
-                new DrawableHitCircle(new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f, BaseDifficulty = baseDifficulty }),
-                new DrawableHitCircle(new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f, BaseDifficulty = baseDifficulty }),
+                new DrawableHitCircle(new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f }),
+                new DrawableHitCircle(new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f }),
                 new DrawableSlider(new Slider
                 {
                     ControlPoints = new List<Vector2>
@@ -42,8 +35,7 @@ namespace osu.Game.Tests.Visual
                     Position = new Vector2(128, 256),
                     Velocity = 1,
                     TickDistance = 100,
-                    Scale = 0.5f,
-                    BaseDifficulty = baseDifficulty
+                    Scale = 0.5f
                 })
             };
 

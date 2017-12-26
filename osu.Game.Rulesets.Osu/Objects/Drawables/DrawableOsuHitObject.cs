@@ -17,12 +17,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
-            if (hitObject.BaseDifficulty.ApproachRate >= 5)
-                TimePreempt = 1200 - (hitObject.BaseDifficulty.ApproachRate - 5) * 150;
-            else
-                TimePreempt = 1800 - hitObject.BaseDifficulty.ApproachRate * 120;
-
-            TimeFadein = TimePreempt * 0.66f;
+            TimePreempt = hitObject.TimePreemt;
+            TimeFadein = hitObject.TimeFadein;
 
             AccentColour = HitObject.ComboColour;
             Alpha = 0;

@@ -58,7 +58,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     ComboColour = s.ComboColour,
                     Samples = s.Samples,
                     SampleControlPoint = s.SampleControlPoint,
-                    BaseDifficulty = s.BaseDifficulty
                 })
             };
 
