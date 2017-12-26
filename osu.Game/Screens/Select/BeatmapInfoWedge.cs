@@ -154,9 +154,10 @@ namespace osu.Game.Screens.Select
                     },
                     new FillFlowContainer
                     {
-                        Name = "Bottom-aligned metadata",
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
+                        Name = "Centre-aligned metadata",
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.TopLeft,
+                        Y = -22,
                         Direction = FillDirection.Vertical,
                         Margin = new MarginPadding { Top = 15, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
