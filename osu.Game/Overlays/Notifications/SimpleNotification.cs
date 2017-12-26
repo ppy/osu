@@ -83,8 +83,10 @@ namespace osu.Game.Overlays.Notifications
 
             set
             {
+                if (value == base.Read) return;
+
                 base.Read = value;
-                Light.FadeTo(value ? 1 : 0, 100);
+                Light.FadeTo(value ? 0 : 1, 100);
             }
         }
     }
