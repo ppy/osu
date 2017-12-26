@@ -201,14 +201,14 @@ namespace osu.Game.Screens.Ranking
             {
                 Children = new Drawable[]
                 {
-                    new SpriteText {
+                    new OsuSpriteText {
                         Text = statistic.Value.ToString().PadLeft(4, '0'),
                         Colour = colours.Gray7,
                         TextSize = 30,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                     },
-                    new SpriteText {
+                    new OsuSpriteText {
                         Text = statistic.Key,
                         Colour = colours.Gray7,
                         Font = @"Exo2.0-Bold",
