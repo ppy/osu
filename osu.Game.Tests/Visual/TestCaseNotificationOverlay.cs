@@ -3,19 +3,18 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Tests.Visual
 {
-    [TestFixture]
     public class TestCaseNotificationOverlay : OsuTestCase
     {
         private readonly NotificationOverlay manager;
+        private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
 
         public TestCaseNotificationOverlay()
         {
@@ -24,15 +23,20 @@ namespace osu.Game.Tests.Visual
             Content.Add(manager = new NotificationOverlay
             {
                 Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
+                Origin = Anchor.TopRight
             });
 
-            AddToggleStep(@"show", state => manager.State = state ? Visibility.Visible : Visibility.Hidden);
+            SpriteText displayedCount = new SpriteText();
 
-            AddStep(@"simple #1", sendNotification1);
-            AddStep(@"simple #2", sendNotification2);
-            AddStep(@"progress #1", sendProgress1);
-            AddStep(@"progress #2", sendProgress2);
+            Content.Add(displayedCount);
+
+            manager.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count}"; };
+
+            AddStep(@"toggle", manager.ToggleVisibility);
+            AddStep(@"simple #1", sendHelloNotification);
+            AddStep(@"simple #2", sendAmazingNotification);
+            AddStep(@"progress #1", sendUploadProgress);
+            AddStep(@"progress #2", sendDownloadProgress);
             AddStep(@"barrage", () => sendBarrage());
         }
 
@@ -41,16 +45,16 @@ namespace osu.Game.Tests.Visual
             switch (RNG.Next(0, 4))
             {
                 case 0:
-                    sendNotification1();
+                    sendHelloNotification();
                     break;
                 case 1:
-                    sendNotification2();
+                    sendAmazingNotification();
                     break;
                 case 2:
-                    sendProgress1();
+                    sendUploadProgress();
                     break;
                 case 3:
-                    sendProgress2();
+                    sendDownloadProgress();
                     break;
             }
 
@@ -80,7 +84,7 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        private void sendProgress2()
+        private void sendDownloadProgress()
         {
             var n = new ProgressNotification
             {
@@ -91,9 +95,7 @@ namespace osu.Game.Tests.Visual
             progressingNotifications.Add(n);
         }
 
-        private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
-
-        private void sendProgress1()
+        private void sendUploadProgress()
         {
             var n = new ProgressNotification
             {
@@ -104,12 +106,12 @@ namespace osu.Game.Tests.Visual
             progressingNotifications.Add(n);
         }
 
-        private void sendNotification2()
+        private void sendAmazingNotification()
         {
             manager.Post(new SimpleNotification { Text = @"You are amazing" });
         }
 
-        private void sendNotification1()
+        private void sendHelloNotification()
         {
             manager.Post(new SimpleNotification { Text = @"Welcome to osu!. Enjoy your stay!" });
         }

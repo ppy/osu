@@ -69,6 +69,8 @@ namespace osu.Game.Tests.Visual
             testSorting();
 
             testRemoveAll();
+            testEmptyTraversal();
+            testHiding();
         }
 
         private void ensureRandomFetchSuccess() =>
@@ -102,6 +104,8 @@ namespace osu.Game.Tests.Visual
         private void checkVisibleItemCount(bool diff, int count) =>
             AddAssert($"{count} {(diff ? "diffs" : "sets")} visible", () =>
                 carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
+
+        private void checkNoSelection() => AddAssert("Selection is null", () => currentSelection == null);
 
         private void nextRandom() =>
             AddStep("select random next", () =>
@@ -274,9 +278,57 @@ namespace osu.Game.Tests.Visual
                 return false;
             }, "Remove all");
 
-            AddAssert("Selection is null", () => currentSelection == null);
+            checkNoSelection();
         }
 
+        private void testEmptyTraversal()
+        {
+            advanceSelection(direction: 1, diff: false);
+            checkNoSelection();
+
+            advanceSelection(direction: 1, diff: true);
+            checkNoSelection();
+
+            advanceSelection(direction: -1, diff: false);
+            checkNoSelection();
+
+            advanceSelection(direction: -1, diff: true);
+            checkNoSelection();
+        }
+
+        private void testHiding()
+        {
+            var hidingSet = createTestBeatmapSet(1);
+            hidingSet.Beatmaps[1].Hidden = true;
+            AddStep("Add set with diff 2 hidden", () => carousel.UpdateBeatmapSet(hidingSet));
+            setSelected(1, 1);
+
+            checkVisibleItemCount(true, 2);
+            advanceSelection(true);
+            checkSelected(1, 3);
+
+            setHidden(3);
+            checkSelected(1, 1);
+
+            setHidden(2, false);
+            advanceSelection(true);
+            checkSelected(1, 2);
+
+            setHidden(1);
+            checkSelected(1, 2);
+
+            setHidden(2);
+            checkNoSelection();
+
+            void setHidden(int diff, bool hidden = true)
+            {
+                AddStep((hidden ? "" : "un") + $"hide diff {diff}", () =>
+                {
+                    hidingSet.Beatmaps[diff - 1].Hidden = hidden;
+                    carousel.UpdateBeatmapSet(hidingSet);
+                });
+            }
+        }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
         {

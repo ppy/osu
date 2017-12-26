@@ -72,6 +72,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public IReadOnlyList<Judgement> Judgements => judgements;
 
         protected List<SampleChannel> Samples = new List<SampleChannel>();
+        protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
@@ -84,15 +85,29 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            foreach (SampleInfo sample in HitObject.Samples)
+            var samples = GetSamples();
+            if (samples.Any())
             {
-                SampleChannel channel = audio.Sample.Get($@"Gameplay/{sample.Bank}-{sample.Name}");
+                if (HitObject.SampleControlPoint == null)
+                    throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
+                                                                                          + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
 
-                if (channel == null)
-                    continue;
+                foreach (SampleInfo s in samples)
+                {
+                    SampleInfo localSampleInfo = new SampleInfo
+                    {
+                        Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
+                        Name = s.Name,
+                        Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
+                    };
 
-                channel.Volume.Value = sample.Volume;
-                Samples.Add(channel);
+                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample);
+
+                    if (channel == null)
+                        continue;
+
+                    Samples.Add(channel);
+                }
             }
         }
 
@@ -162,7 +177,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             judgementOccurred = false;
 
-            if (AllJudged || State != ArmedState.Idle)
+            if (AllJudged)
                 return false;
 
             if (NestedHitObjects != null)
