@@ -71,10 +71,6 @@ namespace osu.Game.Screens.Select
             {
                 State = beatmap == null ? Visibility.Hidden : Visibility.Visible;
 
-                // ensure we ourselves are visible if not already.
-                if (!IsPresent)
-                    State = Visibility.Visible;
-
                 Info?.FadeOut(250);
                 Info?.Expire();
 
