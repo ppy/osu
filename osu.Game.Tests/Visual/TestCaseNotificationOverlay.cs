@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual
 
             AddAssert("Displayed count is 33", () => manager.UnreadCount.Value == 33);
 
-            AddWaitStep(5);
+            AddWaitStep(10);
 
             checkProgressingCount(0);
 
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual
             foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))
             {
                 if (n.Progress < 1)
-                    n.Progress += (float)(Time.Elapsed / 200) * RNG.NextSingle();
+                    n.Progress += (float)(Time.Elapsed / 400) * RNG.NextSingle();
                 else
                     n.State = ProgressNotificationState.Completed;
             }
