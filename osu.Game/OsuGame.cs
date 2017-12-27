@@ -16,6 +16,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -220,15 +221,7 @@ namespace osu.Game
                 Depth = -6,
             }, overlayContent.Add);
 
-            Logger.NewEntry += entry =>
-            {
-                if (entry.Level < LogLevel.Important) return;
-
-                notifications.Post(new SimpleNotification
-                {
-                    Text = $@"{entry.Level}: {entry.Message}"
-                });
-            };
+            forwardLoggedErrorsToNotifications();
 
             dependencies.Cache(settings);
             dependencies.Cache(social);
@@ -288,6 +281,36 @@ namespace osu.Game
             notifications.StateChanged += _ => updateScreenOffset();
 
             Cursor.State = Visibility.Hidden;
+        }
+
+        private void forwardLoggedErrorsToNotifications()
+        {
+            int recentErrorCount = 0;
+
+            const double debounce = 5000;
+
+            Logger.NewEntry += entry =>
+            {
+                if (entry.Level < LogLevel.Error || entry.Target == null) return;
+
+                if (recentErrorCount < 2)
+                {
+                    notifications.Post(new SimpleNotification
+                    {
+                        Icon = FontAwesome.fa_bomb,
+                        Text = (recentErrorCount == 0 ? entry.Message : "Subsequent errors occurred and have been logged.") + "\nClick to view log files.",
+                        Activated = () =>
+                        {
+                            Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
+                            return true;
+                        }
+                    });
+                }
+
+                Interlocked.Increment(ref recentErrorCount);
+
+                Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentErrorCount), debounce);
+            };
         }
 
         private Task asyncLoadStream;
