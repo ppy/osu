@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 {
                     RepeatIndex = repeat,
                     StartTime = repeatStartTime,
-                    Position = Curve.PositionAt(repeat),
+                    Position = Curve.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
                     ComboColour = ComboColour,
