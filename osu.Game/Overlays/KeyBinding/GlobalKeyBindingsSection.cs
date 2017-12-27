@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.KeyBinding
         public override FontAwesome Icon => FontAwesome.fa_osu_hot;
         public override string Header => "Global";
 
-        public GlobalKeyBindingsSection(KeyBindingInputManager manager)
+        public GlobalKeyBindingsSection(KeyBindingContainer manager)
         {
             Add(new DefaultBindingsSubsection(manager));
         }
@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.KeyBinding
         {
             protected override string Header => string.Empty;
 
-            public DefaultBindingsSubsection(KeyBindingInputManager manager)
+            public DefaultBindingsSubsection(KeyBindingContainer manager)
                 : base(null)
             {
                 Defaults = manager.DefaultKeyBindings;

@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
                         AddJudgement(new ManiaJudgement { Result = HitResult.Perfect });
 
                         // Ticks
-                        int tickCount = holdNote.Ticks.Count();
+                        int tickCount = holdNote.NestedHitObjects.OfType<HoldNoteTick>().Count();
                         for (int i = 0; i < tickCount; i++)
                             AddJudgement(new HoldNoteTickJudgement { Result = HitResult.Perfect });
                     }

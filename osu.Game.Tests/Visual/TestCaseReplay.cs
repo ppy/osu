@@ -8,7 +8,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseReplay : TestCasePlayer
+    public class TestCaseReplay : TestCasePlayer
     {
         protected override Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset)
         {

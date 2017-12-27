@@ -27,9 +27,19 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public float Scale { get; set; } = 1;
 
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        /// <summary>
+        /// Whether this fruit can initiate a hyperdash.
+        /// </summary>
+        public bool HyperDash => HyperDashTarget != null;
+
+        /// <summary>
+        /// The target fruit if we are to initiate a hyperdash.
+        /// </summary>
+        public CatchHitObject HyperDashTarget;
+
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             Scale = 1.0f - 0.7f * (difficulty.CircleSize - 5) / 5;
         }

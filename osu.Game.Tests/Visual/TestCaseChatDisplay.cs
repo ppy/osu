@@ -8,7 +8,7 @@ using osu.Game.Overlays;
 namespace osu.Game.Tests.Visual
 {
     [Description("Testing chat api and overlay")]
-    internal class TestCaseChatDisplay : OsuTestCase
+    public class TestCaseChatDisplay : OsuTestCase
     {
         public TestCaseChatDisplay()
         {

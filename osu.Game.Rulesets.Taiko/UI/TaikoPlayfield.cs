@@ -16,6 +16,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -54,7 +55,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box overlayBackground;
         private readonly Box background;
 
-        public TaikoPlayfield()
+        public TaikoPlayfield(ControlPointInfo controlPoints)
             : base(Axes.X)
         {
             AddRangeInternal(new Drawable[]
@@ -149,7 +150,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new InputDrum
+                        new InputDrum(controlPoints)
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
@@ -249,7 +250,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                     {
                         topLevelHitContainer.Add(judgedObject.CreateProxy());
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                 }
 
                 hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));

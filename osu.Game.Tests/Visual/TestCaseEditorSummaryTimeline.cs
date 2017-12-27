@@ -14,7 +14,7 @@ using osu.Framework.Configuration;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseEditorSummaryTimeline : OsuTestCase
+    public class TestCaseEditorSummaryTimeline : OsuTestCase
     {
         private const int length = 60000;
         private readonly Random random;
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual
                 b.ControlPointInfo.EffectPoints.Add(new EffectControlPoint { Time = random.Next(0, length) });
 
             for (int i = 0; i < random.Next(1, 5); i++)
-                b.ControlPointInfo.SoundPoints.Add(new SoundControlPoint { Time = random.Next(0, length) });
+                b.ControlPointInfo.SamplePoints.Add(new SampleControlPoint { Time = random.Next(0, length) });
 
             b.BeatmapInfo.Bookmarks = new int[random.Next(10, 30)];
             for (int i = 0; i < b.BeatmapInfo.Bookmarks.Length; i++)

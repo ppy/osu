@@ -17,7 +17,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Mods;
@@ -126,7 +125,7 @@ namespace osu.Game.Screens.Play
             }
             catch (Exception e)
             {
-                Logger.Log($"Could not load this beatmap sucessfully ({e})!", LoggingTarget.Runtime, LogLevel.Error);
+                Logger.Error(e, "Could not load beatmap sucessfully!");
 
                 //couldn't load, hard abort!
                 Exit();
@@ -161,8 +160,8 @@ namespace osu.Game.Screens.Play
                     OnRetry = Restart,
                     OnQuit = Exit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
-                    Retries = RestartCount,
                     OnPause = () => {
+                        pauseContainer.Retries = RestartCount;
                         hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
                     },
                     OnResume = () => {
@@ -245,7 +244,7 @@ namespace osu.Game.Screens.Play
 
         private void initializeStoryboard(bool asyncLoad)
         {
-            var beatmap = Beatmap.Value.Beatmap;
+            var beatmap = Beatmap.Value;
 
             storyboard = beatmap.Storyboard.CreateDrawable(Beatmap.Value);
             storyboard.Masking = true;
@@ -327,11 +326,6 @@ namespace osu.Game.Screens.Play
             {
                 adjustableSourceClock.Reset();
 
-                // this is temporary until we have blocking (async.Wait()) audio component methods.
-                // then we can call ResetAsync().Wait() or the blocking version above.
-                while (adjustableSourceClock.IsRunning)
-                    Thread.Sleep(1);
-
                 Schedule(() =>
                 {
                     decoupledClock.ChangeSource(adjustableSourceClock);
@@ -388,7 +382,7 @@ namespace osu.Game.Screens.Play
                 initializeStoryboard(true);
 
             var beatmap = Beatmap.Value;
-            var storyboardVisible = showStoryboard && beatmap.Beatmap.Storyboard.HasDrawable;
+            var storyboardVisible = showStoryboard && beatmap.Storyboard.HasDrawable;
 
             storyboardContainer.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
             storyboardContainer.FadeTo(storyboardVisible && opacity > 0 ? 1 : 0);
