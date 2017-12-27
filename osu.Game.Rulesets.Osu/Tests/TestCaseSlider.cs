@@ -22,16 +22,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
-        private double speedMultiplier;
-        private double sliderMultiplier;
+        private double speedMultiplier = 2;
+        private double sliderMultiplier = 2;
         private int depthIndex;
 
         public TestCaseSlider()
         {
             base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
-
-            AddSliderStep("SpeedMultiplier", 0.01, 10, 2, s => speedMultiplier = s);
-            AddSliderStep("SliderMultiplier", 0.01, 10, 2, s => sliderMultiplier = s);
 
             AddStep("Single", () => addSingle());
             AddStep("Repeated (1)", () => addRepeated(1));
@@ -39,6 +36,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Repeated (3)", () => addRepeated(3));
             AddStep("Repeated (4)", () => addRepeated(4));
             AddStep("Stream", addStream);
+
+            AddSliderStep("SpeedMultiplier", 0.01, 10, 2, s => speedMultiplier = s);
+            AddSliderStep("SliderMultiplier", 0.01, 10, 2, s => sliderMultiplier = s);
         }
 
         private void addSingle(double timeOffset = 0, Vector2? positionOffset = null)
