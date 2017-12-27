@@ -189,7 +189,12 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
-                        contentFlow = new OsuLinkTextFlowContainer<ChatLink>(t => { t.TextSize = text_size; })
+                        contentFlow = new OsuLinkTextFlowContainer<ChatLink>(t =>
+                        {
+                            if (Message.IsAction)
+                                t.Font = "Exo2.0-MediumItalic";
+                            t.TextSize = text_size;
+                        })
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
@@ -218,13 +223,7 @@ namespace osu.Game.Overlays.Chat
             contentFlow.Clear();
 
             if (message.Links == null || message.Links.Count == 0)
-            {
-                contentFlow.AddText(message.Content, sprite =>
-                {
-                    if (message.IsAction)
-                        sprite.Font = @"Exo2.0-MediumItalic";
-                });
-            }
+                contentFlow.AddText(message.Content);
             else
             {
                 int prevIndex = 0;
@@ -247,9 +246,6 @@ namespace osu.Game.Overlays.Chat
                     contentFlow.AddLink(message.Content.Substring(link.Index, link.Length), link.Url, sprite =>
                     {
                         ((OsuLinkSpriteText)sprite).TextColour = urlColour;
-
-                        if (message.IsAction)
-                            sprite.Font = @"Exo2.0-MediumItalic";
                     });
                 }
 
