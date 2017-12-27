@@ -39,6 +39,13 @@ namespace osu.Game.Rulesets
         public RulesetInfo GetRuleset(int id) => AvailableRulesets.FirstOrDefault(r => r.ID == id);
 
         /// <summary>
+        /// Retrieve a ruleset using a known short name.
+        /// </summary>
+        /// <param name="shortName">The ruleset's short name.</param>
+        /// <returns>A ruleset, if available, else null.</returns>
+        public RulesetInfo GetRuleset(string shortName) => AvailableRulesets.FirstOrDefault(r => r.ShortName == shortName);
+
+        /// <summary>
         /// All available rulesets.
         /// </summary>
         public IEnumerable<RulesetInfo> AvailableRulesets;
