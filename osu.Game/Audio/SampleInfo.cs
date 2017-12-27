@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.IO;
 using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Audio
@@ -16,14 +17,7 @@ namespace osu.Game.Audio
 
         public SampleChannel GetChannel(SampleManager manager, string resourceNamespace = null)
         {
-            SampleChannel channel = null;
-
-            if (!string.IsNullOrEmpty(resourceNamespace))
-                channel = manager.Get($"Gameplay/{resourceNamespace}/{Bank}-{Name}");
-
-            if (channel == null)
-                channel = manager.Get($"Gameplay/{Bank}-{Name}");
-
+            SampleChannel channel = manager.Get(Path.Combine("Gameplay", resourceNamespace ?? string.Empty, $"{Bank}-{Name}"));
             channel.Volume.Value = Volume / 100.0;
             return channel;
         }
