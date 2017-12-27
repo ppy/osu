@@ -17,7 +17,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The default sample volume at this control point.
         /// </summary>
-        public int SampleVolume;
+        public int SampleVolume = 100;
 
         /// <summary>
         /// Create a SampleInfo based on the sample settings in this control point.
