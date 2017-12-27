@@ -24,6 +24,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Background blur",
+                    Bindable = config.GetBindable<bool>(OsuSetting.BlurLevel),
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Show score overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowInterface)
                 },

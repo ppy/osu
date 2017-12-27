@@ -33,6 +33,8 @@ namespace osu.Game.Screens.Play
 {
     public class Player : OsuScreen
     {
+        private static readonly Vector2 background_blur = new Vector2(20);
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         public override bool ShowOverlays => false;
@@ -65,6 +67,7 @@ namespace osu.Game.Screens.Play
         #region User Settings
 
         private Bindable<double> dimLevel;
+        private Bindable<bool> blurLevel;
         private Bindable<bool> showStoryboard;
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
@@ -88,6 +91,7 @@ namespace osu.Game.Screens.Play
             this.api = api;
 
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            blurLevel = config.GetBindable<bool>(OsuSetting.BlurLevel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
@@ -309,7 +313,14 @@ namespace osu.Game.Screens.Play
             if (!loadedSuccessfully)
                 return;
 
-            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1000, Easing.OutQuint);
+            if ((bool)blurLevel)
+            {
+                (Background as BackgroundScreenBeatmap)?.BlurTo(background_blur, 1000, Easing.OutQuint);
+            }
+            else
+            {
+                (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1000, Easing.OutQuint);
+            }
 
             dimLevel.ValueChanged += dimLevel_ValueChanged;
             showStoryboard.ValueChanged += showStoryboard_ValueChanged;
