@@ -151,35 +151,22 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createRepeatPoints()
         {
-            var length = Curve.Distance;
-            var repeatPointDistance = Math.Min(Distance, length);
-            var repeatDuration = length / Velocity;
-
-            bool sliderStart = true;
+            var repeatDuration = Distance / Velocity;
 
             for (var repeat = 1; repeat < RepeatCount; repeat++)
             {
-                sliderStart = !sliderStart;
+                var repeatStartTime = StartTime + repeat * repeatDuration;
 
-                for (var d = repeatPointDistance; d <= length; d += repeatPointDistance)
+                AddNested(new RepeatPoint
                 {
-                    var repeatStartTime = StartTime + repeat * repeatDuration;
-                    var distanceProgress = d / length;
-
-                    if (sliderStart)
-                        distanceProgress = 0;
-
-                    AddNested(new RepeatPoint
-                    {
-                        RepeatIndex = repeat,
-                        StartTime = repeatStartTime,
-                        Position = Curve.PositionAt(distanceProgress),
-                        StackHeight = StackHeight,
-                        Scale = Scale,
-                        ComboColour = ComboColour,
-                        Samples = new List<SampleInfo>(RepeatSamples[repeat])
-                    });
-                }
+                    RepeatIndex = repeat,
+                    StartTime = repeatStartTime,
+                    Position = Curve.PositionAt(repeat),
+                    StackHeight = StackHeight,
+                    Scale = Scale,
+                    ComboColour = ComboColour,
+                    Samples = new List<SampleInfo>(RepeatSamples[repeat])
+                });
             }
         }
     }
