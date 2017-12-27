@@ -70,10 +70,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         using (slider.BeginAbsoluteSequence(fadeOutTime, true))
                         {
-                            var duration = slider.Slider.EndTime - fadeOutTime; // new duration from fade in to end of the slider
-                            slider.Body.FadeOut(duration);
+                            var sliderDuration = slider.Slider.EndTime - fadeOutTime; // new duration from fade in to end of the slider
+                            slider.Body.FadeOut(sliderDuration);
                             // delay a bit less to let the sliderball fade out peacefully instead of having a hard cut
-                            using (slider.BeginDelayedSequence(duration - fadeOut, true))
+                            using (slider.BeginDelayedSequence(sliderDuration - fadeOut, true))
                             {
                                 slider.Ball.FadeOut(fadeOut);
                                 slider.Delay(fadeOut).Expire();
@@ -84,6 +84,23 @@ namespace osu.Game.Rulesets.Osu.Mods
                         spinner.Disc.FadeOut();
                         spinner.Ticks.FadeOut();
                         spinner.Background.FadeOut();
+
+                        using (spinner.BeginAbsoluteSequence(fadeOutTime, true))
+                        {
+                            var spinnerDuration = spinner.Spinner.EndTime - fadeOutTime; // new duration from fade in to end of the spinner
+                            var sequence = spinner.Delay(spinnerDuration).FadeOut(fadeOut);
+                            // speed up the end sequence accordingly
+                            switch (state)
+                            {
+                                case ArmedState.Hit:
+                                    sequence.ScaleTo(spinner.Scale * 1.2f, fadeOut * 2, Easing.Out);
+                                    break;
+                                case ArmedState.Miss:
+                                    sequence.ScaleTo(spinner.Scale * 0.8f, fadeOut * 2, Easing.Out);
+                                    break;
+                            }
+                            sequence.Expire();
+                        }
                         break;
                 }
             }
