@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Select
         public override bool HandleInput => AllowSelection;
 
         /// <summary>
-        /// Used to avoid firing null selections before the initial baetmaps have been loaded via <see cref="BeatmapSets"/>.
+        /// Used to avoid firing null selections before the initial beatmaps have been loaded via <see cref="BeatmapSets"/>.
         /// </summary>
         private bool initialLoadComplete;
 
