@@ -8,20 +8,21 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO.Serialization;
-using osu.Game.Storyboards;
+using Newtonsoft.Json;
+using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// A Beatmap containing converted HitObjects.
     /// </summary>
-    public class Beatmap<T>
+    public class Beatmap<T> : IJsonSerializable
         where T : HitObject
     {
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
         public ControlPointInfo ControlPointInfo = new ControlPointInfo();
         public List<BreakPeriod> Breaks = new List<BreakPeriod>();
-        public readonly List<Color4> ComboColors = new List<Color4>
+        public List<Color4> ComboColors = new List<Color4>
         {
             new Color4(17, 136, 170, 255),
             new Color4(102, 136, 0, 255),
@@ -29,22 +30,20 @@ namespace osu.Game.Beatmaps
             new Color4(121, 9, 13, 255)
         };
 
+        [JsonIgnore]
         public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
 
         /// <summary>
         /// The HitObjects this Beatmap contains.
         /// </summary>
+        [JsonConverter(typeof(TypedListConverter<HitObject>))]
         public List<T> HitObjects = new List<T>();
 
         /// <summary>
         /// Total amount of break time in the beatmap.
         /// </summary>
+        [JsonIgnore]
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
-
-        /// <summary>
-        /// The Beatmap's Storyboard.
-        /// </summary>
-        public Storyboard Storyboard = new Storyboard();
 
         /// <summary>
         /// Constructs a new beatmap.
@@ -57,7 +56,6 @@ namespace osu.Game.Beatmaps
             Breaks = original?.Breaks ?? Breaks;
             ComboColors = original?.ComboColors ?? ComboColors;
             HitObjects = original?.HitObjects ?? HitObjects;
-            Storyboard = original?.Storyboard ?? Storyboard;
 
             if (original == null && Metadata == null)
             {

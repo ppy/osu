@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -70,6 +71,20 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     }
                 }
             };
+
+            if (HitObject.HyperDash)
+            {
+                Add(new Pulp
+                {
+                    RelativePositionAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AccentColour = Color4.Red,
+                    Blending = BlendingMode.Additive,
+                    Alpha = 0.5f,
+                    Scale = new Vector2(2)
+                });
+            }
         }
     }
 }

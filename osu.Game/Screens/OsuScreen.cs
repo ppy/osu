@@ -13,6 +13,8 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Game.Screens
 {
@@ -71,6 +73,20 @@ namespace osu.Game.Screens
                 Ruleset.BindTo(osuGame.Ruleset);
 
             sampleExit = audio.Sample.Get(@"UI/screen-back");
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat || !IsCurrentScreen) return false;
+
+            switch (args.Key)
+            {
+                case Key.Escape:
+                    Exit();
+                    return true;
+            }
+
+            return base.OnKeyDown(state, args);
         }
 
         protected override void OnResuming(Screen last)

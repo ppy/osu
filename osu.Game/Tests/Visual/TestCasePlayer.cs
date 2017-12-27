@@ -8,7 +8,6 @@ using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
@@ -63,7 +62,7 @@ namespace osu.Game.Tests.Visual
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(test_beatmap_data)))
             using (var reader = new StreamReader(stream))
-                beatmap = BeatmapDecoder.GetDecoder(reader).Decode(reader);
+                beatmap = Game.Beatmaps.Formats.Decoder.GetDecoder(reader).DecodeBeatmap(reader);
 
             return beatmap;
         }

@@ -11,7 +11,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseRoomInspector : OsuTestCase
+    public class TestCaseRoomInspector : OsuTestCase
     {
         private RulesetStore rulesets;
 

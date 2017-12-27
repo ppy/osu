@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 
@@ -120,7 +121,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                                 }
                             }
                         },
-                        new TextFlowContainer(t => { t.TextSize = 19; })
+                        new OsuTextFlowContainer(t => { t.TextSize = 19; })
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
