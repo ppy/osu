@@ -91,6 +91,7 @@
     <Compile Include="Tests\TestCaseHitObjects.cs" />
     <Compile Include="Tests\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\TestCaseSlider.cs" />
+    <Compile Include="Tests\TestCaseSpinner.cs" />
     <Compile Include="UI\Cursor\CursorTrail.cs" />
     <Compile Include="UI\Cursor\GameplayCursor.cs" />
     <Compile Include="UI\OsuSettings.cs" />
