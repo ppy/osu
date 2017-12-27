@@ -91,7 +91,6 @@ namespace osu.Game.Overlays.Notifications
                                     AutoSizeAxes = Axes.Y,
                                     Padding = new MarginPadding
                                     {
-                                        Top = 5,
                                         Left = 45,
                                         Right = 30
                                     },

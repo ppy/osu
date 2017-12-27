@@ -112,9 +112,12 @@ namespace osu.Game.Overlays
 
         private void notificationClosed()
         {
-            // hide ourselves if all notifications have been dismissed.
-            if (totalCount == 0)
-                State = Visibility.Hidden;
+            Schedule(() =>
+            {
+                // hide ourselves if all notifications have been dismissed.
+                if (totalCount == 0)
+                    State = Visibility.Hidden;
+            });
 
             updateCounts();
         }

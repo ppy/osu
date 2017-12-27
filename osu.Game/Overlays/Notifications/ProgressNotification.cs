@@ -95,8 +95,8 @@ namespace osu.Game.Overlays.Notifications
 
         protected virtual void Completed()
         {
-            base.Close();
             CompletionTarget?.Invoke(CreateCompletionNotification());
+            base.Close();
         }
 
         public override bool DisplayOnTop => false;

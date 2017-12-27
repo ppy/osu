@@ -36,8 +36,8 @@
       <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\OpenTK.3.0.0-git00009\lib\net20\OpenTK.dll</HintPath>
+    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
+      <HintPath>$(SolutionDir)\packages\OpenTK.3.0.0-git00021\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -83,6 +83,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scoring\TaikoScoreProcessor.cs" />
     <Compile Include="TaikoInputManager.cs" />
+    <Compile Include="Tests\TestCaseInputDrum.cs" />
     <Compile Include="Tests\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\TestCaseTaikoPlayfield.cs" />
     <Compile Include="UI\HitTarget.cs" />
