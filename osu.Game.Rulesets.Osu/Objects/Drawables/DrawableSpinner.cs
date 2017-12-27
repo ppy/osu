@@ -39,6 +39,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Color4 normalColour;
         private Color4 completeColour;
 
+        /// <summary>
+        /// Determines whether parts (disc, ticks and background) should not be shown.
+        /// </summary>
+        public bool HideSpinnerDetails;
+
         public DrawableSpinner(Spinner s) : base(s)
         {
             Origin = Anchor.Centre;
@@ -166,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
             if (!spmCounter.IsPresent && disc.Tracking)
-                spmCounter.FadeIn(TIME_FADEIN);
+                spmCounter.FadeIn(FadeIn);
 
             base.Update();
         }
@@ -189,6 +194,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
+            if (HideSpinnerDetails)
+            {
+                disc.FadeOut();
+                ticks.FadeOut();
+                background.FadeOut();
+            }
+
             circleContainer.ScaleTo(spinner.Scale * 0.3f);
             circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, Easing.OutQuint);
 
@@ -204,15 +216,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            var sequence = this.Delay(spinner.Duration).FadeOut(160);
+            var sequence = this.Delay(spinner.Duration + ExtendDuration).FadeOut(160 * FadeOutSpeedMultiplier);
 
             switch (state)
             {
                 case ArmedState.Hit:
-                    sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
+                    sequence.ScaleTo(Scale * 1.2f, 320 * FadeOutSpeedMultiplier, Easing.Out);
                     break;
                 case ArmedState.Miss:
-                    sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
+                    sequence.ScaleTo(Scale * 0.8f, 320 * FadeOutSpeedMultiplier, Easing.In);
                     break;
             }
 

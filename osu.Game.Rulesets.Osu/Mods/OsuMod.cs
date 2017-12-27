@@ -11,8 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 using OpenTK;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -23,13 +24,47 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     public class OsuModEasy : ModEasy
     {
-
     }
 
-    public class OsuModHidden : ModHidden
+    public class OsuModHidden : ModHidden, IApplicableToDrawableHitObjects
     {
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
+
+        private const double fade_in_speed_multiplier = 0.6;
+        private const double fade_out_speed_multiplier = 0.3;
+
+        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        {
+            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
+            {
+                d.FadeIn = d.HitObject.StartTime - DrawableOsuHitObject.TIME_PREEMPT * fade_in_speed_multiplier - (d.HitObject.StartTime - DrawableOsuHitObject.TIME_PREEMPT);
+                d.DelayUpdates *= fade_in_speed_multiplier;
+                d.ExtendDuration = DrawableOsuHitObject.TIME_PREEMPT - DrawableOsuHitObject.TIME_PREEMPT * fade_in_speed_multiplier;
+                d.FadeOutSpeedMultiplier = fade_out_speed_multiplier;
+
+                switch (d)
+                {
+                    case DrawableHitCircle circle:
+                        circle.ShowApproachCircle = false;
+                        circle.PlayHitAnimation = false;
+                        break;
+                    case DrawableSlider slider:
+                        slider.GraduallyFadeOut = true;
+                        // we also need to set the values for the InitialCircle
+                        slider.InitialCircle.ShowApproachCircle = false;
+                        slider.InitialCircle.PlayHitAnimation = false;
+                        slider.InitialCircle.FadeIn = d.FadeIn;
+                        slider.InitialCircle.DelayUpdates = d.DelayUpdates;
+                        slider.InitialCircle.ExtendDuration = d.ExtendDuration;
+                        slider.InitialCircle.FadeOutSpeedMultiplier = d.FadeOutSpeedMultiplier;
+                        break;
+                    case DrawableSpinner spinner:
+                        spinner.HideSpinnerDetails = true;
+                        break;
+                }
+            }
+        }
     }
 
     public class OsuModHardRock : ModHardRock, IApplicableToHitObject<OsuHitObject>
@@ -50,11 +85,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             slider.ControlPoints = newControlPoints;
             slider.Curve?.Calculate(); // Recalculate the slider curve
-        }
-
-        public void ApplyToHitObjects(RulesetContainer<OsuHitObject> rulesetContainer)
-        {
-
         }
     }
 
@@ -96,7 +126,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     public class OsuModPerfect : ModPerfect
     {
-
     }
 
     public class OsuModSpunOut : Mod

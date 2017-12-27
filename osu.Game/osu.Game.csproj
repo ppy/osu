@@ -318,6 +318,7 @@
     <Compile Include="Rulesets\Edit\Layers\Selection\HandleContainer.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\SelectionInfo.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\SelectionLayer.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObjects.cs" />
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
     <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
     <Compile Include="Screens\Edit\Components\TimeInfoContainer.cs" />

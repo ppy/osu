@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -20,6 +19,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly ExplodePiece explode;
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
+
+        /// <summary>
+        /// Determines whether the approach circle should be shown.
+        /// </summary>
+        public bool ShowApproachCircle = true;
+
+        /// <summary>
+        /// Determines whether an animation should be played when the HitObject was successfully hit.
+        /// </summary>
+        public bool PlayHitAnimation = true;
 
         public DrawableHitCircle(OsuHitObject h) : base(h)
         {
@@ -88,47 +97,51 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT));
-            ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
+            if (ShowApproachCircle)
+            {
+                ApproachCircle.FadeIn(Math.Min(FadeIn * 2, TIME_PREEMPT));
+                ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
+            }
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            double duration = ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime) - HitObject.StartTime;
-
-            glow.Delay(duration).FadeOut(400);
+            glow.FadeOut(400 * FadeOutSpeedMultiplier);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(duration + TIME_PREEMPT).FadeOut(TIME_FADEOUT);
-                    Expire(true);
+                    this.FadeOut(500 * FadeOutSpeedMultiplier).Delay(ExtendDuration + HitObject.HitWindowFor(HitResult.Miss)).Expire();
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
-                    this.FadeOut(TIME_FADEOUT / 5);
-                    Expire();
+                    this.FadeOut(100 * FadeOutSpeedMultiplier).Expire();
                     break;
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
 
-                    const double flash_in = 40;
-                    flash.FadeTo(0.8f, flash_in)
-                         .Then()
-                         .FadeOut(100);
-
-                    explode.FadeIn(flash_in);
-
-                    using (BeginDelayedSequence(flash_in, true))
+                    if (PlayHitAnimation)
                     {
-                        //after the flash, we can hide some elements that were behind it
-                        ring.FadeOut();
-                        circle.FadeOut();
-                        number.FadeOut();
+                        const double flash_in = 40;
+                        flash.FadeTo(0.8f, flash_in)
+                                .Then()
+                                .FadeOut(100);
 
-                        this.FadeOut(800)
-                            .ScaleTo(Scale * 1.5f, 400, Easing.OutQuad);
+                        explode.FadeIn(flash_in);
+
+                        using (BeginDelayedSequence(flash_in, true))
+                        {
+                            //after the flash, we can hide some elements that were behind it
+                            ring.FadeOut();
+                            circle.FadeOut();
+                            number.FadeOut();
+
+                            this.FadeOut(800 * FadeOutSpeedMultiplier)
+                                .ScaleTo(Scale * 1.5f, 400 * FadeOutSpeedMultiplier, Easing.OutQuad);
+                        }
                     }
+                    else
+                        this.FadeOut(100 * FadeOutSpeedMultiplier);
 
                     Expire();
                     break;

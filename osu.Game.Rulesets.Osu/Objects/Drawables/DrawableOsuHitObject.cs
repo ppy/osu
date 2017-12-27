@@ -10,9 +10,31 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
+        /// <summary>
+        /// The number of milliseconds before <see cref="Rulesets.Objects.HitObject.StartTime"/> we should start fading in.
+        /// <para>This should be calculated in the future.</para>
+        /// </summary>
         public const float TIME_PREEMPT = 600;
         public const float TIME_FADEIN = 400;
-        public const float TIME_FADEOUT = 500;
+
+        public double FadeOutSpeedMultiplier = 1;
+
+        /// <summary>
+        /// The number of milliseconds to fade in.
+        /// </summary>
+        public double FadeIn = TIME_FADEIN;
+
+        /// <summary>
+        /// The number of milliseconds, starting at fade in, that the <see cref="UpdateCurrentState(ArmedState)"/> should be delayed by.
+        /// </summary>
+        public double DelayUpdates = TIME_PREEMPT;
+
+        /// <summary>
+        /// The number of milliseconds the duration should be extended to guarantee a correct lifetime.
+        /// </summary>
+        public double ExtendDuration;
+
+        public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Time.Current >= HitObject.StartTime - TIME_PREEMPT;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
@@ -32,21 +54,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 UpdatePreemptState();
 
-                using (BeginDelayedSequence(TIME_PREEMPT + (Judgements.FirstOrDefault()?.TimeOffset ?? 0), true))
+                var delay = DelayUpdates + (Judgements.FirstOrDefault()?.TimeOffset ?? 0);
+                using (BeginDelayedSequence(delay, true))
                     UpdateCurrentState(state);
             }
         }
 
-        protected virtual void UpdatePreemptState()
-        {
-            this.FadeIn(TIME_FADEIN);
-        }
+        protected virtual void UpdatePreemptState() => this.FadeIn(FadeIn);
 
         protected virtual void UpdateCurrentState(ArmedState state)
         {
+
         }
 
-        // Todo: At some point we need to move these to DrawableHitObject after ensuring that all other Rulesets apply
+        // TODO: At some point we need to move these to DrawableHitObject after ensuring that all other Rulesets apply
         // transforms in the same way and don't rely on them not being cleared
         public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null) { }
         public override void ApplyTransformsAt(double time, bool propagateChildren = false) { }
