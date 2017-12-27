@@ -28,7 +28,12 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
 
-        public virtual bool ShowOverlays => true;
+        protected BindableBool ShowOverlays = new BindableBool();
+
+        /// <summary>
+        /// Whether overlays should be shown when this screen is entered or resumed.
+        /// </summary>
+        public virtual bool ShowOverlaysOnEnter => true;
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
@@ -70,7 +75,10 @@ namespace osu.Game.Screens
             }
 
             if (osuGame != null)
+            {
                 Ruleset.BindTo(osuGame.Ruleset);
+                ShowOverlays.BindTo(osuGame.ShowOverlays);
+            }
 
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
@@ -94,6 +102,8 @@ namespace osu.Game.Screens
             base.OnResuming(last);
             logo.AppendAnimatingAction(() => LogoArriving(logo, true), true);
             sampleExit?.Play();
+
+            ShowOverlays.Value = ShowOverlaysOnEnter;
         }
 
         protected override void OnSuspending(Screen next)
@@ -139,6 +149,8 @@ namespace osu.Game.Screens
             logo.AppendAnimatingAction(() => LogoArriving(logo, false), true);
 
             base.OnEntering(last);
+
+            ShowOverlays.Value = ShowOverlaysOnEnter;
         }
 
         protected override bool OnExiting(Screen next)
