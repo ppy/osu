@@ -167,9 +167,4 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public override Vector2 SelectionPoint => ToScreenSpace(body.Position);
         public override Quad SelectionQuad => body.PathDrawQuad;
     }
-
-    internal interface ISliderProgress
-    {
-        void UpdateProgress(double progress, int repeat);
-    }
 }
