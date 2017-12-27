@@ -5,12 +5,12 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 
 namespace osu.Game.Rulesets.Edit.Layers.Selection
 {
