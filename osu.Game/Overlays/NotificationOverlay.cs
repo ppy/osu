@@ -10,6 +10,8 @@ using osu.Game.Overlays.Notifications;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
+using System;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays
 {
@@ -19,8 +21,12 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        private ScrollContainer scrollContainer;
         private FlowContainer<NotificationSection> sections;
+
+        /// <summary>
+        /// Provide a source for the toolbar height.
+        /// </summary>
+        public Func<float> GetToolbarHeight;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -36,12 +42,12 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
-                    Alpha = 0.6f,
+                    Alpha = 0.6f
                 },
-                scrollContainer = new OsuScrollContainer
+                new OsuScrollContainer
                 {
+                    Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Margin = new MarginPadding { Top = Toolbar.Toolbar.HEIGHT },
                     Children = new[]
                     {
                         sections = new FillFlowContainer<NotificationSection>
@@ -55,14 +61,14 @@ namespace osu.Game.Overlays
                                 {
                                     Title = @"Notifications",
                                     ClearText = @"Clear All",
-                                    AcceptTypes = new[] { typeof(SimpleNotification) },
+                                    AcceptTypes = new[] { typeof(SimpleNotification) }
                                 },
                                 new NotificationSection
                                 {
                                     Title = @"Running Tasks",
                                     ClearText = @"Cancel All",
-                                    AcceptTypes = new[] { typeof(ProgressNotification) },
-                                },
+                                    AcceptTypes = new[] { typeof(ProgressNotification) }
+                                }
                             }
                         }
                     }
@@ -70,47 +76,45 @@ namespace osu.Game.Overlays
             };
         }
 
+        private int totalCount => sections.Select(c => c.DisplayedCount).Sum();
+        private int unreadCount => sections.Select(c => c.UnreadCount).Sum();
+
+        public readonly BindableInt UnreadCount = new BindableInt();
+
         private int runningDepth;
 
         private void notificationClosed()
         {
             // hide ourselves if all notifications have been dismissed.
-            if (sections.Select(c => c.DisplayedCount).Sum() == 0)
+            if (totalCount == 0)
                 State = Visibility.Hidden;
+
+            updateCounts();
         }
 
-        public void Post(Notification notification)
+        public void Post(Notification notification) => Schedule(() =>
         {
-            Schedule(() =>
-            {
-                State = Visibility.Visible;
+            ++runningDepth;
+            notification.Depth = notification.DisplayOnTop ? runningDepth : -runningDepth;
 
-                ++runningDepth;
-                notification.Depth = notification.DisplayOnTop ? runningDepth : -runningDepth;
+            notification.Closed += notificationClosed;
 
-                notification.Closed += notificationClosed;
+            var hasCompletionTarget = notification as IHasCompletionTarget;
+            if (hasCompletionTarget != null)
+                hasCompletionTarget.CompletionTarget = Post;
 
-                var hasCompletionTarget = notification as IHasCompletionTarget;
-                if (hasCompletionTarget != null)
-                    hasCompletionTarget.CompletionTarget = Post;
+            var ourType = notification.GetType();
+            sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
 
-                var ourType = notification.GetType();
-                sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
-            });
-        }
+            updateCounts();
+        });
 
         protected override void PopIn()
         {
             base.PopIn();
 
-            scrollContainer.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(1, TRANSITION_LENGTH / 2);
-        }
-
-        private void markAllRead()
-        {
-            sections.Children.ForEach(s => s.MarkAllRead());
+            this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
         }
 
         protected override void PopOut()
@@ -120,7 +124,26 @@ namespace osu.Game.Overlays
             markAllRead();
 
             this.MoveToX(width, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(0, TRANSITION_LENGTH / 2);
+            this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
+        }
+
+        private void updateCounts()
+        {
+            UnreadCount.Value = unreadCount;
+        }
+
+        private void markAllRead()
+        {
+            sections.Children.ForEach(s => s.MarkAllRead());
+
+            updateCounts();
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
     }
 }

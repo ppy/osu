@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Edit
             }
             catch (Exception e)
             {
-                Logger.Log($"Could not load this beatmap sucessfully ({e})!", LoggingTarget.Runtime, LogLevel.Error);
+                Logger.Error(e, "Could not load beatmap sucessfully!");
                 return;
             }
 
