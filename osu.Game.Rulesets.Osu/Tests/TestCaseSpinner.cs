@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var spinner = new Spinner { StartTime = Time.Current + 1000, EndTime = Time.Current + 4000 };
 
-            spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 0 });
 
             var drawable = new DrawableSpinner(spinner)
             {

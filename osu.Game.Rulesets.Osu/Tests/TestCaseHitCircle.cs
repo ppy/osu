@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Position = positionOffset.Value
             };
 
-            circle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            circle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 0 });
 
             var drawable = new DrawableHitCircle(circle)
             {
