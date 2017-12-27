@@ -20,6 +20,10 @@ namespace osu.Game.Overlays.Notifications
         private OsuSpriteText titleText;
         private OsuSpriteText countText;
 
+        // this is required to ensure correct layout and scheduling on children.
+        // the layout portion of this is being tracked as a framework issue (TODO).
+        protected override bool RequiresChildrenUpdate => true;
+
         private ClearAllButton clearButton;
 
         private FlowContainer<Notification> notifications;
