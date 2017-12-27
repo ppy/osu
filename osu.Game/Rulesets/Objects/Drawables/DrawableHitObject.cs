@@ -74,6 +74,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected List<SampleChannel> Samples = new List<SampleChannel>();
         protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
 
+        // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
+        protected virtual string SampleNamespace => null;
+
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
         protected DrawableHitObject(TObject hitObject)
@@ -101,7 +104,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                         Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
                     };
 
-                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample);
+                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample, SampleNamespace);
 
                     if (channel == null)
                         continue;
