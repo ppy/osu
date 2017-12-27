@@ -117,11 +117,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             progress = slider.ProgressAt(progress);
 
             if (repeat > currentRepeat)
-            {
-                if (repeat < slider.RepeatCount && ball.Tracking)
-                    PlaySamples();
                 currentRepeat = repeat;
-            }
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (!initialCircle.Judgements.Any(j => j.IsHit))
@@ -170,10 +166,5 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override Vector2 SelectionPoint => ToScreenSpace(body.Position);
         public override Quad SelectionQuad => body.PathDrawQuad;
-    }
-
-    internal interface ISliderProgress
-    {
-        void UpdateProgress(double progress, int repeat);
     }
 }
