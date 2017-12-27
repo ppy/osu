@@ -17,8 +17,18 @@ namespace osu.Game.Audio
 
         public SampleChannel GetChannel(SampleManager manager, string resourceNamespace = null)
         {
-            SampleChannel channel = manager.Get(Path.Combine("Gameplay", resourceNamespace ?? string.Empty, $"{Bank}-{Name}"));
-            channel.Volume.Value = Volume / 100.0;
+            SampleChannel channel = null;
+
+            if (resourceNamespace != null)
+                channel = manager.Get(Path.Combine("Gameplay", resourceNamespace, $"{Bank}-{Name}"));
+
+            // try without namespace as a fallback.
+            if (channel == null)
+                channel = manager.Get(Path.Combine("Gameplay", $"{Bank}-{Name}"));
+
+            if (channel != null)
+                channel.Volume.Value = Volume / 100.0;
+
             return channel;
         }
 
