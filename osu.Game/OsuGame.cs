@@ -440,12 +440,16 @@ namespace osu.Game
 
         private void screenAdded(Screen newScreen)
         {
+            currentScreen = (OsuScreen)newScreen;
+
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
         }
 
         private void screenRemoved(Screen newScreen)
         {
+            currentScreen = (OsuScreen)newScreen;
+
             if (newScreen == null)
                 Exit();
         }
