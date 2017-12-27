@@ -1,9 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Overlays;
@@ -15,6 +17,16 @@ namespace osu.Game.Tests.Visual
     {
         private readonly NotificationOverlay manager;
         private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
+
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(NotificationSection),
+            typeof(SimpleNotification),
+            typeof(ProgressNotification),
+            typeof(ProgressCompletionNotification),
+            typeof(IHasCompletionTarget),
+            typeof(Notification)
+        };
 
         public TestCaseNotificationOverlay()
         {
@@ -30,17 +42,44 @@ namespace osu.Game.Tests.Visual
 
             Content.Add(displayedCount);
 
+            void setState(Visibility state) => AddStep(state.ToString(), () => manager.State = state);
+            void checkProgressingCount(int expected) => AddAssert($"progressing count is {expected}", () => progressingNotifications.Count == expected);
+
             manager.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count}"; };
 
-            AddStep(@"toggle", manager.ToggleVisibility);
+
+            setState(Visibility.Visible);
             AddStep(@"simple #1", sendHelloNotification);
             AddStep(@"simple #2", sendAmazingNotification);
             AddStep(@"progress #1", sendUploadProgress);
             AddStep(@"progress #2", sendDownloadProgress);
-            AddStep(@"barrage", () => sendBarrage());
+
+            checkProgressingCount(2);
+
+            setState(Visibility.Hidden);
+
+            AddRepeatStep(@"add many simple", sendManyNotifications, 3);
+            AddWaitStep(5);
+
+            checkProgressingCount(0);
+
+            AddStep(@"progress #3", sendUploadProgress);
+
+            checkProgressingCount(1);
+
+            AddAssert("Displayed count is 33", () => manager.UnreadCount.Value == 33);
+
+            AddWaitStep(10);
+
+            checkProgressingCount(0);
+
+
+            setState(Visibility.Visible);
+
+            //AddStep(@"barrage", () => sendBarrage());
         }
 
-        private void sendBarrage(int remaining = 100)
+        private void sendBarrage(int remaining = 10)
         {
             switch (RNG.Next(0, 4))
             {
@@ -70,7 +109,7 @@ namespace osu.Game.Tests.Visual
 
             if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
             {
-                var p = progressingNotifications.FirstOrDefault(n => n.IsAlive && n.State == ProgressNotificationState.Queued);
+                var p = progressingNotifications.FirstOrDefault(n => n.State == ProgressNotificationState.Queued);
                 if (p != null)
                     p.State = ProgressNotificationState.Active;
             }
@@ -78,7 +117,7 @@ namespace osu.Game.Tests.Visual
             foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))
             {
                 if (n.Progress < 1)
-                    n.Progress += (float)(Time.Elapsed / 2000) * RNG.NextSingle();
+                    n.Progress += (float)(Time.Elapsed / 400) * RNG.NextSingle();
                 else
                     n.State = ProgressNotificationState.Completed;
             }
@@ -114,6 +153,12 @@ namespace osu.Game.Tests.Visual
         private void sendHelloNotification()
         {
             manager.Post(new SimpleNotification { Text = @"Welcome to osu!. Enjoy your stay!" });
+        }
+
+        private void sendManyNotifications()
+        {
+            for (int i = 0; i < 10; i++)
+                manager.Post(new SimpleNotification { Text = @"Spam incoming!!" });
         }
     }
 }
