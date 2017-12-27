@@ -62,7 +62,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             var cpi = new ControlPointInfo();
             cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
-            var difficulty = new BeatmapDifficulty { SliderMultiplier = (float)sliderMultiplier };
+            var difficulty = new BeatmapDifficulty
+            {
+                SliderMultiplier = (float)sliderMultiplier,
+                CircleSize = 0
+            };
 
             slider.ApplyDefaults(cpi, difficulty);
             Add(new DrawableSlider(slider)
@@ -98,7 +102,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             var cpi = new ControlPointInfo();
             cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
-            var difficulty = new BeatmapDifficulty { SliderMultiplier = (float)sliderMultiplier };
+            var difficulty = new BeatmapDifficulty
+            {
+                SliderMultiplier = (float)sliderMultiplier,
+                CircleSize = 0
+            };
 
             slider.ApplyDefaults(cpi, difficulty);
             Add(new DrawableSlider(slider)
