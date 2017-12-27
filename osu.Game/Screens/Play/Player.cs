@@ -312,14 +312,16 @@ namespace osu.Game.Screens.Play
 
             if (!loadedSuccessfully)
                 return;
-
-            if (blurLevel)
+            if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
             {
-                (Background as BackgroundScreenBeatmap)?.BlurTo(background_blur, 1000, Easing.OutQuint);
-            }
-            else
-            {
-                (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1000, Easing.OutQuint);
+                if (blurLevel)
+                {
+                    backgroundModeBeatmap.BlurTo(background_blur, 1000, Easing.OutQuint);
+                }
+                else
+                {
+                    backgroundModeBeatmap.BlurTo(Vector2.Zero, 1000, Easing.OutQuint);
+                }
             }
 
             dimLevel.ValueChanged += dimLevel_ValueChanged;
