@@ -444,7 +444,7 @@ namespace osu.Game.Screens.Select
         {
             if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
                 Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo);
-            else
+            else if (Carousel.SelectedBeatmapSet == null)
                 Carousel.SelectNextRandom();
         }
 
