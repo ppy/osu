@@ -253,11 +253,11 @@ namespace osu.Game.Overlays.Chat
                     });
                 }
 
-                foreach (var link in linksToRemove)
-                    message.Links.Remove(link);
-
                 var lastLink = message.Links[message.Links.Count - 1];
                 contentFlow.AddText(message.Content.Substring(lastLink.Index + lastLink.Length));
+
+                foreach (var link in linksToRemove)
+                    message.Links.Remove(link);
             }
         }
 
