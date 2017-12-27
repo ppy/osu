@@ -65,6 +65,7 @@ namespace osu.Game.Configuration
 
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
+            Set(OsuSetting.BlurLevel, false);
 
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.KeyOverlay, false);
@@ -114,6 +115,7 @@ namespace osu.Game.Configuration
         ShowFpsDisplay,
         ChatDisplayHeight,
         Version,
-        ShowConvertedBeatmaps
+        ShowConvertedBeatmaps,
+        BlurLevel
     }
 }
