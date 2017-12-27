@@ -48,7 +48,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(drawable is DrawableOsuHitObject d))
                 return;
 
-            //var duration = (d.HitObject as IHasEndTime)?.Duration ?? 0;
             var fadeInTime = d.HitObject.StartTime - preEmpt;
             var fadeIn = d.HitObject.StartTime - preEmpt * fade_in_speed_multiplier - fadeInTime;
             var fadeOutTime = fadeInTime + fadeIn;
@@ -56,22 +55,30 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             d.FadeIn = fadeIn;
 
-            using (drawable.BeginAbsoluteSequence(fadeInTime))
+            using (drawable.BeginAbsoluteSequence(fadeInTime, true))
             {
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:
                         circle.ApproachCircle.FadeOut();
+                        // prolong the hitcircle long enough so misses are still possible
                         circle.LifetimeEnd = circle.HitObject.StartTime + Math.Max(fadeOut, circle.HitObject.HitWindowFor(HitResult.Miss));
-
-                        using (circle.BeginDelayedSequence(fadeIn))
-                            circle.FadeOut(fadeOut);
+                        circle.FadeIn(fadeIn).Then().FadeOut(fadeOut); // override fade in as it somehow gets cut otherwise
                         break;
                     case DrawableSlider slider:
                         slider.InitialCircle.ApplyCustomUpdateState += customSequence;
 
-                        //using (slider.BeginDelayedSequence(fadeIn))
-                        //    slider.Body.FadeOut(duration, Easing.Out);
+                        using (slider.BeginAbsoluteSequence(fadeOutTime, true))
+                        {
+                            var duration = slider.Slider.EndTime - fadeOutTime; // new duration from fade in to end of the slider
+                            slider.Body.FadeOut(duration);
+                            // delay a bit less to let the sliderball fade out peacefully instead of having a hard cut
+                            using (slider.BeginDelayedSequence(duration - fadeOut, true))
+                            {
+                                slider.Ball.FadeOut(fadeOut);
+                                slider.Delay(fadeOut).Expire();
+                            }
+                        }
                         break;
                     case DrawableSpinner spinner:
                         spinner.Disc.FadeOut();
