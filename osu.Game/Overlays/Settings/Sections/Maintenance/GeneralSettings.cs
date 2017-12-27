@@ -30,8 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importButton.Enabled.Value = false;
-                        Task.Factory.StartNew(beatmaps.ImportFromStable)
-                            .ContinueWith(t => Schedule(() => importButton.Enabled.Value = true), TaskContinuationOptions.LongRunning);
+                        beatmaps.ImportFromStable().ContinueWith(t => Schedule(() => importButton.Enabled.Value = true));
                     }
                 },
                 deleteButton = new DangerousSettingsButton

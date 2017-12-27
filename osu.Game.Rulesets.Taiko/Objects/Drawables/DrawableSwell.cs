@@ -34,10 +34,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
 
-        private readonly TaikoAction[] rimActions = { TaikoAction.LeftRim, TaikoAction.RightRim };
-        private readonly TaikoAction[] centreActions = { TaikoAction.LeftCentre, TaikoAction.RightCentre };
-        private TaikoAction[] lastAction;
-
         /// <summary>
         /// The amount of times the user has hit this swell.
         /// </summary>
@@ -205,19 +201,20 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
+        private bool? lastWasCentre;
+
         public override bool OnPressed(TaikoAction action)
         {
             // Don't handle keys before the swell starts
             if (Time.Current < HitObject.StartTime)
                 return false;
 
-            // Find the keyset which this key corresponds to
-            var keySet = rimActions.Contains(action) ? rimActions : centreActions;
+            var isCentre = action == TaikoAction.LeftCentre || action == TaikoAction.RightCentre;
 
-            // Ensure alternating keysets
-            if (keySet == lastAction)
+            // Ensure alternating centre and rim hits
+            if (lastWasCentre == isCentre)
                 return false;
-            lastAction = keySet;
+            lastWasCentre = isCentre;
 
             UpdateJudgement(true);
 

@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (timeOffset > second_hit_window)
-                    AddJudgement(new TaikoStrongHitJudgement { Result = HitResult.Miss });
+                    AddJudgement(new TaikoStrongHitJudgement { Result = HitResult.None });
                 return;
             }
 
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return false;
 
             // Assume the intention was to hit the strong hit with both keys only if the first key is still being held down
-            return firstKeyHeld && UpdateJudgement(true) && Judgements.LastOrDefault()?.IsHit == true;
+            return firstKeyHeld && UpdateJudgement(true);
         }
     }
 }
