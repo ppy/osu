@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
@@ -11,7 +10,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Tests.Visual;
 using OpenTK;
 
@@ -24,11 +22,18 @@ namespace osu.Game.Rulesets.Osu.Tests
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
+        private double speedMultiplier;
+        private double sliderMultiplier;
+        private int depthIndex;
+
         public TestCaseSlider()
         {
             base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
 
-            AddStep("Single", addSingle);
+            AddSliderStep("SpeedMultiplier", 0.01, 10, 2, s => speedMultiplier = s);
+            AddSliderStep("SliderMultiplier", 0.01, 10, 2, s => sliderMultiplier = s);
+
+            AddStep("Single", () => addSingle());
             AddStep("Repeated (1)", () => addRepeated(1));
             AddStep("Repeated (2)", () => addRepeated(2));
             AddStep("Repeated (3)", () => addRepeated(3));
@@ -36,29 +41,44 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Stream", addStream);
         }
 
-        private void addSingle()
+        private void addSingle(double timeOffset = 0, Vector2? positionOffset = null)
         {
+            positionOffset = positionOffset ?? Vector2.Zero;
+
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
-                Position = new Vector2(-200, 0),
+                StartTime = Time.Current + 1000 + timeOffset,
+                Position = new Vector2(-200, 0) + positionOffset.Value,
                 ControlPoints = new List<Vector2>
                 {
-                    new Vector2(-200, 0),
-                    new Vector2(400, 0),
+                    new Vector2(-200, 0) + positionOffset.Value,
+                    new Vector2(400, 0) + positionOffset.Value,
                 },
                 Distance = 400,
-                Velocity = 1,
-                TickDistance = 100,
             };
 
-            slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            var cpi = new ControlPointInfo();
+            cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
-            Add(new DrawableSlider(slider) { Anchor = Anchor.Centre });
+            var difficulty = new BeatmapDifficulty { SliderMultiplier = (float)sliderMultiplier };
+
+            slider.ApplyDefaults(cpi, difficulty);
+            Add(new DrawableSlider(slider)
+            {
+                Anchor = Anchor.Centre,
+                Depth = depthIndex++
+            });
         }
 
         private void addRepeated(int repeats)
         {
+            // The first run through the slider is considered a repeat
+            repeats++;
+
+            var repeatSamples = new List<List<SampleInfo>>();
+            for (int i = 0; i < repeats; i++)
+                repeatSamples.Add(new List<SampleInfo>());
+
             var slider = new Slider
             {
                 StartTime = Time.Current + 1000,
@@ -69,20 +89,32 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(400, 0),
                 },
                 Distance = 400,
-                Velocity = 11,
-                TickDistance = 100,
                 RepeatCount = repeats,
-                RepeatSamples = new List<SampleInfo>[repeats].ToList()
+                RepeatSamples = repeatSamples
             };
 
-            slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            var cpi = new ControlPointInfo();
+            cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
-            Add(new DrawableSlider(slider) { Anchor = Anchor.Centre });
+            var difficulty = new BeatmapDifficulty { SliderMultiplier = (float)sliderMultiplier };
+
+            slider.ApplyDefaults(cpi, difficulty);
+            Add(new DrawableSlider(slider)
+            {
+                Anchor = Anchor.Centre,
+                Depth = depthIndex++
+            });
         }
 
         private void addStream()
         {
+            Vector2 pos = Vector2.Zero;
 
+            for (int i = 0; i <= 1000; i += 100)
+            {
+                addSingle(i, pos);
+                pos += new Vector2(10);
+            }
         }
     }
 }
