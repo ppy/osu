@@ -15,6 +15,7 @@ using osu.Game.Users;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -227,6 +228,8 @@ namespace osu.Game.Overlays.Chat
             else
             {
                 int prevIndex = 0;
+                List<MessageFormatter.Link> linksToRemove = new List<MessageFormatter.Link>();
+
                 foreach (var link in message.Links)
                 {
                     contentFlow.AddText(message.Content.Substring(prevIndex, link.Index - prevIndex));
@@ -236,8 +239,9 @@ namespace osu.Game.Overlays.Chat
                     if (link.Url.StartsWith("osu://chan/"))
                     {
                         var channelName = link.Url.Substring(11).Split('/')[0];
-                        if (chat.AvailableChannels.TrueForAll(c => c.Name != channelName))
+                        if (chat?.AvailableChannels.TrueForAll(c => c.Name != channelName) != false)
                         {
+                            linksToRemove.Add(link);
                             contentFlow.AddText(message.Content.Substring(link.Index, link.Length));
                             continue;
                         }
@@ -245,9 +249,12 @@ namespace osu.Game.Overlays.Chat
 
                     contentFlow.AddLink(message.Content.Substring(link.Index, link.Length), link.Url, sprite =>
                     {
-                        ((OsuLinkSpriteText)sprite).TextColour = urlColour;
+                        ((ChatLink)sprite).TextColour = urlColour;
                     });
                 }
+
+                foreach (var link in linksToRemove)
+                    message.Links.Remove(link);
 
                 var lastLink = message.Links[message.Links.Count - 1];
                 contentFlow.AddText(message.Content.Substring(lastLink.Index + lastLink.Length));
