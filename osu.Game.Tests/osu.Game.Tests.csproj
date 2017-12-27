@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="NUnit" Version="3.8.1" />
+    <PackageReference Include="DeepEqual" Version="1.6.0" />
   </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="Resources\Soleily - Renatus %28Gamu%29 [Insane].osu" />
