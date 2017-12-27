@@ -1,9 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -15,6 +17,15 @@ namespace osu.Game.Tests.Visual
         private readonly NotificationOverlay manager;
         private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
 
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(Notification),
+            typeof(ProgressNotification),
+            typeof(ProgressCompletionNotification),
+            typeof(SimpleNotification),
+            typeof(IHasCompletionTarget),
+        };
+
         public TestCaseNotificationOverlay()
         {
             progressingNotifications.Clear();
@@ -24,6 +35,12 @@ namespace osu.Game.Tests.Visual
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight
             });
+
+            SpriteText displayedCount = new SpriteText();
+
+            Content.Add(displayedCount);
+
+            manager.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count}"; };
 
             AddStep(@"toggle", manager.ToggleVisibility);
             AddStep(@"simple #1", sendHelloNotification);

@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Toolbar
             Icon = FontAwesome.fa_music;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(MusicController music)
         {
             StateContainer = music;
