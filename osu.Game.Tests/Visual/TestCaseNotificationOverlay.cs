@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -15,6 +16,15 @@ namespace osu.Game.Tests.Visual
     {
         private readonly NotificationOverlay manager;
         private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
+
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(Notification),
+            typeof(ProgressNotification),
+            typeof(ProgressCompletionNotification),
+            typeof(SimpleNotification),
+            typeof(IHasCompletionTarget),
+        };
 
         public TestCaseNotificationOverlay()
         {
