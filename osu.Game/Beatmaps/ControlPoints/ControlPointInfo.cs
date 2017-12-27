@@ -12,11 +12,6 @@ namespace osu.Game.Beatmaps.ControlPoints
     [Serializable]
     public class ControlPointInfo
     {
-        private static readonly TimingControlPoint default_timing_point = new TimingControlPoint();
-        private static readonly DifficultyControlPoint default_difficulty_point = new DifficultyControlPoint();
-        private static readonly SampleControlPoint default_sample_point = new SampleControlPoint();
-        private static readonly EffectControlPoint default_effect_point = new EffectControlPoint();
-
         /// <summary>
         /// All timing points.
         /// </summary>
@@ -46,68 +41,68 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the difficulty control point at.</param>
         /// <returns>The difficulty control point.</returns>
-        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearch(DifficultyPoints, time, default_difficulty_point);
+        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearch(DifficultyPoints, time);
 
         /// <summary>
         /// Finds the effect control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the effect control point at.</param>
         /// <returns>The effect control point.</returns>
-        public EffectControlPoint EffectPointAt(double time) => binarySearch(EffectPoints, time, default_effect_point);
+        public EffectControlPoint EffectPointAt(double time) => binarySearch(EffectPoints, time);
 
         /// <summary>
         /// Finds the sound control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the sound control point at.</param>
         /// <returns>The sound control point.</returns>
-        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, SamplePoints.FirstOrDefault() ?? default_sample_point);
+        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, SamplePoints.FirstOrDefault());
 
         /// <summary>
         /// Finds the timing control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the timing control point at.</param>
         /// <returns>The timing control point.</returns>
-        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, TimingPoints.FirstOrDefault() ?? default_timing_point);
+        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, TimingPoints.FirstOrDefault());
 
         [JsonIgnore]
         /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
         /// </summary>
         public double BPMMaximum =>
-            60000 / (TimingPoints.OrderBy(c => c.BeatLength).FirstOrDefault() ?? default_timing_point).BeatLength;
+            60000 / (TimingPoints.OrderBy(c => c.BeatLength).FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 
         [JsonIgnore]
         /// <summary>
         /// Finds the minimum BPM represented by any timing control point.
         /// </summary>
         public double BPMMinimum =>
-            60000 / (TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? default_timing_point).BeatLength;
+            60000 / (TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 
         [JsonIgnore]
         /// <summary>
         /// Finds the mode BPM (most common BPM) represented by the control points.
         /// </summary>
         public double BPMMode =>
-            60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? default_timing_point).BeatLength;
+            60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 
         /// <summary>
         /// Binary searches one of the control point lists to find the active control point at <paramref name="time"/>.
         /// </summary>
         /// <param name="list">The list to search.</param>
         /// <param name="time">The time to find the control point at.</param>
-        /// <param name="defaultPoint">The control point to use when there is no control point before <paramref name="time"/>.</param>
+        /// <param name="prePoint">The control point to use when <paramref name="time"/> is before any control points. If null, a new control point will be constructed.</param>
         /// <returns>The active control point at <paramref name="time"/>.</returns>
-        private T binarySearch<T>(SortedList<T> list, double time, T defaultPoint)
+        private T binarySearch<T>(SortedList<T> list, double time, T prePoint = null)
             where T : ControlPoint, new()
         {
             if (list == null)
                 throw new ArgumentNullException(nameof(list));
 
             if (list.Count == 0)
-                return defaultPoint;
+                return new T();
 
             if (time < list[0].Time)
-                return defaultPoint;
+                return prePoint ?? new T();
 
             int index = list.BinarySearch(new T { Time = time });
 
