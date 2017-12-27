@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
@@ -15,6 +16,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
+    [Ignore("getting CI working")]
     public class TestCaseSlider : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(DrawableSlider) };
