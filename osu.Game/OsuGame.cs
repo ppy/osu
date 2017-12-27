@@ -16,6 +16,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -63,6 +64,8 @@ namespace osu.Game
         }
 
         public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
+
+        public readonly BindableBool ShowOverlays = new BindableBool();
 
         private OsuScreen screenStack;
 
@@ -220,15 +223,7 @@ namespace osu.Game
                 Depth = -6,
             }, overlayContent.Add);
 
-            Logger.NewEntry += entry =>
-            {
-                if (entry.Level < LogLevel.Important) return;
-
-                notifications.Post(new SimpleNotification
-                {
-                    Text = $@"{entry.Level}: {entry.Message}"
-                });
-            };
+            forwardLoggedErrorsToNotifications();
 
             dependencies.Cache(settings);
             dependencies.Cache(social);
@@ -287,7 +282,52 @@ namespace osu.Game
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
 
+            notifications.Enabled.BindTo(ShowOverlays);
+
+            ShowOverlays.ValueChanged += visible =>
+            {
+                //central game screen change logic.
+                if (!visible)
+                {
+                    hideAllOverlays();
+                    musicController.State = Visibility.Hidden;
+                    Toolbar.State = Visibility.Hidden;
+                }
+                else
+                    Toolbar.State = Visibility.Visible;
+            };
+
             Cursor.State = Visibility.Hidden;
+        }
+
+        private void forwardLoggedErrorsToNotifications()
+        {
+            int recentErrorCount = 0;
+
+            const double debounce = 5000;
+
+            Logger.NewEntry += entry =>
+            {
+                if (entry.Level < LogLevel.Error || entry.Target == null) return;
+
+                if (recentErrorCount < 2)
+                {
+                    notifications.Post(new SimpleNotification
+                    {
+                        Icon = FontAwesome.fa_bomb,
+                        Text = (recentErrorCount == 0 ? entry.Message : "Subsequent errors occurred and have been logged.") + "\nClick to view log files.",
+                        Activated = () =>
+                        {
+                            Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
+                            return true;
+                        }
+                    });
+                }
+
+                Interlocked.Increment(ref recentErrorCount);
+
+                Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentErrorCount), debounce);
+            };
         }
 
         private Task asyncLoadStream;
@@ -338,8 +378,6 @@ namespace osu.Game
 
         public bool OnReleased(GlobalAction action) => false;
 
-        public event Action<Screen> ScreenChanged;
-
         private Container mainContent;
 
         private Container overlayContent;
@@ -355,29 +393,6 @@ namespace osu.Game
             social.State = Visibility.Hidden;
             userProfile.State = Visibility.Hidden;
             notifications.State = Visibility.Hidden;
-        }
-
-        private void screenChanged(Screen newScreen)
-        {
-            currentScreen = newScreen as OsuScreen;
-
-            if (currentScreen == null)
-            {
-                Exit();
-                return;
-            }
-
-            //central game screen change logic.
-            if (!currentScreen.ShowOverlays)
-            {
-                hideAllOverlays();
-                musicController.State = Visibility.Hidden;
-                Toolbar.State = Visibility.Hidden;
-            }
-            else
-                Toolbar.State = Visibility.Visible;
-
-            ScreenChanged?.Invoke(newScreen);
         }
 
         protected override bool OnExiting()
@@ -425,15 +440,18 @@ namespace osu.Game
 
         private void screenAdded(Screen newScreen)
         {
+            currentScreen = (OsuScreen)newScreen;
+
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
-
-            screenChanged(newScreen);
         }
 
         private void screenRemoved(Screen newScreen)
         {
-            screenChanged(newScreen);
+            currentScreen = (OsuScreen)newScreen;
+
+            if (newScreen == null)
+                Exit();
         }
     }
 }
