@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play
         #endregion
 
         private BreakOverlay breakOverlay;
-        private BufferedContainer storyboardContainer;
+        private Container storyboardContainer;
         private DrawableStoryboard storyboard;
 
         private HUDOverlay hudOverlay;
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                storyboardContainer = new BufferedContainer
+                storyboardContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Clock = offsetClock,
@@ -389,7 +389,6 @@ namespace osu.Game.Screens.Play
 
             storyboardContainer.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
             storyboardContainer.FadeTo(storyboardVisible && opacity > 0 ? 1 : 0, 800, Easing.OutQuint);
-            storyboardContainer.BlurTo(blur, 800, Easing.OutQuint);
 
             Background?.FadeTo(!storyboardVisible || beatmap.Background == null ? opacity : 0, 800, Easing.OutQuint);
             (Background as BackgroundScreenBeatmap)?.BlurTo(blur, 800, Easing.OutQuint);
