@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
@@ -41,14 +44,14 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        private readonly FillFlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
+        private readonly FillFlowContainer<Column> columns;
 
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
 
-        private readonly Container<DrawableManiaJudgement> judgements;  
         public Container<DrawableManiaJudgement> Judgements => judgements;
+        private readonly Container<DrawableManiaJudgement> judgements;
 
         private readonly Container topLevelContainer;
         public Container TopLevelContainer => topLevelContainer;

@@ -80,10 +80,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < numberOfGroup; i ++)
             {
-                var group = new ManiaColumnGroup(columnCount / numberOfGroup)
-                {
-                   
-                };
+                var group = new ManiaColumnGroup(columnCount / numberOfGroup);
                 ListColumnGroup.Add(group);
             }
 
