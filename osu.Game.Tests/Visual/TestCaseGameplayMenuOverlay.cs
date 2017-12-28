@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("Show overlay", () => failOverlay.Show());
 
-            AddStep("Hover first button", () => failOverlay.Buttons.First().TriggerOnHover(null));
+            AddStep("Hover first button", () => failOverlay.Buttons.First().TriggerOnMouseMove(null));
             AddStep("Hide overlay", () => failOverlay.Hide());
 
             AddAssert("Overlay state is reset", () => !failOverlay.Buttons.Any(b => b.Selected));
@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Visual
             var secondButton = pauseOverlay.Buttons.Skip(1).First();
 
             AddStep("Down arrow", () => pauseOverlay.TriggerOnKeyDown(null, new KeyDownEventArgs { Key = Key.Down }));
-            AddStep("Hover second button", () => secondButton.TriggerOnHover(null));
+            AddStep("Hover second button", () => secondButton.TriggerOnMouseMove(null));
             AddAssert("First button not selected", () => !pauseOverlay.Buttons.First().Selected);
             AddAssert("Second button selected", () => secondButton.Selected);
 
@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual
 
             var secondButton = pauseOverlay.Buttons.Skip(1).First();
 
-            AddStep("Hover second button", () => secondButton.TriggerOnHover(null));
+            AddStep("Hover second button", () => secondButton.TriggerOnMouseMove(null));
             AddStep("Up arrow", () => pauseOverlay.TriggerOnKeyDown(null, new KeyDownEventArgs { Key = Key.Up }));
             AddAssert("Second button not selected", () => !secondButton.Selected);
             AddAssert("First button selected", () => pauseOverlay.Buttons.First().Selected);
@@ -195,7 +195,7 @@ namespace osu.Game.Tests.Visual
 
             var secondButton = pauseOverlay.Buttons.Skip(1).First();
 
-            AddStep("Hover second button", () => secondButton.TriggerOnHover(null));
+            AddStep("Hover second button", () => secondButton.TriggerOnMouseMove(null));
             AddStep("Unhover second button", () => secondButton.TriggerOnHoverLost(null));
             AddStep("Down arrow", () => pauseOverlay.TriggerOnKeyDown(null, new KeyDownEventArgs { Key = Key.Down }));
             AddAssert("First button selected", () => pauseOverlay.Buttons.First().Selected); // Initial state condition

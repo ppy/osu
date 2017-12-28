@@ -72,6 +72,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public IReadOnlyList<Judgement> Judgements => judgements;
 
         protected List<SampleChannel> Samples = new List<SampleChannel>();
+        protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
+
+        // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
+        protected virtual string SampleNamespace => null;
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
@@ -84,12 +88,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            if (HitObject.Samples != null)
+            var samples = GetSamples();
+            if (samples.Any())
             {
                 if (HitObject.SampleControlPoint == null)
-                    throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)} must always have an attached {nameof(HitObject.SampleControlPoint)}.");
+                    throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
+                                                                                          + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
 
-                foreach (SampleInfo s in HitObject.Samples)
+                foreach (SampleInfo s in samples)
                 {
                     SampleInfo localSampleInfo = new SampleInfo
                     {
@@ -98,7 +104,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                         Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
                     };
 
-                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample);
+                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample, SampleNamespace);
 
                     if (channel == null)
                         continue;
@@ -174,7 +180,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             judgementOccurred = false;
 
-            if (AllJudged || State != ArmedState.Idle)
+            if (AllJudged)
                 return false;
 
             if (NestedHitObjects != null)
