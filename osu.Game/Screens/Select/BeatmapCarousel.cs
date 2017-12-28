@@ -194,11 +194,14 @@ namespace osu.Game.Screens.Select
             if (!Items.Any())
                 return;
 
-            var d = selectedBeatmap?.Drawables.FirstOrDefault();
-            if (d == null)
+            DrawableCarouselItem drawable = null;
+
+            if (selectedBeatmap != null && (drawable = selectedBeatmap.Drawables.FirstOrDefault()) == null)
+                // if the selected beatmap isn't present yet, we can't correctly change selection.
+                // we can fix this by changing this method to not reference drawables / Items in the first place.
                 return;
 
-            int originalIndex = Items.IndexOf(d);
+            int originalIndex = Items.IndexOf(drawable);
             int currentIndex = originalIndex;
 
             // local function to increment the index in the required direction, wrapping over extremities.
