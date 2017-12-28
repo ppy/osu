@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Catch
                             },
                         },
                         new CatchModHidden(),
-                        new CatchModFlashlight(),
+                        new CatchModFlashlight()
                     };
 
                 case ModType.Special:

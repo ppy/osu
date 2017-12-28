@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     caughtFruit = new Container<DrawableHitObject>
                     {
                         Anchor = Anchor.TopCentre,
-                        Origin = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre
                     }
                 };
             }
@@ -190,15 +190,15 @@ namespace osu.Game.Rulesets.Catch.UI
             /// <returns>Whether the catch is possible.</returns>
             public bool AttemptCatch(CatchHitObject fruit)
             {
-                const double relative_catcher_width = CATCHER_SIZE / 2;
+                const double relative_catcher_width = CATCHER_SIZE;
 
                 // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
                 var catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
                 var catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
 
-                var validCatch =
-                    catchObjectPosition >= catcherPosition - relative_catcher_width / 2 &&
-                    catchObjectPosition <= catcherPosition + relative_catcher_width / 2;
+                var validCatch =                                                                    //best setup I found
+                    catchObjectPosition >= catcherPosition - relative_catcher_width / 2 &&          //2
+                    catchObjectPosition <= catcherPosition + relative_catcher_width / 6;            //6
 
                 if (validCatch && fruit.HyperDash)
                 {

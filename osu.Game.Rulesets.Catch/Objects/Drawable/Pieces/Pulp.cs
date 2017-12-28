@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable.Pieces
                 {
                     Type = EdgeEffectType.Glow,
                     Radius = 5,
-                    Colour = accentColour.Lighten(100),
+                    Colour = accentColour.Lighten(100)
                 };
             }
         }
