@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
@@ -51,13 +52,11 @@ namespace osu.Game.Tests.Visual
             var newLine = new ChatLine(new DummyMessage(text, isAction));
             textContainer.Add(newLine);
 
-            AddAssert($"check msg having {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
-            // todo: tidy this lambda up
-            AddAssert("check link(s) displaying", () => newLine.ContentFlow.Any()
-                                                        && newLine.ContentFlow
-                                                            .Cast<ChatLink>()
-                                                            .All(sprite => sprite.HandleInput && !sprite.TextColour.Equals((SRGBColour)Color4.White)
-                                                                        || !sprite.HandleInput && sprite.TextColour.Equals((SRGBColour)Color4.White)));
+            AddAssert($"msg #{textContainer.Count} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
+            AddAssert($"msg #{textContainer.Count} shows link(s)", () => newLine.ContentFlow.Any() && isShowingLinks(newLine.ContentFlow));
+
+            bool isShowingLinks(OsuTextFlowContainer c) => c.Cast<ChatLink>().All(sprite => sprite.HandleInput && !sprite.TextColour.Equals((SRGBColour)Color4.White)
+                                                                                        || !sprite.HandleInput && sprite.TextColour.Equals((SRGBColour)Color4.White));
         }
 
         private void testLinksGeneral()

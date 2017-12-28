@@ -83,7 +83,10 @@ namespace osu.Game.Overlays.Chat
 
         private Message message;
         private OsuSpriteText username;
-        private OsuLinkTextFlowContainer<ChatLink> contentFlow;
+        private OsuLinkFlowContainer<ChatLink> contentFlow;
+
+        // this is only used for testing
+        public OsuTextFlowContainer ContentFlow => contentFlow;
 
         public Message Message
         {
@@ -100,9 +103,6 @@ namespace osu.Game.Overlays.Chat
                 updateMessageContent();
             }
         }
-
-        // this is only used for testing
-        public OsuTextFlowContainer ContentFlow => contentFlow;
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, ChatOverlay chat)
@@ -193,7 +193,7 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
-                        contentFlow = new OsuLinkTextFlowContainer<ChatLink>(t =>
+                        contentFlow = new OsuLinkFlowContainer<ChatLink>(t =>
                         {
                             if (Message.IsAction)
                                 t.Font = "Exo2.0-MediumItalic";
