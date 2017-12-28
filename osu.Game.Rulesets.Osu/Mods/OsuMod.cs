@@ -41,10 +41,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
-                d.ApplyCustomUpdateState += customSequence;
+                d.ApplyCustomUpdateState += CustomSequence;
         }
 
-        private void customSequence(DrawableHitObject drawable, ArmedState state)
+        protected void CustomSequence(DrawableHitObject drawable, ArmedState state)
         {
             if (!(drawable is DrawableOsuHitObject d))
                 return;
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         circle.FadeIn(fadeIn).Then().FadeOut(fadeOut); // override fade in as it somehow gets cut otherwise
                         break;
                     case DrawableSlider slider:
-                        slider.InitialCircle.ApplyCustomUpdateState += customSequence;
+                        slider.InitialCircle.ApplyCustomUpdateState += CustomSequence;
 
                         using (slider.BeginAbsoluteSequence(fadeOutTime, true))
                         {

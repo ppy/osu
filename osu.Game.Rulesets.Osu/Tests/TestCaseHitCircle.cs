@@ -11,6 +11,9 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using OpenTK;
+using osu.Game.Rulesets.Osu.Mods;
+using OpenTK.Graphics;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -21,7 +24,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected override Container<Drawable> Content => content;
 
         private bool auto;
+        private bool hidden;
         private int depthIndex;
+        private int circleSize;
+        private float circleScale;
 
         public TestCaseHitCircle()
         {
@@ -30,6 +36,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Single", () => addSingle());
             AddStep("Stream", addStream);
             AddToggleStep("Auto", v => auto = v);
+            AddToggleStep("Hidden", v => hidden = v);
+            AddSliderStep("CircleSize", 0, 10, 0, s => circleSize = s);
+            AddSliderStep("CircleScale", 0.5f, 2, 1, s => circleScale = s);
         }
 
         private void addSingle(double timeOffset = 0, Vector2? positionOffset = null)
@@ -39,19 +48,24 @@ namespace osu.Game.Rulesets.Osu.Tests
             var circle = new HitCircle
             {
                 StartTime = Time.Current + 1000 + timeOffset,
-                Position = positionOffset.Value
+                Position = positionOffset.Value,
+                ComboColour = Color4.LightSeaGreen
             };
 
-            circle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 0 });
+            circle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
 
-            var drawable = new DrawableHitCircle(circle)
+            var drawable = new TestDrawableHitCircle(circle, auto)
             {
                 Anchor = Anchor.Centre,
+                Scale = new Vector2(circleScale),
                 Depth = depthIndex++
             };
 
             if (auto)
                 drawable.State.Value = ArmedState.Hit;
+
+            if (hidden)
+                drawable.ApplyCustomUpdateState += new TestOsuModHidden().CustomSequence;
 
             Add(drawable);
         }
@@ -64,6 +78,34 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 addSingle(i, pos);
                 pos += new Vector2(10);
+            }
+        }
+
+        private class TestOsuModHidden : OsuModHidden
+        {
+            public new void CustomSequence(DrawableHitObject drawable, ArmedState state) => base.CustomSequence(drawable, state);
+        }
+
+        private class TestDrawableHitCircle : DrawableHitCircle
+        {
+            private readonly bool auto;
+
+            public TestDrawableHitCircle(OsuHitObject h, bool auto) : base(h)
+            {
+                this.auto = auto;
+            }
+
+            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            {
+                if (auto && !userTriggered && timeOffset > 0)
+                {
+                    // pretend we really hit it
+                    AddJudgement(new OsuJudgement
+                    {
+                        Result = HitObject.ScoreResultForOffset(timeOffset)
+                    });
+                }
+                base.CheckForJudgements(userTriggered, timeOffset);
             }
         }
     }
