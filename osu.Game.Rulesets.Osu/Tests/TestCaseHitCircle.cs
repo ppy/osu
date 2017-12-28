@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private bool hidden;
         private int depthIndex;
         private int circleSize;
-        private float circleScale;
+        private float circleScale = 1;
 
         public TestCaseHitCircle()
         {
