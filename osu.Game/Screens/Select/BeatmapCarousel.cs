@@ -194,7 +194,11 @@ namespace osu.Game.Screens.Select
             if (!Items.Any())
                 return;
 
-            int originalIndex = Items.IndexOf(selectedBeatmap?.Drawables.First());
+            var d = selectedBeatmap?.Drawables.FirstOrDefault();
+            if (d == null)
+                return;
+
+            int originalIndex = Items.IndexOf(d);
             int currentIndex = originalIndex;
 
             // local function to increment the index in the required direction, wrapping over extremities.
