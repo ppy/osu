@@ -49,12 +49,11 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container<DrawableManiaJudgement> judgements;
 
         private readonly Container topLevelContainer;
-        public Container TopLevelContainer => topLevelContainer;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
 
-        public int ColumnCount { get; protected set; }
+        public readonly int ColumnCount;
 
         public ManiaColumnGroup(int columnCount)
             : base(Axes.Y)

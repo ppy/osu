@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// list mania column group
         /// </summary>
-        private FillFlowContainer<ManiaColumnGroup> listColumnGroup;
+        private readonly FillFlowContainer<ManiaColumnGroup> listColumnGroup;
 
         /// <summary>
         /// Whether this playfield should be inverted. This flips everything inside the playfield.
