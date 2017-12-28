@@ -33,15 +33,15 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
 
-            AddStep("Single", () => addSingle());
-            AddStep("Stream", addStream);
+            AddStep("Single", () => testSingle());
+            AddStep("Stream", testStream);
             AddToggleStep("Auto", v => auto = v);
             AddToggleStep("Hidden", v => hidden = v);
             AddSliderStep("CircleSize", 0, 10, 0, s => circleSize = s);
             AddSliderStep("CircleScale", 0.5f, 2, 1, s => circleScale = s);
         }
 
-        private void addSingle(double timeOffset = 0, Vector2? positionOffset = null)
+        private void testSingle(double timeOffset = 0, Vector2? positionOffset = null)
         {
             positionOffset = positionOffset ?? Vector2.Zero;
 
@@ -70,13 +70,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             Add(drawable);
         }
 
-        private void addStream()
+        private void testStream()
         {
             Vector2 pos = Vector2.Zero;
 
             for (int i = 0; i <= 1000; i += 100)
             {
-                addSingle(i, pos);
+                testSingle(i, pos);
                 pos += new Vector2(10);
             }
         }
