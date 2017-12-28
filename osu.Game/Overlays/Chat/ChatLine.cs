@@ -237,11 +237,11 @@ namespace osu.Game.Overlays.Chat
                     contentFlow.AddText(message.Content.Substring(lastLinkEndIndex, link.Index - lastLinkEndIndex));
                     lastLinkEndIndex = link.Index + link.Length;
 
-                    const string channelPrefix = "osu://chan/";
+                    const string channel_link_prefix = "osu://chan/";
                     // If a channel doesn't exist, add it as normal text instead
-                    if (link.Url.StartsWith(channelPrefix))
+                    if (link.Url.StartsWith(channel_link_prefix))
                     {
-                        var channelName = link.Url.Substring(channelPrefix.Length).Split('/')[0];
+                        var channelName = link.Url.Substring(channel_link_prefix.Length).Split('/')[0];
                         if (chat?.AvailableChannels.TrueForAll(c => c.Name != channelName) != false)
                         {
                             linksToRemove.Add(link);
