@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -13,6 +12,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
@@ -24,7 +24,7 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Mania.Mods;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             //get mods to change column and coop
-            foreach (var single in this.WorkingBeatmap.Mods.Value)
+            foreach (var single in WorkingBeatmap.Mods.Value)
             {
                 if (single is ManiaKeyMod maniaKeyMod)
                 {

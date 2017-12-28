@@ -3,21 +3,16 @@
 
 using System;
 using System.Collections.Generic;
-using OpenTK;
-using OpenTK.Graphics;
+using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Game.Graphics;
-using osu.Framework.Allocation;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Timing;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -61,7 +56,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public int ColumnCount { get; protected set; }
 
-        public ManiaColumnGroup(int columnCount) : base(Axes.Y)
+        public ManiaColumnGroup(int columnCount)
+            : base(Axes.Y)
         {
             ColumnCount = columnCount;
             Name = "Playfield elements";
@@ -91,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 {
                                     Name = "Background",
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = new Color4(0,0,0,0.8f)
+                                    Colour = new Color4(0, 0, 0, 0.8f)
                                 },
                                 columns = new FillFlowContainer<Column>
                                 {
@@ -133,7 +129,6 @@ namespace osu.Game.Rulesets.Mania.UI
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }
                 }
-
             };
         }
 
