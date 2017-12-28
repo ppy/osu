@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Timing;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
