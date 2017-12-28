@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mania.UI
     internal class DrawableManiaJudgement : DrawableJudgement
     {
         public DrawableManiaJudgement(Judgement judgement)
-        : base(judgement)
+            : base(judgement)
         {
             JudgementText.TextSize = 25;
         }

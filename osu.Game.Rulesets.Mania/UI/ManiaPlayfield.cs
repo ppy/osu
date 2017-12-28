@@ -1,33 +1,23 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Graphics.Containers;
-using System;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
-using System.Linq;
-using System.Collections.Generic;
-using osu.Framework.Configuration;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Judgements;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Framework.MathUtils;
-using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaPlayfield : ScrollingPlayfield
     {
-
         /// <summary>
         /// list mania column group
         /// </summary>
@@ -53,7 +43,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly int columnCount;
 
-        public ManiaPlayfield(int columnCount,bool coop): base(Axes.Y)
+        public ManiaPlayfield(int columnCount, bool coop)
+            : base(Axes.Y)
         {
             this.columnCount = columnCount;
 
@@ -64,13 +55,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
             InternalChildren = new Drawable[]
             {
-                ListColumnGroup=new FillFlowContainer<ManiaColumnGroup>()
+                ListColumnGroup = new FillFlowContainer<ManiaColumnGroup>()
                 {
-                    Direction= FillDirection.Horizontal,
+                    Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
-                    Anchor= Anchor.Centre,
-                    Origin= Anchor.Centre,
-                    Spacing=new Vector2(400),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Spacing = new Vector2(400),
                 }
             };
 
@@ -78,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.UI
             if (coop)
                 numberOfGroup = 2;
 
-            for (int i = 0; i < numberOfGroup; i ++)
+            for (int i = 0; i < numberOfGroup; i++)
             {
                 var group = new ManiaColumnGroup(columnCount / numberOfGroup);
                 ListColumnGroup.Add(group);
@@ -87,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             foreach (var single in ListColumnGroup)
             {
-                single.VisibleTimeRange.BindTo(this.VisibleTimeRange);
+                single.VisibleTimeRange.BindTo(VisibleTimeRange);
                 AddNested(single);
             }
 
@@ -109,7 +100,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Inverted.ValueChanged += invertedChanged;
             Inverted.TriggerChange();
-
         }
 
         private void invertedChanged(bool newValue)
@@ -141,7 +131,7 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 single.HitObjects.Add(new DrawableBarLine(barline));
             }
-        } 
+        }
 
         private ManiaColumnGroup getFallDownControlContainerByActualColumn(int actualColumn)
         {
