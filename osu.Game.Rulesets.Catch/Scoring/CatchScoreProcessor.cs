@@ -36,8 +36,11 @@ namespace osu.Game.Rulesets.Catch.Scoring
                 }
 
                 var fruit = obj as Fruit;
-
                 if (fruit != null)
+                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+
+               var droplet= obj as Droplet;
+                if (droplet != null)
                     AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
             }
 

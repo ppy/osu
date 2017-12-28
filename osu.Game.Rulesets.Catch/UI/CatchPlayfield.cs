@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchPlayfield : ScrollingPlayfield
     {
-        public const float BASE_WIDTH = 512;
+        public const float BASE_WIDTH = 640;
 
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;

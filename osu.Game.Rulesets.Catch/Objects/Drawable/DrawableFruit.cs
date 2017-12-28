@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             AccentColour = AccentColour,
-                            Scale = new Vector2(0.6f),
+                            Scale = new Vector2(0.6f)
                         },
                         new Pulp
                         {
@@ -66,8 +66,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             RelativePositionAxes = Axes.Both,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
-                            AccentColour = AccentColour,
-                        },
+                            AccentColour = AccentColour
+                        }
                     }
                 }
             };

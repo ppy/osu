@@ -40,6 +40,10 @@ namespace osu.Game.Rulesets.Catch.UI
             if (stream != null)
                 return new DrawableJuiceStream(stream);
 
+            var droplet = h as Droplet;
+            if (droplet != null)
+                return new DrawableDroplet(droplet);
+
             return null;
         }
     }

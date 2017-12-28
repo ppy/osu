@@ -41,9 +41,9 @@ namespace osu.Game.Rulesets.Catch
                             Mods = new Mod[]
                             {
                                 new CatchModHalfTime(),
-                                new CatchModDaycore(),
-                            },
-                        },
+                                new CatchModDaycore()
+                            }
+                        }
                     };
 
                 case ModType.DifficultyIncrease:
@@ -55,19 +55,19 @@ namespace osu.Game.Rulesets.Catch
                             Mods = new Mod[]
                             {
                                 new CatchModSuddenDeath(),
-                                new CatchModPerfect(),
-                            },
+                                new CatchModPerfect()
+                            }
                         },
                         new MultiMod
                         {
                             Mods = new Mod[]
                             {
                                 new CatchModDoubleTime(),
-                                new CatchModNightcore(),
-                            },
+                                new CatchModNightcore()
+                            }
                         },
                         new CatchModHidden(),
-                        new CatchModFlashlight(),
+                        new CatchModFlashlight()
                     };
 
                 case ModType.Special:
@@ -81,9 +81,9 @@ namespace osu.Game.Rulesets.Catch
                             Mods = new Mod[]
                             {
                                 new ModAutoplay(),
-                                new ModCinema(),
-                            },
-                        },
+                                new ModCinema()
+                            }
+                        }
                     };
 
                 default:
