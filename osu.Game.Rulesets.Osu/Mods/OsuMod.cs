@@ -15,6 +15,7 @@ using OpenTK;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -53,6 +54,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             var fadeOutTime = fadeInTime + fadeIn;
             var fadeOut = d.HitObject.StartTime - preEmpt * fade_out_speed_multiplier - fadeOutTime;
 
+            // new duration from completed fade in to end (before fading out)
+            var newDuration = ((d.HitObject as IHasEndTime)?.EndTime ?? d.HitObject.StartTime) - fadeOutTime;
+
             d.FadeIn = fadeIn;
 
             using (drawable.BeginAbsoluteSequence(fadeInTime, true))
@@ -70,10 +74,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         using (slider.BeginAbsoluteSequence(fadeOutTime, true))
                         {
-                            var sliderDuration = slider.Slider.EndTime - fadeOutTime; // new duration from fade in to end of the slider
-                            slider.Body.FadeOut(sliderDuration);
+                            slider.Body.FadeOut(newDuration, Easing.Out);
                             // delay a bit less to let the sliderball fade out peacefully instead of having a hard cut
-                            using (slider.BeginDelayedSequence(sliderDuration - fadeOut, true))
+                            using (slider.BeginDelayedSequence(newDuration - fadeOut, true))
                             {
                                 slider.Ball.FadeOut(fadeOut);
                                 slider.Delay(fadeOut).Expire();
@@ -87,8 +90,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         using (spinner.BeginAbsoluteSequence(fadeOutTime, true))
                         {
-                            var spinnerDuration = spinner.Spinner.EndTime - fadeOutTime; // new duration from fade in to end of the spinner
-                            var sequence = spinner.Delay(spinnerDuration).FadeOut(fadeOut);
+                            var sequence = spinner.Delay(newDuration).FadeOut(fadeOut);
                             // speed up the end sequence accordingly
                             switch (state)
                             {

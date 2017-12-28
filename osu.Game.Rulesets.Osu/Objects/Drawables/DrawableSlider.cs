@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSlider : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        public readonly Slider Slider;
+        private readonly Slider slider;
 
         public readonly DrawableHitCircle InitialCircle;
 
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSlider(Slider s) : base(s)
         {
-            Slider = s;
+            slider = s;
 
             Children = new Drawable[]
             {
@@ -111,17 +111,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Tracking = Ball.Tracking;
 
-            double progress = MathHelper.Clamp((Time.Current - Slider.StartTime) / Slider.Duration, 0, 1);
+            double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
-            int repeat = Slider.RepeatAt(progress);
-            progress = Slider.ProgressAt(progress);
+            int repeat = slider.RepeatAt(progress);
+            progress = slider.ProgressAt(progress);
 
             if (repeat > currentRepeat)
                 currentRepeat = repeat;
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (!InitialCircle.Judgements.Any(j => j.IsHit))
-                InitialCircle.Position = Slider.Curve.PositionAt(progress);
+                InitialCircle.Position = slider.Curve.PositionAt(progress);
 
             foreach (var c in components) c.UpdateProgress(progress, repeat);
             foreach (var t in ticks.Children) t.Tracking = Ball.Tracking;
@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (!userTriggered && Time.Current >= Slider.EndTime)
+            if (!userTriggered && Time.Current >= slider.EndTime)
             {
                 var judgementsCount = ticks.Children.Count + repeatPoints.Children.Count + 1;
                 var judgementsHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit)) + repeatPoints.Children.Count(t => t.Judgements.Any(j => j.IsHit));
@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             Ball.FadeIn();
 
-            using (BeginDelayedSequence(Slider.Duration, true))
+            using (BeginDelayedSequence(slider.Duration, true))
             {
                 Body.FadeOut(160);
                 Ball.FadeOut(160);
