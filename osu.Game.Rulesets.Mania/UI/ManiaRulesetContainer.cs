@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Mania.Mods;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -35,7 +36,12 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public int AvailableColumns { get; private set; }
 
-        public IEnumerable<DrawableBarLine> BarLines;
+        /// <summary>
+        /// Co-op
+        /// </summary>
+        public bool Coop { get; set; } = false;
+
+        public IEnumerable<BarLine> BarLines;
 
         public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
@@ -44,7 +50,7 @@ namespace osu.Game.Rulesets.Mania.UI
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
 
             var timingPoints = Beatmap.ControlPointInfo.TimingPoints;
-            var barLines = new List<DrawableBarLine>();
+            var barLines = new List<BarLine>();
 
             for (int i = 0; i < timingPoints.Count; i++)
             {
@@ -56,12 +62,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 int index = 0;
                 for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength, index++)
                 {
-                    barLines.Add(new DrawableBarLine(new BarLine
+                    barLines.Add(new BarLine
                     {
                         StartTime = t,
                         ControlPoint = point,
                         BeatIndex = index
-                    }));
+                    });
                 }
             }
 
@@ -74,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
         }
 
-        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(AvailableColumns)
+        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(AvailableColumns, Coop)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -99,6 +105,20 @@ namespace osu.Game.Rulesets.Mania.UI
                     AvailableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) > 4 ? 5 : 4;
                 else
                     AvailableColumns = Math.Max(4, Math.Min((int)Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) + 1, 7));
+            }
+
+            //get mods to change column and coop
+            foreach (var single in this.WorkingBeatmap.Mods.Value)
+            {
+                if (single is ManiaKeyMod maniaKeyMod)
+                {
+                    AvailableColumns = maniaKeyMod.KeyCount;
+                }
+                if (single is ManiaModKeyCoop)
+                {
+                    Coop = true;
+                    AvailableColumns = AvailableColumns * 2;
+                }
             }
 
             return new ManiaBeatmapConverter(IsForCurrentRuleset, AvailableColumns);
