@@ -15,10 +15,6 @@ Then restore NuGet packages from the repository
 ```
 nuget restore
 ```
-We also need OpenTK >= 3.0.0-pre
-```
-nuget install opentk -version=3.0.0-pre
-```
 ### 3. Compiling
 Simply run `msbuild` where `osu.sln` is located, this will create all binaries in `osu/osu.Desktop/bin/Debug`.
 ### 4. Optimizing
