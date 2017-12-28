@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal float LazyTravelDistance;
 
-        public List<SampleInfoList> RepeatSamples { get; set; } = new List<SampleInfoList>();
+        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
         public int RepeatCount { get; set; } = 1;
 
         private int stackHeight;
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         StackHeight = StackHeight,
                         Scale = Scale,
                         ComboColour = ComboColour,
-                        Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
+                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                         {
                             Bank = s.Bank,
                             Name = @"slidertick",
@@ -151,28 +151,22 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createRepeatPoints()
         {
-            var length = Curve.Distance;
-            var repeatPointDistance = Math.Min(Distance, length);
-            var repeatDuration = length / Velocity;
+            var repeatDuration = Distance / Velocity;
 
             for (var repeat = 1; repeat < RepeatCount; repeat++)
             {
-                for (var d = repeatPointDistance; d <= length; d += repeatPointDistance)
-                {
-                    var repeatStartTime = StartTime + repeat * repeatDuration;
-                    var distanceProgress = d / length;
+                var repeatStartTime = StartTime + repeat * repeatDuration;
 
-                    AddNested(new RepeatPoint
-                    {
-                        RepeatIndex = repeat,
-                        StartTime = repeatStartTime,
-                        Position = Curve.PositionAt(distanceProgress),
-                        StackHeight = StackHeight,
-                        Scale = Scale,
-                        ComboColour = ComboColour,
-                        Samples = new SampleInfoList(RepeatSamples[repeat])
-                    });
-                }
+                AddNested(new RepeatPoint
+                {
+                    RepeatIndex = repeat,
+                    StartTime = repeatStartTime,
+                    Position = Curve.PositionAt(repeat % 2),
+                    StackHeight = StackHeight,
+                    Scale = Scale,
+                    ComboColour = ComboColour,
+                    Samples = new List<SampleInfo>(RepeatSamples[repeat])
+                });
             }
         }
     }
