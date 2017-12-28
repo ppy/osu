@@ -85,7 +85,6 @@ namespace osu.Game.Overlays.Chat
         private OsuSpriteText username;
         private OsuLinkFlowContainer<ChatLink> contentFlow;
 
-        // this is only used for testing
         public OsuTextFlowContainer ContentFlow => contentFlow;
 
         public Message Message
@@ -196,7 +195,7 @@ namespace osu.Game.Overlays.Chat
                         contentFlow = new OsuLinkFlowContainer<ChatLink>(t =>
                         {
                             if (Message.IsAction)
-                                t.Font = "Exo2.0-MediumItalic";
+                                t.Font = @"Exo2.0-MediumItalic";
                             t.TextSize = text_size;
                         })
                         {
@@ -230,18 +229,19 @@ namespace osu.Game.Overlays.Chat
                 contentFlow.AddText(message.Content);
             else
             {
-                int prevIndex = 0;
+                int lastLinkEndIndex = 0;
                 List<MessageFormatter.Link> linksToRemove = new List<MessageFormatter.Link>();
 
                 foreach (var link in message.Links)
                 {
-                    contentFlow.AddText(message.Content.Substring(prevIndex, link.Index - prevIndex));
-                    prevIndex = link.Index + link.Length;
+                    contentFlow.AddText(message.Content.Substring(lastLinkEndIndex, link.Index - lastLinkEndIndex));
+                    lastLinkEndIndex = link.Index + link.Length;
 
+                    const string channelPrefix = "osu://chan/";
                     // If a channel doesn't exist, add it as normal text instead
-                    if (link.Url.StartsWith("osu://chan/"))
+                    if (link.Url.StartsWith(channelPrefix))
                     {
-                        var channelName = link.Url.Substring(11).Split('/')[0];
+                        var channelName = link.Url.Substring(channelPrefix.Length).Split('/')[0];
                         if (chat?.AvailableChannels.TrueForAll(c => c.Name != channelName) != false)
                         {
                             linksToRemove.Add(link);

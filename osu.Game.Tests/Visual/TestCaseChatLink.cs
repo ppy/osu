@@ -53,7 +53,10 @@ namespace osu.Game.Tests.Visual
             textContainer.Add(newLine);
 
             AddAssert($"msg #{textContainer.Count} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
-            AddAssert($"msg #{textContainer.Count} shows link(s)", () => newLine.ContentFlow.Any() && isShowingLinks(newLine.ContentFlow));
+            AddAssert($"msg #{textContainer.Count} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic(newLine.ContentFlow));
+            AddAssert($"msg #{textContainer.Count} shows link(s)", () => isShowingLinks(newLine.ContentFlow));
+
+            bool isItalic(OsuTextFlowContainer c) => c.Cast<ChatLink>().All(sprite => sprite.Font == @"Exo2.0-MediumItalic");
 
             bool isShowingLinks(OsuTextFlowContainer c) => c.Cast<ChatLink>().All(sprite => sprite.HandleInput && !sprite.TextColour.Equals((SRGBColour)Color4.White)
                                                                                         || !sprite.HandleInput && sprite.TextColour.Equals((SRGBColour)Color4.White));

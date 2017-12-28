@@ -23,7 +23,8 @@ namespace osu.Game.Graphics.Containers
     {
         public override bool HandleInput => true;
 
-        public OsuLinkFlowContainer(Action<SpriteText> defaultCreationParameters = null) : base(defaultCreationParameters)
+        public OsuLinkFlowContainer(Action<SpriteText> defaultCreationParameters = null)
+            : base(defaultCreationParameters)
         {
         }
 
@@ -41,8 +42,8 @@ namespace osu.Game.Graphics.Containers
 
             return AddText(text, link =>
             {
+                ((OsuSpriteLink)link).Url = url;
                 creationParameters?.Invoke(link);
-                ((T)link).Url = url;
             });
         }
 
@@ -51,7 +52,6 @@ namespace osu.Game.Graphics.Containers
             return base.AddText(text, sprite =>
             {
                 ((OsuSpriteLink)sprite).TextColour = TextColour;
-
                 creationParameters?.Invoke(sprite);
             });
         }
