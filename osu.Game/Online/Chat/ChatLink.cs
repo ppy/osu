@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace osu.Game.Online.Chat
 {
-    public class ChatLink : OsuLinkSpriteText, IHasTooltip
+    public class ChatLink : OsuSpriteLink, IHasTooltip
     {
         private APIAccess api;
         private BeatmapSetOverlay beatmapSetOverlay;
@@ -20,9 +20,13 @@ namespace osu.Game.Online.Chat
 
         public override bool HandleInput => !string.IsNullOrEmpty(Url);
 
+        // 'protocol' -> 'https', 'http', 'osu', 'osump' etc.
+        // 'content' -> everything after '<protocol>://'
+        private Match getUrlMatch() => Regex.Match(Url, @"^(?<protocol>osu(?:mp)?|https?):\/\/(?<content>.*)");
+
         protected override void OnLinkClicked()
         {
-            var urlMatch = Regex.Matches(Url, @"^(?<protocol>osu(?:mp)?|https?):\/\/(?<content>.*)")[0];
+            var urlMatch = getUrlMatch();
             if (urlMatch.Success)
             {
                 var args = urlMatch.Groups["content"].Value.Split('/');
@@ -41,11 +45,8 @@ namespace osu.Game.Online.Chat
                             case "chan":
                                 var foundChannel = chat.AvailableChannels.Find(channel => channel.Name == args[1]);
 
-                                if (foundChannel == null)
-                                    throw new ArgumentException($"Unknown channel name ({args[1]}).");
-                                else
-                                    chat.OpenChannel(foundChannel);
-
+                                // links should be filtered out by now if a channel doesn't exist
+                                chat.OpenChannel(foundChannel ?? throw new ArgumentException($"Unknown channel name ({args[1]})."));
                                 break;
                             case "edit":
                                 chat.Game?.LoadEditorTimestamp();
@@ -130,9 +131,10 @@ namespace osu.Game.Online.Chat
                 if (Url == Text)
                     return null;
 
-                if (Url.StartsWith("osu://"))
+                var urlMatch = getUrlMatch();
+                if (urlMatch.Success && urlMatch.Groups["protocol"].Value == "osu")
                 {
-                    var args = Url.Substring(6).Split('/');
+                    var args = urlMatch.Groups["content"].Value.Split('/');
 
                     if (args.Length < 2)
                         return Url;
@@ -140,7 +142,7 @@ namespace osu.Game.Online.Chat
                     if (args[0] == "chan")
                         return "Switch to channel " + args[1];
                     if (args[0] == "edit")
-                        return "Go to " + args[1].Remove(9).TrimEnd();
+                        return "Go to " + args[1];
                 }
 
                 return Url;

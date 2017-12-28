@@ -10,7 +10,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public class OsuLinkSpriteText : OsuSpriteText
+    public class OsuSpriteLink : OsuSpriteText
     {
         protected override IEnumerable<Drawable> FlowingChildren => Children;
 
@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.Sprites
 
         private readonly Container content;
 
-        public OsuLinkSpriteText()
+        public OsuSpriteLink()
         {
             AddInternal(content = new OsuHoverContainer
             {

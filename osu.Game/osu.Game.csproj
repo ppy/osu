@@ -270,8 +270,8 @@
     <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Overlays\Profile\SupporterIcon.cs" />
     <Compile Include="Overlays\Settings\DangerousSettingsButton.cs" />
-    <Compile Include="Graphics\Containers\OsuLinkTextFlowContainer.cs" />
-    <Compile Include="Graphics\Sprites\OsuLinkSpriteText.cs" />
+    <Compile Include="Graphics\Containers\OsuLinkFlowContainer.cs" />
+    <Compile Include="Graphics\Sprites\OsuSpriteLink.cs" />
     <Compile Include="Graphics\UserInterface\HoverClickSounds.cs" />
     <Compile Include="Graphics\UserInterface\HoverSounds.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />

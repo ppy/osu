@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Profile
     public class ProfileHeader : Container
     {
         private readonly OsuTextFlowContainer infoTextLeft;
-        private readonly OsuLinkTextFlowContainer infoTextRight;
+        private readonly OsuLinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
         private readonly RankGraph rankGraph;
 
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.Profile
                     ParagraphSpacing = 0.8f,
                     LineSpacing = 0.2f
                 },
-                infoTextRight = new OsuLinkTextFlowContainer(t =>
+                infoTextRight = new OsuLinkFlowContainer(t =>
                 {
                     t.TextSize = 14;
                     t.Font = @"Exo2.0-RegularItalic";
@@ -473,7 +473,7 @@ namespace osu.Game.Overlays.Profile
             }
         }
 
-        private class ProfileLink : OsuLinkSpriteText, IHasTooltip
+        private class ProfileLink : OsuSpriteLink, IHasTooltip
         {
             public string TooltipText => "View Profile in Browser";
 
