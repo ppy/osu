@@ -21,6 +21,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 
 namespace osu.Game.Screens.Select
@@ -250,7 +251,7 @@ namespace osu.Game.Screens.Select
                     bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
 
                     // Ensure we only change the Beatmap if no map is starting/-ed
-                    if (!Beatmap.Disabled)
+                    if (!(ChildScreen is PlayerLoader))
                         Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap);
                     ensurePlayingSelected(preview);
                 }
