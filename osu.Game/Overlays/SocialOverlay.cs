@@ -64,7 +64,7 @@ namespace osu.Game.Overlays
             // TODO sort our list in some way (either locally or with API call)
             //Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => Scheduler.AddOnce(updateSearch);
 
-            Header.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
+            Header.Tabs.Current.ValueChanged += tab => Scheduler.AddOnce(updateSearch);
 
             currentQuery.ValueChanged += v =>
             {
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays
 
             currentQuery.BindTo(Filter.Search.Current);
 
-            Filter.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
+            Filter.Tabs.Current.ValueChanged += sortCriteria => Scheduler.AddOnce(updateSearch);
 
             Scheduler.AddOnce(updateSearch); // so it displays something once it's first opened
         }
@@ -141,6 +141,7 @@ namespace osu.Game.Overlays
         }
 
         private GetUsersRequest getUsersRequest;
+        private GetFriendsRequest getFriendsRequest;
 
         private readonly Bindable<string> currentQuery = new Bindable<string>();
 
@@ -155,32 +156,49 @@ namespace osu.Game.Overlays
 
             Users = null;
             loading.Hide();
-            getUsersRequest?.Cancel();
+            clearRequests();
 
             if (api == null || api.State == APIState.Offline)
                 return;
 
-            getUsersRequest = new GetUsersRequest(); // TODO filter/sort values?!?
-
-            getUsersRequest.Success += response =>
+            switch (Header.Tabs.Current.Value)
             {
-                Task.Run(() =>
-                {
-                    var newUsers = response.Select(r => r.User);
-
-                    Schedule(() =>
-                    {
-                        Users = newUsers;
-                        recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
-                        loading.Hide();
-                    });
-                });
-            };
-
+                case SocialTab.OnlinePlayers:
+                    getUsersRequest = new GetUsersRequest(); // TODO filter???
+                    getUsersRequest.Success += response => finishRequest(response.Select(r => r.User));
+                    queueRequest(getUsersRequest);
+                    break;
+                case SocialTab.OnlineFriends:
+                    getFriendsRequest = new GetFriendsRequest(); // TODO filter???
+                    getFriendsRequest.Success += finishRequest;
+                    queueRequest(getFriendsRequest);
+                    break;
+            }
             loading.Show();
-            api.Queue(getUsersRequest);
         }
+
+        private void clearRequests()
+        {
+            getUsersRequest?.Cancel();
+            getFriendsRequest?.Cancel();
+        }
+
+        private void finishRequest(IEnumerable<User> newUsers)
+        {
+            Task.Run(() =>
+            {
+                Schedule(() =>
+                {
+                    Users = newUsers;
+                    recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                    loading.Hide();
+                });
+            });
+        }
+
+        private void queueRequest(APIRequest request) => api.Queue(request);
     }
+
 
     public enum SortDirection
     {
