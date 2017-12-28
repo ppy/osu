@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private int repeats;
         private int depthIndex;
         private int circleSize;
-        private float circleScale;
+        private float circleScale = 1;
         private double speedMultiplier = 2;
         private double sliderMultiplier = 2;
 
