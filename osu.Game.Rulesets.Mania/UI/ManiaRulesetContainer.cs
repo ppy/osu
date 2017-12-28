@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// Co-op
         /// </summary>
-        public bool Coop { get; set; } = false;
+        public bool Coop { get; set; }
 
         public IEnumerable<BarLine> BarLines;
 

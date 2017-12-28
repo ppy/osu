@@ -21,19 +21,34 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// list mania column group
         /// </summary>
-        FillFlowContainer<ManiaColumnGroup> ListColumnGroup = new FillFlowContainer<ManiaColumnGroup>();
+        private FillFlowContainer<ManiaColumnGroup> listColumnGroup;
 
         /// <summary>
         /// Whether this playfield should be inverted. This flips everything inside the playfield.
         /// </summary>
         public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
+        /// <summary>
+        /// The style to use for the special column.
+        /// </summary>
+        public SpecialColumnPosition SpecialColumnPosition
+        {
+            get => listColumnGroup.FirstOrDefault()?.SpecialColumnPosition ?? SpecialColumnPosition.Normal;
+            set
+            {
+                foreach (var singleGroup in listColumnGroup)
+                {
+                    singleGroup.SpecialColumnPosition = value;
+                }
+            }
+        }
+
         public List<Column> Columns
         {
             get
             {
                 var list = new List<Column>();
-                foreach (var single in ListColumnGroup)
+                foreach (var single in listColumnGroup)
                 {
                     list.AddRange(single.Columns);
                 }
@@ -41,13 +56,9 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        private readonly int columnCount;
-
         public ManiaPlayfield(int columnCount, bool coop)
             : base(Axes.Y)
         {
-            this.columnCount = columnCount;
-
             if (columnCount <= 0)
                 throw new ArgumentException("Can't have zero or fewer columns.");
 
@@ -55,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             InternalChildren = new Drawable[]
             {
-                ListColumnGroup = new FillFlowContainer<ManiaColumnGroup>()
+                listColumnGroup = new FillFlowContainer<ManiaColumnGroup>
                 {
                     Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
@@ -72,11 +83,11 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < numberOfGroup; i++)
             {
                 var group = new ManiaColumnGroup(columnCount / numberOfGroup);
-                ListColumnGroup.Add(group);
+                listColumnGroup.Add(group);
             }
 
 
-            foreach (var single in ListColumnGroup)
+            foreach (var single in listColumnGroup)
             {
                 single.VisibleTimeRange.BindTo(VisibleTimeRange);
                 AddNested(single);
@@ -85,9 +96,11 @@ namespace osu.Game.Rulesets.Mania.UI
             var currentAction = ManiaAction.Key1;
             for (int i = 0; i < columnCount; i++)
             {
-                var c = new Column();
-                //c.Action = c.IsSpecial ? ManiaAction.Special : currentAction++;
-                c.Action = currentAction++;
+                var c = new Column
+                {
+                    //c.Action = c.IsSpecial ? ManiaAction.Special : currentAction++;
+                    Action = currentAction++
+                };
 
                 /*
                 c.IsSpecial = isSpecialColumn(i);
@@ -107,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.UI
             Scale = new Vector2(1, newValue ? -1 : 1);
 
             //judgements.Scale = Scale;
-            foreach (var single in ListColumnGroup)
+            foreach (var single in listColumnGroup)
             {
                 single.Judgements.Scale = Scale;
             }
@@ -127,7 +140,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public void Add(BarLine barline)
         {
             //HitObjects.Add(new DrawableBarLine(barline));
-            foreach (var single in ListColumnGroup)
+            foreach (var single in listColumnGroup)
             {
                 single.HitObjects.Add(new DrawableBarLine(barline));
             }
@@ -136,7 +149,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private ManiaColumnGroup getFallDownControlContainerByActualColumn(int actualColumn)
         {
             int sum = 0;
-            foreach (var single in ListColumnGroup)
+            foreach (var single in listColumnGroup)
             {
                 sum = sum + single.ColumnCount;
                 if (sum > actualColumn)

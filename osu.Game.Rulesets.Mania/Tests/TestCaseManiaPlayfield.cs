@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Mania.Judgements;
@@ -87,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                //SpecialColumnPosition = specialPos
+                SpecialColumnPosition = specialPos
             });
 
             playfield.Inverted.Value = inverted;
