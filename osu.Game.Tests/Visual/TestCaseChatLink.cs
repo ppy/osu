@@ -1,8 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
@@ -37,25 +39,75 @@ namespace osu.Game.Tests.Visual
                 Direction = FillDirection.Vertical,
             });
 
-            testAddLinks();
+            testLinksGeneral();
+            testAddingLinks();
+            testEcho();
         }
 
-        private void testAddLinks()
-        {
-            int msgCounter = 0;
-            void addMessage(string text, bool isAction = false) => AddStep($"Add message #{++msgCounter}", () => textContainer.Add(new ChatLine(new DummyMessage(text, isAction))));
+        private void clear() => AddStep("clear messages", textContainer.Clear);
 
-            addMessage("Test!");
-            addMessage("osu.ppy.sh!");
-            addMessage("https://osu.ppy.sh!");
-            addMessage("00:12:345 (1,2) - Test?");
-            addMessage("Wiki link for tasty [[Performance Points]]");
-            addMessage("(osu forums)[https://osu.ppy.sh/forum] (old link format)");
-            addMessage("[https://osu.ppy.sh/home New site] (new link format)");
-            addMessage("[https://osu.ppy.sh/home This is only a link to the new osu webpage but this is supposed to test word wrap.]");
-            addMessage("is now listening to [https://osu.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", true);
-            addMessage("is now playing [https://osu.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", true);
-            addMessage("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
+        private void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false)
+        {
+            var newLine = new ChatLine(new DummyMessage(text, isAction));
+            textContainer.Add(newLine);
+
+            AddAssert($"check msg having {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
+            // todo: tidy this lambda up
+            AddAssert("check link(s) displaying", () => newLine.ContentFlow.Any()
+                                                        && newLine.ContentFlow
+                                                            .Cast<ChatLink>()
+                                                            .All(sprite => sprite.HandleInput && !sprite.TextColour.Equals((SRGBColour)Color4.White)
+                                                                        || !sprite.HandleInput && sprite.TextColour.Equals((SRGBColour)Color4.White)));
+        }
+
+        private void testLinksGeneral()
+        {
+            addMessageWithChecks("test!");
+            addMessageWithChecks("osu.ppy.sh!");
+            addMessageWithChecks("https://osu.ppy.sh!", 1);
+            addMessageWithChecks("00:12:345 (1,2) - Test?", 1);
+            addMessageWithChecks("Wiki link for tasty [[Performance Points]]", 1);
+            addMessageWithChecks("(osu forums)[https://osu.ppy.sh/forum] (old link format)", 1);
+            addMessageWithChecks("[https://osu.ppy.sh/home New site] (new link format)", 1);
+            addMessageWithChecks("[https://osu.ppy.sh/home This is only a link to the new osu webpage but this is supposed to test word wrap.]", 1);
+            addMessageWithChecks("is now listening to [https://osu.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", 1, true);
+            addMessageWithChecks("is now playing [https://osu.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", 1, true);
+            addMessageWithChecks("Let's (try)[https://osu.ppy.sh/home] [https://osu.ppy.sh/home multiple links] https://osu.ppy.sh/home", 3);
+            // note that there's 0 links here (they get removed if a channel is not found)
+            addMessageWithChecks("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
+        }
+
+        private void testAddingLinks()
+        {
+            const int count = 5;
+
+            for (int i = 1; i <= count; i++)
+                AddStep($"add long msg #{i}", () => textContainer.Add(new ChatLine(new DummyMessage("alright let's just put a really long text here to see if it loads in correctly rather than adding the text sprites individually after the chat line appearing!"))));
+
+            clear();
+        }
+
+        private void testEcho()
+        {
+            int echoCounter = 0;
+
+            addEchoWithWait("sent!", "received!");
+            addEchoWithWait("https://osu.ppy.sh/home", null, 500);
+            addEchoWithWait("[https://osu.ppy.sh/forum let's try multiple words too!]");
+            addEchoWithWait("(long loading times! clickable while loading?)[https://osu.ppy.sh/home]", null, 5000);
+
+            void addEchoWithWait(string text, string completeText = null, double delay = 250)
+            {
+                var newLine = new ChatLine(new DummyEchoMessage(text));
+
+                AddStep($"send msg #{++echoCounter} after {delay}ms", () =>
+                {
+                    textContainer.Add(newLine);
+                    Scheduler.AddDelayed(() => newLine.Message = new DummyMessage(completeText ?? text), delay);
+                });
+
+                AddUntilStep(() => textContainer.All(line => line.Message is DummyMessage), $"wait for msg #{echoCounter}");
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -65,10 +117,20 @@ namespace osu.Game.Tests.Visual
             dependencies.Cache(beatmapSetOverlay);
         }
 
+        private class DummyEchoMessage : LocalEchoMessage
+        {
+            public DummyEchoMessage(string text)
+            {
+                Content = text;
+                Timestamp = DateTimeOffset.Now;
+                Sender = DummyMessage.TEST_SENDER;
+            }
+        }
+
         private class DummyMessage : Message
         {
             private static long messageCounter;
-            private static readonly User sender = new User
+            internal static readonly User TEST_SENDER = new User
             {
                 Username = @"Somebody",
                 Id = 1,
@@ -98,7 +160,7 @@ namespace osu.Game.Tests.Visual
             {
                 Content = text;
                 IsAction = isAction;
-                Sender = sender;
+                Sender = TEST_SENDER;
             }
         }
 

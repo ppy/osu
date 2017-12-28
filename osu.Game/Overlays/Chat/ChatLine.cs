@@ -101,6 +101,9 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
+        // this is only used for testing
+        public OsuTextFlowContainer ContentFlow => contentFlow;
+
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, ChatOverlay chat)
         {
