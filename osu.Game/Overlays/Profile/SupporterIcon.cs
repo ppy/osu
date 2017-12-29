@@ -12,7 +12,7 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class SupporterIcon : CircularContainer, IHasToolTip
+    public class SupporterIcon : CircularContainer, IHasTooltip
     {
         private readonly Box background;
 
