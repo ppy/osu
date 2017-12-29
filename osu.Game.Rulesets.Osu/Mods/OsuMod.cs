@@ -57,10 +57,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(drawable is DrawableOsuHitObject d))
                 return;
 
-            var fadeInStartTime = d.HitObject.StartTime - preEmpt;
-            var fadeInDuration = preEmpt * fade_in_duration_multiplier;
-
-            var fadeOutStartTime = fadeInStartTime + fadeInDuration;
+            var fadeOutStartTime = d.HitObject.StartTime - preEmpt + d.FadeIn;
             var fadeOutDuration = preEmpt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)
