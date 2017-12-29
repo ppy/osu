@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Profile
     public class SupporterIcon : CircularContainer, IHasToolTip
     {
         private readonly Box background;
-        
+
         public string TooltipText => "osu!supporter";
 
         public SupporterIcon()
