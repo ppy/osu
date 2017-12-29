@@ -49,35 +49,37 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(drawable is DrawableOsuHitObject d))
                 return;
 
-            var fadeInTime = d.HitObject.StartTime - preEmpt;
-            var fadeIn = d.HitObject.StartTime - preEmpt * fade_in_speed_multiplier - fadeInTime;
-            var fadeOutTime = fadeInTime + fadeIn;
-            var fadeOut = d.HitObject.StartTime - preEmpt * fade_out_speed_multiplier - fadeOutTime;
+            var fadeInStartTime = d.HitObject.StartTime - preEmpt;
+            var fadeInDuration = preEmpt * fade_in_speed_multiplier;
+
+            var fadeOutStartTime = fadeInStartTime + fadeInDuration;
+            var fadeOutDuration = preEmpt * fade_out_speed_multiplier;
 
             // new duration from completed fade in to end (before fading out)
-            var newDuration = ((d.HitObject as IHasEndTime)?.EndTime ?? d.HitObject.StartTime) - fadeOutTime;
+            var newDuration = ((d.HitObject as IHasEndTime)?.EndTime ?? d.HitObject.StartTime) - fadeOutStartTime;
 
-            d.FadeIn = fadeIn;
+            d.FadeIn = fadeInDuration;
 
-            using (drawable.BeginAbsoluteSequence(fadeInTime, true))
+            using (drawable.BeginAbsoluteSequence(fadeInStartTime, true))
             {
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:
-                        circle.ApproachCircle.FadeOut();
+                        // we don't want to see the approach circle
+                        circle.ApproachCircle.Hide();
                         // prolong the hitcircle long enough so misses are still possible
-                        circle.LifetimeEnd = circle.HitObject.StartTime + Math.Max(fadeOut, circle.HitObject.HitWindowFor(HitResult.Miss));
-                        circle.FadeIn(fadeIn).Then().FadeOut(fadeOut); // override fade in as it somehow gets cut otherwise
+                        circle.LifetimeEnd = circle.HitObject.StartTime + Math.Max(fadeOutDuration, circle.HitObject.HitWindowFor(HitResult.Miss));
+                        circle.FadeIn(fadeInDuration).Then().FadeOut(fadeOutDuration); // override fade in as it somehow gets cut otherwise
                         break;
                     case DrawableSlider slider:
-                        using (slider.BeginAbsoluteSequence(fadeOutTime, true))
+                        using (slider.BeginAbsoluteSequence(fadeOutStartTime, true))
                         {
                             slider.Body.FadeOut(newDuration, Easing.Out);
                             // delay a bit less to let the sliderball fade out peacefully instead of having a hard cut
-                            using (slider.BeginDelayedSequence(newDuration - fadeOut, true))
+                            using (slider.BeginDelayedSequence(newDuration - fadeOutDuration, true))
                             {
-                                slider.Ball.FadeOut(fadeOut);
-                                slider.Delay(fadeOut).Expire();
+                                slider.Ball.FadeOut(fadeOutDuration);
+                                slider.Delay(fadeOutDuration).Expire();
                             }
                         }
                         break;
@@ -86,17 +88,17 @@ namespace osu.Game.Rulesets.Osu.Mods
                         spinner.Ticks.FadeOut();
                         spinner.Background.FadeOut();
 
-                        using (spinner.BeginAbsoluteSequence(fadeOutTime, true))
+                        using (spinner.BeginAbsoluteSequence(fadeOutStartTime, true))
                         {
-                            var sequence = spinner.Delay(newDuration).FadeOut(fadeOut);
+                            var sequence = spinner.Delay(newDuration).FadeOut(fadeOutDuration);
                             // speed up the end sequence accordingly
                             switch (state)
                             {
                                 case ArmedState.Hit:
-                                    sequence.ScaleTo(spinner.Scale * 1.2f, fadeOut * 2, Easing.Out);
+                                    sequence.ScaleTo(spinner.Scale * 1.2f, fadeOutDuration * 2, Easing.Out);
                                     break;
                                 case ArmedState.Miss:
-                                    sequence.ScaleTo(spinner.Scale * 0.8f, fadeOut * 2, Easing.Out);
+                                    sequence.ScaleTo(spinner.Scale * 0.8f, fadeOutDuration * 2, Easing.Out);
                                     break;
                             }
                             sequence.Expire();
