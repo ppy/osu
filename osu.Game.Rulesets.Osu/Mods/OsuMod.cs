@@ -41,7 +41,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
+            {
+                d.ApplyCustomValues += ApplyHiddenValues;
                 d.ApplyCustomUpdateState += ApplyHiddenState;
+            }
         }
 
         protected void ApplyHiddenValues(DrawableHitObject drawable)
