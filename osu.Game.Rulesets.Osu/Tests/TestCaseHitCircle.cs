@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 drawable.State.Value = ArmedState.Hit;
 
             if (hidden)
-                drawable.ApplyCustomUpdateState += new TestOsuModHidden().ApplyHiddenState;
+                new OsuModHidden().ApplyToDrawableHitObjects(new [] { drawable });
 
             Add(drawable);
         }
@@ -79,11 +79,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 testSingle(i, pos);
                 pos += new Vector2(10);
             }
-        }
-
-        private class TestOsuModHidden : OsuModHidden
-        {
-            public new void ApplyHiddenState(DrawableHitObject drawable, ArmedState state) => base.ApplyHiddenState(drawable, state);
         }
 
         private class TestDrawableHitCircle : DrawableHitCircle
