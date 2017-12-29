@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 drawable.State.Value = ArmedState.Hit;
 
             if (hidden)
-                drawable.ApplyCustomUpdateState += new TestOsuModHidden().CustomSequence;
+                drawable.ApplyCustomUpdateState += new TestOsuModHidden().ApplyHiddenState;
 
             Add(drawable);
         }
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestOsuModHidden : OsuModHidden
         {
-            public new void CustomSequence(DrawableHitObject drawable, ArmedState state) => base.CustomSequence(drawable, state);
+            public new void ApplyHiddenState(DrawableHitObject drawable, ArmedState state) => base.ApplyHiddenState(drawable, state);
         }
 
         private class TestDrawableHitCircle : DrawableHitCircle

@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestOsuModHidden : OsuModHidden
         {
-            public new void CustomSequence(DrawableHitObject drawable, ArmedState state) => base.CustomSequence(drawable, state);
+            public new void CustomSequence(DrawableHitObject drawable, ArmedState state) => base.ApplyHiddenState(drawable, state);
         }
     }
 
