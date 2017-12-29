@@ -99,7 +99,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case ArmedState.Idle:
                     this.Delay(TIME_PREEMPT).FadeOut(500);
+
                     Expire(true);
+
+                    // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
+                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindowFor(HitResult.Miss);
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
