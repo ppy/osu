@@ -77,10 +77,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         // delay a bit less to let the sliderball fade out peacefully instead of having a hard cut
                         using (slider.BeginDelayedSequence(longFadeDuration - fadeOutDuration, true))
-                        {
                             slider.Ball.FadeOut(fadeOutDuration);
-                            slider.Delay(fadeOutDuration).Expire();
-                        }
                     }
 
                     break;
