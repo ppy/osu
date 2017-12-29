@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -50,14 +49,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             if (hidden)
-                drawable.ApplyCustomUpdateState += new TestOsuModHidden().CustomSequence;
+                new OsuModHidden().ApplyToDrawableHitObjects(new [] { drawable });
 
             Add(drawable);
-        }
-
-        private class TestOsuModHidden : OsuModHidden
-        {
-            public new void CustomSequence(DrawableHitObject drawable, ArmedState state) => base.ApplyHiddenState(drawable, state);
         }
     }
 }
