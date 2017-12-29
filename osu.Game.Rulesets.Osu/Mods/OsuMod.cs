@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(drawable is DrawableOsuHitObject d))
                 return;
 
-            d.FadeIn = preEmpt * fade_in_duration_multiplier;
+            d.FadeInDuration = preEmpt * fade_in_duration_multiplier;
         }
 
         protected void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(drawable is DrawableOsuHitObject d))
                 return;
 
-            var fadeOutStartTime = d.HitObject.StartTime - preEmpt + d.FadeIn;
+            var fadeOutStartTime = d.HitObject.StartTime - preEmpt + d.FadeInDuration;
             var fadeOutDuration = preEmpt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)
