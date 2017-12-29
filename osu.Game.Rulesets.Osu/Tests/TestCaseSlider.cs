@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using OpenTK;
 using osu.Game.Rulesets.Osu.Mods;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -63,12 +64,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000 + timeOffset,
                 Position = new Vector2(-200, 0) + positionOffset.Value,
+                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
                     new Vector2(-200, 0) + positionOffset.Value,
                     new Vector2(400, 0) + positionOffset.Value,
                 },
-                Distance = 400,
+                Distance = 400
             };
 
             addSlider(slider);
@@ -87,6 +89,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
+                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
                     new Vector2(-200, 0),
