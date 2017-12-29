@@ -44,6 +44,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                 d.ApplyCustomUpdateState += ApplyHiddenState;
         }
 
+        protected void ApplyHiddenValues(DrawableHitObject drawable)
+        {
+            if (!(drawable is DrawableOsuHitObject d))
+                return;
+
+            d.FadeIn = preEmpt * fade_in_duration_multiplier;
+        }
+
         protected void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
         {
             if (!(drawable is DrawableOsuHitObject d))
@@ -57,8 +65,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // new duration from completed fade in to end (before fading out)
             var longFadeDuration = ((d.HitObject as IHasEndTime)?.EndTime ?? d.HitObject.StartTime) - fadeOutStartTime;
-
-            d.FadeIn = fadeInDuration;
 
             switch (drawable)
             {

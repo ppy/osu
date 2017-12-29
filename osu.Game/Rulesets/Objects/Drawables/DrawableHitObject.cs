@@ -120,6 +120,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             State.ValueChanged += state =>
             {
+                // apply any custom values
+                ApplyCustomValues?.Invoke(this);
+
                 UpdateState(state);
 
                 // apply any custom state overrides
@@ -249,6 +252,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             h.ApplyCustomUpdateState += (d, s) => ApplyCustomUpdateState?.Invoke(d, s);
             nestedHitObjects.Add(h);
         }
+
+        /// <summary>
+        /// Bind to apply custom values.
+        /// </summary>
+        public event Action<DrawableHitObject> ApplyCustomValues;
 
         /// <summary>
         /// Bind to apply a custom state which can override the default implementation.
