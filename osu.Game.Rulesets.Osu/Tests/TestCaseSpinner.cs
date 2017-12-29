@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using OpenTK;
 using osu.Framework.Graphics;
@@ -17,6 +19,13 @@ namespace osu.Game.Rulesets.Osu.Tests
     [Ignore("getting CI working")]
     public class TestCaseSpinner : OsuTestCase
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+{
+            typeof(Spinner),
+            typeof(OsuModHidden),
+            typeof(DrawableSpinner)
+        };
+
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 

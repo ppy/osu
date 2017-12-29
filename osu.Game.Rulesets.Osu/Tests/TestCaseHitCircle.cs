@@ -14,12 +14,21 @@ using OpenTK;
 using osu.Game.Rulesets.Osu.Mods;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Osu.Judgements;
+using System.Collections.Generic;
+using System;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [Ignore("getting CI working")]
     public class TestCaseHitCircle : OsuTestCase
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(HitCircle),
+            typeof(OsuModHidden),
+            typeof(DrawableHitCircle)
+        };
+
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 

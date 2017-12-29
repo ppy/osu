@@ -20,7 +20,14 @@ namespace osu.Game.Rulesets.Osu.Tests
     [Ignore("getting CI working")]
     public class TestCaseSlider : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(DrawableSlider) };
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(Slider),
+            typeof(HitCircle),
+            typeof(OsuModHidden),
+            typeof(DrawableSlider),
+            typeof(DrawableHitCircle)
+        };
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;
