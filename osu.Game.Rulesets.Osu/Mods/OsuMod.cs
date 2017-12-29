@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             var fadeOutDuration = preEmpt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)
-            var newDuration = ((d.HitObject as IHasEndTime)?.EndTime ?? d.HitObject.StartTime) - fadeOutStartTime;
+            var longFadeDuration = ((d.HitObject as IHasEndTime)?.EndTime ?? d.HitObject.StartTime) - fadeOutStartTime;
 
             d.FadeIn = fadeInDuration;
 
@@ -75,10 +75,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                     case DrawableSlider slider:
                         using (slider.BeginAbsoluteSequence(fadeOutStartTime, true))
                         {
-                            slider.Body.FadeOut(newDuration, Easing.Out);
+                            slider.Body.FadeOut(longFadeDuration, Easing.Out);
 
                             // delay a bit less to let the sliderball fade out peacefully instead of having a hard cut
-                            using (slider.BeginDelayedSequence(newDuration - fadeOutDuration, true))
+                            using (slider.BeginDelayedSequence(longFadeDuration - fadeOutDuration, true))
                             {
                                 slider.Ball.FadeOut(fadeOutDuration);
                                 slider.Delay(fadeOutDuration).Expire();
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         using (spinner.BeginAbsoluteSequence(fadeOutStartTime, true))
                         {
-                            var sequence = spinner.Delay(newDuration).FadeOut(fadeOutDuration);
+                            var sequence = spinner.Delay(longFadeDuration).FadeOut(fadeOutDuration);
 
                             // speed up the end sequence accordingly
                             switch (state)
