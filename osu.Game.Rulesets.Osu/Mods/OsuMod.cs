@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     circle.ApproachCircle.Hide();
 
                     // fade out immediately after fade in.
-                    using (drawable.BeginAbsoluteSequence(fadeInStartTime + fadeInDuration, true))
+                    using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
                         circle.FadeOut(fadeOutDuration);
                     break;
                 case DrawableSlider slider:
