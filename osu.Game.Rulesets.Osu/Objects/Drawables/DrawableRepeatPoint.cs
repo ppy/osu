@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AutoSizeAxes = Axes.Both;
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
-            Scale = new Vector2(0.5f);
-
             Children = new Drawable[]
             {
                 new SpriteIcon
@@ -36,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Icon = FontAwesome.fa_eercast,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(32),
+                    Size = new Vector2(32 * repeatPoint.Scale),
                 }
             };
         }
