@@ -33,8 +33,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
 
-        private const double fade_in_speed_multiplier = 0.6;
-        private const double fade_out_speed_multiplier = 0.3;
+        private const double fade_in_duration_multiplier = 0.4;
+        private const double fade_out_duration_multiplier = 0.3;
 
         private float preEmpt => DrawableOsuHitObject.TIME_PREEMPT;
 
@@ -50,10 +50,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             var fadeInStartTime = d.HitObject.StartTime - preEmpt;
-            var fadeInDuration = preEmpt * fade_in_speed_multiplier;
+            var fadeInDuration = preEmpt * fade_in_duration_multiplier;
 
             var fadeOutStartTime = fadeInStartTime + fadeInDuration;
-            var fadeOutDuration = preEmpt * fade_out_speed_multiplier;
+            var fadeOutDuration = preEmpt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)
             var newDuration = ((d.HitObject as IHasEndTime)?.EndTime ?? d.HitObject.StartTime) - fadeOutStartTime;
@@ -67,6 +67,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     case DrawableHitCircle circle:
                         // we don't want to see the approach circle
                         circle.ApproachCircle.Hide();
+
                         // prolong the hitcircle long enough so misses are still possible
                         circle.LifetimeEnd = circle.HitObject.StartTime + Math.Max(fadeOutDuration, circle.HitObject.HitWindowFor(HitResult.Miss));
                         circle.FadeIn(fadeInDuration).Then().FadeOut(fadeOutDuration); // override fade in as it somehow gets cut otherwise
@@ -75,6 +76,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         using (slider.BeginAbsoluteSequence(fadeOutStartTime, true))
                         {
                             slider.Body.FadeOut(newDuration, Easing.Out);
+
                             // delay a bit less to let the sliderball fade out peacefully instead of having a hard cut
                             using (slider.BeginDelayedSequence(newDuration - fadeOutDuration, true))
                             {
@@ -91,6 +93,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         using (spinner.BeginAbsoluteSequence(fadeOutStartTime, true))
                         {
                             var sequence = spinner.Delay(newDuration).FadeOut(fadeOutDuration);
+
                             // speed up the end sequence accordingly
                             switch (state)
                             {
@@ -101,6 +104,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                                     sequence.ScaleTo(spinner.Scale * 0.8f, fadeOutDuration * 2, Easing.Out);
                                     break;
                             }
+
                             sequence.Expire();
                         }
                         break;
