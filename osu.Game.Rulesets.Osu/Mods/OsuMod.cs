@@ -70,8 +70,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                         circle.FadeIn(fadeIn).Then().FadeOut(fadeOut); // override fade in as it somehow gets cut otherwise
                         break;
                     case DrawableSlider slider:
-                        slider.InitialCircle.ApplyCustomUpdateState += ApplyHiddenState;
-
                         using (slider.BeginAbsoluteSequence(fadeOutTime, true))
                         {
                             slider.Body.FadeOut(newDuration, Easing.Out);
