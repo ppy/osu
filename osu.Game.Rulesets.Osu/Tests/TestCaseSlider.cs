@@ -27,7 +27,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(HitCircle),
             typeof(OsuModHidden),
             typeof(DrawableSlider),
-            typeof(DrawableHitCircle)
+            typeof(DrawableHitCircle),
+            typeof(DrawableSliderTick),
+            typeof(DrawableRepeatPoint)
         };
 
         private readonly Container content;
