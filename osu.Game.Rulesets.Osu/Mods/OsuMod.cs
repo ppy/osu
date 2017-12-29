@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                                 spinner.ScaleTo(spinner.Scale * 1.2f, fadeOutDuration * 2, Easing.Out);
                                 break;
                             case ArmedState.Miss:
-                                spinner.ScaleTo(spinner.Scale * 0.8f, fadeOutDuration * 2, Easing.Out);
+                                spinner.ScaleTo(spinner.Scale * 0.8f, fadeOutDuration * 2, Easing.In);
                                 break;
                         }
 
