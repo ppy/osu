@@ -66,9 +66,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     // we don't want to see the approach circle
                     circle.ApproachCircle.Hide();
 
-                    // prolong the hitcircle long enough so misses are still possible
-                    circle.LifetimeEnd = circle.HitObject.StartTime + Math.Max(fadeOutDuration, circle.HitObject.HitWindowFor(HitResult.Miss));
-
                     // fade out immediately after fade in.
                     using (drawable.BeginAbsoluteSequence(fadeInStartTime + fadeInDuration, true))
                         circle.FadeOut(fadeOutDuration);
