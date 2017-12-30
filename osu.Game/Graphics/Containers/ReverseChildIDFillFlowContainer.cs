@@ -11,7 +11,5 @@ namespace osu.Game.Graphics.Containers
     public class ReverseChildIDFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable
     {
         protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
-
-        protected override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
     }
 }
