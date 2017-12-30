@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
-        public DrawableHitCircle(OsuHitObject h) : base(h)
+        public DrawableHitCircle(HitCircle h) : base(h)
         {
             Origin = Anchor.Centre;
 
