@@ -122,6 +122,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 UpdateState(state);
 
+                // apply any custom state overrides
+                ApplyCustomUpdateState?.Invoke(this, state);
+
                 if (State == ArmedState.Hit)
                     PlaySamples();
             };
@@ -243,8 +246,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
             h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
+            h.ApplyCustomUpdateState += (d, s) => ApplyCustomUpdateState?.Invoke(d, s);
             nestedHitObjects.Add(h);
         }
+
+        /// <summary>
+        /// Bind to apply a custom state which can override the default implementation.
+        /// </summary>
+        public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
         protected abstract void UpdateState(ArmedState state);
     }
