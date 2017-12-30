@@ -17,7 +17,6 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Mods;
@@ -36,7 +35,7 @@ namespace osu.Game.Screens.Play
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
-        public override bool ShowOverlays => false;
+        public override bool ShowOverlaysOnEnter => false;
 
         public override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && RulesetContainer.ProvidingUserCursor;
 
@@ -47,6 +46,8 @@ namespace osu.Game.Screens.Play
         public bool HasFailed { get; private set; }
 
         public bool AllowPause { get; set; } = true;
+        public bool AllowLeadIn { get; set; } = true;
+        public bool AllowResults { get; set; } = true;
 
         public int RestartCount;
 
@@ -126,7 +127,7 @@ namespace osu.Game.Screens.Play
             }
             catch (Exception e)
             {
-                Logger.Log($"Could not load this beatmap sucessfully ({e})!", LoggingTarget.Runtime, LogLevel.Error);
+                Logger.Error(e, "Could not load beatmap sucessfully!");
 
                 //couldn't load, hard abort!
                 Exit();
@@ -137,7 +138,10 @@ namespace osu.Game.Screens.Play
             decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
             var firstObjectTime = RulesetContainer.Objects.First().StartTime;
-            decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, beatmap.BeatmapInfo.AudioLeadIn)));
+            decoupledClock.Seek(AllowLeadIn
+                ? Math.Min(0, firstObjectTime - Math.Max(beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, beatmap.BeatmapInfo.AudioLeadIn))
+                : firstObjectTime);
+
             decoupledClock.ProcessFrame();
 
             offsetClock = new FramedOffsetClock(decoupledClock);
@@ -161,8 +165,8 @@ namespace osu.Game.Screens.Play
                     OnRetry = Restart,
                     OnQuit = Exit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
-                    Retries = RestartCount,
                     OnPause = () => {
+                        pauseContainer.Retries = RestartCount;
                         hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
                     },
                     OnResume = () => {
@@ -274,6 +278,8 @@ namespace osu.Game.Screens.Play
 
             ValidForResume = false;
 
+            if (!AllowResults) return;
+
             using (BeginDelayedSequence(1000))
             {
                 onCompletionEvent = Schedule(delegate
@@ -326,11 +332,6 @@ namespace osu.Game.Screens.Play
             Task.Run(() =>
             {
                 adjustableSourceClock.Reset();
-
-                // this is temporary until we have blocking (async.Wait()) audio component methods.
-                // then we can call ResetAsync().Wait() or the blocking version above.
-                while (adjustableSourceClock.IsRunning)
-                    Thread.Sleep(1);
 
                 Schedule(() =>
                 {

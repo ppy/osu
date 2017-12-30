@@ -10,7 +10,7 @@ using OpenTK;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseScoreCounter : OsuTestCase
+    public class TestCaseScoreCounter : OsuTestCase
     {
         public TestCaseScoreCounter()
         {

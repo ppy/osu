@@ -18,13 +18,22 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using System.Linq;
+using osu.Framework.Configuration;
+using osu.Framework.Logging;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
     public class Leaderboard : Container
     {
+        private const double fade_duration = 300;
+
         private readonly ScrollContainer scrollContainer;
+        private readonly Container placeholderContainer;
+
         private FillFlowContainer<LeaderboardScore> scrollFlow;
+
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public Action<Score> ScoreSelected;
 
@@ -38,14 +47,17 @@ namespace osu.Game.Screens.Select.Leaderboards
             set
             {
                 scores = value;
-                getScoresRequest?.Cancel();
 
-                scrollFlow?.FadeOut(200);
-                scrollFlow?.Expire();
+                scrollFlow?.FadeOut(fade_duration, Easing.OutQuint).Expire();
                 scrollFlow = null;
 
-                if (scores == null)
+                loading.Hide();
+
+                if (scores == null || !scores.Any())
                     return;
+
+                // ensure placeholder is hidden when displaying scores
+                PlaceholderState = PlaceholderState.Successful;
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
                 Schedule(() =>
@@ -74,6 +86,56 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
+        private LeaderboardScope scope;
+
+        public LeaderboardScope Scope
+        {
+            get { return scope; }
+            set
+            {
+                if (value == scope) return;
+
+                scope = value;
+                updateScores();
+            }
+        }
+
+        private PlaceholderState placeholderState;
+
+        protected PlaceholderState PlaceholderState
+        {
+            get { return placeholderState; }
+            set
+            {
+                if (value == placeholderState) return;
+
+                switch (placeholderState = value)
+                {
+                    case PlaceholderState.NetworkFailure:
+                        replacePlaceholder(new RetrievalFailurePlaceholder
+                        {
+                            OnRetry = updateScores,
+                        });
+                        break;
+                    case PlaceholderState.Unavailable:
+                        replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
+                        break;
+                    case PlaceholderState.NoScores:
+                        replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
+                        break;
+                    case PlaceholderState.NotLoggedIn:
+                        replacePlaceholder(new MessagePlaceholder(@"Please login to view online leaderboards!"));
+                        break;
+                    case PlaceholderState.NotSupporter:
+                        replacePlaceholder(new MessagePlaceholder(@"Please invest in a supporter tag to view this leaderboard!"));
+                        break;
+                    default:
+                        replacePlaceholder(null);
+                        break;
+                }
+            }
+        }
+
         public Leaderboard()
         {
             Children = new Drawable[]
@@ -83,13 +145,17 @@ namespace osu.Game.Screens.Select.Leaderboards
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
                 },
-                loading = new LoadingAnimation()
+                loading = new LoadingAnimation(),
+                placeholderContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
             };
         }
 
         private APIAccess api;
-
         private BeatmapInfo beatmap;
+        private OsuGame osuGame;
 
         private ScheduledDelegate pendingBeatmapSwitch;
 
@@ -109,31 +175,112 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api)
+        private void load(APIAccess api, OsuGame osuGame)
         {
             this.api = api;
+            this.osuGame = osuGame;
+
+            if (osuGame != null)
+                ruleset.BindTo(osuGame.Ruleset);
+
+            ruleset.ValueChanged += r => updateScores();
+
+            if (api != null)
+                api.OnStateChange += handleApiStateChange;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (api != null)
+                api.OnStateChange -= handleApiStateChange;
         }
 
         private GetScoresRequest getScoresRequest;
 
+        private void handleApiStateChange(APIState oldState, APIState newState)
+        {
+            if (Scope == LeaderboardScope.Local)
+                // No need to respond to API state change while current scope is local
+                return;
+
+            if (newState == APIState.Online)
+                updateScores();
+        }
+
         private void updateScores()
         {
-            if (!IsLoaded) return;
-
-            Scores = null;
             getScoresRequest?.Cancel();
+            getScoresRequest = null;
+            Scores = null;
 
-            if (api == null || Beatmap?.OnlineBeatmapID == null) return;
+            if (Scope == LeaderboardScope.Local)
+            {
+                // TODO: get local scores from wherever here.
+                PlaceholderState = PlaceholderState.NoScores;
+                return;
+            }
 
+            if (Beatmap?.OnlineBeatmapID == null)
+            {
+                PlaceholderState = PlaceholderState.Unavailable;
+                return;
+            }
+
+            if (api?.IsLoggedIn != true)
+            {
+                PlaceholderState = PlaceholderState.NotLoggedIn;
+                return;
+            }
+
+            PlaceholderState = PlaceholderState.Retrieving;
             loading.Show();
 
-            getScoresRequest = new GetScoresRequest(Beatmap);
+            if (Scope != LeaderboardScope.Global && !api.LocalUser.Value.IsSupporter)
+            {
+                loading.Hide();
+                PlaceholderState = PlaceholderState.NotSupporter;
+                return;
+            }
+
+            getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value ?? Beatmap.Ruleset, Scope);
             getScoresRequest.Success += r =>
             {
                 Scores = r.Scores;
-                loading.Hide();
+                PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
             };
+            getScoresRequest.Failure += onUpdateFailed;
+
             api.Queue(getScoresRequest);
+        }
+
+        private void onUpdateFailed(Exception e)
+        {
+            if (e is OperationCanceledException) return;
+
+            PlaceholderState = PlaceholderState.NetworkFailure;
+            Logger.Error(e, @"Couldn't fetch beatmap scores!");
+        }
+
+        private void replacePlaceholder(Placeholder placeholder)
+        {
+            var existingPlaceholder = placeholderContainer.Children.LastOrDefault() as Placeholder;
+
+            if (placeholder != null && placeholder.Equals(existingPlaceholder))
+                return;
+
+            existingPlaceholder?.FadeOut(150, Easing.OutQuint).Expire();
+
+            if (placeholder == null)
+                return;
+
+            Scores = null;
+
+            placeholderContainer.Add(placeholder);
+
+            placeholder.ScaleTo(0.8f).Then().ScaleTo(1, fade_duration * 3, Easing.OutQuint);
+            placeholder.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 
         protected override void Update()
@@ -164,5 +311,24 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
             }
         }
+    }
+
+    public enum LeaderboardScope
+    {
+        Local,
+        Country,
+        Global,
+        Friend,
+    }
+
+    public enum PlaceholderState
+    {
+        Successful,
+        Retrieving,
+        NetworkFailure,
+        Unavailable,
+        NoScores,
+        NotLoggedIn,
+        NotSupporter,
     }
 }

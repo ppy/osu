@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -21,6 +22,8 @@ namespace osu.Game.Overlays.Notifications
                 Schedule(() => textDrawable.Text = value);
             }
         }
+
+        public string CompletionText { get; set; } = "Task has completed!";
 
         public float Progress
         {
@@ -87,13 +90,13 @@ namespace osu.Game.Overlays.Notifications
         protected virtual Notification CreateCompletionNotification() => new ProgressCompletionNotification
         {
             Activated = CompletionClickAction,
-            Text = "Task has completed!"
+            Text = CompletionText
         };
 
         protected virtual void Completed()
         {
-            Expire();
             CompletionTarget?.Invoke(CreateCompletionNotification());
+            base.Close();
         }
 
         public override bool DisplayOnTop => false;
@@ -112,7 +115,7 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.Both,
             });
 
-            Content.Add(textDrawable = new TextFlowContainer(t =>
+            Content.Add(textDrawable = new OsuTextFlowContainer(t =>
             {
                 t.TextSize = 16;
             })

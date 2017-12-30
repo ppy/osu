@@ -201,14 +201,14 @@ namespace osu.Game.Screens.Ranking
             {
                 Children = new Drawable[]
                 {
-                    new SpriteText {
+                    new OsuSpriteText {
                         Text = statistic.Value.ToString().PadLeft(4, '0'),
                         Colour = colours.Gray7,
                         TextSize = 30,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                     },
-                    new SpriteText {
+                    new OsuSpriteText {
                         Text = statistic.Key,
                         Colour = colours.Gray7,
                         Font = @"Exo2.0-Bold",
@@ -324,7 +324,14 @@ namespace osu.Game.Screens.Ranking
                 title.Colour = artist.Colour = colours.BlueDarker;
                 versionMapper.Colour = colours.Gray8;
 
-                versionMapper.Text = $"{beatmap.Version} - mapped by {beatmap.Metadata.Author.Username}";
+                var creator = beatmap.Metadata.Author?.Username;
+                if (!string.IsNullOrEmpty(creator)) {
+                    versionMapper.Text = $"mapped by {creator}";
+
+                    if (!string.IsNullOrEmpty(beatmap.Version))
+                        versionMapper.Text = $"{beatmap.Version} - " + versionMapper.Text;
+                }
+
                 title.Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title);
                 artist.Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist);
             }
