@@ -18,8 +18,10 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Game.Database;
+using osu.Game.Graphics.Textures;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
@@ -84,10 +86,14 @@ namespace osu.Game
 
         private DatabaseContextFactory contextFactory;
 
+        private LargeTextureStore largeTextureStore;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
+
+            dependencies.Cache(largeTextureStore = new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
 
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
