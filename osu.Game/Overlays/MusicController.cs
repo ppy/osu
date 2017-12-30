@@ -65,8 +65,6 @@ namespace osu.Game.Overlays
             AlwaysPresent = true;
         }
 
-        protected override bool OnDragStart(InputState state) => true;
-
         protected override bool OnDrag(InputState state)
         {
             Trace.Assert(state.Mouse.PositionMouseDown != null, "state.Mouse.PositionMouseDown != null");
