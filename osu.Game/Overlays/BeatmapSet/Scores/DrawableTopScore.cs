@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 score = value;
 
                 avatar.User = username.User = score.User;
-                flag.FlagName = score.User.Country?.FlagName;
+                flag.Country = score.User.Country;
                 date.Text = $@"achieved {score.Date:MMM d, yyyy}";
                 rank.UpdateRank(score.Rank);
 
