@@ -67,6 +67,8 @@ namespace osu.Game.Overlays
 
         protected override bool OnDrag(InputState state)
         {
+            if (base.OnDrag(state)) return true;
+
             Trace.Assert(state.Mouse.PositionMouseDown != null, "state.Mouse.PositionMouseDown != null");
 
             Vector2 change = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
@@ -75,7 +77,7 @@ namespace osu.Game.Overlays
             change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
 
             dragContainer.MoveTo(change);
-            return base.OnDrag(state);
+            return true;
         }
 
         protected override bool OnDragEnd(InputState state)

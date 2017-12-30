@@ -64,6 +64,8 @@ namespace osu.Game.Graphics.Containers
             return base.OnDragStart(state);
         }
 
+        protected override bool OnDrag(InputState state) => State == Visibility.Hidden;
+
         private void onStateChanged(Visibility visibility)
         {
             switch (visibility)
