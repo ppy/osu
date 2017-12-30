@@ -50,7 +50,7 @@ Clone the entire repository with submodules using
 ```
 git clone --recurse-submodules https://github.com/ppy/osu
 ```
-Navigate into the osu dirctory then restore NuGet packages from the repository
+Navigate into the osu directory and then restore NuGet packages from the repository
 ```
 nuget restore
 ```
