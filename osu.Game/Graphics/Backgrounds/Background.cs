@@ -5,8 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using OpenTK.Graphics;
+using osu.Game.Graphics.Textures;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -22,7 +22,6 @@ namespace osu.Game.Graphics.Backgrounds
 
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
-            Depth = float.MaxValue;
 
             Add(Sprite = new Sprite
             {
@@ -35,7 +34,7 @@ namespace osu.Game.Graphics.Backgrounds
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(LargeTextureStore textures)
         {
             if (!string.IsNullOrEmpty(textureName))
                 Sprite.Texture = textures.Get(textureName);
