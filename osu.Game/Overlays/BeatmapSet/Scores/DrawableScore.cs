@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Font = @"Exo2.0-RegularItalic",
                     Margin = new MarginPadding { Left = side_margin }
                 },
-                new DrawableFlag(score.User.Country?.FlagName)
+                new DrawableFlag(score.User.Country)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
