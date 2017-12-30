@@ -40,9 +40,9 @@ Do not run NuGet as root on the first run or you might run into very peculiar is
 Mono >= 5.4.0
 You can download through homebrew-cask (brew cask install mono-mdk) or [here](http://www.mono-project.com/download/)  
 Do **not** download mono via regular homebrew as it does not come with the required libraries and components for development.
-nuget (comes with mono-mdk)
-msbuild (comes with mono-mdk)
-git
+nuget (comes with mono-mdk)  
+msbuild (comes with mono-mdk)  
+git  
 
 ### 2. Cloning project
 Clone the entire repository with submodules using
