@@ -8,8 +8,12 @@ This is still heavily under development and is not intended for end-user use. Th
 
 # Requirements
 
-- A desktop platform which can compile .NET 4.5 (tested on macOS, linux and windows). We recommend using [Visual Studio Code](https://code.visualstudio.com/) (all platforms) or [Visual Studio Community Edition](https://www.visualstudio.com/) (windows only), both of which are free.
+- A desktop platform which can compile .NET 4.5 (tested on macOS, linux and windows). We recommend using [MonoDevelop](http://www.monodevelop.com/download/) (Linux), [Visual Studio Code](https://code.visualstudio.com/) (macOS) or [Visual Studio Community Edition](https://www.visualstudio.com/) (Windows), all of which are free.
 - Make sure you initialise and keep submodules up-to-date.
+
+# Getting Started
+- Clone the repository including submodules (`git clone --recurse-submodules https://github.com/ppy/osu`)
+- Build in your IDE of choice (recommended IDEs automatically restore nuget packages; if you are using an alternative make sure to `nuget restore`)
 
 # Contributing
 
