@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             private readonly bool auto;
 
-            public TestDrawableHitCircle(OsuHitObject h, bool auto) : base(h)
+            public TestDrawableHitCircle(HitCircle h, bool auto) : base(h)
             {
                 this.auto = auto;
             }
