@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
-        public DrawableHitCircle(OsuHitObject h) : base(h)
+        public DrawableHitCircle(HitCircle h) : base(h)
         {
             Origin = Anchor.Centre;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 number = new NumberPiece
                 {
-                    Text = h is Spinner ? "S" : (HitObject.ComboIndex + 1).ToString(),
+                    Text = (HitObject.ComboIndex + 1).ToString(),
                 },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
