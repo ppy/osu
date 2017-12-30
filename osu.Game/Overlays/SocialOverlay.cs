@@ -66,18 +66,18 @@ namespace osu.Game.Overlays
 
             Header.Tabs.Current.ValueChanged += tab => Scheduler.AddOnce(updateSearch);
 
-            currentQuery.ValueChanged += v =>
-            {
-                queryChangedDebounce?.Cancel();
+            //currentQuery.ValueChanged += v =>
+            //{
+            //    queryChangedDebounce?.Cancel();
 
-                if (string.IsNullOrEmpty(v))
-                    Scheduler.AddOnce(updateSearch);
-                else
-                {
-                    Users = null;
-                    queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
-                }
-            };
+            //    if (string.IsNullOrEmpty(v))
+            //        Scheduler.AddOnce(updateSearch);
+            //    else
+            //    {
+            //        Users = null;
+            //        queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
+            //    }
+            //};
 
             currentQuery.BindTo(Filter.Search.Current);
 
