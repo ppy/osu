@@ -42,6 +42,11 @@ namespace osu.Game.Rulesets.Mods
         public abstract double ScoreMultiplier { get; }
 
         /// <summary>
+        /// Returns true if this mod is implemented (and playable).
+        /// </summary>
+        public virtual bool HasImplementation => this is IApplicableMod;
+
+        /// <summary>
         /// Returns if this mod is ranked.
         /// </summary>
         public virtual bool Ranked => false;
