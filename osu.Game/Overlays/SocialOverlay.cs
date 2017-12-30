@@ -140,8 +140,7 @@ namespace osu.Game.Overlays
             });
         }
 
-        private GetUsersRequest getUsersRequest;
-        private GetFriendsRequest getFriendsRequest;
+        private APIRequest getUsersRequest;
 
         private readonly Bindable<string> currentQuery = new Bindable<string>();
 
@@ -156,7 +155,7 @@ namespace osu.Game.Overlays
 
             Users = null;
             loading.Hide();
-            clearRequests();
+            getUsersRequest?.Cancel();
 
             if (api == null || api.State == APIState.Offline)
                 return;
@@ -165,22 +164,15 @@ namespace osu.Game.Overlays
             {
                 case SocialTab.OnlinePlayers:
                     getUsersRequest = new GetUsersRequest(); // TODO filter???
-                    getUsersRequest.Success += response => finishRequest(response.Select(r => r.User));
-                    queueRequest(getUsersRequest);
+                    ((GetUsersRequest)getUsersRequest).Success += response => finishRequest(response.Select(r => r.User));
                     break;
                 case SocialTab.OnlineFriends:
-                    getFriendsRequest = new GetFriendsRequest(); // TODO filter???
-                    getFriendsRequest.Success += finishRequest;
-                    queueRequest(getFriendsRequest);
+                    getUsersRequest = new GetFriendsRequest(); // TODO filter???
+                    ((GetFriendsRequest)getUsersRequest).Success += finishRequest;
                     break;
             }
+            api.Queue(getUsersRequest);
             loading.Show();
-        }
-
-        private void clearRequests()
-        {
-            getUsersRequest?.Cancel();
-            getFriendsRequest?.Cancel();
         }
 
         private void finishRequest(IEnumerable<User> newUsers)
@@ -195,10 +187,7 @@ namespace osu.Game.Overlays
                 });
             });
         }
-
-        private void queueRequest(APIRequest request) => api.Queue(request);
     }
-
 
     public enum SortDirection
     {
