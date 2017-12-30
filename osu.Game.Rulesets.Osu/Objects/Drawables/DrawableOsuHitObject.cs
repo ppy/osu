@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// The number of milliseconds used to fade in.
         /// </summary>
-        public double FadeInDuration = TIME_FADEIN;
+        public virtual double FadeInDuration { get; set; } = TIME_FADEIN;
 
         public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Time.Current >= HitObject.StartTime - TIME_PREEMPT;
 
