@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         Origin = Anchor.CentreLeft,
                         Anchor = Anchor.CentreLeft,
-                        Text = datetime.ToString("dd/MM/yyyy"),
+                        Text = datetime.ToShortDateString(),
                         Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                         Colour = Color4.White,
                     },
