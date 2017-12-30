@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 totalScore.Value = $@"{score.TotalScore:N0}";
                 accuracy.Value = $@"{score.Accuracy:P2}";
-                statistics.Value = $"{score.Statistics["300"]}/{score.Statistics["100"]}/{score.Statistics["50"]}";
+                statistics.Value = $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Meh]}";
 
                 modsContainer.Clear();
                 foreach (Mod mod in score.Mods)
