@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace osu.Game.Overlays
 {
-    public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>
+    public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>, IOnlineComponent
     {
         private APIAccess api;
 
@@ -90,6 +90,7 @@ namespace osu.Game.Overlays
         private void load(APIAccess api)
         {
             this.api = api;
+            api.Register(this);
         }
 
         private void recreatePanels(PanelDisplayStyle displayStyle)
@@ -186,6 +187,20 @@ namespace osu.Game.Overlays
                     loading.Hide();
                 });
             });
+        }
+
+        public void APIStateChanged(APIAccess api, APIState state)
+        {
+            switch (state)
+            {
+                case APIState.Online:
+                    Scheduler.AddOnce(updateSearch);
+                    break;
+                default:
+                    Users = null;
+                    recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                    break;
+            }
         }
     }
 
