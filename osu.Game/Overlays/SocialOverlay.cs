@@ -82,8 +82,6 @@ namespace osu.Game.Overlays
             currentQuery.BindTo(Filter.Search.Current);
 
             Filter.Tabs.Current.ValueChanged += sortCriteria => Scheduler.AddOnce(updateSearch);
-
-            Scheduler.AddOnce(updateSearch); // so it displays something once it's first opened
         }
 
         [BackgroundDependencyLoader]
