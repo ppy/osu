@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// An interface for mods that make adjustments to the track.
     /// </summary>
-    public interface IApplicableToClock
+    public interface IApplicableToClock : IApplicableMod
     {
         void ApplyToClock(IAdjustableClock clock);
     }
