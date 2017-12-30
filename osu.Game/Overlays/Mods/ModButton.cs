@@ -204,13 +204,13 @@ namespace osu.Game.Overlays.Mods
             {
                 iconsContainer.AddRange(new[]
                 {
-                    backgroundIcon = new DisplayableModIcon(Mods[1])
+                    backgroundIcon = new PassThroughTooltipModIcon(Mods[1])
                     {
                         Origin = Anchor.BottomRight,
                         Anchor = Anchor.BottomRight,
                         Position = new Vector2(1.5f),
                     },
-                    foregroundIcon = new DisplayableModIcon(Mods[0])
+                    foregroundIcon = new PassThroughTooltipModIcon(Mods[0])
                     {
                         Origin = Anchor.BottomRight,
                         Anchor = Anchor.BottomRight,
@@ -220,7 +220,7 @@ namespace osu.Game.Overlays.Mods
             }
             else
             {
-                iconsContainer.Add(foregroundIcon = new DisplayableModIcon(Mod)
+                iconsContainer.Add(foregroundIcon = new PassThroughTooltipModIcon(Mod)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -260,14 +260,13 @@ namespace osu.Game.Overlays.Mods
             Mod = mod;
         }
 
-        private class DisplayableModIcon : ModIcon {
+        private class PassThroughTooltipModIcon : ModIcon
+        {
+            public override string TooltipText => null;
 
-            public override string TooltipText { get; }
-                
-            public DisplayableModIcon(Mod mod) : base(mod) {
-                TooltipText = null;
+            public PassThroughTooltipModIcon(Mod mod) : base(mod)
+            {
             }
-
         }
     }
 }
