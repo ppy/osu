@@ -268,9 +268,10 @@
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
+    <Compile Include="Graphics\Containers\ChatFlowContainer.cs" />
+    <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\Profile\SupporterIcon.cs" />
     <Compile Include="Overlays\Settings\DangerousSettingsButton.cs" />
-    <Compile Include="Graphics\Containers\OsuLinkFlowContainer.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteLink.cs" />
     <Compile Include="Graphics\UserInterface\HoverClickSounds.cs" />
     <Compile Include="Graphics\UserInterface\HoverSounds.cs" />
@@ -293,7 +294,6 @@
       <DependentUpon>20171209034410_AddRulesetInfoShortName.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
-    <Compile Include="Online\API\Requests\GetBeatmapRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\Chat\ChatLink.cs" />
     <Compile Include="Online\Chat\MessageFormatter.cs" />
@@ -441,7 +441,6 @@
     <Compile Include="Online\API\Requests\SearchBeatmapSetsRequest.cs" />
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
     <Compile Include="Online\API\Requests\GetScoresRequest.cs" />
-    <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
     <Compile Include="Online\API\Requests\ListChannelsRequest.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />

@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
@@ -47,19 +48,32 @@ namespace osu.Game.Tests.Visual
 
         private void clear() => AddStep("clear messages", textContainer.Clear);
 
-        private void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false)
+        private void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false, bool isImportant = false)
         {
-            var newLine = new ChatLine(new DummyMessage(text, isAction));
+            var newLine = new ChatLine(new DummyMessage(text, isAction, isImportant));
             textContainer.Add(newLine);
 
             AddAssert($"msg #{textContainer.Count} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
             AddAssert($"msg #{textContainer.Count} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic(newLine.ContentFlow));
-            AddAssert($"msg #{textContainer.Count} shows link(s)", () => isShowingLinks(newLine.ContentFlow));
+            AddAssert($"msg #{textContainer.Count} shows link(s)", isShowingLinks);
 
-            bool isItalic(OsuTextFlowContainer c) => c.Cast<ChatLink>().All(sprite => sprite.Font == @"Exo2.0-MediumItalic");
+            bool isItalic(ChatFlowContainer c) => c.Cast<ChatLink>().All(sprite => sprite.Font == @"Exo2.0-MediumItalic");
 
-            bool isShowingLinks(OsuTextFlowContainer c) => c.Cast<ChatLink>().All(sprite => sprite.HandleInput && !sprite.TextColour.Equals((SRGBColour)Color4.White)
-                                                                                        || !sprite.HandleInput && sprite.TextColour.Equals((SRGBColour)Color4.White));
+            bool isShowingLinks()
+            {
+                SRGBColour textColour = Color4.White;
+                bool hasBackground = !string.IsNullOrEmpty(newLine.Message.Sender.Colour);
+
+                if (isAction && hasBackground)
+                    textColour = OsuColour.FromHex(newLine.Message.Sender.Colour);
+
+                return newLine.ContentFlow
+                    .Cast<ChatLink>()
+                    .All(sprite => sprite.HandleInput && !sprite.TextColour.Equals(textColour)
+                                || !sprite.HandleInput && sprite.TextColour.Equals(textColour)
+                                // if someone with a background uses /me with a link, the usual link colour is overridden
+                                || isAction && hasBackground && sprite.HandleInput && !sprite.TextColour.Equals((ColourInfo)Color4.White));
+            }
         }
 
         private void testLinksGeneral()
@@ -77,6 +91,9 @@ namespace osu.Game.Tests.Visual
             addMessageWithChecks("Let's (try)[https://osu.ppy.sh/home] [https://osu.ppy.sh/home multiple links] https://osu.ppy.sh/home", 3);
             // note that there's 0 links here (they get removed if a channel is not found)
             addMessageWithChecks("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
+            addMessageWithChecks("I am important!", 0, false, true);
+            addMessageWithChecks("feels important", 0, true, true);
+            addMessageWithChecks("likes to post this [https://osu.ppy.sh/home link].", 1, true, true);
         }
 
         private void testAddingLinks()
@@ -132,37 +149,27 @@ namespace osu.Game.Tests.Visual
         private class DummyMessage : Message
         {
             private static long messageCounter;
+            internal static readonly User TEST_SENDER_BACKGROUND = new User
+            {
+                Username = @"i-am-important",
+                Id = 42,
+                Colour = "#250cc9",
+            };
+
             internal static readonly User TEST_SENDER = new User
             {
                 Username = @"Somebody",
                 Id = 1,
-                Country = new Country { FullName = @"Alien" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
-                JoinDate = DateTimeOffset.Now.AddDays(-1),
-                LastVisit = DateTimeOffset.Now,
-                Age = 1,
-                ProfileOrder = new[] { "me" },
-                CountryRank = 1,
-                Statistics = new UserStatistics
-                {
-                    Rank = 2148,
-                    PP = 4567.89m
-                },
-                RankHistory = new User.RankHistoryData
-                {
-                    Mode = @"osu",
-                    Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray(),
-                }
             };
 
             public new DateTimeOffset Timestamp = DateTimeOffset.Now;
 
-            public DummyMessage(string text, bool isAction = false)
+            public DummyMessage(string text, bool isAction = false, bool isImportant = false)
                 : base(messageCounter++)
             {
                 Content = text;
                 IsAction = isAction;
-                Sender = TEST_SENDER;
+                Sender = isImportant ? TEST_SENDER_BACKGROUND : TEST_SENDER;
             }
         }
 

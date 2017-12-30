@@ -12,6 +12,8 @@ namespace osu.Game.Graphics.Sprites
 {
     public class OsuSpriteLink : OsuSpriteText
     {
+        public override bool HandleInput => !string.IsNullOrEmpty(Url);
+
         protected override IEnumerable<Drawable> FlowingChildren => Children;
 
         protected override Container<Drawable> Content => content;

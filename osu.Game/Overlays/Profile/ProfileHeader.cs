@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Profile
     public class ProfileHeader : Container
     {
         private readonly OsuTextFlowContainer infoTextLeft;
-        private readonly OsuLinkFlowContainer infoTextRight;
+        private readonly LinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
         private readonly RankGraph rankGraph;
 
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.Profile
                     ParagraphSpacing = 0.8f,
                     LineSpacing = 0.2f
                 },
-                infoTextRight = new OsuLinkFlowContainer(t =>
+                infoTextRight = new LinkFlowContainer(t =>
                 {
                     t.TextSize = 14;
                     t.Font = @"Exo2.0-RegularItalic";
@@ -471,6 +471,20 @@ namespace osu.Game.Overlays.Profile
             {
                 badge.Texture = textures.Get($"Grades/{grade}");
             }
+        }
+
+        private class LinkFlowContainer : OsuTextFlowContainer
+        {
+            public override bool HandleInput => true;
+
+            public LinkFlowContainer(Action<SpriteText> defaultCreationParameters = null)
+                : base(defaultCreationParameters)
+            {
+            }
+
+            protected override SpriteText CreateSpriteText() => new OsuSpriteLink();
+
+            public void AddLink(string text, string url) => AddText(text, sprite => ((OsuSpriteLink)sprite).Url = url);
         }
 
         private class ProfileLink : OsuSpriteLink, IHasTooltip

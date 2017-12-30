@@ -83,13 +83,13 @@ namespace osu.Game.Overlays.Chat
 
         private Message message;
         private OsuSpriteText username;
-        private OsuLinkFlowContainer<ChatLink> contentFlow;
+        private ChatFlowContainer contentFlow;
 
-        public OsuTextFlowContainer ContentFlow => contentFlow;
+        public ChatFlowContainer ContentFlow => contentFlow;
 
         public Message Message
         {
-            get { return message; }
+            get => message;
             set
             {
                 if (message == value) return;
@@ -107,7 +107,6 @@ namespace osu.Game.Overlays.Chat
         private void load(OsuColour colours, ChatOverlay chat)
         {
             this.chat = chat;
-            urlColour = colours.Blue;
             customUsernameColour = colours.ChatBlue;
         }
 
@@ -192,10 +191,16 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
-                        contentFlow = new OsuLinkFlowContainer<ChatLink>(t =>
+                        contentFlow = new ChatFlowContainer(t =>
                         {
                             if (Message.IsAction)
+                            {
                                 t.Font = @"Exo2.0-MediumItalic";
+
+                                if (senderHasBackground)
+                                    t.TextColour = OsuColour.FromHex(message.Sender.Colour);
+                            }
+
                             t.TextSize = text_size;
                         })
                         {
@@ -205,15 +210,12 @@ namespace osu.Game.Overlays.Chat
                     }
                 }
             };
-            if (message.IsAction && senderHasBackground)
-                contentFlow.TextColour = OsuColour.FromHex(message.Sender.Colour);
 
             updateMessageContent();
             FinishTransforms(true);
         }
 
         private ChatOverlay chat;
-        private Color4 urlColour;
 
         private void updateMessageContent()
         {
@@ -230,7 +232,7 @@ namespace osu.Game.Overlays.Chat
             else
             {
                 int lastLinkEndIndex = 0;
-                List<MessageFormatter.Link> linksToRemove = new List<MessageFormatter.Link>();
+                List<Link> linksToRemove = new List<Link>();
 
                 foreach (var link in message.Links)
                 {
@@ -250,10 +252,7 @@ namespace osu.Game.Overlays.Chat
                         }
                     }
 
-                    contentFlow.AddLink(message.Content.Substring(link.Index, link.Length), link.Url, sprite =>
-                    {
-                        ((ChatLink)sprite).TextColour = urlColour;
-                    });
+                    contentFlow.AddLink(message.Content.Substring(link.Index, link.Length), link.Url, link.Action, link.Argument);
                 }
 
                 var lastLink = message.Links[message.Links.Count - 1];
