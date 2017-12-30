@@ -27,7 +27,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly SliderBody Body;
         public readonly SliderBall Ball;
 
-        public DrawableSlider(Slider s) : base(s)
+        public DrawableSlider(Slider s)
+            : base(s)
         {
             slider = s;
 
@@ -50,7 +51,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 InitialCircle = new DrawableHitCircle(new HitCircle
                 {
-                    //todo: avoid creating this temporary HitCircle.
                     StartTime = s.StartTime,
                     Position = s.StackedPosition,
                     ComboIndex = s.ComboIndex,
@@ -104,6 +104,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private int currentRepeat;
         public bool Tracking;
+
+        public override double FadeInDuration
+        {
+            get { return base.FadeInDuration; }
+            set { InitialCircle.FadeInDuration = base.FadeInDuration = value; }
+        }
 
         protected override void Update()
         {
