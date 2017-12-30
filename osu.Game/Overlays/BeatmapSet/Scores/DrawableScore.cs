@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
+using static osu.Game.Rulesets.Scoring.Score;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -104,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Text = $"{score.Statistics["300"]}/{score.Statistics["100"]}/{score.Statistics["50"]}",
+                    Text = $"{score.Statistics[HitCount.Great]}/{score.Statistics[HitCount.Good]}/{score.Statistics[HitCount.Meh]}",
                     Font = @"Exo2.0-RegularItalic",
                     Margin = new MarginPadding { Right = side_margin }
                 },

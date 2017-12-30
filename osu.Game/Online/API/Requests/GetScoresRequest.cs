@@ -122,26 +122,26 @@ namespace osu.Game.Online.API.Requests
             {
                 foreach (var kvp in value)
                 {
-                    string key = kvp.Key;
-                    switch (key)
+                    HitCount newKey;
+                    switch (kvp.Key)
                     {
                         case @"count_300":
-                            key = @"300";
+                            newKey = HitCount.Great;
                             break;
                         case @"count_100":
-                            key = @"100";
+                            newKey = HitCount.Good;
                             break;
                         case @"count_50":
-                            key = @"50";
+                            newKey = HitCount.Meh;
                             break;
                         case @"count_miss":
-                            key = @"x";
+                            newKey = HitCount.Miss;
                             break;
                         default:
                             continue;
                     }
 
-                    Statistics.Add(key, kvp.Value);
+                    Statistics.Add(newKey, kvp.Value);
                 }
             }
         }
