@@ -124,9 +124,9 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        protected override void Start()
+        protected override bool OnSelectionFinalised()
         {
-            if (player != null) return;
+            if (player != null) return false;
 
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
@@ -147,7 +147,12 @@ namespace osu.Game.Screens.Select
 
             sampleConfirm?.Play();
 
-            LoadComponentAsync(player = new PlayerLoader(new Player()), l => Push(player));
+            LoadComponentAsync(player = new PlayerLoader(new Player()), l =>
+            {
+                if (IsCurrentScreen) Push(player);
+            });
+
+            return true;
         }
     }
 }
