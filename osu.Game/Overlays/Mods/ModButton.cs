@@ -66,6 +66,13 @@ namespace osu.Game.Overlays.Mods
 
                 Mod modAfter = SelectedMod ?? Mods[0];
 
+                if (!modAfter.HasImplementation)
+                {
+                    if (modAfter != modBefore)
+                        SelectedIndex += direction;
+                    return;
+                }
+
                 if (beforeSelected != Selected)
                 {
                     iconsContainer.RotateTo(Selected ? 5f : 0f, 300, Easing.OutElastic);
@@ -195,6 +202,7 @@ namespace osu.Game.Overlays.Mods
                 backgroundIcon.Icon = foregroundIcon.Icon;
             foregroundIcon.Icon = mod.Icon;
             text.Text = mod.Name;
+            Colour = mod.HasImplementation ? Color4.White : Color4.Gray;
         }
 
         private void createIcons()
