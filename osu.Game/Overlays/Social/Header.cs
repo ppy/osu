@@ -53,9 +53,9 @@ namespace osu.Game.Overlays.Social
 
     public enum SocialTab
     {
-        [Description("Online Players")]
+        [Description("Players")]
         OnlinePlayers,
-        [Description("Online Friends")]
+        [Description("Friends")]
         OnlineFriends,
         //[Description("Online Team Members")]
         //OnlineTeamMembers,
