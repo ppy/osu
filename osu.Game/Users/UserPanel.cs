@@ -114,7 +114,7 @@ namespace osu.Game.Users
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        new DrawableFlag(user.Country?.FlagName)
+                                        new DrawableFlag(user.Country)
                                         {
                                             Width = 30f,
                                             RelativeSizeAxes = Axes.Y,
