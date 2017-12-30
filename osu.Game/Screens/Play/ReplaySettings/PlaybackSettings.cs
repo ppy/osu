@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
                         Default = 1,
                         MinValue = 0.5,
                         MaxValue = 2,
-                        Precision = 0.01,
+                        Precision = 0.1,
                     },
                 }
             };
