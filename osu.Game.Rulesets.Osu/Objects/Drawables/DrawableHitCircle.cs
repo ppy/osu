@@ -88,8 +88,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT));
-            ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
+            ApproachCircle.FadeIn(Math.Min(TimeFadein * 2, TimePreempt));
+            ApproachCircle.ScaleTo(1.1f, TimePreempt);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(duration + TIME_PREEMPT).FadeOut(TIME_FADEOUT);
+                    this.Delay(duration + TimePreempt).FadeOut(TIME_FADEOUT);
                     Expire(true);
                     break;
                 case ArmedState.Miss:

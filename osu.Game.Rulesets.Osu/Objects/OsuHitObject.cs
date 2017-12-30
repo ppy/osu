@@ -24,6 +24,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         public float X => Position.X;
         public float Y => Position.Y;
 
+        public float TimePreempt;
+        public float TimeFadein;
+
         public Vector2 StackedPosition => Position + StackOffset;
 
         public virtual Vector2 EndPosition => Position;
@@ -71,6 +74,12 @@ namespace osu.Game.Rulesets.Osu.Objects
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
+
+            if (difficulty.ApproachRate >= 5)
+                TimePreempt = 1200 - (difficulty.ApproachRate - 5) * 150;
+            else
+                TimePreempt = 1800 - difficulty.ApproachRate * 120;
+            TimeFadein = TimePreempt * 0.66f;
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }

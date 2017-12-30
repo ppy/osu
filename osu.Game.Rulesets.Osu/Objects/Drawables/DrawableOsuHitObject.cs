@@ -10,20 +10,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
-        public const float TIME_PREEMPT = 600;
-        public const float TIME_FADEIN = 400;
+        public static float TimePreempt = 600;
+        public static float TimeFadein = 400;
         public const float TIME_FADEOUT = 500;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
+            TimePreempt = hitObject.TimePreempt;
+            TimeFadein = hitObject.TimeFadein;
+
             AccentColour = HitObject.ComboColour;
             Alpha = 0;
         }
 
         protected sealed override void UpdateState(ArmedState state)
         {
-            double transformTime = HitObject.StartTime - TIME_PREEMPT;
+            double transformTime = HitObject.StartTime - TimePreempt;
 
             base.ApplyTransformsAt(transformTime, true);
             base.ClearTransformsAfter(transformTime, true);
@@ -32,14 +35,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 UpdatePreemptState();
 
-                using (BeginDelayedSequence(TIME_PREEMPT + (Judgements.FirstOrDefault()?.TimeOffset ?? 0), true))
+                using (BeginDelayedSequence(TimePreempt + (Judgements.FirstOrDefault()?.TimeOffset ?? 0), true))
                     UpdateCurrentState(state);
             }
         }
 
         protected virtual void UpdatePreemptState()
         {
-            this.FadeIn(TIME_FADEIN);
+            this.FadeIn(TimeFadein);
         }
 
         protected virtual void UpdateCurrentState(ArmedState state)

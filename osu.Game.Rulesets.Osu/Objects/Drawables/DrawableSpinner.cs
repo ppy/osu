@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
             if (!spmCounter.IsPresent && disc.Tracking)
-                spmCounter.FadeIn(TIME_FADEIN);
+                spmCounter.FadeIn(TimeFadein);
 
             base.Update();
         }
@@ -190,14 +190,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdatePreemptState();
 
             circleContainer.ScaleTo(spinner.Scale * 0.3f);
-            circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, Easing.OutQuint);
+            circleContainer.ScaleTo(spinner.Scale, TimePreempt / 1.4f, Easing.OutQuint);
 
             disc.RotateTo(-720);
             symbol.RotateTo(-720);
 
             mainContainer
                 .ScaleTo(0)
-                .ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, Easing.OutQuint)
+                .ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TimePreempt - 150, Easing.OutQuint)
                 .Then()
                 .ScaleTo(1, 500, Easing.OutQuint);
         }
