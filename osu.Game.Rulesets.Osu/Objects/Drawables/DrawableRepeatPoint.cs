@@ -24,19 +24,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             this.repeatPoint = repeatPoint;
             this.drawableSlider = drawableSlider;
 
-            AutoSizeAxes = Axes.Both;
+            Size = new Vector2(32 * repeatPoint.Scale);
+
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
-            Scale = new Vector2(0.5f);
 
             Children = new Drawable[]
             {
                 new SpriteIcon
                 {
-                    Icon = FontAwesome.fa_eercast,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(32),
+                    RelativeSizeAxes = Axes.Both,
+                    Icon = FontAwesome.fa_eercast
                 }
             };
         }
