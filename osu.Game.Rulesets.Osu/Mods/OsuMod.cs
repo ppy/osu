@@ -42,17 +42,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
-                d.ApplyCustomValues += ApplyHiddenValues;
                 d.ApplyCustomUpdateState += ApplyHiddenState;
+                d.FadeInDuration = preEmpt * fade_in_duration_multiplier;
             }
-        }
-
-        protected void ApplyHiddenValues(DrawableHitObject drawable)
-        {
-            if (!(drawable is DrawableOsuHitObject d))
-                return;
-
-            d.FadeInDuration = preEmpt * fade_in_duration_multiplier;
         }
 
         protected void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
