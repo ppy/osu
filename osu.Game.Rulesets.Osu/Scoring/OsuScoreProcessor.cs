@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using static osu.Game.Rulesets.Scoring.Score;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
@@ -33,8 +34,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             foreach (var obj in beatmap.HitObjects)
             {
-                var slider = obj as Slider;
-                if (slider != null)
+                if (obj is Slider slider)
                 {
                     // Head
                     AddJudgement(new OsuJudgement { Result = HitResult.Great });
@@ -64,10 +64,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             base.PopulateScore(score);
 
-            score.Statistics[@"300"] = scoreResultCounts.GetOrDefault(HitResult.Great);
-            score.Statistics[@"100"] = scoreResultCounts.GetOrDefault(HitResult.Good);
-            score.Statistics[@"50"] = scoreResultCounts.GetOrDefault(HitResult.Meh);
-            score.Statistics[@"x"] = scoreResultCounts.GetOrDefault(HitResult.Miss);
+            score.Statistics[HitCount.Great] = scoreResultCounts.GetOrDefault(HitResult.Great);
+            score.Statistics[HitCount.Good] = scoreResultCounts.GetOrDefault(HitResult.Good);
+            score.Statistics[HitCount.Meh] = scoreResultCounts.GetOrDefault(HitResult.Meh);
+            score.Statistics[HitCount.Miss] = scoreResultCounts.GetOrDefault(HitResult.Miss);
         }
 
         protected override void OnNewJudgement(Judgement judgement)

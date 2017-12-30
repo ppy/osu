@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
+using static osu.Game.Rulesets.Scoring.Score;
 
 namespace osu.Game.Tests.Visual
 {
@@ -41,12 +42,12 @@ namespace osu.Game.Tests.Visual
                 MaxCombo = 123,
                 Rank = ScoreRank.A,
                 Date = DateTimeOffset.Now,
-                Statistics = new Dictionary<string, dynamic>
+                Statistics = new Dictionary<HitCount, dynamic>
                 {
-                    { "300", 50 },
-                    { "100", 20 },
-                    { "50", 50 },
-                    { "x", 1 }
+                    { HitCount.Great, 50 },
+                    { HitCount.Good, 20 },
+                    { HitCount.Meh, 50 },
+                    { HitCount.Miss, 1 }
                 },
                 User = new User
                 {
