@@ -7,7 +7,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 using osu.Game.Rulesets.Replays;
-using System.ComponentModel;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -41,21 +40,6 @@ namespace osu.Game.Rulesets.Scoring
 
         public DateTimeOffset Date;
 
-        public Dictionary<HitCount, object> Statistics = new Dictionary<HitCount, object>();
-
-        public enum HitCount
-        {
-            [Description("300")]
-            Great,
-
-            [Description("100")]
-            Good,
-
-            [Description("50")]
-            Meh,
-
-            [Description("x")]
-            Miss
-        }
+        public Dictionary<HitResult, object> Statistics = new Dictionary<HitResult, object>();
     }
 }

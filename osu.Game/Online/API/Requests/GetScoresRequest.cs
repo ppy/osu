@@ -122,20 +122,20 @@ namespace osu.Game.Online.API.Requests
             {
                 foreach (var kvp in value)
                 {
-                    HitCount newKey;
+                    HitResult newKey;
                     switch (kvp.Key)
                     {
                         case @"count_300":
-                            newKey = HitCount.Great;
+                            newKey = HitResult.Great;
                             break;
                         case @"count_100":
-                            newKey = HitCount.Good;
+                            newKey = HitResult.Good;
                             break;
                         case @"count_50":
-                            newKey = HitCount.Meh;
+                            newKey = HitResult.Meh;
                             break;
                         case @"count_miss":
-                            newKey = HitCount.Miss;
+                            newKey = HitResult.Miss;
                             break;
                         default:
                             continue;

@@ -23,7 +23,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 using osu.Framework.Graphics.Shapes;
-using static osu.Game.Rulesets.Scoring.Score;
 using osu.Framework.Extensions;
 
 namespace osu.Game.Screens.Ranking
@@ -188,9 +187,9 @@ namespace osu.Game.Screens.Ranking
 
         private class DrawableScoreStatistic : Container
         {
-            private readonly KeyValuePair<HitCount, object> statistic;
+            private readonly KeyValuePair<HitResult, object> statistic;
 
-            public DrawableScoreStatistic(KeyValuePair<HitCount, object> statistic)
+            public DrawableScoreStatistic(KeyValuePair<HitResult, object> statistic)
             {
                 this.statistic = statistic;
 

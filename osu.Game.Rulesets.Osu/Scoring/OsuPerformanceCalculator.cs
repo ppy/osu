@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
-using static osu.Game.Rulesets.Scoring.Score;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
@@ -42,10 +41,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
             mods = Score.Mods;
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
-            count300 = Convert.ToInt32(Score.Statistics[HitCount.Great]);
-            count100 = Convert.ToInt32(Score.Statistics[HitCount.Good]);
-            count50 = Convert.ToInt32(Score.Statistics[HitCount.Meh]);
-            countMiss = Convert.ToInt32(Score.Statistics[HitCount.Miss]);
+            count300 = Convert.ToInt32(Score.Statistics[HitResult.Great]);
+            count100 = Convert.ToInt32(Score.Statistics[HitResult.Good]);
+            count50 = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
+            countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))

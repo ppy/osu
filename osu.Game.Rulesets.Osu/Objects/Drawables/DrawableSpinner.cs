@@ -13,6 +13,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Screens.Ranking;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {

@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
-using static osu.Game.Rulesets.Scoring.Score;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -59,7 +58,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 totalScore.Value = $@"{score.TotalScore:N0}";
                 accuracy.Value = $@"{score.Accuracy:P2}";
-                statistics.Value = $"{score.Statistics[HitCount.Great]}/{score.Statistics[HitCount.Good]}/{score.Statistics[HitCount.Meh]}";
+                statistics.Value = $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Meh]}";
 
                 modsContainer.Clear();
                 foreach (Mod mod in score.Mods)
