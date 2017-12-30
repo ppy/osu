@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
-using static osu.Game.Rulesets.Scoring.Score;
 
 namespace osu.Game.Tests.Visual
 {
@@ -161,9 +160,9 @@ namespace osu.Game.Tests.Visual
             };
             foreach(var s in scores)
             {
-                s.Statistics.Add(HitCount.Great, RNG.Next(2000));
-                s.Statistics.Add(HitCount.Good, RNG.Next(2000));
-                s.Statistics.Add(HitCount.Meh, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Great, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Good, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
             }
 
             anotherScores = new[]
@@ -273,9 +272,9 @@ namespace osu.Game.Tests.Visual
             };
             foreach (var s in anotherScores)
             {
-                s.Statistics.Add(HitCount.Great, RNG.Next(2000));
-                s.Statistics.Add(HitCount.Good, RNG.Next(2000));
-                s.Statistics.Add(HitCount.Meh, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Great, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Good, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
             }
 
             topScore = new OnlineScore
@@ -300,9 +299,9 @@ namespace osu.Game.Tests.Visual
                 TotalScore = 987654321,
                 Accuracy = 0.8487,
             };
-            topScore.Statistics.Add(HitCount.Great, RNG.Next(2000));
-            topScore.Statistics.Add(HitCount.Good, RNG.Next(2000));
-            topScore.Statistics.Add(HitCount.Meh, RNG.Next(2000));
+            topScore.Statistics.Add(HitResult.Great, RNG.Next(2000));
+            topScore.Statistics.Add(HitResult.Good, RNG.Next(2000));
+            topScore.Statistics.Add(HitResult.Meh, RNG.Next(2000));
         }
 
         [BackgroundDependencyLoader]

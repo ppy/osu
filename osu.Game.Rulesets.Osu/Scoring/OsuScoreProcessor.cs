@@ -6,13 +6,11 @@ using System.Linq;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using static osu.Game.Rulesets.Scoring.Score;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
@@ -64,10 +62,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             base.PopulateScore(score);
 
-            score.Statistics[HitCount.Great] = scoreResultCounts.GetOrDefault(HitResult.Great);
-            score.Statistics[HitCount.Good] = scoreResultCounts.GetOrDefault(HitResult.Good);
-            score.Statistics[HitCount.Meh] = scoreResultCounts.GetOrDefault(HitResult.Meh);
-            score.Statistics[HitCount.Miss] = scoreResultCounts.GetOrDefault(HitResult.Miss);
+            score.Statistics[HitResult.Great] = scoreResultCounts.GetOrDefault(HitResult.Great);
+            score.Statistics[HitResult.Good] = scoreResultCounts.GetOrDefault(HitResult.Good);
+            score.Statistics[HitResult.Meh] = scoreResultCounts.GetOrDefault(HitResult.Meh);
+            score.Statistics[HitResult.Miss] = scoreResultCounts.GetOrDefault(HitResult.Miss);
         }
 
         protected override void OnNewJudgement(Judgement judgement)
