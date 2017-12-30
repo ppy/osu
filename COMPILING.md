@@ -21,11 +21,6 @@ Simply run `msbuild` where `osu.sln` is located, this will create all binaries i
 If you want additional performance you can change build type to Release with
 ```
 msbuild -p:Configuration=Release
-```
-Additionally, mono provides an AOT utility which attempts to precompile binaries. You can utilize that by running
-```
-mono --aot ./osu\!.exe
-```
 ### 5. Troubleshooting
 You may run into trouble with NuGet versioning, as the one in packaging system is almost always out of date. Simply run 
 ```
@@ -61,9 +56,6 @@ If you want additional performance you can change build type to Release with
 ```
 msbuild -p:Configuration=Release
 ```
-Additionally, mono provides an AOT utility which attempts to precompile binaries. You can utilize that by running
-```
-mono --aot ./osu\!.exe
-```
+
 ### 5. Troubleshooting
 If you see several errors referencing `netstandard 2.0.0` it means you have installed `homebrew mono` not `homebrew cask mono-mdk`. Refer back to Requirements.
