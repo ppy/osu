@@ -311,10 +311,9 @@ namespace osu.Game.Screens.Play
             if (!loadedSuccessfully)
                 return;
 
-            dimLevel.ValueChanged += backgroundLevel_ValueChanged;
-            blurLevel.ValueChanged += backgroundLevel_ValueChanged;
-
-            showStoryboard.ValueChanged += showStoryboard_ValueChanged;
+            dimLevel.ValueChanged += value => updateBackgroundElements();
+            blurLevel.ValueChanged += value => updateBackgroundElements();
+            showStoryboard.ValueChanged += value => updateBackgroundElements();
             updateBackgroundElements();
 
             Content.Alpha = 0;
@@ -370,12 +369,6 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        private void backgroundLevel_ValueChanged(double newValue)
-            => updateBackgroundElements();
-
-        private void showStoryboard_ValueChanged(bool newValue)
-            => updateBackgroundElements();
-
         private void updateBackgroundElements()
         {
             var opacity = 1 - (float)dimLevel;
@@ -396,10 +389,6 @@ namespace osu.Game.Screens.Play
 
         private void fadeOut()
         {
-            dimLevel.ValueChanged -= backgroundLevel_ValueChanged;
-            blurLevel.ValueChanged -= backgroundLevel_ValueChanged;
-            showStoryboard.ValueChanged -= showStoryboard_ValueChanged;
-
             const float fade_out_duration = 250;
 
             RulesetContainer?.FadeOut(fade_out_duration);
