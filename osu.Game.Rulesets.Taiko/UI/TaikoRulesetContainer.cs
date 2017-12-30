@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
-        protected override Playfield CreatePlayfield() => new TaikoPlayfield
+        protected override Playfield CreatePlayfield() => new TaikoPlayfield(Beatmap.ControlPointInfo)
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft

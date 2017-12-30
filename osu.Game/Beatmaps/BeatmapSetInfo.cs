@@ -33,6 +33,8 @@ namespace osu.Game.Beatmaps
 
         public List<BeatmapSetFileInfo> Files { get; set; }
 
+        public override string ToString() => Metadata.ToString();
+
         public bool Protected { get; set; }
     }
 }

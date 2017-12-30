@@ -13,18 +13,18 @@ namespace osu.Game.Beatmaps.Formats
     {
         public static void Register()
         {
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v14");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v13");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v12");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v11");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v10");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v9");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v8");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v7");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v6");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v5");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v4");
-            AddDecoder<LegacyBeatmapDecoder>(@"osu file format v3");
+            AddDecoder(@"osu file format v14", m => new LegacyBeatmapDecoder(m));
+            AddDecoder(@"osu file format v13", m => new LegacyBeatmapDecoder(m));
+            AddDecoder(@"osu file format v12", m => new LegacyBeatmapDecoder(m));
+            AddDecoder(@"osu file format v11", m => new LegacyBeatmapDecoder(m));
+            AddDecoder(@"osu file format v10", m => new LegacyBeatmapDecoder(m));
+            AddDecoder(@"osu file format v9", m => new LegacyBeatmapDecoder(m));
+            AddDecoder(@"osu file format v8", m => new LegacyBeatmapDecoder(m));
+            AddDecoder(@"osu file format v7", m => new LegacyBeatmapDecoder(m));
+            AddDecoder(@"osu file format v6", m => new LegacyBeatmapDecoder(m));
+            AddDecoder(@"osu file format v5", m => new LegacyBeatmapDecoder(m));
+            AddDecoder(@"osu file format v4", m => new LegacyBeatmapDecoder(m));
+            AddDecoder(@"osu file format v3", m => new LegacyBeatmapDecoder(m));
             // TODO: differences between versions
         }
 

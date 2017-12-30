@@ -134,6 +134,7 @@ namespace osu.Game.Beatmaps
             var notification = new ProgressNotification
             {
                 Text = "Beatmap import is initialising...",
+                CompletionText = "Import successful!",
                 Progress = 0,
                 State = ProgressNotificationState.Active,
             };
@@ -245,8 +246,9 @@ namespace osu.Game.Beatmaps
                 return;
             }
 
-            ProgressNotification downloadNotification = new ProgressNotification
+            var downloadNotification = new ProgressNotification
             {
+                CompletionText = $"Imported {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
                 Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
             };
 
@@ -339,6 +341,61 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        public void UndeleteAll()
+        {
+            var deleteMaps = QueryBeatmapSets(bs => bs.DeletePending).ToList();
+
+            if (!deleteMaps.Any()) return;
+
+            var notification = new ProgressNotification
+            {
+                CompletionText = "Restored all deleted beatmaps!",
+                Progress = 0,
+                State = ProgressNotificationState.Active,
+            };
+
+            PostNotification?.Invoke(notification);
+
+            int i = 0;
+
+            foreach (var bs in deleteMaps)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
+                notification.Text = $"Restoring ({i} of {deleteMaps.Count})";
+                notification.Progress = (float)++i / deleteMaps.Count;
+                Undelete(bs);
+            }
+
+            notification.State = ProgressNotificationState.Completed;
+        }
+
+        public void Undelete(BeatmapSetInfo beatmapSet)
+        {
+            if (beatmapSet.Protected)
+                return;
+
+            lock (importContext)
+            {
+                var context = importContext.Value;
+
+                using (var transaction = context.BeginTransaction())
+                {
+                    context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                    var iFiles = new FileStore(() => context, storage);
+                    var iBeatmaps = createBeatmapStore(() => context);
+
+                    undelete(iBeatmaps, iFiles, beatmapSet);
+
+                    context.ChangeTracker.AutoDetectChangesEnabled = true;
+                    context.SaveChanges(transaction);
+                }
+            }
+        }
+
         /// <summary>
         /// Delete a beatmap difficulty.
         /// </summary>
@@ -374,11 +431,8 @@ namespace osu.Game.Beatmaps
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
-            if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
+            if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
-
-            if (beatmapInfo.BeatmapSet == null)
-                throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
 
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
@@ -497,15 +551,21 @@ namespace osu.Game.Beatmaps
             using (var stream = new StreamReader(reader.GetStream(mapName)))
                 metadata = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
 
+
             // check if a set already exists with the same online id.
-            beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID) ?? new BeatmapSetInfo
-            {
-                OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
-                Beatmaps = new List<BeatmapInfo>(),
-                Hash = hash,
-                Files = fileInfos,
-                Metadata = metadata
-            };
+            if (metadata.OnlineBeatmapSetID != null)
+                beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID);
+
+            if (beatmapSet == null)
+                beatmapSet = new BeatmapSetInfo
+                {
+                    OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
+                    Beatmaps = new List<BeatmapInfo>(),
+                    Hash = hash,
+                    Files = fileInfos,
+                    Metadata = metadata
+                };
+
 
             var mapNames = reader.Filenames.Where(f => f.EndsWith(".osu"));
 
@@ -525,12 +585,13 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
-                    var existing = beatmaps.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.BeatmapInfo.Hash || b.OnlineBeatmapID == beatmap.BeatmapInfo.OnlineBeatmapID);
+                    var existing = beatmaps.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.BeatmapInfo.Hash || beatmap.BeatmapInfo.OnlineBeatmapID != null && b.OnlineBeatmapID == beatmap.BeatmapInfo.OnlineBeatmapID);
 
                     if (existing == null)
                     {
-                        // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
-                        beatmap.BeatmapInfo.Metadata = null;
+                        // Exclude beatmap-metadata if it's equal to beatmapset-metadata
+                        if (metadata.Equals(beatmap.Metadata))
+                            beatmap.BeatmapInfo.Metadata = null;
 
                         RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
 
@@ -636,10 +697,12 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
+
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public void ImportFromStable()
+        public async Task ImportFromStable()
         {
             var stable = GetStableStorage?.Invoke();
 
@@ -649,7 +712,7 @@ namespace osu.Game.Beatmaps
                 return;
             }
 
-            Import(stable.GetDirectories("Songs"));
+            await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs")), TaskCreationOptions.LongRunning);
         }
 
         public void DeleteAll()
@@ -661,6 +724,7 @@ namespace osu.Game.Beatmaps
             var notification = new ProgressNotification
             {
                 Progress = 0,
+                CompletionText = "Deleted all beatmaps!",
                 State = ProgressNotificationState.Active,
             };
 

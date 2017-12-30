@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public class NotificationSection : FillFlowContainer
+    public class NotificationSection : AlwaysUpdateFillFlowContainer<Drawable>
     {
         private OsuSpriteText titleText;
         private OsuSpriteText countText;
@@ -26,11 +26,14 @@ namespace osu.Game.Overlays.Notifications
 
         public int DisplayedCount => notifications.Count(n => !n.WasClosed);
 
+        public int UnreadCount => notifications.Count(n => !n.WasClosed && !n.Read);
+
         public void Add(Notification notification) => notifications.Add(notification);
 
         public IEnumerable<Type> AcceptTypes;
 
         private string clearText;
+
         public string ClearText
         {
             get { return clearText; }
@@ -108,7 +111,7 @@ namespace osu.Game.Overlays.Notifications
                         },
                     },
                 },
-                notifications = new FillFlowContainer<Notification>
+                notifications = new AlwaysUpdateFillFlowContainer<Notification>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
@@ -157,4 +160,13 @@ namespace osu.Game.Overlays.Notifications
             notifications?.Children.ForEach(n => n.Read = true);
         }
     }
+
+    public class AlwaysUpdateFillFlowContainer<T> : FillFlowContainer<T>
+        where T : Drawable
+    {
+        // this is required to ensure correct layout and scheduling on children.
+        // the layout portion of this is being tracked as a framework issue (https://github.com/ppy/osu-framework/issues/1297).
+        protected override bool RequiresChildrenUpdate => true;
+    }
+
 }

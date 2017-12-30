@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays.MedalSplash
                             Alpha = 0f,
                             Scale = new Vector2(1f / scale_when_full),
                         },
-                        description = new TextFlowContainer
+                        description = new OsuTextFlowContainer
                         {
                             TextAnchor = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,

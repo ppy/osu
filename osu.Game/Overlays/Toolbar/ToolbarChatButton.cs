@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Toolbar
             SetIcon(FontAwesome.fa_comments);
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(ChatOverlay chat)
         {
             StateContainer = chat;

@@ -75,7 +75,7 @@ namespace osu.Game.Users
         public bool Active;
 
         [JsonProperty(@"interests")]
-        public string Intrerests;
+        public string Interests;
 
         [JsonProperty(@"occupation")]
         public string Occupation;
@@ -136,5 +136,7 @@ namespace osu.Game.Users
 
         [JsonProperty(@"rankHistory")]
         public RankHistoryData RankHistory;
+
+        public override string ToString() => Username;
     }
 }
