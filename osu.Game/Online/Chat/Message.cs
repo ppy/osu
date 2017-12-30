@@ -41,7 +41,7 @@ namespace osu.Game.Online.Chat
         {
         }
 
-        public List<MessageFormatter.Link> Links;
+        public List<Link> Links;
 
         public Message(long? id)
         {

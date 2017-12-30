@@ -39,7 +39,7 @@ namespace osu.Game.Online.Chat
         // Unicode emojis
         private static readonly Regex emoji_regex = new Regex(@"(\uD83D[\uDC00-\uDE4F])");
 
-        private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0)
+        private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null)
         {
             int captureOffset = 0;
             foreach (Match m in regex.Matches(result.Text, startIndex))
@@ -66,7 +66,8 @@ namespace osu.Game.Online.Chat
                     //since we just changed the line display text, offset any already processed links.
                     result.Links.ForEach(l => l.Index -= l.Index > index ? m.Length - displayText.Length : 0);
 
-                    result.Links.Add(new Link(linkText, index, displayText.Length));
+                    var details = getLinkDetails(link);
+                    result.Links.Add(new Link(linkText, index, displayText.Length, linkActionOverride ?? details.linkType, details.linkArgument));
 
                     //adjust the offset for processing the current matches group.
                     captureOffset += m.Length - displayText.Length;
@@ -93,7 +94,70 @@ namespace osu.Game.Online.Chat
                     }
                 }
 
-                result.Links.Add(new Link(link, index, indexLength));
+                var details = getLinkDetails(link);
+                result.Links.Add(new Link(link, index, indexLength, details.linkType, details.linkArgument));
+            }
+        }
+
+        private static (LinkAction linkType, string linkArgument) getLinkDetails(string url)
+        {
+            var args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            args[0] = args[0].TrimEnd(':');
+
+            switch (args[0])
+            {
+                case "http":
+                case "https":
+                    // length > 3 since all these links need another argument to work
+                    if (args.Length > 3 && (args[1] == "osu.ppy.sh" || args[1] == "new.ppy.sh"))
+                    {
+                        switch (args[2])
+                        {
+                            case "b":
+                            case "beatmaps":
+                                return (LinkAction.OpenBeatmap, args[3]);
+                            case "s":
+                            case "beatmapsets":
+                            case "d":
+                                return (LinkAction.External, args[3]);
+                        }
+                    }
+
+                    return (LinkAction.External, null);
+                case "osu":
+                    // every internal link also needs some kind of argument
+                    if (args.Length < 3)
+                        return (LinkAction.External, null);
+
+                    LinkAction linkType;
+                    switch (args[1])
+                    {
+                        case "chan":
+                            linkType = LinkAction.OpenChannel;
+                            break;
+                        case "edit":
+                            linkType = LinkAction.OpenEditorTimestamp;
+                            break;
+                        case "b":
+                            linkType = LinkAction.OpenBeatmap;
+                            break;
+                        case "s":
+                        case "dl":
+                            linkType = LinkAction.OpenBeatmapSet;
+                            break;
+                        case "spectate":
+                            linkType = LinkAction.Spectate;
+                            break;
+                        default:
+                            linkType = LinkAction.External;
+                            break;
+                    }
+
+                    return (linkType, args[2]);
+                case "osump":
+                    return (LinkAction.JoinMultiplayerMatch, args[1]);
+                default:
+                    return (LinkAction.External, null);
             }
         }
 
@@ -114,10 +178,10 @@ namespace osu.Game.Online.Chat
             handleAdvanced(advanced_link_regex, result, startIndex);
 
             // handle editor times
-            handleMatches(time_regex, "{0}", "osu://edit/{0}", result, startIndex);
+            handleMatches(time_regex, "{0}", "osu://edit/{0}", result, startIndex, LinkAction.OpenEditorTimestamp);
 
             // handle channels
-            handleMatches(channel_regex, "{0}", "osu://chan/{0}", result, startIndex);
+            handleMatches(channel_regex, "{0}", "osu://chan/{0}", result, startIndex, LinkAction.OpenChannel);
 
             var empty = "";
             while (space-- > 0)
@@ -151,21 +215,36 @@ namespace osu.Game.Online.Chat
                 OriginalText = Text = text;
             }
         }
+    }
 
-        public class Link : IComparable<Link>
+    public enum LinkAction
+    {
+        External,
+        OpenBeatmap,
+        OpenBeatmapSet,
+        OpenChannel,
+        OpenEditorTimestamp,
+        JoinMultiplayerMatch,
+        Spectate,
+    }
+
+    public class Link : IComparable<Link>
+    {
+        public string Url;
+        public int Index;
+        public int Length;
+        public LinkAction Action;
+        public string Argument;
+
+        public Link(string url, int startIndex, int length, LinkAction action, string argument)
         {
-            public string Url;
-            public int Index;
-            public int Length;
-
-            public Link(string url, int startIndex, int length)
-            {
-                Url = url;
-                Index = startIndex;
-                Length = length;
-            }
-
-            public int CompareTo(Link otherLink) => Index > otherLink.Index ? 1 : -1;
+            Url = url;
+            Index = startIndex;
+            Length = length;
+            Action = action;
+            Argument = argument;
         }
+
+        public int CompareTo(Link otherLink) => Index > otherLink.Index ? 1 : -1;
     }
 }
