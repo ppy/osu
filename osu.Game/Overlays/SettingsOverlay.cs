@@ -54,7 +54,6 @@ namespace osu.Game.Overlays
         {
             this.showSidebar = showSidebar;
             RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
         }
 
         protected virtual IEnumerable<SettingsSection> CreateSections() => null;
@@ -176,8 +175,6 @@ namespace osu.Game.Overlays
         }
 
         public override bool AcceptsFocus => true;
-
-        protected override bool OnClick(InputState state) => true;
 
         protected override void OnFocus(InputState state)
         {
