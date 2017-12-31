@@ -17,7 +17,7 @@ namespace osu.Game.Screens
     {
         private bool showDisclaimer;
 
-        public override bool ShowOverlays => false;
+        public override bool ShowOverlaysOnEnter => false;
 
         public Loader()
         {

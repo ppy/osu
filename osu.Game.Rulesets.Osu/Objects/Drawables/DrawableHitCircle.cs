@@ -6,8 +6,8 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
-        public DrawableHitCircle(OsuHitObject h) : base(h)
+        public DrawableHitCircle(HitCircle h) : base(h)
         {
             Origin = Anchor.Centre;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 number = new NumberPiece
                 {
-                    Text = h is Spinner ? "S" : (HitObject.ComboIndex + 1).ToString(),
+                    Text = (HitObject.ComboIndex + 1).ToString(),
                 },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
@@ -88,25 +88,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT));
+            ApproachCircle.FadeIn(Math.Min(FadeInDuration * 2, TIME_PREEMPT));
             ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            double duration = ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime) - HitObject.StartTime;
-
-            glow.Delay(duration).FadeOut(400);
+            glow.FadeOut(400);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(duration + TIME_PREEMPT).FadeOut(TIME_FADEOUT);
+                    this.Delay(TIME_PREEMPT).FadeOut(500);
+
                     Expire(true);
+
+                    // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
+                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindowFor(HitResult.Miss);
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
-                    this.FadeOut(TIME_FADEOUT / 5);
+                    this.FadeOut(100);
                     Expire();
                     break;
                 case ArmedState.Hit:
