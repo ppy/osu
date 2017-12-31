@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 TimePreempt = 1200 - (difficulty.ApproachRate - 5) * 150;
             else
                 TimePreempt = 1800 - difficulty.ApproachRate * 120;
-            TimeFadein = TimePreempt / 3;
+            TimeFadein = TimePreempt * 0.66f;
 
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;

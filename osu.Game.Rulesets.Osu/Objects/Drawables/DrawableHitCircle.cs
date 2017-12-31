@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            ApproachCircle.FadeIn(Math.Min(FadeInDuration * 2, HitObject.TimePreempt));
+            ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadein * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
         }
 

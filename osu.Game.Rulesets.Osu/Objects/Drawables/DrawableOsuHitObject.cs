@@ -10,18 +10,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
-        /// <summary>
-        /// The number of milliseconds used to fade in.
-        /// </summary>
-        public virtual double FadeInDuration { get; set; }
-
         public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Time.Current >= HitObject.StartTime - HitObject.TimePreempt;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
-            FadeInDuration = hitObject.TimeFadein;
-
             AccentColour = HitObject.ComboColour;
             Alpha = 0;
         }
@@ -42,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected virtual void UpdatePreemptState() => this.FadeIn(FadeInDuration);
+        protected virtual void UpdatePreemptState() => this.FadeIn(HitObject.TimeFadein);
 
         protected virtual void UpdateCurrentState(ArmedState state)
         {
