@@ -4,15 +4,19 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
+using System;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableFruit : DrawableCatchHitObject<Fruit>
     {
+        private Circle border;
+
         public DrawableFruit(Fruit h)
             : base(h)
         {
@@ -69,7 +73,25 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             AccentColour = AccentColour,
                         },
                     }
-                }
+                },
+                border = new Circle
+                {
+                    Size = new Vector2(Pulp.PULP_SIZE * 3.5f),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    BorderColour = AccentColour,
+                    BorderThickness = 3,
+                    Children = new Framework.Graphics.Drawable[]
+                    {
+                        new Box
+                        {
+                            AlwaysPresent = true,
+                            Colour = AccentColour,
+                            Alpha = 0,
+                            RelativeSizeAxes = Axes.Both
+                        }
+                    }
+                },
             };
 
             if (HitObject.HyperDash)
@@ -85,6 +107,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     Scale = new Vector2(2)
                 });
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            border.Alpha = (float)MathHelper.Clamp((HitObject.StartTime - Time.Current) / 1000, 0, 1);
         }
     }
 }
