@@ -101,15 +101,26 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Storage> GetStableStorage { private get; set; }
 
+        private void refreshImportContext()
+        {
+            lock (importContextLock)
+            {
+                importContext?.Value?.Dispose();
+
+                importContext = new Lazy<OsuDbContext>(() =>
+                {
+                    var c = createContext();
+                    c.Database.AutoTransactionsEnabled = false;
+                    return c;
+                });
+            }
+        }
+
         public BeatmapManager(Storage storage, Func<OsuDbContext> context, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
         {
             createContext = context;
-            importContext = new Lazy<OsuDbContext>(() =>
-            {
-                var c = createContext();
-                c.Database.AutoTransactionsEnabled = false;
-                return c;
-            });
+
+            refreshImportContext();
 
             beatmaps = createBeatmapStore(context);
             files = new FileStore(context, storage);
@@ -174,13 +185,16 @@ namespace osu.Game.Beatmaps
                 {
                     e = e.InnerException ?? e;
                     Logger.Error(e, $@"Could not import beatmap set ({Path.GetFileName(path)})");
+                    refreshImportContext();
                 }
             }
 
             notification.State = ProgressNotificationState.Completed;
         }
 
-        private readonly Lazy<OsuDbContext> importContext;
+        private readonly object importContextLock = new object();
+
+        private Lazy<OsuDbContext> importContext;
 
         /// <summary>
         /// Import a beatmap from an <see cref="ArchiveReader"/>.
@@ -189,7 +203,7 @@ namespace osu.Game.Beatmaps
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
             // let's only allow one concurrent import at a time for now.
-            lock (importContext)
+            lock (importContextLock)
             {
                 var context = importContext.Value;
 
@@ -314,7 +328,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap set to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            lock (importContext)
+            lock (importContextLock)
             {
                 var context = importContext.Value;
 
@@ -377,7 +391,7 @@ namespace osu.Game.Beatmaps
             if (beatmapSet.Protected)
                 return;
 
-            lock (importContext)
+            lock (importContextLock)
             {
                 var context = importContext.Value;
 
