@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Menu
 
         public override bool HasLocalCursorDisplayed => true;
 
-        public override bool ShowOverlays => false;
+        public override bool ShowOverlaysOnEnter => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();
 

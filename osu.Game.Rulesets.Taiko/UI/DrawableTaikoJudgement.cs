@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {

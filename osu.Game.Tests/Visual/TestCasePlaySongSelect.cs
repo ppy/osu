@@ -26,6 +26,7 @@ namespace osu.Game.Tests.Visual
         private RulesetStore rulesets;
 
         private DependencyContainer dependencies;
+        private WorkingBeatmap defaultBeatmap;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -47,31 +48,61 @@ namespace osu.Game.Tests.Visual
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
 
+        private class TestSongSelect : PlaySongSelect
+        {
+            public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
+            public new BeatmapCarousel Carousel => base.Carousel;
+        }
+
         [BackgroundDependencyLoader]
         private void load(BeatmapManager baseManager)
         {
-            PlaySongSelect songSelect;
+            TestSongSelect songSelect = null;
 
-            if (manager == null)
+            var storage = new TestStorage(@"TestCasePlaySongSelect");
+
+            // this is by no means clean. should be replacing inside of OsuGameBase somehow.
+            var context = new OsuDbContext();
+
+            Func<OsuDbContext> contextFactory = () => context;
+
+            dependencies.Cache(rulesets = new RulesetStore(contextFactory));
+            dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
             {
-                var storage = new TestStorage(@"TestCasePlaySongSelect");
+                DefaultBeatmap = defaultBeatmap = baseManager.GetWorkingBeatmap(null)
+            });
 
-                // this is by no means clean. should be replacing inside of OsuGameBase somehow.
-                var context = new OsuDbContext();
+            void loadNewSongSelect(bool deleteMaps = false) => AddStep("reload song select", () =>
+            {
+                if (deleteMaps) manager.DeleteAll();
 
-                Func<OsuDbContext> contextFactory = () => context;
-
-                dependencies.Cache(rulesets = new RulesetStore(contextFactory));
-                dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
+                if (songSelect != null)
                 {
-                    DefaultBeatmap = baseManager.GetWorkingBeatmap(null)
-                });
+                    Remove(songSelect);
+                    songSelect.Dispose();
+                }
 
+                Add(songSelect = new TestSongSelect());
+            });
+
+            loadNewSongSelect(true);
+
+            AddWaitStep(3);
+
+            AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
+
+            AddStep("import test maps", () =>
+            {
                 for (int i = 0; i < 100; i += 10)
                     manager.Import(createTestBeatmapSet(i));
-            }
+            });
 
-            Add(songSelect = new PlaySongSelect());
+            AddWaitStep(3);
+            AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
+
+            loadNewSongSelect();
+            AddWaitStep(3);
+            AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
             AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
             AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });

@@ -3,7 +3,7 @@
 
 using System.ComponentModel;
 
-namespace osu.Game.Rulesets.Objects.Drawables
+namespace osu.Game.Rulesets.Scoring
 {
     public enum HitResult
     {

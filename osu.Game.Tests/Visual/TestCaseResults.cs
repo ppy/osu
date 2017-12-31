@@ -15,6 +15,15 @@ namespace osu.Game.Tests.Visual
     {
         private BeatmapManager beatmaps;
 
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(Score),
+            typeof(Results),
+            typeof(ResultsPage),
+            typeof(ResultsPageScore),
+            typeof(ResultsPageRanking)
+        };
+
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmaps)
         {
@@ -41,12 +50,12 @@ namespace osu.Game.Tests.Visual
                 MaxCombo = 123,
                 Rank = ScoreRank.A,
                 Date = DateTimeOffset.Now,
-                Statistics = new Dictionary<string, dynamic>
+                Statistics = new Dictionary<HitResult, dynamic>
                 {
-                    { "300", 50 },
-                    { "100", 20 },
-                    { "50", 50 },
-                    { "x", 1 }
+                    { HitResult.Great, 50 },
+                    { HitResult.Good, 20 },
+                    { HitResult.Meh, 50 },
+                    { HitResult.Miss, 1 }
                 },
                 User = new User
                 {
