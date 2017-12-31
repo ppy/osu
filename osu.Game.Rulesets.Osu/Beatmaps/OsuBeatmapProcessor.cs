@@ -37,7 +37,6 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         private void applyStacking(Beatmap<OsuHitObject> beatmap)
         {
             const int stack_distance = 3;
-            float stackThreshold = DrawableOsuHitObject.TIME_PREEMPT * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
 
             // Reset stacking
             for (int i = 0; i <= beatmap.HitObjects.Count - 1; i++)
@@ -58,6 +57,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         continue;
 
                     double endTime = (stackBaseObject as IHasEndTime)?.EndTime ?? stackBaseObject.StartTime;
+                    float stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
 
                     if (objectN.StartTime - endTime > stackThreshold)
                         //We are no longer within stacking range of the next object.
@@ -112,6 +112,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         if (objectN is Spinner) continue;
 
                         double endTime = (objectN as IHasEndTime)?.EndTime ?? objectN.StartTime;
+                        float stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
 
                         if (objectI.StartTime - endTime > stackThreshold)
                             //We are no longer within stacking range of the previous object.
@@ -164,6 +165,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     {
                         OsuHitObject objectN = beatmap.HitObjects[n];
                         if (objectN is Spinner) continue;
+
+                        float stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
 
                         if (objectI.StartTime - objectN.StartTime > stackThreshold)
                             //We are no longer within stacking range of the previous object.

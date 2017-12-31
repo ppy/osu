@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         private const double hit_window_100 = 80;
         private const double hit_window_300 = 30;
 
+        public float TimePreempt = 600;
+        public float TimeFadein = 400;
+
         public Vector2 Position { get; set; }
         public float X => Position.X;
         public float Y => Position.Y;
@@ -71,6 +74,13 @@ namespace osu.Game.Rulesets.Osu.Objects
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
+
+            if (difficulty.ApproachRate >= 5)
+                TimePreempt = 1200 - (difficulty.ApproachRate - 5) * 150;
+            else
+                TimePreempt = 1800 - difficulty.ApproachRate * 120;
+            TimeFadein = TimePreempt / 3;
+
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }
