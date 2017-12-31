@@ -86,14 +86,12 @@ namespace osu.Game
 
         private DatabaseContextFactory contextFactory;
 
-        private LargeTextureStore largeTextureStore;
-
         [BackgroundDependencyLoader]
         private void load()
         {
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
 
-            dependencies.Cache(largeTextureStore = new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
+            dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
 
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
