@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -39,6 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Color4 normalColour;
         private Color4 completeColour;
+        private int rotationMultiplier;
 
         public DrawableSpinner(Spinner s) : base(s)
         {
@@ -150,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuConfigManager config, OsuColour colours)
         {
             normalColour = baseColour;
 
@@ -161,6 +163,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Disc.AccentColour = fillColour;
             circle.Colour = colours.BlueDark;
             glow.Colour = colours.BlueDark;
+
+            rotationMultiplier = config.GetBindable<bool>(OsuSetting.InitialSpinnerRotationCW) ? -1 : 1;
+            
         }
 
         protected override void Update()
@@ -193,8 +198,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circleContainer.ScaleTo(spinner.Scale * 0.3f);
             circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, Easing.OutQuint);
 
-            Disc.RotateTo(-720);
-            symbol.RotateTo(-720);
+            Disc.RotateTo(rotationMultiplier * 720);
+            symbol.RotateTo(rotationMultiplier * 720);
 
             mainContainer
                 .ScaleTo(0)

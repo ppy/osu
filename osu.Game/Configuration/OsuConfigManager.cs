@@ -60,9 +60,6 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.MenuParallax, true);
 
-            Set(OsuSetting.SnakingInSliders, true);
-            Set(OsuSetting.SnakingOutSliders, true);
-
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
 
@@ -70,6 +67,10 @@ namespace osu.Game.Configuration
             Set(OsuSetting.KeyOverlay, false);
 
             Set(OsuSetting.FloatingComments, false);
+
+            Set(OsuSetting.SnakingInSliders, true);
+            Set(OsuSetting.SnakingOutSliders, true);
+            Set(OsuSetting.InitialSpinnerRotationCW, true);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -111,6 +112,7 @@ namespace osu.Game.Configuration
         RandomSelectAlgorithm,
         SnakingInSliders,
         SnakingOutSliders,
+        InitialSpinnerRotationCW,
         ShowFpsDisplay,
         ChatDisplayHeight,
         Version,
