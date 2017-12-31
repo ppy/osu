@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual;
 using OpenTK;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
