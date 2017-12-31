@@ -165,7 +165,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             glow.Colour = colours.BlueDark;
 
             rotationMultiplier = config.GetBindable<bool>(OsuSetting.InitialSpinnerRotationCW) ? -1 : 1;
-            
         }
 
         protected override void Update()
