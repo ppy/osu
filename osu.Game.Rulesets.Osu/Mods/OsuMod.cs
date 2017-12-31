@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
                 d.ApplyCustomUpdateState += ApplyHiddenState;
-                d.FadeInDuration = d.HitObject.TimePreempt * fade_in_duration_multiplier;
+                d.HitObject.TimeFadein = d.HitObject.TimePreempt * (float)fade_in_duration_multiplier;
             }
         }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(drawable is DrawableOsuHitObject d))
                 return;
 
-            var fadeOutStartTime = d.HitObject.StartTime - d.HitObject.TimePreempt + d.FadeInDuration;
+            var fadeOutStartTime = d.HitObject.StartTime - d.HitObject.TimePreempt + d.HitObject.TimeFadein;
             var fadeOutDuration = d.HitObject.TimePreempt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)
