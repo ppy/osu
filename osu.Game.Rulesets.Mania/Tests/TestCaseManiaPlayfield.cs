@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Mania.UI;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Tests.Visual;
 
