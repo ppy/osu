@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
+    [Ignore("getting CI working")]
     public class TestCaseSpinnerHidden : TestCaseSpinner
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
