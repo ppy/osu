@@ -99,6 +99,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 OsuHitObject objectI = beatmap.HitObjects[i];
                 if (objectI.StackHeight != 0 || objectI is Spinner) continue;
 
+                float stackThreshold = objectI.TimePreempt * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
+
                 /* If this object is a hitcircle, then we enter this "special" case.
                     * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
                     * Any other case is handled by the "is Slider" code below this.
@@ -111,7 +113,6 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         if (objectN is Spinner) continue;
 
                         double endTime = (objectN as IHasEndTime)?.EndTime ?? objectN.StartTime;
-                        float stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
 
                         if (objectI.StartTime - endTime > stackThreshold)
                             //We are no longer within stacking range of the previous object.
@@ -164,8 +165,6 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     {
                         OsuHitObject objectN = beatmap.HitObjects[n];
                         if (objectN is Spinner) continue;
-
-                        float stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
 
                         if (objectI.StartTime - objectN.StartTime > stackThreshold)
                             //We are no longer within stacking range of the previous object.
