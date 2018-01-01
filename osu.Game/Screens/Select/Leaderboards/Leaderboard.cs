@@ -234,15 +234,14 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return;
             }
 
-            PlaceholderState = PlaceholderState.Retrieving;
-            loading.Show();
-
             if (Scope != LeaderboardScope.Global && !api.LocalUser.Value.IsSupporter)
             {
-                loading.Hide();
                 PlaceholderState = PlaceholderState.NotSupporter;
                 return;
             }
+
+            PlaceholderState = PlaceholderState.Retrieving;
+            loading.Show();
 
             getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value ?? Beatmap.Ruleset, Scope);
             getScoresRequest.Success += r =>
