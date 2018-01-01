@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
 
-        private const double fade_in_duration_multiplier = 0.4;
+        private const float fade_in_duration_multiplier = 0.4f;
         private const double fade_out_duration_multiplier = 0.3;
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
                 d.ApplyCustomUpdateState += ApplyHiddenState;
-                d.HitObject.TimeFadein = d.HitObject.TimePreempt * (float)fade_in_duration_multiplier;
+                d.HitObject.TimeFadein = d.HitObject.TimePreempt * fade_in_duration_multiplier;
             }
         }
 
