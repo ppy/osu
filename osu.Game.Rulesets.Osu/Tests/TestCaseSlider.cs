@@ -13,37 +13,52 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using OpenTK;
+using osu.Game.Rulesets.Osu.Mods;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [Ignore("getting CI working")]
     public class TestCaseSlider : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(DrawableSlider) };
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(Slider),
+            typeof(HitCircle),
+            typeof(OsuModHidden),
+            typeof(DrawableSlider),
+            typeof(DrawableHitCircle),
+            typeof(DrawableSliderTick),
+            typeof(DrawableRepeatPoint)
+        };
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
+        private bool hidden;
+        private int repeats;
+        private int depthIndex;
+        private int circleSize;
+        private float circleScale = 1;
         private double speedMultiplier = 2;
         private double sliderMultiplier = 2;
-        private int depthIndex;
 
         public TestCaseSlider()
         {
             base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
 
-            AddStep("Single", () => addSingle());
-            AddStep("Repeated (1)", () => addRepeated(1));
-            AddStep("Repeated (2)", () => addRepeated(2));
-            AddStep("Repeated (3)", () => addRepeated(3));
-            AddStep("Repeated (4)", () => addRepeated(4));
-            AddStep("Stream", addStream);
-
-            AddSliderStep("SpeedMultiplier", 0.01, 10, 2, s => speedMultiplier = s);
-            AddSliderStep("SliderMultiplier", 0.01, 10, 2, s => sliderMultiplier = s);
+            AddStep("Single", () => testSingle());
+            AddStep("Stream", testStream);
+            AddStep("Repeated", () => testRepeated(repeats));
+            AddToggleStep("Hidden", v => hidden = v);
+            AddSliderStep("Repeats", 1, 10, 1, s => repeats = s);
+            AddSliderStep("CircleSize", 0, 10, 0, s => circleSize = s);
+            AddSliderStep("CircleScale", 0.5f, 2, 1, s => circleScale = s);
+            AddSliderStep("SpeedMultiplier", 0.1, 10, 2, s => speedMultiplier = s);
+            AddSliderStep("SliderMultiplier", 0.1, 10, 2, s => sliderMultiplier = s);
         }
 
-        private void addSingle(double timeOffset = 0, Vector2? positionOffset = null)
+        private void testSingle(double timeOffset = 0, Vector2? positionOffset = null)
         {
             positionOffset = positionOffset ?? Vector2.Zero;
 
@@ -51,32 +66,19 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000 + timeOffset,
                 Position = new Vector2(-200, 0) + positionOffset.Value,
+                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
                     new Vector2(-200, 0) + positionOffset.Value,
                     new Vector2(400, 0) + positionOffset.Value,
                 },
-                Distance = 400,
+                Distance = 400
             };
 
-            var cpi = new ControlPointInfo();
-            cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
-
-            var difficulty = new BeatmapDifficulty
-            {
-                SliderMultiplier = (float)sliderMultiplier,
-                CircleSize = 0
-            };
-
-            slider.ApplyDefaults(cpi, difficulty);
-            Add(new DrawableSlider(slider)
-            {
-                Anchor = Anchor.Centre,
-                Depth = depthIndex++
-            });
+            addSlider(slider);
         }
 
-        private void addRepeated(int repeats)
+        private void testRepeated(int repeats)
         {
             // The first run through the slider is considered a repeat
             repeats++;
@@ -89,6 +91,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
+                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
                     new Vector2(-200, 0),
@@ -99,32 +102,45 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RepeatSamples = repeatSamples
             };
 
+            addSlider(slider);
+        }
+
+        private void testStream()
+        {
+            Vector2 pos = Vector2.Zero;
+
+            for (int i = 0; i <= 1000; i += 100)
+            {
+                testSingle(i, pos);
+                pos += new Vector2(10);
+            }
+        }
+
+        private void addSlider(Slider slider)
+        {
             var cpi = new ControlPointInfo();
             cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
             var difficulty = new BeatmapDifficulty
             {
                 SliderMultiplier = (float)sliderMultiplier,
-                CircleSize = 0
+                CircleSize = circleSize
             };
 
             slider.ApplyDefaults(cpi, difficulty);
-            Add(new DrawableSlider(slider)
+
+            var drawable = new DrawableSlider(slider)
             {
                 Anchor = Anchor.Centre,
+                Scale = new Vector2(circleScale),
                 Depth = depthIndex++
-            });
-        }
+            };
 
-        private void addStream()
-        {
-            Vector2 pos = Vector2.Zero;
+            if (hidden)
+                new OsuModHidden().ApplyToDrawableHitObjects(new [] { drawable });
 
-            for (int i = 0; i <= 1000; i += 100)
-            {
-                addSingle(i, pos);
-                pos += new Vector2(10);
-            }
+            Add(drawable);
         }
     }
+
 }

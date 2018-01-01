@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.UI
 
         private readonly ModType type;
 
-        public string TooltipText { get; }
+        public virtual string TooltipText { get; }
 
         public ModIcon(Mod mod)
         {
