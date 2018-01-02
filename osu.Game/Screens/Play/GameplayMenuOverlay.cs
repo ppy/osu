@@ -15,6 +15,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using OpenTK.Input;
 using System.Collections.Generic;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
@@ -25,6 +26,13 @@ namespace osu.Game.Screens.Play
         private const float background_alpha = 0.75f;
 
         protected override bool BlockPassThroughKeyboard => true;
+
+        private GlobalKeyBindingInputManager globalBinding;
+        protected override bool OnWheel(InputState state)
+        {
+            globalBinding.TriggerOnWheel(state);
+            return true;
+        }
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
@@ -47,8 +55,10 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, GlobalKeyBindingInputManager globalBinding)
         {
+            this.globalBinding = globalBinding;
+
             Children = new Drawable[]
             {
                 new Box
