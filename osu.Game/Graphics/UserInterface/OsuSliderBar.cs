@@ -32,11 +32,18 @@ namespace osu.Game.Graphics.UserInterface
             get
             {
                 var bindableDouble = CurrentNumber as BindableNumber<double>;
-                if (bindableDouble != null)
+                var bindableFloat = CurrentNumber as BindableNumber<float>;
+                var floatValue = bindableDouble?.Value ?? bindableFloat?.Value ?? null;
+
+                if (floatValue != null)
                 {
-                    if (bindableDouble.MaxValue == 1 && (bindableDouble.MinValue == 0 || bindableDouble.MinValue == -1))
-                        return bindableDouble.Value.ToString(@"P0");
-                    return bindableDouble.Value.ToString(@"n1");
+                    var floatMinValue = bindableDouble?.MinValue ?? bindableFloat?.MinValue ?? null;
+                    var floatMaxValue = bindableDouble?.MaxValue ?? bindableFloat?.MaxValue ?? null;
+
+                    if (floatMaxValue == 1 && (floatMinValue == 0 || floatMinValue == -1))
+                        return floatValue.Value.ToString(@"P0");
+
+                    return floatValue.Value.ToString(@"n1");
                 }
 
                 var bindableInt = CurrentNumber as BindableNumber<int>;
