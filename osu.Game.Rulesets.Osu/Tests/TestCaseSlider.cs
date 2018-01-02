@@ -60,9 +60,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Fast Slider", () => testHighSpeed());
             AddStep("Fast Slider 1 Repeat", () => testHighSpeed(1));
             AddStep("Fast Slider 2 Repeats", () => testHighSpeed(2));
-            AddStep("Fast Short Slider", () => testHighSpeed());
-            AddStep("Fast Short Slider 1 Repeat", () => testHighSpeed(1));
-            AddStep("Fast Short Slider 2 Repeats", () => testHighSpeed(2));
+            AddStep("Fast Short Slider", () => testShortHighSpeed());
+            AddStep("Fast Short Slider 1 Repeat", () => testShortHighSpeed(1));
+            AddStep("Fast Short Slider 2 Repeats", () => testShortHighSpeed(2));
 
             AddStep("Perfect Curve", testCurve);
             // TODO more curve types?
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void testShortHighSpeed(int repeats = 0) => createSlider(distance: 100, repeats: repeats, speedMultiplier: 15);
 
-        private void createSlider(float circleSize = 2, float distance = 800, int repeats = 0, double speedMultiplier = 2)
+        private void createSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2)
         {
             repeats++; // The first run through the slider is considered a repeat
 
