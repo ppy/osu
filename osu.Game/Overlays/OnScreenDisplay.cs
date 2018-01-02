@@ -139,7 +139,7 @@ namespace osu.Game.Overlays
 
         private readonly List<IBindable> references = new List<IBindable>();
 
-        private void trackSetting<T>(Bindable<T> bindable, Bindable<T>.BindableValueChanged<T> action)
+        private void trackSetting<T>(Bindable<T> bindable, Action<T> action)
         {
             // we need to keep references as we bind
             references.Add(bindable);
