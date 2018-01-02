@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(HitCircle),
             typeof(DrawableHitCircle)
         };
 

@@ -16,6 +16,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -24,14 +25,11 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(Slider),
-            typeof(HitCircle),
-            typeof(SliderTick),
-            typeof(RepeatPoint),
+            typeof(SliderBall),
+            typeof(SliderBody),
             typeof(DrawableSlider),
-            typeof(DrawableHitCircle),
-            typeof(DrawableSliderTick),
-            typeof(DrawableRepeatPoint)
+            typeof(DrawableRepeatPoint),
+            typeof(DrawableOsuHitObject)
         };
 
         private readonly Container content;

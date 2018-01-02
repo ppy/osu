@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -21,8 +22,9 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
 {
-            typeof(Spinner),
-            typeof(DrawableSpinner)
+            typeof(SpinnerDisc),
+            typeof(DrawableSpinner),
+            typeof(DrawableOsuHitObject)
         };
 
         private readonly Container content;
