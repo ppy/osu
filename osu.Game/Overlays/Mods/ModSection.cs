@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Mods
         {
             var index = Array.IndexOf(ToggleKeys, args.Key);
             if (index > -1 && index < buttons.Length)
-                buttons[index].SelectNext();
+                buttons[index].SelectNext(state.Keyboard.ShiftPressed ? -1 : 1);
 
             return base.OnKeyDown(state, args);
         }
