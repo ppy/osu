@@ -15,7 +15,6 @@ using osu.Game.Configuration;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
-using System.Linq;
 
 namespace osu.Game.Screens.Menu
 {
@@ -43,23 +42,19 @@ namespace osu.Game.Screens.Menu
         private Track track;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game, OsuGame osuGame)
+        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
         {
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
             BeatmapSetInfo setInfo = null;
 
-            var currentRulesetId = osuGame.Ruleset.Value.ID;
-
             if (!menuMusic)
             {
-                var sets = beatmaps.GetAllUsableBeatmapSets().FindAll(b => b.Beatmaps.Exists(bm => bm.Ruleset.ID == 0 || bm.Ruleset.ID == currentRulesetId));
+                var sets = beatmaps.GetAllUsableBeatmapSets();
                 if (sets.Count > 0)
                     setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
             }
-
-            BeatmapInfo beatmapInfo;
 
             if (setInfo == null)
             {
@@ -71,13 +66,9 @@ namespace osu.Game.Screens.Menu
                     setInfo = beatmaps.Import(new OszArchiveReader(game.Resources.GetStream(@"Tracks/circles.osz")));
                     setInfo.Protected = true;
                 }
-
-                beatmapInfo = setInfo.Beatmaps[0];
             }
-            else
-                beatmapInfo = setInfo.Beatmaps.First(b => b.Ruleset.ID == 0 || b.Ruleset.ID == currentRulesetId);
 
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
 
             track = Beatmap.Value.Track;
 
