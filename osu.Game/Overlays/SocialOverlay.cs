@@ -15,9 +15,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
-using osu.Framework.Configuration;
-using osu.Framework.Threading;
-using System.Threading.Tasks;
 
 namespace osu.Game.Overlays
 {
@@ -79,7 +76,7 @@ namespace osu.Game.Overlays
             //    }
             //};
 
-            currentQuery.BindTo(Filter.Search.Current);
+            //currentQuery.BindTo(Filter.Search.Current);
 
             Filter.Tabs.Current.ValueChanged += sortCriteria => Scheduler.AddOnce(updateSearch);
         }
@@ -145,13 +142,13 @@ namespace osu.Game.Overlays
 
         private APIRequest getUsersRequest;
 
-        private readonly Bindable<string> currentQuery = new Bindable<string>();
+        //private readonly Bindable<string> currentQuery = new Bindable<string>();
 
-        private ScheduledDelegate queryChangedDebounce;
+        //private ScheduledDelegate queryChangedDebounce;
 
         private void updateSearch()
         {
-            queryChangedDebounce?.Cancel();
+            //queryChangedDebounce?.Cancel();
 
             if (!IsLoaded)
                 return;
