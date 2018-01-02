@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Framework.Configuration;
 using OpenTK;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
