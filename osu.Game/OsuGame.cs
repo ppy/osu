@@ -27,6 +27,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using OpenTK.Graphics;
 
 namespace osu.Game
 {
@@ -284,10 +285,10 @@ namespace osu.Game
 
             notifications.Enabled.BindTo(ShowOverlays);
 
-            ShowOverlays.ValueChanged += visible =>
+            ShowOverlays.ValueChanged += show =>
             {
                 //central game screen change logic.
-                if (!visible)
+                if (!show)
                 {
                     hideAllOverlays();
                     musicController.State = Visibility.Hidden;
@@ -331,10 +332,21 @@ namespace osu.Game
         }
 
         private Task asyncLoadStream;
+        private int visibleOverlayCount;
 
         private void loadComponentSingleFile<T>(T d, Action<T> add)
             where T : Drawable
         {
+            var focused = d as FocusedOverlayContainer;
+            if (focused != null)
+            {
+                focused.StateChanged += s =>
+                {
+                    visibleOverlayCount += s == Visibility.Visible ? 1 : -1;
+                    screenStack.FadeColour(visibleOverlayCount > 0 ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+                };
+            }
+
             // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
             // we could avoid the need for scheduling altogether.
