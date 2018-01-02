@@ -32,7 +32,10 @@ namespace osu.Game.Overlays.Mods
         private readonly Container<ModIcon> iconsContainer;
         private SampleChannel sampleOn, sampleOff;
 
-        public Action<Mod> Action; // Passed the selected mod or null if none
+        /// <summary>
+        /// Fired when the selection changes.
+        /// </summary>
+        public Action<Mod> SelectionChanged;
 
         public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
 
@@ -42,78 +45,78 @@ namespace osu.Game.Overlays.Mods
         // A selected index of -1 means not selected.
         private int selectedIndex = -1;
 
-        protected int SelectedIndex
+        /// <summary>
+        /// Change the selected mod index of this button.
+        /// </summary>
+        /// <param name="value">The new index</param>
+        /// <returns>Whether the selection changed.</returns>
+        private bool changeSelectedIndex(int value)
         {
-            get
+            if (value == selectedIndex) return false;
+
+            int direction = value < selectedIndex ? -1 : 1;
+            bool beforeSelected = Selected;
+
+            Mod modBefore = SelectedMod ?? Mods[0];
+
+            if (value >= Mods.Length)
+                selectedIndex = -1;
+            else if (value < -1)
+                selectedIndex = Mods.Length - 1;
+            else
+                selectedIndex = value;
+
+            Mod modAfter = SelectedMod ?? Mods[0];
+
+            if (!modAfter.HasImplementation)
             {
-                return selectedIndex;
+                if (modAfter != modBefore)
+                    return changeSelectedIndex(selectedIndex + direction);
+                return false;
             }
-            set
+
+            if (beforeSelected != Selected)
             {
-                if (value == selectedIndex) return;
-
-                int direction = value < selectedIndex ? -1 : 1;
-                bool beforeSelected = Selected;
-
-                Mod modBefore = SelectedMod ?? Mods[0];
-
-                if (value >= Mods.Length)
-                    selectedIndex = -1;
-                else if (value < -1)
-                    selectedIndex = Mods.Length - 1;
-                else
-                    selectedIndex = value;
-
-                Mod modAfter = SelectedMod ?? Mods[0];
-
-                if (!modAfter.HasImplementation)
-                {
-                    if (modAfter != modBefore)
-                        SelectedIndex += direction;
-                    return;
-                }
-
-                if (beforeSelected != Selected)
-                {
-                    iconsContainer.RotateTo(Selected ? 5f : 0f, 300, Easing.OutElastic);
-                    iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, Easing.OutElastic);
-                }
-
-                if (modBefore != modAfter)
-                {
-                    const float rotate_angle = 16;
-
-                    foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
-                    backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
-
-                    backgroundIcon.Icon = modAfter.Icon;
-                    using (BeginDelayedSequence(mod_switch_duration, true))
-                    {
-                        foregroundIcon
-                            .RotateTo(-rotate_angle * direction)
-                            .RotateTo(0f, mod_switch_duration, mod_switch_easing);
-
-                        backgroundIcon
-                            .RotateTo(rotate_angle * direction)
-                            .RotateTo(0f, mod_switch_duration, mod_switch_easing);
-
-                        Schedule(() => displayMod(modAfter));
-                    }
-                }
-
-                foregroundIcon.Highlighted = Selected;
+                iconsContainer.RotateTo(Selected ? 5f : 0f, 300, Easing.OutElastic);
+                iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, Easing.OutElastic);
             }
+
+            if (modBefore != modAfter)
+            {
+                const float rotate_angle = 16;
+
+                foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
+                backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
+
+                backgroundIcon.Icon = modAfter.Icon;
+                using (BeginDelayedSequence(mod_switch_duration, true))
+                {
+                    foregroundIcon
+                        .RotateTo(-rotate_angle * direction)
+                        .RotateTo(0f, mod_switch_duration, mod_switch_easing);
+
+                    backgroundIcon
+                        .RotateTo(rotate_angle * direction)
+                        .RotateTo(0f, mod_switch_duration, mod_switch_easing);
+
+                    Schedule(() => displayMod(modAfter));
+                }
+            }
+
+            foregroundIcon.Highlighted = Selected;
+
+            (selectedIndex == -1 ? sampleOff : sampleOn).Play();
+            SelectionChanged?.Invoke(SelectedMod);
+            return true;
         }
 
-        public bool Selected => SelectedIndex != -1;
+        public bool Selected => selectedIndex != -1;
 
         private Color4 selectedColour;
+
         public Color4 SelectedColour
         {
-            get
-            {
-                return selectedColour;
-            }
+            get { return selectedColour; }
             set
             {
                 if (value == selectedColour) return;
@@ -123,12 +126,10 @@ namespace osu.Game.Overlays.Mods
         }
 
         private Mod mod;
+
         public Mod Mod
         {
-            get
-            {
-                return mod;
-            }
+            get { return mod; }
             set
             {
                 mod = value;
@@ -154,9 +155,7 @@ namespace osu.Game.Overlays.Mods
 
         public Mod[] Mods { get; private set; }
 
-        // the mods from Mod, only multiple if Mod is a MultiMod
-
-        public virtual Mod SelectedMod => Mods.ElementAtOrDefault(SelectedIndex);
+        public virtual Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -176,25 +175,15 @@ namespace osu.Game.Overlays.Mods
                     SelectPrevious();
                     break;
             }
+
             return true;
         }
 
-        public void SelectNext()
-        {
-            (++SelectedIndex == Mods.Length ? sampleOff : sampleOn).Play();
-            Action?.Invoke(SelectedMod);
-        }
+        public void SelectNext() => changeSelectedIndex(selectedIndex + 1);
 
-        public void SelectPrevious()
-        {
-            (--SelectedIndex == -1 ? sampleOff : sampleOn).Play();
-            Action?.Invoke(SelectedMod);
-        }
+        public void SelectPrevious() => changeSelectedIndex(selectedIndex - 1);
 
-        public void Deselect()
-        {
-            SelectedIndex = -1;
-        }
+        public void Deselect() => changeSelectedIndex(-1);
 
         private void displayMod(Mod mod)
         {
@@ -272,7 +261,8 @@ namespace osu.Game.Overlays.Mods
         {
             public override string TooltipText => null;
 
-            public PassThroughTooltipModIcon(Mod mod) : base(mod)
+            public PassThroughTooltipModIcon(Mod mod)
+                : base(mod)
             {
             }
         }
