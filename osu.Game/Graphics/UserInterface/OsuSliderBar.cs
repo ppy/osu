@@ -39,12 +39,12 @@ namespace osu.Game.Graphics.UserInterface
             {
                 var bindableDouble = CurrentNumber as BindableNumber<double>;
                 var bindableFloat = CurrentNumber as BindableNumber<float>;
-                var floatValue = bindableDouble?.Value ?? bindableFloat?.Value ?? null;
+                var floatValue = bindableDouble?.Value ?? bindableFloat?.Value;
 
                 if (floatValue != null)
                 {
-                    var floatMinValue = bindableDouble?.MinValue ?? bindableFloat?.MinValue ?? null;
-                    var floatMaxValue = bindableDouble?.MaxValue ?? bindableFloat?.MaxValue ?? null;
+                    var floatMinValue = bindableDouble?.MinValue ?? bindableFloat.MinValue;
+                    var floatMaxValue = bindableDouble?.MaxValue ?? bindableFloat.MaxValue;
 
                     if (floatMaxValue == 1 && (floatMinValue == 0 || floatMinValue == -1))
                         return floatValue.Value.ToString(@"P0");
