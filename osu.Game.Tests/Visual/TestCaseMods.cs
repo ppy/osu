@@ -80,16 +80,21 @@ namespace osu.Game.Tests.Visual
 
             var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
             var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
+
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
-            var autoPilotMod = assistMods.FirstOrDefault(m => m is OsuModAutopilot);
+
+            var easy = easierMods.FirstOrDefault(m => m is OsuModEasy);
+            var hardRock = harderMods.FirstOrDefault(m => m is OsuModHardRock);
 
             testSingleMod(noFailMod);
             testMultiMod(doubleTimeMod);
-            testIncompatibleMods(noFailMod, autoPilotMod);
+            testIncompatibleMods(easy, hardRock);
             testDeselectAll(easierMods.Where(m => !(m is MultiMod)));
             testMultiplierTextColour(noFailMod, modSelect.LowMultiplierColour);
             testMultiplierTextColour(hiddenMod, modSelect.HighMultiplierColour);
-            testMultiplierTextUnranked(autoPilotMod);
+
+            // TODO: add back once we have an implemented unranked mod.
+            // testMultiplierTextUnranked(autoPilotMod);
         }
 
         private void testSingleMod(Mod mod)
@@ -169,9 +174,9 @@ namespace osu.Game.Tests.Visual
             AddAssert("check for ranked", () => !modSelect.MultiplierLabel.Text.EndsWith(unranked_suffix));
         }
 
-        private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext());
+        private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));
 
-        private void selectPrevious(Mod mod) => AddStep($"right click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectPrevious());
+        private void selectPrevious(Mod mod) => AddStep($"right click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(-1));
 
         private void checkSelected(Mod mod)
         {
