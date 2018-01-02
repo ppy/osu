@@ -93,12 +93,7 @@ namespace osu.Game.Overlays
 
         private void recreatePanels(PanelDisplayStyle displayStyle)
         {
-            if (panels != null)
-            {
-                panels.FadeOut(200);
-                panels.Expire();
-                panels = null;
-            }
+            clearPanels();
 
             if (Users == null)
                 return;
@@ -139,6 +134,15 @@ namespace osu.Game.Overlays
             });
         }
 
+        private void clearPanels()
+        {
+            if (panels != null)
+            {
+                panels.Expire();
+                panels = null;
+            }
+        }
+
         private APIRequest getUsersRequest;
 
         private readonly Bindable<string> currentQuery = new Bindable<string>();
@@ -153,10 +157,11 @@ namespace osu.Game.Overlays
                 return;
 
             Users = null;
+            clearPanels();
             loading.Hide();
             getUsersRequest?.Cancel();
 
-            if (api == null || api.State == APIState.Offline)
+            if (api?.IsLoggedIn == false)
                 return;
 
             switch (Header.Tabs.Current.Value)
@@ -180,8 +185,8 @@ namespace osu.Game.Overlays
             Schedule(() =>
             {
                 Users = newUsers;
-                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
                 loading.Hide();
+                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             });
         }
 
