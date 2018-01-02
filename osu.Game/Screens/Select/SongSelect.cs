@@ -227,13 +227,18 @@ namespace osu.Game.Screens.Select
             Push(new Editor());
         }
 
-        public void Start(BeatmapInfo beatmap)
+        /// <summary>
+        /// Call to make a selection and perform the default action for this SongSelect.
+        /// </summary>
+        /// <param name="beatmap">An optional beatmap to override the current carousel selection.</param>
+        public void FinaliseSelection(BeatmapInfo beatmap = null)
         {
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
             Carousel.FlushPendingFilterOperations();
 
-            Carousel.SelectBeatmap(beatmap);
+            if (beatmap != null)
+                Carousel.SelectBeatmap(beatmap);
 
             if (selectionChangedDebounce?.Completed == false)
             {
@@ -242,13 +247,14 @@ namespace osu.Game.Screens.Select
                 selectionChangedDebounce = null;
             }
 
-            Start();
+            OnSelectionFinalised();
         }
 
         /// <summary>
         /// Called when a selection is made.
         /// </summary>
-        protected abstract void Start();
+        /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
+        protected abstract bool OnSelectionFinalised();
 
         private ScheduledDelegate selectionChangedDebounce;
 
@@ -339,7 +345,7 @@ namespace osu.Game.Screens.Select
 
             logo.Action = () =>
             {
-                Start();
+                FinaliseSelection();
                 return false;
             };
         }
@@ -462,7 +468,7 @@ namespace osu.Game.Screens.Select
             {
                 case Key.KeypadEnter:
                 case Key.Enter:
-                    Start();
+                    FinaliseSelection();
                     return true;
                 case Key.Delete:
                     if (state.Keyboard.ShiftPressed)
