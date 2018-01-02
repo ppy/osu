@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Globalization;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -27,6 +28,11 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box leftBox;
         private readonly Box rightBox;
 
+        /// <summary>
+        /// The amount of decimal digits to display for <see cref="OsuSliderBar{T}"/>s with floating point values.
+        /// </summary>
+        public int TooltipDecimalDigits = 1;
+
         public virtual string TooltipText
         {
             get
@@ -43,7 +49,10 @@ namespace osu.Game.Graphics.UserInterface
                     if (floatMaxValue == 1 && (floatMinValue == 0 || floatMinValue == -1))
                         return floatValue.Value.ToString(@"P0");
 
-                    return floatValue.Value.ToString(@"n1");
+                    var nfi = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
+                    nfi.NumberDecimalDigits = TooltipDecimalDigits;
+
+                    return string.Format(nfi, "{0:F}", floatValue.Value);
                 }
 
                 var bindableInt = CurrentNumber as BindableNumber<int>;
