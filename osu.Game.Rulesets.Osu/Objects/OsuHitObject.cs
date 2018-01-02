@@ -7,7 +7,7 @@ using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
