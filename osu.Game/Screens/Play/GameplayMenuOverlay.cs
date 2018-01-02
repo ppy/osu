@@ -263,6 +263,14 @@ namespace osu.Game.Screens.Play
 
         private class Button : DialogButton
         {
+            protected override bool OnHover(InputState state) => true;
+
+            protected override bool OnMouseMove(InputState state)
+            {
+                Selected.Value = true;
+                return base.OnMouseMove(state);
+            }
+
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
             {
                 if (args.Repeat || args.Key != Key.Enter || !Selected)

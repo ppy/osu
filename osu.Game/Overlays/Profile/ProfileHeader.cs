@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Profile
                                             Origin = Anchor.BottomLeft,
                                             Y = -48,
                                         },
-                                        countryFlag = new DrawableFlag(user.Country?.FlagName)
+                                        countryFlag = new DrawableFlag(user.Country)
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
@@ -332,7 +332,7 @@ namespace osu.Game.Overlays.Profile
             {
                 infoTextLeft.AddText("from ");
                 infoTextLeft.AddText(user.Country.FullName, boldItalic);
-                countryFlag.FlagName = user.Country.FlagName;
+                countryFlag.Country = user.Country;
             }
 
             infoTextLeft.NewParagraph();
@@ -457,7 +457,7 @@ namespace osu.Game.Overlays.Profile
                     Width = width,
                     Height = 26
                 });
-                Add(numberText = new SpriteText
+                Add(numberText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,

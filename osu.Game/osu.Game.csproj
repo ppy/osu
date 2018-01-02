@@ -143,8 +143,8 @@
       <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\OpenTK.3.0.0-git00009\lib\net20\OpenTK.dll</HintPath>
+    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0.11\lib\net45\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Remotion.Linq, Version=2.1.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
@@ -239,7 +239,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\SampleInfo.cs" />
-    <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Beatmaps\BeatmapDifficulty.cs" />
@@ -316,6 +315,8 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
+    <Compile Include="Screens\Select\ImportFromStablePopup.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\OriginHandle.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectSelectionBox.cs" />
@@ -615,7 +616,7 @@
     <Compile Include="Rulesets\Objects\Drawables\ArmedState.cs" />
     <Compile Include="Rulesets\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Rulesets\Objects\Drawables\DrawableScrollingHitObject.cs" />
-    <Compile Include="Rulesets\Objects\Drawables\HitResult.cs" />
+    <Compile Include="Rulesets\Scoring\HitResult.cs" />
     <Compile Include="Rulesets\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Rulesets\Objects\Drawables\IScrollingHitObject.cs" />
     <Compile Include="Rulesets\Objects\HitObject.cs" />

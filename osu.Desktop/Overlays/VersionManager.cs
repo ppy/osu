@@ -110,7 +110,7 @@ namespace osu.Desktop.Overlays
 
                 // only show a notification if we've previously saved a version to the config file (ie. not the first run).
                 if (!string.IsNullOrEmpty(lastVersion))
-                    Scheduler.AddDelayed(() => notificationOverlay.Post(new UpdateCompleteNotification(version)), 5000);
+                    notificationOverlay.Post(new UpdateCompleteNotification(version));
             }
         }
 

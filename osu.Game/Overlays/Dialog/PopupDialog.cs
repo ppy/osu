@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Dialog
         private readonly FillFlowContainer<PopupDialogButton> buttonsContainer;
         private readonly SpriteIcon icon;
         private readonly SpriteText header;
-        private readonly SpriteText body;
+        private readonly TextFlowContainer body;
 
         public FontAwesome Icon
         {
@@ -48,7 +48,6 @@ namespace osu.Game.Overlays.Dialog
 
         public string BodyText
         {
-            get { return body.Text; }
             set { body.Text = value; }
         }
 
@@ -220,17 +219,15 @@ namespace osu.Game.Overlays.Dialog
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Text = @"Header",
                                     TextSize = 25,
                                     Shadow = true,
                                 },
-                                body = new OsuSpriteText
+                                body = new OsuTextFlowContainer(t => t.TextSize = 18)
                                 {
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Text = @"Body",
-                                    TextSize = 18,
-                                    Shadow = true,
+                                    Padding = new MarginPadding(15),
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    TextAnchor = Anchor.TopCentre,
                                 },
                             },
                         },
