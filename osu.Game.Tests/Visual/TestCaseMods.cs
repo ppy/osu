@@ -83,6 +83,8 @@ namespace osu.Game.Tests.Visual
 
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
 
+            var autoPilotMod = assistMods.FirstOrDefault(m => m is OsuModAutopilot);
+
             var easy = easierMods.FirstOrDefault(m => m is OsuModEasy);
             var hardRock = harderMods.FirstOrDefault(m => m is OsuModHardRock);
 
@@ -92,6 +94,8 @@ namespace osu.Game.Tests.Visual
             testDeselectAll(easierMods.Where(m => !(m is MultiMod)));
             testMultiplierTextColour(noFailMod, modSelect.LowMultiplierColour);
             testMultiplierTextColour(hiddenMod, modSelect.HighMultiplierColour);
+
+            testUnimplmentedMod(autoPilotMod);
 
             // TODO: add back once we have an implemented unranked mod.
             // testMultiplierTextUnranked(autoPilotMod);
@@ -127,6 +131,12 @@ namespace osu.Game.Tests.Visual
 
             foreach (var mod in multiMod.Mods)
                 checkNotSelected(mod);
+        }
+
+        private void testUnimplmentedMod(Mod mod)
+        {
+            selectNext(mod);
+            checkNotSelected(mod);
         }
 
         private void testIncompatibleMods(Mod modA, Mod modB)
