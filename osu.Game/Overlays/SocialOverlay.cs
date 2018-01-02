@@ -162,15 +162,16 @@ namespace osu.Game.Overlays
             switch (Header.Tabs.Current.Value)
             {
                 case SocialTab.OnlinePlayers:
-                    getUsersRequest = new GetUsersRequest(); // TODO filter???
-                    ((GetUsersRequest)getUsersRequest).Success += response => finishRequest(response.Select(r => r.User));
+                    var userRequest = new GetUsersRequest(); // TODO filter???
+                    userRequest.Success += response => finishRequest(response.Select(r => r.User));
+                    api.Queue(getUsersRequest = userRequest);
                     break;
                 case SocialTab.OnlineFriends:
-                    getUsersRequest = new GetFriendsRequest(); // TODO filter???
-                    ((GetFriendsRequest)getUsersRequest).Success += finishRequest;
+                    var friendRequest = new GetFriendsRequest(); // TODO filter???
+                    friendRequest.Success += finishRequest;
+                    api.Queue(getUsersRequest = friendRequest);
                     break;
             }
-            api.Queue(getUsersRequest);
             loading.Show();
         }
 
