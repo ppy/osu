@@ -23,6 +23,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Extensions;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -163,7 +164,7 @@ namespace osu.Game.Screens.Ranking
                 }
             };
 
-            statisticsContainer.ChildrenEnumerable = Score.Statistics.Select(s => new DrawableScoreStatistic(s));
+            statisticsContainer.ChildrenEnumerable = Score.Statistics.OrderByDescending(p => p.Key).Select(s => new DrawableScoreStatistic(s));
         }
 
         protected override void LoadComplete()
@@ -186,9 +187,9 @@ namespace osu.Game.Screens.Ranking
 
         private class DrawableScoreStatistic : Container
         {
-            private readonly KeyValuePair<string, object> statistic;
+            private readonly KeyValuePair<HitResult, object> statistic;
 
-            public DrawableScoreStatistic(KeyValuePair<string, object> statistic)
+            public DrawableScoreStatistic(KeyValuePair<HitResult, object> statistic)
             {
                 this.statistic = statistic;
 
@@ -209,7 +210,7 @@ namespace osu.Game.Screens.Ranking
                         Origin = Anchor.TopCentre,
                     },
                     new OsuSpriteText {
-                        Text = statistic.Key,
+                        Text = statistic.Key.GetDescription(),
                         Colour = colours.Gray7,
                         Font = @"Exo2.0-Bold",
                         Y = 26,
@@ -250,16 +251,16 @@ namespace osu.Game.Screens.Ranking
                     {
                         Origin = Anchor.CentreLeft,
                         Anchor = Anchor.CentreLeft,
-                        Text = datetime.ToString("HH:mm"),
-                        Padding = new MarginPadding { Left = 10, Right = 10, Top = 5, Bottom = 5 },
+                        Text = datetime.ToShortDateString(),
+                        Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                         Colour = Color4.White,
                     },
                     new OsuSpriteText
                     {
                         Origin = Anchor.CentreRight,
                         Anchor = Anchor.CentreRight,
-                        Text = datetime.ToString("yyyy/MM/dd"),
-                        Padding = new MarginPadding { Left = 10, Right = 10, Top = 5, Bottom = 5 },
+                        Text = datetime.ToShortTimeString(),
+                        Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                         Colour = Color4.White,
                     }
                 };
