@@ -48,32 +48,27 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Change the selected mod index of this button.
         /// </summary>
-        /// <param name="value">The new index</param>
+        /// <param name="newIndexhe new index</param>
         /// <returns>Whether the selection changed.</returns>
-        private bool changeSelectedIndex(int value)
+        private bool changeSelectedIndex(int newIndex)
         {
-            if (value == selectedIndex) return false;
+            if (newIndex == selectedIndex) return false;
 
-            int direction = value < selectedIndex ? -1 : 1;
+            int direction = newIndex < selectedIndex ? -1 : 1;
             bool beforeSelected = Selected;
 
             Mod modBefore = SelectedMod ?? Mods[0];
 
-            if (value >= Mods.Length)
-                selectedIndex = -1;
-            else if (value < -1)
-                selectedIndex = Mods.Length - 1;
-            else
-                selectedIndex = value;
+            if (newIndex >= Mods.Length)
+                newIndex = -1;
+            else if (newIndex < -1)
+                newIndex = Mods.Length - 1;
 
-            Mod modAfter = SelectedMod ?? Mods[0];
-
-            if (!modAfter.HasImplementation)
-            {
-                if (modAfter != modBefore)
-                    return changeSelectedIndex(selectedIndex + direction);
+            if (newIndex >= 0 && !Mods[newIndex].HasImplementation)
                 return false;
-            }
+
+            selectedIndex = newIndex;
+            Mod modAfter = SelectedMod ?? Mods[0];
 
             if (beforeSelected != Selected)
             {
@@ -169,19 +164,40 @@ namespace osu.Game.Overlays.Mods
             switch (args.Button)
             {
                 case MouseButton.Left:
-                    SelectNext();
+                    SelectNext(1);
                     break;
                 case MouseButton.Right:
-                    SelectPrevious();
+                    SelectNext(-1);
                     break;
             }
 
             return true;
         }
 
-        public void SelectNext() => changeSelectedIndex(selectedIndex + 1);
+        /// <summary>
+        /// Select the next available mod in a specified direction.
+        /// </summary>
+        /// <param name="direction">1 for forwards, -1 for backwards.</param>
+        public void SelectNext(int direction)
+        {
+            int start = selectedIndex + direction;
+            // wrap around if we are at an extremity.
+            if (start >= Mods.Length)
+                start = -1;
+            else if (start < -1)
+                start = Mods.Length - 1;
 
-        public void SelectPrevious() => changeSelectedIndex(selectedIndex - 1);
+            for (int i = start; i < Mods.Length && i >= 0; i += direction)
+            {
+                if (Mods[i].HasImplementation)
+                {
+                    changeSelectedIndex(i);
+                    return;
+                }
+            }
+
+            Deselect();
+        }
 
         public void Deselect() => changeSelectedIndex(-1);
 
