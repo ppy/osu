@@ -29,5 +29,6 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "Watch a perfect automated play through the song";
         public override double ScoreMultiplier => 0;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };
+        public override bool AllowFail => false;	
     }
 }
