@@ -109,6 +109,13 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 if (value == placeholderState) return;
 
+                if (value != PlaceholderState.Successful)
+                {
+                    getScoresRequest?.Cancel();
+                    getScoresRequest = null;
+                    Scores = null;
+                }
+
                 switch (placeholderState = value)
                 {
                     case PlaceholderState.NetworkFailure:
@@ -211,10 +218,6 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void updateScores()
         {
-            getScoresRequest?.Cancel();
-            getScoresRequest = null;
-            Scores = null;
-
             if (Scope == LeaderboardScope.Local)
             {
                 // TODO: get local scores from wherever here.
