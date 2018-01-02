@@ -28,18 +28,15 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box leftBox;
         private readonly Box rightBox;
 
-        private int tooltipDecimalDigits = 1;
-        /// <summary>
-        /// The amount of decimal digits to display for <see cref="OsuSliderBar{T}"/>s with floating point values.
-        /// </summary>
-        public int TooltipDecimalDigits
+        private NumberFormatInfo format;
+        public NumberFormatInfo Format
         {
-            get => tooltipDecimalDigits;
+            get => format ?? (format = createDefaultFormat());
             set
             {
-                if (tooltipDecimalDigits == value)
+                if (format == value)
                     return;
-                tooltipDecimalDigits = value;
+                format = value;
 
                 if (IsLoaded)
                 {
@@ -63,17 +60,14 @@ namespace osu.Game.Graphics.UserInterface
                     var floatMaxValue = bindableDouble?.MaxValue ?? bindableFloat.MaxValue;
 
                     if (floatMaxValue == 1 && (floatMinValue == 0 || floatMinValue == -1))
-                        return floatValue.Value.ToString(@"P0");
+                        return floatValue.Value.ToString("P", Format);
 
-                    var nfi = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
-                    nfi.NumberDecimalDigits = TooltipDecimalDigits;
-
-                    return string.Format(nfi, "{0:F}", floatValue.Value);
+                    return floatValue.Value.ToString("F", Format);
                 }
 
                 var bindableInt = CurrentNumber as BindableNumber<int>;
                 if (bindableInt != null)
-                    return bindableInt.Value.ToString(@"n0");
+                    return bindableInt.Value.ToString("N0");
 
                 return Current.Value.ToString();
             }
@@ -135,6 +129,15 @@ namespace osu.Game.Graphics.UserInterface
         {
             sample = audio.Sample.Get(@"UI/sliderbar-notch");
             AccentColour = colours.Pink;
+        }
+
+        private NumberFormatInfo createDefaultFormat()
+        {
+            var nfi = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
+            nfi.PercentDecimalDigits = 0;
+            nfi.NumberDecimalDigits = 1;
+
+            return nfi;
         }
 
         protected override bool OnHover(InputState state)
