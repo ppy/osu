@@ -28,10 +28,26 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box leftBox;
         private readonly Box rightBox;
 
+        private int tooltipDecimalDigits = 1;
         /// <summary>
         /// The amount of decimal digits to display for <see cref="OsuSliderBar{T}"/>s with floating point values.
         /// </summary>
-        public int TooltipDecimalDigits = 1;
+        public int TooltipDecimalDigits
+        {
+            get => tooltipDecimalDigits;
+            set
+            {
+                if (tooltipDecimalDigits == value)
+                    return;
+                tooltipDecimalDigits = value;
+
+                if (IsLoaded)
+                {
+                    // Some users may want to see the updated ToolTipText
+                    Current.TriggerChange();
+                }
+            }
+        }
 
         public virtual string TooltipText
         {
