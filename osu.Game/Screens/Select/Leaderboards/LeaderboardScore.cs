@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        new DrawableFlag(Score.User?.Country?.FlagName)
+                                                        new DrawableFlag(Score.User?.Country)
                                                         {
                                                             Width = 30,
                                                             RelativeSizeAxes = Axes.Y,

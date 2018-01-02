@@ -16,6 +16,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -26,6 +27,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using OpenTK.Graphics;
 
 namespace osu.Game
 {
@@ -63,6 +65,8 @@ namespace osu.Game
         }
 
         public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
+
+        public readonly BindableBool ShowOverlays = new BindableBool();
 
         private OsuScreen screenStack;
 
@@ -248,15 +252,7 @@ namespace osu.Game
                 Depth = -6,
             }, overlayContent.Add);
 
-            Logger.NewEntry += entry =>
-            {
-                if (entry.Level < LogLevel.Important) return;
-
-                notifications.Post(new SimpleNotification
-                {
-                    Text = $@"{entry.Level}: {entry.Message}"
-                });
-            };
+            forwardLoggedErrorsToNotifications();
 
             dependencies.Cache(settings);
             dependencies.Cache(social);
@@ -300,7 +296,7 @@ namespace osu.Game
                 };
             }
 
-            Action<Visibility> stateChanged = delegate
+            void updateScreenOffset()
             {
                 float offset = 0;
 
@@ -309,20 +305,76 @@ namespace osu.Game
                 if (notifications.State == Visibility.Visible)
                     offset -= ToolbarButton.WIDTH / 2;
 
-                intro.MoveToX(offset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
-            };
+                screenStack.MoveToX(offset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
+            }
 
-            settings.StateChanged += stateChanged;
-            notifications.StateChanged += stateChanged;
+            settings.StateChanged += _ => updateScreenOffset();
+            notifications.StateChanged += _ => updateScreenOffset();
+
+            notifications.Enabled.BindTo(ShowOverlays);
+
+            ShowOverlays.ValueChanged += show =>
+            {
+                //central game screen change logic.
+                if (!show)
+                {
+                    hideAllOverlays();
+                    musicController.State = Visibility.Hidden;
+                    Toolbar.State = Visibility.Hidden;
+                }
+                else
+                    Toolbar.State = Visibility.Visible;
+            };
 
             Cursor.State = Visibility.Hidden;
         }
 
+        private void forwardLoggedErrorsToNotifications()
+        {
+            int recentErrorCount = 0;
+
+            const double debounce = 5000;
+
+            Logger.NewEntry += entry =>
+            {
+                if (entry.Level < LogLevel.Error || entry.Target == null) return;
+
+                if (recentErrorCount < 2)
+                {
+                    notifications.Post(new SimpleNotification
+                    {
+                        Icon = FontAwesome.fa_bomb,
+                        Text = (recentErrorCount == 0 ? entry.Message : "Subsequent errors occurred and have been logged.") + "\nClick to view log files.",
+                        Activated = () =>
+                        {
+                            Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
+                            return true;
+                        }
+                    });
+                }
+
+                Interlocked.Increment(ref recentErrorCount);
+
+                Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentErrorCount), debounce);
+            };
+        }
+
         private Task asyncLoadStream;
+        private int visibleOverlayCount;
 
         private void loadComponentSingleFile<T>(T d, Action<T> add)
             where T : Drawable
         {
+            var focused = d as FocusedOverlayContainer;
+            if (focused != null)
+            {
+                focused.StateChanged += s =>
+                {
+                    visibleOverlayCount += s == Visibility.Visible ? 1 : -1;
+                    screenStack.FadeColour(visibleOverlayCount > 0 ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+                };
+            }
+
             // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
             // we could avoid the need for scheduling altogether.
@@ -366,8 +418,6 @@ namespace osu.Game
 
         public bool OnReleased(GlobalAction action) => false;
 
-        public event Action<Screen> ScreenChanged;
-
         private Container mainContent;
 
         private Container overlayContent;
@@ -383,29 +433,6 @@ namespace osu.Game
             social.State = Visibility.Hidden;
             userProfile.State = Visibility.Hidden;
             notifications.State = Visibility.Hidden;
-        }
-
-        private void screenChanged(Screen newScreen)
-        {
-            currentScreen = newScreen as OsuScreen;
-
-            if (currentScreen == null)
-            {
-                Exit();
-                return;
-            }
-
-            //central game screen change logic.
-            if (!currentScreen.ShowOverlays)
-            {
-                hideAllOverlays();
-                musicController.State = Visibility.Hidden;
-                Toolbar.State = Visibility.Hidden;
-            }
-            else
-                Toolbar.State = Visibility.Visible;
-
-            ScreenChanged?.Invoke(newScreen);
         }
 
         protected override bool OnExiting()
@@ -453,15 +480,18 @@ namespace osu.Game
 
         private void screenAdded(Screen newScreen)
         {
+            currentScreen = (OsuScreen)newScreen;
+
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
-
-            screenChanged(newScreen);
         }
 
         private void screenRemoved(Screen newScreen)
         {
-            screenChanged(newScreen);
+            currentScreen = (OsuScreen)newScreen;
+
+            if (newScreen == null)
+                Exit();
         }
     }
 }

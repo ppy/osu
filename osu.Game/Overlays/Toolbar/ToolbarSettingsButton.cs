@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Toolbar
             TooltipSub = "Change your settings";
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(SettingsOverlay settings)
         {
             StateContainer = settings;

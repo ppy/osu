@@ -40,6 +40,6 @@ namespace osu.Game.Rulesets.Scoring
 
         public DateTimeOffset Date;
 
-        public Dictionary<string, object> Statistics = new Dictionary<string, object>();
+        public Dictionary<HitResult, object> Statistics = new Dictionary<HitResult, object>();
     }
 }

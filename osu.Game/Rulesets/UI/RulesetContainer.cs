@@ -260,6 +260,9 @@ namespace osu.Game.Rulesets.UI
             }
 
             Playfield.PostProcess();
+
+            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
+                mod.ApplyToDrawableHitObjects(Playfield.HitObjects.Objects);
         }
 
         protected override void Update()
