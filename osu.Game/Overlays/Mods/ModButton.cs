@@ -32,7 +32,10 @@ namespace osu.Game.Overlays.Mods
         private readonly Container<ModIcon> iconsContainer;
         private SampleChannel sampleOn, sampleOff;
 
-        public Action<Mod> Action; // Passed the selected mod or null if none
+        /// <summary>
+        /// Fired when the selection changes.
+        /// </summary>
+        public Action<Mod> SelectionChanged;
 
         public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
 
@@ -42,71 +45,73 @@ namespace osu.Game.Overlays.Mods
         // A selected index of -1 means not selected.
         private int selectedIndex = -1;
 
-        protected int SelectedIndex
+        /// <summary>
+        /// Change the selected mod index of this button.
+        /// </summary>
+        /// <param name="newIndex">The new index.</param>
+        /// <returns>Whether the selection changed.</returns>
+        private bool changeSelectedIndex(int newIndex)
         {
-            get
+            if (newIndex == selectedIndex) return false;
+
+            int direction = newIndex < selectedIndex ? -1 : 1;
+            bool beforeSelected = Selected;
+
+            Mod modBefore = SelectedMod ?? Mods[0];
+
+            if (newIndex >= Mods.Length)
+                newIndex = -1;
+            else if (newIndex < -1)
+                newIndex = Mods.Length - 1;
+
+            if (newIndex >= 0 && !Mods[newIndex].HasImplementation)
+                return false;
+
+            selectedIndex = newIndex;
+            Mod modAfter = SelectedMod ?? Mods[0];
+
+            if (beforeSelected != Selected)
             {
-                return selectedIndex;
+                iconsContainer.RotateTo(Selected ? 5f : 0f, 300, Easing.OutElastic);
+                iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, Easing.OutElastic);
             }
-            set
+
+            if (modBefore != modAfter)
             {
-                if (value == selectedIndex) return;
+                const float rotate_angle = 16;
 
-                int direction = value < selectedIndex ? -1 : 1;
-                bool beforeSelected = Selected;
+                foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
+                backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
 
-                Mod modBefore = SelectedMod ?? Mods[0];
-
-                if (value >= Mods.Length)
-                    selectedIndex = -1;
-                else if (value < -1)
-                    selectedIndex = Mods.Length - 1;
-                else
-                    selectedIndex = value;
-
-                Mod modAfter = SelectedMod ?? Mods[0];
-
-                if (beforeSelected != Selected)
+                backgroundIcon.Icon = modAfter.Icon;
+                using (BeginDelayedSequence(mod_switch_duration, true))
                 {
-                    iconsContainer.RotateTo(Selected ? 5f : 0f, 300, Easing.OutElastic);
-                    iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, Easing.OutElastic);
+                    foregroundIcon
+                        .RotateTo(-rotate_angle * direction)
+                        .RotateTo(0f, mod_switch_duration, mod_switch_easing);
+
+                    backgroundIcon
+                        .RotateTo(rotate_angle * direction)
+                        .RotateTo(0f, mod_switch_duration, mod_switch_easing);
+
+                    Schedule(() => displayMod(modAfter));
                 }
-
-                if (modBefore != modAfter)
-                {
-                    const float rotate_angle = 16;
-
-                    foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
-                    backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
-
-                    backgroundIcon.Icon = modAfter.Icon;
-                    using (BeginDelayedSequence(mod_switch_duration, true))
-                    {
-                        foregroundIcon
-                            .RotateTo(-rotate_angle * direction)
-                            .RotateTo(0f, mod_switch_duration, mod_switch_easing);
-
-                        backgroundIcon
-                            .RotateTo(rotate_angle * direction)
-                            .RotateTo(0f, mod_switch_duration, mod_switch_easing);
-
-                        Schedule(() => displayMod(modAfter));
-                    }
-                }
-
-                foregroundIcon.Highlighted = Selected;
             }
+
+            foregroundIcon.Highlighted = Selected;
+
+            (selectedIndex == -1 ? sampleOff : sampleOn).Play();
+            SelectionChanged?.Invoke(SelectedMod);
+            return true;
         }
 
-        public bool Selected => SelectedIndex != -1;
+        public bool Selected => selectedIndex != -1;
 
         private Color4 selectedColour;
+
         public Color4 SelectedColour
         {
-            get
-            {
-                return selectedColour;
-            }
+            get { return selectedColour; }
             set
             {
                 if (value == selectedColour) return;
@@ -116,12 +121,10 @@ namespace osu.Game.Overlays.Mods
         }
 
         private Mod mod;
+
         public Mod Mod
         {
-            get
-            {
-                return mod;
-            }
+            get { return mod; }
             set
             {
                 mod = value;
@@ -147,9 +150,7 @@ namespace osu.Game.Overlays.Mods
 
         public Mod[] Mods { get; private set; }
 
-        // the mods from Mod, only multiple if Mod is a MultiMod
-
-        public virtual Mod SelectedMod => Mods.ElementAtOrDefault(SelectedIndex);
+        public virtual Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -163,31 +164,42 @@ namespace osu.Game.Overlays.Mods
             switch (args.Button)
             {
                 case MouseButton.Left:
-                    SelectNext();
+                    SelectNext(1);
                     break;
                 case MouseButton.Right:
-                    SelectPrevious();
+                    SelectNext(-1);
                     break;
             }
+
             return true;
         }
 
-        public void SelectNext()
+        /// <summary>
+        /// Select the next available mod in a specified direction.
+        /// </summary>
+        /// <param name="direction">1 for forwards, -1 for backwards.</param>
+        public void SelectNext(int direction)
         {
-            (++SelectedIndex == Mods.Length ? sampleOff : sampleOn).Play();
-            Action?.Invoke(SelectedMod);
+            int start = selectedIndex + direction;
+            // wrap around if we are at an extremity.
+            if (start >= Mods.Length)
+                start = -1;
+            else if (start < -1)
+                start = Mods.Length - 1;
+
+            for (int i = start; i < Mods.Length && i >= 0; i += direction)
+            {
+                if (Mods[i].HasImplementation)
+                {
+                    changeSelectedIndex(i);
+                    return;
+                }
+            }
+
+            Deselect();
         }
 
-        public void SelectPrevious()
-        {
-            (--SelectedIndex == -1 ? sampleOff : sampleOn).Play();
-            Action?.Invoke(SelectedMod);
-        }
-
-        public void Deselect()
-        {
-            SelectedIndex = -1;
-        }
+        public void Deselect() => changeSelectedIndex(-1);
 
         private void displayMod(Mod mod)
         {
@@ -195,6 +207,7 @@ namespace osu.Game.Overlays.Mods
                 backgroundIcon.Icon = foregroundIcon.Icon;
             foregroundIcon.Icon = mod.Icon;
             text.Text = mod.Name;
+            Colour = mod.HasImplementation ? Color4.White : Color4.Gray;
         }
 
         private void createIcons()
@@ -264,7 +277,8 @@ namespace osu.Game.Overlays.Mods
         {
             public override string TooltipText => null;
 
-            public PassThroughTooltipModIcon(Mod mod) : base(mod)
+            public PassThroughTooltipModIcon(Mod mod)
+                : base(mod)
             {
             }
         }
