@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddStep("Right special style", () => createPlayfield(4, SpecialColumnPosition.Right));
             AddStep("5 columns", () => createPlayfield(5, SpecialColumnPosition.Normal));
             AddStep("8 columns", () => createPlayfield(8, SpecialColumnPosition.Normal));
-            AddStep("4 + 4 columns", () => 
+            AddStep("4 + 4 columns", () =>
             {
                 var stages = new List<StageDefinition>()
                 {
