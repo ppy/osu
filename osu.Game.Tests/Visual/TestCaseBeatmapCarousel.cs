@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Visual
             var currentlySelected = carousel.Items.FirstOrDefault(s => s.Item is CarouselBeatmap && s.Item.State == CarouselItemState.Selected);
             if (currentlySelected == null)
                 return true;
-            return !currentlySelected.Item.Filtered;
+            return currentlySelected.Item.Visible;
         }
 
         private void checkInvisibleDifficultiesUnselectable()
