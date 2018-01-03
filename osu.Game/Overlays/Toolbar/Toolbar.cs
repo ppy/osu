@@ -62,10 +62,10 @@ namespace osu.Game.Overlays.Toolbar
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
-                        new ToolbarButton
-                        {
-                            Icon = FontAwesome.fa_search
-                        },
+                        //new ToolbarButton
+                        //{
+                        //    Icon = FontAwesome.fa_search
+                        //},
                         userArea = new ToolbarUserArea(),
                         new ToolbarNotificationButton(),
                     }
