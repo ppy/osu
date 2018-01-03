@@ -51,11 +51,12 @@ namespace osu.Game.Tests.Visual
         private class TestSongSelect : PlaySongSelect
         {
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
+            public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager baseManager)
+        private void load(OsuGameBase game)
         {
             TestSongSelect songSelect = null;
 
@@ -69,12 +70,16 @@ namespace osu.Game.Tests.Visual
             dependencies.Cache(rulesets = new RulesetStore(contextFactory));
             dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
             {
-                DefaultBeatmap = defaultBeatmap = baseManager.GetWorkingBeatmap(null)
+                DefaultBeatmap = defaultBeatmap = game.Beatmap.Default
             });
 
             void loadNewSongSelect(bool deleteMaps = false) => AddStep("reload song select", () =>
             {
-                if (deleteMaps) manager.DeleteAll();
+                if (deleteMaps)
+                {
+                    manager.DeleteAll();
+                    game.Beatmap.SetDefault();
+                }
 
                 if (songSelect != null)
                 {
@@ -90,6 +95,8 @@ namespace osu.Game.Tests.Visual
             AddWaitStep(3);
 
             AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
+
+            AddAssert("dummy shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap);
 
             AddStep("import test maps", () =>
             {

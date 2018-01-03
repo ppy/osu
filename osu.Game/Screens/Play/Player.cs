@@ -298,7 +298,7 @@ namespace osu.Game.Screens.Play
 
         private bool onFail()
         {
-            if (Beatmap.Value.Mods.Value.Any(m => !m.AllowFail))
+            if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
             decoupledClock.Stop();

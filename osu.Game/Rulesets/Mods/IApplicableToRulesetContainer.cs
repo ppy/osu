@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// An interface for <see cref="Mod"/>s that can be applied to <see cref="RulesetContainer"/>s.
     /// </summary>
-    public interface IApplicableToRulesetContainer<TObject>
+    public interface IApplicableToRulesetContainer<TObject> : IApplicableMod
         where TObject : HitObject
     {
         /// <summary>
