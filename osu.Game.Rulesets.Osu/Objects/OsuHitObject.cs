@@ -75,11 +75,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            if (difficulty.ApproachRate >= 5)
-                TimePreempt = 1200 - (difficulty.ApproachRate - 5) * 150;
-            else
-                TimePreempt = 1800 - difficulty.ApproachRate * 120;
-            TimeFadein = TimePreempt * 0.66f;
+            TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
+            TimeFadein = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1200, 800, 300);
 
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
