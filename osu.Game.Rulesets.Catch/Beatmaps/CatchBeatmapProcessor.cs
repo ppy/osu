@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             if (beatmap.ComboColors.Count == 0)
                 return;
 
-            int comboIndex = 0;
+            int index = 0;
             int colourIndex = 0;
 
             CatchHitObject lastObj = null;
@@ -31,12 +31,10 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 if (obj.NewCombo)
                 {
                     if (lastObj != null) lastObj.LastInCombo = true;
-
-                    comboIndex = 0;
                     colourIndex = (colourIndex + 1) % beatmap.ComboColors.Count;
                 }
 
-                obj.ComboIndex = comboIndex++;
+                obj.IndexInBeatmap = index++;
                 obj.ComboColour = beatmap.ComboColors[colourIndex];
 
                 lastObj = obj;
