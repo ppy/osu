@@ -229,11 +229,15 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public void SelectNextRandom()
+        /// <summary>
+        /// Select the next beatmap in the random sequence.
+        /// </summary>
+        /// <returns>True if a selection could be made, else False.</returns>
+        public bool SelectNextRandom()
         {
-            var visibleSets = beatmapSets.Where(s => !s.Filtered).ToList();
-            if (!visibleSets.Any())
-                return;
+            var visible = beatmapSets.Where(s => !s.Filtered).ToList();
+            if (!visible.Any())
+                return false;
 
             if (selectedBeatmap != null)
             {
@@ -264,6 +268,7 @@ namespace osu.Game.Screens.Select
 
             var visibleBeatmaps = set.Beatmaps.Where(s => !s.Filtered).ToList();
             select(visibleBeatmaps.Skip(RNG.Next(visibleBeatmaps.Count)).FirstOrDefault());
+            return true;
         }
 
         public void SelectPreviousRandom()
