@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public void ApplyToRulesetContainer(RulesetContainer<ManiaHitObject> rulesetContainer)
         {
-            int availableColumns = ((ManiaRulesetContainer)rulesetContainer).AvailableColumns;
+            int availableColumns = ((ManiaRulesetContainer)rulesetContainer).Beatmap.TotalColumns;
             var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(item => RNG.Next()).ToList();
 
             rulesetContainer.Objects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
