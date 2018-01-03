@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSpinner : DrawableOsuHitObject
     {
-        private readonly Spinner spinner;
+        protected readonly Spinner Spinner;
 
         public readonly SpinnerDisc Disc;
         public readonly SpinnerTicks Ticks;
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // we are slightly bigger than our parent, to clip the top and bottom of the circle
             Height = 1.3f;
 
-            spinner = s;
+            Spinner = s;
 
             Children = new Drawable[]
             {
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
-                        Disc = new SpinnerDisc(spinner)
+                        Disc = new SpinnerDisc(Spinner)
                         {
                             Scale = Vector2.Zero,
                             Anchor = Anchor.Centre,
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
         }
 
-        public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / spinner.SpinsRequired, 0, 1);
+        public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 glow.FadeColour(completeColour, duration);
             }
 
-            if (!userTriggered && Time.Current >= spinner.EndTime)
+            if (!userTriggered && Time.Current >= Spinner.EndTime)
             {
                 if (Progress >= 1)
                     AddJudgement(new OsuJudgement { Result = HitResult.Great });
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AddJudgement(new OsuJudgement { Result = HitResult.Good });
                 else if (Progress > .75)
                     AddJudgement(new OsuJudgement { Result = HitResult.Meh });
-                else if (Time.Current >= spinner.EndTime)
+                else if (Time.Current >= Spinner.EndTime)
                     AddJudgement(new OsuJudgement { Result = HitResult.Miss });
             }
         }
@@ -180,7 +180,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Ticks.Rotation = Disc.Rotation;
             spmCounter.SetRotation(Disc.RotationAbsolute);
 
-            float relativeCircleScale = spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
+            float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
 
             symbol.RotateTo(Disc.Rotation / 2, 500, Easing.OutQuint);
@@ -190,22 +190,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            circleContainer.ScaleTo(spinner.Scale * 0.3f);
-            circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, Easing.OutQuint);
+            circleContainer.ScaleTo(Spinner.Scale * 0.3f);
+            circleContainer.ScaleTo(Spinner.Scale, TIME_PREEMPT / 1.4f, Easing.OutQuint);
 
             Disc.RotateTo(-720);
             symbol.RotateTo(-720);
 
             mainContainer
                 .ScaleTo(0)
-                .ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, Easing.OutQuint)
+                .ScaleTo(Spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, Easing.OutQuint)
                 .Then()
                 .ScaleTo(1, 500, Easing.OutQuint);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            var sequence = this.Delay(spinner.Duration).FadeOut(160);
+            var sequence = this.Delay(Spinner.Duration).FadeOut(160);
 
             switch (state)
             {
