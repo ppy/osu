@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mania.Mods;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
@@ -68,6 +70,9 @@ namespace osu.Game.Tests.Visual
                     case OsuRuleset or:
                         testOsuMods(or);
                         break;
+                    case ManiaRuleset mr:
+                        testManiaMods(mr);
+                        break;
                 }
             }
         }
@@ -80,16 +85,27 @@ namespace osu.Game.Tests.Visual
 
             var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
             var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
+
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
+
             var autoPilotMod = assistMods.FirstOrDefault(m => m is OsuModAutopilot);
+
+            var easy = easierMods.FirstOrDefault(m => m is OsuModEasy);
+            var hardRock = harderMods.FirstOrDefault(m => m is OsuModHardRock);
 
             testSingleMod(noFailMod);
             testMultiMod(doubleTimeMod);
-            testIncompatibleMods(noFailMod, autoPilotMod);
+            testIncompatibleMods(easy, hardRock);
             testDeselectAll(easierMods.Where(m => !(m is MultiMod)));
             testMultiplierTextColour(noFailMod, modSelect.LowMultiplierColour);
             testMultiplierTextColour(hiddenMod, modSelect.HighMultiplierColour);
-            testMultiplierTextUnranked(autoPilotMod);
+
+            testUnimplmentedMod(autoPilotMod);
+        }
+
+        private void testManiaMods(ManiaRuleset ruleset)
+        {
+            testMultiplierTextUnranked(ruleset.GetModsFor(ModType.Special).First(m => m is ManiaModRandom));
         }
 
         private void testSingleMod(Mod mod)
@@ -122,6 +138,12 @@ namespace osu.Game.Tests.Visual
 
             foreach (var mod in multiMod.Mods)
                 checkNotSelected(mod);
+        }
+
+        private void testUnimplmentedMod(Mod mod)
+        {
+            selectNext(mod);
+            checkNotSelected(mod);
         }
 
         private void testIncompatibleMods(Mod modA, Mod modB)
@@ -169,9 +191,9 @@ namespace osu.Game.Tests.Visual
             AddAssert("check for ranked", () => !modSelect.MultiplierLabel.Text.EndsWith(unranked_suffix));
         }
 
-        private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext());
+        private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));
 
-        private void selectPrevious(Mod mod) => AddStep($"right click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectPrevious());
+        private void selectPrevious(Mod mod) => AddStep($"right click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(-1));
 
         private void checkSelected(Mod mod)
         {
