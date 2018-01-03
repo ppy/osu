@@ -1,15 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Timing;
-
 namespace osu.Game.Rulesets.Mods
 {
     /// <summary>
-    /// An interface for mods that make adjustments to the track.
+    /// The base interface for a mod which can be applied in some way.
+    /// If this is not implemented by a mod, it will not be available for use in-game.
     /// </summary>
-    public interface IApplicableToClock : IApplicableMod
+    public interface IApplicableMod
     {
-        void ApplyToClock(IAdjustableClock clock);
     }
 }
