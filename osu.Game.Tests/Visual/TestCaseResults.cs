@@ -15,6 +15,15 @@ namespace osu.Game.Tests.Visual
     {
         private BeatmapManager beatmaps;
 
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(Score),
+            typeof(Results),
+            typeof(ResultsPage),
+            typeof(ResultsPageScore),
+            typeof(ResultsPageRanking)
+        };
+
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmaps)
         {

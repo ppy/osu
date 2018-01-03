@@ -251,16 +251,16 @@ namespace osu.Game.Screens.Ranking
                     {
                         Origin = Anchor.CentreLeft,
                         Anchor = Anchor.CentreLeft,
-                        Text = datetime.ToString("HH:mm"),
-                        Padding = new MarginPadding { Left = 10, Right = 10, Top = 5, Bottom = 5 },
+                        Text = datetime.ToShortDateString(),
+                        Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                         Colour = Color4.White,
                     },
                     new OsuSpriteText
                     {
                         Origin = Anchor.CentreRight,
                         Anchor = Anchor.CentreRight,
-                        Text = datetime.ToString("yyyy/MM/dd"),
-                        Padding = new MarginPadding { Left = 10, Right = 10, Top = 5, Bottom = 5 },
+                        Text = datetime.ToShortTimeString(),
+                        Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                         Colour = Color4.White,
                     }
                 };

@@ -449,9 +449,16 @@ namespace osu.Game.Screens.Select
         private void carouselBeatmapsLoaded()
         {
             if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
+            {
                 Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo);
+            }
             else if (Carousel.SelectedBeatmapSet == null)
-                Carousel.SelectNextRandom();
+            {
+                if (!Carousel.SelectNextRandom())
+                    // in the case random selection failed, we want to trigger selectionChanged
+                    // to show the dummy beatmap (we have nothing else to display).
+                    carouselSelectionChanged(null);
+            }
         }
 
         private void delete(BeatmapSetInfo beatmap)
