@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 number = new NumberPiece
                 {
-                    Text = (HitObject.ComboIndex + 1).ToString(),
+                    Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
                 },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),

@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     colourIndex = (colourIndex + 1) % beatmap.ComboColors.Count;
                 }
 
-                obj.ComboIndex = comboIndex++;
+                obj.IndexInCurrentCombo = comboIndex++;
                 obj.ComboColour = beatmap.ComboColors[colourIndex];
             }
         }

@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     StartTime = s.StartTime,
                     Position = s.StackedPosition,
-                    ComboIndex = s.ComboIndex,
+                    IndexInCurrentCombo = s.IndexInCurrentCombo,
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
                     Samples = s.Samples,
