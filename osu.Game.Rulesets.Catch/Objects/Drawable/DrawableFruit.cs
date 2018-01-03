@@ -42,13 +42,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         Hollow = true,
                         Type = EdgeEffectType.Glow,
                         Radius = 4,
-                        Colour = AccentColour.Darken(1).Opacity(0.8f)
+                        Colour = AccentColour.Darken(1).Opacity(0.6f)
                     },
                     Size = new Vector2(Height * 1.5f),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BorderColour = Color4.White,
-                    BorderThickness = 2.5f,
+                    BorderThickness = 4f,
                     Children = new Framework.Graphics.Drawable[]
                     {
                         new Box
@@ -248,7 +248,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         protected override void Update()
         {
             base.Update();
-            border.Alpha = (float)MathHelper.Clamp((HitObject.StartTime - Time.Current) / 1000, 0, 1);
+
+            border.Alpha = (float)MathHelper.Clamp((HitObject.StartTime - Time.Current) / 500, 0, 1);
         }
     }
 }
