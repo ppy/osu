@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mania.Mods;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
@@ -68,6 +70,9 @@ namespace osu.Game.Tests.Visual
                     case OsuRuleset or:
                         testOsuMods(or);
                         break;
+                    case ManiaRuleset mr:
+                        testManiaMods(mr);
+                        break;
                 }
             }
         }
@@ -96,9 +101,11 @@ namespace osu.Game.Tests.Visual
             testMultiplierTextColour(hiddenMod, modSelect.HighMultiplierColour);
 
             testUnimplmentedMod(autoPilotMod);
+        }
 
-            // TODO: add back once we have an implemented unranked mod.
-            // testMultiplierTextUnranked(autoPilotMod);
+        private void testManiaMods(ManiaRuleset ruleset)
+        {
+            testMultiplierTextUnranked(ruleset.GetModsFor(ModType.Special).First(m => m is ManiaModRandom));
         }
 
         private void testSingleMod(Mod mod)
