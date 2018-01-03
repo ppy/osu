@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Social
         Relevance,
         Rank,
         Name,
-        //Location,
+        Location,
         //[Description("Time Zone")]
         //TimeZone,
         //[Description("World Map")]
