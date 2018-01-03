@@ -17,9 +17,9 @@ using OpenTK.Graphics;
 namespace osu.Game.Rulesets.Mania.UI
 {
     /// <summary>
-    /// controls that from up to down
+    /// A collection of <see cref="Column"/>s.
     /// </summary>
-    internal class ManiaColumnGroup : ScrollingPlayfield
+    internal class ManiaColumnStage : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
 
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly int ColumnCount;
 
-        public ManiaColumnGroup(int columnCount)
+        public ManiaColumnStage(int columnCount)
             : base(Axes.Y)
         {
             ColumnCount = columnCount;

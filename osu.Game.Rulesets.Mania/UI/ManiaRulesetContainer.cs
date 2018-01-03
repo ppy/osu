@@ -31,11 +31,6 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
-        /// <summary>
-        /// Co-op
-        /// </summary>
-        public bool Coop { get; set; }
-
         public IEnumerable<BarLine> BarLines;
 
         public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
@@ -75,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
         }
 
-        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.TotalColumns)
+        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,

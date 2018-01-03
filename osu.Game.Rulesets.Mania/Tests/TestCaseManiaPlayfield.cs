@@ -2,11 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -82,7 +84,11 @@ namespace osu.Game.Rulesets.Mania.Tests
             Add(inputManager);
 
             ManiaPlayfield playfield;
-            inputManager.Add(playfield = new ManiaPlayfield(cols, false)
+            var stages = new List<StageDefinition>()
+            {
+                new StageDefinition() { Columns = cols },
+            };
+            inputManager.Add(playfield = new ManiaPlayfield(stages)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -104,7 +110,11 @@ namespace osu.Game.Rulesets.Mania.Tests
             Add(inputManager);
 
             ManiaPlayfield playfield;
-            inputManager.Add(playfield = new ManiaPlayfield(4,false)
+            var stages = new List<StageDefinition>()
+            {
+                new StageDefinition() { Columns = 4 },
+            };
+            inputManager.Add(playfield = new ManiaPlayfield(stages)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
