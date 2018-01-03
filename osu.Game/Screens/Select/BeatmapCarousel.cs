@@ -265,7 +265,7 @@ namespace osu.Game.Screens.Select
             }
             else
                 set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
-            
+
             var visibleBeatmaps = set.Beatmaps.Where(s => !s.Filtered).ToList();
             select(visibleBeatmaps.Skip(RNG.Next(visibleBeatmaps.Count)).FirstOrDefault());
             return true;
