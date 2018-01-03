@@ -108,13 +108,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return placeholderState; }
             set
             {
-                if (value != PlaceholderState.Successful)
-                {
-                    getScoresRequest?.Cancel();
-                    getScoresRequest = null;
-                    Scores = null;
-                }
-
                 if (value == placeholderState)
                     return;
 
@@ -177,7 +170,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                     return;
 
                 beatmap = value;
-                Scores = null;
 
                 pendingBeatmapSwitch?.Cancel();
                 pendingBeatmapSwitch = Schedule(updateScores);
@@ -221,6 +213,10 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void updateScores()
         {
+            getScoresRequest?.Cancel();
+            getScoresRequest = null;
+            Scores = null;
+
             if (Scope == LeaderboardScope.Local)
             {
                 // TODO: get local scores from wherever here.
@@ -280,8 +276,6 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (placeholder == null)
                 return;
-
-            Scores = null;
 
             placeholderContainer.Add(placeholder);
 
