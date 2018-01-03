@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.UI
     public class ManiaPlayfield : ScrollingPlayfield
     {
         /// <summary>
-        /// list mania column group
+        /// list mania column stages
         /// </summary>
         private readonly FillFlowContainer<ManiaColumnStage> listColumnStages;
 
@@ -37,9 +37,9 @@ namespace osu.Game.Rulesets.Mania.UI
             get => listColumnStages.FirstOrDefault()?.SpecialColumnPosition ?? SpecialColumnPosition.Normal;
             set
             {
-                foreach (var singleGroup in listColumnStages)
+                foreach (var singleStage in listColumnStages)
                 {
-                    singleGroup.SpecialColumnPosition = value;
+                    singleStage.SpecialColumnPosition = value;
                 }
             }
         }
@@ -81,11 +81,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
             foreach (var stage in stages)
             {
-                var group = new ManiaColumnStage(stage.Columns);
-                group.VisibleTimeRange.BindTo(VisibleTimeRange);
+                var drawableStage = new ManiaColumnStage(stage.Columns);
+                drawableStage.VisibleTimeRange.BindTo(VisibleTimeRange);
 
-                listColumnStages.Add(group);
-                AddNested(group);
+                listColumnStages.Add(drawableStage);
+                AddNested(drawableStage);
 
                 for (int i = 0; i < stage.Columns; i++)
                 {
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         Action = currentAction++
                     };
 
-                    group.AddColumn(c);
+                    drawableStage.AddColumn(c);
                     AddNested(c);
                 }
             }
@@ -108,7 +108,6 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             Scale = new Vector2(1, newValue ? -1 : 1);
 
-            //judgements.Scale = Scale;
             foreach (var single in listColumnStages)
             {
                 single.Judgements.Scale = Scale;
