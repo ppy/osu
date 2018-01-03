@@ -177,8 +177,6 @@ namespace osu.Game.Overlays
 
         public override bool AcceptsFocus => true;
 
-        protected override bool OnClick(InputState state) => true;
-
         protected override void OnFocus(InputState state)
         {
             GetContainingInputManager().ChangeFocus(searchTextBox);

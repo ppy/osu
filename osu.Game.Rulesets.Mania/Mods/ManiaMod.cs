@@ -105,6 +105,8 @@ namespace osu.Game.Rulesets.Mania.Mods
 
     public abstract class ManiaKeyMod : Mod
     {
+        // TODO: implement using the IApplicable interface. Haven't done so yet because KeyCount isn't even hooked up at the moment.
+
         public override string ShortenedName => Name;
         public abstract int KeyCount { get; }
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier
