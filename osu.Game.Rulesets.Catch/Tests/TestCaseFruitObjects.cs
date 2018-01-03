@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
+using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using osu.Game.Tests.Visual;
 using OpenTK;
 
@@ -18,8 +19,11 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             typeof(CatchHitObject),
             typeof(Fruit),
+            typeof(Droplet),
             typeof(DrawableCatchHitObject),
             typeof(DrawableFruit),
+            typeof(DrawableDroplet),
+            typeof(Pulp),
         };
 
         public TestCaseFruitObjects()
@@ -33,25 +37,23 @@ namespace osu.Game.Rulesets.Catch.Tests
                     {
                         createDrawable(0),
                         createDrawable(1),
+                        createDrawable(2),
                     },
                     new Drawable[]
                     {
-                        createDrawable(2),
                         createDrawable(3),
+                        createDrawable(4),
+                        createDrawable(5),
                     },
                 }
             });
         }
 
-        protected override void Update()
-        {
-            base.Update();
-        }
-
         private DrawableFruit createDrawable(int index) => new DrawableFruit(new Fruit
         {
-            StartTime = 1000000,
-            IndexInBeatmap = index
+            StartTime = 1000000000000,
+            IndexInBeatmap = index,
+            Scale = 1.5f,
         })
         {
             Anchor = Anchor.Centre,
