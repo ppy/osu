@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
@@ -16,36 +15,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public float X { get; set; }
 
-        public Color4 ComboColour
-        {
-            get
-            {
-                switch (VisualRepresentation)
-                {
-                    default:
-                    case FruitVisualRepresentation.Triforce:
-                        return new Color4(17, 136, 170, 255);
-                    case FruitVisualRepresentation.Grape:
-                        return new Color4(204, 102, 0, 255);
-                    case FruitVisualRepresentation.DPad:
-                        return new Color4(121, 9, 13, 255);
-                    case FruitVisualRepresentation.Pineapple:
-                        return new Color4(102, 136, 0, 255);
-                    case FruitVisualRepresentation.Banana:
-                        switch (RNG.Next(0, 3))
-                        {
-                            default:
-                                return new Color4(255, 240, 0, 255);
-                            case 1:
-                                return new Color4(255, 192, 0, 255);
-                            case 2:
-                                return new Color4(214, 221, 28, 255);
-                        }
-                }
-            }
-
-            set { }
-        }
+        public Color4 ComboColour { get; set; }
 
         public int IndexInBeatmap { get; set; }
 
