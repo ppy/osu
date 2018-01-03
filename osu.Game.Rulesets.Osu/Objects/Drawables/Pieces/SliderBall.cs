@@ -101,16 +101,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         // If the current time is between the start and end of the slider, we should track mouse input regardless of the cursor position.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => canCurrentlyTrack || base.ReceiveMouseInputAt(screenSpacePos);
 
-        public override void ClearTransforms(bool propagateChildren = false, string targetMember = null)
+        public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
         {
             // Consider the case of rewinding - children's transforms are handled internally, so propagating down
             // any further will cause weirdness with the Tracking bool below. Let's not propagate further at this point.
-            base.ClearTransforms(false, targetMember);
-        }
-
-        public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
-        {
-            // Same reasoning as in ClearTransforms.
             base.ClearTransformsAfter(time, false, targetMember);
         }
 
