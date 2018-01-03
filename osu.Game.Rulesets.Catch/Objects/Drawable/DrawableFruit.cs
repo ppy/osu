@@ -40,10 +40,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 {
                     EdgeEffect = new EdgeEffectParameters
                     {
-                        Hollow = true,
+                        Hollow = !HitObject.HyperDash,
                         Type = EdgeEffectType.Glow,
                         Radius = 4,
-                        Colour = AccentColour.Darken(1).Opacity(0.6f)
+                        Colour = HitObject.HyperDash ? Color4.Red : AccentColour.Darken(1).Opacity(0.6f)
                     },
                     Size = new Vector2(Height * 1.5f),
                     Anchor = Anchor.Centre,
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             switch (representation)
             {
                 default:
-                    return new Container { };
+                    return new Container();
                 case FruitVisualRepresentation.DPad:
                     return new Container
                     {
