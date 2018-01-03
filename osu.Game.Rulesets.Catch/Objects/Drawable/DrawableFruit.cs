@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             AccentColour = HitObject.ComboColour;
             Masking = false;
 
-            //Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
+            Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
         }
 
         [BackgroundDependencyLoader]
