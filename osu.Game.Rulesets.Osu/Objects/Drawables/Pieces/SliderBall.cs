@@ -108,6 +108,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             base.ClearTransforms(false, targetMember);
         }
 
+        public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
+        {
+            // Same reasoning as in ClearTransforms.
+            base.ClearTransformsAfter(time, false, targetMember);
+        }
+
         private bool tracking;
         public bool Tracking
         {
