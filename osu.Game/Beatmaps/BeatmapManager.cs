@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Textures;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Online.API;
@@ -651,7 +652,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return new TextureStore(new RawTextureLoaderStore(store), false).Get(getPathForFile(Metadata.BackgroundFile));
+                    return new LargeTextureStore(new RawTextureLoaderStore(store)).Get(getPathForFile(Metadata.BackgroundFile));
                 }
                 catch
                 {
