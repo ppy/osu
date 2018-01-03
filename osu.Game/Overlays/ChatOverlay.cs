@@ -240,8 +240,6 @@ namespace osu.Game.Overlays
 
         public override bool AcceptsFocus => true;
 
-        protected override bool OnClick(InputState state) => true;
-
         protected override void OnFocus(InputState state)
         {
             //this is necessary as textbox is masked away and therefore can't get focus :(

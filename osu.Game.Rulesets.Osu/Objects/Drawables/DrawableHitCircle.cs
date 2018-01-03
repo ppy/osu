@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Origin = Anchor.Centre;
 
             Position = HitObject.StackedPosition;
-            Scale = new Vector2(HitObject.Scale);
+            Scale = new Vector2(h.Scale);
 
             Children = new Drawable[]
             {
