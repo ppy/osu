@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// An interface for <see cref="Mod"/>s that can be applied to <see cref="DrawableHitObject"/>s.
     /// </summary>
-    public interface IApplicableToDrawableHitObjects
+    public interface IApplicableToDrawableHitObjects : IApplicableMod
     {
         /// <summary>
         /// Applies this <see cref="IApplicableToDrawableHitObjects"/> to a list of <see cref="DrawableHitObject"/>s.
