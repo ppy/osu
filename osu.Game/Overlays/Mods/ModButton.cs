@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Change the selected mod index of this button.
         /// </summary>
-        /// <param name="newIndexhe new index</param>
+        /// <param name="newIndex">The new index.</param>
         /// <returns>Whether the selection changed.</returns>
         private bool changeSelectedIndex(int newIndex)
         {
