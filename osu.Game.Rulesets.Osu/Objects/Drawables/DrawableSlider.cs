@@ -10,6 +10,7 @@ using System.Linq;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -17,23 +18,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         private readonly Slider slider;
 
-        private readonly DrawableHitCircle initialCircle;
+        public readonly DrawableHitCircle InitialCircle;
 
         private readonly List<ISliderProgress> components = new List<ISliderProgress>();
 
         private readonly Container<DrawableSliderTick> ticks;
         private readonly Container<DrawableRepeatPoint> repeatPoints;
 
-        private readonly SliderBody body;
-        private readonly SliderBall ball;
+        public readonly SliderBody Body;
+        public readonly SliderBall Ball;
 
-        public DrawableSlider(Slider s) : base(s)
+        public DrawableSlider(Slider s)
+            : base(s)
         {
             slider = s;
 
             Children = new Drawable[]
             {
-                body = new SliderBody(s)
+                Body = new SliderBody(s)
                 {
                     AccentColour = AccentColour,
                     Position = s.StackedPosition,
@@ -41,16 +43,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 ticks = new Container<DrawableSliderTick>(),
                 repeatPoints = new Container<DrawableRepeatPoint>(),
-                ball = new SliderBall(s)
+                Ball = new SliderBall(s)
                 {
                     Scale = new Vector2(s.Scale),
                     AccentColour = AccentColour,
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                initialCircle = new DrawableHitCircle(new HitCircle
+                InitialCircle = new DrawableHitCircle(new HitCircle
                 {
-                    //todo: avoid creating this temporary HitCircle.
                     StartTime = s.StartTime,
                     Position = s.StackedPosition,
                     ComboIndex = s.ComboIndex,
@@ -61,16 +62,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 })
             };
 
-            components.Add(body);
-            components.Add(ball);
+            components.Add(Body);
+            components.Add(Ball);
 
-            AddNested(initialCircle);
+            AddNested(InitialCircle);
 
             var repeatDuration = s.Curve.Distance / s.Velocity;
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
                 var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? TIME_FADEIN : TIME_FADEIN / 2);
+                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? FadeInDuration : FadeInDuration / 2);
                 var fadeOutTime = repeatStartTime + repeatDuration;
 
                 var drawableTick = new DrawableSliderTick(tick)
@@ -87,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
                 var repeatStartTime = s.StartTime + repeatPoint.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? TIME_FADEIN : TIME_FADEIN / 2);
+                var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? FadeInDuration : FadeInDuration / 2);
                 var fadeOutTime = repeatStartTime + repeatDuration;
 
                 var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
@@ -105,11 +106,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private int currentRepeat;
         public bool Tracking;
 
+        public override double FadeInDuration
+        {
+            get { return base.FadeInDuration; }
+            set { InitialCircle.FadeInDuration = base.FadeInDuration = value; }
+        }
+
         protected override void Update()
         {
             base.Update();
 
-            Tracking = ball.Tracking;
+            Tracking = Ball.Tracking;
 
             double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
@@ -120,11 +127,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 currentRepeat = repeat;
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (!initialCircle.Judgements.Any(j => j.IsHit))
-                initialCircle.Position = slider.Curve.PositionAt(progress);
+            if (!InitialCircle.Judgements.Any(j => j.IsHit))
+                InitialCircle.Position = slider.Curve.PositionAt(progress);
 
             foreach (var c in components) c.UpdateProgress(progress, repeat);
-            foreach (var t in ticks.Children) t.Tracking = ball.Tracking;
+            foreach (var t in ticks.Children) t.Tracking = Ball.Tracking;
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
@@ -133,13 +140,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 var judgementsCount = ticks.Children.Count + repeatPoints.Children.Count + 1;
                 var judgementsHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit)) + repeatPoints.Children.Count(t => t.Judgements.Any(j => j.IsHit));
-                if (initialCircle.Judgements.Any(j => j.IsHit))
+                if (InitialCircle.Judgements.Any(j => j.IsHit))
                     judgementsHit++;
 
                 var hitFraction = (double)judgementsHit / judgementsCount;
-                if (hitFraction == 1 && initialCircle.Judgements.Any(j => j.Result == HitResult.Great))
+                if (hitFraction == 1 && InitialCircle.Judgements.Any(j => j.Result == HitResult.Great))
                     AddJudgement(new OsuJudgement { Result = HitResult.Great });
-                else if (hitFraction >= 0.5 && initialCircle.Judgements.Any(j => j.Result >= HitResult.Good))
+                else if (hitFraction >= 0.5 && InitialCircle.Judgements.Any(j => j.Result >= HitResult.Good))
                     AddJudgement(new OsuJudgement { Result = HitResult.Good });
                 else if (hitFraction > 0)
                     AddJudgement(new OsuJudgement { Result = HitResult.Meh });
@@ -150,21 +157,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            ball.FadeIn();
+            Ball.FadeIn();
 
             using (BeginDelayedSequence(slider.Duration, true))
             {
-                body.FadeOut(160);
-                ball.FadeOut(160);
+                Body.FadeOut(160);
+                Ball.FadeOut(160);
 
                 this.FadeOut(800)
                     .Expire();
             }
         }
 
-        public Drawable ProxiedLayer => initialCircle.ApproachCircle;
+        public Drawable ProxiedLayer => InitialCircle.ApproachCircle;
 
-        public override Vector2 SelectionPoint => ToScreenSpace(body.Position);
-        public override Quad SelectionQuad => body.PathDrawQuad;
+        public override Vector2 SelectionPoint => ToScreenSpace(Body.Position);
+        public override Quad SelectionQuad => Body.PathDrawQuad;
     }
 }
