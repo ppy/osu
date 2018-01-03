@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using System.Collections.Generic;
-using System;
 
 namespace osu.Game.Rulesets.Mania
 {
@@ -18,6 +17,6 @@ namespace osu.Game.Rulesets.Mania
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null) => 0;
 
-        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter(Beatmap beatmap) => new ManiaBeatmapConverter(true, (int)Math.Max(1, Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize)));
+        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter(Beatmap beatmap) => new ManiaBeatmapConverter(true, beatmap);
     }
 }
