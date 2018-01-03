@@ -12,22 +12,22 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
     public class ManiaBeatmap : Beatmap<ManiaHitObject>
     {
         /// <summary>
-        /// The definitions for each grouping in a <see cref="ManiaPlayfield"/>.
+        /// The definitions for each stage in a <see cref="ManiaPlayfield"/>.
         /// </summary>
-        public readonly List<GroupDefinition> Groups = new List<GroupDefinition>();
+        public readonly List<StageDefinition> Stages = new List<StageDefinition>();
 
         /// <summary>
-        /// Total number of columns represented by all groups in this <see cref="ManiaBeatmap"/>.
+        /// Total number of columns represented by all stages in this <see cref="ManiaBeatmap"/>.
         /// </summary>
-        public int TotalColumns => Groups.Sum(g => g.Columns);
+        public int TotalColumns => Stages.Sum(g => g.Columns);
 
         /// <summary>
         /// Creates a new <see cref="ManiaBeatmap"/>.
         /// </summary>
-        /// <param name="initialGroup">The initial grouping of columns.</param>
-        public ManiaBeatmap(GroupDefinition initialGroup)
+        /// <param name="initialStage">The initial stage.</param>
+        public ManiaBeatmap(StageDefinition initialStage)
         {
-            Groups.Add(initialGroup);
+            Stages.Add(initialStage);
         }
     }
 }
