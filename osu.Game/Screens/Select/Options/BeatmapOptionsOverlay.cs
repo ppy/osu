@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Select.Options
         private readonly Box holder;
         private readonly FillFlowContainer<BeatmapOptionsButton> buttonsContainer;
 
+        public override bool BlockScreenWideMouse => false;
+
         protected override void PopIn()
         {
             base.PopIn();
