@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -30,11 +29,7 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaRulesetContainer : ScrollingRulesetContainer<ManiaPlayfield, ManiaHitObject>
     {
-        /// <summary>
-        /// The number of columns which the <see cref="ManiaPlayfield"/> should display, and which
-        /// the beatmap converter will attempt to convert beatmaps to use.
-        /// </summary>
-        public int AvailableColumns { get; private set; }
+        public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
         /// <summary>
         /// Co-op
@@ -80,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
         }
 
-        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(AvailableColumns, Coop)
+        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.TotalColumns)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -88,41 +83,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, AvailableColumns);
+        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Beatmap.TotalColumns);
 
-        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter()
-        {
-            if (IsForCurrentRuleset)
-                AvailableColumns = (int)Math.Max(1, Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.CircleSize));
-            else
-            {
-                float percentSliderOrSpinner = (float)WorkingBeatmap.Beatmap.HitObjects.Count(h => h is IHasEndTime) / WorkingBeatmap.Beatmap.HitObjects.Count;
-                if (percentSliderOrSpinner < 0.2)
-                    AvailableColumns = 7;
-                else if (percentSliderOrSpinner < 0.3 || Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.CircleSize) >= 5)
-                    AvailableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) > 5 ? 7 : 6;
-                else if (percentSliderOrSpinner > 0.6)
-                    AvailableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) > 4 ? 5 : 4;
-                else
-                    AvailableColumns = Math.Max(4, Math.Min((int)Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) + 1, 7));
-            }
-
-            //get mods to change column and coop
-            foreach (var single in WorkingBeatmap.Mods.Value)
-            {
-                if (single is ManiaKeyMod maniaKeyMod)
-                {
-                    AvailableColumns = maniaKeyMod.KeyCount;
-                }
-                if (single is ManiaModKeyCoop)
-                {
-                    Coop = true;
-                    AvailableColumns = AvailableColumns * 2;
-                }
-            }
-
-            return new ManiaBeatmapConverter(IsForCurrentRuleset, AvailableColumns);
-        }
+        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter(IsForCurrentRuleset, WorkingBeatmap.Beatmap);
 
         protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {

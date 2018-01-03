@@ -7,6 +7,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -203,6 +204,8 @@ namespace osu.Game.Tests.Visual
             private readonly FillFlowContainer<PerformanceDisplay> scores;
             private APIAccess api;
 
+            private readonly Bindable<WorkingBeatmap> currentBeatmap = new Bindable<WorkingBeatmap>();
+
             public PerformanceList()
             {
                 RelativeSizeAxes = Axes.X;
@@ -231,12 +234,15 @@ namespace osu.Game.Tests.Visual
                     };
                 }
 
-                osuGame.Beatmap.ValueChanged += beatmapChanged;
+                currentBeatmap.ValueChanged += beatmapChanged;
+                currentBeatmap.BindTo(osuGame.Beatmap);
             }
 
             private GetScoresRequest lastRequest;
             private void beatmapChanged(WorkingBeatmap newBeatmap)
             {
+                if (!IsAlive) return;
+
                 lastRequest?.Cancel();
                 scores.Clear();
 
