@@ -107,14 +107,15 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return placeholderState; }
             set
             {
-                if (value == placeholderState) return;
-
                 if (value != PlaceholderState.Successful)
                 {
                     getScoresRequest?.Cancel();
                     getScoresRequest = null;
                     Scores = null;
                 }
+
+                if (value == placeholderState)
+                    return;
 
                 switch (placeholderState = value)
                 {
