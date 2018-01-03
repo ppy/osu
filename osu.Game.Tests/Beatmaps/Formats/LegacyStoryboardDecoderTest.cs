@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsTrue(animation.IsDrawable);
                 Assert.AreEqual(AnimationLoopType.LoopForever, animation.LoopType);
                 Assert.AreEqual(Anchor.Centre, animation.Origin);
-                Assert.AreEqual(Path.Combine("SB", "red jitter", "red_000.jpg"), animation.Path);
+                Assert.AreEqual(Path.Combine("SB", "red jitter", "red_0000.jpg"), animation.Path);
                 Assert.AreEqual(78993, animation.StartTime);
             }
         }
