@@ -6,7 +6,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModNoFail : Mod
+    public abstract class ModNoFail : Mod, IApplicableFailOverride
     {
         public override string Name => "NoFail";
         public override string ShortenedName => "NF";
@@ -20,6 +20,6 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// We never fail, 'yo.
         /// </summary>
-        public override bool AllowFail => false;
+        public bool AllowFail => false;
     }
 }
