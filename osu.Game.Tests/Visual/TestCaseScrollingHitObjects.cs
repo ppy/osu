@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -12,27 +14,36 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseScrollingHitObjects : OsuTestCase
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Playfield) };
+
+        private List<TestPlayfield> playfields = new List<TestPlayfield>();
+
         public TestCaseScrollingHitObjects()
         {
-            AddStep("Vertically-scrolling", () => createPlayfield(Direction.Vertical));
-            AddStep("Horizontally-scrolling", () => createPlayfield(Direction.Horizontal));
+            playfields.Add(new TestPlayfield(Direction.Vertical));
+            playfields.Add(new TestPlayfield(Direction.Horizontal));
 
-            AddStep("Add hitobject", addHitObject);
+            AddRange(playfields);
         }
 
-        private TestPlayfield playfield;
-        private void createPlayfield(Direction scrollingDirection)
+        protected override void LoadComplete()
         {
-            if (playfield != null)
-                Remove(playfield);
-            Add(playfield = new TestPlayfield(scrollingDirection));
+            base.LoadComplete();
+
+            for (int i = 0; i <= 5000; i += 1000)
+                addHitObject(Time.Current + i);
+
+            Scheduler.AddDelayed(() => addHitObject(Time.Current + 5000), 1000, true);
         }
 
-        private void addHitObject()
+        private void addHitObject(double time)
         {
-            playfield.Add(new TestDrawableHitObject(new HitObject { StartTime = Time.Current + 5000 })
+            playfields.ForEach(p =>
             {
-                Anchor = playfield.ScrollingDirection == Direction.Horizontal ? Anchor.CentreRight : Anchor.BottomCentre
+                p.Add(new TestDrawableHitObject(new HitObject { StartTime = time })
+                {
+                    Anchor = p.ScrollingDirection == Direction.Horizontal ? Anchor.CentreRight : Anchor.BottomCentre
+                });
             });
         }
 
