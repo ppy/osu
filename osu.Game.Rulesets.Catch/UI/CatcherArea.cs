@@ -12,6 +12,8 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Catch.Objects.Drawable;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
@@ -39,17 +41,30 @@ namespace osu.Game.Rulesets.Catch.UI
             };
         }
 
-        public void Add(DrawableHitObject fruit, Vector2 absolutePosition)
+        public void OnJudgement(DrawableCatchHitObject fruit, Judgement judgement)
         {
-            fruit.RelativePositionAxes = Axes.None;
-            fruit.Position = new Vector2(MovableCatcher.ToLocalSpace(absolutePosition).X - MovableCatcher.DrawSize.X / 2, 0);
+            if (judgement.IsHit)
+            {
+                var screenSpacePosition = fruit.ScreenSpaceDrawQuad.Centre;
 
-            fruit.Anchor = Anchor.TopCentre;
-            fruit.Origin = Anchor.BottomCentre;
-            fruit.Scale *= 0.7f;
-            fruit.LifetimeEnd = double.MaxValue;
+                fruit.RelativePositionAxes = Axes.None;
+                fruit.Position = new Vector2(MovableCatcher.ToLocalSpace(screenSpacePosition).X - MovableCatcher.DrawSize.X / 2, 0);
 
-            MovableCatcher.Add(fruit);
+                fruit.Anchor = Anchor.TopCentre;
+                fruit.Origin = Anchor.Centre;
+                fruit.Scale *= 0.7f;
+                fruit.LifetimeEnd = double.MaxValue;
+
+                MovableCatcher.Add(fruit);
+            }
+
+            if (fruit.HitObject.LastInCombo)
+            {
+                if (judgement.IsHit)
+                    MovableCatcher.Explode();
+                else
+                    MovableCatcher.Drop();
+            }
         }
 
         public bool AttemptCatch(CatchHitObject obj) => MovableCatcher.AttemptCatch(obj);
@@ -176,11 +191,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 }
 
                 caughtFruit.Add(fruit);
-
-                var catchObject = (CatchHitObject)fruit.HitObject;
-
-                if (catchObject.LastInCombo)
-                    explode();
             }
 
             /// <summary>
@@ -309,7 +319,35 @@ namespace osu.Game.Rulesets.Catch.UI
                 X = (float)MathHelper.Clamp(X + direction * Clock.ElapsedFrameTime * BASE_SPEED * dashModifier, 0, 1);
             }
 
-            private void explode()
+            /// <summary>
+            /// Drop any fruit off the plate.
+            /// </summary>
+            public void Drop()
+            {
+                var fruit = caughtFruit.ToArray();
+
+                foreach (var f in fruit)
+                {
+                    if (ExplodingFruitTarget != null)
+                    {
+                        f.Anchor = Anchor.TopLeft;
+                        f.Position = caughtFruit.ToSpaceOfOtherDrawable(f.DrawPosition, ExplodingFruitTarget);
+
+                        caughtFruit.Remove(f);
+
+                        ExplodingFruitTarget.Add(f);
+                    }
+
+                    f.MoveToY(f.Y + 75, 750, Easing.InSine);
+                    f.FadeOut(750);
+                    f.Expire();
+                }
+            }
+
+            /// <summary>
+            /// Explode any fruit off the plate.
+            /// </summary>
+            public void Explode()
             {
                 var fruit = caughtFruit.ToArray();
 
