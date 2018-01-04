@@ -81,7 +81,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected abstract void ProcessSection(Section section, string line);
 
-        protected KeyValuePair<string, string> splitKeyVal(string line, char separator)
+        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator)
         {
             var split = line.Trim().Split(new[] { separator }, 2);
 

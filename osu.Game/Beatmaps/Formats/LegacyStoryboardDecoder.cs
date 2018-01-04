@@ -20,7 +20,7 @@ namespace osu.Game.Beatmaps.Formats
         private StoryboardSprite storyboardSprite;
         private CommandTimelineGroup timelineGroup;
 
-        private readonly Dictionary<string, string> Variables = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> variables = new Dictionary<string, string>();
 
         public LegacyStoryboardDecoder()
         {
@@ -65,7 +65,7 @@ namespace osu.Game.Beatmaps.Formats
                 line = line.Substring(1);
             }
 
-            DecodeVariables(ref line);
+            decodeVariables(ref line);
 
             string[] split = line.Split(',');
 
@@ -274,15 +274,15 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleVariables(string line)
         {
-            var pair = splitKeyVal(line, '=');
-            Variables[pair.Key] = pair.Value;
+            var pair = SplitKeyVal(line, '=');
+            variables[pair.Key] = pair.Value;
         }
 
         /// <summary>
         /// Decodes any beatmap variables present in a line into their real values.
         /// </summary>
         /// <param name="line">The line which may contains variables.</param>
-        private void DecodeVariables(ref string line)
+        private void decodeVariables(ref string line)
         {
             while (line.IndexOf('$') >= 0)
             {
@@ -291,8 +291,8 @@ namespace osu.Game.Beatmaps.Formats
                 for (int i = 0; i < split.Length; i++)
                 {
                     var item = split[i];
-                    if (item.StartsWith("$") && Variables.ContainsKey(item))
-                        split[i] = Variables[item];
+                    if (item.StartsWith("$") && variables.ContainsKey(item))
+                        split[i] = variables[item];
                 }
 
                 line = string.Join(",", split);
