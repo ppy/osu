@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float opacity_pressed = 0.25f;
 
         public Column()
-            : base(Direction.Vertical)
+            : base(ScrollingDirection.Down)
         {
             Width = column_width;
 

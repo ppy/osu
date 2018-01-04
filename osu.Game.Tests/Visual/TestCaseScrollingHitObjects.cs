@@ -24,8 +24,8 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseScrollingHitObjects()
         {
-            playfields.Add(new TestPlayfield(Direction.Vertical));
-            playfields.Add(new TestPlayfield(Direction.Horizontal));
+            playfields.Add(new TestPlayfield(ScrollingDirection.Down));
+            playfields.Add(new TestPlayfield(ScrollingDirection.Right));
 
             playfields.ForEach(p => p.HitObjects.ControlPoints.Add(new MultiplierControlPoint(double.MinValue)));
 
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual
             {
                 p.Add(new TestDrawableHitObject(time)
                 {
-                    Anchor = p.ScrollingDirection == Direction.Horizontal ? Anchor.CentreRight : Anchor.BottomCentre
+                    Anchor = p.Direction == ScrollingDirection.Right ? Anchor.CentreRight : Anchor.BottomCentre
                 });
             });
         }
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual
 
                 TestDrawableControlPoint createDrawablePoint(double t) => new TestDrawableControlPoint(t)
                 {
-                    Anchor = p.ScrollingDirection == Direction.Horizontal ? Anchor.CentreRight : Anchor.BottomCentre
+                    Anchor = p.Direction == ScrollingDirection.Right ? Anchor.CentreRight : Anchor.BottomCentre
                 };
 
                 p.Add(createDrawablePoint(time));
@@ -105,15 +105,15 @@ namespace osu.Game.Tests.Visual
         {
             public readonly BindableDouble TimeRange = new BindableDouble(5000);
 
-            public readonly Direction ScrollingDirection;
+            public readonly ScrollingDirection Direction;
 
             public new ScrollingPlayfield.ScrollingHitObjectContainer HitObjects => (ScrollingPlayfield.ScrollingHitObjectContainer)base.HitObjects;
 
-            public TestPlayfield(Direction scrollingDirection)
+            public TestPlayfield(ScrollingDirection direction)
             {
-                ScrollingDirection = scrollingDirection;
+                Direction = direction;
 
-                base.HitObjects = new ScrollingPlayfield.ScrollingHitObjectContainer(scrollingDirection);
+                base.HitObjects = new ScrollingPlayfield.ScrollingHitObjectContainer(direction);
                 HitObjects.TimeRange.BindTo(TimeRange);
             }
         }
