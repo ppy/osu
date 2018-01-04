@@ -266,6 +266,6 @@ namespace osu.Game.Beatmaps.Formats
             throw new InvalidDataException($@"Unknown origin: {value}");
         }
 
-        private string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('\"'));
+        private string cleanFilename(string path) => FileSafety.PathSanitise(path.Trim('\"'));
     }
 }
