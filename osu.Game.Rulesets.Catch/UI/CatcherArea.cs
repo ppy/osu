@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.UI
             fruit.Position = new Vector2(MovableCatcher.ToLocalSpace(absolutePosition).X - MovableCatcher.DrawSize.X / 2, 0);
 
             fruit.Anchor = Anchor.TopCentre;
-            fruit.Origin = Anchor.BottomCentre;
+            fruit.Origin = Anchor.Centre;
             fruit.Scale *= 0.7f;
             fruit.LifetimeEnd = double.MaxValue;
 
@@ -167,12 +167,18 @@ namespace osu.Game.Rulesets.Catch.UI
             /// <param name="fruit">The fruit that was caught.</param>
             public void Add(DrawableHitObject fruit)
             {
-                float distance = fruit.DrawSize.X / 2 * fruit.Scale.X;
+                float ourRadius = fruit.DrawSize.X / 2 * fruit.Scale.X;
+                float theirRadius = 0;
 
-                while (caughtFruit.Any(f => f.LifetimeEnd == double.MaxValue && Vector2Extensions.DistanceSquared(f.Position, fruit.Position) < distance * distance))
+                const float allowance = 6;
+
+                while (caughtFruit.Any(f =>
+                    f.LifetimeEnd == double.MaxValue &&
+                    Vector2Extensions.Distance(f.Position, fruit.Position) < (ourRadius + (theirRadius = (f.DrawSize.X / 2  * f.Scale.X))) / (allowance / 2)))
                 {
-                    fruit.X += RNG.Next(-5, 5);
-                    fruit.Y -= RNG.Next(0, 5);
+                    float diff = (ourRadius + theirRadius) / allowance;
+                    fruit.X += (RNG.NextSingle() - 0.5f) * 2 * diff;
+                    fruit.Y -= RNG.NextSingle() * diff;
                 }
 
                 caughtFruit.Add(fruit);
