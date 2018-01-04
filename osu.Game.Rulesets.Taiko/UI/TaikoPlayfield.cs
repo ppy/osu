@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Taiko.Judgements;
@@ -17,6 +16,7 @@ using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {

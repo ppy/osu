@@ -2,15 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using OpenTK.Input;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
+using OpenTK.Input;
 
-namespace osu.Game.Rulesets.UI
+namespace osu.Game.Rulesets.UI.Scrolling
 {
     /// <summary>
     /// A type of <see cref="Playfield"/> specialized towards scrolling <see cref="DrawableHitObject"/>s.
