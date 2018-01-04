@@ -29,9 +29,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
             RelativeSizeAxes = Axes.Both;
         }
 
-        protected override void UpdateAfterChildren()
+        protected override void UpdateAfterChildrenLife()
         {
-            base.UpdateAfterChildren();
+            base.UpdateAfterChildrenLife();
+
+            // We need to calculate this as soon as possible so that hitobjects
+            // get the final say in their positions
 
             var currentMultiplier = controlPointAt(Time.Current);
 
