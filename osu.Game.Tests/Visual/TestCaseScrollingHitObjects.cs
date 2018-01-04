@@ -3,12 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Configuration;
 using OpenTK;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -16,14 +19,37 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Playfield) };
 
-        private List<TestPlayfield> playfields = new List<TestPlayfield>();
+        private readonly List<TestPlayfield> playfields = new List<TestPlayfield>();
 
         public TestCaseScrollingHitObjects()
         {
             playfields.Add(new TestPlayfield(Direction.Vertical));
             playfields.Add(new TestPlayfield(Direction.Horizontal));
 
-            AddRange(playfields);
+            Add(new Container
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                Size = new Vector2(0.85f),
+                Masking = true,
+                BorderColour = Color4.White,
+                BorderThickness = 2,
+                MaskingSmoothness = 1,
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        Name = "Background",
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.35f,
+                    },
+                    playfields[0],
+                    playfields[1]
+                }
+            });
+
+            AddSliderStep("Time range", 100, 10000, 5000, v => playfields.ForEach(p => p.TimeRange.Value = v));
         }
 
         protected override void LoadComplete()
@@ -49,7 +75,11 @@ namespace osu.Game.Tests.Visual
 
         private class ScrollingHitObjectContainer : Playfield.HitObjectContainer
         {
-            public double TimeRange = 5000;
+            public readonly BindableDouble TimeRange = new BindableDouble
+            {
+                MinValue = 0,
+                MaxValue = double.MaxValue
+            };
 
             private readonly Direction scrollingDirection;
 
@@ -86,13 +116,18 @@ namespace osu.Game.Tests.Visual
 
         private class TestPlayfield : Playfield
         {
+            public readonly BindableDouble TimeRange = new BindableDouble(5000);
+
             public readonly Direction ScrollingDirection;
 
             public TestPlayfield(Direction scrollingDirection)
             {
                 ScrollingDirection = scrollingDirection;
 
-                HitObjects = new ScrollingHitObjectContainer(scrollingDirection);
+                var scrollingHitObjects = new ScrollingHitObjectContainer(scrollingDirection);
+                scrollingHitObjects.TimeRange.BindTo(TimeRange);
+
+                HitObjects = scrollingHitObjects;
             }
         }
 
