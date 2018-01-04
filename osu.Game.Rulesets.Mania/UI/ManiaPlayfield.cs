@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly int columnCount;
 
         public ManiaPlayfield(int columnCount)
-            : base(ScrollingDirection.Down)
+            : base(ScrollingDirection.Up)
         {
             this.columnCount = columnCount;
 
