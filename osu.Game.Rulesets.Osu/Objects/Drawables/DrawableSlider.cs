@@ -158,6 +158,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void UpdateCurrentState(ArmedState state)
         {
             Ball.FadeIn();
+            Ball.ScaleTo(HitObject.Scale);
 
             using (BeginDelayedSequence(slider.Duration, true))
             {
@@ -168,12 +169,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 switch (state)
                 {
-                    case ArmedState.Idle:
-                        break;
                     case ArmedState.Hit:
                         Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
-                        break;
-                    case ArmedState.Miss:
                         break;
                 }
 
