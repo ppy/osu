@@ -60,9 +60,9 @@ namespace osu.Game.Tests.Visual
                 RelativeSizeAxes = Axes.Both;
             }
 
-            protected override void Update()
+            protected override void UpdateAfterChildren()
             {
-                base.Update();
+                base.UpdateAfterChildren();
 
                 foreach (var obj in AliveObjects)
                 {
