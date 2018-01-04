@@ -84,12 +84,12 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 Children = new Drawable[]
                 {
-                    createCatcherSprite(),
                     caughtFruit = new Container<DrawableHitObject>
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.BottomCentre,
-                    }
+                    },
+                    createCatcherSprite(),
                 };
             }
 
