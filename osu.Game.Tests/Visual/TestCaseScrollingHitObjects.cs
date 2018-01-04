@@ -8,8 +8,10 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Lists;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using OpenTK.Graphics;
 
@@ -25,6 +27,8 @@ namespace osu.Game.Tests.Visual
         {
             playfields.Add(new TestPlayfield(Direction.Vertical));
             playfields.Add(new TestPlayfield(Direction.Horizontal));
+
+            playfields.ForEach(p => p.HitObjects.ControlPoints.Add(new MultiplierControlPoint(double.MinValue)));
 
             Add(new Container
             {
@@ -50,6 +54,7 @@ namespace osu.Game.Tests.Visual
             });
 
             AddSliderStep("Time range", 100, 10000, 5000, v => playfields.ForEach(p => p.TimeRange.Value = v));
+            AddStep("Add control point", () => addControlPoint(Time.Current + 5000));
         }
 
         protected override void LoadComplete()
@@ -66,10 +71,32 @@ namespace osu.Game.Tests.Visual
         {
             playfields.ForEach(p =>
             {
-                p.Add(new TestDrawableHitObject(new HitObject { StartTime = time })
+                p.Add(new TestDrawableHitObject(time)
                 {
                     Anchor = p.ScrollingDirection == Direction.Horizontal ? Anchor.CentreRight : Anchor.BottomCentre
                 });
+            });
+        }
+
+        private void addControlPoint(double time)
+        {
+            playfields.ForEach(p =>
+            {
+                p.HitObjects.ControlPoints.AddRange(new[]
+                {
+                    new MultiplierControlPoint(time) { DifficultyPoint = { SpeedMultiplier = 3 } },
+                    new MultiplierControlPoint(time + 2000) { DifficultyPoint = { SpeedMultiplier = 2 } },
+                    new MultiplierControlPoint(time + 3000) { DifficultyPoint = { SpeedMultiplier = 1 } },
+                });
+
+                TestDrawableControlPoint createDrawablePoint(double t) => new TestDrawableControlPoint(t)
+                {
+                    Anchor = p.ScrollingDirection == Direction.Horizontal ? Anchor.CentreRight : Anchor.BottomCentre
+                };
+
+                p.Add(createDrawablePoint(time));
+                p.Add(createDrawablePoint(time + 2000));
+                p.Add(createDrawablePoint(time + 3000));
             });
         }
 
@@ -80,6 +107,8 @@ namespace osu.Game.Tests.Visual
                 MinValue = 0,
                 MaxValue = double.MaxValue
             };
+
+            public readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
 
             private readonly Direction scrollingDirection;
 
@@ -94,9 +123,11 @@ namespace osu.Game.Tests.Visual
             {
                 base.UpdateAfterChildren();
 
+                var currentMultiplier = controlPointAt(Time.Current);
+
                 foreach (var obj in AliveObjects)
                 {
-                    var relativePosition = (Time.Current - obj.HitObject.StartTime) / TimeRange;
+                    var relativePosition = (Time.Current - obj.HitObject.StartTime) / (TimeRange / currentMultiplier.Multiplier);
 
                     // Todo: We may need to consider scale here
                     var finalPosition = (float)relativePosition * DrawSize;
@@ -112,6 +143,24 @@ namespace osu.Game.Tests.Visual
                     }
                 }
             }
+
+            private readonly MultiplierControlPoint searchingPoint = new MultiplierControlPoint();
+            private MultiplierControlPoint controlPointAt(double time)
+            {
+                if (ControlPoints.Count == 0)
+                    return new MultiplierControlPoint(double.MinValue);
+
+                if (time < ControlPoints[0].StartTime)
+                    return ControlPoints[0];
+
+                searchingPoint.StartTime = time;
+
+                int index = ControlPoints.BinarySearch(searchingPoint);
+                if (index < 0)
+                    index = ~index - 1;
+
+                return ControlPoints[index];
+            }
         }
 
         private class TestPlayfield : Playfield
@@ -120,21 +169,52 @@ namespace osu.Game.Tests.Visual
 
             public readonly Direction ScrollingDirection;
 
+            public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
+
             public TestPlayfield(Direction scrollingDirection)
             {
                 ScrollingDirection = scrollingDirection;
 
-                var scrollingHitObjects = new ScrollingHitObjectContainer(scrollingDirection);
-                scrollingHitObjects.TimeRange.BindTo(TimeRange);
+                base.HitObjects = new ScrollingHitObjectContainer(scrollingDirection);
+                HitObjects.TimeRange.BindTo(TimeRange);
+            }
+        }
 
-                HitObjects = scrollingHitObjects;
+        private class TestDrawableControlPoint : DrawableHitObject<HitObject>
+        {
+            private readonly Box box;
+
+            public TestDrawableControlPoint(double time)
+                : base(new HitObject { StartTime = time })
+            {
+                Origin = Anchor.Centre;
+
+                Add(box = new Box
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                RelativeSizeAxes = (Anchor & Anchor.x2) > 0 ? Axes.Y : Axes.X;
+                Size = new Vector2(1);
+
+                box.Size = DrawSize;
+            }
+
+            protected override void UpdateState(ArmedState state)
+            {
             }
         }
 
         private class TestDrawableHitObject : DrawableHitObject<HitObject>
         {
-            public TestDrawableHitObject(HitObject hitObject)
-                : base(hitObject)
+            public TestDrawableHitObject(double time)
+                : base(new HitObject { StartTime = time })
             {
                 Origin = Anchor.Centre;
                 AutoSizeAxes = Axes.Both;
