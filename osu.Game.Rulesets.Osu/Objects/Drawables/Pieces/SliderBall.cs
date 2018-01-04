@@ -129,11 +129,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.Update();
 
-            // Make sure to use the base version of ReceiveMouseInputAt so that we correctly check the position.
-            Tracking = canCurrentlyTrack
-                        && lastState != null
-                        && base.ReceiveMouseInputAt(lastState.Mouse.NativeState.Position)
-                        && ((Parent as DrawableSlider)?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+            if (Time.Current < slider.EndTime)
+            {
+                // Make sure to use the base version of ReceiveMouseInputAt so that we correctly check the position.
+                Tracking = canCurrentlyTrack
+                           && lastState != null
+                           && base.ReceiveMouseInputAt(lastState.Mouse.NativeState.Position)
+                           && ((Parent as DrawableSlider)?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+            }
         }
 
         public void UpdateProgress(double progress, int repeat)
