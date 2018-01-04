@@ -31,8 +31,6 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly BeatmapSetInfo beatmapSet;
 
-        private readonly FillFlowContainer difficultyIcons;
-
         public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
             : base(set)
         {
