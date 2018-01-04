@@ -65,8 +65,8 @@ namespace osu.Game.Users
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
-                    OnLoadComplete = d => d.FadeInFromZero(200),
-                }, 0) { RelativeSizeAxes = Axes.Both },
+                    OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out)
+                }, 300) { RelativeSizeAxes = Axes.Both },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -76,7 +76,7 @@ namespace osu.Game.Users
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Top = content_padding, Left = content_padding, Right = content_padding },
+                    Padding = new MarginPadding { Top = content_padding, Horizontal = content_padding },
                     Children = new Drawable[]
                     {
                         new UpdateableAvatar
@@ -167,11 +167,13 @@ namespace osu.Game.Users
             };
 
             if (user.IsSupporter)
+            {
                 infoContainer.Add(new SupporterIcon
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = 20f,
                 });
+            }
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]

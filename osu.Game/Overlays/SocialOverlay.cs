@@ -22,7 +22,7 @@ namespace osu.Game.Overlays
     {
         private APIAccess api;
         private readonly LoadingAnimation loading;
-        private FillFlowContainer<UserPanel> panels;
+        private FillFlowContainer<SocialPanel> panels;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"60284b");
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"672b51");
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays
             if (Users == null)
                 return;
 
-            var newPanels = new FillFlowContainer<UserPanel>
+            var newPanels = new FillFlowContainer<SocialPanel>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -129,18 +129,18 @@ namespace osu.Game.Overlays
                 Margin = new MarginPadding { Top = 10 },
                 ChildrenEnumerable = Users.Select(u =>
                 {
-                    UserPanel panel = new UserPanel(u)
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre
-                    };
+                    SocialPanel panel;
                     switch (displayStyle)
                     {
                         case PanelDisplayStyle.Grid:
-                            panel.Width = 300;
+                            panel = new SocialGridPanel(u)
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre
+                            };
                             break;
                         default:
-                            panel.RelativeSizeAxes = Axes.X;
+                            panel = new SocialListPanel(u);
                             break;
                     }
                     panel.Status.BindTo(u.Status);
@@ -148,14 +148,20 @@ namespace osu.Game.Overlays
                 })
             };
 
-            LoadComponentAsync(newPanels, p => ScrollFlow.Add(panels = newPanels));
+            LoadComponentAsync(newPanels, p =>
+            {
+                if(panels != null)
+                    ScrollFlow.Remove(panels);
+
+                ScrollFlow.Add(panels = newPanels);
+            });
         }
 
         private void clearPanels()
         {
             if (panels != null)
             {
-                ScrollFlow.Remove(panels);
+                panels.FadeOut(200);
                 panels.Expire();
                 panels = null;
             }
@@ -185,7 +191,7 @@ namespace osu.Game.Overlays
             switch (Header.Tabs.Current.Value)
             {
                 case SocialTab.OnlineFriends:
-                    var friendRequest = new GetFriendsRequest(); // TODO filter???
+                    var friendRequest = new GetFriendsRequest();
                     friendRequest.Success += updateUsers;
                     api.Queue(getUsersRequest = friendRequest);
                     break;
