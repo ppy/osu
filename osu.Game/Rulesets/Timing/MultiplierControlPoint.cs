@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// The time in milliseconds at which this <see cref="MultiplierControlPoint"/> starts.
         /// </summary>
-        public readonly double StartTime;
+        public double StartTime;
 
         /// <summary>
         /// The multiplier which this <see cref="MultiplierControlPoint"/> provides.
