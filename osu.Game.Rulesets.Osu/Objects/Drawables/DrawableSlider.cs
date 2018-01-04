@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 const float fade_out_time = 450;
 
-                Body.FadeOut(fade_out_time, Easing.Out);
+                // intentionally pile on an extra FadeOut to make it happen much faster.
                 Ball.FadeOut(fade_out_time / 4, Easing.Out);
 
                 switch (state)
@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         break;
                 }
 
-                this.FadeOut(800, Easing.Out).Expire();
+                this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
             }
         }
 
