@@ -10,8 +10,6 @@ namespace osu.Game.Screens.Select.Carousel
     /// </summary>
     public class CarouselGroup : CarouselItem
     {
-        private readonly List<CarouselItem> items;
-
         protected override DrawableCarouselItem CreateDrawableRepresentation() => null;
 
         public IReadOnlyList<CarouselItem> Children => InternalChildren;
