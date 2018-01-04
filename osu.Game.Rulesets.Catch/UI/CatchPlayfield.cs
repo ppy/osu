@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.UI;
-using OpenTK;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
@@ -63,18 +62,6 @@ namespace osu.Game.Rulesets.Catch.UI
             fruit.CheckPosition = CheckIfWeCanCatch;
         }
 
-        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
-        {
-            if (judgement.IsHit)
-            {
-                Vector2 screenPosition = judgedObject.ScreenSpaceDrawQuad.Centre;
-
-                // todo: don't do this
-                (judgedObject.Parent as Container<DrawableHitObject>)?.Remove(judgedObject);
-                (judgedObject.Parent as Container)?.Remove(judgedObject);
-
-                catcherArea.Add(judgedObject, screenPosition);
-            }
-        }
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement) => catcherArea.OnJudgement((DrawableCatchHitObject)judgedObject, judgement);
     }
 }
