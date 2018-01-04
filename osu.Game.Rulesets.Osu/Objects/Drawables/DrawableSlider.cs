@@ -158,14 +158,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void UpdateCurrentState(ArmedState state)
         {
             Ball.FadeIn();
+            Ball.ScaleTo(HitObject.Scale);
 
             using (BeginDelayedSequence(slider.Duration, true))
             {
-                Body.FadeOut(160);
-                Ball.FadeOut(160);
+                const float fade_out_time = 450;
 
-                this.FadeOut(800)
-                    .Expire();
+                // intentionally pile on an extra FadeOut to make it happen much faster.
+                Ball.FadeOut(fade_out_time / 4, Easing.Out);
+
+                switch (state)
+                {
+                    case ArmedState.Hit:
+                        Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
+                        break;
+                }
+
+                this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
             }
         }
 
