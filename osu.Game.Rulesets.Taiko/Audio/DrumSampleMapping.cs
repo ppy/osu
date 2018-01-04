@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Game.Audio;
@@ -13,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.Audio
     public class DrumSampleMapping
     {
         private readonly ControlPointInfo controlPoints;
-        private readonly Dictionary<SampleControlPoint, DrumSample> mappings = new Dictionary<SampleControlPoint, DrumSample>();
+        private readonly Dictionary<double, DrumSample> mappings = new Dictionary<double, DrumSample>();
 
         public DrumSampleMapping(ControlPointInfo controlPoints, AudioManager audio)
         {
@@ -26,17 +25,17 @@ namespace osu.Game.Rulesets.Taiko.Audio
             else
                 samplePoints = controlPoints.SamplePoints;
 
-            foreach (var s in samplePoints.Distinct())
+            foreach (var s in samplePoints)
             {
-                mappings[s] = new DrumSample
+                mappings[s.Time] = new DrumSample
                 {
-                    Centre = s.GetSampleInfo().GetChannel(audio.Sample),
-                    Rim = s.GetSampleInfo(SampleInfo.HIT_CLAP).GetChannel(audio.Sample)
+                    Centre = s.GetSampleInfo().GetChannel(audio.Sample, "Taiko"),
+                    Rim = s.GetSampleInfo(SampleInfo.HIT_CLAP).GetChannel(audio.Sample, "Taiko")
                 };
             }
         }
 
-        public DrumSample SampleAt(double time) => mappings[controlPoints.SamplePointAt(time)];
+        public DrumSample SampleAt(double time) => mappings[controlPoints.SamplePointAt(time).Time];
 
         public class DrumSample
         {
