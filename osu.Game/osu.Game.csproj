@@ -267,6 +267,7 @@
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
+    <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
     <Compile Include="Overlays\Profile\SupporterIcon.cs" />
     <Compile Include="Online\API\Requests\GetFriendsRequest.cs" />
     <Compile Include="Overlays\Settings\DangerousSettingsButton.cs" />
@@ -311,6 +312,8 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Overlays\Social\SocialGridPanel.cs" />
     <Compile Include="Overlays\Social\SocialListPanel.cs" />
     <Compile Include="Overlays\Social\SocialPanel.cs" />
