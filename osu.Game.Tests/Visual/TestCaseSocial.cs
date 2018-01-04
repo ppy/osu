@@ -13,8 +13,12 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
+            typeof(UserPanel),
+            typeof(SocialPanel),
             typeof(FilterControl),
-            typeof(SocialOverlay)
+            typeof(SocialOverlay),
+            typeof(SocialGridPanel),
+            typeof(SocialListPanel)
         };
 
         public TestCaseSocial()
