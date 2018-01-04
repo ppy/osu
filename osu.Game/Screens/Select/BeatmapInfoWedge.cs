@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Select
 {
@@ -86,6 +87,8 @@ namespace osu.Game.Screens.Select
             public OsuSpriteText ArtistLabel { get; private set; }
             public FillFlowContainer MapperContainer { get; private set; }
             public FillFlowContainer InfoLabelContainer { get; private set; }
+            private UnicodeBindableString titleBinding;
+            private UnicodeBindableString artistBinding;
 
             public BufferedWedgeInfo(WorkingBeatmap working)
             {
@@ -93,7 +96,7 @@ namespace osu.Game.Screens.Select
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(LocalisationEngine localisation)
             {
                 var beatmapInfo = working.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata ?? working.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
@@ -101,6 +104,9 @@ namespace osu.Game.Screens.Select
                 PixelSnapping = true;
                 CacheDrawnFrameBuffer = true;
                 RelativeSizeAxes = Axes.Both;
+
+                titleBinding = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
+                artistBinding = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
 
                 Children = new Drawable[]
                 {
@@ -167,13 +173,11 @@ namespace osu.Game.Screens.Select
                             TitleLabel = new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
-                                Text = string.IsNullOrEmpty(metadata.Source) ? metadata.Title : metadata.Source + " — " + metadata.Title,
                                 TextSize = 28,
                             },
                             ArtistLabel = new OsuSpriteText
                             {
                                 Font = @"Exo2.0-MediumItalic",
-                                Text = metadata.Artist,
                                 TextSize = 17,
                             },
                             MapperContainer = new FillFlowContainer
@@ -193,6 +197,15 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 };
+                artistBinding.ValueChanged += value => setMetadata(metadata.Source);
+                artistBinding.TriggerChange();
+            }
+
+            private void setMetadata(string source)
+            {
+                ArtistLabel.Text = artistBinding.Value;
+                TitleLabel.Text = string.IsNullOrEmpty(source) ? titleBinding.Value : source + " — " + titleBinding.Value;
+                ForceRedraw();
             }
 
             private InfoLabel[] getInfoLabels()
