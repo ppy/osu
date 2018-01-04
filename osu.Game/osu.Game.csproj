@@ -315,6 +315,7 @@
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Rulesets\UI\ScrollingDirection.cs" />
+    <Compile Include="Rulesets\UI\ScrollingHitObjectContainer.cs" />
     <Compile Include="Screens\Select\ImportFromStablePopup.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\OriginHandle.cs" />

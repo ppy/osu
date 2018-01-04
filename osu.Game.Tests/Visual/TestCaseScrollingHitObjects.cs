@@ -107,13 +107,13 @@ namespace osu.Game.Tests.Visual
 
             public readonly ScrollingDirection Direction;
 
-            public new ScrollingPlayfield.ScrollingHitObjectContainer HitObjects => (ScrollingPlayfield.ScrollingHitObjectContainer)base.HitObjects;
+            public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
 
             public TestPlayfield(ScrollingDirection direction)
             {
                 Direction = direction;
 
-                base.HitObjects = new ScrollingPlayfield.ScrollingHitObjectContainer(direction);
+                base.HitObjects = new ScrollingHitObjectContainer(direction);
                 HitObjects.TimeRange.BindTo(TimeRange);
             }
         }
