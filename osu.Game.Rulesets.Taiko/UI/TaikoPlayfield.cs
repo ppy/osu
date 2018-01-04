@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
-            : base(Axes.X)
+            : base(Direction.Horizontal)
         {
             AddRangeInternal(new Drawable[]
             {

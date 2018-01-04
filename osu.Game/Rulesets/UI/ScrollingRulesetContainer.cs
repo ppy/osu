@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.UI
 
         private void applySpeedAdjustment(MultiplierControlPoint controlPoint, ScrollingPlayfield playfield)
         {
-            playfield.HitObjects.AddSpeedAdjustment(CreateSpeedAdjustmentContainer(controlPoint));
+            playfield.HitObjects.ControlPoints.Add(controlPoint);
             playfield.NestedPlayfields.ForEach(p => applySpeedAdjustment(controlPoint, p));
         }
 
@@ -108,12 +108,5 @@ namespace osu.Game.Rulesets.UI
 
             return new MultiplierControlPoint(time, DefaultControlPoints[index].DeepClone());
         }
-
-        /// <summary>
-        /// Creates a <see cref="SpeedAdjustmentContainer"/> that facilitates the movement of hit objects.
-        /// </summary>
-        /// <param name="controlPoint">The <see cref="MultiplierControlPoint"/> that provides the speed adjustments for the hitobjects.</param>
-        /// <returns>The <see cref="SpeedAdjustmentContainer"/>.</returns>
-        protected virtual SpeedAdjustmentContainer CreateSpeedAdjustmentContainer(MultiplierControlPoint controlPoint) => new SpeedAdjustmentContainer(controlPoint);
     }
 }

@@ -23,11 +23,9 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly CatcherArea catcherArea;
 
         public CatchPlayfield(BeatmapDifficulty difficulty)
-            : base(Axes.Y)
+            : base(Direction.Vertical)
         {
             Container explodingFruitContainer;
-
-            Reversed.Value = true;
 
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;

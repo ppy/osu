@@ -5,16 +5,13 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Timing;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests
@@ -44,10 +41,10 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddStep("Right special style", () => createPlayfield(8, SpecialColumnPosition.Right));
             AddStep("Reversed", () => createPlayfield(4, SpecialColumnPosition.Normal, true));
 
-            AddStep("Notes with input", () => createPlayfieldWithNotes(false));
-            AddStep("Notes with input (reversed)", () => createPlayfieldWithNotes(false, true));
-            AddStep("Notes with gravity", () => createPlayfieldWithNotes(true));
-            AddStep("Notes with gravity (reversed)", () => createPlayfieldWithNotes(true, true));
+            AddStep("Notes with input", () => createPlayfieldWithNotes());
+            AddStep("Notes with input (reversed)", () => createPlayfieldWithNotes(true));
+            AddStep("Notes with gravity", () => createPlayfieldWithNotes());
+            AddStep("Notes with gravity (reversed)", () => createPlayfieldWithNotes(true));
 
             AddStep("Hit explosion", () =>
             {
@@ -70,11 +67,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             maniaRuleset = rulesets.GetRuleset(3);
         }
 
-        private SpeedAdjustmentContainer createTimingChange(double time, bool gravity) => new ManiaSpeedAdjustmentContainer(new MultiplierControlPoint(time)
-        {
-            TimingPoint = { BeatLength = 1000 }
-        }, gravity ? ScrollingAlgorithm.Gravity : ScrollingAlgorithm.Basic);
-
         private ManiaPlayfield createPlayfield(int cols, SpecialColumnPosition specialPos, bool inverted = false)
         {
             Clear();
@@ -95,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             return playfield;
         }
 
-        private void createPlayfieldWithNotes(bool gravity, bool inverted = false)
+        private void createPlayfieldWithNotes(bool inverted = false)
         {
             Clear();
 
@@ -114,22 +106,13 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             playfield.Inverted.Value = inverted;
 
-            if (!gravity)
-                playfield.Columns.ForEach(c => c.Add(createTimingChange(0, false)));
-
             for (double t = start_time; t <= start_time + duration; t += 100)
             {
-                if (gravity)
-                    playfield.Columns.ElementAt(0).Add(createTimingChange(t, true));
-
                 playfield.Add(new DrawableNote(new Note
                 {
                     StartTime = t,
                     Column = 0
                 }, ManiaAction.Key1));
-
-                if (gravity)
-                    playfield.Columns.ElementAt(3).Add(createTimingChange(t, true));
 
                 playfield.Add(new DrawableNote(new Note
                 {
@@ -138,18 +121,12 @@ namespace osu.Game.Rulesets.Mania.Tests
                 }, ManiaAction.Key4));
             }
 
-            if (gravity)
-                playfield.Columns.ElementAt(1).Add(createTimingChange(start_time, true));
-
             playfield.Add(new DrawableHoldNote(new HoldNote
             {
                 StartTime = start_time,
                 Duration = duration,
                 Column = 1
             }, ManiaAction.Key2));
-
-            if (gravity)
-                playfield.Columns.ElementAt(2).Add(createTimingChange(start_time, true));
 
             playfield.Add(new DrawableHoldNote(new HoldNote
             {

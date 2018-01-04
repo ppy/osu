@@ -614,7 +614,6 @@
     <Compile Include="Rulesets\Objects\CircularArcApproximator.cs" />
     <Compile Include="Rulesets\Objects\Drawables\ArmedState.cs" />
     <Compile Include="Rulesets\Objects\Drawables\DrawableHitObject.cs" />
-    <Compile Include="Rulesets\Objects\Drawables\DrawableScrollingHitObject.cs" />
     <Compile Include="Rulesets\Scoring\HitResult.cs" />
     <Compile Include="Rulesets\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Rulesets\Objects\Drawables\IScrollingHitObject.cs" />
@@ -665,10 +664,7 @@
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
     <Compile Include="Rulesets\Scoring\ScoreRank.cs" />
     <Compile Include="Rulesets\Scoring\ScoreStore.cs" />
-    <Compile Include="Rulesets\Timing\LinearScrollingContainer.cs" />
     <Compile Include="Rulesets\Timing\MultiplierControlPoint.cs" />
-    <Compile Include="Rulesets\Timing\ScrollingContainer.cs" />
-    <Compile Include="Rulesets\Timing\SpeedAdjustmentContainer.cs" />
     <Compile Include="Rulesets\UI\ModIcon.cs" />
     <Compile Include="Rulesets\UI\Playfield.cs" />
     <Compile Include="Rulesets\UI\RulesetContainer.cs" />
