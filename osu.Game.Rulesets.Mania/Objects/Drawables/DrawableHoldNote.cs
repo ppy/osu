@@ -42,8 +42,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public DrawableHoldNote(HoldNote hitObject, ManiaAction action)
             : base(hitObject, action)
         {
-            RelativeSizeAxes = Axes.Both;
-            Height = (float)HitObject.Duration;
+            RelativeSizeAxes = Axes.X;
 
             AddRange(new Drawable[]
             {
