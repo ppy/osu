@@ -110,6 +110,12 @@ namespace osu.Game.Rulesets.UI
 
             //dividing by the customwidth will effectively scale our content to the required container size.
             protected override Vector2 DrawScale => CustomWidth.HasValue ? new Vector2(DrawSize.X / CustomWidth.Value) : base.DrawScale;
+
+            protected override void Update()
+            {
+                base.Update();
+                RelativeChildSize = new Vector2(DrawScale.X, base.RelativeChildSize.Y);
+            }
         }
     }
 }
