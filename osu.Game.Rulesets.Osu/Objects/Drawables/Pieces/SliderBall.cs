@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private readonly Slider slider;
-        private readonly Box follow;
+        public readonly Box FollowCircle;
         private readonly Box ball;
 
         public SliderBall(Slider slider)
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                follow = new Box
+                FollowCircle = new Box
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -118,8 +118,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
                 tracking = value;
 
-                follow.ScaleTo(tracking ? 2.8f : 1, 300, Easing.OutQuint);
-                follow.FadeTo(tracking ? 0.2f : 0, 300, Easing.OutQuint);
+                FollowCircle.ScaleTo(tracking ? 2.8f : 1, 300, Easing.OutQuint);
+                FollowCircle.FadeTo(tracking ? 0.2f : 0, 300, Easing.OutQuint);
             }
         }
 
