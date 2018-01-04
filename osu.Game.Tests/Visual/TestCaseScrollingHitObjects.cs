@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual
             {
                 base.Update();
 
-                foreach (var obj in Objects)
+                foreach (var obj in AliveObjects)
                 {
                     var relativePosition = (Time.Current - obj.HitObject.StartTime) / TimeRange;
 
