@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using OpenTK;
@@ -18,6 +19,8 @@ namespace osu.Game.Beatmaps.Formats
 
         private StoryboardSprite storyboardSprite;
         private CommandTimelineGroup timelineGroup;
+
+        private readonly Dictionary<string, string> Variables = new Dictionary<string, string>();
 
         public LegacyStoryboardDecoder()
         {
@@ -46,6 +49,9 @@ namespace osu.Game.Beatmaps.Formats
             {
                 case Section.Events:
                     handleEvents(line);
+                    break;
+                case Section.Variables:
+                    handleVariables(line);
                     break;
             }
         }
@@ -264,6 +270,35 @@ namespace osu.Game.Beatmaps.Formats
                     return Anchor.BottomRight;
             }
             throw new InvalidDataException($@"Unknown origin: {value}");
+        }
+
+        private void handleVariables(string line)
+        {
+            var pair = splitKeyVal(line, '=');
+            Variables[pair.Key] = pair.Value;
+        }
+
+        /// <summary>
+        /// Decodes any beatmap variables present in a line into their real values.
+        /// </summary>
+        /// <param name="line">The line which may contains variables.</param>
+        private void DecodeVariables(ref string line)
+        {
+            while (line.IndexOf('$') >= 0)
+            {
+                string origLine = line;
+                string[] split = line.Split(',');
+                for (int i = 0; i < split.Length; i++)
+                {
+                    var item = split[i];
+                    if (item.StartsWith("$") && Variables.ContainsKey(item))
+                        split[i] = Variables[item];
+                }
+
+                line = string.Join(",", split);
+                if (line == origLine)
+                    break;
+            }
         }
 
         private string cleanFilename(string path) => FileSafety.PathSanitise(path.Trim('\"'));
