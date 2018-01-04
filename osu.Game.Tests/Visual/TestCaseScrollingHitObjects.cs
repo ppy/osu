@@ -8,7 +8,6 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Lists;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
@@ -100,68 +99,7 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        private class ScrollingHitObjectContainer : Playfield.HitObjectContainer
-        {
-            public readonly BindableDouble TimeRange = new BindableDouble
-            {
-                MinValue = 0,
-                MaxValue = double.MaxValue
-            };
 
-            public readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
-
-            private readonly Direction scrollingDirection;
-
-            public ScrollingHitObjectContainer(Direction scrollingDirection)
-            {
-                this.scrollingDirection = scrollingDirection;
-
-                RelativeSizeAxes = Axes.Both;
-            }
-
-            protected override void UpdateAfterChildren()
-            {
-                base.UpdateAfterChildren();
-
-                var currentMultiplier = controlPointAt(Time.Current);
-
-                foreach (var obj in AliveObjects)
-                {
-                    var relativePosition = (Time.Current - obj.HitObject.StartTime) / (TimeRange / currentMultiplier.Multiplier);
-
-                    // Todo: We may need to consider scale here
-                    var finalPosition = (float)relativePosition * DrawSize;
-
-                    switch (scrollingDirection)
-                    {
-                        case Direction.Horizontal:
-                            obj.X = finalPosition.X;
-                            break;
-                        case Direction.Vertical:
-                            obj.Y = finalPosition.Y;
-                            break;
-                    }
-                }
-            }
-
-            private readonly MultiplierControlPoint searchingPoint = new MultiplierControlPoint();
-            private MultiplierControlPoint controlPointAt(double time)
-            {
-                if (ControlPoints.Count == 0)
-                    return new MultiplierControlPoint(double.MinValue);
-
-                if (time < ControlPoints[0].StartTime)
-                    return ControlPoints[0];
-
-                searchingPoint.StartTime = time;
-
-                int index = ControlPoints.BinarySearch(searchingPoint);
-                if (index < 0)
-                    index = ~index - 1;
-
-                return ControlPoints[index];
-            }
-        }
 
         private class TestPlayfield : Playfield
         {
@@ -169,13 +107,13 @@ namespace osu.Game.Tests.Visual
 
             public readonly Direction ScrollingDirection;
 
-            public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
+            public new ScrollingPlayfield.ScrollingHitObjectContainer HitObjects => (ScrollingPlayfield.ScrollingHitObjectContainer)base.HitObjects;
 
             public TestPlayfield(Direction scrollingDirection)
             {
                 ScrollingDirection = scrollingDirection;
 
-                base.HitObjects = new ScrollingHitObjectContainer(scrollingDirection);
+                base.HitObjects = new ScrollingPlayfield.ScrollingHitObjectContainer(scrollingDirection);
                 HitObjects.TimeRange.BindTo(TimeRange);
             }
         }

@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public abstract class DrawableTaikoHitObject<TaikoHitType> : DrawableScrollingHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
+    public abstract class DrawableTaikoHitObject<TaikoHitType> : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
         where TaikoHitType : TaikoHitObject
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);

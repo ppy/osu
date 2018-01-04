@@ -24,14 +24,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         }
     }
 
-    public abstract class DrawableCatchHitObject : DrawableScrollingHitObject<CatchHitObject>
+    public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
         protected DrawableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {
-            RelativePositionAxes = Axes.Both;
+            RelativePositionAxes = Axes.X;
             X = hitObject.X;
-            Y = (float)HitObject.StartTime;
         }
 
         public Func<CatchHitObject, bool> CheckPosition;
