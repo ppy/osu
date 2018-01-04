@@ -161,11 +161,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             using (BeginDelayedSequence(slider.Duration, true))
             {
-                Body.FadeOut(160);
-                Ball.FadeOut(160);
+                Body.FadeOut(450, Easing.OutQuint);
+                Ball.FadeOut(450, Easing.OutQuint);
 
-                this.FadeOut(800)
-                    .Expire();
+                switch (state)
+                {
+                    case ArmedState.Idle:
+                        break;
+                    case ArmedState.Hit:
+                        Ball.ScaleTo(HitObject.Scale * 1.5f, 450, Easing.OutQuint);
+                        break;
+                    case ArmedState.Miss:
+                        break;
+                }
+
+                this.FadeOut(800, Easing.Out).Expire();
             }
         }
 
