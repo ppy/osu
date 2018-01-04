@@ -37,19 +37,22 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             IsForCurrentRuleset = isForCurrentRuleset;
 
+            var roundedCircleSize = Math.Round(original.BeatmapInfo.BaseDifficulty.CircleSize);
+            var roundedOverallDifficulty = Math.Round(original.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+
             if (isForCurrentRuleset)
-                TargetColumns = (int)Math.Max(1, Math.Round(original.BeatmapInfo.BaseDifficulty.CircleSize));
+                TargetColumns = (int)Math.Max(1, roundedCircleSize);
             else
             {
                 float percentSliderOrSpinner = (float)original.HitObjects.Count(h => h is IHasEndTime) / original.HitObjects.Count;
                 if (percentSliderOrSpinner < 0.2)
                     TargetColumns = 7;
-                else if (percentSliderOrSpinner < 0.3 || Math.Round(original.BeatmapInfo.BaseDifficulty.CircleSize) >= 5)
-                    TargetColumns = Math.Round(original.BeatmapInfo.BaseDifficulty.OverallDifficulty) > 5 ? 7 : 6;
+                else if (percentSliderOrSpinner < 0.3 || roundedCircleSize >= 5)
+                    TargetColumns = roundedOverallDifficulty > 5 ? 7 : 6;
                 else if (percentSliderOrSpinner > 0.6)
-                    TargetColumns = Math.Round(original.BeatmapInfo.BaseDifficulty.OverallDifficulty) > 4 ? 5 : 4;
+                    TargetColumns = roundedOverallDifficulty > 4 ? 5 : 4;
                 else
-                    TargetColumns = Math.Max(4, Math.Min((int)Math.Round(original.BeatmapInfo.BaseDifficulty.OverallDifficulty) + 1, 7));
+                    TargetColumns = Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
             }
         }
 
