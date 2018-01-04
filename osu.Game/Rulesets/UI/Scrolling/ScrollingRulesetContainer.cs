@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 
-namespace osu.Game.Rulesets.UI
+namespace osu.Game.Rulesets.UI.Scrolling
 {
     /// <summary>
     /// A type of <see cref="RulesetContainer{TPlayfield,TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.

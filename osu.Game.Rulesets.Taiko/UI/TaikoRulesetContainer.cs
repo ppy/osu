@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Taiko.Replays;
 using OpenTK;
 using System.Linq;
 using osu.Framework.Input;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {

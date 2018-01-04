@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Lists;
 using osu.Game.Rulesets.Timing;
 
-namespace osu.Game.Rulesets.UI
+namespace osu.Game.Rulesets.UI.Scrolling
 {
     public class ScrollingHitObjectContainer : Playfield.HitObjectContainer
     {
