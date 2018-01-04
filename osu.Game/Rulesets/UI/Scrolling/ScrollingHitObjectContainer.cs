@@ -4,7 +4,9 @@
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
+using OpenTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
@@ -35,9 +37,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             foreach (var obj in AliveObjects)
             {
-                var relativePosition = (Time.Current - obj.HitObject.StartTime) / (TimeRange / currentMultiplier.Multiplier);
-
                 // Todo: We may need to consider scale here
+                var relativePosition = (Time.Current - obj.HitObject.StartTime) * currentMultiplier.Multiplier / TimeRange;
                 var finalPosition = (float)relativePosition * DrawSize;
 
                 switch (direction)
@@ -53,6 +54,27 @@ namespace osu.Game.Rulesets.UI.Scrolling
                         break;
                     case ScrollingDirection.Right:
                         obj.X = finalPosition.X;
+                        break;
+                }
+
+                if (!(obj.HitObject is IHasEndTime endTime))
+                    continue;
+
+                // Todo: We may need to consider scale here
+                var relativeEndPosition = (Time.Current - endTime.EndTime) * currentMultiplier.Multiplier / TimeRange;
+                var finalEndPosition = (float)relativeEndPosition * DrawSize;
+
+                float length = Vector2.Distance(finalPosition, finalEndPosition);
+
+                switch (direction)
+                {
+                    case ScrollingDirection.Up:
+                    case ScrollingDirection.Down:
+                        obj.Height = length;
+                        break;
+                    case ScrollingDirection.Left:
+                    case ScrollingDirection.Right:
+                        obj.Width = length;
                         break;
                 }
             }
