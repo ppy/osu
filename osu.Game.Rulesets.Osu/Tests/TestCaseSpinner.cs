@@ -3,15 +3,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
-using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -21,46 +22,67 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
 {
-            typeof(Spinner),
-            typeof(OsuModHidden),
-            typeof(DrawableSpinner)
+            typeof(SpinnerDisc),
+            typeof(DrawableSpinner),
+            typeof(DrawableOsuHitObject)
         };
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
-        private bool hidden;
         private int depthIndex;
-        private int circleSize;
-        private float circleScale = 1;
+        protected readonly List<Mod> Mods = new List<Mod>();
 
         public TestCaseSpinner()
         {
             base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
 
-            AddStep("Single", testSingle);
-            AddToggleStep("Hidden", v => hidden = v);
-            AddSliderStep("CircleSize", 0, 10, 0, s => circleSize = s);
-            AddSliderStep("CircleScale", 0.5f, 2, 1, s => circleScale = s);
+            AddStep("Miss Big", () => testSingle(2));
+            AddStep("Miss Medium", () => testSingle(5));
+            AddStep("Miss Small", () => testSingle(7));
+            AddStep("Hit Big", () => testSingle(2, true));
+            AddStep("Hit Medium", () => testSingle(5, true));
+            AddStep("Hit Small", () => testSingle(7, true));
         }
 
-        private void testSingle()
+        private void testSingle(float circleSize, bool auto = false)
         {
             var spinner = new Spinner { StartTime = Time.Current + 1000, EndTime = Time.Current + 4000 };
 
             spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
 
-            var drawable = new DrawableSpinner(spinner)
+            var drawable = new TestDrawableSpinner(spinner, auto)
             {
                 Anchor = Anchor.Centre,
-                Scale = new Vector2(circleScale),
                 Depth = depthIndex++
             };
 
-            if (hidden)
-                new OsuModHidden().ApplyToDrawableHitObjects(new [] { drawable });
+            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
+                mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             Add(drawable);
+        }
+
+        private class TestDrawableSpinner : DrawableSpinner
+        {
+            private bool auto;
+
+            public TestDrawableSpinner(Spinner s, bool auto) : base(s)
+            {
+                this.auto = auto;
+            }
+
+            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            {
+                if (auto && !userTriggered && Time.Current > Spinner.StartTime + Spinner.Duration / 2 && Progress < 1)
+                {
+                    // force completion only once to not break human interaction
+                    Disc.RotationAbsolute = Spinner.SpinsRequired * 360;
+                    auto = false;
+                }
+
+                base.CheckForJudgements(userTriggered, timeOffset);
+            }
         }
     }
 }
