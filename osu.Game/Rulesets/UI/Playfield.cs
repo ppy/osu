@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.UI
             protected override void Update()
             {
                 base.Update();
-                RelativeChildSize = new Vector2(DrawScale.X, base.RelativeChildSize.Y);
+                RelativeChildSize = new Vector2(DrawScale.X, RelativeChildSize.Y);
             }
         }
     }
