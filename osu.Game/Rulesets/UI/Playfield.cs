@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.UI
 
         public class HitObjectContainer : CompositeDrawable
         {
-            public virtual IEnumerable<DrawableHitObject> Objects => InternalChildren.OfType<DrawableHitObject>();
+            public virtual IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>();
             public virtual void Add(DrawableHitObject hitObject) => AddInternal(hitObject);
             public virtual bool Remove(DrawableHitObject hitObject) => RemoveInternal(hitObject);
         }
