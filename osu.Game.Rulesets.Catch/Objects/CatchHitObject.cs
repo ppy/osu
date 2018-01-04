@@ -50,9 +50,9 @@ namespace osu.Game.Rulesets.Catch.Objects
 
     public enum FruitVisualRepresentation
     {
-        Triforce,
+        Pear,
         Grape,
-        DPad,
+        Raspberry,
         Pineapple,
         Banana // banananananannaanana
     }

@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             {
                 default:
                     return new Container();
-                case FruitVisualRepresentation.DPad:
+                case FruitVisualRepresentation.Raspberry:
                     return new Container
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             },
                         }
                     };
-                case FruitVisualRepresentation.Triforce:
+                case FruitVisualRepresentation.Pear:
                     return new Container
                     {
                         RelativeSizeAxes = Axes.Both,

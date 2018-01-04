@@ -80,11 +80,11 @@ namespace osu.Game.Rulesets.Catch.Tests
             switch (representation)
             {
                 default:
-                case FruitVisualRepresentation.Triforce:
+                case FruitVisualRepresentation.Pear:
                     return new Color4(17, 136, 170, 255);
                 case FruitVisualRepresentation.Grape:
                     return new Color4(204, 102, 0, 255);
-                case FruitVisualRepresentation.DPad:
+                case FruitVisualRepresentation.Raspberry:
                     return new Color4(121, 9, 13, 255);
                 case FruitVisualRepresentation.Pineapple:
                     return new Color4(102, 136, 0, 255);
