@@ -58,10 +58,10 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="scrollingAxes">The axes on which <see cref="DrawableHitObject"/>s in this container should scroll.</param>
         /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width</param>
-        protected ScrollingPlayfield(Direction scrollingDirection, float? customWidth = null)
+        protected ScrollingPlayfield(ScrollingDirection direction, float? customWidth = null)
             : base(customWidth)
         {
-            base.HitObjects = HitObjects = new ScrollingHitObjectContainer(scrollingDirection) { RelativeSizeAxes = Axes.Both };
+            base.HitObjects = HitObjects = new ScrollingHitObjectContainer(direction) { RelativeSizeAxes = Axes.Both };
             HitObjects.TimeRange.BindTo(VisibleTimeRange);
         }
 
@@ -133,11 +133,11 @@ namespace osu.Game.Rulesets.UI
 
             public readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
 
-            private readonly Direction scrollingDirection;
+            private readonly ScrollingDirection direction;
 
-            public ScrollingHitObjectContainer(Direction scrollingDirection)
+            public ScrollingHitObjectContainer(ScrollingDirection direction)
             {
-                this.scrollingDirection = scrollingDirection;
+                this.direction = direction;
 
                 RelativeSizeAxes = Axes.Both;
             }
@@ -155,13 +155,19 @@ namespace osu.Game.Rulesets.UI
                     // Todo: We may need to consider scale here
                     var finalPosition = (float)relativePosition * DrawSize;
 
-                    switch (scrollingDirection)
+                    switch (direction)
                     {
-                        case Direction.Horizontal:
-                            obj.X = finalPosition.X;
+                        case ScrollingDirection.Up:
+                            obj.Y = -finalPosition.Y;
                             break;
-                        case Direction.Vertical:
+                        case ScrollingDirection.Down:
                             obj.Y = finalPosition.Y;
+                            break;
+                        case ScrollingDirection.Left:
+                            obj.X = -finalPosition.X;
+                            break;
+                        case ScrollingDirection.Right:
+                            obj.X = finalPosition.X;
                             break;
                     }
                 }
