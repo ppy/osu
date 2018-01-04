@@ -5,6 +5,10 @@ namespace osu.Game.Screens.Select
 {
     public class MatchSongSelect : SongSelect
     {
-        protected override void Start() => Exit();
+        protected override bool OnSelectionFinalised()
+        {
+            Exit();
+            return true;
+        }
     }
 }

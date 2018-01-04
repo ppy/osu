@@ -12,6 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
@@ -48,7 +49,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Font = @"Exo2.0-RegularItalic",
                     Margin = new MarginPadding { Left = side_margin }
                 },
-                new DrawableFlag(score.User.Country?.FlagName)
+                new DrawableFlag(score.User.Country)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -104,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Text = $"{score.Statistics["300"]}/{score.Statistics["100"]}/{score.Statistics["50"]}",
+                    Text = $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Meh]}",
                     Font = @"Exo2.0-RegularItalic",
                     Margin = new MarginPadding { Right = side_margin }
                 },

@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Framework.Configuration;
 using OpenTK;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -74,6 +75,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected List<SampleChannel> Samples = new List<SampleChannel>();
         protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
 
+        // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
+        protected virtual string SampleNamespace => null;
+
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
         protected DrawableHitObject(TObject hitObject)
@@ -101,7 +105,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                         Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
                     };
 
-                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample);
+                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample, SampleNamespace);
 
                     if (channel == null)
                         continue;
@@ -118,6 +122,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             State.ValueChanged += state =>
             {
                 UpdateState(state);
+
+                // apply any custom state overrides
+                ApplyCustomUpdateState?.Invoke(this, state);
 
                 if (State == ArmedState.Hit)
                     PlaySamples();
@@ -240,8 +247,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
             h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
+            h.ApplyCustomUpdateState += (d, s) => ApplyCustomUpdateState?.Invoke(d, s);
             nestedHitObjects.Add(h);
         }
+
+        /// <summary>
+        /// Bind to apply a custom state which can override the default implementation.
+        /// </summary>
+        public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
         protected abstract void UpdateState(ArmedState state);
     }
