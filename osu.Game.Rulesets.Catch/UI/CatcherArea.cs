@@ -47,6 +47,11 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 var screenSpacePosition = fruit.ScreenSpaceDrawQuad.Centre;
 
+                // remove the fruit from its current parent.
+                // todo: make this less ugly, somehow.
+                (fruit.Parent as Container<DrawableHitObject>)?.Remove(fruit);
+                (fruit.Parent as Container)?.Remove(fruit);
+
                 fruit.RelativePositionAxes = Axes.None;
                 fruit.Position = new Vector2(MovableCatcher.ToLocalSpace(screenSpacePosition).X - MovableCatcher.DrawSize.X / 2, 0);
 
