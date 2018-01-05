@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             private readonly SpriteIcon icon;
 
-            public Action Action;
+            public new Action Action;
 
             public RetryButton()
             {
