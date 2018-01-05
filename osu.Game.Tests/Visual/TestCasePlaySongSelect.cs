@@ -13,43 +13,103 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Tests.Platform;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCasePlaySongSelect : OsuTestCase
+    public class TestCasePlaySongSelect : OsuTestCase
     {
         private BeatmapManager manager;
 
         private RulesetStore rulesets;
 
         private DependencyContainer dependencies;
+        private WorkingBeatmap defaultBeatmap;
+
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(SongSelect),
+            typeof(BeatmapCarousel),
+
+            typeof(CarouselItem),
+            typeof(CarouselGroup),
+            typeof(CarouselGroupEagerSelect),
+            typeof(CarouselBeatmap),
+            typeof(CarouselBeatmapSet),
+
+            typeof(DrawableCarouselItem),
+            typeof(CarouselItemState),
+
+            typeof(DrawableCarouselBeatmap),
+            typeof(DrawableCarouselBeatmapSet),
+        };
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
 
-        [BackgroundDependencyLoader]
-        private void load()
+        private class TestSongSelect : PlaySongSelect
         {
-            PlaySongSelect songSelect;
+            public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
+            public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
+            public new BeatmapCarousel Carousel => base.Carousel;
+        }
 
-            if (manager == null)
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase game)
+        {
+            TestSongSelect songSelect = null;
+
+            var storage = new TestStorage(@"TestCasePlaySongSelect");
+
+            // this is by no means clean. should be replacing inside of OsuGameBase somehow.
+            var context = new OsuDbContext();
+
+            Func<OsuDbContext> contextFactory = () => context;
+
+            dependencies.Cache(rulesets = new RulesetStore(contextFactory));
+            dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
             {
-                var storage = new TestStorage(@"TestCasePlaySongSelect");
+                DefaultBeatmap = defaultBeatmap = game.Beatmap.Default
+            });
 
-                // this is by no means clean. should be replacing inside of OsuGameBase somehow.
-                var context = new OsuDbContext();
+            void loadNewSongSelect(bool deleteMaps = false) => AddStep("reload song select", () =>
+            {
+                if (deleteMaps)
+                {
+                    manager.DeleteAll();
+                    game.Beatmap.SetDefault();
+                }
 
-                Func<OsuDbContext> contextFactory = () => context;
+                if (songSelect != null)
+                {
+                    Remove(songSelect);
+                    songSelect.Dispose();
+                }
 
-                dependencies.Cache(rulesets = new RulesetStore(contextFactory));
-                dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null));
+                Add(songSelect = new TestSongSelect());
+            });
 
+            loadNewSongSelect(true);
+
+            AddWaitStep(3);
+
+            AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
+
+            AddAssert("dummy shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap);
+
+            AddStep("import test maps", () =>
+            {
                 for (int i = 0; i < 100; i += 10)
                     manager.Import(createTestBeatmapSet(i));
-            }
+            });
 
-            Add(songSelect = new PlaySongSelect());
+            AddWaitStep(3);
+            AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
+
+            loadNewSongSelect();
+            AddWaitStep(3);
+            AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
             AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
             AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });

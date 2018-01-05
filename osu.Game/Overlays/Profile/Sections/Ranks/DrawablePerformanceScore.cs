@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawablePerformanceScore : DrawableScore
+    public class DrawablePerformanceScore : DrawableProfileScore
     {
         private readonly double? weight;
 
@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private void load(OsuColour colour)
         {
             double pp = Score.PP ?? 0;
-            Stats.Add(new OsuSpriteText
+            RightFlowContainer.Add(new OsuSpriteText
             {
                 Text = $"{pp:0}pp",
                 Anchor = Anchor.TopRight,
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
             if (weight.HasValue)
             {
-                Stats.Add(new OsuSpriteText
+                RightFlowContainer.Add(new OsuSpriteText
                 {
                     Text = $"weighted: {pp * weight:0}pp ({weight:P0})",
                     Anchor = Anchor.TopRight,

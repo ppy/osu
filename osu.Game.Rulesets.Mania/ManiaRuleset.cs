@@ -105,6 +105,8 @@ namespace osu.Game.Rulesets.Mania
 
         public override string Description => "osu!mania";
 
+        public override string ShortName => "mania";
+
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_mania_o };
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new ManiaDifficultyCalculator(beatmap);

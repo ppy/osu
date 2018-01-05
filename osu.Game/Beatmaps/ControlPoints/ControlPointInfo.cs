@@ -4,31 +4,37 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using osu.Framework.Lists;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
+    [Serializable]
     public class ControlPointInfo
     {
         /// <summary>
         /// All timing points.
         /// </summary>
-        public readonly SortedList<TimingControlPoint> TimingPoints = new SortedList<TimingControlPoint>(Comparer<TimingControlPoint>.Default);
+        [JsonProperty]
+        public SortedList<TimingControlPoint> TimingPoints { get; private set; } = new SortedList<TimingControlPoint>(Comparer<TimingControlPoint>.Default);
 
         /// <summary>
         /// All difficulty points.
         /// </summary>
-        public readonly SortedList<DifficultyControlPoint> DifficultyPoints = new SortedList<DifficultyControlPoint>(Comparer<DifficultyControlPoint>.Default);
+        [JsonProperty]
+        public SortedList<DifficultyControlPoint> DifficultyPoints { get; private set; } = new SortedList<DifficultyControlPoint>(Comparer<DifficultyControlPoint>.Default);
 
         /// <summary>
         /// All sound points.
         /// </summary>
-        public readonly SortedList<SoundControlPoint> SoundPoints = new SortedList<SoundControlPoint>(Comparer<SoundControlPoint>.Default);
+        [JsonProperty]
+        public SortedList<SampleControlPoint> SamplePoints { get; private set; } = new SortedList<SampleControlPoint>(Comparer<SampleControlPoint>.Default);
 
         /// <summary>
         /// All effect points.
         /// </summary>
-        public readonly SortedList<EffectControlPoint> EffectPoints = new SortedList<EffectControlPoint>(Comparer<EffectControlPoint>.Default);
+        [JsonProperty]
+        public SortedList<EffectControlPoint> EffectPoints { get; private set; } = new SortedList<EffectControlPoint>(Comparer<EffectControlPoint>.Default);
 
         /// <summary>
         /// Finds the difficulty control point that is active at <paramref name="time"/>.
@@ -49,7 +55,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the sound control point at.</param>
         /// <returns>The sound control point.</returns>
-        public SoundControlPoint SoundPointAt(double time) => binarySearch(SoundPoints, time);
+        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, SamplePoints.FirstOrDefault());
 
         /// <summary>
         /// Finds the timing control point that is active at <paramref name="time"/>.
@@ -61,18 +67,21 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
         /// </summary>
+        [JsonIgnore]
         public double BPMMaximum =>
             60000 / (TimingPoints.OrderBy(c => c.BeatLength).FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 
         /// <summary>
         /// Finds the minimum BPM represented by any timing control point.
         /// </summary>
+        [JsonIgnore]
         public double BPMMinimum =>
             60000 / (TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 
         /// <summary>
         /// Finds the mode BPM (most common BPM) represented by the control points.
         /// </summary>
+        [JsonIgnore]
         public double BPMMode =>
             60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 

@@ -27,8 +27,10 @@ namespace osu.Game.Overlays.Profile
         private readonly OsuTextFlowContainer infoTextLeft;
         private readonly LinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
+        private readonly RankGraph rankGraph;
 
-        private readonly Container coverContainer, chartContainer, supporterTag;
+        public readonly SupporterIcon SupporterTag;
+        private readonly Container coverContainer;
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
@@ -53,6 +55,7 @@ namespace osu.Game.Overlays.Profile
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = cover_height,
+                    Masking = true,
                     Children = new Drawable[]
                     {
                         new Box
@@ -92,32 +95,13 @@ namespace osu.Game.Overlays.Profile
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        supporterTag = new CircularContainer
+                                        SupporterTag = new SupporterIcon
                                         {
+                                            Alpha = 0,
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
                                             Y = -75,
-                                            Size = new Vector2(25, 25),
-                                            Masking = true,
-                                            BorderThickness = 3,
-                                            BorderColour = Color4.White,
-                                            Alpha = 0,
-                                            Children = new Drawable[]
-                                            {
-                                                new Box
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Alpha = 0,
-                                                    AlwaysPresent = true
-                                                },
-                                                new SpriteIcon
-                                                {
-                                                    Icon = FontAwesome.fa_heart,
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    Size = new Vector2(12),
-                                                }
-                                            }
+                                            Size = new Vector2(25, 25)
                                         },
                                         new LinkFlowContainer.ProfileLink(user)
                                         {
@@ -125,7 +109,7 @@ namespace osu.Game.Overlays.Profile
                                             Origin = Anchor.BottomLeft,
                                             Y = -48,
                                         },
-                                        countryFlag = new DrawableFlag(user.Country?.FlagName)
+                                        countryFlag = new DrawableFlag(user.Country)
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
@@ -272,7 +256,7 @@ namespace osu.Game.Overlays.Profile
                                 }
                             }
                         },
-                        chartContainer = new Container
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.BottomCentre,
@@ -283,6 +267,10 @@ namespace osu.Game.Overlays.Profile
                                 new Box
                                 {
                                     Colour = Color4.Black.Opacity(0.25f),
+                                    RelativeSizeAxes = Axes.Both
+                                },
+                                rankGraph = new RankGraph
+                                {
                                     RelativeSizeAxes = Axes.Both
                                 }
                             }
@@ -302,11 +290,7 @@ namespace osu.Game.Overlays.Profile
 
         public User User
         {
-            get
-            {
-                return user;
-            }
-
+            get { return user; }
             set
             {
                 user = value;
@@ -324,10 +308,10 @@ namespace osu.Game.Overlays.Profile
                 FillMode = FillMode.Fill,
                 OnLoadComplete = d => d.FadeInFromZero(200),
                 Depth = float.MaxValue,
-            },
-            coverContainer.Add);
+            }, coverContainer.Add);
 
-            if (user.IsSupporter) supporterTag.Show();
+            if (user.IsSupporter)
+                SupporterTag.Show();
 
             if (!string.IsNullOrEmpty(user.Colour))
             {
@@ -349,7 +333,7 @@ namespace osu.Game.Overlays.Profile
             {
                 infoTextLeft.AddText("from ");
                 infoTextLeft.AddText(user.Country.FullName, boldItalic);
-                countryFlag.FlagName = user.Country.FlagName;
+                countryFlag.Country = user.Country;
             }
             infoTextLeft.NewParagraph();
 
@@ -382,7 +366,7 @@ namespace osu.Game.Overlays.Profile
             }
 
             tryAddInfoRightLine(FontAwesome.fa_map_marker, user.Location);
-            tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Intrerests);
+            tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Interests);
             tryAddInfoRightLine(FontAwesome.fa_suitcase, user.Occupation);
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))
@@ -420,7 +404,7 @@ namespace osu.Game.Overlays.Profile
                 gradeSPlus.DisplayCount = 0;
                 gradeSSPlus.DisplayCount = 0;
 
-                chartContainer.Add(new RankChart(user) { RelativeSizeAxes = Axes.Both });
+                rankGraph.User.Value = user;
             }
         }
 
@@ -472,7 +456,7 @@ namespace osu.Game.Overlays.Profile
                     Width = width,
                     Height = 26
                 });
-                Add(numberText = new SpriteText
+                Add(numberText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
@@ -514,7 +498,7 @@ namespace osu.Game.Overlays.Profile
                 {
                     set
                     {
-                        if(value != null)
+                        if (value != null)
                             content.Action = () => Process.Start(value);
                     }
                 }

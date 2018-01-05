@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -77,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 }
             });
 
-            foreach (var tick in HitObject.Ticks)
+            foreach (var tick in HitObject.NestedHitObjects.OfType<HoldNoteTick>())
             {
                 var drawableTick = new DrawableHoldNoteTick(tick)
                 {

@@ -8,7 +8,6 @@ using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
@@ -22,6 +21,8 @@ namespace osu.Game.Tests.Visual
         private readonly Type ruleset;
 
         protected Player Player;
+
+        private TestWorkingBeatmap working;
 
         /// <summary>
         /// Create a TestCase which runs through the Player screen.
@@ -63,7 +64,7 @@ namespace osu.Game.Tests.Visual
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(test_beatmap_data)))
             using (var reader = new StreamReader(stream))
-                beatmap = BeatmapDecoder.GetDecoder(reader).Decode(reader);
+                beatmap = Game.Beatmaps.Formats.Decoder.GetDecoder(reader).DecodeBeatmap(reader);
 
             return beatmap;
         }
@@ -76,7 +77,7 @@ namespace osu.Game.Tests.Visual
 
             var instance = r.CreateInstance();
 
-            WorkingBeatmap working = new TestWorkingBeatmap(beatmap);
+            working = new TestWorkingBeatmap(beatmap);
             working.Mods.Value = new[] { instance.GetAllMods().First(m => m is ModNoFail) };
 
             if (Player != null)
@@ -89,10 +90,21 @@ namespace osu.Game.Tests.Visual
             return player;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (working != null)
+                // note that this will override any mod rate application
+                working.Track.Rate = Clock.Rate;
+        }
+
         protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset) => new Player
         {
             InitialBeatmap = beatmap,
-            AllowPause = false
+            AllowPause = false,
+            AllowLeadIn = false,
+            AllowResults = false,
         };
 
         private const string test_beatmap_data =

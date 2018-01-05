@@ -7,12 +7,12 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
@@ -204,6 +204,8 @@ namespace osu.Game.Tests.Visual
             private readonly FillFlowContainer<PerformanceDisplay> scores;
             private APIAccess api;
 
+            private readonly Bindable<WorkingBeatmap> currentBeatmap = new Bindable<WorkingBeatmap>();
+
             public PerformanceList()
             {
                 RelativeSizeAxes = Axes.X;
@@ -224,7 +226,7 @@ namespace osu.Game.Tests.Visual
 
                 if (!api.IsLoggedIn)
                 {
-                    InternalChild = new SpriteText
+                    InternalChild = new OsuSpriteText
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
@@ -232,19 +234,22 @@ namespace osu.Game.Tests.Visual
                     };
                 }
 
-                osuGame.Beatmap.ValueChanged += beatmapChanged;
+                currentBeatmap.ValueChanged += beatmapChanged;
+                currentBeatmap.BindTo(osuGame.Beatmap);
             }
 
             private GetScoresRequest lastRequest;
             private void beatmapChanged(WorkingBeatmap newBeatmap)
             {
+                if (!IsAlive) return;
+
                 lastRequest?.Cancel();
                 scores.Clear();
 
                 if (!api.IsLoggedIn)
                     return;
 
-                lastRequest = new GetScoresRequest(newBeatmap.BeatmapInfo);
+                lastRequest = new GetScoresRequest(newBeatmap.BeatmapInfo, newBeatmap.BeatmapInfo.Ruleset);
                 lastRequest.Success += res => res.Scores.ForEach(s => scores.Add(new PerformanceDisplay(s, newBeatmap.Beatmap)));
                 api.Queue(lastRequest);
             }

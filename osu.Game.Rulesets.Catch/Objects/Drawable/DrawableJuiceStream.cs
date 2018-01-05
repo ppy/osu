@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 RelativeChildSize = new Vector2(1, (float)HitObject.Duration)
             };
 
-            foreach (CatchHitObject tick in s.Ticks)
+            foreach (CatchHitObject tick in s.NestedHitObjects.OfType<CatchHitObject>())
             {
                 TinyDroplet tiny = tick as TinyDroplet;
                 if (tiny != null)

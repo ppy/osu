@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// An interface for mods that make general adjustments to difficulty.
     /// </summary>
-    public interface IApplicableToDifficulty
+    public interface IApplicableToDifficulty : IApplicableMod
     {
         void ApplyToDifficulty(BeatmapDifficulty difficulty);
     }
