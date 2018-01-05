@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
@@ -16,13 +16,22 @@ namespace osu.Game.Overlays.Settings
 
     public class SettingsSlider<T, U> : SettingsItem<T>
         where T : struct, IEquatable<T>
-        where U : SliderBar<T>, new()
+        where U : OsuSliderBar<T>, new()
     {
         protected override Drawable CreateControl() => new U
         {
             Margin = new MarginPadding { Top = 5, Bottom = 5 },
             RelativeSizeAxes = Axes.X
         };
+
+        /// <summary>
+        /// The format that will be used for the tooltip when the sliderbar is hovered.
+        /// </summary>
+        public NumberFormatInfo Format
+        {
+            get => ((U)Control).Format;
+            set => ((U)Control).Format = value;
+        }
 
         public float KeyboardStep;
 
