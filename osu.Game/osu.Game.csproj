@@ -313,6 +313,7 @@
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
     <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Rulesets\UI\Scrolling\ScrollingDirection.cs" />
     <Compile Include="Rulesets\UI\Scrolling\ScrollingHitObjectContainer.cs" />

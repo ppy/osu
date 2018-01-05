@@ -176,6 +176,10 @@ namespace osu.Game.Rulesets.UI
             if (!converter.CanConvert(workingBeatmap.Beatmap))
                 throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can not be converted for the current ruleset (converter: {converter}).");
 
+            // Apply conversion adjustments before converting
+            foreach (var mod in Mods.OfType<IApplicableToBeatmapConverter<TObject>>())
+                mod.ApplyToBeatmapConverter(converter);
+
             // Convert the beatmap
             Beatmap = converter.Convert(workingBeatmap.Beatmap);
 

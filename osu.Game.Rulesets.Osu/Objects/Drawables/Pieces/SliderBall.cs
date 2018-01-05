@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private readonly Slider slider;
-        private readonly Box follow;
+        public readonly Box FollowCircle;
         private readonly Box ball;
 
         public SliderBall(Slider slider)
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                follow = new Box
+                FollowCircle = new Box
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -101,11 +101,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         // If the current time is between the start and end of the slider, we should track mouse input regardless of the cursor position.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => canCurrentlyTrack || base.ReceiveMouseInputAt(screenSpacePos);
 
-        public override void ClearTransforms(bool propagateChildren = false, string targetMember = null)
+        public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
         {
             // Consider the case of rewinding - children's transforms are handled internally, so propagating down
             // any further will cause weirdness with the Tracking bool below. Let's not propagate further at this point.
-            base.ClearTransforms(false, targetMember);
+            base.ClearTransformsAfter(time, false, targetMember);
         }
 
         private bool tracking;
@@ -118,8 +118,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
                 tracking = value;
 
-                follow.ScaleTo(tracking ? 2.8f : 1, 300, Easing.OutQuint);
-                follow.FadeTo(tracking ? 0.2f : 0, 300, Easing.OutQuint);
+                FollowCircle.ScaleTo(tracking ? 2.8f : 1, 300, Easing.OutQuint);
+                FollowCircle.FadeTo(tracking ? 0.2f : 0, 300, Easing.OutQuint);
             }
         }
 
@@ -129,11 +129,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.Update();
 
-            // Make sure to use the base version of ReceiveMouseInputAt so that we correctly check the position.
-            Tracking = canCurrentlyTrack
-                        && lastState != null
-                        && base.ReceiveMouseInputAt(lastState.Mouse.NativeState.Position)
-                        && ((Parent as DrawableSlider)?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+            if (Time.Current < slider.EndTime)
+            {
+                // Make sure to use the base version of ReceiveMouseInputAt so that we correctly check the position.
+                Tracking = canCurrentlyTrack
+                           && lastState != null
+                           && base.ReceiveMouseInputAt(lastState.Mouse.NativeState.Position)
+                           && ((Parent as DrawableSlider)?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+            }
         }
 
         public void UpdateProgress(double progress, int repeat)
