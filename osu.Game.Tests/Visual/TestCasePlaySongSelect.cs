@@ -15,6 +15,7 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Platform;
 
 namespace osu.Game.Tests.Visual
@@ -22,8 +23,8 @@ namespace osu.Game.Tests.Visual
     public class TestCasePlaySongSelect : OsuTestCase
     {
         private BeatmapManager manager;
-
         private RulesetStore rulesets;
+        private OsuGame osu;
 
         private DependencyContainer dependencies;
         private WorkingBeatmap defaultBeatmap;
@@ -55,9 +56,11 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager baseManager)
+        private void load(OsuGameBase baseGame, BeatmapManager baseManager)
         {
             TestSongSelect songSelect = null;
+            // need to reset this here so that test env for dummy beatmap assert is correct when dynamic compiling
+            baseGame.Beatmap.Value = defaultBeatmap = baseManager.GetWorkingBeatmap(null);
 
             var storage = new TestStorage(@"TestCasePlaySongSelect");
 
@@ -69,8 +72,11 @@ namespace osu.Game.Tests.Visual
             dependencies.Cache(rulesets = new RulesetStore(contextFactory));
             dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
             {
-                DefaultBeatmap = defaultBeatmap = baseManager.GetWorkingBeatmap(null)
+                DefaultBeatmap = defaultBeatmap,
             });
+            dependencies.Cache(osu = new OsuGame());
+
+            osu.Ruleset.Value = rulesets.GetRuleset(0);
 
             void loadNewSongSelect(bool deleteMaps = false) => AddStep("reload song select", () =>
             {
@@ -104,6 +110,20 @@ namespace osu.Game.Tests.Visual
             AddWaitStep(3);
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
+            AddWaitStep(3);
+            AddStep("non-convertible initial WorkingBeatmap", () => {
+                var beatmaps = manager.GetAllUsableBeatmapSets();
+
+                baseGame.Beatmap.Value = new TestWorkingBeatmap(new Beatmap
+                {
+                    BeatmapInfo = beatmaps[0].Beatmaps[0],
+                });
+            });
+            AddAssert("unplayable ruleset beatmap selected", () => baseGame.Beatmap.Value.BeatmapInfo.RulesetID != 0);
+            loadNewSongSelect();
+            AddWaitStep(3);
+            AddAssert("correct ruleset beatmap selected", () => baseGame.Beatmap.Value.BeatmapInfo.RulesetID == 0);
+
             AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
             AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });
             AddStep(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
@@ -118,7 +138,7 @@ namespace osu.Game.Tests.Visual
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
-                    OnlineBeatmapSetID = 1234 + i,
+                    OnlineBeatmapSetID = 1233 + i,
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = "MONACA " + RNG.Next(0, 9),
                     Title = "Black Song " + RNG.Next(0, 9),
@@ -126,6 +146,18 @@ namespace osu.Game.Tests.Visual
                 },
                 Beatmaps = new List<BeatmapInfo>(new[]
                 {
+                    new BeatmapInfo
+                    {
+                        OnlineBeatmapID = 1233 + i,
+                        Ruleset = rulesets.GetRuleset(1),
+                        RulesetID = 1,
+                        Path = "normal.taiko",
+                        Version = "Normal",
+                        BaseDifficulty = new BeatmapDifficulty
+                        {
+                            OverallDifficulty = 3.5f,
+                        },
+                    },
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1234 + i,
