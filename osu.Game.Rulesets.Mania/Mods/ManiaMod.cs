@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.UI;
@@ -103,10 +104,8 @@ namespace osu.Game.Rulesets.Mania.Mods
         }
     }
 
-    public abstract class ManiaKeyMod : Mod, IApplicableToBeatmapConverter<ManiaHitObject>
+    public abstract class ManiaKeyMod : Mod, IApplicableMod, IApplicableToBeatmapConverter<ManiaHitObject>
     {
-        // TODO: implement using the IApplicable interface. Haven't done so yet because KeyCount isn't even hooked up at the moment.
-
         public override string ShortenedName => Name;
         public abstract int KeyCount { get; }
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier
@@ -114,7 +113,13 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public void ApplyToBeatmapConverter(BeatmapConverter<ManiaHitObject> beatmapConverter)
         {
-            throw new NotImplementedException();
+            var mbc = (ManiaBeatmapConverter)beatmapConverter;
+
+            // Although this can work, for now let's not allow keymods for mania-specific beatmaps
+            if (mbc.IsForCurrentRuleset)
+                return;
+
+            mbc.TargetColumns = KeyCount;
         }
     }
 
