@@ -29,11 +29,22 @@ namespace osu.Game.Rulesets.UI.Scrolling
             RelativeSizeAxes = Axes.Both;
         }
 
+        protected override bool UpdateChildrenLife()
+        {
+            foreach (var obj in Objects)
+            {
+                obj.LifetimeStart = obj.HitObject.StartTime - TimeRange - 1000;
+                obj.LifetimeEnd = ((obj.HitObject as IHasEndTime)?.EndTime ?? obj.HitObject.StartTime + TimeRange) + 1000;
+            }
+
+            return base.UpdateChildrenLife();
+        }
+
         protected override void UpdateAfterChildrenLife()
         {
             base.UpdateAfterChildrenLife();
 
-            // We need to calculate this as soon as possible so that hitobjects
+            // We need to calculate this as soon as possible after lifetimes so that hitobjects
             // get the final say in their positions
 
             var currentMultiplier = controlPointAt(Time.Current);
