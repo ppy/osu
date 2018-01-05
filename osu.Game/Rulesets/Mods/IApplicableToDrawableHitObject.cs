@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Applies this <see cref="IApplicableToDrawableHitObjects"/> to a list of <see cref="DrawableHitObject"/>s.
         /// </summary>
-        /// <param name="drawable">The list of <see cref="DrawableHitObject"/>s to apply to.</param>
+        /// <param name="drawables">The list of <see cref="DrawableHitObject"/>s to apply to.</param>
         void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables);
     }
 }
