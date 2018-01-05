@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
@@ -33,8 +34,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             foreach (var obj in Objects)
             {
-                obj.LifetimeStart = obj.HitObject.StartTime - TimeRange - 1000;
-                obj.LifetimeEnd = ((obj.HitObject as IHasEndTime)?.EndTime ?? obj.HitObject.StartTime + TimeRange) + 1000;
+                obj.LifetimeStart = obj.HitObject.StartTime - TimeRange * 2;
+                obj.LifetimeEnd = ((obj.HitObject as IHasEndTime)?.EndTime ?? obj.HitObject.StartTime) + TimeRange * 2;
             }
 
             return base.UpdateChildrenLife();
@@ -47,27 +48,25 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // We need to calculate this as soon as possible after lifetimes so that hitobjects
             // get the final say in their positions
 
-            var currentMultiplier = controlPointAt(Time.Current);
+            var timelinePosition = positionAt(Time.Current);
 
             foreach (var obj in AliveObjects)
             {
-                // Todo: We may need to consider scale here
-                var relativePosition = (Time.Current - obj.HitObject.StartTime) * currentMultiplier.Multiplier / TimeRange;
-                var finalPosition = (float)relativePosition * DrawSize;
+                var finalPosition = positionAt(obj.HitObject.StartTime);
 
                 switch (direction)
                 {
                     case ScrollingDirection.Up:
-                        obj.Y = -finalPosition.Y;
+                        obj.Y = finalPosition.Y - timelinePosition.Y;
                         break;
                     case ScrollingDirection.Down:
-                        obj.Y = finalPosition.Y;
+                        obj.Y = -finalPosition.Y + timelinePosition.Y;
                         break;
                     case ScrollingDirection.Left:
-                        obj.X = -finalPosition.X;
+                        obj.X = finalPosition.X - timelinePosition.X;
                         break;
                     case ScrollingDirection.Right:
-                        obj.X = finalPosition.X;
+                        obj.X = -finalPosition.X + timelinePosition.X;
                         break;
                 }
 
@@ -75,8 +74,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     continue;
 
                 // Todo: We may need to consider scale here
-                var relativeEndPosition = (Time.Current - endTime.EndTime) * currentMultiplier.Multiplier / TimeRange;
-                var finalEndPosition = (float)relativeEndPosition * DrawSize;
+                var finalEndPosition = positionAt(endTime.EndTime);
 
                 float length = Vector2.Distance(finalPosition, finalEndPosition);
 
@@ -94,22 +92,24 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        private readonly MultiplierControlPoint searchingPoint = new MultiplierControlPoint();
-        private MultiplierControlPoint controlPointAt(double time)
+        private Vector2 positionAt(double time)
         {
-            if (ControlPoints.Count == 0)
-                return new MultiplierControlPoint(double.MinValue);
+            float length = 0;
+            for (int i = 0; i < ControlPoints.Count; i++)
+            {
+                var current = ControlPoints[i];
+                var next = i < ControlPoints.Count - 1 ? ControlPoints[i + 1] : null;
 
-            if (time < ControlPoints[0].StartTime)
-                return ControlPoints[0];
+                if (i > 0 && current.StartTime > time)
+                    continue;
 
-            searchingPoint.StartTime = time;
+                // Duration of the current control point
+                var currentDuration = (next?.StartTime ?? double.PositiveInfinity) - current.StartTime;
 
-            int index = ControlPoints.BinarySearch(searchingPoint);
-            if (index < 0)
-                index = ~index - 1;
+                length += (float)(Math.Min(currentDuration, time - current.StartTime) * current.Multiplier / TimeRange);
+            }
 
-            return ControlPoints[index];
+            return length * DrawSize;
         }
     }
 }

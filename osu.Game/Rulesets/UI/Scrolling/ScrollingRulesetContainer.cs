@@ -70,12 +70,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             // Perform some post processing of the timing changes
             timingChanges = timingChanges
-                // Collapse sections after the last hit object
-                .Where(s => s.StartTime <= lastObjectTime)
-                // Collapse sections with the same start time
-                .GroupBy(s => s.StartTime).Select(g => g.Last()).OrderBy(s => s.StartTime)
-                // Collapse sections with the same beat length
-                .GroupBy(s => s.TimingPoint.BeatLength * s.DifficultyPoint.SpeedMultiplier).Select(g => g.First());
+                            // Collapse sections after the last hit object
+                            .Where(s => s.StartTime <= lastObjectTime)
+                            // Collapse sections with the same start time
+                            .GroupBy(s => s.StartTime).Select(g => g.Last()).OrderBy(s => s.StartTime);
 
             DefaultControlPoints.AddRange(timingChanges);
 
