@@ -59,6 +59,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
                 }
             };
 
+            sliderbar.Format.NumberDecimalDigits = 2;
             sliderbar.Bindable.ValueChanged += rateMultiplier => multiplierText.Text = $"{rateMultiplier}x";
         }
 
