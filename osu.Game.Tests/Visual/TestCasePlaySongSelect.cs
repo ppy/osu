@@ -24,7 +24,6 @@ namespace osu.Game.Tests.Visual
     {
         private BeatmapManager manager;
         private RulesetStore rulesets;
-        private OsuGame osu;
 
         private DependencyContainer dependencies;
         private WorkingBeatmap defaultBeatmap;
@@ -54,6 +53,8 @@ namespace osu.Game.Tests.Visual
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
             public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
+
+            public void SetRuleset(RulesetInfo ruleset) => Ruleset.Value = ruleset;
         }
 
         [BackgroundDependencyLoader]
@@ -73,9 +74,6 @@ namespace osu.Game.Tests.Visual
             {
                 DefaultBeatmap = defaultBeatmap = game.Beatmap.Default
             });
-            dependencies.Cache(osu = new OsuGame());
-
-            osu.Ruleset.Value = rulesets.GetRuleset(0);
 
             void loadNewSongSelect(bool deleteMaps = false) => AddStep("reload song select", () =>
             {
@@ -92,6 +90,7 @@ namespace osu.Game.Tests.Visual
                 }
 
                 Add(songSelect = new TestSongSelect());
+                songSelect?.SetRuleset(rulesets.GetRuleset(0));
             });
 
             loadNewSongSelect(true);
@@ -115,7 +114,6 @@ namespace osu.Game.Tests.Visual
             AddWaitStep(3);
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
-            AddWaitStep(3);
             AddStep("non-convertible initial WorkingBeatmap", () => {
                 var beatmaps = manager.GetAllUsableBeatmapSets();
 

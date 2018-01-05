@@ -60,7 +60,6 @@ namespace osu.Game.Screens.Select
         private readonly BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
         private BeatmapManager beatmaps;
-        private OsuGame osu;
 
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
@@ -197,10 +196,7 @@ namespace osu.Game.Screens.Select
                 this.beatmaps = beatmaps;
 
             if (osu != null)
-            {
-                this.osu = osu;
                 Ruleset.BindTo(osu.Ruleset);
-            }
 
             this.beatmaps.BeatmapSetAdded += onBeatmapSetAdded;
             this.beatmaps.BeatmapSetRemoved += onBeatmapSetRemoved;
@@ -453,7 +449,7 @@ namespace osu.Game.Screens.Select
 
         private void carouselBeatmapsLoaded()
         {
-            var currentRulesetId = osu.Ruleset.Value.ID;
+            var currentRulesetId = Ruleset.Value.ID;
 
             BeatmapInfo beatmap = Beatmap.Value.BeatmapInfo;
 
@@ -465,12 +461,11 @@ namespace osu.Game.Screens.Select
             {
                 Carousel.SelectBeatmap(beatmap);
             }
-            else if (Carousel.SelectedBeatmapSet == null)
+            else if (!Carousel.SelectNextRandom())
             {
-                if (!Carousel.SelectNextRandom())
-                    // in the case random selection failed, we want to trigger selectionChanged
-                    // to show the dummy beatmap (we have nothing else to display).
-                    carouselSelectionChanged(null);
+                // in the case random selection failed, we want to trigger selectionChanged
+                // to show the dummy beatmap (we have nothing else to display).
+                carouselSelectionChanged(null);
             }
         }
 
