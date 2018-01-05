@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using System.Threading;
 using OpenTK;
 using OpenTK.Input;
@@ -59,6 +60,7 @@ namespace osu.Game.Screens.Select
         private readonly BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
         private BeatmapManager beatmaps;
+        private OsuGame osu;
 
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
@@ -195,7 +197,10 @@ namespace osu.Game.Screens.Select
                 this.beatmaps = beatmaps;
 
             if (osu != null)
+            {
+                this.osu = osu;
                 Ruleset.BindTo(osu.Ruleset);
+            }
 
             this.beatmaps.BeatmapSetAdded += onBeatmapSetAdded;
             this.beatmaps.BeatmapSetRemoved += onBeatmapSetRemoved;
@@ -448,9 +453,20 @@ namespace osu.Game.Screens.Select
 
         private void carouselBeatmapsLoaded()
         {
-            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
-                Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo);
-            else if (Carousel.SelectedBeatmapSet == null)
+            if (!Carousel.BeatmapSets.Any())
+                return;
+
+            var currentRulesetId = osu.Ruleset.Value.ID;
+
+            BeatmapInfo beatmap = Beatmap.Value.BeatmapInfo;
+
+            // ensure that the current beatmap is playable in the current ruleset
+            if (beatmap.RulesetID > 0 && currentRulesetId != beatmap.RulesetID)
+                beatmap = Beatmap.Value.BeatmapSetInfo?.Beatmaps.FirstOrDefault(b => b.RulesetID == 0 || b.RulesetID == currentRulesetId);
+
+            if (beatmap != null && !Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
+                Carousel.SelectBeatmap(beatmap);
+            else
                 Carousel.SelectNextRandom();
         }
 
