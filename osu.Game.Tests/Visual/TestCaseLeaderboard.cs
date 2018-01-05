@@ -38,6 +38,11 @@ namespace osu.Game.Tests.Visual
             AddStep(@"Not logged in", () => leaderboard.SetRetrievalState(PlaceholderState.NotLoggedIn));
             AddStep(@"Unavailable", () => leaderboard.SetRetrievalState(PlaceholderState.Unavailable));
             AddStep(@"Real beatmap", realBeatmap);
+            AddStep("New Scores + Empty Scores", () =>
+            {
+                newScores();
+                leaderboard.SetRetrievalState(PlaceholderState.NoScores);
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -271,6 +276,7 @@ namespace osu.Game.Tests.Visual
         {
             public void SetRetrievalState(PlaceholderState state)
             {
+                Scores = null; // emulate updateScores which would delete them
                 PlaceholderState = state;
             }
         }
