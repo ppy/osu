@@ -54,10 +54,13 @@ namespace osu.Game.Screens.Select.Leaderboards
                 loading.Hide();
 
                 if (scores == null || !scores.Any())
+                {
+                    PlaceholderState = PlaceholderState.NoScores;
                     return;
+                }
 
                 // ensure placeholder is hidden when displaying scores
-                PlaceholderState = PlaceholderState.Successful;
+                PlaceholderState = PlaceholderState.None;
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
                 Schedule(() =>
@@ -68,7 +71,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(0f, 5f),
                         Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                        ChildrenEnumerable = scores.Select((s, index) => new LeaderboardScore(s, index + 1) { Action = () => ScoreSelected?.Invoke(s) })
+                        ChildrenEnumerable = scores?.Select((s, index) => new LeaderboardScore(s, index + 1) { Action = () => ScoreSelected?.Invoke(s) }) ?? new LeaderboardScore[] { }
                     }, f =>
                     {
                         scrollContainer.Add(scrollFlow = f);
@@ -93,7 +96,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return scope; }
             set
             {
-                if (value == scope) return;
+                if (value == scope)
+                    return;
 
                 scope = value;
                 updateScores();
@@ -107,14 +111,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return placeholderState; }
             set
             {
-                if (value == placeholderState) return;
-
-                if (value != PlaceholderState.Successful)
-                {
-                    getScoresRequest?.Cancel();
-                    getScoresRequest = null;
-                    Scores = null;
-                }
+                if (value == placeholderState)
+                    return;
 
                 switch (placeholderState = value)
                 {
@@ -171,10 +169,10 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return beatmap; }
             set
             {
-                if (beatmap == value) return;
+                if (beatmap == value)
+                    return;
 
                 beatmap = value;
-                Scores = null;
 
                 pendingBeatmapSwitch?.Cancel();
                 pendingBeatmapSwitch = Schedule(updateScores);
@@ -218,6 +216,10 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void updateScores()
         {
+            getScoresRequest?.Cancel();
+            getScoresRequest = null;
+            Scores = null;
+
             if (Scope == LeaderboardScope.Local)
             {
                 // TODO: get local scores from wherever here.
@@ -243,26 +245,21 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return;
             }
 
-            PlaceholderState = PlaceholderState.Retrieving;
+            PlaceholderState = PlaceholderState.None;
             loading.Show();
 
             getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value ?? Beatmap.Ruleset, Scope);
-            getScoresRequest.Success += r =>
+            getScoresRequest.Success += r => Scores = r.Scores;
+            getScoresRequest.Failure += e =>
             {
-                Scores = r.Scores;
-                PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
+                if (e is OperationCanceledException)
+                    return;
+
+                PlaceholderState = PlaceholderState.NetworkFailure;
+                Logger.Error(e, @"Couldn't fetch beatmap scores!");
             };
-            getScoresRequest.Failure += onUpdateFailed;
 
             api.Queue(getScoresRequest);
-        }
-
-        private void onUpdateFailed(Exception e)
-        {
-            if (e is OperationCanceledException) return;
-
-            PlaceholderState = PlaceholderState.NetworkFailure;
-            Logger.Error(e, @"Couldn't fetch beatmap scores!");
         }
 
         private void replacePlaceholder(Placeholder placeholder)
@@ -276,8 +273,6 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (placeholder == null)
                 return;
-
-            Scores = null;
 
             placeholderContainer.Add(placeholder);
 
@@ -294,7 +289,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (!scrollContainer.IsScrolledToEnd())
                 fadeStart -= LeaderboardScore.HEIGHT;
 
-            if (scrollFlow == null) return;
+            if (scrollFlow == null)
+                return;
 
             foreach (var c in scrollFlow.Children)
             {
@@ -325,8 +321,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
     public enum PlaceholderState
     {
-        Successful,
-        Retrieving,
+        None,
         NetworkFailure,
         Unavailable,
         NoScores,
