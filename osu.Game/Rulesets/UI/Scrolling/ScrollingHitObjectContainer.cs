@@ -2,9 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 using OpenTK;
@@ -19,26 +22,86 @@ namespace osu.Game.Rulesets.UI.Scrolling
             MaxValue = double.MaxValue
         };
 
-        public readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
-
         private readonly ScrollingDirection direction;
+
+        private Cached positionCache = new Cached();
 
         public ScrollingHitObjectContainer(ScrollingDirection direction)
         {
             this.direction = direction;
 
             RelativeSizeAxes = Axes.Both;
+
+            TimeRange.ValueChanged += v => positionCache.Invalidate();
         }
 
-        protected override bool UpdateChildrenLife()
+        public override void Add(DrawableHitObject hitObject)
         {
+            positionCache.Invalidate();
+            base.Add(hitObject);
+        }
+
+        public override bool Remove(DrawableHitObject hitObject)
+        {
+            var result = base.Remove(hitObject);
+            if (result)
+                positionCache.Invalidate();
+            return result;
+        }
+
+        private readonly SortedList<MultiplierControlPoint> controlPoints = new SortedList<MultiplierControlPoint>();
+
+        public void AddControlPoint(MultiplierControlPoint controlPoint)
+        {
+            controlPoints.Add(controlPoint);
+            positionCache.Invalidate();
+        }
+
+        public bool RemoveControlPoint(MultiplierControlPoint controlPoint)
+        {
+            var result = controlPoints.Remove(controlPoint);
+            if (result)
+                positionCache.Invalidate();
+            return result;
+        }
+
+        private readonly Dictionary<DrawableHitObject, Vector2> hitObjectPositions = new Dictionary<DrawableHitObject, Vector2>();
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (positionCache.IsValid)
+                return;
+
             foreach (var obj in Objects)
             {
-                obj.LifetimeStart = obj.HitObject.StartTime - TimeRange * 2;
-                obj.LifetimeEnd = ((obj.HitObject as IHasEndTime)?.EndTime ?? obj.HitObject.StartTime) + TimeRange * 2;
+                var startPosition = hitObjectPositions[obj] = positionAt(obj.HitObject.StartTime);
+
+                obj.LifetimeStart = obj.HitObject.StartTime - TimeRange - 1000;
+                obj.LifetimeEnd = ((obj.HitObject as IHasEndTime)?.EndTime ?? obj.HitObject.StartTime) + TimeRange + 1000;
+
+                if (!(obj.HitObject is IHasEndTime endTime))
+                    continue;
+
+                var endPosition = positionAt(endTime.EndTime);
+
+                float length = Vector2.Distance(startPosition, endPosition);
+
+                switch (direction)
+                {
+                    case ScrollingDirection.Up:
+                    case ScrollingDirection.Down:
+                        obj.Height = length;
+                        break;
+                    case ScrollingDirection.Left:
+                    case ScrollingDirection.Right:
+                        obj.Width = length;
+                        break;
+                }
             }
 
-            return base.UpdateChildrenLife();
+            positionCache.Validate();
         }
 
         protected override void UpdateAfterChildrenLife()
@@ -52,7 +115,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             foreach (var obj in AliveObjects)
             {
-                var finalPosition = positionAt(obj.HitObject.StartTime);
+                var finalPosition = hitObjectPositions[obj];
 
                 switch (direction)
                 {
@@ -69,36 +132,16 @@ namespace osu.Game.Rulesets.UI.Scrolling
                         obj.X = -finalPosition.X + timelinePosition.X;
                         break;
                 }
-
-                if (!(obj.HitObject is IHasEndTime endTime))
-                    continue;
-
-                // Todo: We may need to consider scale here
-                var finalEndPosition = positionAt(endTime.EndTime);
-
-                float length = Vector2.Distance(finalPosition, finalEndPosition);
-
-                switch (direction)
-                {
-                    case ScrollingDirection.Up:
-                    case ScrollingDirection.Down:
-                        obj.Height = length;
-                        break;
-                    case ScrollingDirection.Left:
-                    case ScrollingDirection.Right:
-                        obj.Width = length;
-                        break;
-                }
             }
         }
 
         private Vector2 positionAt(double time)
         {
-            float length = 0;
-            for (int i = 0; i < ControlPoints.Count; i++)
+            double length = 0;
+            for (int i = 0; i < controlPoints.Count; i++)
             {
-                var current = ControlPoints[i];
-                var next = i < ControlPoints.Count - 1 ? ControlPoints[i + 1] : null;
+                var current = controlPoints[i];
+                var next = i < controlPoints.Count - 1 ? controlPoints[i + 1] : null;
 
                 if (i > 0 && current.StartTime > time)
                     continue;
