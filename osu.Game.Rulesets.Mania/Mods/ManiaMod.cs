@@ -96,14 +96,14 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public void ApplyToRulesetContainer(RulesetContainer<ManiaHitObject> rulesetContainer)
         {
-            int availableColumns = ((ManiaRulesetContainer)rulesetContainer).AvailableColumns;
+            int availableColumns = ((ManiaRulesetContainer)rulesetContainer).Beatmap.TotalColumns;
             var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(item => RNG.Next()).ToList();
 
             rulesetContainer.Objects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
         }
     }
 
-    public abstract class ManiaKeyMod : Mod
+    public abstract class ManiaKeyMod : Mod, IApplicableToBeatmapConverter<ManiaHitObject>
     {
         // TODO: implement using the IApplicable interface. Haven't done so yet because KeyCount isn't even hooked up at the moment.
 
@@ -111,6 +111,11 @@ namespace osu.Game.Rulesets.Mania.Mods
         public abstract int KeyCount { get; }
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier
         public override bool Ranked => true;
+
+        public void ApplyToBeatmapConverter(BeatmapConverter<ManiaHitObject> beatmapConverter)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class ManiaModKey1 : ManiaKeyMod
