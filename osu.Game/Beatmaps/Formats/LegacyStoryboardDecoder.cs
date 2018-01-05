@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -266,6 +266,6 @@ namespace osu.Game.Beatmaps.Formats
             throw new InvalidDataException($@"Unknown origin: {value}");
         }
 
-        private string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('\"'));
+        private string cleanFilename(string path) => FileSafety.PathSanitise(path.Trim('\"'));
     }
 }

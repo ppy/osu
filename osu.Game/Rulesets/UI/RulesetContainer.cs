@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -175,6 +175,10 @@ namespace osu.Game.Rulesets.UI
             // Check if the beatmap can be converted
             if (!converter.CanConvert(workingBeatmap.Beatmap))
                 throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can not be converted for the current ruleset (converter: {converter}).");
+
+            // Apply conversion adjustments before converting
+            foreach (var mod in Mods.OfType<IApplicableToBeatmapConverter<TObject>>())
+                mod.ApplyToBeatmapConverter(converter);
 
             // Convert the beatmap
             Beatmap = converter.Convert(workingBeatmap.Beatmap);
