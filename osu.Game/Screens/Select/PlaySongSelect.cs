@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select
     {
         private OsuScreen player;
         private readonly ModSelectOverlay modSelect;
-        private readonly BeatmapDetailArea beatmapDetails;
+        protected readonly BeatmapDetailArea BeatmapDetails;
         private bool removeAutoModOnResume;
 
         public PlaySongSelect()
@@ -35,13 +35,13 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.BottomCentre,
             });
 
-            LeftContent.Add(beatmapDetails = new BeatmapDetailArea
+            LeftContent.Add(BeatmapDetails = new BeatmapDetailArea
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding { Top = 10, Right = 5 },
             });
 
-            beatmapDetails.Leaderboard.ScoreSelected += s => Push(new Results(s));
+            BeatmapDetails.Leaderboard.ScoreSelected += s => Push(new Results(s));
         }
 
         private SampleChannel sampleConfirm;
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Select
 
             beatmap.Mods.BindTo(modSelect.SelectedMods);
 
-            beatmapDetails.Beatmap = beatmap;
+            BeatmapDetails.Beatmap = beatmap;
 
             if (beatmap.Track != null)
                 beatmap.Track.Looping = true;

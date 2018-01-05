@@ -52,15 +52,14 @@ namespace osu.Game.Tests.Visual
         private class TestSongSelect : PlaySongSelect
         {
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
+            public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase baseGame, BeatmapManager baseManager)
+        private void load(OsuGameBase game)
         {
             TestSongSelect songSelect = null;
-            // need to reset this here so that test env for dummy beatmap assert is correct when dynamic compiling
-            baseGame.Beatmap.Value = defaultBeatmap = baseManager.GetWorkingBeatmap(null);
 
             var storage = new TestStorage(@"TestCasePlaySongSelect");
 
@@ -72,7 +71,7 @@ namespace osu.Game.Tests.Visual
             dependencies.Cache(rulesets = new RulesetStore(contextFactory));
             dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
             {
-                DefaultBeatmap = defaultBeatmap,
+                DefaultBeatmap = defaultBeatmap = game.Beatmap.Default
             });
             dependencies.Cache(osu = new OsuGame());
 
@@ -80,7 +79,11 @@ namespace osu.Game.Tests.Visual
 
             void loadNewSongSelect(bool deleteMaps = false) => AddStep("reload song select", () =>
             {
-                if (deleteMaps) manager.DeleteAll();
+                if (deleteMaps)
+                {
+                    manager.DeleteAll();
+                    game.Beatmap.SetDefault();
+                }
 
                 if (songSelect != null)
                 {
@@ -96,6 +99,8 @@ namespace osu.Game.Tests.Visual
             AddWaitStep(3);
 
             AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
+
+            AddAssert("dummy shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap);
 
             AddStep("import test maps", () =>
             {
@@ -114,15 +119,15 @@ namespace osu.Game.Tests.Visual
             AddStep("non-convertible initial WorkingBeatmap", () => {
                 var beatmaps = manager.GetAllUsableBeatmapSets();
 
-                baseGame.Beatmap.Value = new TestWorkingBeatmap(new Beatmap
+                game.Beatmap.Value = new TestWorkingBeatmap(new Beatmap
                 {
                     BeatmapInfo = beatmaps[0].Beatmaps[0],
                 });
             });
-            AddAssert("unplayable ruleset beatmap selected", () => baseGame.Beatmap.Value.BeatmapInfo.RulesetID != 0);
+            AddAssert("unplayable ruleset beatmap selected", () => game.Beatmap.Value.BeatmapInfo.RulesetID != 0);
             loadNewSongSelect();
             AddWaitStep(3);
-            AddAssert("correct ruleset beatmap selected", () => baseGame.Beatmap.Value.BeatmapInfo.RulesetID == 0);
+            AddAssert("correct ruleset beatmap selected", () => game.Beatmap.Value.BeatmapInfo.RulesetID == 0);
 
             AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
             AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });

@@ -64,24 +64,24 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <returns>The timing control point.</returns>
         public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, TimingPoints.FirstOrDefault());
 
-        [JsonIgnore]
         /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
         /// </summary>
+        [JsonIgnore]
         public double BPMMaximum =>
             60000 / (TimingPoints.OrderBy(c => c.BeatLength).FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 
-        [JsonIgnore]
         /// <summary>
         /// Finds the minimum BPM represented by any timing control point.
         /// </summary>
+        [JsonIgnore]
         public double BPMMinimum =>
             60000 / (TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 
-        [JsonIgnore]
         /// <summary>
         /// Finds the mode BPM (most common BPM) represented by the control points.
         /// </summary>
+        [JsonIgnore]
         public double BPMMode =>
             60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 
