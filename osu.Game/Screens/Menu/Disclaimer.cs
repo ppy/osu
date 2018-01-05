@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Menu
         private readonly SpriteIcon icon;
         private Color4 iconColour;
 
-        public override bool ShowOverlays => false;
+        public override bool ShowOverlaysOnEnter => false;
 
         public override bool HasLocalCursorDisplayed => true;
 

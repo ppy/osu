@@ -10,7 +10,7 @@ namespace osu.Game.Tests.Visual
 {
     [TestFixture]
     [System.ComponentModel.Description("PlaySongSelect leaderboard/details area")]
-    internal class TestCaseBeatmapDetailArea : OsuTestCase
+    public class TestCaseBeatmapDetailArea : OsuTestCase
     {
         public TestCaseBeatmapDetailArea()
         {

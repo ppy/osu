@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 RelativeChildSize = new Vector2((float)HitObject.Duration, 1)
             });
 
-            foreach (var tick in drumRoll.Ticks)
+            foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
             {
                 var newTick = new DrawableDrumRollTick(tick);
                 newTick.OnJudgement += onTickJudgement;

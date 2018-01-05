@@ -10,19 +10,28 @@ using osu.Game.Rulesets;
 using osu.Game.Users;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Select.Leaderboards;
+using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API.Requests
 {
     public class GetScoresRequest : APIRequest<GetScoresResponse>
     {
         private readonly BeatmapInfo beatmap;
+        private readonly LeaderboardScope scope;
+        private readonly RulesetInfo ruleset;
 
-        public GetScoresRequest(BeatmapInfo beatmap)
+        public GetScoresRequest(BeatmapInfo beatmap, RulesetInfo ruleset, LeaderboardScope scope = LeaderboardScope.Global)
         {
             if (!beatmap.OnlineBeatmapID.HasValue)
                 throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.OnlineBeatmapID)}.");
 
+            if (scope == LeaderboardScope.Local)
+                throw new InvalidOperationException("Should not attempt to request online scores for a local scoped leaderboard");
+
             this.beatmap = beatmap;
+            this.scope = scope;
+            this.ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
 
             Success += onSuccess;
         }
@@ -31,6 +40,17 @@ namespace osu.Game.Online.API.Requests
         {
             foreach (OnlineScore score in r.Scores)
                 score.ApplyBeatmap(beatmap);
+        }
+
+        protected override WebRequest CreateWebRequest()
+        {
+            var req = base.CreateWebRequest();
+
+            req.Timeout = 30000;
+            req.AddParameter(@"type", scope.ToString().ToLowerInvariant());
+            req.AddParameter(@"mode", ruleset.ShortName);
+
+            return req;
         }
 
         protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores";
@@ -102,26 +122,26 @@ namespace osu.Game.Online.API.Requests
             {
                 foreach (var kvp in value)
                 {
-                    string key = kvp.Key;
-                    switch (key)
+                    HitResult newKey;
+                    switch (kvp.Key)
                     {
                         case @"count_300":
-                            key = @"300";
+                            newKey = HitResult.Great;
                             break;
                         case @"count_100":
-                            key = @"100";
+                            newKey = HitResult.Good;
                             break;
                         case @"count_50":
-                            key = @"50";
+                            newKey = HitResult.Meh;
                             break;
                         case @"count_miss":
-                            key = @"x";
+                            newKey = HitResult.Miss;
                             break;
                         default:
                             continue;
                     }
 
-                    Statistics.Add(key, kvp.Value);
+                    Statistics.Add(newKey, kvp.Value);
                 }
             }
         }

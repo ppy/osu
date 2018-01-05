@@ -19,6 +19,6 @@ namespace osu.Game.Tests.Beatmaps
 
         protected override Beatmap GetBeatmap() => beatmap;
         protected override Texture GetBackground() => null;
-        protected override Track GetTrack() => null;
+        protected override Track GetTrack() => new TrackVirtual();
     }
 }

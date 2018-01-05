@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             cpi.TimingPoints.ForEach(addTimingPoint);
 
             // Consider all non-timing points as the same type
-            cpi.SoundPoints.Select(c => (ControlPoint)c)
+            cpi.SamplePoints.Select(c => (ControlPoint)c)
                 .Concat(cpi.EffectPoints)
                 .Concat(cpi.DifficultyPoints)
                 .Distinct()
