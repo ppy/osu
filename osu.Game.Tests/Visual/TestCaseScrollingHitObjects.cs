@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual
             playfields.Add(new TestPlayfield(ScrollingDirection.Down));
             playfields.Add(new TestPlayfield(ScrollingDirection.Right));
 
-            playfields.ForEach(p => p.HitObjects.ControlPoints.Add(new MultiplierControlPoint(double.MinValue)));
+            playfields.ForEach(p => p.HitObjects.AddControlPoint(new MultiplierControlPoint(double.MinValue)));
 
             Add(new Container
             {
@@ -82,12 +82,9 @@ namespace osu.Game.Tests.Visual
         {
             playfields.ForEach(p =>
             {
-                p.HitObjects.ControlPoints.AddRange(new[]
-                {
-                    new MultiplierControlPoint(time) { DifficultyPoint = { SpeedMultiplier = 3 } },
-                    new MultiplierControlPoint(time + 2000) { DifficultyPoint = { SpeedMultiplier = 2 } },
-                    new MultiplierControlPoint(time + 3000) { DifficultyPoint = { SpeedMultiplier = 1 } },
-                });
+                p.HitObjects.AddControlPoint(new MultiplierControlPoint(time) { DifficultyPoint = { SpeedMultiplier = 3 } });
+                p.HitObjects.AddControlPoint(new MultiplierControlPoint(time + 2000) { DifficultyPoint = { SpeedMultiplier = 2 } });
+                p.HitObjects.AddControlPoint(new MultiplierControlPoint(time + 3000) { DifficultyPoint = { SpeedMultiplier = 1 } });
 
                 TestDrawableControlPoint createDrawablePoint(double t) => new TestDrawableControlPoint(t)
                 {
