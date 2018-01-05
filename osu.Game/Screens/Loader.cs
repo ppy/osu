@@ -101,8 +101,6 @@ namespace osu.Game.Screens
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE));
             }
 
-            private Shader currentLoadTarget;
-
             protected override void Update()
             {
                 base.Update();

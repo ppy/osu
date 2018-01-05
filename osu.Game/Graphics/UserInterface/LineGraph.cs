@@ -73,8 +73,6 @@ namespace osu.Game.Graphics.UserInterface
             });
         }
 
-        private bool pending;
-
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {
             if ((invalidation & Invalidation.DrawSize) > 0)
