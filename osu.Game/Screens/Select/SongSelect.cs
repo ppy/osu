@@ -453,9 +453,6 @@ namespace osu.Game.Screens.Select
 
         private void carouselBeatmapsLoaded()
         {
-            if (!Carousel.BeatmapSets.Any())
-                return;
-
             var currentRulesetId = osu.Ruleset.Value.ID;
 
             BeatmapInfo beatmap = Beatmap.Value.BeatmapInfo;
@@ -465,11 +462,16 @@ namespace osu.Game.Screens.Select
                 beatmap = Beatmap.Value.BeatmapSetInfo?.Beatmaps.FirstOrDefault(b => b.RulesetID == 0 || b.RulesetID == currentRulesetId);
 
             if (beatmap != null && !Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
+            {
                 Carousel.SelectBeatmap(beatmap);
-            else if (!Carousel.SelectNextRandom())
-                // in the case random selection failed, we want to trigger selectionChanged
-                // to show the dummy beatmap (we have nothing else to display).
-                carouselSelectionChanged(null);
+            }
+            else if (Carousel.SelectedBeatmapSet == null)
+            {
+                if (!Carousel.SelectNextRandom())
+                    // in the case random selection failed, we want to trigger selectionChanged
+                    // to show the dummy beatmap (we have nothing else to display).
+                    carouselSelectionChanged(null);
+            }
         }
 
         private void delete(BeatmapSetInfo beatmap)
