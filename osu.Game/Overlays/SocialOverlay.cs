@@ -153,7 +153,7 @@ namespace osu.Game.Overlays
                 if(panels != null)
                     ScrollFlow.Remove(panels);
 
-                ScrollFlow.Add(panels = newPanels);
+                Scheduler.AddDelayed(() => ScrollFlow.Add(panels = newPanels), 200);
             });
         }
 
