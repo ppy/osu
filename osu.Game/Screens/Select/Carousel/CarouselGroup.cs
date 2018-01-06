@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -10,8 +10,6 @@ namespace osu.Game.Screens.Select.Carousel
     /// </summary>
     public class CarouselGroup : CarouselItem
     {
-        private readonly List<CarouselItem> items;
-
         protected override DrawableCarouselItem CreateDrawableRepresentation() => null;
 
         public IReadOnlyList<CarouselItem> Children => InternalChildren;

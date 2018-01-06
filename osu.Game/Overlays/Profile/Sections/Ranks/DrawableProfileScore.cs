@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
@@ -16,7 +15,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public abstract class DrawableProfileScore : DrawableProfileRow
     {
-        private readonly FillFlowContainer metadata;
         private readonly ScoreModsContainer modsContainer;
         protected readonly Score Score;
 
