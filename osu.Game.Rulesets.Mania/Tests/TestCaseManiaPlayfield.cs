@@ -2,12 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -40,6 +41,36 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddStep("Right special style", () => createPlayfield(4, SpecialColumnPosition.Right));
             AddStep("5 columns", () => createPlayfield(5, SpecialColumnPosition.Normal));
             AddStep("8 columns", () => createPlayfield(8, SpecialColumnPosition.Normal));
+            AddStep("4 + 4 columns", () =>
+            {
+                var stages = new List<StageDefinition>()
+                {
+                    new StageDefinition() { Columns = 4 },
+                    new StageDefinition() { Columns = 4 },
+                };
+                createPlayfield(stages, SpecialColumnPosition.Normal);
+            });
+            AddStep("2 + 4 + 2 columns", () =>
+            {
+                var stages = new List<StageDefinition>()
+                {
+                    new StageDefinition() { Columns = 2 },
+                    new StageDefinition() { Columns = 4 },
+                    new StageDefinition() { Columns = 2 },
+                };
+                createPlayfield(stages, SpecialColumnPosition.Normal);
+            });
+            AddStep("1 + 1 + 8 columns", () =>
+            {
+                var stages = new List<StageDefinition>()
+                {
+                    new StageDefinition() { Columns = 1 },
+                    new StageDefinition() { Columns = 8 },
+                    new StageDefinition() { Columns = 1 },
+                };
+                createPlayfield(stages, SpecialColumnPosition.Normal);
+            });
+
             AddStep("Left special style", () => createPlayfield(8, SpecialColumnPosition.Left));
             AddStep("Right special style", () => createPlayfield(8, SpecialColumnPosition.Right));
             AddStep("Reversed", () => createPlayfield(4, SpecialColumnPosition.Normal, true));
@@ -77,13 +108,23 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private ManiaPlayfield createPlayfield(int cols, SpecialColumnPosition specialPos, bool inverted = false)
         {
+            var stages = new List<StageDefinition>()
+            {
+                new StageDefinition() { Columns = cols },
+            };
+            return createPlayfield(stages, specialPos, inverted);
+        }
+
+        private ManiaPlayfield createPlayfield(List<StageDefinition> stages, SpecialColumnPosition specialPos, bool inverted = false)
+        {
             Clear();
 
-            var inputManager = new ManiaInputManager(maniaRuleset, cols) { RelativeSizeAxes = Axes.Both };
+            var inputManager = new ManiaInputManager(maniaRuleset, stages.Sum(g => g.Columns)) { RelativeSizeAxes = Axes.Both };
             Add(inputManager);
 
             ManiaPlayfield playfield;
-            inputManager.Add(playfield = new ManiaPlayfield(cols)
+
+            inputManager.Add(playfield = new ManiaPlayfield(stages)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -105,7 +146,11 @@ namespace osu.Game.Rulesets.Mania.Tests
             Add(inputManager);
 
             ManiaPlayfield playfield;
-            inputManager.Add(playfield = new ManiaPlayfield(4)
+            var stages = new List<StageDefinition>()
+            {
+                new StageDefinition() { Columns = 4 },
+            };
+            inputManager.Add(playfield = new ManiaPlayfield(stages)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
