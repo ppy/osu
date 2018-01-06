@@ -43,30 +43,30 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddStep("8 columns", () => createPlayfield(8, SpecialColumnPosition.Normal));
             AddStep("4 + 4 columns", () =>
             {
-                var stages = new List<StageDefinition>()
+                var stages = new List<StageDefinition>
                 {
-                    new StageDefinition() { Columns = 4 },
-                    new StageDefinition() { Columns = 4 },
+                    new StageDefinition { Columns = 4 },
+                    new StageDefinition { Columns = 4 },
                 };
                 createPlayfield(stages, SpecialColumnPosition.Normal);
             });
             AddStep("2 + 4 + 2 columns", () =>
             {
-                var stages = new List<StageDefinition>()
+                var stages = new List<StageDefinition>
                 {
-                    new StageDefinition() { Columns = 2 },
-                    new StageDefinition() { Columns = 4 },
-                    new StageDefinition() { Columns = 2 },
+                    new StageDefinition { Columns = 2 },
+                    new StageDefinition { Columns = 4 },
+                    new StageDefinition { Columns = 2 },
                 };
                 createPlayfield(stages, SpecialColumnPosition.Normal);
             });
             AddStep("1 + 1 + 8 columns", () =>
             {
-                var stages = new List<StageDefinition>()
+                var stages = new List<StageDefinition>
                 {
-                    new StageDefinition() { Columns = 1 },
-                    new StageDefinition() { Columns = 8 },
-                    new StageDefinition() { Columns = 1 },
+                    new StageDefinition { Columns = 1 },
+                    new StageDefinition { Columns = 8 },
+                    new StageDefinition { Columns = 1 },
                 };
                 createPlayfield(stages, SpecialColumnPosition.Normal);
             });
@@ -108,9 +108,9 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private ManiaPlayfield createPlayfield(int cols, SpecialColumnPosition specialPos, bool inverted = false)
         {
-            var stages = new List<StageDefinition>()
+            var stages = new List<StageDefinition>
             {
-                new StageDefinition() { Columns = cols },
+                new StageDefinition { Columns = cols },
             };
             return createPlayfield(stages, specialPos, inverted);
         }
@@ -146,9 +146,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             Add(inputManager);
 
             ManiaPlayfield playfield;
-            var stages = new List<StageDefinition>()
+            var stages = new List<StageDefinition>
             {
-                new StageDefinition() { Columns = 4 },
+                new StageDefinition { Columns = 4 },
             };
             inputManager.Add(playfield = new ManiaPlayfield(stages)
             {
