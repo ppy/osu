@@ -37,16 +37,16 @@ namespace osu.Game.Overlays.Social
 
         protected override bool OnHover(InputState state)
         {
-            TweenEdgeEffectTo(edgeEffectHovered, hover_transition_time, Easing.OutQuint);
-            //Content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
+            Content.TweenEdgeEffectTo(edgeEffectHovered, hover_transition_time, Easing.OutQuint);
+            Content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
 
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
-            //Content.MoveToY(0, hover_transition_time, Easing.OutQuint);
+            Content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
+            Content.MoveToY(0, hover_transition_time, Easing.OutQuint);
 
             base.OnHoverLost(state);
         }
