@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play
         protected override bool OnWheel(InputState state)
         {
             globalBinding.TriggerOnWheel(state);
-            return true;
+            return BlockPassThroughMouse;
         }
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
