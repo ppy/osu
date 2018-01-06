@@ -38,6 +38,11 @@ namespace osu.Game.Overlays.Settings.Sections
                     LabelText = "Adjust gameplay cursor size based on current beatmap",
                     Bindable = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Expand cursor on click",
+                    Bindable = config.GetBindable<bool>(OsuSetting.CursorExpand)
+                },
             };
         }
 

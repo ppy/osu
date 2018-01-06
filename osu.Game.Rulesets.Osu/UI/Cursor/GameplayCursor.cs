@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         }
 
         private int downCount;
+        private Bindable<bool> cursorExpand;
 
         public class OsuCursor : Container
         {
@@ -132,31 +133,41 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            cursorExpand = config.GetBindable<bool>(OsuSetting.CursorExpand);
+        }
+
         public bool OnPressed(OsuAction action)
         {
-            switch (action)
+            if (cursorExpand)
             {
-                case OsuAction.LeftButton:
-                case OsuAction.RightButton:
-                    downCount++;
-                    ActiveCursor.ScaleTo(1).ScaleTo(1.2f, 100, Easing.OutQuad);
-                    break;
+                switch (action)
+                {
+                    case OsuAction.LeftButton:
+                    case OsuAction.RightButton:
+                        downCount++;
+                        ActiveCursor.ScaleTo(1).ScaleTo(1.2f, 100, Easing.OutQuad);
+                        break;
+                }
             }
-
             return false;
         }
 
         public bool OnReleased(OsuAction action)
         {
-            switch (action)
+            if (cursorExpand)
             {
-                case OsuAction.LeftButton:
-                case OsuAction.RightButton:
-                    if (--downCount == 0)
-                        ActiveCursor.ScaleTo(1, 200, Easing.OutQuad);
-                    break;
+                switch (action)
+                {
+                    case OsuAction.LeftButton:
+                    case OsuAction.RightButton:
+                        if (--downCount == 0)
+                            ActiveCursor.ScaleTo(1, 200, Easing.OutQuad);
+                        break;
+                }
             }
-
             return false;
         }
     }
