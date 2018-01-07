@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -33,15 +32,6 @@ namespace osu.Game.Overlays
         private ProfileTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 50;
-
-        // receive input outside our bounds so we can trigger a close event on ourselves.
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
-
-        protected override bool OnClick(InputState state)
-        {
-            State = Visibility.Hidden;
-            return true;
-        }
 
         public UserProfileOverlay()
         {

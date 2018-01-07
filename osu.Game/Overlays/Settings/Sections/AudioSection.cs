@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections
     public class AudioSection : SettingsSection
     {
         public override string Header => "Audio";
-        public override FontAwesome Icon => FontAwesome.fa_headphones;
+        public override FontAwesome Icon => FontAwesome.fa_volume_up;
 
         public AudioSection()
         {

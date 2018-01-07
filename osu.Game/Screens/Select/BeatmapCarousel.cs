@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -229,11 +229,15 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public void SelectNextRandom()
+        /// <summary>
+        /// Select the next beatmap in the random sequence.
+        /// </summary>
+        /// <returns>True if a selection could be made, else False.</returns>
+        public bool SelectNextRandom()
         {
             var visible = beatmapSets.Where(s => !s.Filtered).ToList();
             if (!visible.Any())
-                return;
+                return false;
 
             if (selectedBeatmap != null)
             {
@@ -263,6 +267,7 @@ namespace osu.Game.Screens.Select
                 set = visible.ElementAt(RNG.Next(visible.Count));
 
             select(set.Beatmaps.Skip(RNG.Next(set.Beatmaps.Count())).FirstOrDefault());
+            return true;
         }
 
         public void SelectPreviousRandom()
