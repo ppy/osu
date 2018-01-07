@@ -70,14 +70,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
                 case DrawableSlider slider:
                     using (slider.BeginAbsoluteSequence(fadeOutStartTime, true))
-                    {
                         slider.Body.FadeOut(longFadeDuration, Easing.Out);
-
-                        // delay a bit less to let the sliderball fade out peacefully instead of having a hard cut
-                        using (slider.BeginDelayedSequence(longFadeDuration - fadeOutDuration, true))
-                            slider.Ball.FadeOut(fadeOutDuration);
-                    }
-
                     break;
                 case DrawableSpinner spinner:
                     // hide elements we don't care about.
@@ -87,7 +80,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     using (spinner.BeginAbsoluteSequence(fadeOutStartTime + longFadeDuration, true))
                         spinner.FadeOut(fadeOutDuration);
-
                     break;
             }
         }
