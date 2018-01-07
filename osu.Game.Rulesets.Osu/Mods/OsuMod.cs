@@ -86,22 +86,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     spinner.Background.Hide();
 
                     using (spinner.BeginAbsoluteSequence(fadeOutStartTime + longFadeDuration, true))
-                    {
                         spinner.FadeOut(fadeOutDuration);
-
-                        // speed up the end sequence accordingly
-                        switch (state)
-                        {
-                            case ArmedState.Hit:
-                                spinner.ScaleTo(spinner.Scale * 1.2f, fadeOutDuration * 2, Easing.Out);
-                                break;
-                            case ArmedState.Miss:
-                                spinner.ScaleTo(spinner.Scale * 0.8f, fadeOutDuration * 2, Easing.In);
-                                break;
-                        }
-
-                        spinner.Expire();
-                    }
 
                     break;
             }
