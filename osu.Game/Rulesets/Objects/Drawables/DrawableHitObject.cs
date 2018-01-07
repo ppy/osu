@@ -61,7 +61,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public new readonly TObject HitObject;
 
-        public override bool HandleInput => Interactive;
+        public override bool HandleKeyboardInput => Interactive;
+        public override bool HandleMouseInput => Interactive;
         public bool Interactive = true;
 
         /// <summary>
