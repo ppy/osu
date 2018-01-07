@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
     /// <summary>
     /// A type of <see cref="Playfield"/> specialized towards scrolling <see cref="DrawableHitObject"/>s.
     /// </summary>
-    public class ScrollingPlayfield : Playfield
+    public abstract class ScrollingPlayfield : Playfield
     {
         /// <summary>
         /// The default span of time visible by the length of the scrolling axes.
@@ -49,7 +49,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// The container that contains the <see cref="SpeedAdjustmentContainer"/>s and <see cref="DrawableHitObject"/>s.
         /// </summary>
-        public new readonly ScrollingHitObjectContainer HitObjects;
+        public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
+
+        private readonly ScrollingDirection direction;
 
         /// <summary>
         /// Creates a new <see cref="ScrollingPlayfield"/>.
@@ -59,7 +61,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected ScrollingPlayfield(ScrollingDirection direction, float? customWidth = null)
             : base(customWidth)
         {
-            base.HitObjects = HitObjects = new ScrollingHitObjectContainer(direction) { RelativeSizeAxes = Axes.Both };
+            this.direction = direction;
             HitObjects.TimeRange.BindTo(VisibleTimeRange);
         }
 
@@ -104,6 +106,14 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             this.TransformTo(this.PopulateTransform(new TransformVisibleTimeRange(), newTimeRange, duration, easing));
         }
+
+        protected sealed override HitObjectContainer CreateHitObjectContainer() => CreateScrollingHitObjectContainer();
+
+        /// <summary>
+        /// Creates the <see cref="ScrollingHitObjectContainer"/> that will handle the scrolling of the <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual ScrollingHitObjectContainer CreateScrollingHitObjectContainer() => new GlobalScrollingHitObjectContainer(direction);
 
         private class TransformVisibleTimeRange : Transform<double, ScrollingPlayfield>
         {

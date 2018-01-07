@@ -315,6 +315,10 @@
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
+    <Compile Include="Rulesets\UI\HitObjectContainer.cs" />
+    <Compile Include="Rulesets\UI\Scrolling\Algorithms\GlobalScrollingAlgorithm.cs" />
+    <Compile Include="Rulesets\UI\Scrolling\Algorithms\IScrollingAlgorithm.cs" />
+    <Compile Include="Rulesets\UI\Scrolling\GlobalScrollingHitObjectContainer.cs" />
     <Compile Include="Rulesets\UI\Scrolling\ScrollingDirection.cs" />
     <Compile Include="Rulesets\UI\Scrolling\ScrollingHitObjectContainer.cs" />
     <Compile Include="Rulesets\UI\Scrolling\ScrollingPlayfield.cs" />

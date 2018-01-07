@@ -99,19 +99,17 @@ namespace osu.Game.Tests.Visual
 
 
 
-        private class TestPlayfield : Playfield
+        private class TestPlayfield : ScrollingPlayfield
         {
             public readonly BindableDouble TimeRange = new BindableDouble(5000);
 
             public readonly ScrollingDirection Direction;
 
-            public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
-
             public TestPlayfield(ScrollingDirection direction)
+                : base(direction)
             {
                 Direction = direction;
 
-                base.HitObjects = new ScrollingHitObjectContainer(direction);
                 HitObjects.TimeRange.BindTo(TimeRange);
             }
         }
