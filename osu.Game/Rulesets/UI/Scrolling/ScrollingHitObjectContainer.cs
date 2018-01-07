@@ -10,7 +10,6 @@ using osu.Framework.Lists;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
-using OpenTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
@@ -65,7 +64,15 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return result;
         }
 
-        private readonly Dictionary<DrawableHitObject, Vector2> hitObjectPositions = new Dictionary<DrawableHitObject, Vector2>();
+        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
+        {
+            if ((invalidation & (Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo)) > 0)
+                positionCache.Invalidate();
+
+            return base.Invalidate(invalidation, source, shallPropagate);
+        }
+
+        private readonly Dictionary<DrawableHitObject, double> hitObjectPositions = new Dictionary<DrawableHitObject, double>();
 
         protected override void Update()
         {
@@ -84,19 +91,17 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 if (!(obj.HitObject is IHasEndTime endTime))
                     continue;
 
-                var endPosition = positionAt(endTime.EndTime);
-
-                float length = Vector2.Distance(startPosition, endPosition);
+                var length = positionAt(endTime.EndTime) - startPosition;
 
                 switch (direction)
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
-                        obj.Height = length;
+                        obj.Height = (float)(length * DrawHeight);
                         break;
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
-                        obj.Width = length;
+                        obj.Width = (float)(length * DrawWidth);
                         break;
                 }
             }
@@ -115,27 +120,27 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             foreach (var obj in AliveObjects)
             {
-                var finalPosition = hitObjectPositions[obj];
+                var finalPosition = hitObjectPositions[obj] - timelinePosition;
 
                 switch (direction)
                 {
                     case ScrollingDirection.Up:
-                        obj.Y = finalPosition.Y - timelinePosition.Y;
+                        obj.Y = (float)(finalPosition * DrawHeight);
                         break;
                     case ScrollingDirection.Down:
-                        obj.Y = -finalPosition.Y + timelinePosition.Y;
+                        obj.Y = (float)(-finalPosition * DrawHeight);
                         break;
                     case ScrollingDirection.Left:
-                        obj.X = finalPosition.X - timelinePosition.X;
+                        obj.X = (float)(finalPosition * DrawWidth);
                         break;
                     case ScrollingDirection.Right:
-                        obj.X = -finalPosition.X + timelinePosition.X;
+                        obj.X = (float)(-finalPosition * DrawWidth);
                         break;
                 }
             }
         }
 
-        private Vector2 positionAt(double time)
+        private double positionAt(double time)
         {
             double length = 0;
             for (int i = 0; i < controlPoints.Count; i++)
@@ -149,10 +154,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 // Duration of the current control point
                 var currentDuration = (next?.StartTime ?? double.PositiveInfinity) - current.StartTime;
 
-                length += (float)(Math.Min(currentDuration, time - current.StartTime) * current.Multiplier / TimeRange);
+                length += Math.Min(currentDuration, time - current.StartTime) * current.Multiplier / TimeRange;
             }
 
-            return length * DrawSize;
+            return length;
         }
     }
 }
