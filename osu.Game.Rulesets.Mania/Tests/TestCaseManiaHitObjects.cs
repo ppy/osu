@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                                 RelativeChildSize = new Vector2(1, 10000),
                                 Children = new[]
                                 {
-                                    new DrawableHoldNote(new HoldNote(), ManiaAction.Key1)
+                                    new DrawableHoldNote(new HoldNote { Duration = 1 }, ManiaAction.Key1)
                                     {
                                         Y = 5000,
                                         Height = 1000,
