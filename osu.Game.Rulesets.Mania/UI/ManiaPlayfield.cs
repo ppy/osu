@@ -44,18 +44,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public List<Column> Columns
-        {
-            get
-            {
-                var list = new List<Column>();
-                foreach (var stage in listColumnStages)
-                {
-                    list.AddRange(stage.Columns);
-                }
-                return list;
-            }
-        }
+        public List<Column> Columns => listColumnStages.SelectMany(x => x.Columns).ToList();
 
         public ManiaPlayfield(List<StageDefinition> stages)
             : base(Axes.Y)
