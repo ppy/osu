@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                 var controlPoint = controlPointAt(obj.HitObject.StartTime);
 
                 obj.LifetimeStart = obj.HitObject.StartTime - timeRange / controlPoint.Multiplier;
-                obj.LifetimeEnd = ((obj as IHasEndTime)?.EndTime ?? obj.HitObject.StartTime) + timeRange / controlPoint.Multiplier;
+                obj.LifetimeEnd = ((obj.HitObject as IHasEndTime)?.EndTime ?? obj.HitObject.StartTime) + timeRange / controlPoint.Multiplier;
             }
         }
 

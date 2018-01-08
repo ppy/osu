@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
@@ -62,6 +63,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
             : base(customWidth)
         {
             this.direction = direction;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             HitObjects.TimeRange.BindTo(VisibleTimeRange);
         }
 
@@ -107,13 +113,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             this.TransformTo(this.PopulateTransform(new TransformVisibleTimeRange(), newTimeRange, duration, easing));
         }
 
-        protected sealed override HitObjectContainer CreateHitObjectContainer() => CreateScrollingHitObjectContainer();
-
-        /// <summary>
-        /// Creates the <see cref="ScrollingHitObjectContainer"/> that will handle the scrolling of the <see cref="DrawableHitObject"/>s.
-        /// </summary>
-        /// <returns></returns>
-        protected virtual ScrollingHitObjectContainer CreateScrollingHitObjectContainer() => new GlobalScrollingHitObjectContainer(direction);
+        protected sealed override HitObjectContainer CreateHitObjectContainer() => new ScrollingHitObjectContainer(direction);
 
         private class TransformVisibleTimeRange : Transform<double, ScrollingPlayfield>
         {
