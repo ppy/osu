@@ -93,7 +93,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return scope; }
             set
             {
-                if (value == scope) return;
+                if (value == scope)
+                    return;
 
                 scope = value;
                 updateScores();
@@ -107,14 +108,15 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return placeholderState; }
             set
             {
-                if (value == placeholderState) return;
-
                 if (value != PlaceholderState.Successful)
                 {
                     getScoresRequest?.Cancel();
                     getScoresRequest = null;
                     Scores = null;
                 }
+
+                if (value == placeholderState)
+                    return;
 
                 switch (placeholderState = value)
                 {
@@ -171,7 +173,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return beatmap; }
             set
             {
-                if (beatmap == value) return;
+                if (beatmap == value)
+                    return;
 
                 beatmap = value;
                 Scores = null;
@@ -259,7 +262,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void onUpdateFailed(Exception e)
         {
-            if (e is OperationCanceledException) return;
+            if (e is OperationCanceledException)
+                return;
 
             PlaceholderState = PlaceholderState.NetworkFailure;
             Logger.Error(e, @"Couldn't fetch beatmap scores!");
@@ -294,7 +298,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (!scrollContainer.IsScrolledToEnd())
                 fadeStart -= LeaderboardScore.HEIGHT;
 
-            if (scrollFlow == null) return;
+            if (scrollFlow == null)
+                return;
 
             foreach (var c in scrollFlow.Children)
             {
