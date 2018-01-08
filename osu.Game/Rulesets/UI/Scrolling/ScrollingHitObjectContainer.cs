@@ -1,17 +1,19 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
-    public abstract class ScrollingHitObjectContainer : HitObjectContainer
+    public class ScrollingHitObjectContainer : HitObjectContainer
     {
         public readonly BindableDouble TimeRange = new BindableDouble
         {
@@ -25,7 +27,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private Cached initialStateCache = new Cached();
 
-        protected ScrollingHitObjectContainer(ScrollingDirection direction)
+        public ScrollingHitObjectContainer(ScrollingDirection direction)
         {
             this.direction = direction;
 
@@ -35,11 +37,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
         }
 
         private IScrollingAlgorithm scrollingAlgorithm;
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
-            scrollingAlgorithm = CreateScrollingAlgorithm();
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            switch (config.Get<ScrollingAlgorithmType>(OsuSetting.ScrollingAlgorithm))
+            {
+                case ScrollingAlgorithmType.Global:
+                    scrollingAlgorithm = new GlobalScrollingAlgorithm(ControlPoints);
+                    break;
+                case ScrollingAlgorithmType.Local:
+                    scrollingAlgorithm = new LocalScrollingAlgorithm(ControlPoints);
+                    break;
+            }
         }
 
         public override void Add(DrawableHitObject hitObject)
@@ -99,10 +109,5 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             scrollingAlgorithm.ComputePositions(AliveObjects, direction, Time.Current, TimeRange, DrawSize);
         }
-
-        /// <summary>
-        /// Creates the algorithm that will process the positions of the <see cref="DrawableHitObject"/>s.
-        /// </summary>
-        protected abstract IScrollingAlgorithm CreateScrollingAlgorithm();
     }
 }

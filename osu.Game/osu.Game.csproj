@@ -265,6 +265,7 @@
     <Compile Include="Beatmaps\Formats\JsonBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
+    <Compile Include="Configuration\ScrollingAlgorithmType.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
@@ -310,6 +311,7 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\PaginatedScoreContainer.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
+    <Compile Include="Overlays\Settings\Sections\Gameplay\ScrollingSettings.cs" />
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
     <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
@@ -319,8 +321,6 @@
     <Compile Include="Rulesets\UI\Scrolling\Algorithms\GlobalScrollingAlgorithm.cs" />
     <Compile Include="Rulesets\UI\Scrolling\Algorithms\IScrollingAlgorithm.cs" />
     <Compile Include="Rulesets\UI\Scrolling\Algorithms\LocalScrollingAlgorithm.cs" />
-    <Compile Include="Rulesets\UI\Scrolling\GlobalScrollingHitObjectContainer.cs" />
-    <Compile Include="Rulesets\UI\Scrolling\LocalScrollingHitObjectContainer.cs" />
     <Compile Include="Rulesets\UI\Scrolling\ScrollingDirection.cs" />
     <Compile Include="Rulesets\UI\Scrolling\ScrollingHitObjectContainer.cs" />
     <Compile Include="Rulesets\UI\Scrolling\ScrollingPlayfield.cs" />

@@ -71,6 +71,8 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.FloatingComments, false);
 
+            Set(OsuSetting.ScrollingAlgorithm, ScrollingAlgorithmType.Global);
+
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
@@ -114,6 +116,7 @@ namespace osu.Game.Configuration
         ShowFpsDisplay,
         ChatDisplayHeight,
         Version,
-        ShowConvertedBeatmaps
+        ShowConvertedBeatmaps,
+        ScrollingAlgorithm
     }
 }

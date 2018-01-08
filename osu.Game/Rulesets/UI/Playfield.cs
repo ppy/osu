@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The HitObjects contained in this Playfield.
         /// </summary>
-        public readonly HitObjectContainer HitObjects;
+        public HitObjectContainer HitObjects { get; private set; }
 
         public Container<Drawable> ScaledContent;
 
@@ -49,14 +49,14 @@ namespace osu.Game.Rulesets.UI
                     }
                 }
             });
-
-            HitObjects = CreateHitObjectContainer();
-            HitObjects.RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            HitObjects = CreateHitObjectContainer();
+            HitObjects.RelativeSizeAxes = Axes.Both;
+
             Add(HitObjects);
         }
 
