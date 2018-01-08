@@ -14,13 +14,14 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Ranking;
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipButton : Container
+    public class SkipButton : Container, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
         public IAdjustableClock AudioClock;
@@ -117,19 +118,19 @@ namespace osu.Game.Screens.Play
             remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, Easing.OutQuint);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public bool OnPressed(GlobalAction action)
         {
-            if (args.Repeat) return false;
-
-            switch (args.Key)
+            switch (action)
             {
-                case Key.Space:
+                case GlobalAction.SkipCutscene:
                     button.TriggerOnClick();
                     return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
+
+        public bool OnReleased(GlobalAction action) => false;
 
         private class FadeContainer : Container, IStateful<Visibility>
         {
