@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Origin = Anchor.Centre;
 
             Position = HitObject.StackedPosition;
-            Scale = new Vector2(HitObject.Scale);
+            Scale = new Vector2(h.Scale);
 
             Children = new Drawable[]
             {

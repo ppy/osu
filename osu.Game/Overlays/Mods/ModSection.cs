@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Mods
                         return new ModButton(m)
                         {
                             SelectedColour = selectedColour,
-                            Action = Action,
+                            SelectionChanged = Action,
                         };
                 }).ToArray();
 
@@ -83,26 +83,33 @@ namespace osu.Game.Overlays.Mods
         {
             var index = Array.IndexOf(ToggleKeys, args.Key);
             if (index > -1 && index < buttons.Length)
-                buttons[index].SelectNext();
+                buttons[index].SelectNext(state.Keyboard.ShiftPressed ? -1 : 1);
 
             return base.OnKeyDown(state, args);
         }
 
-        public void DeselectAll()
-        {
-            foreach (ModButton button in buttons)
-                button.Deselect();
-        }
+        public void DeselectAll() => DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null));
 
-        public void DeselectTypes(Type[] modTypes)
+        /// <summary>
+        /// Deselect one or more mods in this section.
+        /// </summary>
+        /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
+        /// <param name="immediate">Set to true to bypass animations and update selections immediately.</param>
+        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
         {
+            int delay = 0;
             foreach (var button in buttons)
             {
                 Mod selected = button.SelectedMod;
                 if (selected == null) continue;
                 foreach (Type type in modTypes)
                     if (type.IsInstanceOfType(selected))
-                        button.Deselect();
+                    {
+                        if (immediate)
+                            button.Deselect();
+                        else
+                            Scheduler.AddDelayed(() => button.Deselect(), delay += 50);
+                    }
             }
         }
 

@@ -268,6 +268,7 @@
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Graphics\Containers\ChatFlowContainer.cs" />
+    <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\Profile\SupporterIcon.cs" />
     <Compile Include="Overlays\Settings\DangerousSettingsButton.cs" />
@@ -315,6 +316,9 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\DrawableTotalScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Screens\Select\ImportFromStablePopup.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />

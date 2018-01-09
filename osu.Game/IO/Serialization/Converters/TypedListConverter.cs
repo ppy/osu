@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -9,11 +9,11 @@ using Newtonsoft.Json.Linq;
 namespace osu.Game.IO.Serialization.Converters
 {
     /// <summary>
-    /// A type of <see cref="JsonConverter"/> that serializes a <see cref="List<T>"/> alongside
+    /// A type of <see cref="JsonConverter"/> that serializes a <see cref="List{T}"/> alongside
     /// a lookup table for the types contained. The lookup table is used in deserialization to
     /// reconstruct the objects with their original types.
     /// </summary>
-    /// <typeparam name="T">The type of objects contained in the <see cref="List<T>"/> this attribute is attached to.</typeparam>
+    /// <typeparam name="T">The type of objects contained in the <see cref="List{T}"/> this attribute is attached to.</typeparam>
     public class TypedListConverter<T> : JsonConverter
     {
         private readonly bool requiresTypeVersion;
