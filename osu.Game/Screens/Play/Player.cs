@@ -24,10 +24,10 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Screens.Play.BreaksOverlay;
 using osu.Game.Storyboards.Drawables;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -378,8 +378,9 @@ namespace osu.Game.Screens.Play
 
         private void updateBackgroundElements()
         {
+            const float duration = 800;
+
             var opacity = 1 - (float)dimLevel;
-            var blur = new Vector2((float)blurLevel.Value * 25);
 
             if (showStoryboard && storyboard == null)
                 initializeStoryboard(true);
@@ -387,11 +388,13 @@ namespace osu.Game.Screens.Play
             var beatmap = Beatmap.Value;
             var storyboardVisible = showStoryboard && beatmap.Storyboard.HasDrawable;
 
-            storyboardContainer.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
-            storyboardContainer.FadeTo(storyboardVisible && opacity > 0 ? 1 : 0, 800, Easing.OutQuint);
+            storyboardContainer
+                .FadeColour(OsuColour.Gray(opacity), duration, Easing.OutQuint)
+                .FadeTo(storyboardVisible && opacity > 0 ? 1 : 0, duration, Easing.OutQuint);
 
-            Background?.FadeTo(!storyboardVisible || beatmap.Background == null ? opacity : 0, 800, Easing.OutQuint);
-            (Background as BackgroundScreenBeatmap)?.BlurTo(blur, 800, Easing.OutQuint);
+            (Background as BackgroundScreenBeatmap)?
+                .BlurTo(new Vector2((float)blurLevel.Value * 25), duration, Easing.OutQuint)?
+                .FadeTo(!storyboardVisible || beatmap.Background == null ? opacity : 0, duration, Easing.OutQuint);
         }
 
         private void fadeOut()
