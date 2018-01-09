@@ -318,9 +318,9 @@ namespace osu.Game.Screens.Play
             if (!loadedSuccessfully)
                 return;
 
-            dimLevel.ValueChanged += value => updateBackgroundElements();
-            blurLevel.ValueChanged += value => updateBackgroundElements();
-            showStoryboard.ValueChanged += value => updateBackgroundElements();
+            dimLevel.ValueChanged += _ => updateBackgroundElements();
+            blurLevel.ValueChanged += _ => updateBackgroundElements();
+            showStoryboard.ValueChanged += _ => updateBackgroundElements();
             updateBackgroundElements();
 
             Content.Alpha = 0;
