@@ -66,7 +66,7 @@ namespace osu.Game.Online.Chat
                     //since we just changed the line display text, offset any already processed links.
                     result.Links.ForEach(l => l.Index -= l.Index > index ? m.Length - displayText.Length : 0);
 
-                    var details = getLinkDetails(link);
+                    var details = getLinkDetails(linkText);
                     result.Links.Add(new Link(linkText, index, displayText.Length, linkActionOverride ?? details.linkType, details.linkArgument));
 
                     //adjust the offset for processing the current matches group.
@@ -119,7 +119,7 @@ namespace osu.Game.Online.Chat
                             case "s":
                             case "beatmapsets":
                             case "d":
-                                return (LinkAction.External, args[3]);
+                                return (LinkAction.OpenBeatmapSet, args[3]);
                         }
                     }
 
@@ -196,7 +196,7 @@ namespace osu.Game.Online.Chat
         {
             var result = format(inputMessage.Content);
 
-            inputMessage.Content = result.Text;
+            inputMessage.DisplayContent = result.Text;
 
             // Sometimes, regex matches are not in order
             result.Links.Sort();
