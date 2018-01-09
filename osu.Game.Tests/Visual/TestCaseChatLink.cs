@@ -14,6 +14,7 @@ using osu.Game.Overlays.Chat;
 using osu.Game.Users;
 using System;
 using System.Linq;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Tests.Visual
 {
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Visual
             AddAssert($"msg #{textContainer.Count} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic(newLine.ContentFlow));
             AddAssert($"msg #{textContainer.Count} shows link(s)", isShowingLinks);
 
-            bool isItalic(ChatFlowContainer c) => c.Cast<ChatLink>().All(sprite => sprite.Font == @"Exo2.0-MediumItalic");
+            bool isItalic(LinkFlowContainer c) => c.Cast<OsuSpriteText>().All(sprite => sprite.Font == @"Exo2.0-MediumItalic");
 
             bool isShowingLinks()
             {
@@ -68,11 +69,11 @@ namespace osu.Game.Tests.Visual
                     textColour = OsuColour.FromHex(newLine.Message.Sender.Colour);
 
                 return newLine.ContentFlow
-                    .Cast<ChatLink>()
-                    .All(sprite => sprite.HandleInput && !sprite.TextColour.Equals(textColour)
-                                || !sprite.HandleInput && sprite.TextColour.Equals(textColour)
+                    .Cast<OsuSpriteText>()
+                    .All(sprite => sprite.HandleInput && !sprite.Colour.Equals(textColour)
+                                || !sprite.HandleInput && sprite.Colour.Equals(textColour)
                                 // if someone with a background uses /me with a link, the usual link colour is overridden
-                                || isAction && hasBackground && sprite.HandleInput && !sprite.TextColour.Equals((ColourInfo)Color4.White));
+                                || isAction && hasBackground && sprite.HandleInput && !sprite.Colour.Equals((ColourInfo)Color4.White));
             }
         }
 

@@ -267,12 +267,11 @@
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
-    <Compile Include="Graphics\Containers\ChatFlowContainer.cs" />
+    <Compile Include="Graphics\Containers\LinkFlowContainer.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\Profile\SupporterIcon.cs" />
     <Compile Include="Overlays\Settings\DangerousSettingsButton.cs" />
-    <Compile Include="Graphics\Sprites\OsuSpriteLink.cs" />
     <Compile Include="Graphics\UserInterface\HoverClickSounds.cs" />
     <Compile Include="Graphics\UserInterface\HoverSounds.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
@@ -295,7 +294,7 @@
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
-    <Compile Include="Online\Chat\ChatLink.cs" />
+    <Compile Include="Online\Chat\DrawableLinkCompiler.cs" />
     <Compile Include="Online\Chat\MessageFormatter.cs" />
     <Compile Include="Online\API\Requests\APIResponseBeatmapSet.cs" />
     <Compile Include="Online\API\Requests\GetUserMostPlayedBeatmapsRequest.cs" />
