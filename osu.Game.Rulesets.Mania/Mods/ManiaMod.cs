@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Graphics;
@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.UI;
@@ -96,21 +97,30 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public void ApplyToRulesetContainer(RulesetContainer<ManiaHitObject> rulesetContainer)
         {
-            int availableColumns = ((ManiaRulesetContainer)rulesetContainer).AvailableColumns;
+            int availableColumns = ((ManiaRulesetContainer)rulesetContainer).Beatmap.TotalColumns;
             var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(item => RNG.Next()).ToList();
 
             rulesetContainer.Objects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
         }
     }
 
-    public abstract class ManiaKeyMod : Mod
+    public abstract class ManiaKeyMod : Mod, IApplicableMod, IApplicableToBeatmapConverter<ManiaHitObject>
     {
-        // TODO: implement using the IApplicable interface. Haven't done so yet because KeyCount isn't even hooked up at the moment.
-
         public override string ShortenedName => Name;
         public abstract int KeyCount { get; }
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier
         public override bool Ranked => true;
+
+        public void ApplyToBeatmapConverter(BeatmapConverter<ManiaHitObject> beatmapConverter)
+        {
+            var mbc = (ManiaBeatmapConverter)beatmapConverter;
+
+            // Although this can work, for now let's not allow keymods for mania-specific beatmaps
+            if (mbc.IsForCurrentRuleset)
+                return;
+
+            mbc.TargetColumns = KeyCount;
+        }
     }
 
     public class ManiaModKey1 : ManiaKeyMod
