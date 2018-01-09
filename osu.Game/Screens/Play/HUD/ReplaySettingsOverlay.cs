@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play.HUD
         public bool ReplayLoaded;
 
         public readonly PlaybackSettings PlaybackSettings;
+        public readonly VisualSettings VisualSettings;
         //public readonly CollectionSettings CollectionSettings;
         //public readonly DiscussionSettings DiscussionSettings;
 
@@ -33,11 +34,12 @@ namespace osu.Game.Screens.Play.HUD
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 20),
                 Margin = new MarginPadding { Top = 100, Right = 10 },
-                Children = new[]
+                Children = new ReplayGroup[]
                 {
                     //CollectionSettings = new CollectionSettings(),
                     //DiscussionSettings = new DiscussionSettings(),
                     PlaybackSettings = new PlaybackSettings(),
+                    VisualSettings = new VisualSettings()
                 }
             };
 

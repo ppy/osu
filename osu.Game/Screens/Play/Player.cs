@@ -228,7 +228,8 @@ namespace osu.Game.Screens.Play
 
             breakOverlay.BindProcessor(scoreProcessor);
 
-            hudOverlay.ReplaySettingsOverlay.PlaybackSettings.AdjustableClock = adjustableSourceClock;
+            hudOverlay.ReplaySettingsOverlay.PlaybackSettings.AdjustableClock =
+            hudOverlay.ReplaySettingsOverlay.VisualSettings.AdjustableClock = adjustableSourceClock;
 
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
