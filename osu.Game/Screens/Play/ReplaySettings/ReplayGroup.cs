@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
         private readonly FillFlowContainer content;
         private readonly IconButton button;
 
-        private bool expanded = true;
+        protected bool Expanded = true;
 
         private Color4 buttonActiveColour;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
                                     Position = new Vector2(-15, 0),
                                     Icon = FontAwesome.fa_bars,
                                     Scale = new Vector2(0.75f),
-                                    Action = toggleContentVisibility,
+                                    Action = ToggleContentVisibility,
                                 },
                             }
                         },
@@ -112,13 +112,13 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         protected override Container<Drawable> Content => content;
 
-        private void toggleContentVisibility()
+        protected virtual void ToggleContentVisibility()
         {
             content.ClearTransforms();
 
-            expanded = !expanded;
+            Expanded = !Expanded;
 
-            if (expanded)
+            if (Expanded)
                 content.AutoSizeAxes = Axes.Y;
             else
             {
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
                 content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
             }
 
-            button.FadeColour(expanded ? buttonActiveColour : Color4.White, 200, Easing.OutQuint);
+            button.FadeColour(Expanded ? buttonActiveColour : Color4.White, 200, Easing.OutQuint);
         }
     }
 }

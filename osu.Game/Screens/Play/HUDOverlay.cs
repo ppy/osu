@@ -102,7 +102,8 @@ namespace osu.Game.Screens.Play
             // in the case a replay isn't loaded, we want some elements to only appear briefly.
             if (!replayLoaded)
             {
-                ReplaySettingsOverlay.Hide();
+                ReplaySettingsOverlay.PlaybackSettings.Hide();
+                ReplaySettingsOverlay.Delay(5000).FadeOut(200);
                 ModDisplay.Delay(2000).FadeOut(200);
             }
         }
