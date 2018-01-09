@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 namespace osu.Game.Screens.Select
@@ -7,6 +7,10 @@ namespace osu.Game.Screens.Select
     {
         protected override bool ShowFooter => false;
 
-        protected override void Start() => Exit();
+        protected override bool OnSelectionFinalised()
+        {
+            Exit();
+            return true;
+        }
     }
 }

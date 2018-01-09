@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private const float idle_alpha = 0.2f;
         private const float tracking_alpha = 0.4f;
+
+        public override bool IsPresent => true; // handle input when hidden
 
         public SpinnerDisc(Spinner s)
         {

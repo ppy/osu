@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Audio;
@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <summary>
         /// The samples to be played when each repeat node is hit (0 -> first repeat node, 1 -> second repeat node, etc).
         /// </summary>
-        List<SampleInfoList> RepeatSamples { get; }
+        List<List<SampleInfo>> RepeatSamples { get; }
     }
 }

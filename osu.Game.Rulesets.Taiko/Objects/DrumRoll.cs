@@ -1,10 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Objects.Types;
 using System;
-using System.Linq;
-using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 
@@ -74,13 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                     FirstTick = first,
                     TickSpacing = tickSpacing,
                     StartTime = t,
-                    IsStrong = IsStrong,
-                    Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
-                    {
-                        Bank = s.Bank,
-                        Name = @"slidertick",
-                        Volume = s.Volume
-                    }))
+                    IsStrong = IsStrong
                 });
 
                 first = false;

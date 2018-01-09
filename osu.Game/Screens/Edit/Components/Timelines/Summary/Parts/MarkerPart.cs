@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -46,6 +46,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             if (Beatmap.Value == null)
                 return;
+
+            if (Beatmap.Value.Track.Length == double.PositiveInfinity) return;
 
             float markerPos = MathHelper.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
             seekTo(markerPos / DrawWidth * Beatmap.Value.Track.Length);

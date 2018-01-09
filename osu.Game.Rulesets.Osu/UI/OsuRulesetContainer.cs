@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Input;
@@ -35,16 +35,13 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {
-            var circle = h as HitCircle;
-            if (circle != null)
+            if (h is HitCircle circle)
                 return new DrawableHitCircle(circle);
 
-            var slider = h as Slider;
-            if (slider != null)
+            if (h is Slider slider)
                 return new DrawableSlider(slider);
 
-            var spinner = h as Spinner;
-            if (spinner != null)
+            if (h is Spinner spinner)
                 return new DrawableSpinner(spinner);
             return null;
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -110,7 +110,7 @@ namespace osu.Desktop.Overlays
 
                 // only show a notification if we've previously saved a version to the config file (ie. not the first run).
                 if (!string.IsNullOrEmpty(lastVersion))
-                    Scheduler.AddDelayed(() => notificationOverlay.Post(new UpdateCompleteNotification(version)), 5000);
+                    notificationOverlay.Post(new UpdateCompleteNotification(version));
             }
         }
 

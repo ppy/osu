@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -17,6 +17,7 @@ using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -183,7 +184,7 @@ namespace osu.Game.Screens.Ranking
                                     Height = 50,
                                     Margin = new MarginPadding { Bottom = 110 },
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = $"{score.MaxCombo}x",
                                     TextSize = 40,
@@ -194,7 +195,7 @@ namespace osu.Game.Screens.Ranking
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.BottomCentre,
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = "max combo",
                                     TextSize = 20,
@@ -204,7 +205,7 @@ namespace osu.Game.Screens.Ranking
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.TopCentre,
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = $"{score.Accuracy:P2}",
                                     TextSize = 40,
@@ -215,7 +216,7 @@ namespace osu.Game.Screens.Ranking
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.BottomCentre,
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = "accuracy",
                                     TextSize = 20,

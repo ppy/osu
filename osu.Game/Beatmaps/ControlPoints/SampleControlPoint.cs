@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Audio;
@@ -17,7 +17,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The default sample volume at this control point.
         /// </summary>
-        public int SampleVolume;
+        public int SampleVolume = 100;
 
         /// <summary>
         /// Create a SampleInfo based on the sample settings in this control point.

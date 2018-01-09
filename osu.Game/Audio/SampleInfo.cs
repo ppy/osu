@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -14,10 +14,20 @@ namespace osu.Game.Audio
         public const string HIT_NORMAL = @"hitnormal";
         public const string HIT_CLAP = @"hitclap";
 
-        public SampleChannel GetChannel(SampleManager manager)
+        public SampleChannel GetChannel(SampleManager manager, string resourceNamespace = null)
         {
-            var channel = manager.Get($"Gameplay/{Bank}-{Name}");
-            channel.Volume.Value = Volume / 100.0;
+            SampleChannel channel = null;
+
+            if (resourceNamespace != null)
+                channel = manager.Get($"Gameplay/{resourceNamespace}/{Bank}-{Name}");
+
+            // try without namespace as a fallback.
+            if (channel == null)
+                channel = manager.Get($"Gameplay/{Bank}-{Name}");
+
+            if (channel != null)
+                channel.Volume.Value = Volume / 100.0;
+
             return channel;
         }
 

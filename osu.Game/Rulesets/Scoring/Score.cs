@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -40,6 +40,6 @@ namespace osu.Game.Rulesets.Scoring
 
         public DateTimeOffset Date;
 
-        public Dictionary<string, object> Statistics = new Dictionary<string, object>();
+        public Dictionary<HitResult, object> Statistics = new Dictionary<HitResult, object>();
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -70,6 +70,7 @@ namespace osu.Game.Tests.Visual
 
             testRemoveAll();
             testEmptyTraversal();
+            testHiding();
         }
 
         private void ensureRandomFetchSuccess() =>
@@ -126,6 +127,20 @@ namespace osu.Game.Tests.Visual
             carousel.SelectPreviousRandom();
             selectedSets.Pop();
         });
+
+        private bool selectedBeatmapVisible()
+        {
+            var currentlySelected = carousel.Items.FirstOrDefault(s => s.Item is CarouselBeatmap && s.Item.State == CarouselItemState.Selected);
+            if (currentlySelected == null)
+                return true;
+            return currentlySelected.Item.Visible;
+        }
+
+        private void checkInvisibleDifficultiesUnselectable()
+        {
+            nextRandom();
+            AddAssert("Selection is visible", selectedBeatmapVisible);
+        }
 
         /// <summary>
         /// Test keyboard traversal
@@ -221,6 +236,15 @@ namespace osu.Game.Tests.Visual
 
             nextRandom();
             AddAssert("ensure repeat", () => selectedSets.Contains(carousel.SelectedBeatmapSet));
+
+            AddStep("Add set with 100 difficulties", () => carousel.UpdateBeatmapSet(createTestBeatmapSetWithManyDifficulties(set_count + 1)));
+            AddStep("Filter Extra", () => carousel.Filter(new FilterCriteria { SearchText = "Extra 10" }, false));
+            checkInvisibleDifficultiesUnselectable();
+            checkInvisibleDifficultiesUnselectable();
+            checkInvisibleDifficultiesUnselectable();
+            checkInvisibleDifficultiesUnselectable();
+            checkInvisibleDifficultiesUnselectable();
+            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
         }
 
         /// <summary>
@@ -295,26 +319,60 @@ namespace osu.Game.Tests.Visual
             checkNoSelection();
         }
 
-        private BeatmapSetInfo createTestBeatmapSet(int i)
+        private void testHiding()
+        {
+            var hidingSet = createTestBeatmapSet(1);
+            hidingSet.Beatmaps[1].Hidden = true;
+            AddStep("Add set with diff 2 hidden", () => carousel.UpdateBeatmapSet(hidingSet));
+            setSelected(1, 1);
+
+            checkVisibleItemCount(true, 2);
+            advanceSelection(true);
+            checkSelected(1, 3);
+
+            setHidden(3);
+            checkSelected(1, 1);
+
+            setHidden(2, false);
+            advanceSelection(true);
+            checkSelected(1, 2);
+
+            setHidden(1);
+            checkSelected(1, 2);
+
+            setHidden(2);
+            checkNoSelection();
+
+            void setHidden(int diff, bool hidden = true)
+            {
+                AddStep((hidden ? "" : "un") + $"hide diff {diff}", () =>
+                {
+                    hidingSet.Beatmaps[diff - 1].Hidden = hidden;
+                    carousel.UpdateBeatmapSet(hidingSet);
+                });
+            }
+        }
+
+        private BeatmapSetInfo createTestBeatmapSet(int id)
         {
             return new BeatmapSetInfo
             {
-                ID = i,
-                OnlineBeatmapSetID = i,
+                ID = id,
+                OnlineBeatmapSetID = id,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
-                    OnlineBeatmapSetID = i,
+                    OnlineBeatmapSetID = id,
                     // Create random metadata, then we can check if sorting works based on these
-                    Artist = $"peppy{i.ToString().PadLeft(6, '0')}",
-                    Title = $"test set #{i}!",
-                    AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, i - 1)), 5))
+                    Artist = $"peppy{id.ToString().PadLeft(6, '0')}",
+                    Title = $"test set #{id}!",
+                    AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, id - 1)), 5))
                 },
                 Beatmaps = new List<BeatmapInfo>(new[]
                 {
                     new BeatmapInfo
                     {
-                        OnlineBeatmapID = i * 10,
+                        OnlineBeatmapID = id * 10,
                         Path = "normal.osu",
                         Version = "Normal",
                         StarDifficulty = 2,
@@ -325,7 +383,7 @@ namespace osu.Game.Tests.Visual
                     },
                     new BeatmapInfo
                     {
-                        OnlineBeatmapID = i * 10 + 1,
+                        OnlineBeatmapID = id * 10 + 1,
                         Path = "hard.osu",
                         Version = "Hard",
                         StarDifficulty = 5,
@@ -336,7 +394,7 @@ namespace osu.Game.Tests.Visual
                     },
                     new BeatmapInfo
                     {
-                        OnlineBeatmapID = i * 10 + 2,
+                        OnlineBeatmapID = id * 10 + 2,
                         Path = "insane.osu",
                         Version = "Insane",
                         StarDifficulty = 6,
@@ -347,6 +405,40 @@ namespace osu.Game.Tests.Visual
                     },
                 }),
             };
+        }
+
+        private BeatmapSetInfo createTestBeatmapSetWithManyDifficulties(int id)
+        {
+            var toReturn = new BeatmapSetInfo
+            {
+                ID = id,
+                OnlineBeatmapSetID = id,
+                Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
+                Metadata = new BeatmapMetadata
+                {
+                    OnlineBeatmapSetID = id,
+                    // Create random metadata, then we can check if sorting works based on these
+                    Artist = $"peppy{id.ToString().PadLeft(6, '0')}",
+                    Title = $"test set #{id}!",
+                    AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, id - 1)), 5))
+                },
+                Beatmaps = new List<BeatmapInfo>(),
+            };
+            for (int b = 1; b < 101; b++)
+            {
+                toReturn.Beatmaps.Add(new BeatmapInfo
+                {
+                    OnlineBeatmapID = b * 10,
+                    Path = $"extra{b}.osu",
+                    Version = $"Extra {b}",
+                    StarDifficulty = 2,
+                    BaseDifficulty = new BeatmapDifficulty
+                    {
+                        OverallDifficulty = 3.5f,
+                    }
+                });
+            }
+            return toReturn;
         }
 
         private class TestBeatmapCarousel : BeatmapCarousel

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -114,7 +114,7 @@ namespace osu.Game.Users
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        new DrawableFlag(user.Country?.FlagName)
+                                        new DrawableFlag(user.Country)
                                         {
                                             Width = 30f,
                                             RelativeSizeAxes = Axes.Y,

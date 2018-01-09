@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -263,6 +263,14 @@ namespace osu.Game.Screens.Play
 
         private class Button : DialogButton
         {
+            protected override bool OnHover(InputState state) => true;
+
+            protected override bool OnMouseMove(InputState state)
+            {
+                Selected.Value = true;
+                return base.OnMouseMove(state);
+            }
+
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
             {
                 if (args.Repeat || args.Key != Key.Enter || !Selected)
