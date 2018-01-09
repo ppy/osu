@@ -83,9 +83,9 @@ namespace osu.Game.Overlays.Chat
 
         private Message message;
         private OsuSpriteText username;
-        private ChatFlowContainer contentFlow;
+        private LinkFlowContainer contentFlow;
 
-        public ChatFlowContainer ContentFlow => contentFlow;
+        public LinkFlowContainer ContentFlow => contentFlow;
 
         public Message Message
         {
@@ -191,14 +191,14 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
-                        contentFlow = new ChatFlowContainer(t =>
+                        contentFlow = new LinkFlowContainer(t =>
                         {
                             if (Message.IsAction)
                             {
                                 t.Font = @"Exo2.0-MediumItalic";
 
                                 if (senderHasBackground)
-                                    t.TextColour = OsuColour.FromHex(message.Sender.Colour);
+                                    t.Colour = OsuColour.FromHex(message.Sender.Colour);
                             }
 
                             t.TextSize = text_size;
@@ -252,7 +252,7 @@ namespace osu.Game.Overlays.Chat
                         }
                     }
 
-                    contentFlow.AddLink(message.Content.Substring(link.Index, link.Length), link.Url, link.Action, link.Argument);
+                    contentFlow.AddLink(message.Content.Substring(link.Index, link.Length), link.Url);
                 }
 
                 var lastLink = message.Links[message.Links.Count - 1];
