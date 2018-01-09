@@ -55,36 +55,34 @@ namespace osu.Game.Overlays
 
             Filter.Search.Current.ValueChanged += text =>
             {
-                if (text != string.Empty)
+                if (!string.IsNullOrEmpty(text))
                 {
-                    Header.Tabs.Current.Value = SocialTab.Search;
+                    // force searching in players until searching for friends is supported
+                    Header.Tabs.Current.Value = SocialTab.AllPlayers;
 
-                    if (Filter.Tabs.Current.Value == SocialSortCriteria.Rank)
-                        Filter.Tabs.Current.Value = SocialSortCriteria.Relevance;
-                }
-                else
-                {
-                    Header.Tabs.Current.Value = SocialTab.OnlinePlayers;
-
-                    if (Filter.Tabs.Current.Value == SocialSortCriteria.Relevance)
+                    if (Filter.Tabs.Current.Value != SocialSortCriteria.Rank)
                         Filter.Tabs.Current.Value = SocialSortCriteria.Rank;
                 }
             };
 
-            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
-
-            // TODO sort our list in some way (either locally or with API call)
-            //Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += sortOrder => Scheduler.AddOnce(updateSearch);
-
             Header.Tabs.Current.ValueChanged += tab =>
             {
-                if (tab != SocialTab.Search)
-                {
-                    //currentQuery.Value = string.Empty;
-                    Filter.Tabs.Current.Value = (SocialSortCriteria)Header.Tabs.Current.Value;
-                    Scheduler.AddOnce(updateSearch);
-                }
+                //currentQuery.Value = string.Empty;
+                Filter.Tabs.Current.Value = (SocialSortCriteria)Header.Tabs.Current.Value;
+                Scheduler.AddOnce(updateSearch);
             };
+
+            Filter.Tabs.Current.ValueChanged += sortCriteria =>
+            {
+                // force searching in players until searching for friends is supported
+                if (Header.Tabs.Current.Value != SocialTab.AllPlayers && sortCriteria != (SocialSortCriteria)Header.Tabs.Current.Value)
+                    Header.Tabs.Current.Value = SocialTab.AllPlayers;
+
+                Scheduler.AddOnce(updateSearch);
+            };
+
+            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += sortOrder => Scheduler.AddOnce(updateSearch);
 
             //currentQuery.ValueChanged += v =>
             //{
@@ -97,14 +95,6 @@ namespace osu.Game.Overlays
             //};
 
             //currentQuery.BindTo(Filter.Search.Current);
-
-            Filter.Tabs.Current.ValueChanged += sortCriteria =>
-            {
-                if (Header.Tabs.Current.Value != SocialTab.Search && sortCriteria != (SocialSortCriteria)Header.Tabs.Current.Value)
-                    Header.Tabs.Current.Value = SocialTab.Search;
-
-                Scheduler.AddOnce(updateSearch);
-            };
         }
 
         [BackgroundDependencyLoader]
@@ -148,11 +138,12 @@ namespace osu.Game.Overlays
                 })
             };
 
-            LoadComponentAsync(newPanels, p =>
+            LoadComponentAsync(newPanels, f =>
             {
                 if(panels != null)
                     ScrollFlow.Remove(panels);
 
+                // delay new panels so they don't get added before the old ones are gone
                 Scheduler.AddDelayed(() => ScrollFlow.Add(panels = newPanels), 200);
             });
         }
@@ -190,13 +181,13 @@ namespace osu.Game.Overlays
 
             switch (Header.Tabs.Current.Value)
             {
-                case SocialTab.OnlineFriends:
-                    var friendRequest = new GetFriendsRequest();
+                case SocialTab.Friends:
+                    var friendRequest = new GetFriendsRequest(); // TODO filter arguments?
                     friendRequest.Success += updateUsers;
                     api.Queue(getUsersRequest = friendRequest);
                     break;
                 default:
-                    var userRequest = new GetUsersRequest(); // TODO filter???
+                    var userRequest = new GetUsersRequest(); // TODO filter arguments!
                     userRequest.Success += response => updateUsers(response.Select(r => r.User));
                     api.Queue(getUsersRequest = userRequest);
                     break;
@@ -223,7 +214,7 @@ namespace osu.Game.Overlays
                     break;
                 default:
                     Users = null;
-                    recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                    clearPanels();
                     break;
             }
         }

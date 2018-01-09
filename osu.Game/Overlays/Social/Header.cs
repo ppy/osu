@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Social
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"38202e");
         protected override float TabStripWidth => 438;
 
-        protected override SocialTab DefaultTab => SocialTab.OnlinePlayers;
+        protected override SocialTab DefaultTab => SocialTab.AllPlayers;
         protected override FontAwesome Icon => FontAwesome.fa_users;
 
         protected override Drawable CreateHeaderText()
@@ -54,13 +54,12 @@ namespace osu.Game.Overlays.Social
 
     public enum SocialTab
     {
-        Search,
-        [Description("Players")]
-        OnlinePlayers = SocialSortCriteria.Rank,
+        [Description("All Players")]
+        AllPlayers = SocialSortCriteria.Rank,
         [Description("Friends")]
-        OnlineFriends = SocialSortCriteria.Name,
-        //[Description("Online Team Members")]
-        //OnlineTeamMembers,
+        Friends = SocialSortCriteria.Name,
+        //[Description("Team Members")]
+        //TeamMembers,
         //[Description("Chat Channels")]
         //ChatChannels,
     }
