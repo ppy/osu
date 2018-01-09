@@ -235,8 +235,8 @@ namespace osu.Game.Screens.Select
         /// <returns>True if a selection could be made, else False.</returns>
         public bool SelectNextRandom()
         {
-            var visible = beatmapSets.Where(s => !s.Filtered).ToList();
-            if (!visible.Any())
+            var visibleSets = beatmapSets.Where(s => !s.Filtered).ToList();
+            if (!visibleSets.Any())
                 return false;
 
             if (selectedBeatmap != null)
@@ -253,20 +253,21 @@ namespace osu.Game.Screens.Select
 
             if (RandomAlgorithm == RandomSelectAlgorithm.RandomPermutation)
             {
-                var notYetVisitedSets = visible.Except(previouslyVisitedRandomSets).ToList();
+                var notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomSets).ToList();
                 if (!notYetVisitedSets.Any())
                 {
-                    previouslyVisitedRandomSets.Clear();
-                    notYetVisitedSets = visible;
+                    previouslyVisitedRandomSets.RemoveAll(s => visibleSets.Contains(s));
+                    notYetVisitedSets = visibleSets;
                 }
 
                 set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
                 previouslyVisitedRandomSets.Add(set);
             }
             else
-                set = visible.ElementAt(RNG.Next(visible.Count));
+                set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
 
-            select(set.Beatmaps.Skip(RNG.Next(set.Beatmaps.Count())).FirstOrDefault());
+            var visibleBeatmaps = set.Beatmaps.Where(s => !s.Filtered).ToList();
+            select(visibleBeatmaps[RNG.Next(visibleBeatmaps.Count)]);
             return true;
         }
 
