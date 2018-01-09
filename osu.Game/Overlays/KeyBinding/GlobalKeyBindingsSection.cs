@@ -1,8 +1,8 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Overlays.KeyBinding
@@ -12,19 +12,31 @@ namespace osu.Game.Overlays.KeyBinding
         public override FontAwesome Icon => FontAwesome.fa_osu_hot;
         public override string Header => "Global";
 
-        public GlobalKeyBindingsSection(KeyBindingContainer manager)
+        public GlobalKeyBindingsSection(GlobalKeyBindingInputManager manager)
         {
             Add(new DefaultBindingsSubsection(manager));
+            Add(new InGameKeyBindingsSubsection(manager));
         }
+
 
         private class DefaultBindingsSubsection : KeyBindingsSubsection
         {
             protected override string Header => string.Empty;
 
-            public DefaultBindingsSubsection(KeyBindingContainer manager)
+            public DefaultBindingsSubsection(GlobalKeyBindingInputManager manager)
                 : base(null)
             {
-                Defaults = manager.DefaultKeyBindings;
+                Defaults = manager.GlobalKeyBindings;
+            }
+        }
+
+        private class InGameKeyBindingsSubsection : KeyBindingsSubsection
+        {
+            protected override string Header => "In Game";
+
+            public InGameKeyBindingsSubsection(GlobalKeyBindingInputManager manager) : base(null)
+            {
+                Defaults = manager.InGameKeyBindings;
             }
         }
     }
