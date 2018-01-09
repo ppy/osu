@@ -21,7 +21,6 @@ namespace osu.Game.Overlays.Social
 
     public enum SocialSortCriteria
     {
-        Relevance,
         Rank,
         Name,
         Location,
