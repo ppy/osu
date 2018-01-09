@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -100,17 +100,22 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
-        public void DeselectTypes(Type[] modTypes)
+        /// <summary>
+        /// Deselect one or more mods.
+        /// </summary>
+        /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
+        /// <param name="immediate">Set to true to bypass animations and update selections immediately.</param>
+        public void DeselectTypes(Type[] modTypes, bool immediate = false)
         {
             if (modTypes.Length == 0) return;
             foreach (ModSection section in ModSectionsContainer.Children)
-                section.DeselectTypes(modTypes);
+                section.DeselectTypes(modTypes, immediate);
         }
 
         private void modButtonPressed(Mod selectedMod)
         {
             if (selectedMod != null)
-                DeselectTypes(selectedMod.IncompatibleMods);
+                DeselectTypes(selectedMod.IncompatibleMods, true);
             refreshSelectedMods();
         }
 
@@ -126,10 +131,6 @@ namespace osu.Game.Overlays.Mods
                 multiplier *= mod.ScoreMultiplier;
                 ranked &= mod.Ranked;
             }
-
-            // 1.00x
-            // 1.05x
-            // 1.20x
 
             MultiplierLabel.Text = $"{multiplier:N2}x";
             if (!ranked)
