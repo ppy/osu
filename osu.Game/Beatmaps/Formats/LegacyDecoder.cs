@@ -29,7 +29,6 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         protected int BeatmapVersion;
-        protected readonly Dictionary<string, string> Variables = new Dictionary<string, string>();
 
         public override Decoder GetStoryboardDecoder() => new LegacyStoryboardDecoder(BeatmapVersion);
 
@@ -82,27 +81,15 @@ namespace osu.Game.Beatmaps.Formats
 
         protected abstract void ProcessSection(Section section, string line);
 
-        /// <summary>
-        /// Decodes any beatmap variables present in a line into their real values.
-        /// </summary>
-        /// <param name="line">The line which may contains variables.</param>
-        protected void DecodeVariables(ref string line)
+        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator)
         {
-            while (line.IndexOf('$') >= 0)
-            {
-                string origLine = line;
-                string[] split = line.Split(',');
-                for (int i = 0; i < split.Length; i++)
-                {
-                    var item = split[i];
-                    if (item.StartsWith("$") && Variables.ContainsKey(item))
-                        split[i] = Variables[item];
-                }
+            var split = line.Trim().Split(new[] { separator }, 2);
 
-                line = string.Join(",", split);
-                if (line == origLine)
-                    break;
-            }
+            return new KeyValuePair<string, string>
+            (
+                split[0].Trim(),
+                split.Length > 1 ? split[1].Trim() : string.Empty
+            );
         }
 
         protected enum Section
