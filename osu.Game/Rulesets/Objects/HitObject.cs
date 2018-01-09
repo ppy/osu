@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public virtual double StartTime { get; set; }
 
+        private List<SampleInfo> samples;
+
         /// <summary>
         /// The samples to be played when this hit object is hit.
         /// <para>
@@ -32,7 +34,11 @@ namespace osu.Game.Rulesets.Objects
         /// and can be treated as the default samples for the hit object.
         /// </para>
         /// </summary>
-        public SampleInfoList Samples;
+        public List<SampleInfo> Samples
+        {
+            get => samples ?? (samples = new List<SampleInfo>());
+            set => samples = value;
+        }
 
         [JsonIgnore]
         public SampleControlPoint SampleControlPoint;

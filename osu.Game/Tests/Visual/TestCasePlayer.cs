@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -21,6 +21,8 @@ namespace osu.Game.Tests.Visual
         private readonly Type ruleset;
 
         protected Player Player;
+
+        private TestWorkingBeatmap working;
 
         /// <summary>
         /// Create a TestCase which runs through the Player screen.
@@ -75,7 +77,7 @@ namespace osu.Game.Tests.Visual
 
             var instance = r.CreateInstance();
 
-            WorkingBeatmap working = new TestWorkingBeatmap(beatmap);
+            working = new TestWorkingBeatmap(beatmap);
             working.Mods.Value = new[] { instance.GetAllMods().First(m => m is ModNoFail) };
 
             if (Player != null)
@@ -88,10 +90,21 @@ namespace osu.Game.Tests.Visual
             return player;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (working != null)
+                // note that this will override any mod rate application
+                working.Track.Rate = Clock.Rate;
+        }
+
         protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset) => new Player
         {
             InitialBeatmap = beatmap,
-            AllowPause = false
+            AllowPause = false,
+            AllowLeadIn = false,
+            AllowResults = false,
         };
 
         private const string test_beatmap_data =

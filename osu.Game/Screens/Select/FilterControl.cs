@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Select
         {
             Children = new Drawable[]
             {
-                new Box
+                Background = new Box
                 {
                     Colour = Color4.Black,
                     Alpha = 0.8f,
@@ -166,6 +166,8 @@ namespace osu.Game.Screens.Select
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<bool> showConverted;
+
+        public readonly Box Background;
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuColour colours, OsuGame osu, OsuConfigManager config)

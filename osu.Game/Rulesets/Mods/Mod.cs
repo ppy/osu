@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Graphics;
@@ -42,6 +42,11 @@ namespace osu.Game.Rulesets.Mods
         public abstract double ScoreMultiplier { get; }
 
         /// <summary>
+        /// Returns true if this mod is implemented (and playable).
+        /// </summary>
+        public virtual bool HasImplementation => this is IApplicableMod;
+
+        /// <summary>
         /// Returns if this mod is ranked.
         /// </summary>
         public virtual bool Ranked => false;
@@ -50,10 +55,5 @@ namespace osu.Game.Rulesets.Mods
         /// The mods this mod cannot be enabled with.
         /// </summary>
         public virtual Type[] IncompatibleMods => new Type[] { };
-
-        /// <summary>
-        /// Whether we should allow failing at the current point in time.
-        /// </summary>
-        public virtual bool AllowFail => true;
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -62,10 +62,10 @@ namespace osu.Game.Overlays.Toolbar
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
-                        new ToolbarButton
-                        {
-                            Icon = FontAwesome.fa_search
-                        },
+                        //new ToolbarButton
+                        //{
+                        //    Icon = FontAwesome.fa_search
+                        //},
                         userArea = new ToolbarUserArea(),
                         new ToolbarNotificationButton(),
                     }

@@ -36,18 +36,31 @@
       <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\OpenTK.3.0.0-git00009\lib\net20\OpenTK.dll</HintPath>
+    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0.11\lib\net45\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\DrumSampleMapping.cs" />
     <Compile Include="Beatmaps\TaikoBeatmapConverter.cs" />
     <Compile Include="Judgements\TaikoDrumRollTickJudgement.cs" />
     <Compile Include="Judgements\TaikoStrongHitJudgement.cs" />
     <Compile Include="Judgements\TaikoJudgement.cs" />
+    <Compile Include="Mods\TaikoModAutoplay.cs" />
+    <Compile Include="Mods\TaikoModDaycore.cs" />
+    <Compile Include="Mods\TaikoModDoubleTime.cs" />
+    <Compile Include="Mods\TaikoModEasy.cs" />
+    <Compile Include="Mods\TaikoModFlashlight.cs" />
+    <Compile Include="Mods\TaikoModHalfTime.cs" />
+    <Compile Include="Mods\TaikoModHardRock.cs" />
+    <Compile Include="Mods\TaikoModHidden.cs" />
+    <Compile Include="Mods\TaikoModNightcore.cs" />
+    <Compile Include="Mods\TaikoModPerfect.cs" />
+    <Compile Include="Mods\TaikoModRelax.cs" />
+    <Compile Include="Mods\TaikoModSuddenDeath.cs" />
     <Compile Include="Objects\BarLine.cs" />
     <Compile Include="Objects\Drawables\DrawableBarLine.cs" />
     <Compile Include="Objects\Drawables\DrawableBarLineMajor.cs" />
@@ -82,6 +95,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scoring\TaikoScoreProcessor.cs" />
     <Compile Include="TaikoInputManager.cs" />
+    <Compile Include="Tests\TestCaseInputDrum.cs" />
     <Compile Include="Tests\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\TestCaseTaikoPlayfield.cs" />
     <Compile Include="UI\HitTarget.cs" />
@@ -92,7 +106,7 @@
     <Compile Include="UI\TaikoRulesetContainer.cs" />
     <Compile Include="UI\TaikoPlayfield.cs" />
     <Compile Include="TaikoRuleset.cs" />
-    <Compile Include="Mods\TaikoMod.cs" />
+    <Compile Include="Mods\TaikoModNoFail.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

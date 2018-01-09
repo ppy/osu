@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Audio.Track;
@@ -19,6 +19,6 @@ namespace osu.Game.Tests.Beatmaps
 
         protected override Beatmap GetBeatmap() => beatmap;
         protected override Texture GetBackground() => null;
-        protected override Track GetTrack() => null;
+        protected override Track GetTrack() => new TrackVirtual();
     }
 }

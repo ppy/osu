@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -160,9 +160,9 @@ namespace osu.Game.Tests.Visual
             };
             foreach(var s in scores)
             {
-                s.Statistics.Add("300", RNG.Next(2000));
-                s.Statistics.Add("100", RNG.Next(2000));
-                s.Statistics.Add("50", RNG.Next(2000));
+                s.Statistics.Add(HitResult.Great, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Good, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
             }
 
             anotherScores = new[]
@@ -272,9 +272,9 @@ namespace osu.Game.Tests.Visual
             };
             foreach (var s in anotherScores)
             {
-                s.Statistics.Add("300", RNG.Next(2000));
-                s.Statistics.Add("100", RNG.Next(2000));
-                s.Statistics.Add("50", RNG.Next(2000));
+                s.Statistics.Add(HitResult.Great, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Good, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
             }
 
             topScore = new OnlineScore
@@ -299,9 +299,9 @@ namespace osu.Game.Tests.Visual
                 TotalScore = 987654321,
                 Accuracy = 0.8487,
             };
-            topScore.Statistics.Add("300", RNG.Next(2000));
-            topScore.Statistics.Add("100", RNG.Next(2000));
-            topScore.Statistics.Add("50", RNG.Next(2000));
+            topScore.Statistics.Add(HitResult.Great, RNG.Next(2000));
+            topScore.Statistics.Add(HitResult.Good, RNG.Next(2000));
+            topScore.Statistics.Add(HitResult.Meh, RNG.Next(2000));
         }
 
         [BackgroundDependencyLoader]

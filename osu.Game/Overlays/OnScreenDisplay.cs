@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
@@ -63,7 +64,7 @@ namespace osu.Game.Overlays
                             Width = 240,
                             RelativeSizeAxes = Axes.Y,
                         },
-                        textLine1 = new SpriteText
+                        textLine1 = new OsuSpriteText
                         {
                             Padding = new MarginPadding(10),
                             Font = @"Exo2.0-Black",
@@ -72,7 +73,7 @@ namespace osu.Game.Overlays
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
-                        textLine2 = new SpriteText
+                        textLine2 = new OsuSpriteText
                         {
                             TextSize = 24,
                             Font = @"Exo2.0-Light",
@@ -97,7 +98,7 @@ namespace osu.Game.Overlays
                                     Origin = Anchor.TopCentre,
                                     AutoSizeAxes = Axes.Both
                                 },
-                                textLine3 = new SpriteText
+                                textLine3 = new OsuSpriteText
                                 {
                                     Padding = new MarginPadding { Bottom = 15 },
                                     Font = @"Exo2.0-Bold",
@@ -138,7 +139,7 @@ namespace osu.Game.Overlays
 
         private readonly List<IBindable> references = new List<IBindable>();
 
-        private void trackSetting<T>(Bindable<T> bindable, Bindable<T>.BindableValueChanged<T> action)
+        private void trackSetting<T>(Bindable<T> bindable, Action<T> action)
         {
             // we need to keep references as we bind
             references.Add(bindable);

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -52,13 +52,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 score = value;
 
                 avatar.User = username.User = score.User;
-                flag.FlagName = score.User.Country?.FlagName;
+                flag.Country = score.User.Country;
                 date.Text = $@"achieved {score.Date:MMM d, yyyy}";
                 rank.UpdateRank(score.Rank);
 
                 totalScore.Value = $@"{score.TotalScore:N0}";
                 accuracy.Value = $@"{score.Accuracy:P2}";
-                statistics.Value = $"{score.Statistics["300"]}/{score.Statistics["100"]}/{score.Statistics["50"]}";
+                statistics.Value = $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Meh]}";
 
                 modsContainer.Clear();
                 foreach (Mod mod in score.Mods)

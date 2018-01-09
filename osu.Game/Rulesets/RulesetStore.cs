@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -37,6 +37,13 @@ namespace osu.Game.Rulesets
         /// <param name="id">The ruleset's internal ID.</param>
         /// <returns>A ruleset, if available, else null.</returns>
         public RulesetInfo GetRuleset(int id) => AvailableRulesets.FirstOrDefault(r => r.ID == id);
+
+        /// <summary>
+        /// Retrieve a ruleset using a known short name.
+        /// </summary>
+        /// <param name="shortName">The ruleset's short name.</param>
+        /// <returns>A ruleset, if available, else null.</returns>
+        public RulesetInfo GetRuleset(string shortName) => AvailableRulesets.FirstOrDefault(r => r.ShortName == shortName);
 
         /// <summary>
         /// All available rulesets.
