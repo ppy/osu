@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -16,8 +15,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
     {
         private readonly double endTime;
 
-        public EndTimeObjectPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns)
-            : base(random, hitObject, beatmap, availableColumns, new Pattern())
+        public EndTimeObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap)
+            : base(random, hitObject, beatmap, new Pattern())
         {
             var endtimeData = HitObject as IHasEndTime;
 
@@ -30,14 +29,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             bool generateHold = endTime - HitObject.StartTime >= 100;
 
-            if (AvailableColumns == 8)
+            if (TotalColumns == 8)
             {
                 if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000)
                     addToPattern(pattern, 0, generateHold);
                 else
                     addToPattern(pattern, getNextRandomColumn(RandomStart), generateHold);
             }
-            else if (AvailableColumns > 0)
+            else if (TotalColumns > 0)
                 addToPattern(pattern, getNextRandomColumn(0), generateHold);
 
             return pattern;
@@ -50,10 +49,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <returns>A random column after <paramref name="start"/>.</returns>
         private int getNextRandomColumn(int start)
         {
-            int nextColumn = Random.Next(start, AvailableColumns);
+            int nextColumn = Random.Next(start, TotalColumns);
 
             while (PreviousPattern.ColumnHasObject(nextColumn))
-                nextColumn = Random.Next(start, AvailableColumns);
+                nextColumn = Random.Next(start, TotalColumns);
 
             return nextColumn;
         }
