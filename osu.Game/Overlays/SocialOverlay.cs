@@ -143,8 +143,7 @@ namespace osu.Game.Overlays
                 if(panels != null)
                     ScrollFlow.Remove(panels);
 
-                // delay new panels so they don't get added before the old ones are gone
-                Scheduler.AddDelayed(() => ScrollFlow.Add(panels = newPanels), 200);
+                ScrollFlow.Add(panels = newPanels);
             });
         }
 
@@ -197,12 +196,9 @@ namespace osu.Game.Overlays
 
         private void updateUsers(IEnumerable<User> newUsers)
         {
-            Schedule(() =>
-            {
-                Users = newUsers;
-                loading.Hide();
-                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
-            });
+            Users = newUsers;
+            loading.Hide();
+            recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
