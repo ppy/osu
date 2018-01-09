@@ -8,7 +8,6 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
-using System.Collections.Generic;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -82,15 +81,12 @@ namespace osu.Game.Beatmaps.Formats
                 case Section.HitObjects:
                     handleHitObjects(line);
                     break;
-                case Section.Variables:
-                    handleVariables(line);
-                    break;
             }
         }
 
         private void handleGeneral(string line)
         {
-            var pair = splitKeyVal(line, ':');
+            var pair = SplitKeyVal(line, ':');
 
             var metadata = beatmap.BeatmapInfo.Metadata;
             switch (pair.Key)
@@ -149,7 +145,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEditor(string line)
         {
-            var pair = splitKeyVal(line, ':');
+            var pair = SplitKeyVal(line, ':');
 
             switch (pair.Key)
             {
@@ -173,7 +169,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleMetadata(string line)
         {
-            var pair = splitKeyVal(line, ':');
+            var pair = SplitKeyVal(line, ':');
 
             var metadata = beatmap.BeatmapInfo.Metadata;
             switch (pair.Key)
@@ -214,7 +210,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleDifficulty(string line)
         {
-            var pair = splitKeyVal(line, ':');
+            var pair = SplitKeyVal(line, ':');
 
             var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
             switch (pair.Key)
@@ -242,8 +238,6 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(string line)
         {
-            DecodeVariables(ref line);
-
             string[] split = line.Split(',');
 
             EventType type;
@@ -359,7 +353,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleColours(string line)
         {
-            var pair = splitKeyVal(line, ':');
+            var pair = SplitKeyVal(line, ':');
 
             string[] split = pair.Value.Split(',');
 
@@ -399,23 +393,6 @@ namespace osu.Game.Beatmaps.Formats
 
             if (obj != null)
                 beatmap.HitObjects.Add(obj);
-        }
-
-        private void handleVariables(string line)
-        {
-            var pair = splitKeyVal(line, '=');
-            Variables[pair.Key] = pair.Value;
-        }
-
-        private KeyValuePair<string, string> splitKeyVal(string line, char separator)
-        {
-            var split = line.Trim().Split(new[] { separator }, 2);
-
-            return new KeyValuePair<string, string>
-            (
-                split[0].Trim(),
-                split.Length > 1 ? split[1].Trim() : string.Empty
-            );
         }
     }
 }
