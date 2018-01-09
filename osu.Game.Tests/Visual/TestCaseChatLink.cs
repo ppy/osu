@@ -4,12 +4,9 @@
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 using osu.Game.Users;
 using System;
@@ -20,20 +17,11 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseChatLink : OsuTestCase
     {
-        private readonly BeatmapSetOverlay beatmapSetOverlay;
-        private readonly ChatOverlay chat;
-
-        private DependencyContainer dependencies;
-
         private readonly TestChatLineContainer textContainer;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
+        private Color4 linkColour;
 
         public TestCaseChatLink()
         {
-            chat = new ChatOverlay();
-            Add(beatmapSetOverlay = new BeatmapSetOverlay { Depth = float.MinValue });
-
             Add(textContainer = new TestChatLineContainer
             {
                 Padding = new MarginPadding { Left = 20, Right = 20 },
@@ -43,37 +31,50 @@ namespace osu.Game.Tests.Visual
             });
 
             testLinksGeneral();
-            testAddingLinks();
             testEcho();
         }
 
         private void clear() => AddStep("clear messages", textContainer.Clear);
 
-        private void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false, bool isImportant = false)
+        private void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false, bool isImportant = false, params LinkAction[] expectedActions)
         {
             var newLine = new ChatLine(new DummyMessage(text, isAction, isImportant));
             textContainer.Add(newLine);
 
             AddAssert($"msg #{textContainer.Count} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
-            AddAssert($"msg #{textContainer.Count} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic(newLine.ContentFlow));
-            AddAssert($"msg #{textContainer.Count} shows link(s)", isShowingLinks);
+            AddAssert($"msg #{textContainer.Count} has the right action", hasExpectedActions);
+            AddAssert($"msg #{textContainer.Count} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
+            AddAssert($"msg #{textContainer.Count} shows {linkAmount} link(s)", isShowingLinks);
 
-            bool isItalic(LinkFlowContainer c) => c.Cast<OsuSpriteText>().All(sprite => sprite.Font == @"Exo2.0-MediumItalic");
+            bool hasExpectedActions()
+            {
+                var expectedActionsList = expectedActions.ToList();
+
+                if (expectedActionsList.Count != newLine.Message.Links.Count)
+                    return false;
+
+                for (int i = 0; i < newLine.Message.Links.Count; i++)
+                {
+                    var action = newLine.Message.Links[i].Action;
+                    if (action != expectedActions[i]) return false;
+                }
+
+                return true;
+            }
+
+            bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font == "Exo2.0-MediumItalic");
 
             bool isShowingLinks()
             {
-                SRGBColour textColour = Color4.White;
                 bool hasBackground = !string.IsNullOrEmpty(newLine.Message.Sender.Colour);
 
-                if (isAction && hasBackground)
-                    textColour = OsuColour.FromHex(newLine.Message.Sender.Colour);
+                Color4 textColour = isAction && hasBackground ? OsuColour.FromHex(newLine.Message.Sender.Colour) : Color4.White;
 
-                return newLine.ContentFlow
-                    .Cast<OsuSpriteText>()
-                    .All(sprite => sprite.HandleInput && !sprite.Colour.Equals(textColour)
-                                || !sprite.HandleInput && sprite.Colour.Equals(textColour)
-                                // if someone with a background uses /me with a link, the usual link colour is overridden
-                                || isAction && hasBackground && sprite.HandleInput && !sprite.Colour.Equals((ColourInfo)Color4.White));
+                var linkCompilers = newLine.ContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
+                var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
+
+                return linkSprites.All(d => d.Colour == linkColour)
+                    && newLine.ContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
             }
         }
 
@@ -81,30 +82,20 @@ namespace osu.Game.Tests.Visual
         {
             addMessageWithChecks("test!");
             addMessageWithChecks("osu.ppy.sh!");
-            addMessageWithChecks("https://osu.ppy.sh!", 1);
-            addMessageWithChecks("00:12:345 (1,2) - Test?", 1);
-            addMessageWithChecks("Wiki link for tasty [[Performance Points]]", 1);
-            addMessageWithChecks("(osu forums)[https://osu.ppy.sh/forum] (old link format)", 1);
-            addMessageWithChecks("[https://osu.ppy.sh/home New site] (new link format)", 1);
-            addMessageWithChecks("[https://osu.ppy.sh/home This is only a link to the new osu webpage but this is supposed to test word wrap.]", 1);
-            addMessageWithChecks("is now listening to [https://osu.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", 1, true);
-            addMessageWithChecks("is now playing [https://osu.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", 1, true);
-            addMessageWithChecks("Let's (try)[https://osu.ppy.sh/home] [https://osu.ppy.sh/home multiple links] https://osu.ppy.sh/home", 3);
+            addMessageWithChecks("https://osu.ppy.sh!", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("00:12:345 (1,2) - Test?", 1, expectedActions: LinkAction.OpenEditorTimestamp);
+            addMessageWithChecks("Wiki link for tasty [[Performance Points]]", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("(osu forums)[https://osu.ppy.sh/forum] (old link format)", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("[https://osu.ppy.sh/home New site] (new link format)", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("[https://osu.ppy.sh/home This is only a link to the new osu webpage but this is supposed to test word wrap.]", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("is now listening to [https://osu.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", 1, true, expectedActions: LinkAction.OpenBeatmapSet);
+            addMessageWithChecks("is now playing [https://osu.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", 1, true, expectedActions: LinkAction.OpenBeatmap);
+            addMessageWithChecks("Let's (try)[https://osu.ppy.sh/home] [https://osu.ppy.sh/b/252238 multiple links] https://osu.ppy.sh/home", 3, expectedActions: new[] { LinkAction.External, LinkAction.OpenBeatmap, LinkAction.External });
             // note that there's 0 links here (they get removed if a channel is not found)
             addMessageWithChecks("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
             addMessageWithChecks("I am important!", 0, false, true);
             addMessageWithChecks("feels important", 0, true, true);
-            addMessageWithChecks("likes to post this [https://osu.ppy.sh/home link].", 1, true, true);
-        }
-
-        private void testAddingLinks()
-        {
-            const int count = 5;
-
-            for (int i = 1; i <= count; i++)
-                AddStep($"add long msg #{i}", () => textContainer.Add(new ChatLine(new DummyMessage("alright let's just put a really long text here to see if it loads in correctly rather than adding the text sprites individually after the chat line appearing!"))));
-
-            clear();
+            addMessageWithChecks("likes to post this [https://osu.ppy.sh/home link].", 1, true, true, expectedActions: LinkAction.External);
         }
 
         private void testEcho()
@@ -131,10 +122,9 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
-            dependencies.Cache(chat);
-            dependencies.Cache(beatmapSetOverlay);
+            linkColour = colours.Blue;
         }
 
         private class DummyEchoMessage : LocalEchoMessage

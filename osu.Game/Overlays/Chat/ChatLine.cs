@@ -225,42 +225,17 @@ namespace osu.Game.Overlays.Chat
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
             username.Text = $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
 
+            // remove any non-existent channels from the link list
+            var linksToRemove = new List<Link>();
+            foreach (var link in message.Links)
+                if (link.Action == LinkAction.OpenChannel && chat?.AvailableChannels.TrueForAll(c => c.Name != link.Argument) != false)
+                    linksToRemove.Add(link);
+
+            foreach (var link in linksToRemove)
+                message.Links.Remove(link);
+
             contentFlow.Clear();
-
-            if (message.Links == null || message.Links.Count == 0)
-                contentFlow.AddText(message.Content);
-            else
-            {
-                int lastLinkEndIndex = 0;
-                List<Link> linksToRemove = new List<Link>();
-
-                foreach (var link in message.Links)
-                {
-                    contentFlow.AddText(message.Content.Substring(lastLinkEndIndex, link.Index - lastLinkEndIndex));
-                    lastLinkEndIndex = link.Index + link.Length;
-
-                    const string channel_link_prefix = "osu://chan/";
-                    // If a channel doesn't exist, add it as normal text instead
-                    if (link.Url.StartsWith(channel_link_prefix))
-                    {
-                        var channelName = link.Url.Substring(channel_link_prefix.Length).Split('/')[0];
-                        if (chat?.AvailableChannels.TrueForAll(c => c.Name != channelName) != false)
-                        {
-                            linksToRemove.Add(link);
-                            contentFlow.AddText(message.Content.Substring(link.Index, link.Length));
-                            continue;
-                        }
-                    }
-
-                    contentFlow.AddLink(message.Content.Substring(link.Index, link.Length), link.Url);
-                }
-
-                var lastLink = message.Links[message.Links.Count - 1];
-                contentFlow.AddText(message.Content.Substring(lastLink.Index + lastLink.Length));
-
-                foreach (var link in linksToRemove)
-                    message.Links.Remove(link);
-            }
+            contentFlow.AddLinks(message.DisplayContent, message.Links);
         }
 
         private class MessageSender : OsuClickableContainer, IHasContextMenu

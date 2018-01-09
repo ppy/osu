@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Overlays;
+using System.Collections.Generic;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -20,17 +20,34 @@ namespace osu.Game.Graphics.Containers
 
         public override bool HandleInput => true;
 
-        private BeatmapSetOverlay beatmapSetOverlay;
-        private ChatOverlay chat;
         private OsuGame game;
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapSetOverlay beatmapSetOverlay, ChatOverlay chat, OsuGame game)
+        private void load(OsuGame game)
         {
-            this.beatmapSetOverlay = beatmapSetOverlay;
-            this.chat = chat;
-            // this will be null in tests
+            // will be null in tests
             this.game = game;
+        }
+
+        public void AddLinks(string text, List<Link> links)
+        {
+            if (string.IsNullOrEmpty(text) || links == null)
+                return;
+
+            if (links.Count == 0)
+            {
+                AddText(text);
+                return;
+            }
+
+            int previousLinkEnd = 0;
+            foreach (var link in links)
+            {
+                AddText(text.Substring(previousLinkEnd, link.Index - previousLinkEnd));
+
+                AddLink(text.Substring(link.Index, link.Length), link.Url, link.Action, link.Argument);
+                previousLinkEnd = link.Index + link.Length;
+            }
         }
 
         public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
@@ -47,10 +64,10 @@ namespace osu.Game.Graphics.Containers
                             break;
                         case LinkAction.OpenBeatmapSet:
                             if (int.TryParse(linkArgument, out int setId))
-                                beatmapSetOverlay.ShowBeatmapSet(setId);
+                                game?.ShowBeatmapSet(setId);
                             break;
                         case LinkAction.OpenChannel:
-                            chat.OpenChannel(chat.AvailableChannels.Find(c => c.Name == linkArgument));
+                            game?.OpenChannel(linkArgument);
                             break;
                         case LinkAction.OpenEditorTimestamp:
                             game?.LoadEditorTimestamp();

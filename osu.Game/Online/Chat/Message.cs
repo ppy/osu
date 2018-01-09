@@ -41,6 +41,15 @@ namespace osu.Game.Online.Chat
         {
         }
 
+        /// <summary>
+        /// The text that is displayed in chat.
+        /// </summary>
+        public string DisplayContent { get; set; }
+
+        /// <summary>
+        /// The links found in this message.
+        /// </summary>
+        /// <remarks>The links' positions are according to <see cref="DisplayContent"/></remarks>
         public List<Link> Links;
 
         public Message(long? id)

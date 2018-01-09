@@ -119,7 +119,12 @@ namespace osu.Game
 
         private ScheduledDelegate scoreLoad;
 
-        // TODO: Implement this properly as soon as the Editor is done
+        #region chat link actions
+
+        internal void OpenChannel(string channelName) => chat.OpenChannel(chat.AvailableChannels.Find(c => c.Name == channelName));
+
+        internal void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
+
         internal void LoadEditorTimestamp()
         {
             notifications.Post(new SimpleNotification
@@ -146,6 +151,8 @@ namespace osu.Game
                 Icon = FontAwesome.fa_life_saver,
             });
         }
+
+        #endregion
 
         protected void LoadScore(Score s)
         {
