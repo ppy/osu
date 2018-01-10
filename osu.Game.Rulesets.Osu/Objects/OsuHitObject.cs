@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Color4 ComboColour { get; set; } = Color4.Gray;
         public virtual bool NewCombo { get; set; }
-        public int ComboIndex { get; set; }
+        public int IndexInCurrentCombo { get; set; }
 
         public double HitWindowFor(HitResult result)
         {

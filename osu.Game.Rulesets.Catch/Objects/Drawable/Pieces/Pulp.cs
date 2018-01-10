@@ -6,18 +6,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable.Pieces
 {
     public class Pulp : Circle, IHasAccentColour
     {
-        public const float PULP_SIZE = (float)CatchHitObject.OBJECT_RADIUS / 2.2f;
-
         public Pulp()
         {
-            Size = new Vector2(PULP_SIZE);
+            RelativePositionAxes = Axes.Both;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
 
             Blending = BlendingMode.Additive;
             Colour = Color4.White.Opacity(0.9f);
@@ -34,8 +33,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable.Pieces
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Radius = 5,
-                    Colour = accentColour.Lighten(100),
+                    Radius = 8,
+                    Colour = accentColour.Darken(0.2f).Opacity(0.75f)
                 };
             }
         }
