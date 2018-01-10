@@ -155,6 +155,12 @@ namespace osu.Game.Rulesets.Mania.UI
             c.VisibleTimeRange.BindTo(VisibleTimeRange);
             topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
             columns.Add(c);
+
+            Margin = new MarginPadding()
+            {
+                Left = columns.Count * HIT_TARGET_POSITION / 2,
+                Right = columns.Count * HIT_TARGET_POSITION / 2,
+            };
         }
 
         public void AddJudgement(Judgement judgement)

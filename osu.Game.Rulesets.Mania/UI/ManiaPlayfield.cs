@@ -54,15 +54,18 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Inverted.Value = true;
 
+            var stageSpacing = 300 / stages.Count();
+
             InternalChildren = new Drawable[]
             {
                 listColumnStages = new FillFlowContainer<ManiaColumnStage>
                 {
+                    Name="Stages",
                     Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Spacing = new Vector2(400),
+                    Spacing = new Vector2(stageSpacing),
                 }
             };
 
