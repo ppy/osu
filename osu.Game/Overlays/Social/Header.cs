@@ -55,9 +55,9 @@ namespace osu.Game.Overlays.Social
     public enum SocialTab
     {
         [Description("All Players")]
-        AllPlayers = SocialSortCriteria.Rank,
+        AllPlayers,
         [Description("Friends")]
-        Friends = SocialSortCriteria.Name,
+        Friends,
         //[Description("Team Members")]
         //TeamMembers,
         //[Description("Chat Channels")]
