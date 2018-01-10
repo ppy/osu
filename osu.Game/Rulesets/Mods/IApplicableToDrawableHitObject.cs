@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Applies this <see cref="IApplicableToDrawableHitObjects"/> to a list of <see cref="DrawableHitObject"/>s.
         /// </summary>
-        /// <param name="drawable">The list of <see cref="DrawableHitObject"/>s to apply to.</param>
+        /// <param name="drawables">The list of <see cref="DrawableHitObject"/>s to apply to.</param>
         void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables);
     }
 }
