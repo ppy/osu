@@ -28,24 +28,6 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box leftBox;
         private readonly Box rightBox;
 
-        private NumberFormatInfo format;
-        public NumberFormatInfo Format
-        {
-            get => format ?? (format = createDefaultFormat());
-            set
-            {
-                if (format == value)
-                    return;
-                format = value;
-
-                if (IsLoaded)
-                {
-                    // Some users may want to see the updated ToolTipText
-                    Current.TriggerChange();
-                }
-            }
-        }
-
         public virtual string TooltipText
         {
             get
@@ -60,9 +42,9 @@ namespace osu.Game.Graphics.UserInterface
                     var floatMaxValue = bindableDouble?.MaxValue ?? bindableFloat.MaxValue;
 
                     if (floatMaxValue == 1 && (floatMinValue == 0 || floatMinValue == -1))
-                        return floatValue.Value.ToString("P", Format);
+                        return floatValue.Value.ToString("P0");
 
-                    return floatValue.Value.ToString("F", Format);
+                    return floatValue.Value.ToString("N1");
                 }
 
                 var bindableInt = CurrentNumber as BindableNumber<int>;
