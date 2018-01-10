@@ -38,10 +38,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1);
 
-            // Life time managed by the parent DrawableHoldNote
-            LifetimeStart = double.MinValue;
-            LifetimeEnd = double.MaxValue;
-
             Children = new[]
             {
                 glowContainer = new CircularContainer
