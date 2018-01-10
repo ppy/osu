@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public override bool RemoveCompletedTransforms => false;
         public override bool RemoveWhenNotAlive => false;
+        protected override bool RequiresChildrenUpdate => true;
 
         protected DrawableHitObject(HitObject hitObject)
         {
