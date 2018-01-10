@@ -378,6 +378,8 @@ namespace osu.Game.Screens.Play
 
         private void updateBackgroundElements()
         {
+            if (!IsCurrentScreen) return;
+
             const float duration = 800;
 
             var opacity = 1 - (float)dimLevel;
