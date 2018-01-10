@@ -10,12 +10,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -63,6 +65,8 @@ namespace osu.Game.Screens.Select
 
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
+
+        private Bindable<bool> conversionAllowed;
 
         private CancellationTokenSource initialAddSetsTask;
 
@@ -180,7 +184,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours, OsuConfigManager config)
         {
             dependencies.Cache(this);
 
@@ -220,6 +224,8 @@ namespace osu.Game.Screens.Select
                 if (IsCurrentScreen)
                     Carousel.SelectBeatmap(b?.BeatmapInfo);
             };
+
+            conversionAllowed = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
         }
 
         public void Edit(BeatmapInfo beatmap)
@@ -454,8 +460,11 @@ namespace osu.Game.Screens.Select
             BeatmapInfo beatmap = Beatmap.Value.BeatmapInfo;
 
             // ensure that the current beatmap is playable in the current ruleset
-            if (beatmap.RulesetID > 0 && currentRulesetId != beatmap.RulesetID)
-                beatmap = Beatmap.Value.BeatmapSetInfo?.Beatmaps.FirstOrDefault(b => b.RulesetID == 0 || b.RulesetID == currentRulesetId);
+            if (currentRulesetId != beatmap.RulesetID)
+                if (!conversionAllowed.Value)
+                    beatmap = Beatmap.Value.BeatmapSetInfo?.Beatmaps.FirstOrDefault(b => b.RulesetID == currentRulesetId);
+                else if (beatmap.RulesetID > 0)
+                    beatmap = Beatmap.Value.BeatmapSetInfo?.Beatmaps.FirstOrDefault(b => b.RulesetID == 0 || b.RulesetID == currentRulesetId);
 
             if (beatmap != null && !Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
             {
