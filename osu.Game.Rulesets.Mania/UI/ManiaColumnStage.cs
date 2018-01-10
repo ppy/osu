@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Mania.UI
             topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
             columns.Add(c);
 
-            Margin = new MarginPadding()
+            Margin = new MarginPadding
             {
                 Left = columns.Count * HIT_TARGET_POSITION / 2,
                 Right = columns.Count * HIT_TARGET_POSITION / 2,
