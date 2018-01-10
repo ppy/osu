@@ -15,6 +15,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
+using osu.Framework.Configuration;
+using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
 {
@@ -65,36 +67,24 @@ namespace osu.Game.Overlays
                 }
             };
 
-            Header.Tabs.Current.ValueChanged += tab =>
-            {
-                //currentQuery.Value = string.Empty;
-                Filter.Tabs.Current.Value = (SocialSortCriteria)Header.Tabs.Current.Value;
-                Scheduler.AddOnce(updateSearch);
-            };
+            Header.Tabs.Current.ValueChanged += tab => Scheduler.AddOnce(updateSearch);
 
-            Filter.Tabs.Current.ValueChanged += sortCriteria =>
-            {
-                // force searching in players until searching for friends is supported
-                if (Header.Tabs.Current.Value != SocialTab.AllPlayers && sortCriteria != (SocialSortCriteria)Header.Tabs.Current.Value)
-                    Header.Tabs.Current.Value = SocialTab.AllPlayers;
-
-                Scheduler.AddOnce(updateSearch);
-            };
+            Filter.Tabs.Current.ValueChanged += sortCriteria => Scheduler.AddOnce(updateSearch);
 
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
             Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += sortOrder => Scheduler.AddOnce(updateSearch);
 
-            //currentQuery.ValueChanged += v =>
-            //{
-            //    queryChangedDebounce?.Cancel();
+            currentQuery.ValueChanged += query =>
+            {
+                queryChangedDebounce?.Cancel();
 
-            //    if (string.IsNullOrEmpty(v))
-            //        Scheduler.AddOnce(updateSearch);
-            //    else
-            //        queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
-            //};
+                if (string.IsNullOrEmpty(query))
+                    Scheduler.AddOnce(updateSearch);
+                else
+                    queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
+            };
 
-            //currentQuery.BindTo(Filter.Search.Current);
+            currentQuery.BindTo(Filter.Search.Current);
         }
 
         [BackgroundDependencyLoader]
@@ -159,13 +149,13 @@ namespace osu.Game.Overlays
 
         private APIRequest getUsersRequest;
 
-        //private readonly Bindable<string> currentQuery = new Bindable<string>();
+        private readonly Bindable<string> currentQuery = new Bindable<string>();
 
-        //private ScheduledDelegate queryChangedDebounce;
+        private ScheduledDelegate queryChangedDebounce;
 
         private void updateSearch()
         {
-            //queryChangedDebounce?.Cancel();
+            queryChangedDebounce?.Cancel();
 
             if (!IsLoaded)
                 return;
