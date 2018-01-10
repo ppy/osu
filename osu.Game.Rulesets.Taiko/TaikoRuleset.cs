@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public override int LegacyID => 1;
 
-        public TaikoRuleset(RulesetInfo rulesetInfo)
+        public TaikoRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
         {
         }

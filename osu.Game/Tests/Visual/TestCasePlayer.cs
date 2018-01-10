@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,24 +17,19 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class TestCasePlayer : ScreenTestCase
     {
-        private readonly Type ruleset;
+        private readonly Ruleset ruleset;
 
         protected Player Player;
 
         private TestWorkingBeatmap working;
 
-        /// <summary>
-        /// Create a TestCase which runs through the Player screen.
-        /// </summary>
-        /// <param name="ruleset">An optional ruleset type which we want to target. If not provided we'll allow all rulesets to be tested.</param>
-        protected TestCasePlayer(Type ruleset)
+        protected TestCasePlayer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
         }
 
         protected TestCasePlayer()
         {
-
         }
 
         [BackgroundDependencyLoader]
@@ -48,13 +42,20 @@ namespace osu.Game.Tests.Visual
                 Depth = int.MaxValue
             });
 
-            string instantiation = ruleset?.AssemblyQualifiedName;
-
-            foreach (var r in rulesets.AvailableRulesets.Where(rs => instantiation == null || rs.InstantiationInfo == instantiation))
+            if (ruleset != null)
             {
                 Player p = null;
-                AddStep(r.Name, () => p = loadPlayerFor(r));
+                AddStep(ruleset.RulesetInfo.Name, () => p = loadPlayerFor(ruleset));
                 AddUntilStep(() => p.IsLoaded);
+            }
+            else
+            {
+                foreach (var r in rulesets.AvailableRulesets)
+                {
+                    Player p = null;
+                    AddStep(r.Name, () => p = loadPlayerFor(r));
+                    AddUntilStep(() => p.IsLoaded);
+                }
             }
         }
 
@@ -69,21 +70,21 @@ namespace osu.Game.Tests.Visual
             return beatmap;
         }
 
-        private Player loadPlayerFor(RulesetInfo r)
+        private Player loadPlayerFor(RulesetInfo ri) => loadPlayerFor(ri.CreateInstance());
+
+        private Player loadPlayerFor(Ruleset r)
         {
             var beatmap = CreateBeatmap();
 
-            beatmap.BeatmapInfo.Ruleset = r;
-
-            var instance = r.CreateInstance();
+            beatmap.BeatmapInfo.Ruleset = r.RulesetInfo;
 
             working = new TestWorkingBeatmap(beatmap);
-            working.Mods.Value = new[] { instance.GetAllMods().First(m => m is ModNoFail) };
+            working.Mods.Value = new[] { r.GetAllMods().First(m => m is ModNoFail) };
 
             if (Player != null)
                 Remove(Player);
 
-            var player = CreatePlayer(working, instance);
+            var player = CreatePlayer(working, r);
 
             LoadComponentAsync(player, LoadScreen);
 
