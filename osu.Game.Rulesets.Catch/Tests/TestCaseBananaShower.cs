@@ -42,8 +42,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }
             };
 
-            for (int i = 0; i < 10; i++)
-                beatmap.HitObjects.Add(new BananaShower { StartTime = i * 1200, Duration = 1000, NewCombo = i % 2 == 0 });
+            beatmap.HitObjects.Add(new BananaShower { StartTime = 200, Duration = 10000, NewCombo = true });
 
             return beatmap;
         }
