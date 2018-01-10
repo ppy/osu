@@ -103,7 +103,8 @@ namespace osu.Game.Screens.Play
             if (!replayLoaded)
             {
                 ReplaySettingsOverlay.PlaybackSettings.Hide();
-                ReplaySettingsOverlay.Delay(5000).FadeOut(200);
+                // TODO Hide VisualSettings correctly. At least, It shouldn't dissapear in expanded state.
+                //ReplaySettingsOverlay.VisualSettings.Delay(10000).FadeOut(200);
                 ModDisplay.Delay(2000).FadeOut(200);
             }
         }

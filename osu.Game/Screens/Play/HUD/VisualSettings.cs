@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
@@ -14,7 +13,9 @@ namespace osu.Game.Screens.Play.HUD
     public class VisualSettings : ReplayGroup
     {
         protected override string Title => "Visual settings";
-        public IAdjustableClock AdjustableClock { get; set; }
+
+        public IAdjustableClock AudioClock { get; set; }
+        public FramedClock FramedClock { get; set; }
 
         private readonly ReplaySliderBar<double> dimSliderBar;
         private readonly ReplayCheckbox showStoryboardToggle;
@@ -51,9 +52,17 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.ToggleContentVisibility();
             if (Expanded)
-                AdjustableClock?.Stop();
+            {
+                AudioClock?.Stop();
+                if (FramedClock != null)
+                    FramedClock.ProcessSourceClockFrames = false;
+            }
             else
-                AdjustableClock?.Start();
+            {
+                AudioClock?.Start();
+                if (FramedClock != null)
+                    FramedClock.ProcessSourceClockFrames = true;
+            }
         }
     }
 }
