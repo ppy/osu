@@ -47,7 +47,6 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 var screenSpacePosition = fruit.ScreenSpaceDrawQuad.Centre;
 
-                // remove the fruit from its current parent.
                 // todo: make this less ugly, somehow.
                 (fruit.Parent as Container<DrawableHitObject>)?.Remove(fruit);
                 (fruit.Parent as Container)?.Remove(fruit);
@@ -104,12 +103,12 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 Children = new Drawable[]
                 {
-                    createCatcherSprite(),
                     caughtFruit = new Container<DrawableHitObject>
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.BottomCentre,
-                    }
+                    },
+                    createCatcherSprite(),
                 };
             }
 
@@ -187,13 +186,21 @@ namespace osu.Game.Rulesets.Catch.UI
             /// <param name="fruit">The fruit that was caught.</param>
             public void Add(DrawableHitObject fruit)
             {
-                float distance = fruit.DrawSize.X / 2 * fruit.Scale.X;
+                float ourRadius = fruit.DrawSize.X / 2 * fruit.Scale.X;
+                float theirRadius = 0;
 
-                while (caughtFruit.Any(f => f.LifetimeEnd == double.MaxValue && Vector2Extensions.DistanceSquared(f.Position, fruit.Position) < distance * distance))
+                const float allowance = 6;
+
+                while (caughtFruit.Any(f =>
+                    f.LifetimeEnd == double.MaxValue &&
+                    Vector2Extensions.Distance(f.Position, fruit.Position) < (ourRadius + (theirRadius = f.DrawSize.X / 2  * f.Scale.X)) / (allowance / 2)))
                 {
-                    fruit.X += RNG.Next(-5, 5);
-                    fruit.Y -= RNG.Next(0, 5);
+                    float diff = (ourRadius + theirRadius) / allowance;
+                    fruit.X += (RNG.NextSingle() - 0.5f) * 2 * diff;
+                    fruit.Y -= RNG.NextSingle() * diff;
                 }
+
+                fruit.X = MathHelper.Clamp(fruit.X, -CATCHER_SIZE / 2, CATCHER_SIZE / 2);
 
                 caughtFruit.Add(fruit);
             }
@@ -205,15 +212,15 @@ namespace osu.Game.Rulesets.Catch.UI
             /// <returns>Whether the catch is possible.</returns>
             public bool AttemptCatch(CatchHitObject fruit)
             {
-                const double relative_catcher_width = CATCHER_SIZE / 2;
+                double halfCatcherWidth = CATCHER_SIZE * Math.Abs(Scale.X) * 0.5f;
 
                 // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
                 var catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
                 var catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
 
                 var validCatch =
-                    catchObjectPosition >= catcherPosition - relative_catcher_width / 2 &&
-                    catchObjectPosition <= catcherPosition + relative_catcher_width / 2;
+                    catchObjectPosition >= catcherPosition - halfCatcherWidth &&
+                    catchObjectPosition <= catcherPosition + halfCatcherWidth;
 
                 if (validCatch && fruit.HyperDash)
                 {
