@@ -13,13 +13,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         private readonly Container bananaContainer;
 
-        public DrawableBananaShower(BananaShower s) : base(s)
+        public DrawableBananaShower(BananaShower s)
+            : base(s)
         {
             RelativeSizeAxes = Axes.Both;
             Height = (float)HitObject.Duration;
             X = 0;
 
-           Child = bananaContainer = new Container
+            Child = bananaContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativeChildOffset = new Vector2(0, (float)HitObject.StartTime),
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             };
 
             foreach (var b in s.NestedHitObjects.Cast<BananaShower.Banana>())
-                    AddNested(new DrawableFruit(b));
+                AddNested(new DrawableFruit(b));
         }
 
         protected override void AddNested(DrawableHitObject<CatchHitObject> h)
