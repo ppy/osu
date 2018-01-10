@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Inverted.Value = true;
 
-            var stageSpacing = 300 / stages.Count();
+            var stageSpacing = 300 / stages.Count;
 
             InternalChildren = new Drawable[]
             {
