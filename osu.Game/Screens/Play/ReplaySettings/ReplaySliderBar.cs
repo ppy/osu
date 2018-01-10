@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         private class Sliderbar : OsuSliderBar<T>
         {
+            public override string TooltipText => $"{CurrentNumber.Value}";
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
