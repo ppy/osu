@@ -696,14 +696,9 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    Decoder decoder;
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo?.Path))))
-                        decoder = Decoder.GetDecoder(stream);
-
-                    // try for .osb first and fall back to .osu
-                    string storyboardFile = BeatmapSetInfo.StoryboardFile ?? BeatmapInfo.Path;
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(storyboardFile))))
-                        return decoder.GetStoryboardDecoder().DecodeStoryboard(stream);
+                    using (var beatmap = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo?.Path))))
+                    using (var storyboard = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
+                        return Decoder.GetDecoder(beatmap).GetStoryboardDecoder().DecodeStoryboard(beatmap, storyboard);
                 }
                 catch
                 {
