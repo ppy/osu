@@ -15,8 +15,11 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public float X { get; set; }
 
-        public Color4 ComboColour { get; set; } = Color4.Gray;
-        public int ComboIndex { get; set; }
+        public Color4 ComboColour { get; set; }
+
+        public int IndexInBeatmap { get; set; }
+
+        public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(IndexInBeatmap % 4);
 
         public virtual bool NewCombo { get; set; }
 
@@ -43,5 +46,14 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             Scale = 1.0f - 0.7f * (difficulty.CircleSize - 5) / 5;
         }
+    }
+
+    public enum FruitVisualRepresentation
+    {
+        Pear,
+        Grape,
+        Raspberry,
+        Pineapple,
+        Banana // banananananannaanana
     }
 }
