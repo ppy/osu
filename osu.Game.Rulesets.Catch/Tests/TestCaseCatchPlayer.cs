@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     [Ignore("getting CI working")]
     public class TestCaseCatchPlayer : Game.Tests.Visual.TestCasePlayer
     {
-        public TestCaseCatchPlayer() : base(typeof(CatchRuleset))
+        public TestCaseCatchPlayer() : base(new CatchRuleset())
         {
         }
     }
