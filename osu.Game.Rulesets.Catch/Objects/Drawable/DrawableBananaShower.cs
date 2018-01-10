@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableBananaShower : DrawableCatchHitObject<BananaShower>
     {
-        private readonly Container dropletContainer;
+        private readonly Container bananaContainer;
 
         public DrawableBananaShower(BananaShower s) : base(s)
         {
@@ -19,21 +19,21 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Height = (float)HitObject.Duration;
             X = 0;
 
-            Child = dropletContainer = new Container
+           Child = bananaContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativeChildOffset = new Vector2(0, (float)HitObject.StartTime),
                 RelativeChildSize = new Vector2(1, (float)HitObject.Duration)
             };
 
-            foreach (var b in s.NestedHitObjects.OfType<BananaShower.Banana>())
+            foreach (var b in s.NestedHitObjects.Cast<BananaShower.Banana>())
                     AddNested(new DrawableFruit(b));
         }
 
         protected override void AddNested(DrawableHitObject<CatchHitObject> h)
         {
             ((DrawableCatchHitObject)h).CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
-            dropletContainer.Add(h);
+            bananaContainer.Add(h);
             base.AddNested(h);
         }
     }
