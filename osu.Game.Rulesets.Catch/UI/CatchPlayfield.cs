@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.UI;
 using OpenTK;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -23,14 +24,17 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly CatcherArea catcherArea;
 
         public CatchPlayfield(BeatmapDifficulty difficulty)
-            : base(ScrollingDirection.Down)
+            : base(Axes.Y, BASE_WIDTH)
         {
             Container explodingFruitContainer;
 
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
-            InternalChildren = new Drawable[]
+            ScaledContent.Anchor = Anchor.BottomLeft;
+            ScaledContent.Origin = Anchor.BottomLeft;
+
+            ScaledContent.AddRange(new Drawable[]
             {
                 content = new Container<Drawable>
                 {
@@ -46,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                 }
-            };
+            });
         }
 
         public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.AttemptCatch(obj);
@@ -61,18 +65,6 @@ namespace osu.Game.Rulesets.Catch.UI
             fruit.CheckPosition = CheckIfWeCanCatch;
         }
 
-        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
-        {
-            if (judgement.IsHit)
-            {
-                Vector2 screenPosition = judgedObject.ScreenSpaceDrawQuad.Centre;
-
-                // todo: don't do this
-                (judgedObject.Parent as Container<DrawableHitObject>)?.Remove(judgedObject);
-                (judgedObject.Parent as Container)?.Remove(judgedObject);
-
-                catcherArea.Add(judgedObject, screenPosition);
-            }
-        }
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement) => catcherArea.OnJudgement((DrawableCatchHitObject)judgedObject, judgement);
     }
 }
