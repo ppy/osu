@@ -14,9 +14,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             : base(h)
         {
             Origin = Anchor.Centre;
-
-            Size = new Vector2(Pulp.PULP_SIZE);
-
+            Size = new Vector2((float)CatchHitObject.OBJECT_RADIUS) / 4;
             AccentColour = h.ComboColour;
             Masking = false;
         }
@@ -27,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Child = new Pulp
             {
                 AccentColour = AccentColour,
-                Scale = new Vector2(0.8f),
+                Size = Size
             };
         }
     }
