@@ -72,6 +72,5 @@ namespace osu.Game.Screens.Play.ReplaySettings
             var clockRate = AdjustableClock.Rate;
             sliderbar.Bindable.ValueChanged += rateMultiplier => AdjustableClock.Rate = clockRate * rateMultiplier;
         }
-
     }
 }

@@ -113,15 +113,6 @@ namespace osu.Game.Graphics.UserInterface
             AccentColour = colours.Pink;
         }
 
-        private NumberFormatInfo createDefaultFormat()
-        {
-            var nfi = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
-            nfi.PercentDecimalDigits = 0;
-            nfi.NumberDecimalDigits = 1;
-
-            return nfi;
-        }
-
         protected override bool OnHover(InputState state)
         {
             Nub.Glowing = true;
