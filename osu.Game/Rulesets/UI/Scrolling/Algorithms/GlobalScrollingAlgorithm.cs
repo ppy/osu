@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                 var startPosition = hitObjectPositions[obj] = positionAt(obj.HitObject.StartTime, timeRange);
 
                 obj.LifetimeStart = obj.HitObject.StartTime - timeRange - 1000;
-                obj.LifetimeEnd = ((obj.HitObject as IHasEndTime)?.EndTime ?? obj.HitObject.StartTime) + timeRange + 1000;
 
                 if (!(obj.HitObject is IHasEndTime endTime))
                     continue;

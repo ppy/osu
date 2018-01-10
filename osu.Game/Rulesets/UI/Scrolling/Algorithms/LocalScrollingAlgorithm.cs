@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Lists;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 using OpenTK;
 
@@ -26,9 +25,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             foreach (var obj in hitObjects)
             {
                 var controlPoint = controlPointAt(obj.HitObject.StartTime);
-
                 obj.LifetimeStart = obj.HitObject.StartTime - timeRange / controlPoint.Multiplier;
-                obj.LifetimeEnd = ((obj.HitObject as IHasEndTime)?.EndTime ?? obj.HitObject.StartTime) + timeRange / controlPoint.Multiplier;
             }
         }
 

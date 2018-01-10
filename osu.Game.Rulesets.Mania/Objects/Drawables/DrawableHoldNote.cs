@@ -251,6 +251,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 });
             }
 
+            protected override void UpdateState(ArmedState state)
+            {
+            }
+
             public override bool OnPressed(ManiaAction action) => false; // Tail doesn't handle key down
 
             public override bool OnReleased(ManiaAction action)
