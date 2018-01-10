@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual
         }
 
         private class TestSliderBar<T> : OsuSliderBar<T>
-            where T : struct, IEquatable<T>
+            where T : struct, IEquatable<T>, IComparable, IConvertible
         {
             public TestSliderBar()
             {

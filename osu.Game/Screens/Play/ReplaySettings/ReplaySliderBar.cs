@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Screens.Play.ReplaySettings
 {
     public class ReplaySliderBar<T> : SettingsSlider<T>
-        where T : struct, IEquatable<T>
+        where T : struct, IEquatable<T>, IComparable, IConvertible
     {
         protected override Drawable CreateControl() => new Sliderbar
         {

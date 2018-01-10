@@ -18,7 +18,7 @@ using osu.Framework.Graphics.Shapes;
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
-        where T : struct, IEquatable<T>
+        where T : struct, IEquatable<T>, IComparable, IConvertible
     {
         private SampleChannel sample;
         private double lastSampleTime;
@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (bindableInt != null)
                     return bindableInt.Value.ToString("N0");
 
-                return Current.Value.ToString();
+                return Current.Value.ToString(CultureInfo.InvariantCulture);
             }
         }
 
