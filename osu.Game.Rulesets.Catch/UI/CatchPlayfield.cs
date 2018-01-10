@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly CatcherArea catcherArea;
 
         public CatchPlayfield(BeatmapDifficulty difficulty)
-            : base(Axes.Y)
+            : base(Axes.Y, BASE_WIDTH)
         {
             Container explodingFruitContainer;
 
@@ -31,7 +31,10 @@ namespace osu.Game.Rulesets.Catch.UI
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
-            InternalChildren = new Drawable[]
+            ScaledContent.Anchor = Anchor.BottomLeft;
+            ScaledContent.Origin = Anchor.BottomLeft;
+
+            ScaledContent.AddRange(new Drawable[]
             {
                 content = new Container<Drawable>
                 {
@@ -47,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                 }
-            };
+            });
         }
 
         public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.AttemptCatch(obj);
