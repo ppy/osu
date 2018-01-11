@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Configuration;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -21,45 +20,37 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Playfield) };
 
-        private readonly List<TestPlayfield> playfields = new List<TestPlayfield>();
+        private readonly TestPlayfield[] playfields = new TestPlayfield[4];
 
         public TestCaseScrollingHitObjects()
         {
-            playfields.Add(new TestPlayfield(ScrollingDirection.Down));
-            playfields.Add(new TestPlayfield(ScrollingDirection.Right));
-
-            playfields.ForEach(p => p.HitObjects.AddControlPoint(new MultiplierControlPoint(double.MinValue)));
-
-            Add(new Container
+            Add(new GridContainer
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Size = new Vector2(0.85f),
-                Masking = true,
-                BorderColour = Color4.White,
-                BorderThickness = 2,
-                MaskingSmoothness = 1,
-                Children = new Drawable[]
+                Content = new[]
                 {
-                    new Box
+                    new Drawable[]
                     {
-                        Name = "Background",
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.35f,
+                        playfields[0] = new TestPlayfield(ScrollingDirection.Up),
+                        playfields[1] = new TestPlayfield(ScrollingDirection.Down)
                     },
-                    playfields[0],
-                    playfields[1]
+                    new Drawable[]
+                    {
+                        playfields[2] = new TestPlayfield(ScrollingDirection.Left),
+                        playfields[3] = new TestPlayfield(ScrollingDirection.Right)
+                    }
                 }
             });
 
-            AddSliderStep("Time range", 100, 10000, 5000, v => playfields.ForEach(p => p.TimeRange.Value = v));
+            AddSliderStep("Time range", 100, 10000, 5000, v => playfields.ForEach(p => p.VisibleTimeRange.Value = v));
             AddStep("Add control point", () => addControlPoint(Time.Current + 5000));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            playfields.ForEach(p => p.HitObjects.AddControlPoint(new MultiplierControlPoint(0)));
 
             for (int i = 0; i <= 5000; i += 1000)
                 addHitObject(Time.Current + i);
@@ -71,10 +62,10 @@ namespace osu.Game.Tests.Visual
         {
             playfields.ForEach(p =>
             {
-                p.Add(new TestDrawableHitObject(time)
-                {
-                    Anchor = p.Direction == ScrollingDirection.Right ? Anchor.CentreRight : Anchor.BottomCentre
-                });
+                var hitObject = new TestDrawableHitObject(time);
+                setAnchor(hitObject, p);
+
+                p.Add(hitObject);
             });
         }
 
@@ -86,10 +77,12 @@ namespace osu.Game.Tests.Visual
                 p.HitObjects.AddControlPoint(new MultiplierControlPoint(time + 2000) { DifficultyPoint = { SpeedMultiplier = 2 } });
                 p.HitObjects.AddControlPoint(new MultiplierControlPoint(time + 3000) { DifficultyPoint = { SpeedMultiplier = 1 } });
 
-                TestDrawableControlPoint createDrawablePoint(double t) => new TestDrawableControlPoint(t)
+                TestDrawableControlPoint createDrawablePoint(double t)
                 {
-                    Anchor = p.Direction == ScrollingDirection.Right ? Anchor.CentreRight : Anchor.BottomCentre
-                };
+                    var obj = new TestDrawableControlPoint(p.Direction, t);
+                    setAnchor(obj, p);
+                    return obj;
+                }
 
                 p.Add(createDrawablePoint(time));
                 p.Add(createDrawablePoint(time + 2000));
@@ -97,12 +90,28 @@ namespace osu.Game.Tests.Visual
             });
         }
 
+        private void setAnchor(DrawableHitObject obj, TestPlayfield playfield)
+        {
+            switch (playfield.Direction)
+            {
+                case ScrollingDirection.Up:
+                    obj.Anchor = Anchor.TopCentre;
+                    break;
+                case ScrollingDirection.Down:
+                    obj.Anchor = Anchor.BottomCentre;
+                    break;
+                case ScrollingDirection.Left:
+                    obj.Anchor = Anchor.CentreLeft;
+                    break;
+                case ScrollingDirection.Right:
+                    obj.Anchor = Anchor.CentreRight;
+                    break;
+            }
+        }
 
 
         private class TestPlayfield : ScrollingPlayfield
         {
-            public readonly BindableDouble TimeRange = new BindableDouble(5000);
-
             public readonly ScrollingDirection Direction;
 
             public TestPlayfield(ScrollingDirection direction)
@@ -110,34 +119,45 @@ namespace osu.Game.Tests.Visual
             {
                 Direction = direction;
 
-                HitObjects.TimeRange.BindTo(TimeRange);
+                Padding = new MarginPadding(2);
+                ScaledContent.Masking = true;
+
+                AddInternal(new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.5f,
+                    Depth = float.MaxValue
+                });
             }
         }
 
         private class TestDrawableControlPoint : DrawableHitObject<HitObject>
         {
-            private readonly Box box;
-
-            public TestDrawableControlPoint(double time)
+            public TestDrawableControlPoint(ScrollingDirection direction, double time)
                 : base(new HitObject { StartTime = time })
             {
                 Origin = Anchor.Centre;
 
-                Add(box = new Box
+                Add(new Box
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both
                 });
-            }
 
-            protected override void Update()
-            {
-                base.Update();
-
-                RelativeSizeAxes = (Anchor & Anchor.x2) > 0 ? Axes.Y : Axes.X;
-                Size = new Vector2(1);
-
-                box.Size = DrawSize;
+                switch (direction)
+                {
+                    case ScrollingDirection.Up:
+                    case ScrollingDirection.Down:
+                        RelativeSizeAxes = Axes.X;
+                        Height = 2;
+                        break;
+                    case ScrollingDirection.Left:
+                    case ScrollingDirection.Right:
+                        RelativeSizeAxes = Axes.Y;
+                        Width = 2;
+                        break;
+                }
             }
 
             protected override void UpdateState(ArmedState state)
