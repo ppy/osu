@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
@@ -16,22 +15,17 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         public DrawableBananaShower(BananaShower s)
             : base(s)
         {
-            RelativeSizeAxes = Axes.Both;
-            Height = (float)HitObject.Duration;
+            RelativeSizeAxes = Axes.X;
+            Origin = Anchor.BottomLeft;
             X = 0;
 
-            Child = bananaContainer = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                RelativeChildOffset = new Vector2(0, (float)HitObject.StartTime),
-                RelativeChildSize = new Vector2(1, (float)HitObject.Duration)
-            };
+            Child = bananaContainer = new Container { RelativeSizeAxes = Axes.Both };
 
             foreach (var b in s.NestedHitObjects.Cast<BananaShower.Banana>())
                 AddNested(new DrawableFruit(b));
         }
 
-        protected override void AddNested(DrawableHitObject<CatchHitObject> h)
+        protected override void AddNested(DrawableHitObject h)
         {
             ((DrawableCatchHitObject)h).CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
             bananaContainer.Add(h);
