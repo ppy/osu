@@ -1,5 +1,5 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu-framework/master/LICENCE
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Diagnostics;
@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Play.HUD
         public FramedClock FramedClock { get; set; }
 
         private bool autohide;
+
         public bool Autohide
         {
             get => autohide;
