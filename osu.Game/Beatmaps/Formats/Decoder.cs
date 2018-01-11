@@ -74,9 +74,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var storyboard = new Storyboard();
             foreach (StreamReader stream in streams)
-            {
                 ParseStoryboard(stream, storyboard);
-            }
             return storyboard;
         }
 
