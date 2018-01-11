@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             HitObject = hitObject;
 
             Scale = new Vector2(HitObject.Scale);
+
+            Anchor = Anchor.BottomLeft;
         }
     }
 
