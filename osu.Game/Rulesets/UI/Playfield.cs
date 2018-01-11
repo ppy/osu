@@ -49,14 +49,14 @@ namespace osu.Game.Rulesets.UI
                     }
                 }
             });
+
+            HitObjects = CreateHitObjectContainer();
+            HitObjects.RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            HitObjects = CreateHitObjectContainer();
-            HitObjects.RelativeSizeAxes = Axes.Both;
-
             Add(HitObjects);
         }
 
