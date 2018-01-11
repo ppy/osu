@@ -29,22 +29,25 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 
                 obj.LifetimeStart = obj.HitObject.StartTime - timeRange - 1000;
 
-                if (!(obj.HitObject is IHasEndTime endTime))
-                    continue;
-
-                var diff = positionAt(endTime.EndTime, timeRange) - startPosition;
-
-                switch (direction)
+                if (obj.HitObject is IHasEndTime endTime)
                 {
-                    case ScrollingDirection.Up:
-                    case ScrollingDirection.Down:
-                        obj.Height = (float)(diff * length.Y);
-                        break;
-                    case ScrollingDirection.Left:
-                    case ScrollingDirection.Right:
-                        obj.Width = (float)(diff * length.X);
-                        break;
+                    var diff = positionAt(endTime.EndTime, timeRange) - startPosition;
+
+                    switch (direction)
+                    {
+                        case ScrollingDirection.Up:
+                        case ScrollingDirection.Down:
+                            obj.Height = (float)(diff * length.Y);
+                            break;
+                        case ScrollingDirection.Left:
+                        case ScrollingDirection.Right:
+                            obj.Width = (float)(diff * length.X);
+                            break;
+                    }
                 }
+
+                if (obj.NestedHitObjects != null)
+                    ComputeInitialStates(obj.NestedHitObjects, direction, timeRange, length);
             }
         }
 
@@ -71,6 +74,9 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                         obj.X = (float)(-finalPosition * length.X);
                         break;
                 }
+
+                if (obj.NestedHitObjects != null)
+                    ComputePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
             }
         }
 

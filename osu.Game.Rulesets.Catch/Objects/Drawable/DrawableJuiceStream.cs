@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             }
         }
 
-        protected override void AddNested(DrawableHitObject<CatchHitObject> h)
+        protected override void AddNested(DrawableHitObject h)
         {
             ((DrawableCatchHitObject)h).CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
             dropletContainer.Add(h);
