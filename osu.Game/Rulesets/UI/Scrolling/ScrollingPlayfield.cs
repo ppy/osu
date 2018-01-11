@@ -48,6 +48,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
         };
 
         /// <summary>
+        /// Whether the player can change <see cref="VisibleTimeRange"/>.
+        /// </summary>
+        protected virtual bool UserScrollSpeedAdjustment => true;
+
+        /// <summary>
         /// The container that contains the <see cref="SpeedAdjustmentContainer"/>s and <see cref="DrawableHitObject"/>s.
         /// </summary>
         public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
@@ -92,6 +97,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (!UserScrollSpeedAdjustment)
+                return false;
+
             if (state.Keyboard.ControlPressed)
             {
                 switch (args.Key)
