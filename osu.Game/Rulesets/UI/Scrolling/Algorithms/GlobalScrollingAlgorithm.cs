@@ -47,7 +47,10 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                 }
 
                 if (obj.NestedHitObjects != null)
+                {
                     ComputeInitialStates(obj.NestedHitObjects, direction, timeRange, length);
+                    ComputePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
+                }
             }
         }
 
@@ -74,9 +77,6 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                         obj.X = (float)(-finalPosition * length.X);
                         break;
                 }
-
-                if (obj.NestedHitObjects != null)
-                    ComputePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
             }
         }
 
