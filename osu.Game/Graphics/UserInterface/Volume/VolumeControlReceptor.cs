@@ -3,12 +3,13 @@
 
 using System;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
-    public class VolumeControlReceptor : Container, IKeyBindingHandler<GlobalAction>
+    public class VolumeControlReceptor : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalInput
     {
         public Func<GlobalAction, bool> ActionRequested;
 
