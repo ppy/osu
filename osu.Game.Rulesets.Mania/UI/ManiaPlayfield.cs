@@ -15,6 +15,7 @@ using osu.Framework.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -161,8 +162,10 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
+            config.BindWith(OsuSetting.UserScrollSpeed, VisibleTimeRange);
+
             normalColumnColours = new List<Color4>
             {
                 colours.RedDark,
