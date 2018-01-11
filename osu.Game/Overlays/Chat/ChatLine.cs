@@ -15,7 +15,6 @@ using osu.Game.Users;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
-using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -225,14 +224,8 @@ namespace osu.Game.Overlays.Chat
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
             username.Text = $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
 
-            // remove any non-existent channels from the link list
-            var linksToRemove = new List<Link>();
-            foreach (var link in message.Links)
-                if (link.Action == LinkAction.OpenChannel && chat?.AvailableChannels.TrueForAll(c => c.Name != link.Argument) != false)
-                    linksToRemove.Add(link);
-
-            foreach (var link in linksToRemove)
-                message.Links.Remove(link);
+            // remove non-existent channels from the link list
+            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chat?.AvailableChannels.TrueForAll(c => c.Name != link.Argument) != false);
 
             contentFlow.Clear();
             contentFlow.AddLinks(message.DisplayContent, message.Links);
