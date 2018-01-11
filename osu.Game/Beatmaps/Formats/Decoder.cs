@@ -70,10 +70,11 @@ namespace osu.Game.Beatmaps.Formats
 
         protected abstract void ParseBeatmap(StreamReader stream, Beatmap beatmap);
 
-        public virtual Storyboard DecodeStoryboard(StreamReader stream)
+        public virtual Storyboard DecodeStoryboard(params StreamReader[] streams)
         {
             var storyboard = new Storyboard();
-            ParseStoryboard(stream, storyboard);
+            foreach (StreamReader stream in streams)
+                ParseStoryboard(stream, storyboard);
             return storyboard;
         }
 

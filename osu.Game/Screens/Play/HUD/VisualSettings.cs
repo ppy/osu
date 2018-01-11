@@ -33,10 +33,11 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private readonly TimeSpan hideTimeSpan = TimeSpan.FromSeconds(5);
+        private readonly TimeSpan hideTimeSpan = TimeSpan.FromSeconds(3);
         private Stopwatch hideStopWatch;
 
         private readonly ReplaySliderBar<double> dimSliderBar;
+        private readonly ReplaySliderBar<double> blurSliderBar;
         private readonly ReplayCheckbox showStoryboardToggle;
         private readonly ReplayCheckbox mouseWheelDisabledToggle;
 
@@ -51,6 +52,11 @@ namespace osu.Game.Screens.Play.HUD
                 dimSliderBar = new ReplaySliderBar<double>(),
                 new OsuSpriteText
                 {
+                    Text = "Background blur:"
+                },
+                blurSliderBar = new ReplaySliderBar<double>(),
+                new OsuSpriteText
+                {
                     Text = "Toggles:"
                 },
                 showStoryboardToggle = new ReplayCheckbox { LabelText = "Storyboards" },
@@ -62,6 +68,7 @@ namespace osu.Game.Screens.Play.HUD
         private void load(OsuConfigManager config)
         {
             dimSliderBar.Bindable = config.GetBindable<double>(OsuSetting.DimLevel);
+            blurSliderBar.Bindable = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboardToggle.Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
             mouseWheelDisabledToggle.Bindable = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
@@ -91,7 +98,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Update();
 
-            if (Autohide && IsPresent && hideStopWatch.Elapsed > hideTimeSpan) this.FadeOut(100);
+            if (Autohide && IsPresent && hideStopWatch.Elapsed > hideTimeSpan) this.FadeOut(50);
         }
     }
 }
