@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override int LegacyID => 2;
 
-        public CatchRuleset(RulesetInfo rulesetInfo)
+        public CatchRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
         {
         }

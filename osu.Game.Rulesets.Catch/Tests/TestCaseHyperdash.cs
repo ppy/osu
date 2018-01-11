@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     public class TestCaseHyperdash : Game.Tests.Visual.TestCasePlayer
     {
         public TestCaseHyperdash()
-            : base(typeof(CatchRuleset))
+            : base(new CatchRuleset())
         {
         }
 

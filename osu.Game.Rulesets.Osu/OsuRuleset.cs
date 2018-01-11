@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override int LegacyID => 0;
 
-        public OsuRuleset(RulesetInfo rulesetInfo)
+        public OsuRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
         {
         }
