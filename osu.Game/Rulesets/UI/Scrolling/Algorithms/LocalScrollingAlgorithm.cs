@@ -28,7 +28,10 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                 obj.LifetimeStart = obj.HitObject.StartTime - timeRange / controlPoint.Multiplier;
 
                 if (obj.NestedHitObjects != null)
+                {
                     ComputeInitialStates(obj.NestedHitObjects, direction, timeRange, length);
+                    ComputePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
+                }
             }
         }
 
@@ -55,9 +58,6 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                         obj.X = (float)(-position * length.X);
                         break;
                 }
-
-                if (obj.NestedHitObjects != null)
-                    ComputePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
             }
         }
 
