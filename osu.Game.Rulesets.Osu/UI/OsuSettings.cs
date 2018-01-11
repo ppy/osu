@@ -27,6 +27,11 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Snaking out sliders",
                     Bindable = config.GetBindable<bool>(OsuSetting.SnakingOutSliders)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Spinners initially spin clockwise",
+                    Bindable = config.GetBindable<bool>(OsuSetting.InitialSpinnerRotationCW)
+                },
             };
         }
     }
