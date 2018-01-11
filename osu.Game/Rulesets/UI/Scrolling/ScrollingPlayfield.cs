@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -102,13 +103,15 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (state.Keyboard.ControlPressed)
             {
+                var lastValue = Transforms.OfType<TransformVisibleTimeRange>().LastOrDefault()?.EndValue ?? VisibleTimeRange.Value;
+
                 switch (args.Key)
                 {
                     case Key.Minus:
-                        transformVisibleTimeRangeTo(VisibleTimeRange + time_span_step, 200, Easing.OutQuint);
+                        transformVisibleTimeRangeTo(lastValue + time_span_step, 200, Easing.OutQuint);
                         break;
                     case Key.Plus:
-                        transformVisibleTimeRangeTo(VisibleTimeRange - time_span_step, 200, Easing.OutQuint);
+                        transformVisibleTimeRangeTo(lastValue - time_span_step, 200, Easing.OutQuint);
                         break;
                 }
             }

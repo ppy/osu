@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
@@ -115,7 +116,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig)
+        private void load(FrameworkConfigManager frameworkConfig, OsuConfigManager osuConfig)
         {
             trackSetting(frameworkConfig.GetBindable<FrameSync>(FrameworkSetting.FrameSync), v => display(v, "Frame Limiter", v.GetDescription(), "Ctrl+F7"));
             trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.AudioDevice), v => display(v, "Audio Device", string.IsNullOrEmpty(v) ? "Default" : v, v));
@@ -135,6 +136,9 @@ namespace osu.Game.Overlays
                 });
 
             trackSetting(frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode), v => display(v, "Screen Mode", v.ToString(), "Alt+Enter"));
+
+            // Todo: This should be part of the ruleset-specific OSD
+            trackSetting(osuConfig.GetBindable<double>(OsuSetting.UserScrollSpeed), v => display(v, "Scroll Speed", $"{v:N0}ms", "Ctrl+(+/-) to change"));
         }
 
         private readonly List<IBindable> references = new List<IBindable>();
