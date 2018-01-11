@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
 
 namespace osu.Game.Online.Chat
@@ -25,6 +26,8 @@ namespace osu.Game.Online.Chat
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceiveMouseInputAt(screenSpacePos));
 
+        protected override HoverClickSounds CreateHoverClickSounds(HoverSampleSet sampleSet) => new LinkHoverSounds(sampleSet, Parts);
+
         public DrawableLinkCompiler(IEnumerable<SpriteText> parts)
         {
             Parts = parts.ToList();
@@ -39,5 +42,18 @@ namespace osu.Game.Online.Chat
         protected override IEnumerable<Drawable> EffectTargets => Parts;
 
         public string TooltipText { get; set; }
+
+        private class LinkHoverSounds : HoverClickSounds
+        {
+            private readonly List<SpriteText> parts;
+
+            public LinkHoverSounds(HoverSampleSet sampleSet, List<SpriteText> parts)
+                : base(sampleSet)
+            {
+                this.parts = parts;
+            }
+
+            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => parts.Any(d => d.ReceiveMouseInputAt(screenSpacePos));
+        }
     }
 }
