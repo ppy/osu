@@ -32,9 +32,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
-            RelativePositionAxes = Axes.Y;
-            Y = (float)HitObject.StartTime;
-
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1);
 
