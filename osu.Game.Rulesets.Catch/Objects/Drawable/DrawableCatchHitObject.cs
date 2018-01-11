@@ -10,6 +10,17 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
+    public abstract class PalpableCatchHitObject<TObject> : DrawableCatchHitObject<TObject>
+        where TObject : CatchHitObject
+    {
+        protected PalpableCatchHitObject(TObject hitObject)
+            : base(hitObject)
+        {
+            Scale = new Vector2(HitObject.Scale);
+        }
+    }
+
+
     public abstract class DrawableCatchHitObject<TObject> : DrawableCatchHitObject
         where TObject : CatchHitObject
     {
@@ -19,9 +30,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             : base(hitObject)
         {
             HitObject = hitObject;
-
-            Scale = new Vector2(HitObject.Scale);
-
             Anchor = Anchor.BottomLeft;
         }
     }
