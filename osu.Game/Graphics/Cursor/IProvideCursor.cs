@@ -6,16 +6,19 @@ using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Graphics.Cursor
 {
+    /// <summary>
+    /// Interface for <see cref="IDrawable"/>s that display cursors which can replace the user's cursor.
+    /// </summary>
     public interface IProvideCursor : IDrawable
     {
         /// <summary>
         /// The cursor provided by this <see cref="Drawable"/>.
+        /// May be null if no cursor should be visible.
         /// </summary>
         CursorContainer Cursor { get; }
 
         /// <summary>
-        /// Whether the cursor provided by this <see cref="Drawable"/> should be displayed.
-        /// If this is false, a cursor occurring earlier in the draw hierarchy will be displayed instead.
+        /// Whether the cursor provided by this <see cref="Drawable"/> should be displayed as the user's cursor.
         /// </summary>
         bool ProvidesUserCursor { get; }
     }
