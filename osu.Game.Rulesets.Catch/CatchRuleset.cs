@@ -10,7 +10,6 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Catch.Objects;
 
 namespace osu.Game.Rulesets.Catch
 {
