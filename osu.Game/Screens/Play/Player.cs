@@ -155,12 +155,6 @@ namespace osu.Game.Screens.Play
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
-            // We want the cursor to be above everything (including the skip button), but still be able to be controlled
-            // by the ruleset's input manager and replay, so we need to proxy it out from the ruleset container
-            var cursorProxyContainer = new Container { RelativeSizeAxes = Axes.Both };
-            if (RulesetContainer.Cursor != null)
-                cursorProxyContainer.Add(RulesetContainer.Cursor.CreateProxy());
-
             Children = new Drawable[]
             {
                 storyboardContainer = new Container
@@ -203,8 +197,7 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre,
                             Clock = decoupledClock,
                             Breaks = beatmap.Breaks
-                        },
-                        cursorProxyContainer
+                        }
                     }
                 },
                 failOverlay = new FailOverlay
