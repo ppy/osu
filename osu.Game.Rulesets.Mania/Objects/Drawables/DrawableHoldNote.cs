@@ -186,6 +186,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 return true;
             }
+
+            protected override void UpdateState(ArmedState state)
+            {
+                // The holdnote keeps scrolling through for now, so having the head disappear looks weird
+            }
         }
 
         /// <summary>
