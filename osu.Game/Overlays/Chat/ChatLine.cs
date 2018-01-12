@@ -219,7 +219,6 @@ namespace osu.Game.Overlays.Chat
             }
             else
                 contentFlow.Text = message.Content;
-
         }
 
         private class MessageSender : OsuClickableContainer, IHasContextMenu
