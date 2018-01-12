@@ -9,7 +9,7 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class OsuCursorContainer : Container, IProvideLocalCursor
+    public class OsuCursorContainer : Container, IProvideCursor
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -19,14 +19,14 @@ namespace osu.Game.Graphics.Cursor
         /// </summary>
         public bool CanShowCursor;
 
-        public CursorContainer LocalCursor { get; }
+        public CursorContainer Cursor { get; }
         public bool ProvidesUserCursor => true;
 
         public OsuCursorContainer()
         {
             AddRangeInternal(new Drawable[]
             {
-                LocalCursor = new MenuCursor { State = Visibility.Hidden },
+                Cursor = new MenuCursor { State = Visibility.Hidden },
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
         }
@@ -39,24 +39,24 @@ namespace osu.Game.Graphics.Cursor
             inputManager = GetContainingInputManager();
         }
 
-        private IProvideLocalCursor currentTarget;
+        private IProvideCursor currentTarget;
         protected override void Update()
         {
             base.Update();
 
             if (!CanShowCursor)
             {
-                currentTarget?.LocalCursor?.Hide();
+                currentTarget?.Cursor?.Hide();
                 return;
             }
 
-            var newTarget = inputManager.HoveredDrawables.OfType<IProvideLocalCursor>().FirstOrDefault(t => t.ProvidesUserCursor) ?? this;
+            var newTarget = inputManager.HoveredDrawables.OfType<IProvideCursor>().FirstOrDefault(t => t.ProvidesUserCursor) ?? this;
 
             if (currentTarget == newTarget)
                 return;
 
-            currentTarget?.LocalCursor?.Hide();
-            newTarget.LocalCursor?.Show();
+            currentTarget?.Cursor?.Hide();
+            newTarget.Cursor?.Show();
 
             currentTarget = newTarget;
         }
