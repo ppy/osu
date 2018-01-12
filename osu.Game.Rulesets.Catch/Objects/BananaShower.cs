@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         public override FruitVisualRepresentation VisualRepresentation => FruitVisualRepresentation.Banana;
 
+        public override bool LastInCombo => true;
+
         protected override void CreateNestedHitObjects()
         {
             base.CreateNestedHitObjects();
