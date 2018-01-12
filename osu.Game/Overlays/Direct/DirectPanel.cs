@@ -65,7 +65,6 @@ namespace osu.Game.Overlays.Direct
             Colour = Color4.Black.Opacity(0.3f),
         };
 
-
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay)
         {

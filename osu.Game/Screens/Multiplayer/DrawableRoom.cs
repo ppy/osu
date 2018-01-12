@@ -229,7 +229,6 @@ namespace osu.Game.Screens.Multiplayer
             {
                 coverContainer.FadeIn(transition_duration);
 
-
                 LoadComponentAsync(new BeatmapSetCover(value.BeatmapSet)
                 {
                     Anchor = Anchor.Centre,

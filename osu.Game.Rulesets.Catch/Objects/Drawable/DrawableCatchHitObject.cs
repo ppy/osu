@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         }
     }
 
-
     public abstract class DrawableCatchHitObject<TObject> : DrawableCatchHitObject
         where TObject : CatchHitObject
     {
