@@ -243,6 +243,27 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             },
                         }
                     };
+                case FruitVisualRepresentation.Banana:
+                    return new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Framework.Graphics.Drawable[]
+                        {
+                            new Pulp
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                AccentColour = AccentColour,
+                                Size = new Vector2(small_pulp),
+                                Y = -0.15f
+                            },
+                            new Pulp
+                            {
+                                AccentColour = AccentColour,
+                                Size = new Vector2(large_pulp_4 * 1.2f, large_pulp_4 * 3),
+                            },
+                        }
+                    };
             }
         }
 
