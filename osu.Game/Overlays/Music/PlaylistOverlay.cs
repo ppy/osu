@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using System;
 
 namespace osu.Game.Overlays.Music
 {
@@ -30,6 +31,8 @@ namespace osu.Game.Overlays.Music
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets => list.BeatmapSets;
+
+        public event Action StartedPlaying;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, BeatmapManager beatmaps, OsuColour colours)
@@ -152,6 +155,7 @@ namespace osu.Game.Overlays.Music
             var track = beatmapBacking.Value.Track;
 
             track.Restart();
+            StartedPlaying?.Invoke();
         }
     }
 

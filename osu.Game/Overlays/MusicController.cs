@@ -56,6 +56,9 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
+        private bool paused;
+        public event Action StartedPlaying;
+
         public MusicController()
         {
             Width = 400;
@@ -211,6 +214,12 @@ namespace osu.Game.Overlays
             beatmapBacking.BindTo(game.Beatmap);
 
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
+            playlist.StartedPlaying += () =>
+            {
+                // If the user selects a new track from the Playlist it counts as pressing play.
+                paused = false;
+                StartedPlaying?.Invoke();
+            };
         }
 
         protected override void LoadComplete()
@@ -220,6 +229,32 @@ namespace osu.Game.Overlays
             beatmapBacking.TriggerChange();
 
             base.LoadComplete();
+        }
+
+        /// <summary>
+        /// Resumes the current track if it wasn't manually paused.
+        /// </summary>
+        public void Resume()
+        {
+            var track = current?.Track;
+
+            // We don't want to resume if the user paused it manually before.
+            if (track?.IsRunning == false && !paused)
+            {
+                track.Start();
+                StartedPlaying?.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// Pauses the current track.
+        /// </summary>
+        public void Pause()
+        {
+            var track = current?.Track;
+
+            if (track?.IsRunning == true)
+                track.Stop();
         }
 
         private void beatmapDisabledChanged(bool disabled)
@@ -270,9 +305,15 @@ namespace osu.Game.Overlays
             }
 
             if (track.IsRunning)
-                track.Stop();
+            {
+                paused = true;
+                Pause();
+            }
             else
-                track.Start();
+            {
+                paused = false;
+                Resume();
+            }
         }
 
         private void prev()
