@@ -8,15 +8,15 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 using OpenTK;
 
-namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
+namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
-    public class GlobalScrollingAlgorithm : IScrollingAlgorithm
+    public class SequentialSpeedChangeVisualiser : ISpeedChangeVisualiser
     {
         private readonly Dictionary<DrawableHitObject, double> hitObjectPositions = new Dictionary<DrawableHitObject, double>();
 
         private readonly IReadOnlyList<MultiplierControlPoint> controlPoints;
 
-        public GlobalScrollingAlgorithm(IReadOnlyList<MultiplierControlPoint> controlPoints)
+        public SequentialSpeedChangeVisualiser(IReadOnlyList<MultiplierControlPoint> controlPoints)
         {
             this.controlPoints = controlPoints;
         }

@@ -7,15 +7,15 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using OpenTK;
 
-namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
+namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
-    public class LocalScrollingAlgorithm : IScrollingAlgorithm
+    public class OverlappingSpeedChangeVisualiser : ISpeedChangeVisualiser
     {
         private readonly Dictionary<DrawableHitObject, double> hitObjectPositions = new Dictionary<DrawableHitObject, double>();
 
         private readonly SortedList<MultiplierControlPoint> controlPoints;
 
-        public LocalScrollingAlgorithm(SortedList<MultiplierControlPoint> controlPoints)
+        public OverlappingSpeedChangeVisualiser(SortedList<MultiplierControlPoint> controlPoints)
         {
             this.controlPoints = controlPoints;
         }

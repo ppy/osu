@@ -5,11 +5,11 @@ using System.ComponentModel;
 
 namespace osu.Game.Configuration
 {
-    public enum ScrollingAlgorithmType
+    public enum SpeedChangeVisualisationMethod
     {
-        [Description("Global")]
-        Global,
-        [Description("Local")]
-        Local
+        [Description("Sequential")]
+        Sequential,
+        [Description("Overlapping")]
+        Overlapping
     }
 }

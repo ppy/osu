@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 
-namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
+namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
-    public interface IScrollingAlgorithm
+    public interface ISpeedChangeVisualiser
     {
         /// <summary>
         /// Computes the states of <see cref="DrawableHitObject"/>s that are constant, such as lifetime and spatial length.

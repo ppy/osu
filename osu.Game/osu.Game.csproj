@@ -265,7 +265,7 @@
     <Compile Include="Beatmaps\Formats\JsonBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
-    <Compile Include="Configuration\ScrollingAlgorithmType.cs" />
+    <Compile Include="Configuration\SpeedChangeVisualisationMethod.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
@@ -318,9 +318,9 @@
     <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Rulesets\UI\HitObjectContainer.cs" />
-    <Compile Include="Rulesets\UI\Scrolling\Algorithms\GlobalScrollingAlgorithm.cs" />
-    <Compile Include="Rulesets\UI\Scrolling\Algorithms\IScrollingAlgorithm.cs" />
-    <Compile Include="Rulesets\UI\Scrolling\Algorithms\LocalScrollingAlgorithm.cs" />
+    <Compile Include="Rulesets\UI\Scrolling\Algorithms\SequentialSpeedChangeVisualiser.cs" />
+    <Compile Include="Rulesets\UI\Scrolling\Algorithms\ISpeedChangeVisualiser.cs" />
+    <Compile Include="Rulesets\UI\Scrolling\Algorithms\OverlappingSpeedChangeVisualiser.cs" />
     <Compile Include="Rulesets\UI\Scrolling\ScrollingDirection.cs" />
     <Compile Include="Rulesets\UI\Scrolling\ScrollingHitObjectContainer.cs" />
     <Compile Include="Rulesets\UI\Scrolling\ScrollingPlayfield.cs" />
