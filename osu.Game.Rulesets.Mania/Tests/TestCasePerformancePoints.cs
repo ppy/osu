@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     public class TestCasePerformancePoints : Game.Tests.Visual.TestCasePerformancePoints
     {
         public TestCasePerformancePoints()
-            : base(new ManiaRuleset(new RulesetInfo()))
+            : base(new ManiaRuleset())
         {
         }
     }
