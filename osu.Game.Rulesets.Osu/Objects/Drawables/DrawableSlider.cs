@@ -54,11 +54,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     StartTime = s.StartTime,
                     Position = s.StackedPosition,
-                    ComboIndex = s.ComboIndex,
+                    IndexInCurrentCombo = s.IndexInCurrentCombo,
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
                     Samples = s.Samples,
-                    SampleControlPoint = s.SampleControlPoint
+                    SampleControlPoint = s.SampleControlPoint,
+                    TimePreempt = s.TimePreempt,
+                    TimeFadein = s.TimeFadein
                 })
             };
 
@@ -71,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
                 var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? FadeInDuration : FadeInDuration / 2);
+                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? HitObject.TimeFadein : HitObject.TimeFadein / 2);
                 var fadeOutTime = repeatStartTime + repeatDuration;
 
                 var drawableTick = new DrawableSliderTick(tick)
@@ -88,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
                 var repeatStartTime = s.StartTime + repeatPoint.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? FadeInDuration : FadeInDuration / 2);
+                var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? HitObject.TimeFadein : HitObject.TimeFadein / 2);
                 var fadeOutTime = repeatStartTime + repeatDuration;
 
                 var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
@@ -105,12 +107,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private int currentRepeat;
         public bool Tracking;
-
-        public override double FadeInDuration
-        {
-            get { return base.FadeInDuration; }
-            set { InitialCircle.FadeInDuration = base.FadeInDuration = value; }
-        }
 
         protected override void Update()
         {

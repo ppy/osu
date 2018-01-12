@@ -64,7 +64,6 @@
     <Compile Include="Judgements\HoldNoteTickJudgement.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
-    <Compile Include="Mods\IGenerateSpeedAdjustments.cs" />
     <Compile Include="Mods\ManiaKeyMod.cs" />
     <Compile Include="Mods\ManiaModAutoplay.cs" />
     <Compile Include="Mods\ManiaModDaycore.cs" />
@@ -114,8 +113,6 @@
     <Compile Include="Tests\TestCaseManiaHitObjects.cs" />
     <Compile Include="Tests\TestCaseManiaPlayfield.cs" />
     <Compile Include="Tests\TestCasePerformancePoints.cs" />
-    <Compile Include="Timing\GravityScrollingContainer.cs" />
-    <Compile Include="Timing\ScrollingAlgorithm.cs" />
     <Compile Include="UI\Column.cs" />
     <Compile Include="UI\DrawableManiaJudgement.cs" />
     <Compile Include="UI\HitExplosion.cs" />
@@ -123,9 +120,7 @@
     <Compile Include="UI\ManiaPlayfield.cs" />
     <Compile Include="ManiaRuleset.cs" />
     <Compile Include="Mods\ManiaModNoFail.cs" />
-    <Compile Include="Mods\ManiaModGravity.cs" />
     <Compile Include="UI\SpecialColumnPosition.cs" />
-    <Compile Include="Timing\ManiaSpeedAdjustmentContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

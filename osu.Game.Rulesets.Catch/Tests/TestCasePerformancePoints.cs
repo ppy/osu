@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     public class TestCasePerformancePoints : Game.Tests.Visual.TestCasePerformancePoints
     {
         public TestCasePerformancePoints()
-            : base(new CatchRuleset(new RulesetInfo()))
+            : base(new CatchRuleset())
         {
         }
     }

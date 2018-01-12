@@ -36,10 +36,30 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public override bool RemoveCompletedTransforms => false;
         public override bool RemoveWhenNotAlive => false;
+        protected override bool RequiresChildrenUpdate => true;
+
+        public virtual bool AllJudged => false;
 
         protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
+        }
+
+        /// <summary>
+        /// Processes this <see cref="DrawableHitObject"/>, checking if any judgements have occurred.
+        /// </summary>
+        /// <param name="userTriggered">Whether the user triggered this process.</param>
+        /// <returns>Whether a judgement has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>s.</returns>
+        protected internal virtual bool UpdateJudgement(bool userTriggered) => false;
+
+        private List<DrawableHitObject> nestedHitObjects;
+        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+
+        protected virtual void AddNested(DrawableHitObject h)
+        {
+            if (nestedHitObjects == null)
+                nestedHitObjects = new List<DrawableHitObject>();
+            nestedHitObjects.Add(h);
         }
 
         /// <summary>
@@ -144,7 +164,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
+        public sealed override bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
 
         /// <summary>
         /// Notifies that a new judgement has occurred for this <see cref="DrawableHitObject"/>.
@@ -180,7 +200,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="userTriggered">Whether the user triggered this process.</param>
         /// <returns>Whether a judgement has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>s.</returns>
-        protected bool UpdateJudgement(bool userTriggered)
+        protected internal sealed override bool UpdateJudgement(bool userTriggered)
         {
             judgementOccurred = false;
 
@@ -237,18 +257,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
             UpdateJudgement(false);
         }
 
-        private List<DrawableHitObject<TObject>> nestedHitObjects;
-        protected IEnumerable<DrawableHitObject<TObject>> NestedHitObjects => nestedHitObjects;
-
-        protected virtual void AddNested(DrawableHitObject<TObject> h)
+        protected override void AddNested(DrawableHitObject h)
         {
-            if (nestedHitObjects == null)
-                nestedHitObjects = new List<DrawableHitObject<TObject>>();
+            base.AddNested(h);
 
-            h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
-            h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
-            h.ApplyCustomUpdateState += (d, s) => ApplyCustomUpdateState?.Invoke(d, s);
-            nestedHitObjects.Add(h);
+            if (!(h is DrawableHitObject<TObject> hWithJudgement))
+                return;
+
+            hWithJudgement.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
+            hWithJudgement.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
+            hWithJudgement.ApplyCustomUpdateState += (d, s) => ApplyCustomUpdateState?.Invoke(d, s);
         }
 
         /// <summary>

@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using System;
 using System.Diagnostics;
 using osu.Framework.Graphics;
@@ -133,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             // Do some nice easing for cursor movements
             if (Frames.Count > 0)
             {
-                moveToHitObject(h.StartTime, startPosition, h.Radius, easing);
+                moveToHitObject(h, startPosition, easing);
             }
 
             // Add frames to click the hitobject
@@ -191,12 +190,12 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        private void moveToHitObject(double targetTime, Vector2 targetPos, double hitObjectRadius, Easing easing)
+        private void moveToHitObject(OsuHitObject h, Vector2 targetPos, Easing easing)
         {
             ReplayFrame lastFrame = Frames[Frames.Count - 1];
 
             // Wait until Auto could "see and react" to the next note.
-            double waitTime = targetTime - Math.Max(0.0, DrawableOsuHitObject.TIME_PREEMPT - reactionTime);
+            double waitTime = h.StartTime - Math.Max(0.0, h.TimePreempt - reactionTime);
             if (waitTime > lastFrame.Time)
             {
                 lastFrame = new ReplayFrame(waitTime, lastFrame.MouseX, lastFrame.MouseY, lastFrame.ButtonState);
@@ -205,17 +204,17 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             Vector2 lastPosition = lastFrame.Position;
 
-            double timeDifference = ApplyModsToTime(targetTime - lastFrame.Time);
+            double timeDifference = ApplyModsToTime(h.StartTime - lastFrame.Time);
 
             // Only "snap" to hitcircles if they are far enough apart. As the time between hitcircles gets shorter the snapping threshold goes up.
             if (timeDifference > 0 && // Sanity checks
-                ((lastPosition - targetPos).Length > hitObjectRadius * (1.5 + 100.0 / timeDifference) || // Either the distance is big enough
+                ((lastPosition - targetPos).Length > h.Radius * (1.5 + 100.0 / timeDifference) || // Either the distance is big enough
                 timeDifference >= 266)) // ... or the beats are slow enough to tap anyway.
             {
                 // Perform eased movement
-                for (double time = lastFrame.Time + FrameDelay; time < targetTime; time += FrameDelay)
+                for (double time = lastFrame.Time + FrameDelay; time < h.StartTime; time += FrameDelay)
                 {
-                    Vector2 currentPosition = Interpolation.ValueAt(time, lastPosition, targetPos, lastFrame.Time, targetTime, easing);
+                    Vector2 currentPosition = Interpolation.ValueAt(time, lastPosition, targetPos, lastFrame.Time, h.StartTime, easing);
                     AddFrameToReplay(new ReplayFrame((int)time, currentPosition.X, currentPosition.Y, lastFrame.ButtonState));
                 }
 
