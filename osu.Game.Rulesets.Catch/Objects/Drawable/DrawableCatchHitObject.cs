@@ -63,10 +63,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         protected override void UpdateState(ArmedState state)
         {
             using (BeginAbsoluteSequence(HitObject.StartTime - preempt))
-            {
-                // animation
                 this.FadeIn(200);
-            }
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
