@@ -155,7 +155,7 @@ namespace osu.Game.Overlays
             loading.Hide();
             getUsersRequest?.Cancel();
 
-            if (api?.IsLoggedIn == false)
+            if (api?.IsLoggedIn != true)
                 return;
 
             switch (Header.Tabs.Current.Value)
