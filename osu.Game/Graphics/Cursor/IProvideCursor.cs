@@ -6,12 +6,12 @@ using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public interface IProvideLocalCursor : IDrawable
+    public interface IProvideCursor : IDrawable
     {
         /// <summary>
         /// The cursor provided by this <see cref="Drawable"/>.
         /// </summary>
-        CursorContainer LocalCursor { get; }
+        CursorContainer Cursor { get; }
 
         /// <summary>
         /// Whether the cursor provided by this <see cref="Drawable"/> should be displayed.

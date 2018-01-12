@@ -215,7 +215,7 @@ namespace osu.Game
             CursorContainer.Child = globalBinding = new GlobalKeyBindingInputManager(this)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(CursorContainer.LocalCursor) { RelativeSizeAxes = Axes.Both　}
+                Child = content = new OsuTooltipContainer(CursorContainer.Cursor) { RelativeSizeAxes = Axes.Both　}
             };
 
             base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorContainer });

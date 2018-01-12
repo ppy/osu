@@ -33,7 +33,7 @@ using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : OsuScreen, IProvideLocalCursor
+    public class Player : OsuScreen, IProvideCursor
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
 
         public int RestartCount;
 
-        public CursorContainer LocalCursor => RulesetContainer.Cursor;
+        public CursorContainer Cursor => RulesetContainer.Cursor;
         public bool ProvidesUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded;
 
         private IAdjustableClock adjustableSourceClock;
