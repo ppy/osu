@@ -76,7 +76,6 @@ namespace osu.Game.Screens.Play
 
         #endregion
 
-        private BreakOverlay breakOverlay;
         private Container storyboardContainer;
         private DrawableStoryboard storyboard;
 
@@ -190,7 +189,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        breakOverlay = new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, scoreProcessor)
+                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, scoreProcessor)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
