@@ -69,18 +69,20 @@ namespace osu.Game.Rulesets.Catch.UI
                 lastPlateableFruit = caughtFruit;
             }
 
-            // this is required to make this run after the last caught fruit runs UpdateState at least once.
-            // TODO: find a better alternative
-            lastPlateableFruit.OnLoadComplete = _ =>
+            if (fruit.HitObject.LastInCombo)
             {
-                if (fruit.HitObject.LastInCombo)
+                if (judgement.IsHit)
                 {
-                    if (judgement.IsHit)
+                    // this is required to make this run after the last caught fruit runs UpdateState at least once.
+                    // TODO: find a better alternative
+                    if (lastPlateableFruit.IsLoaded)
                         MovableCatcher.Explode();
                     else
-                        MovableCatcher.Drop();
+                        lastPlateableFruit.OnLoadComplete = _ => { MovableCatcher.Explode(); };
                 }
-            };
+                else
+                    MovableCatcher.Drop();
+            }
         }
 
         public bool OnPressed(CatchAction action)
