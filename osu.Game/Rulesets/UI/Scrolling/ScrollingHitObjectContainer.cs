@@ -9,7 +9,7 @@ using osu.Framework.Lists;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
-using osu.Game.Rulesets.UI.Scrolling.Algorithms;
+using osu.Game.Rulesets.UI.Scrolling.Visualisers;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
@@ -42,18 +42,18 @@ namespace osu.Game.Rulesets.UI.Scrolling
             TimeRange.ValueChanged += v => initialStateCache.Invalidate();
         }
 
-        private IScrollingAlgorithm scrollingAlgorithm;
+        private ISpeedChangeVisualiser speedChangeVisualiser;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            switch (config.Get<ScrollingAlgorithmType>(OsuSetting.ScrollingAlgorithm))
+            switch (config.Get<SpeedChangeVisualisationMethod>(OsuSetting.SpeedChangeVisualisation))
             {
-                case ScrollingAlgorithmType.Global:
-                    scrollingAlgorithm = new GlobalScrollingAlgorithm(ControlPoints);
+                case SpeedChangeVisualisationMethod.Sequential:
+                    speedChangeVisualiser = new SequentialSpeedChangeVisualiser(ControlPoints);
                     break;
-                case ScrollingAlgorithmType.Local:
-                    scrollingAlgorithm = new LocalScrollingAlgorithm(ControlPoints);
+                case SpeedChangeVisualisationMethod.Overlapping:
+                    speedChangeVisualiser = new OverlappingSpeedChangeVisualiser(ControlPoints);
                     break;
             }
         }
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             if (initialStateCache.IsValid)
                 return;
 
-            scrollingAlgorithm.ComputeInitialStates(Objects, direction, TimeRange, DrawSize);
+            speedChangeVisualiser.ComputeInitialStates(Objects, direction, TimeRange, DrawSize);
 
             initialStateCache.Validate();
         }
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             base.UpdateAfterChildrenLife();
 
             // We need to calculate this as soon as possible after lifetimes so that hitobjects get the final say in their positions
-            scrollingAlgorithm.ComputePositions(AliveObjects, direction, Time.Current, TimeRange, DrawSize);
+            speedChangeVisualiser.ComputePositions(AliveObjects, direction, Time.Current, TimeRange, DrawSize);
         }
     }
 }

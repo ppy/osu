@@ -15,10 +15,10 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new[]
             {
-                new SettingsEnumDropdown<ScrollingAlgorithmType>
+                new SettingsEnumDropdown<SpeedChangeVisualisationMethod>
                 {
-                    LabelText = "Scrolling algorithm",
-                    Bindable = config.GetBindable<ScrollingAlgorithmType>(OsuSetting.ScrollingAlgorithm),
+                    LabelText = "Visualise speed changes as",
+                    Bindable = config.GetBindable<SpeedChangeVisualisationMethod>(OsuSetting.SpeedChangeVisualisation),
                 }
             };
         }
