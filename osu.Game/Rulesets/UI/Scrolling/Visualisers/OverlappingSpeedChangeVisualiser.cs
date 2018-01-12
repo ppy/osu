@@ -11,8 +11,6 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
     public class OverlappingSpeedChangeVisualiser : ISpeedChangeVisualiser
     {
-        private readonly Dictionary<DrawableHitObject, double> hitObjectPositions = new Dictionary<DrawableHitObject, double>();
-
         private readonly SortedList<MultiplierControlPoint> controlPoints;
 
         public OverlappingSpeedChangeVisualiser(SortedList<MultiplierControlPoint> controlPoints)
