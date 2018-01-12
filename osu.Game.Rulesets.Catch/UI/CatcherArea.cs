@@ -13,6 +13,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
+using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -21,7 +22,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatcherArea : Container
+    public class CatcherArea : Container, IKeyBindingHandler<CatchAction>
     {
         public const float CATCHER_SIZE = 172;
 
@@ -71,6 +72,20 @@ namespace osu.Game.Rulesets.Catch.UI
                     MovableCatcher.Drop();
             }
         }
+
+        public bool OnPressed(CatchAction action)
+        {
+            if (action != CatchAction.PositionUpdate) return false;
+
+            CatchFramedReplayInputHandler.CatchReplayState state = (CatchFramedReplayInputHandler.CatchReplayState)GetContainingInputManager().CurrentState;
+
+            if (state.CatcherX.HasValue)
+                MovableCatcher.X = state.CatcherX.Value;
+
+            return true;
+        }
+
+        public bool OnReleased(CatchAction action) => false;
 
         public bool AttemptCatch(CatchHitObject obj) => MovableCatcher.AttemptCatch(obj);
 
