@@ -98,12 +98,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             base.Update();
 
-            if (initialStateCache.IsValid)
-                return;
-
-            speedChangeVisualiser.ComputeInitialStates(Objects, direction, TimeRange, DrawSize);
-
-            initialStateCache.Validate();
+            if (!initialStateCache.IsValid)
+            {
+                speedChangeVisualiser.ComputeInitialStates(Objects, direction, TimeRange, DrawSize);
+                initialStateCache.Validate();
+            }
         }
 
         protected override void UpdateAfterChildrenLife()
