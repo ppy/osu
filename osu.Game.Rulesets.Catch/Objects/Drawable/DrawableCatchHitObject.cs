@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -10,6 +10,17 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
+    public abstract class PalpableCatchHitObject<TObject> : DrawableCatchHitObject<TObject>
+        where TObject : CatchHitObject
+    {
+        protected PalpableCatchHitObject(TObject hitObject)
+            : base(hitObject)
+        {
+            Scale = new Vector2(HitObject.Scale);
+        }
+    }
+
+
     public abstract class DrawableCatchHitObject<TObject> : DrawableCatchHitObject
         where TObject : CatchHitObject
     {
@@ -19,19 +30,17 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             : base(hitObject)
         {
             HitObject = hitObject;
-
-            Scale = new Vector2(HitObject.Scale);
+            Anchor = Anchor.BottomLeft;
         }
     }
 
-    public abstract class DrawableCatchHitObject : DrawableScrollingHitObject<CatchHitObject>
+    public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
         protected DrawableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {
-            RelativePositionAxes = Axes.Both;
+            RelativePositionAxes = Axes.X;
             X = hitObject.X;
-            Y = (float)HitObject.StartTime;
         }
 
         public Func<CatchHitObject, bool> CheckPosition;

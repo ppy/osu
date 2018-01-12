@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Taiko.Judgements;
@@ -17,6 +16,7 @@ using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         private const float left_area_size = 240;
 
+        protected override bool UserScrollSpeedAdjustment => false;
 
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
@@ -56,7 +57,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
-            : base(Axes.X)
+            : base(ScrollingDirection.Left)
         {
             AddRangeInternal(new Drawable[]
             {

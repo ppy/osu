@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// The time in milliseconds at which this <see cref="MultiplierControlPoint"/> starts.
         /// </summary>
-        public readonly double StartTime;
+        public double StartTime;
 
         /// <summary>
         /// The multiplier which this <see cref="MultiplierControlPoint"/> provides.
