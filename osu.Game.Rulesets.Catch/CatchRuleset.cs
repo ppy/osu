@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Catch
                         {
                             Mods = new Mod[]
                             {
-                                new ModAutoplay<CatchHitObject>(),
+                                new CatchModAutoplay(),
                                 new ModCinema(),
                             },
                         },
