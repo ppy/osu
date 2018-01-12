@@ -10,6 +10,7 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Catch.Objects;
 
 namespace osu.Game.Rulesets.Catch
 {
@@ -80,7 +81,7 @@ namespace osu.Game.Rulesets.Catch
                         {
                             Mods = new Mod[]
                             {
-                                new ModAutoplay(),
+                                new ModAutoplay<CatchHitObject>(),
                                 new ModCinema(),
                             },
                         },
@@ -101,7 +102,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override int LegacyID => 2;
 
-        public CatchRuleset(RulesetInfo rulesetInfo)
+        public CatchRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
         {
         }

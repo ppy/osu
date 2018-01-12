@@ -20,7 +20,9 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        public override IEnumerable<KeyBinding> DefaultKeyBindings => new[]
+        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings);
+
+        public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
             new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
             new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
@@ -31,6 +33,11 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.MouseWheelUp }, GlobalAction.IncreaseVolume),
             new KeyBinding(new[] { InputKey.Down }, GlobalAction.DecreaseVolume),
             new KeyBinding(new[] { InputKey.MouseWheelDown }, GlobalAction.DecreaseVolume),
+        };
+
+        public IEnumerable<KeyBinding> InGameKeyBindings => new[]
+        {
+            new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene)
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
@@ -55,5 +62,9 @@ namespace osu.Game.Input.Bindings
         IncreaseVolume,
         [Description("Decrease Volume")]
         DecreaseVolume,
+
+        // In-Game Keybindings
+        [Description("Skip Cutscene")]
+        SkipCutscene
     }
 }

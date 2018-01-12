@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     public class TestCaseCatchStacker : Game.Tests.Visual.TestCasePlayer
     {
         public TestCaseCatchStacker()
-            : base(typeof(CatchRuleset))
+            : base(new CatchRuleset())
         {
         }
 
