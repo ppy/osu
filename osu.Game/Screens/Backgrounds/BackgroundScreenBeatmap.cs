@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
