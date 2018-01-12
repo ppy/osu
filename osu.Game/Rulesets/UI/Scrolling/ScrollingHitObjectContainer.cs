@@ -15,12 +15,18 @@ namespace osu.Game.Rulesets.UI.Scrolling
 {
     public class ScrollingHitObjectContainer : HitObjectContainer
     {
+        /// <summary>
+        /// The duration required to scroll through one length of the <see cref="ScrollingHitObjectContainer"/> before any control point adjustments.
+        /// </summary>
         public readonly BindableDouble TimeRange = new BindableDouble
         {
             MinValue = 0,
             MaxValue = double.MaxValue
         };
 
+        /// <summary>
+        /// The control points that adjust the scrolling speed.
+        /// </summary>
         protected readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
 
         private readonly ScrollingDirection direction;
@@ -104,9 +110,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             base.UpdateAfterChildrenLife();
 
-            // We need to calculate this as soon as possible after lifetimes so that hitobjects
-            // get the final say in their positions
-
+            // We need to calculate this as soon as possible after lifetimes so that hitobjects get the final say in their positions
             scrollingAlgorithm.ComputePositions(AliveObjects, direction, Time.Current, TimeRange, DrawSize);
         }
     }
