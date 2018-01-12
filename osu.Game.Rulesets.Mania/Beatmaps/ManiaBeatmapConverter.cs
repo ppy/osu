@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Mania.Objects;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
@@ -24,24 +25,39 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
+        public int TargetColumns;
+        public readonly bool IsForCurrentRuleset;
+
         private Pattern lastPattern = new Pattern();
         private FastRandom random;
-        private Beatmap beatmap;
 
-        private readonly int availableColumns;
-        private readonly bool isForCurrentRuleset;
+        private ManiaBeatmap beatmap;
 
-        public ManiaBeatmapConverter(bool isForCurrentRuleset, int availableColumns)
+        public ManiaBeatmapConverter(bool isForCurrentRuleset, Beatmap original)
         {
-            if (availableColumns <= 0) throw new ArgumentOutOfRangeException(nameof(availableColumns));
+            IsForCurrentRuleset = isForCurrentRuleset;
 
-            this.isForCurrentRuleset = isForCurrentRuleset;
-            this.availableColumns = availableColumns;
+            var roundedCircleSize = Math.Round(original.BeatmapInfo.BaseDifficulty.CircleSize);
+            var roundedOverallDifficulty = Math.Round(original.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+
+            if (isForCurrentRuleset)
+                TargetColumns = (int)Math.Max(1, roundedCircleSize);
+            else
+            {
+                float percentSliderOrSpinner = (float)original.HitObjects.Count(h => h is IHasEndTime) / original.HitObjects.Count;
+                if (percentSliderOrSpinner < 0.2)
+                    TargetColumns = 7;
+                else if (percentSliderOrSpinner < 0.3 || roundedCircleSize >= 5)
+                    TargetColumns = roundedOverallDifficulty > 5 ? 7 : 6;
+                else if (percentSliderOrSpinner > 0.6)
+                    TargetColumns = roundedOverallDifficulty > 4 ? 5 : 4;
+                else
+                    TargetColumns = Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
+            }
         }
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(Beatmap original)
         {
-            beatmap = original;
 
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
@@ -50,6 +66,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             return base.ConvertBeatmap(original);
         }
+
+        protected override Beatmap<ManiaHitObject> CreateBeatmap() => beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
@@ -60,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield break;
             }
 
-            var objects = isForCurrentRuleset ? generateSpecific(original) : generateConverted(original);
+            var objects = IsForCurrentRuleset ? generateSpecific(original) : generateConverted(original);
 
             if (objects == null)
                 yield break;
@@ -96,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <returns>The hit objects generated.</returns>
         private IEnumerable<ManiaHitObject> generateSpecific(HitObject original)
         {
-            var generator = new SpecificBeatmapPatternGenerator(random, original, beatmap, availableColumns, lastPattern);
+            var generator = new SpecificBeatmapPatternGenerator(random, original, beatmap, lastPattern);
 
             Pattern newPattern = generator.Generate();
             lastPattern = newPattern;
@@ -120,14 +138,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
-                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, availableColumns, lastPattern);
+                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, lastPattern);
             else if (endTimeData != null)
-                conversion = new EndTimeObjectPatternGenerator(random, original, beatmap, availableColumns);
+                conversion = new EndTimeObjectPatternGenerator(random, original, beatmap);
             else if (positionData != null)
             {
                 computeDensity(original.StartTime);
 
-                conversion = new HitObjectPatternGenerator(random, original, beatmap, availableColumns, lastPattern, lastTime, lastPosition, density, lastStair);
+                conversion = new HitObjectPatternGenerator(random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair);
 
                 recordNote(original.StartTime, positionData.Position);
             }
@@ -149,8 +167,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         private class SpecificBeatmapPatternGenerator : Patterns.Legacy.PatternGenerator
         {
-            public SpecificBeatmapPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern)
-                : base(random, hitObject, beatmap, availableColumns, previousPattern)
+            public SpecificBeatmapPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern)
+                : base(random, hitObject, beatmap, previousPattern)
             {
             }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -39,10 +39,14 @@ namespace osu.Game.Users
         public string AvatarUrl;
 
         [JsonProperty(@"cover_url")]
-        public string CoverUrl;
+        public string CoverUrl
+        {
+            get { return Cover?.Url; }
+            set { Cover = new UserCover { Url = value }; }
+        }
 
-        //[JsonProperty(@"cover")]
-        //public UserCover Cover;
+        [JsonProperty(@"cover")]
+        public UserCover Cover;
 
         public class UserCover
         {
