@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Backgrounds
             Beatmap = beatmap;
         }
 
-        public TransformSequence<Background> BlurTo(Vector2 sigma, double duration, Easing easing = Easing.None)
+        public void BlurTo(Vector2 sigma, double duration, Easing easing = Easing.None)
             => background?.BlurTo(blurTarget = sigma, duration, easing);
 
         public override bool Equals(BackgroundScreen other)
