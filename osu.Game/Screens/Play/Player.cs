@@ -152,6 +152,8 @@ namespace osu.Game.Screens.Play
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
+            scoreProcessor = RulesetContainer.CreateScoreProcessor();
+
             Children = new Drawable[]
             {
                 storyboardContainer = new Container
@@ -183,12 +185,12 @@ namespace osu.Game.Screens.Play
                             Clock = offsetClock,
                             Child = RulesetContainer,
                         },
-                        hudOverlay = new HUDOverlay
+                        hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, decoupledClock, working, adjustableSourceClock)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        breakOverlay = new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks)
+                        breakOverlay = new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, scoreProcessor)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -213,24 +215,8 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            scoreProcessor = RulesetContainer.CreateScoreProcessor();
-
             if (showStoryboard)
                 initializeStoryboard(false);
-
-            hudOverlay.BindProcessor(scoreProcessor);
-            hudOverlay.BindRulesetContainer(RulesetContainer);
-
-            hudOverlay.Progress.Objects = RulesetContainer.Objects;
-            hudOverlay.Progress.AudioClock = decoupledClock;
-            hudOverlay.Progress.AllowSeeking = RulesetContainer.HasReplayLoaded;
-            hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
-
-            hudOverlay.ModDisplay.Current.BindTo(working.Mods);
-
-            breakOverlay.BindProcessor(scoreProcessor);
-
-            hudOverlay.ReplaySettingsOverlay.PlaybackSettings.AdjustableClock = adjustableSourceClock;
 
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
