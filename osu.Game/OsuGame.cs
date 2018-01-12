@@ -444,6 +444,8 @@ namespace osu.Game
             Beatmap.Disabled = applyRestrictions;
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
+
+            CursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
         private void screenAdded(Screen newScreen)

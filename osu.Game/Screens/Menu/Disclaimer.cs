@@ -9,21 +9,17 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Graphics.Cursor;
-using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Screens.Menu
 {
-    public class Disclaimer : OsuScreen, IProvideLocalCursor
+    public class Disclaimer : OsuScreen
     {
         private Intro intro;
         private readonly SpriteIcon icon;
         private Color4 iconColour;
 
         public override bool ShowOverlaysOnEnter => false;
-
-        public CursorContainer LocalCursor => null;
-        public bool ProvidesUserCursor => true;
+        public override bool CursorVisible => false;
 
         public Disclaimer()
         {

@@ -44,6 +44,8 @@ namespace osu.Game
 
         protected KeyBindingStore KeyBindingStore;
 
+        protected OsuCursorContainer CursorContainer;
+
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
         public APIAccess API;
@@ -209,14 +211,14 @@ namespace osu.Game
 
             GlobalKeyBindingInputManager globalBinding;
 
-            var cursorContainer = new OsuCursorContainer { RelativeSizeAxes = Axes.Both };
-            cursorContainer.Child = globalBinding = new GlobalKeyBindingInputManager(this)
+            CursorContainer = new OsuCursorContainer { RelativeSizeAxes = Axes.Both };
+            CursorContainer.Child = globalBinding = new GlobalKeyBindingInputManager(this)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(cursorContainer.LocalCursor) { RelativeSizeAxes = Axes.Both　}
+                Child = content = new OsuTooltipContainer(CursorContainer.LocalCursor) { RelativeSizeAxes = Axes.Both　}
             };
 
-            base.Content.Add(new DrawSizePreservingFillContainer { Child = cursorContainer });
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorContainer });
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);

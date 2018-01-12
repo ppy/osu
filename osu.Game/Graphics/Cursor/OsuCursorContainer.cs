@@ -14,6 +14,11 @@ namespace osu.Game.Graphics.Cursor
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
+        /// <summary>
+        /// Whether any cursors can be displayed.
+        /// </summary>
+        public bool CanShowCursor;
+
         public CursorContainer LocalCursor { get; }
         public bool ProvidesUserCursor => true;
 
@@ -38,6 +43,12 @@ namespace osu.Game.Graphics.Cursor
         protected override void Update()
         {
             base.Update();
+
+            if (!CanShowCursor)
+            {
+                currentTarget?.LocalCursor?.Hide();
+                return;
+            }
 
             var newTarget = inputManager.HoveredDrawables.OfType<IProvideLocalCursor>().FirstOrDefault(t => t.ProvidesUserCursor) ?? this;
 
