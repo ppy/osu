@@ -176,13 +176,13 @@ namespace osu.Game.Screens.Play
                     },
                     Children = new Drawable[]
                     {
-                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Clock = offsetClock,
                             Child = RulesetContainer,
                         },
+                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                         hudOverlay = new HUDOverlay
                         {
                             Anchor = Anchor.Centre,
