@@ -238,6 +238,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             protected override void UpdateState(ArmedState state)
             {
+                // The holdnote keeps scrolling through, so having the tail disappear looks weird
             }
 
             public override bool OnPressed(ManiaAction action) => false; // Tail doesn't handle key down
