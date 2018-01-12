@@ -61,6 +61,8 @@
     <Compile Include="Mods\CatchModRelax.cs" />
     <Compile Include="Mods\CatchModSuddenDeath.cs" />
     <Compile Include="Mods\CatchModAutoplay.cs" />
+    <Compile Include="Objects\BananaShower.cs" />
+    <Compile Include="Objects\Drawable\DrawableBananaShower.cs" />
     <Compile Include="Objects\Drawable\DrawableCatchHitObject.cs" />
     <Compile Include="Objects\Drawable\DrawableDroplet.cs" />
     <Compile Include="Objects\Drawable\DrawableJuiceStream.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="Objects\Fruit.cs" />
     <Compile Include="Objects\TinyDroplet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\TestCaseBananaShower.cs" />
     <Compile Include="Tests\TestCaseCatcherArea.cs" />
     <Compile Include="Tests\TestCaseCatchStacker.cs" />
     <Compile Include="Tests\TestCaseFruitObjects.cs" />

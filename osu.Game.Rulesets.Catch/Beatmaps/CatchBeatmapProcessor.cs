@@ -12,7 +12,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
-    internal class CatchBeatmapProcessor : BeatmapProcessor<CatchHitObject>
+    public class CatchBeatmapProcessor : BeatmapProcessor<CatchHitObject>
     {
         public override void PostProcess(Beatmap<CatchHitObject> beatmap)
         {
