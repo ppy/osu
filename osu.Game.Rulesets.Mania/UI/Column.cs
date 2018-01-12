@@ -12,8 +12,8 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float opacity_pressed = 0.25f;
 
         public Column()
-            : base(Axes.Y)
+            : base(ScrollingDirection.Up)
         {
             Width = column_width;
 
