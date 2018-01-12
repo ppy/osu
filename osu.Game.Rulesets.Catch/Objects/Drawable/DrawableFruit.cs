@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
-    public class DrawableFruit : DrawableCatchHitObject<Fruit>
+    public class DrawableFruit : PalpableCatchHitObject<Fruit>
     {
         private Circle border;
 
