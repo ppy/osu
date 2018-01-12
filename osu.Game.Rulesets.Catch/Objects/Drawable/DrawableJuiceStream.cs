@@ -40,7 +40,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         protected override void AddNested(DrawableHitObject h)
         {
-            ((DrawableCatchHitObject)h).CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
+            var catchObject = (DrawableCatchHitObject)h;
+
+            catchObject.CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
+            catchObject.AccentColour = HitObject.ComboColour;
+
             dropletContainer.Add(h);
             base.AddNested(h);
         }
