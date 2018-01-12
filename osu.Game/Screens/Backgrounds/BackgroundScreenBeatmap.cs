@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Transforms;
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
@@ -19,10 +20,7 @@ namespace osu.Game.Screens.Backgrounds
 
         public WorkingBeatmap Beatmap
         {
-            get
-            {
-                return beatmap;
-            }
+            get { return beatmap; }
             set
             {
                 if (beatmap == value && beatmap != null)
@@ -56,11 +54,8 @@ namespace osu.Game.Screens.Backgrounds
             Beatmap = beatmap;
         }
 
-        public void BlurTo(Vector2 sigma, double duration, Easing easing = Easing.None)
-        {
-            background?.BlurTo(sigma, duration, easing);
-            blurTarget = sigma;
-        }
+        public TransformSequence<Background> BlurTo(Vector2 sigma, double duration, Easing easing = Easing.None)
+            => background?.BlurTo(blurTarget = sigma, duration, easing);
 
         public override bool Equals(BackgroundScreen other)
         {

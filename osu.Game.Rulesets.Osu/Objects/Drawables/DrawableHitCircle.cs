@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 number = new NumberPiece
                 {
-                    Text = (HitObject.ComboIndex + 1).ToString(),
+                    Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
                 },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
@@ -88,8 +88,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            ApproachCircle.FadeIn(Math.Min(FadeInDuration * 2, TIME_PREEMPT));
-            ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
+            ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadein * 2, HitObject.TimePreempt));
+            ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(TIME_PREEMPT).FadeOut(500);
+                    this.Delay(HitObject.TimePreempt).FadeOut(500);
 
                     Expire(true);
 

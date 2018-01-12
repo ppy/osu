@@ -65,11 +65,14 @@ namespace osu.Game.Configuration
 
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
+            Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
 
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.KeyOverlay, false);
 
             Set(OsuSetting.FloatingComments, false);
+
+            Set(OsuSetting.SpeedChangeVisualisation, SpeedChangeVisualisationMethod.Sequential);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -90,6 +93,7 @@ namespace osu.Game.Configuration
         GameplayCursorSize,
         AutoCursorSize,
         DimLevel,
+        BlurLevel,
         ShowStoryboard,
         KeyOverlay,
         FloatingComments,
@@ -114,6 +118,7 @@ namespace osu.Game.Configuration
         ShowFpsDisplay,
         ChatDisplayHeight,
         Version,
-        ShowConvertedBeatmaps
+        ShowConvertedBeatmaps,
+        SpeedChangeVisualisation
     }
 }
