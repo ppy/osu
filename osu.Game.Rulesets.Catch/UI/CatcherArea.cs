@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -48,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 var screenSpacePosition = fruit.ScreenSpaceDrawQuad.Centre;
 
                 // todo: make this less ugly, somehow.
-                (fruit.Parent as Container<DrawableHitObject>)?.Remove(fruit);
+                (fruit.Parent as HitObjectContainer)?.Remove(fruit);
                 (fruit.Parent as Container)?.Remove(fruit);
 
                 fruit.RelativePositionAxes = Axes.None;

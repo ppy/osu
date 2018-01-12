@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 
-namespace osu.Game.Rulesets.UI
+namespace osu.Game.Rulesets.UI.Scrolling
 {
     /// <summary>
     /// A type of <see cref="RulesetContainer{TPlayfield,TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.
@@ -70,12 +70,10 @@ namespace osu.Game.Rulesets.UI
 
             // Perform some post processing of the timing changes
             timingChanges = timingChanges
-                // Collapse sections after the last hit object
-                .Where(s => s.StartTime <= lastObjectTime)
-                // Collapse sections with the same start time
-                .GroupBy(s => s.StartTime).Select(g => g.Last()).OrderBy(s => s.StartTime)
-                // Collapse sections with the same beat length
-                .GroupBy(s => s.TimingPoint.BeatLength * s.DifficultyPoint.SpeedMultiplier).Select(g => g.First());
+                            // Collapse sections after the last hit object
+                            .Where(s => s.StartTime <= lastObjectTime)
+                            // Collapse sections with the same start time
+                            .GroupBy(s => s.StartTime).Select(g => g.Last()).OrderBy(s => s.StartTime);
 
             DefaultControlPoints.AddRange(timingChanges);
 
@@ -88,7 +86,7 @@ namespace osu.Game.Rulesets.UI
 
         private void applySpeedAdjustment(MultiplierControlPoint controlPoint, ScrollingPlayfield playfield)
         {
-            playfield.HitObjects.AddSpeedAdjustment(CreateSpeedAdjustmentContainer(controlPoint));
+            playfield.HitObjects.AddControlPoint(controlPoint);
             playfield.NestedPlayfields.ForEach(p => applySpeedAdjustment(controlPoint, p));
         }
 
@@ -108,12 +106,5 @@ namespace osu.Game.Rulesets.UI
 
             return new MultiplierControlPoint(time, DefaultControlPoints[index].DeepClone());
         }
-
-        /// <summary>
-        /// Creates a <see cref="SpeedAdjustmentContainer"/> that facilitates the movement of hit objects.
-        /// </summary>
-        /// <param name="controlPoint">The <see cref="MultiplierControlPoint"/> that provides the speed adjustments for the hitobjects.</param>
-        /// <returns>The <see cref="SpeedAdjustmentContainer"/>.</returns>
-        protected virtual SpeedAdjustmentContainer CreateSpeedAdjustmentContainer(MultiplierControlPoint controlPoint) => new SpeedAdjustmentContainer(controlPoint);
     }
 }

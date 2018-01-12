@@ -34,15 +34,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
-            Width = (float)HitObject.Duration;
+            RelativeSizeAxes = Axes.Y;
 
             Container<DrawableDrumRollTick> tickContainer;
-            MainPiece.Add(tickContainer = new Container<DrawableDrumRollTick>
-            {
-                RelativeSizeAxes = Axes.Both,
-                RelativeChildOffset = new Vector2((float)HitObject.StartTime, 0),
-                RelativeChildSize = new Vector2((float)HitObject.Duration, 1)
-            });
+            MainPiece.Add(tickContainer = new Container<DrawableDrumRollTick> { RelativeSizeAxes = Axes.Both });
 
             foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
             {
@@ -100,6 +95,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+            switch (state)
+            {
+                case ArmedState.Hit:
+                case ArmedState.Miss:
+                    this.FadeOut(100).Expire();
+                    break;
+            }
         }
     }
 }

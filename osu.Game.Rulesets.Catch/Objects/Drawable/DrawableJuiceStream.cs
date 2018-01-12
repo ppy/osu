@@ -16,15 +16,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         public DrawableJuiceStream(JuiceStream s) : base(s)
         {
             RelativeSizeAxes = Axes.Both;
-            Height = (float)HitObject.Duration;
+            Origin = Anchor.BottomLeft;
             X = 0;
 
-            Child = dropletContainer = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                RelativeChildOffset = new Vector2(0, (float)HitObject.StartTime),
-                RelativeChildSize = new Vector2(1, (float)HitObject.Duration)
-            };
+            Child = dropletContainer = new Container { RelativeSizeAxes = Axes.Both, };
 
             foreach (CatchHitObject tick in s.NestedHitObjects.OfType<CatchHitObject>())
             {
@@ -45,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             }
         }
 
-        protected override void AddNested(DrawableHitObject<CatchHitObject> h)
+        protected override void AddNested(DrawableHitObject h)
         {
             ((DrawableCatchHitObject)h).CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
             dropletContainer.Add(h);

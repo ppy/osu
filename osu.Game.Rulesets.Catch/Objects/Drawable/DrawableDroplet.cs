@@ -8,7 +8,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
-    public class DrawableDroplet : DrawableCatchHitObject<Droplet>
+    public class DrawableDroplet : PalpableCatchHitObject<Droplet>
     {
         public DrawableDroplet(Droplet h)
             : base(h)
