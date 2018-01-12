@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override BeatmapConverter<CatchHitObject> CreateBeatmapConverter() => new CatchBeatmapConverter();
 
-        protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty);
+        protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, GetVisualRepresentation);
 
         public override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
@@ -42,9 +43,13 @@ namespace osu.Game.Rulesets.Catch.UI
                 case Fruit fruit:
                     return new DrawableFruit(fruit);
                 case JuiceStream stream:
-                    return new DrawableJuiceStream(stream);
+                    return new DrawableJuiceStream(stream, GetVisualRepresentation);
                 case BananaShower banana:
-                    return new DrawableBananaShower(banana);
+                    return new DrawableBananaShower(banana, GetVisualRepresentation);
+                case TinyDroplet tiny:
+                    return new DrawableDroplet(tiny) { Scale = new Vector2(0.5f) };
+                case Droplet droplet:
+                    return new DrawableDroplet(droplet);
             }
 
             return null;

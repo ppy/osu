@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -27,6 +26,8 @@ namespace osu.Game.Rulesets.Catch.UI
         public const float CATCHER_SIZE = 172;
 
         protected readonly Catcher MovableCatcher;
+
+        public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> GetVisualRepresentation;
 
         public Container ExplodingFruitTarget
         {
@@ -45,23 +46,24 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnJudgement(DrawableCatchHitObject fruit, Judgement judgement)
         {
-            if (judgement.IsHit)
+            if (judgement.IsHit && fruit.CanBePlated)
             {
-                var screenSpacePosition = fruit.ScreenSpaceDrawQuad.Centre;
+                var caughtFruit = (DrawableCatchHitObject)GetVisualRepresentation?.Invoke(fruit.HitObject);
 
-                // todo: make this less ugly, somehow.
-                (fruit.Parent as HitObjectContainer)?.Remove(fruit);
-                (fruit.Parent as Container)?.Remove(fruit);
+                if (caughtFruit != null)
+                {
+                    caughtFruit.State.Value = ArmedState.Idle;
+                    caughtFruit.AccentColour = fruit.AccentColour;
+                    caughtFruit.RelativePositionAxes = Axes.None;
+                    caughtFruit.Position = new Vector2(MovableCatcher.ToLocalSpace(fruit.ScreenSpaceDrawQuad.Centre).X - MovableCatcher.DrawSize.X / 2, 0);
 
-                fruit.RelativePositionAxes = Axes.None;
-                fruit.Position = new Vector2(MovableCatcher.ToLocalSpace(screenSpacePosition).X - MovableCatcher.DrawSize.X / 2, 0);
+                    caughtFruit.Anchor = Anchor.TopCentre;
+                    caughtFruit.Origin = Anchor.Centre;
+                    caughtFruit.Scale *= 0.7f;
+                    caughtFruit.LifetimeEnd = double.MaxValue;
+                }
 
-                fruit.Anchor = Anchor.TopCentre;
-                fruit.Origin = Anchor.Centre;
-                fruit.Scale *= 0.7f;
-                fruit.LifetimeEnd = double.MaxValue;
-
-                MovableCatcher.Add(fruit);
+                MovableCatcher.Add(caughtFruit);
             }
 
             if (fruit.HitObject.LastInCombo)

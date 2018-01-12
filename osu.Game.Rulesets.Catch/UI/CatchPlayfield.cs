@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private readonly CatcherArea catcherArea;
 
-        public CatchPlayfield(BeatmapDifficulty difficulty)
+        public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
             : base(ScrollingDirection.Down, BASE_WIDTH)
         {
             Container explodingFruitContainer;
@@ -44,6 +45,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 },
                 catcherArea = new CatcherArea(difficulty)
                 {
+                    GetVisualRepresentation = getVisualRepresentation,
                     ExplodingFruitTarget = explodingFruitContainer,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
