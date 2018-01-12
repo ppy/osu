@@ -28,9 +28,12 @@ namespace osu.Game.Users
         private const float content_padding = 10;
         private const float status_height = 30;
 
-        private readonly Container statusBar;
-        private readonly Box statusBg;
-        private readonly OsuSpriteText statusMessage;
+        private Container statusBar;
+        private Box statusBg;
+        private OsuSpriteText statusMessage;
+
+        private Container content;
+        protected override Container<Drawable> Content => content;
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
@@ -45,133 +48,7 @@ namespace osu.Game.Users
 
             this.user = user;
 
-            FillFlowContainer infoContainer;
-
             Height = height - status_height;
-            Masking = true;
-            CornerRadius = 5;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(0.25f),
-                Radius = 4,
-            };
-
-            Children = new Drawable[]
-            {
-                new DelayedLoadWrapper(new UserCoverBackground(user)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    FillMode = FillMode.Fill,
-                    OnLoadComplete = d => d.FadeInFromZero(200),
-                }, 0) { RelativeSizeAxes = Axes.Both },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.7f),
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Top = content_padding, Left = content_padding, Right = content_padding },
-                    Children = new Drawable[]
-                    {
-                        new UpdateableAvatar
-                        {
-                            Size = new Vector2(height - status_height - content_padding * 2),
-                            User = user,
-                            Masking = true,
-                            CornerRadius = 5,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.25f),
-                                Radius = 4,
-                            },
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = height - status_height - content_padding },
-                            Children = new Drawable[]
-                            {
-                                new OsuSpriteText
-                                {
-                                    Text = user.Username,
-                                    TextSize = 18,
-                                    Font = @"Exo2.0-SemiBoldItalic",
-                                },
-                                infoContainer = new FillFlowContainer
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    AutoSizeAxes = Axes.X,
-                                    Height = 20f,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(5f, 0f),
-                                    Children = new Drawable[]
-                                    {
-                                        new DrawableFlag(user.Country)
-                                        {
-                                            Width = 30f,
-                                            RelativeSizeAxes = Axes.Y,
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                statusBar = new Container
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Alpha = 0f,
-                    Children = new Drawable[]
-                    {
-                        statusBg = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.5f,
-                        },
-                        new FillFlowContainer
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(5f, 0f),
-                            Children = new Drawable[]
-                            {
-                                new SpriteIcon
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Icon = FontAwesome.fa_circle_o,
-                                    Shadow = true,
-                                    Size = new Vector2(14),
-                                },
-                                statusMessage = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Font = @"Exo2.0-Semibold",
-                                },
-                            },
-                        },
-                    },
-                },
-            };
-
-            if (user.IsSupporter)
-                infoContainer.Add(new SupporterIcon
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 20f,
-                });
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -179,6 +56,139 @@ namespace osu.Game.Users
         {
             if (colours == null)
                 throw new ArgumentNullException(nameof(colours));
+
+            FillFlowContainer infoContainer;
+
+            AddInternal(content = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                CornerRadius = 5,
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Colour = Color4.Black.Opacity(0.25f),
+                    Radius = 4,
+                },
+
+                Children = new Drawable[]
+                {
+                    new DelayedLoadWrapper(new UserCoverBackground(user)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        FillMode = FillMode.Fill,
+                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out)
+                    }, 300) { RelativeSizeAxes = Axes.Both },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black.Opacity(0.7f),
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Top = content_padding, Horizontal = content_padding },
+                        Children = new Drawable[]
+                        {
+                            new UpdateableAvatar
+                            {
+                                Size = new Vector2(height - status_height - content_padding * 2),
+                                User = user,
+                                Masking = true,
+                                CornerRadius = 5,
+                                EdgeEffect = new EdgeEffectParameters
+                                {
+                                    Type = EdgeEffectType.Shadow,
+                                    Colour = Color4.Black.Opacity(0.25f),
+                                    Radius = 4,
+                                },
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Left = height - status_height - content_padding },
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Text = user.Username,
+                                        TextSize = 18,
+                                        Font = @"Exo2.0-SemiBoldItalic",
+                                    },
+                                    infoContainer = new FillFlowContainer
+                                    {
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        AutoSizeAxes = Axes.X,
+                                        Height = 20f,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(5f, 0f),
+                                        Children = new Drawable[]
+                                        {
+                                            new DrawableFlag(user.Country)
+                                            {
+                                                Width = 30f,
+                                                RelativeSizeAxes = Axes.Y,
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    statusBar = new Container
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.X,
+                        Alpha = 0f,
+                        Children = new Drawable[]
+                        {
+                            statusBg = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0.5f,
+                            },
+                            new FillFlowContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                AutoSizeAxes = Axes.Both,
+                                Spacing = new Vector2(5f, 0f),
+                                Children = new Drawable[]
+                                {
+                                    new SpriteIcon
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Icon = FontAwesome.fa_circle_o,
+                                        Shadow = true,
+                                        Size = new Vector2(14),
+                                    },
+                                    statusMessage = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Font = @"Exo2.0-Semibold",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                }
+            });
+
+            if (user.IsSupporter)
+            {
+                infoContainer.Add(new SupporterIcon
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 20f,
+                });
+            }
 
             Status.ValueChanged += displayStatus;
             Status.ValueChanged += status => statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
