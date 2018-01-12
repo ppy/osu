@@ -141,7 +141,7 @@
     <Compile Include="Visual\TestCaseResults.cs" />
     <Compile Include="Visual\TestCaseRoomInspector.cs" />
     <Compile Include="Visual\TestCaseScoreCounter.cs" />
-    <Compile Include="Visual\TestCaseScrollingPlayfield.cs" />
+    <Compile Include="Visual\TestCaseScrollingHitObjects.cs" />
     <Compile Include="Visual\TestCaseSettings.cs" />
     <Compile Include="Visual\TestCaseSkipButton.cs" />
     <Compile Include="Visual\TestCaseSocial.cs" />

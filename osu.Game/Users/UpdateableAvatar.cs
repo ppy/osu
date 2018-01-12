@@ -44,7 +44,7 @@ namespace osu.Game.Users
                 new Avatar(user)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    OnLoadComplete = d => d.FadeInFromZero(200),
+                    OnLoadComplete = d => d.FadeInFromZero(300, Easing.OutQuint),
                 })
             );
         }

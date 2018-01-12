@@ -34,9 +34,9 @@ namespace osu.Game.Rulesets
 
         public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
 
-        protected Ruleset(RulesetInfo rulesetInfo)
+        protected Ruleset(RulesetInfo rulesetInfo = null)
         {
-            RulesetInfo = rulesetInfo;
+            RulesetInfo = rulesetInfo ?? createRulesetInfo();
         }
 
         /// <summary>
@@ -88,5 +88,17 @@ namespace osu.Game.Rulesets
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
         public virtual string GetVariantName(int variant) => string.Empty;
+
+        /// <summary>
+        /// Create a ruleset info based on this ruleset.
+        /// </summary>
+        /// <returns>A filled <see cref="RulesetInfo"/>.</returns>
+        private RulesetInfo createRulesetInfo() => new RulesetInfo
+        {
+            Name = Description,
+            ShortName = ShortName,
+            InstantiationInfo = GetType().AssemblyQualifiedName,
+            ID = LegacyID
+        };
     }
 }

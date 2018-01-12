@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
-using OpenTK;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -42,8 +41,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public DrawableHoldNote(HoldNote hitObject, ManiaAction action)
             : base(hitObject, action)
         {
-            RelativeSizeAxes = Axes.Both;
-            Height = (float)HitObject.Duration;
+            RelativeSizeAxes = Axes.X;
 
             AddRange(new Drawable[]
             {
@@ -60,12 +58,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                 },
-                tickContainer = new Container<DrawableHoldNoteTick>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    RelativeChildOffset = new Vector2(0, (float)HitObject.StartTime),
-                    RelativeChildSize = new Vector2(1, (float)HitObject.Duration)
-                },
+                tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
                 head = new DrawableHeadNote(this, action)
                 {
                     Anchor = Anchor.TopCentre,
@@ -73,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 },
                 tail = new DrawableTailNote(this, action)
                 {
-                    Anchor = Anchor.BottomCentre,
+                    Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 }
             });
@@ -175,13 +168,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             {
                 this.holdNote = holdNote;
 
-                RelativePositionAxes = Axes.None;
-                Y = 0;
-
-                // Life time managed by the parent DrawableHoldNote
-                LifetimeStart = double.MinValue;
-                LifetimeEnd = double.MaxValue;
-
                 GlowPiece.Alpha = 0;
             }
 
@@ -200,6 +186,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 return true;
             }
+
+            protected override void UpdateState(ArmedState state)
+            {
+                // The holdnote keeps scrolling through for now, so having the head disappear looks weird
+            }
         }
 
         /// <summary>
@@ -213,13 +204,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 : base(holdNote.HitObject.Tail, action)
             {
                 this.holdNote = holdNote;
-
-                RelativePositionAxes = Axes.None;
-                Y = 0;
-
-                // Life time managed by the parent DrawableHoldNote
-                LifetimeStart = double.MinValue;
-                LifetimeEnd = double.MaxValue;
 
                 GlowPiece.Alpha = 0;
             }
@@ -250,6 +234,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Result = HitObject.HitWindows.ResultFor(offset) ?? HitResult.Miss,
                     HasBroken = holdNote.hasBroken
                 });
+            }
+
+            protected override void UpdateState(ArmedState state)
+            {
+                // The holdnote keeps scrolling through, so having the tail disappear looks weird
             }
 
             public override bool OnPressed(ManiaAction action) => false; // Tail doesn't handle key down

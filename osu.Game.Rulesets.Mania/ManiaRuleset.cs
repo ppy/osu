@@ -95,7 +95,6 @@ namespace osu.Game.Rulesets.Mania
                                 new ModCinema(),
                             },
                         },
-                        new ManiaModGravity()
                     };
 
                 default:
@@ -113,7 +112,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override int LegacyID => 3;
 
-        public ManiaRuleset(RulesetInfo rulesetInfo)
+        public ManiaRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
         {
         }
