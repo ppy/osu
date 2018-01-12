@@ -445,7 +445,7 @@ namespace osu.Game
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
-            CursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
+            CursorVisualiser.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
         private void screenAdded(Screen newScreen)

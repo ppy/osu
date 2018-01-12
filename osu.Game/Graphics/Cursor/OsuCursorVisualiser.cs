@@ -9,7 +9,10 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class OsuCursorContainer : Container, IProvideCursor
+    /// <summary>
+    /// Visualises different cursors depending on the currently-hovered <see cref="Drawable"/>s.
+    /// </summary>
+    public class OsuCursorVisualiser : Container, IProvideCursor
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -22,7 +25,7 @@ namespace osu.Game.Graphics.Cursor
         public CursorContainer Cursor { get; }
         public bool ProvidesUserCursor => true;
 
-        public OsuCursorContainer()
+        public OsuCursorVisualiser()
         {
             AddRangeInternal(new Drawable[]
             {
