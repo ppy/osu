@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         private readonly Container bananaContainer;
 
-        public DrawableBananaShower(BananaShower s)
+        public DrawableBananaShower(BananaShower s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation = null)
             : base(s)
         {
             RelativeSizeAxes = Axes.X;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Child = bananaContainer = new Container { RelativeSizeAxes = Axes.Both };
 
             foreach (var b in s.NestedHitObjects.Cast<BananaShower.Banana>())
-                AddNested(new DrawableFruit(b));
+                AddNested(getVisualRepresentation?.Invoke(b));
         }
 
         protected override void AddNested(DrawableHitObject h)

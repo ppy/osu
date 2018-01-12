@@ -1,9 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
@@ -12,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         private readonly Container dropletContainer;
 
-        public DrawableJuiceStream(JuiceStream s)
+        public DrawableJuiceStream(JuiceStream s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation = null)
             : base(s)
         {
             RelativeSizeAxes = Axes.Both;
@@ -21,21 +22,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             Child = dropletContainer = new Container { RelativeSizeAxes = Axes.Both, };
 
-            foreach (var tick in s.NestedHitObjects)
-            {
-                switch (tick)
-                {
-                    case TinyDroplet tiny:
-                        AddNested(new DrawableDroplet(tiny) { Scale = new Vector2(0.5f) });
-                        break;
-                    case Droplet droplet:
-                        AddNested(new DrawableDroplet(droplet));
-                        break;
-                    case Fruit fruit:
-                        AddNested(new DrawableFruit(fruit));
-                        break;
-                }
-            }
+            foreach (var o in s.NestedHitObjects.Cast<CatchHitObject>())
+                AddNested(getVisualRepresentation?.Invoke(o));
         }
 
         protected override void AddNested(DrawableHitObject h)
