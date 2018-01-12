@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
@@ -13,7 +12,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         private readonly Container dropletContainer;
 
-        public DrawableJuiceStream(JuiceStream s) : base(s)
+        public DrawableJuiceStream(JuiceStream s)
+            : base(s)
         {
             RelativeSizeAxes = Axes.Both;
             Origin = Anchor.BottomLeft;
@@ -21,22 +21,20 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             Child = dropletContainer = new Container { RelativeSizeAxes = Axes.Both, };
 
-            foreach (CatchHitObject tick in s.NestedHitObjects.OfType<CatchHitObject>())
+            foreach (var tick in s.NestedHitObjects)
             {
-                TinyDroplet tiny = tick as TinyDroplet;
-                if (tiny != null)
+                switch (tick)
                 {
-                    AddNested(new DrawableDroplet(tiny) { Scale = new Vector2(0.5f) });
-                    continue;
+                    case TinyDroplet tiny:
+                        AddNested(new DrawableDroplet(tiny) { Scale = new Vector2(0.5f) });
+                        break;
+                    case Droplet droplet:
+                        AddNested(new DrawableDroplet(droplet));
+                        break;
+                    case Fruit fruit:
+                        AddNested(new DrawableFruit(fruit));
+                        break;
                 }
-
-                Droplet droplet = tick as Droplet;
-                if (droplet != null)
-                    AddNested(new DrawableDroplet(droplet));
-
-                Fruit fruit = tick as Fruit;
-                if (fruit != null)
-                    AddNested(new DrawableFruit(fruit));
             }
         }
 

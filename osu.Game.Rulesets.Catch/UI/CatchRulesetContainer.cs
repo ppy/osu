@@ -33,13 +33,15 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)
         {
-            var fruit = h as Fruit;
-            if (fruit != null)
-                return new DrawableFruit(fruit);
-
-            var stream = h as JuiceStream;
-            if (stream != null)
-                return new DrawableJuiceStream(stream);
+            switch (h)
+            {
+                case Fruit fruit:
+                    return new DrawableFruit(fruit);
+                case JuiceStream stream:
+                    return new DrawableJuiceStream(stream);
+                case BananaShower banana:
+                    return new DrawableBananaShower(banana);
+            }
 
             return null;
         }
