@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             if (CheckPosition == null) return;
 
             if (timeOffset > 0)
-                AddJudgement(new Judgement { Result = (bool)CheckPosition?.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss });
+                AddJudgement(new Judgement { Result = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss });
         }
 
         private const float preempt = 1000;
