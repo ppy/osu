@@ -174,10 +174,7 @@ namespace osu.Game.Overlays.Direct
             private void load(AudioManager audio)
             {
                 if (!string.IsNullOrEmpty(preview))
-                {
                     Preview = audio.Track.Get(preview);
-                    Preview.Volume.Value = 0.5;
-                }
             }
         }
     }
