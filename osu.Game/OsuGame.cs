@@ -297,8 +297,6 @@ namespace osu.Game
                 else
                     Toolbar.State = Visibility.Visible;
             };
-
-            Cursor.State = Visibility.Hidden;
         }
 
         private void forwardLoggedErrorsToNotifications()
@@ -446,8 +444,6 @@ namespace osu.Game
             Beatmap.Disabled = applyRestrictions;
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
-
-            Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
         }
 
         private void screenAdded(Screen newScreen)

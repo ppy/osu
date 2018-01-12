@@ -37,8 +37,6 @@ namespace osu.Game.Screens
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        public virtual bool HasLocalCursorDisplayed => false;
-
         private OsuLogo logo;
 
         /// <summary>
