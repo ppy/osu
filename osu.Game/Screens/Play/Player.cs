@@ -23,21 +23,21 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Game.Screens.Play.BreaksOverlay;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : OsuScreen
+    public class Player : OsuScreen, IProvideLocalCursor
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         public override bool ShowOverlaysOnEnter => false;
-
-        public override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && RulesetContainer.ProvidingUserCursor;
 
         public Action RestartRequested;
 
@@ -50,6 +50,9 @@ namespace osu.Game.Screens.Play
         public bool AllowResults { get; set; } = true;
 
         public int RestartCount;
+
+        public CursorContainer LocalCursor => RulesetContainer.Cursor;
+        public bool ProvidesUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded;
 
         private IAdjustableClock adjustableSourceClock;
         private FramedOffsetClock offsetClock;
@@ -152,6 +155,12 @@ namespace osu.Game.Screens.Play
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
+            // We want the cursor to be above everything (including the skip button), but still be able to be controlled
+            // by the ruleset's input manager and replay, so we need to proxy it out from the ruleset container
+            var cursorProxyContainer = new Container { RelativeSizeAxes = Axes.Both };
+            if (RulesetContainer.Cursor != null)
+                cursorProxyContainer.Add(RulesetContainer.Cursor.CreateProxy());
+
             Children = new Drawable[]
             {
                 storyboardContainer = new Container
@@ -195,6 +204,7 @@ namespace osu.Game.Screens.Play
                             Clock = decoupledClock,
                             Breaks = beatmap.Breaks
                         },
+                        cursorProxyContainer
                     }
                 },
                 failOverlay = new FailOverlay

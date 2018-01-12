@@ -52,8 +52,6 @@ namespace osu.Game
 
         protected override Container<Drawable> Content => content;
 
-        protected MenuCursor Cursor;
-
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
         private Bindable<bool> fpsDisplayVisible;
@@ -211,21 +209,14 @@ namespace osu.Game
 
             GlobalKeyBindingInputManager globalBinding;
 
-            base.Content.Add(new DrawSizePreservingFillContainer
+            var cursorContainer = new OsuCursorContainer { RelativeSizeAxes = Axes.Both };
+            cursorContainer.Child = globalBinding = new GlobalKeyBindingInputManager(this)
             {
-                Children = new Drawable[]
-                {
-                    Cursor = new MenuCursor(),
-                    globalBinding = new GlobalKeyBindingInputManager(this)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = content = new OsuTooltipContainer(Cursor)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    }
-                }
-            });
+                RelativeSizeAxes = Axes.Both,
+                Child = content = new OsuTooltipContainer(cursorContainer.LocalCursor) { RelativeSizeAxes = Axes.Both　}
+            };
+
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = cursorContainer });
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);

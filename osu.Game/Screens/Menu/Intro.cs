@@ -15,10 +15,12 @@ using osu.Game.Configuration;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Graphics.Cursor;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Screens.Menu
 {
-    public class Intro : OsuScreen
+    public class Intro : OsuScreen, IProvideLocalCursor
     {
         private const string menu_music_beatmap_hash = "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 
@@ -31,9 +33,10 @@ namespace osu.Game.Screens.Menu
         private SampleChannel welcome;
         private SampleChannel seeya;
 
-        public override bool HasLocalCursorDisplayed => true;
-
         public override bool ShowOverlaysOnEnter => false;
+
+        public CursorContainer LocalCursor => null;
+        public bool ProvidesUserCursor => true;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();
 

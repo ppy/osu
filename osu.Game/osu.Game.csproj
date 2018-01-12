@@ -374,8 +374,10 @@
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Containers\ReverseChildIDFillFlowContainer.cs" />
     <Compile Include="Graphics\Containers\SectionsContainer.cs" />
+    <Compile Include="Graphics\Cursor\IProvideLocalCursor.cs" />
     <Compile Include="Graphics\Cursor\MenuCursor.cs" />
     <Compile Include="Graphics\Cursor\OsuContextMenuContainer.cs" />
+    <Compile Include="Graphics\Cursor\OsuCursorContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuTooltipContainer.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
