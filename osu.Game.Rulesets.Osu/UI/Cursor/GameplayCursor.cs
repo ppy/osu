@@ -159,5 +159,17 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             return false;
         }
+
+        protected override void PopIn()
+        {
+            ActiveCursor.FadeTo(1, 250, Easing.OutQuint);
+            ActiveCursor.ScaleTo(1, 400, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            ActiveCursor.FadeTo(0, 250, Easing.OutQuint);
+            ActiveCursor.ScaleTo(0.6f, 250, Easing.In);
+        }
     }
 }
