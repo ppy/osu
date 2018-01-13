@@ -29,6 +29,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public virtual Color4 AccentColour { get; set; } = Color4.Gray;
 
+        // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
+        protected virtual string SampleNamespace => null;
+
+        protected List<SampleChannel> Samples = new List<SampleChannel>();
+        protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
+
         private List<DrawableHitObject> nestedHitObjects;
         public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
 
@@ -70,6 +76,35 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject = hitObject;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            var samples = GetSamples();
+            if (samples.Any())
+            {
+                if (HitObject.SampleControlPoint == null)
+                    throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
+                                                                                          + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
+
+                foreach (SampleInfo s in samples)
+                {
+                    SampleInfo localSampleInfo = new SampleInfo
+                    {
+                        Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
+                        Name = s.Name,
+                        Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
+                    };
+
+                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample, SampleNamespace);
+
+                    if (channel == null)
+                        continue;
+
+                    Samples.Add(channel);
+                }
+            }
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -80,6 +115,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                 // apply any custom state overrides
                 ApplyCustomUpdateState?.Invoke(this, state);
+
+                if (State == ArmedState.Hit)
+                    PlaySamples();
             };
 
             State.TriggerChange();
@@ -91,6 +129,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Bind to apply a custom state which can override the default implementation.
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
+
+        protected void PlaySamples() => Samples.ForEach(s => s?.Play());
 
         protected override void Update()
         {
@@ -208,58 +248,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
     {
         public new readonly TObject HitObject;
 
-        protected List<SampleChannel> Samples = new List<SampleChannel>();
-        protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
-
-        // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
-        protected virtual string SampleNamespace => null;
-
         protected DrawableHitObject(TObject hitObject)
             : base(hitObject)
         {
             HitObject = hitObject;
         }
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            var samples = GetSamples();
-            if (samples.Any())
-            {
-                if (HitObject.SampleControlPoint == null)
-                    throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
-                                                                                          + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-
-                foreach (SampleInfo s in samples)
-                {
-                    SampleInfo localSampleInfo = new SampleInfo
-                    {
-                        Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
-                        Name = s.Name,
-                        Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
-                    };
-
-                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample, SampleNamespace);
-
-                    if (channel == null)
-                        continue;
-
-                    Samples.Add(channel);
-                }
-            }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            State.ValueChanged += state =>
-            {
-                if (State == ArmedState.Hit)
-                    PlaySamples();
-            };
-        }
-
-        protected void PlaySamples() => Samples.ForEach(s => s?.Play());
     }
 }
