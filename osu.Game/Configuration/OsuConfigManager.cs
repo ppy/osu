@@ -72,6 +72,8 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.FloatingComments, false);
 
+            Set(OsuSetting.SpeedChangeVisualisation, SpeedChangeVisualisationMethod.Sequential);
+
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
@@ -116,6 +118,7 @@ namespace osu.Game.Configuration
         ShowFpsDisplay,
         ChatDisplayHeight,
         Version,
-        ShowConvertedBeatmaps
+        ShowConvertedBeatmaps,
+        SpeedChangeVisualisation
     }
 }

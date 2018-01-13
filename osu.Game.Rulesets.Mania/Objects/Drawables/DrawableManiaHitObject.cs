@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
-    public abstract class DrawableManiaHitObject<TObject> : DrawableScrollingHitObject<ManiaHitObject>
+    public abstract class DrawableManiaHitObject<TObject> : DrawableHitObject<ManiaHitObject>
         where TObject : ManiaHitObject
     {
         /// <summary>
@@ -20,7 +20,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected DrawableManiaHitObject(TObject hitObject, ManiaAction? action = null)
             : base(hitObject)
         {
-            RelativePositionAxes = Axes.Y;
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.TopCentre;
+
             HitObject = hitObject;
 
             if (action != null)

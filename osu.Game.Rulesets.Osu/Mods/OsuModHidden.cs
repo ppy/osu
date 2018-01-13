@@ -16,17 +16,15 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
 
-        private const double fade_in_duration_multiplier = 0.4;
+        private const float fade_in_duration_multiplier = 0.4f;
         private const double fade_out_duration_multiplier = 0.3;
-
-        private float preEmpt => DrawableOsuHitObject.TIME_PREEMPT;
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
                 d.ApplyCustomUpdateState += ApplyHiddenState;
-                d.FadeInDuration = preEmpt * fade_in_duration_multiplier;
+                d.HitObject.TimeFadein = d.HitObject.TimePreempt * fade_in_duration_multiplier;
             }
         }
 
@@ -35,8 +33,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(drawable is DrawableOsuHitObject d))
                 return;
 
-            var fadeOutStartTime = d.HitObject.StartTime - preEmpt + d.FadeInDuration;
-            var fadeOutDuration = preEmpt * fade_out_duration_multiplier;
+            var fadeOutStartTime = d.HitObject.StartTime - d.HitObject.TimePreempt + d.HitObject.TimeFadein;
+            var fadeOutDuration = d.HitObject.TimePreempt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)
             var longFadeDuration = ((d.HitObject as IHasEndTime)?.EndTime ?? d.HitObject.StartTime) - fadeOutStartTime;

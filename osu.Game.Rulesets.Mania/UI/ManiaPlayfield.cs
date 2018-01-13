@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,6 +16,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly int columnCount;
 
         public ManiaPlayfield(int columnCount)
-            : base(Axes.Y)
+            : base(ScrollingDirection.Up)
         {
             this.columnCount = columnCount;
 
