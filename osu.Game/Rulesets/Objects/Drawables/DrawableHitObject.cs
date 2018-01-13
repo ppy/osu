@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="userTriggered">Whether the user triggered this process.</param>
         /// <returns>Whether a judgement has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>s.</returns>
-        protected internal bool UpdateJudgement(bool userTriggered)
+        protected bool UpdateJudgement(bool userTriggered)
         {
             judgementOccurred = false;
 
