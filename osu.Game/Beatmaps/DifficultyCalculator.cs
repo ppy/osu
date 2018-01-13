@@ -27,7 +27,6 @@ namespace osu.Game.Beatmaps
             Beatmap = CreateBeatmapConverter(beatmap).Convert(beatmap);
             Mods = mods ?? new Mod[0];
 
-
             ApplyMods(Mods);
 
             PreprocessHitObjects();
