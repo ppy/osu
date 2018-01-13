@@ -157,7 +157,6 @@ namespace osu.Game.Screens.Menu
                             return true;
                     }
 
-
                     return false;
             }
 
