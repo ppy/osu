@@ -50,6 +50,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public virtual bool DisplayJudgement => true;
 
         /// <summary>
+        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been hit.
+        /// </summary>
+        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && (NestedHitObjects?.All(n => n.IsHit) ?? true);
+
+        /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
         public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
