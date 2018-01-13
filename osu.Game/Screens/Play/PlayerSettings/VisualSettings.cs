@@ -8,11 +8,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Play.ReplaySettings;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class VisualSettings : ReplayGroup
+    public class VisualSettings : PlayerGroup
     {
         protected override string Title => "Visual settings";
 
@@ -37,10 +36,10 @@ namespace osu.Game.Screens.Play.HUD
         private readonly TimeSpan hideTimeSpan = TimeSpan.FromSeconds(3);
         private Stopwatch hideStopWatch;
 
-        private readonly ReplaySliderBar<double> dimSliderBar;
-        private readonly ReplaySliderBar<double> blurSliderBar;
-        private readonly ReplayCheckbox showStoryboardToggle;
-        private readonly ReplayCheckbox mouseWheelDisabledToggle;
+        private readonly PlayerSliderBar<double> dimSliderBar;
+        private readonly PlayerSliderBar<double> blurSliderBar;
+        private readonly PlayerCheckbox showStoryboardToggle;
+        private readonly PlayerCheckbox mouseWheelDisabledToggle;
 
         public VisualSettings()
         {
@@ -50,18 +49,18 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     Text = "Background dim:"
                 },
-                dimSliderBar = new ReplaySliderBar<double>(),
+                dimSliderBar = new PlayerSliderBar<double>(),
                 new OsuSpriteText
                 {
                     Text = "Background blur:"
                 },
-                blurSliderBar = new ReplaySliderBar<double>(),
+                blurSliderBar = new PlayerSliderBar<double>(),
                 new OsuSpriteText
                 {
                     Text = "Toggles:"
                 },
-                showStoryboardToggle = new ReplayCheckbox { LabelText = "Storyboards" },
-                mouseWheelDisabledToggle = new ReplayCheckbox { LabelText = "Disable mouse wheel" }
+                showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboards" },
+                mouseWheelDisabledToggle = new PlayerCheckbox { LabelText = "Disable mouse wheel" }
             };
         }
 

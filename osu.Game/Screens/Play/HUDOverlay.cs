@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
-        public readonly ReplaySettingsOverlay ReplaySettingsOverlay;
+        public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         private Bindable<bool> showHud;
         private bool replayLoaded;
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
-                    ReplaySettingsOverlay = CreateReplaySettingsOverlay(),
+                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                 }
             });
         }
@@ -97,13 +97,13 @@ namespace osu.Game.Screens.Play
 
             replayLoaded = rulesetContainer.HasReplayLoaded;
 
-            ReplaySettingsOverlay.ReplayLoaded = replayLoaded;
+            PlayerSettingsOverlay.ReplayLoaded = replayLoaded;
 
             // in the case a replay isn't loaded, we want some elements to only appear briefly.
             if (!replayLoaded)
             {
-                ReplaySettingsOverlay.PlaybackSettings.Hide();
-                ReplaySettingsOverlay.VisualSettings.Autohide = true;
+                PlayerSettingsOverlay.PlaybackSettings.Hide();
+                PlayerSettingsOverlay.VisualSettings.Autohide = true;
                 ModDisplay.Delay(2000).FadeOut(200);
             }
         }
@@ -183,7 +183,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
-        protected virtual ReplaySettingsOverlay CreateReplaySettingsOverlay() => new ReplaySettingsOverlay();
+        protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
         public virtual void BindProcessor(ScoreProcessor processor)
         {
