@@ -23,9 +23,9 @@ namespace osu.Game.Rulesets.Mania.UI
     public class ManiaPlayfield : ScrollingPlayfield
     {
         /// <summary>
-        /// list mania column stages
+        /// <see cref="ManiaStage"/>s contained by this <see cref="ManiaPlayfield"/>.
         /// </summary>
-        private readonly FillFlowContainer<ManiaStage> Stages;
+        private readonly FillFlowContainer<ManiaStage> stages;
 
         /// <summary>
         /// Whether this playfield should be inverted. This flips everything inside the playfield.
@@ -37,35 +37,38 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public SpecialColumnPosition SpecialColumnPosition
         {
-            get => Stages.FirstOrDefault()?.SpecialColumnPosition ?? SpecialColumnPosition.Normal;
+            get => stages.FirstOrDefault()?.SpecialColumnPosition ?? SpecialColumnPosition.Normal;
             set
             {
-                foreach (var singleStage in Stages)
+                foreach (var singleStage in stages)
                 {
                     singleStage.SpecialColumnPosition = value;
                 }
             }
         }
 
-        public List<Column> Columns => Stages.SelectMany(x => x.Columns).ToList();
+        public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
 
         private readonly int columnCount;
 
-        public ManiaPlayfield(List<StageDefinition> stages)
+        public ManiaPlayfield(List<StageDefinition> stageDefinition)
             : base(ScrollingDirection.Up)
         {
-            if (stages.Count <= 0)
+            if (stageDefinition ==null)
+                throw new ArgumentNullException();
+
+            if (stageDefinition.Count <= 0)
                 throw new ArgumentException("Can't have zero or fewer columns.");
 
             Inverted.Value = true;
 
-            var stageSpacing = 300 / stages.Count;
+            var stageSpacing = 300 / stageDefinition.Count;
 
             InternalChildren = new Drawable[]
             {
-                Stages = new FillFlowContainer<ManiaStage>
+                this.stages = new FillFlowContainer<ManiaStage>
                 {
-                    Name="Stages",
+                    Name = "Stages",
                     Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
@@ -76,12 +79,12 @@ namespace osu.Game.Rulesets.Mania.UI
 
             var currentAction = ManiaAction.Key1;
 
-            foreach (var stage in stages)
+            foreach (var stage in stageDefinition)
             {
                 var drawableStage = new ManiaStage();
                 drawableStage.VisibleTimeRange.BindTo(VisibleTimeRange);
 
-                Stages.Add(drawableStage);
+                this.stages.Add(drawableStage);
                 AddNested(drawableStage);
 
                 for (int i = 0; i < stage.Columns; i++)
@@ -105,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             Scale = new Vector2(1, newValue ? -1 : 1);
 
-            foreach (var single in Stages)
+            foreach (var single in stages)
             {
                 single.Judgements.Scale = Scale;
             }
@@ -117,28 +120,28 @@ namespace osu.Game.Rulesets.Mania.UI
             int column = maniaObject.Column;
             Columns[column].OnJudgement(judgedObject, judgement);
 
-            getFallDownControlContainerByActualColumn(column).AddJudgement(judgement);
+            getStageByColumn(column).AddJudgement(judgement);
         }
 
         public override void Add(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column).Add(h);
 
         public void Add(BarLine barline)
         {
-            foreach (var single in Stages)
+            foreach (var single in stages)
             {
                 single.HitObjects.Add(new DrawableBarLine(barline));
             }
         }
 
-        private ManiaStage getFallDownControlContainerByActualColumn(int actualColumn)
+        private ManiaStage getStageByColumn(int column)
         {
             int sum = 0;
-            foreach (var single in Stages)
+            foreach (var stage in stages)
             {
-                sum = sum + single.Columns.Count();
-                if (sum > actualColumn)
+                sum = sum + stage.Columns.Count();
+                if (sum > column)
                 {
-                    return single;
+                    return stage;
                 }
             }
 
