@@ -81,8 +81,9 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 var drawableStage = new ManiaStage();
                 drawableStage.VisibleTimeRange.BindTo(VisibleTimeRange);
+                drawableStage.Inverted.BindTo(Inverted);
                 drawableStage.ColumnStartIndex = stageIndex;
-                
+
                 stages.Add(drawableStage);
                 AddNested(drawableStage);
 
@@ -99,19 +100,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 }
 
                 stageIndex = stageIndex + stage.Columns;
-            }
-
-            Inverted.ValueChanged += invertedChanged;
-            Inverted.TriggerChange();
-        }
-
-        private void invertedChanged(bool newValue)
-        {
-            Scale = new Vector2(1, newValue ? -1 : 1);
-
-            foreach (var single in stages)
-            {
-                single.Judgements.Scale = Scale;
             }
         }
 

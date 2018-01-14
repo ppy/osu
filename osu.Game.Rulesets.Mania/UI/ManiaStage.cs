@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -24,6 +25,11 @@ namespace osu.Game.Rulesets.Mania.UI
     internal class ManiaStage : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
+
+        /// <summary>
+        /// Whether this playfield should be inverted. This flips everything inside the playfield.
+        /// </summary>
+        public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
         private SpecialColumnPosition specialColumnPosition;
 
@@ -61,8 +67,8 @@ namespace osu.Game.Rulesets.Mania.UI
             : base(ScrollingDirection.Up)
         {
             Name = "Playfield elements";
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
             //RelativeSizeAxes = Axes.Y;
             //AutoSizeAxes = Axes.X;
             InternalChildren = new Drawable[]
@@ -130,6 +136,15 @@ namespace osu.Game.Rulesets.Mania.UI
                     }
                 }
             };
+
+            Inverted.ValueChanged += invertedChanged;
+            Inverted.TriggerChange();
+        }
+
+        private void invertedChanged(bool newValue)
+        {
+            Scale = new Vector2(1, newValue ? -1 : 1);
+            Judgements.Scale = Scale;
         }
 
         /// <summary>
@@ -166,15 +181,15 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override void Add(DrawableHitObject h)
         {
-            int index = ((ManiaHitObject)h.HitObject).Column - ColumnStartIndex;
-            Columns.ElementAt(index).Add(h);
+            int columnIndex = ((ManiaHitObject)h.HitObject).Column - ColumnStartIndex;
+            Columns.ElementAt(columnIndex).Add(h);
         }
 
         public void AddJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             var maniaObject = (ManiaHitObject)judgedObject.HitObject;
-            int column = maniaObject.Column - ColumnStartIndex;
-            columns[column].OnJudgement(judgedObject, judgement);
+            int columnIndex = maniaObject.Column - ColumnStartIndex;
+            columns[columnIndex].OnJudgement(judgedObject, judgement);
 
             judgements.Clear();
             judgements.Add(new DrawableManiaJudgement(judgement)
