@@ -115,7 +115,7 @@
     <Compile Include="Tests\TestCasePerformancePoints.cs" />
     <Compile Include="UI\Column.cs" />
     <Compile Include="UI\DrawableManiaJudgement.cs" />
-    <Compile Include="UI\ManiaColumnStage.cs" />
+    <Compile Include="UI\ManiaStage.cs" />
     <Compile Include="UI\HitExplosion.cs" />
     <Compile Include="UI\ManiaRulesetContainer.cs" />
     <Compile Include="UI\ManiaPlayfield.cs" />
