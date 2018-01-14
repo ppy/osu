@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly int ColumnCount;
 
         public ManiaColumnStage(int columnCount)
-            : base(Axes.Y)
+            : base(ScrollingDirection.Up)
         {
             ColumnCount = columnCount;
             Name = "Playfield elements";

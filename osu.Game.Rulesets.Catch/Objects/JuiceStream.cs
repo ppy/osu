@@ -125,9 +125,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                     X = Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
                 });
             }
-
         }
-
 
         public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
 

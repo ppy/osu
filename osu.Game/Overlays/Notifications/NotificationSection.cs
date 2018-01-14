@@ -168,5 +168,4 @@ namespace osu.Game.Overlays.Notifications
         // the layout portion of this is being tracked as a framework issue (https://github.com/ppy/osu-framework/issues/1297).
         protected override bool RequiresChildrenUpdate => true;
     }
-
 }

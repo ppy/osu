@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public abstract class ManiaKeyMod : Mod, IApplicableMod, IApplicableToBeatmapConverter<ManiaHitObject>
+    public abstract class ManiaKeyMod : Mod, IApplicableToBeatmapConverter<ManiaHitObject>
     {
         public override string ShortenedName => Name;
         public abstract int KeyCount { get; }

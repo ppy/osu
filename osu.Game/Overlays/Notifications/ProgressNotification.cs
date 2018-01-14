@@ -217,7 +217,6 @@ namespace osu.Game.Overlays.Notifications
                 };
             }
 
-
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {

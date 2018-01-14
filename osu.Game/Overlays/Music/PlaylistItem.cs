@@ -148,7 +148,6 @@ namespace osu.Game.Overlays.Music
 
         private class PlaylistItemHandle : SpriteIcon
         {
-
             public PlaylistItemHandle()
             {
                 Anchor = Anchor.TopLeft;
