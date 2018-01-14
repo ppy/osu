@@ -46,8 +46,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
 
-        private readonly int columnCount;
-
         public ManiaPlayfield(List<StageDefinition> stageDefinition)
             : base(ScrollingDirection.Up)
         {
@@ -63,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             InternalChildren = new Drawable[]
             {
-                this.stages = new FillFlowContainer<ManiaStage>
+                stages = new FillFlowContainer<ManiaStage>
                 {
                     Name = "Stages",
                     Direction = FillDirection.Horizontal,
