@@ -96,7 +96,6 @@ namespace osu.Game.Rulesets.Mania.UI
                     };
 
                     drawableStage.AddColumn(c);
-                    AddNested(c);
                 }
 
                 stageIndex = stageIndex + stage.Columns;
