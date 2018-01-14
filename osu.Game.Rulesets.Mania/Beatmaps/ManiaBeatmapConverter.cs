@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
         public int TargetColumns;
+        public List<StageDefinition> StageDefinitions;
         public readonly bool IsForCurrentRuleset;
 
         private Pattern lastPattern = new Pattern();
@@ -66,7 +67,16 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             return base.ConvertBeatmap(original);
         }
 
-        protected override Beatmap<ManiaHitObject> CreateBeatmap() => beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
+        protected override Beatmap<ManiaHitObject> CreateBeatmap()
+        {
+            if(StageDefinitions==null)
+                StageDefinitions=new List<StageDefinition>()
+                {
+                    new StageDefinition { Columns = TargetColumns }
+                };
+
+            return beatmap = new ManiaBeatmap(StageDefinitions);
+        }
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
         {

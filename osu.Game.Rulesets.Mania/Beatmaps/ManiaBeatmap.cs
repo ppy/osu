@@ -25,9 +25,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// Creates a new <see cref="ManiaBeatmap"/>.
         /// </summary>
         /// <param name="initialStage">The initial stage.</param>
-        public ManiaBeatmap(StageDefinition initialStage)
+        public ManiaBeatmap(List<StageDefinition> stages)
         {
-            Stages.Add(initialStage);
+            Stages = stages;
         }
     }
 }
