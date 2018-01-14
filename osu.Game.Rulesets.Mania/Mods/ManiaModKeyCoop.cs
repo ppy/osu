@@ -27,10 +27,10 @@ namespace osu.Game.Rulesets.Mania.Mods
 
             int originTargetColumns = mbc.TargetColumns;
 
-            var newStages = new List<StageDefinition>()
+            var newStages = new List<StageDefinition>
             {
-                new StageDefinition() { Columns = originTargetColumns },
-                new StageDefinition() { Columns = originTargetColumns },
+                new StageDefinition { Columns = originTargetColumns },
+                new StageDefinition { Columns = originTargetColumns },
             };
 
             mbc.StageDefinitions = newStages;
