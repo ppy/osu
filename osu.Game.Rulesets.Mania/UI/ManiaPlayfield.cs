@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// The style to use for the special column.
         /// </summary>
-        public Bindable<SpecialColumnPosition> SpecialColumnPosition = new Bindable<UI.SpecialColumnPosition>();
+        public Bindable<SpecialColumnPosition> SpecialColumnPosition = new Bindable<SpecialColumnPosition>();
 
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
 
@@ -68,6 +68,7 @@ namespace osu.Game.Rulesets.Mania.UI
             foreach (var stage in stageDefinition)
             {
                 var drawableStage = new ManiaStage();
+                drawableStage.SpecialColumn.BindTo(SpecialColumnPosition);
                 drawableStage.VisibleTimeRange.BindTo(VisibleTimeRange);
                 drawableStage.Inverted.BindTo(Inverted);
                 drawableStage.ColumnStartIndex = stageIndex;
@@ -99,7 +100,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override void Add(DrawableHitObject h)
         {
-            // => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column).Add(h)
             int column = ((ManiaHitObject)h.HitObject).Column;
             var stage = getStageByColumn(column);
             stage.Add(h);

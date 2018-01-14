@@ -55,8 +55,6 @@ namespace osu.Game.Rulesets.Mania.UI
             Name = "Playfield elements";
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            //RelativeSizeAxes = Axes.Y;
-            //AutoSizeAxes = Axes.X;
             InternalChildren = new Drawable[]
             {
                 new Container
