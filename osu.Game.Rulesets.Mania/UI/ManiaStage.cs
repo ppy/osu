@@ -171,6 +171,7 @@ namespace osu.Game.Rulesets.Mania.UI
             c.VisibleTimeRange.BindTo(VisibleTimeRange);
             topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
             columns.Add(c);
+            AddNested(c);
 
             Margin = new MarginPadding
             {
