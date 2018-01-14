@@ -39,10 +39,14 @@ namespace osu.Game.Users
         public string AvatarUrl;
 
         [JsonProperty(@"cover_url")]
-        public string CoverUrl;
+        public string CoverUrl
+        {
+            get { return Cover?.Url; }
+            set { Cover = new UserCover { Url = value }; }
+        }
 
-        //[JsonProperty(@"cover")]
-        //public UserCover Cover;
+        [JsonProperty(@"cover")]
+        public UserCover Cover;
 
         public class UserCover
         {

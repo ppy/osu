@@ -22,7 +22,8 @@ namespace osu.Game.Overlays.Social
     public enum SocialSortCriteria
     {
         Rank,
-        //Location,
+        Name,
+        Location,
         //[Description("Time Zone")]
         //TimeZone,
         //[Description("World Map")]

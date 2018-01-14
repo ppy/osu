@@ -78,6 +78,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+            switch (state)
+            {
+                case ArmedState.Hit:
+                case ArmedState.Miss:
+                    this.FadeOut(100).Expire();
+                    break;
+            }
         }
 
         public virtual bool OnPressed(ManiaAction action)

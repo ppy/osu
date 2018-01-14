@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Screens.Play.ReplaySettings
 {
     public class ReplaySliderBar<T> : SettingsSlider<T>
-        where T : struct, IEquatable<T>
+        where T : struct, IEquatable<T>, IComparable, IConvertible
     {
         protected override Drawable CreateControl() => new Sliderbar
         {
@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         private class Sliderbar : OsuSliderBar<T>
         {
+            public override string TooltipText => $"{CurrentNumber.Value}";
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
