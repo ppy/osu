@@ -31,21 +31,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
-        private SpecialColumnPosition specialColumnPosition;
-
-        /// <summary>
-        /// The style to use for the special column.
-        /// </summary>
-        public SpecialColumnPosition SpecialColumnPosition
-        {
-            get { return specialColumnPosition; }
-            set
-            {
-                if (IsLoaded)
-                    throw new InvalidOperationException($"Setting {nameof(SpecialColumnPosition)} after the playfield is loaded requires re-creating the playfield.");
-                specialColumnPosition = value;
-            }
-        }
+        public readonly Bindable<SpecialColumnPosition> SpecialColumn = new Bindable<SpecialColumnPosition>();
 
         public IEnumerable<Column> Columns => columns.Children;
         private readonly FillFlowContainer<Column> columns;
@@ -147,25 +133,6 @@ namespace osu.Game.Rulesets.Mania.UI
             Judgements.Scale = Scale;
         }
 
-        /// <summary>
-        /// Whether the column index is a special column for this playfield.
-        /// </summary>
-        /// <param name="column">The 0-based column index.</param>
-        /// <returns>Whether the column is a special column.</returns>
-        private bool isSpecialColumn(int column)
-        {
-            switch (SpecialColumnPosition)
-            {
-                default:
-                case SpecialColumnPosition.Normal:
-                    return columns.Count % 2 == 1 && column == columns.Count / 2;
-                case SpecialColumnPosition.Left:
-                    return column == 0;
-                case SpecialColumnPosition.Right:
-                    return column == columns.Count - 1;
-            }
-        }
-
         public void AddColumn(Column c)
         {
             c.VisibleTimeRange.BindTo(VisibleTimeRange);
@@ -178,6 +145,25 @@ namespace osu.Game.Rulesets.Mania.UI
                 Left = columns.Count * HIT_TARGET_POSITION / 2,
                 Right = columns.Count * HIT_TARGET_POSITION / 2,
             };
+        }
+
+        /// <summary>
+        /// Whether the column index is a special column for this playfield.
+        /// </summary>
+        /// <param name="column">The 0-based column index.</param>
+        /// <returns>Whether the column is a special column.</returns>
+        private bool isSpecialColumn(int column)
+        {
+            switch (SpecialColumn.Value)
+            {
+                default:
+                case SpecialColumnPosition.Normal:
+                    return columns.Count % 2 == 1 && column == columns.Count / 2;
+                case SpecialColumnPosition.Left:
+                    return column == 0;
+                case SpecialColumnPosition.Right:
+                    return column == columns.Count - 1;
+            }
         }
 
         public override void Add(DrawableHitObject h)
@@ -203,6 +189,11 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            for (int i = 0; i < columns.Count; i++)
+            {
+                columns[i].IsSpecial = isSpecialColumn(i);
+            }
+
             normalColumnColours = new List<Color4>
             {
                 colours.RedDark,
