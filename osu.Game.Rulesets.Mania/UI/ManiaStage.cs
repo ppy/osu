@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK;
 using OpenTK.Graphics;
@@ -52,6 +54,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
+
+        public int ColumnStartIndex;
 
         public ManiaStage()
             : base(ScrollingDirection.Up)
@@ -160,8 +164,18 @@ namespace osu.Game.Rulesets.Mania.UI
             };
         }
 
-        public void AddJudgement(Judgement judgement)
+        public override void Add(DrawableHitObject h)
         {
+            int index = ((ManiaHitObject)h.HitObject).Column - ColumnStartIndex;
+            Columns.ElementAt(index).Add(h);
+        }
+
+        public void AddJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        {
+            var maniaObject = (ManiaHitObject)judgedObject.HitObject;
+            int column = maniaObject.Column - ColumnStartIndex;
+            columns[column].OnJudgement(judgedObject, judgement);
+
             judgements.Clear();
             judgements.Add(new DrawableManiaJudgement(judgement)
             {
