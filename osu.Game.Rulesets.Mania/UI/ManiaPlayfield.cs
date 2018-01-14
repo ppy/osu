@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// list mania column stages
         /// </summary>
-        private readonly FillFlowContainer<ManiaColumnStage> listColumnStages;
+        private readonly FillFlowContainer<ManiaStage> Stages;
 
         /// <summary>
         /// Whether this playfield should be inverted. This flips everything inside the playfield.
@@ -37,17 +37,17 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public SpecialColumnPosition SpecialColumnPosition
         {
-            get => listColumnStages.FirstOrDefault()?.SpecialColumnPosition ?? SpecialColumnPosition.Normal;
+            get => Stages.FirstOrDefault()?.SpecialColumnPosition ?? SpecialColumnPosition.Normal;
             set
             {
-                foreach (var singleStage in listColumnStages)
+                foreach (var singleStage in Stages)
                 {
                     singleStage.SpecialColumnPosition = value;
                 }
             }
         }
 
-        public List<Column> Columns => listColumnStages.SelectMany(x => x.Columns).ToList();
+        public List<Column> Columns => Stages.SelectMany(x => x.Columns).ToList();
 
         private readonly int columnCount;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             InternalChildren = new Drawable[]
             {
-                listColumnStages = new FillFlowContainer<ManiaColumnStage>
+                Stages = new FillFlowContainer<ManiaStage>
                 {
                     Name="Stages",
                     Direction = FillDirection.Horizontal,
@@ -78,10 +78,10 @@ namespace osu.Game.Rulesets.Mania.UI
 
             foreach (var stage in stages)
             {
-                var drawableStage = new ManiaColumnStage(stage.Columns);
+                var drawableStage = new ManiaStage();
                 drawableStage.VisibleTimeRange.BindTo(VisibleTimeRange);
 
-                listColumnStages.Add(drawableStage);
+                Stages.Add(drawableStage);
                 AddNested(drawableStage);
 
                 for (int i = 0; i < stage.Columns; i++)
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             Scale = new Vector2(1, newValue ? -1 : 1);
 
-            foreach (var single in listColumnStages)
+            foreach (var single in Stages)
             {
                 single.Judgements.Scale = Scale;
             }
@@ -124,18 +124,18 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public void Add(BarLine barline)
         {
-            foreach (var single in listColumnStages)
+            foreach (var single in Stages)
             {
                 single.HitObjects.Add(new DrawableBarLine(barline));
             }
         }
 
-        private ManiaColumnStage getFallDownControlContainerByActualColumn(int actualColumn)
+        private ManiaStage getFallDownControlContainerByActualColumn(int actualColumn)
         {
             int sum = 0;
-            foreach (var single in listColumnStages)
+            foreach (var single in Stages)
             {
-                sum = sum + single.ColumnCount;
+                sum = sum + single.Columns.Count();
                 if (sum > actualColumn)
                 {
                     return single;

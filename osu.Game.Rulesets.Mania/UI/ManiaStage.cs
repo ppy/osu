@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    internal class ManiaColumnStage : ScrollingPlayfield
+    internal class ManiaStage : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
 
@@ -53,12 +53,9 @@ namespace osu.Game.Rulesets.Mania.UI
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
 
-        public readonly int ColumnCount;
-
-        public ManiaColumnStage(int columnCount)
+        public ManiaStage()
             : base(ScrollingDirection.Up)
         {
-            ColumnCount = columnCount;
             Name = "Playfield elements";
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
@@ -142,11 +139,11 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 default:
                 case SpecialColumnPosition.Normal:
-                    return ColumnCount % 2 == 1 && column == ColumnCount / 2;
+                    return columns.Count % 2 == 1 && column == columns.Count / 2;
                 case SpecialColumnPosition.Left:
                     return column == 0;
                 case SpecialColumnPosition.Right:
-                    return column == ColumnCount - 1;
+                    return column == columns.Count - 1;
             }
         }
 
