@@ -4,14 +4,11 @@
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -79,12 +76,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
             var currentAction = ManiaAction.Key1;
 
+            int stageIndex = 0;
             foreach (var stage in stageDefinition)
             {
                 var drawableStage = new ManiaStage();
                 drawableStage.VisibleTimeRange.BindTo(VisibleTimeRange);
-
-                this.stages.Add(drawableStage);
+                drawableStage.ColumnStartIndex = stageIndex;
+                
+                stages.Add(drawableStage);
                 AddNested(drawableStage);
 
                 for (int i = 0; i < stage.Columns; i++)
@@ -98,6 +97,8 @@ namespace osu.Game.Rulesets.Mania.UI
                     drawableStage.AddColumn(c);
                     AddNested(c);
                 }
+
+                stageIndex = stageIndex + stage.Columns;
             }
 
             Inverted.ValueChanged += invertedChanged;
@@ -118,12 +119,16 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             var maniaObject = (ManiaHitObject)judgedObject.HitObject;
             int column = maniaObject.Column;
-            Columns[column].OnJudgement(judgedObject, judgement);
-
-            getStageByColumn(column).AddJudgement(judgement);
+            getStageByColumn(column).AddJudgement(judgedObject,judgement);
         }
 
-        public override void Add(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column).Add(h);
+        public override void Add(DrawableHitObject h)
+        {
+            // => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column).Add(h)
+            int column = ((ManiaHitObject)h.HitObject).Column;
+            var stage = getStageByColumn(column);
+            stage.Add(h);
+        }
 
         public void Add(BarLine barline)
         {
