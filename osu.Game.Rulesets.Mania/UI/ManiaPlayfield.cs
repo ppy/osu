@@ -32,17 +32,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// The style to use for the special column.
         /// </summary>
-        public SpecialColumnPosition SpecialColumnPosition
-        {
-            get => stages.FirstOrDefault()?.SpecialColumnPosition ?? SpecialColumnPosition.Normal;
-            set
-            {
-                foreach (var singleStage in stages)
-                {
-                    singleStage.SpecialColumnPosition = value;
-                }
-            }
-        }
+        public Bindable<SpecialColumnPosition> SpecialColumnPosition = new Bindable<UI.SpecialColumnPosition>();
 
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
 
