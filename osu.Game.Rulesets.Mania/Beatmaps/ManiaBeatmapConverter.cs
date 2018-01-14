@@ -69,8 +69,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override Beatmap<ManiaHitObject> CreateBeatmap()
         {
-            if(StageDefinitions==null)
-                StageDefinitions=new List<StageDefinition>()
+            if (StageDefinitions == null)
+                StageDefinitions = new List<StageDefinition>
                 {
                     new StageDefinition { Columns = TargetColumns }
                 };
