@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -22,6 +21,7 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
-        public IEnumerable<DrawableBarLine> BarLines;
+        public IEnumerable<BarLine> BarLines;
 
         public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.UI
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
 
             var timingPoints = Beatmap.ControlPointInfo.TimingPoints;
-            var barLines = new List<DrawableBarLine>();
+            var barLines = new List<BarLine>();
 
             for (int i = 0; i < timingPoints.Count; i++)
             {
@@ -50,12 +50,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 int index = 0;
                 for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength, index++)
                 {
-                    barLines.Add(new DrawableBarLine(new BarLine
+                    barLines.Add(new BarLine
                     {
                         StartTime = t,
                         ControlPoint = point,
                         BeatIndex = index
-                    }));
+                    });
                 }
             }
 
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
         }
 
-        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.TotalColumns)
+        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
