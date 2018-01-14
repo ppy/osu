@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Mania
                 bindings.Add(new KeyBinding(rightKeys[i], currentKey++));
 
             if (variant % 2 == 1)
-                bindings.Add(new KeyBinding(InputKey.Space, ManiaAction.Special));
+                bindings.Insert(variant / 2, new KeyBinding(InputKey.Space, ManiaAction.Special));
 
             return bindings;
         }

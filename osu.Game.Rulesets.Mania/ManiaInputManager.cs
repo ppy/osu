@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Mania
     {
         [Description("Special")]
         Special,
+        [Description("Special")]
+        Specia2,
         [Description("Key 1")]
         Key1 = 10,
         [Description("Key 2")]
