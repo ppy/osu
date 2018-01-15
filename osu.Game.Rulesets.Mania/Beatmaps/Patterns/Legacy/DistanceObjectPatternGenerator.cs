@@ -321,7 +321,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     break;
             }
 
-            Func<SampleInfo, bool> isDoubleSample = sample => sample.Name == SampleInfo.HIT_CLAP && sample.Name == SampleInfo.HIT_FINISH;
+            bool isDoubleSample(SampleInfo sample) => sample.Name == SampleInfo.HIT_CLAP && sample.Name == SampleInfo.HIT_FINISH;
 
             bool canGenerateTwoNotes = (convertType & PatternType.LowProbability) == 0;
             canGenerateTwoNotes &= HitObject.Samples.Any(isDoubleSample) || sampleInfoListAt(HitObject.StartTime).Any(isDoubleSample);
