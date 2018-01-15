@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.Cursor
         public bool CanShowCursor;
 
         public CursorContainer Cursor { get; }
-        public bool ProvidesUserCursor => true;
+        public bool ProvidingUserCursor => true;
 
         public CursorOverrideContainer()
         {
@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.Cursor
                 return;
             }
 
-            var newTarget = inputManager.HoveredDrawables.OfType<IProvideCursor>().FirstOrDefault(t => t.ProvidesUserCursor) ?? this;
+            var newTarget = inputManager.HoveredDrawables.OfType<IProvideCursor>().FirstOrDefault(t => t.ProvidingUserCursor) ?? this;
 
             if (currentTarget == newTarget)
                 return;

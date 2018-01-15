@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Play
         public int RestartCount;
 
         public CursorContainer Cursor => RulesetContainer.Cursor;
-        public bool ProvidesUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded;
+        public bool ProvidingUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded;
 
         private IAdjustableClock adjustableSourceClock;
         private FramedOffsetClock offsetClock;
