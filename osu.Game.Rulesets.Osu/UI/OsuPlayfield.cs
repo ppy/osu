@@ -12,8 +12,6 @@ using osu.Game.Rulesets.UI;
 using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
-using osu.Game.Rulesets.Osu.UI.Cursor;
-using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -22,8 +20,6 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly Container approachCircles;
         private readonly Container judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
-
-        public override bool ProvidingUserCursor => true;
 
         // Todo: This should not be a thing, but is currently required for the editor
         // https://github.com/ppy/osu-framework/issues/1283
@@ -70,15 +66,6 @@ namespace osu.Game.Rulesets.Osu.UI
             });
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            var cursor = CreateCursor();
-            if (cursor != null)
-                AddInternal(cursor);
-        }
-
         public override void Add(DrawableHitObject h)
         {
             h.Depth = (float)h.HitObject.StartTime;
@@ -113,7 +100,5 @@ namespace osu.Game.Rulesets.Osu.UI
 
             judgementLayer.Add(explosion);
         }
-
-        protected virtual CursorContainer CreateCursor() => new GameplayCursor();
     }
 }

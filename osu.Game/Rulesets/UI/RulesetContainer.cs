@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
@@ -44,11 +45,6 @@ namespace osu.Game.Rulesets.UI
         public PassThroughInputManager KeyBindingInputManager;
 
         /// <summary>
-        /// Whether we are currently providing the local user a gameplay cursor.
-        /// </summary>
-        public virtual bool ProvidingUserCursor => false;
-
-        /// <summary>
         /// Whether we have a replay loaded currently.
         /// </summary>
         public bool HasReplayLoaded => ReplayInputManager?.ReplayInputHandler != null;
@@ -61,6 +57,11 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public Playfield Playfield => playfield.Value;
 
+        /// <summary>
+        /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
+        /// </summary>
+        public readonly CursorContainer Cursor;
+
         protected readonly Ruleset Ruleset;
 
         /// <summary>
@@ -71,6 +72,8 @@ namespace osu.Game.Rulesets.UI
         {
             Ruleset = ruleset;
             playfield = new Lazy<Playfield>(CreatePlayfield);
+
+            Cursor = CreateCursor();
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -97,6 +100,12 @@ namespace osu.Game.Rulesets.UI
             Replay = replay;
             ReplayInputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
         }
+
+
+        /// <summary>
+        /// Creates the cursor. May be null if the <see cref="RulesetContainer"/> doesn't provide a custom cursor.
+        /// </summary>
+        protected virtual CursorContainer CreateCursor() => null;
 
         /// <summary>
         /// Creates a Playfield.
@@ -143,8 +152,6 @@ namespace osu.Game.Rulesets.UI
         /// Whether the specified beatmap is assumed to be specific to the current ruleset.
         /// </summary>
         protected readonly bool IsForCurrentRuleset;
-
-        public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
@@ -211,6 +218,9 @@ namespace osu.Game.Rulesets.UI
 
             AddInternal(KeyBindingInputManager);
             KeyBindingInputManager.Add(Playfield);
+
+            if (Cursor != null)
+                KeyBindingInputManager.Add(Cursor);
 
             loadObjects();
         }
