@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Menu
             if (IsLoaded)
                 runnableAction();
             else
-                Schedule(() => runnableAction());
+                Schedule(runnableAction);
         }
 
         [BackgroundDependencyLoader]
