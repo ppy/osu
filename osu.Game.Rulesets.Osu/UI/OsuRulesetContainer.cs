@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using OpenTK;
 using osu.Game.Beatmaps;
@@ -10,6 +11,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Replays;
@@ -49,5 +51,7 @@ namespace osu.Game.Rulesets.Osu.UI
         protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuReplayInputHandler(replay);
 
         protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f);
+
+        protected override CursorContainer CreateCursor() => new GameplayCursor();
     }
 }
