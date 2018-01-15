@@ -9,9 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Configuration;
-using osu.Game.Rulesets.Judgements;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -36,18 +35,18 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
 
-        public ManiaPlayfield(List<StageDefinition> stageDefinition)
+        public ManiaPlayfield(List<StageDefinition> stageDefinitions)
             : base(ScrollingDirection.Up)
         {
-            if (stageDefinition == null)
-                throw new ArgumentNullException(nameof(stageDefinition));
+            if (stageDefinitions == null)
+                throw new ArgumentNullException(nameof(stageDefinitions));
 
-            if (stageDefinition.Count <= 0)
+            if (stageDefinitions.Count <= 0)
                 throw new ArgumentException("Can't have zero or fewer stages.");
 
             Inverted.Value = true;
 
-            var stageSpacing = 300 / stageDefinition.Count;
+            var stageSpacing = 300 / stageDefinitions.Count;
 
             InternalChildren = new Drawable[]
             {
@@ -63,9 +62,9 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             int firstColumnIndex = 0;
-            for (int i = 0; i < stageDefinition.Count; i++)
+            for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new ManiaStage(i, firstColumnIndex, stageDefinition[i]);
+                var newStage = new ManiaStage(i, firstColumnIndex, stageDefinitions[i]);
                 newStage.SpecialColumn.BindTo(SpecialColumnPosition);
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
                 newStage.Inverted.BindTo(Inverted);
@@ -77,27 +76,9 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
-        {
-            var maniaObject = (ManiaHitObject)judgedObject.HitObject;
-            int column = maniaObject.Column;
-            getStageByColumn(column).AddJudgement(judgedObject, judgement);
-        }
+        public override void Add(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
 
-        public override void Add(DrawableHitObject h)
-        {
-            int column = ((ManiaHitObject)h.HitObject).Column;
-            var stage = getStageByColumn(column);
-            stage.Add(h);
-        }
-
-        public void Add(BarLine barline)
-        {
-            foreach (var single in stages)
-            {
-                single.HitObjects.Add(new DrawableBarLine(barline));
-            }
-        }
+        public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
 
         private ManiaStage getStageByColumn(int column)
         {
@@ -106,9 +87,7 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 sum = sum + stage.Columns.Count;
                 if (sum > column)
-                {
                     return stage;
-                }
             }
 
             return null;

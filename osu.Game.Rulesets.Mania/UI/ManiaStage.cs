@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK;
@@ -178,11 +179,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override void Add(DrawableHitObject h)
         {
-            int columnIndex = ((ManiaHitObject)h.HitObject).Column - firstColumnIndex;
+            var maniaObject = (ManiaHitObject)h.HitObject;
+            int columnIndex = maniaObject.Column - firstColumnIndex;
             Columns.ElementAt(columnIndex).Add(h);
         }
 
-        public void AddJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
+
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             var maniaObject = (ManiaHitObject)judgedObject.HitObject;
             int columnIndex = maniaObject.Column - firstColumnIndex;
