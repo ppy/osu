@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
-    public class DrawableFruit : DrawableCatchHitObject<Fruit>
+    public class DrawableFruit : PalpableCatchHitObject<Fruit>
     {
         private Circle border;
 
@@ -240,6 +240,27 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                                 Size = new Vector2(large_pulp_3),
                                 AccentColour = AccentColour,
                                 Position = positionAt(240, distance_from_centre_3),
+                            },
+                        }
+                    };
+                case FruitVisualRepresentation.Banana:
+                    return new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Framework.Graphics.Drawable[]
+                        {
+                            new Pulp
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                AccentColour = AccentColour,
+                                Size = new Vector2(small_pulp),
+                                Y = -0.15f
+                            },
+                            new Pulp
+                            {
+                                AccentColour = AccentColour,
+                                Size = new Vector2(large_pulp_4 * 1.2f, large_pulp_4 * 3),
                             },
                         }
                     };

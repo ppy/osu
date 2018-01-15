@@ -8,8 +8,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Game.Rulesets.Judgements;
 using osu.Framework.Allocation;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -18,7 +16,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The HitObjects contained in this Playfield.
         /// </summary>
-        public HitObjectContainer HitObjects { get; protected set; }
+        public HitObjectContainer HitObjects { get; private set; }
 
         public Container<Drawable> ScaledContent;
 
@@ -46,16 +44,14 @@ namespace osu.Game.Rulesets.UI
                     }
                 }
             });
-
-            HitObjects = new HitObjectContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-            };
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            HitObjects = CreateHitObjectContainer();
+            HitObjects.RelativeSizeAxes = Axes.Both;
+
             Add(HitObjects);
         }
 
@@ -89,12 +85,10 @@ namespace osu.Game.Rulesets.UI
         /// <param name="judgement">The <see cref="Judgement"/> that occurred.</param>
         public virtual void OnJudgement(DrawableHitObject judgedObject, Judgement judgement) { }
 
-        public class HitObjectContainer : CompositeDrawable
-        {
-            public virtual IEnumerable<DrawableHitObject> Objects => InternalChildren.OfType<DrawableHitObject>();
-            public virtual void Add(DrawableHitObject hitObject) => AddInternal(hitObject);
-            public virtual bool Remove(DrawableHitObject hitObject) => RemoveInternal(hitObject);
-        }
+        /// <summary>
+        /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
 
         private class ScaledContainer : Container
         {
