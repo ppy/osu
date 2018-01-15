@@ -10,9 +10,9 @@ using osu.Framework.Input;
 namespace osu.Game.Graphics.Cursor
 {
     /// <summary>
-    /// Visualises different cursors depending on the currently-hovered <see cref="Drawable"/>s.
+    /// A container which provides a <see cref="MenuCursor"/> which can be overridden by hovered <see cref="Drawable"/>s.
     /// </summary>
-    public class OsuCursorVisualiser : Container, IProvideCursor
+    public class CursorOverrideContainer : Container, IProvideCursor
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.Cursor
         public CursorContainer Cursor { get; }
         public bool ProvidesUserCursor => true;
 
-        public OsuCursorVisualiser()
+        public CursorOverrideContainer()
         {
             AddRangeInternal(new Drawable[]
             {
