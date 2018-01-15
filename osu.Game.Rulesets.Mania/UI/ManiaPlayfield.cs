@@ -55,6 +55,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     Name = "Stages",
                     Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Spacing = new Vector2(stageSpacing),

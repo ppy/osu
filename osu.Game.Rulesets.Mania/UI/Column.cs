@@ -47,6 +47,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public Column()
             : base(ScrollingDirection.Up)
         {
+            RelativeSizeAxes = Axes.Y;
             Width = column_width;
 
             InternalChildren = new Drawable[]
