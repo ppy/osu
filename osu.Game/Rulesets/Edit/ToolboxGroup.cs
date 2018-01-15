@@ -6,7 +6,7 @@ using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class ToolboxGroup : PlayerGroup
+    public class ToolboxGroup : PlayerSettingsGroup
     {
         protected override string Title => "toolbox";
 

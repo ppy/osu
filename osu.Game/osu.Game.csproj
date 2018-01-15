@@ -756,7 +756,7 @@
     <Compile Include="Screens\Play\PlayerSettings\DiscussionSettings.cs" />
     <Compile Include="Screens\Play\PlayerSettings\PlaybackSettings.cs" />
     <Compile Include="Screens\Play\PlayerSettings\PlayerCheckbox.cs" />
-    <Compile Include="Screens\Play\PlayerSettings\PlayerGroup.cs" />
+    <Compile Include="Screens\Play\PlayerSettings\PlayerSettingsGroup.cs" />
     <Compile Include="Screens\Play\PlayerSettings\PlayerSliderBar.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
     <Compile Include="Screens\Play\SongProgress.cs" />

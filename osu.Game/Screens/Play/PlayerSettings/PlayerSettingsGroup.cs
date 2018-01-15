@@ -13,7 +13,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public abstract class PlayerGroup : Container
+    public abstract class PlayerSettingsGroup : Container
     {
         /// <summary>
         /// The title to be displayed in the header of this group.
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private Color4 buttonActiveColour;
 
-        protected PlayerGroup()
+        protected PlayerSettingsGroup()
         {
             AutoSizeAxes = Axes.Y;
             Width = container_width;

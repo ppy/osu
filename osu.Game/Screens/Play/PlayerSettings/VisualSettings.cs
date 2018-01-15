@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class VisualSettings : PlayerGroup
+    public class VisualSettings : PlayerSettingsGroup
     {
         protected override string Title => "Visual settings";
 

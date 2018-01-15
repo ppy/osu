@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class DiscussionSettings : PlayerGroup
+    public class DiscussionSettings : PlayerSettingsGroup
     {
         protected override string Title => @"discussions";
 
