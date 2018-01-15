@@ -60,9 +60,13 @@ namespace osu.Game.Rulesets.Mania.UI
             this.firstColumnIndex = firstColumnIndex;
             this.definition = definition;
 
-            Name = "Playfield elements";
+            Name = "Stage";
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
+
             InternalChildren = new Drawable[]
             {
                 new Container
