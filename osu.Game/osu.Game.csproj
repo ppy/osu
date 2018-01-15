@@ -377,7 +377,7 @@
     <Compile Include="Graphics\Cursor\IProvideCursor.cs" />
     <Compile Include="Graphics\Cursor\MenuCursor.cs" />
     <Compile Include="Graphics\Cursor\OsuContextMenuContainer.cs" />
-    <Compile Include="Graphics\Cursor\OsuCursorVisualiser.cs" />
+    <Compile Include="Graphics\Cursor\CursorOverrideContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuTooltipContainer.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
