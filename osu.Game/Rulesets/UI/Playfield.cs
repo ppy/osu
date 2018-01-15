@@ -20,11 +20,6 @@ namespace osu.Game.Rulesets.UI
 
         public Container<Drawable> ScaledContent;
 
-        /// <summary>
-        /// Whether we are currently providing the local user a gameplay cursor.
-        /// </summary>
-        public virtual bool ProvidingUserCursor => false;
-
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
 

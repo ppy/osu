@@ -99,8 +99,8 @@ namespace osu.Game.Graphics.Cursor
 
         protected override void PopOut()
         {
-            ActiveCursor.FadeTo(0, 900, Easing.OutQuint);
-            ActiveCursor.ScaleTo(0, 500, Easing.In);
+            ActiveCursor.FadeTo(0, 250, Easing.OutQuint);
+            ActiveCursor.ScaleTo(0.6f, 250, Easing.In);
         }
 
         [BackgroundDependencyLoader]
