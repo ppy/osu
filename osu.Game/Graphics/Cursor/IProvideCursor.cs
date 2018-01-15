@@ -12,14 +12,15 @@ namespace osu.Game.Graphics.Cursor
     public interface IProvideCursor : IDrawable
     {
         /// <summary>
-        /// The cursor provided by this <see cref="Drawable"/>.
+        /// The cursor provided by this <see cref="IDrawable"/>.
         /// May be null if no cursor should be visible.
         /// </summary>
         CursorContainer Cursor { get; }
 
         /// <summary>
-        /// Whether the cursor provided by this <see cref="Drawable"/> should be displayed as the user's cursor.
+        /// Whether <see cref="Cursor"/> should be displayed as the singular user cursor. This will temporarily hide any other user cursor.
+        /// This value is checked every frame and may be used to control whether multiple cursors are displayed (e.g. watching replays).
         /// </summary>
-        bool ProvidesUserCursor { get; }
+        bool ProvidingUserCursor { get; }
     }
 }
