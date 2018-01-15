@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Mania
                             InputKey.Semicolon
                         },
                         SpecialKey = InputKey.Space,
-                        SpecialAction = ManiaAction.Special,
+                        SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1,
                     }.GenerateKeyBindingsFor(variant);
                 case ManiaVariantType.Coop:
@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Mania
                             InputKey.V
                         },
                         SpecialKey = InputKey.Tilde,
-                        SpecialAction = ManiaAction.Special,
+                        SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1
                     }.GenerateKeyBindingsFor(p1K);
 
