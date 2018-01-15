@@ -1,15 +1,18 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModKeyCoop : Mod, IApplicableToBeatmapConverter<ManiaHitObject>
+    public class ManiaModKeyCoop : Mod, IApplicableToBeatmapConverter<ManiaHitObject>, IApplicableToRulesetContainer<ManiaHitObject>
     {
         public override string Name => "KeyCoop";
         public override string ShortenedName => "2P";
@@ -25,16 +28,21 @@ namespace osu.Game.Rulesets.Mania.Mods
             if (mbc.IsForCurrentRuleset)
                 return;
 
-            int originTargetColumns = mbc.TargetColumns;
+            mbc.TargetColumns *= 2;
+        }
 
-            var newStages = new List<StageDefinition>
+        public void ApplyToRulesetContainer(RulesetContainer<ManiaHitObject> rulesetContainer)
+        {
+            var mrc = (ManiaRulesetContainer)rulesetContainer;
+
+            var newDefinitions = new List<StageDefinition>();
+            foreach (var existing in mrc.Beatmap.Stages)
             {
-                new StageDefinition { Columns = originTargetColumns },
-                new StageDefinition { Columns = originTargetColumns },
-            };
+                newDefinitions.Add(new StageDefinition { Columns = (int)Math.Ceiling(existing.Columns / 2f) });
+                newDefinitions.Add(new StageDefinition { Columns = (int)Math.Floor(existing.Columns / 2f) });
+            }
 
-            mbc.StageDefinitions = newStages;
-            mbc.TargetColumns = originTargetColumns * 2;
+            mrc.Beatmap.Stages = newDefinitions;
         }
     }
 }
