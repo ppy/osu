@@ -18,9 +18,8 @@ namespace osu.Game.Rulesets.Mania
     public enum ManiaAction
     {
         [Description("Special")]
-        Special,
-        [Description("Special")]
-        Specia2,
+        Special = 1,
+
         [Description("Key 1")]
         Key1 = 1000,
         [Description("Key 2")]
