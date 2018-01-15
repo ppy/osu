@@ -44,6 +44,8 @@ namespace osu.Game
 
         protected KeyBindingStore KeyBindingStore;
 
+        protected CursorOverrideContainer CursorOverrideContainer;
+
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
         public APIAccess API;
@@ -51,8 +53,6 @@ namespace osu.Game
         private Container content;
 
         protected override Container<Drawable> Content => content;
-
-        protected MenuCursor Cursor;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
@@ -211,21 +211,14 @@ namespace osu.Game
 
             GlobalKeyBindingInputManager globalBinding;
 
-            base.Content.Add(new DrawSizePreservingFillContainer
+            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
+            CursorOverrideContainer.Child = globalBinding = new GlobalKeyBindingInputManager(this)
             {
-                Children = new Drawable[]
-                {
-                    Cursor = new MenuCursor(),
-                    globalBinding = new GlobalKeyBindingInputManager(this)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = content = new OsuTooltipContainer(Cursor)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    }
-                }
-            });
+                RelativeSizeAxes = Axes.Both,
+                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both　}
+            };
+
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);

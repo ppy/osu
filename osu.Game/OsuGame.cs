@@ -297,8 +297,6 @@ namespace osu.Game
                 else
                     Toolbar.State = Visibility.Visible;
             };
-
-            Cursor.State = Visibility.Hidden;
         }
 
         private void forwardLoggedErrorsToNotifications()
@@ -447,7 +445,7 @@ namespace osu.Game
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
-            Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
+            CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
         private void screenAdded(Screen newScreen)
