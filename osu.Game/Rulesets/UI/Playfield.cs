@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
-using osu.Game.Rulesets.Judgements;
 using osu.Framework.Allocation;
 
 namespace osu.Game.Rulesets.UI
@@ -85,13 +84,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
         public virtual void Remove(DrawableHitObject h) => HitObjects.Remove(h);
-
-        /// <summary>
-        /// Triggered when a new <see cref="Judgement"/> occurs on a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <param name="judgedObject">The object that <paramref name="judgement"/> occured for.</param>
-        /// <param name="judgement">The <see cref="Judgement"/> that occurred.</param>
-        public virtual void OnJudgement(DrawableHitObject judgedObject, Judgement judgement) { }
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
