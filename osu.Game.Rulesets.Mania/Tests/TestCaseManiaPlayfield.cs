@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 };
                 createPlayfield(stages, SpecialColumnPosition.Normal);
             });
+
             AddStep("2 + 4 + 2 columns", () =>
             {
                 var stages = new List<StageDefinition>
@@ -58,7 +59,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                 };
                 createPlayfield(stages, SpecialColumnPosition.Normal);
             });
-            AddStep("1 + 1 + 8 columns", () =>
+
+            AddStep("1 + 8 + 1 columns", () =>
             {
                 var stages = new List<StageDefinition>
                 {
@@ -105,6 +107,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 new StageDefinition { Columns = cols },
             };
+
             return createPlayfield(stages, specialPos, inverted);
         }
 
@@ -143,6 +146,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 new StageDefinition { Columns = 4 },
             };
+
             inputManager.Add(playfield = new ManiaPlayfield(stages)
             {
                 Anchor = Anchor.Centre,
