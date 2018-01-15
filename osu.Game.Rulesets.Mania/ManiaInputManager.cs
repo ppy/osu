@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania
         [Description("Special")]
         Specia2,
         [Description("Key 1")]
-        Key1 = 10,
+        Key1 = 1000,
         [Description("Key 2")]
         Key2,
         [Description("Key 3")]
