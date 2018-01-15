@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <summary>
         /// The definitions for each stage in a <see cref="ManiaPlayfield"/>.
         /// </summary>
-        public readonly List<StageDefinition> Stages;
+        public List<StageDefinition> Stages = new List<StageDefinition>();
 
         /// <summary>
         /// Total number of columns represented by all stages in this <see cref="ManiaBeatmap"/>.
@@ -24,10 +24,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <summary>
         /// Creates a new <see cref="ManiaBeatmap"/>.
         /// </summary>
-        /// <param name="stages">The initial stages.</param>
-        public ManiaBeatmap(List<StageDefinition> stages)
+        /// <param name="defaultStage">The initial stages.</param>
+        public ManiaBeatmap(StageDefinition defaultStage)
         {
-            Stages = stages;
+            Stages.Add(defaultStage);
         }
     }
 }
