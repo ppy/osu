@@ -39,11 +39,11 @@ namespace osu.Game.Rulesets.Mania.UI
         public ManiaPlayfield(List<StageDefinition> stageDefinition)
             : base(ScrollingDirection.Up)
         {
-            if (stageDefinition ==null)
-                throw new ArgumentNullException();
+            if (stageDefinition == null)
+                throw new ArgumentNullException(nameof(stageDefinition));
 
             if (stageDefinition.Count <= 0)
-                throw new ArgumentException("Can't have zero or fewer columns.");
+                throw new ArgumentException("Can't have zero or fewer stages.");
 
             Inverted.Value = true;
 
@@ -62,32 +62,18 @@ namespace osu.Game.Rulesets.Mania.UI
                 }
             };
 
-            var currentAction = ManiaAction.Key1;
-
-            int stageIndex = 0;
-            foreach (var stage in stageDefinition)
+            int firstColumnIndex = 0;
+            for (int i = 0; i < stageDefinition.Count; i++)
             {
-                var drawableStage = new ManiaStage();
-                drawableStage.SpecialColumn.BindTo(SpecialColumnPosition);
-                drawableStage.VisibleTimeRange.BindTo(VisibleTimeRange);
-                drawableStage.Inverted.BindTo(Inverted);
-                drawableStage.ColumnStartIndex = stageIndex;
+                var newStage = new ManiaStage(i, firstColumnIndex, stageDefinition[i]);
+                newStage.SpecialColumn.BindTo(SpecialColumnPosition);
+                newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
+                newStage.Inverted.BindTo(Inverted);
 
-                stages.Add(drawableStage);
-                AddNested(drawableStage);
+                stages.Add(newStage);
+                AddNested(newStage);
 
-                for (int i = 0; i < stage.Columns; i++)
-                {
-                    var c = new Column
-                    {
-                        //c.Action = c.IsSpecial ? ManiaAction.Special : currentAction++;
-                        Action = currentAction++
-                    };
-
-                    drawableStage.AddColumn(c);
-                }
-
-                stageIndex = stageIndex + stage.Columns;
+                firstColumnIndex += newStage.Columns.Count;
             }
         }
 
@@ -95,7 +81,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             var maniaObject = (ManiaHitObject)judgedObject.HitObject;
             int column = maniaObject.Column;
-            getStageByColumn(column).AddJudgement(judgedObject,judgement);
+            getStageByColumn(column).AddJudgement(judgedObject, judgement);
         }
 
         public override void Add(DrawableHitObject h)
@@ -118,7 +104,7 @@ namespace osu.Game.Rulesets.Mania.UI
             int sum = 0;
             foreach (var stage in stages)
             {
-                sum = sum + stage.Columns.Count();
+                sum = sum + stage.Columns.Count;
                 if (sum > column)
                 {
                     return stage;
