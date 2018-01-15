@@ -11,6 +11,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
@@ -76,7 +77,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Beatmap.TotalColumns);
+        public override PassThroughInputManager CreateInputManager()
+        {
+            var variantType = Mods.OfType<IKeyBindingMod>().FirstOrDefault()?.Variant ?? ManiaKeyBindingVariantType.Solo;
+            return new ManiaInputManager(Ruleset.RulesetInfo, (int)variantType + Beatmap.TotalColumns);
+        }
 
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter(IsForCurrentRuleset, WorkingBeatmap.Beatmap);
 

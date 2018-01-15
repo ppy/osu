@@ -124,9 +124,9 @@ namespace osu.Game.Rulesets.Mania
             get
             {
                 for (int i = 1; i <= 9; i++)
-                    yield return (int)ManiaVariantType.Solo + i;
+                    yield return (int)ManiaKeyBindingVariantType.Solo + i;
                 for (int i = 2; i <= 18; i++)
-                    yield return (int)ManiaVariantType.Coop + i;
+                    yield return (int)ManiaKeyBindingVariantType.Coop + i;
                 // Todo: Versus mode
             }
         }
@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Mania
         {
             switch (getVariantType(variant))
             {
-                case ManiaVariantType.Solo:
+                case ManiaKeyBindingVariantType.Solo:
                     return new VariantMappingGenerator
                     {
                         LeftKeys = new[]
@@ -156,8 +156,8 @@ namespace osu.Game.Rulesets.Mania
                         SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1,
                     }.GenerateKeyBindingsFor(variant);
-                case ManiaVariantType.Coop:
-                case ManiaVariantType.Versus:
+                case ManiaKeyBindingVariantType.Coop:
+                case ManiaKeyBindingVariantType.Versus:
                     getMultiVariantKeyCounts(variant, out int p1K, out int p2K);
 
                     var player1Bindings = new VariantMappingGenerator
@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Mania
                         },
                         SpecialKey = InputKey.BackSlash,
                         SpecialAction = ManiaAction.Special2,
-                        NormalActionStart = ManiaAction.Key10
+                        NormalActionStart = ManiaAction.Key1 + p1K
                     }.GenerateKeyBindingsFor(p2K);
 
                     return player1Bindings.Concat(player2Bindings);
@@ -213,14 +213,14 @@ namespace osu.Game.Rulesets.Mania
             switch (getVariantType(variant))
             {
                 default:
-                case ManiaVariantType.Solo:
+                case ManiaKeyBindingVariantType.Solo:
                     return $"{variant}K";
-                case ManiaVariantType.Coop:
+                case ManiaKeyBindingVariantType.Coop:
                 {
                     getMultiVariantKeyCounts(variant, out int p1K, out int p2K);
                     return $"{p1K}K + {p2K}K";
                 }
-                case ManiaVariantType.Versus:
+                case ManiaKeyBindingVariantType.Versus:
                 {
                     getMultiVariantKeyCounts(variant, out int p1K, out int p2K);
                     return $"{p1K}K Vs. {p2K}K";
@@ -229,7 +229,7 @@ namespace osu.Game.Rulesets.Mania
         }
 
         /// <summary>
-        /// Finds the number of keys for each player in <see cref="ManiaVariantType.Coop"/> or <see cref="ManiaVariantType.Versus"/>.
+        /// Finds the number of keys for each player in <see cref="ManiaKeyBindingVariantType.Coop"/> or <see cref="ManiaKeyBindingVariantType.Versus"/>.
         /// </summary>
         /// <param name="variant">The variant.</param>
         /// <param name="player1Keys">The number of keys for player 1.</param>
@@ -241,16 +241,16 @@ namespace osu.Game.Rulesets.Mania
 
             switch (getVariantType(variant))
             {
-                case ManiaVariantType.Coop:
+                case ManiaKeyBindingVariantType.Coop:
                 {
-                    int totalKeys = variant - (int)ManiaVariantType.Coop;
+                    int totalKeys = variant - (int)ManiaKeyBindingVariantType.Coop;
                     player1Keys = (int)Math.Ceiling(totalKeys / 2f);
                     player2Keys = (int)Math.Floor(totalKeys / 2f);
                     break;
                 }
-                case ManiaVariantType.Versus:
+                case ManiaKeyBindingVariantType.Versus:
                 {
-                    int totalKeys = variant - (int)ManiaVariantType.Versus;
+                    int totalKeys = variant - (int)ManiaKeyBindingVariantType.Versus;
                     player1Keys = totalKeys;
                     player2Keys = totalKeys;
                     break;
@@ -259,13 +259,13 @@ namespace osu.Game.Rulesets.Mania
         }
 
         /// <summary>
-        /// Finds the <see cref="ManiaVariantType"/> that corresponds to a variant value.
+        /// Finds the <see cref="ManiaKeyBindingVariantType"/> that corresponds to a variant value.
         /// </summary>
         /// <param name="variant">The variant value.</param>
-        /// <returns>The <see cref="ManiaVariantType"/> that corresponds to <paramref name="variant"/>.</returns>
-        private ManiaVariantType getVariantType(int variant)
+        /// <returns>The <see cref="ManiaKeyBindingVariantType"/> that corresponds to <paramref name="variant"/>.</returns>
+        private ManiaKeyBindingVariantType getVariantType(int variant)
         {
-            return (ManiaVariantType)Enum.GetValues(typeof(ManiaVariantType)).Cast<int>().OrderByDescending(i => i).First(v => variant > v);
+            return (ManiaKeyBindingVariantType)Enum.GetValues(typeof(ManiaKeyBindingVariantType)).Cast<int>().OrderByDescending(i => i).First(v => variant >= v);
         }
     }
 
@@ -320,7 +320,7 @@ namespace osu.Game.Rulesets.Mania
         }
     }
 
-    public enum ManiaVariantType
+    public enum ManiaKeyBindingVariantType
     {
         /// <summary>
         /// Solo play keybinding variant (single stage).
