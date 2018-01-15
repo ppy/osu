@@ -64,6 +64,7 @@
     <Compile Include="Judgements\HoldNoteTickJudgement.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
+    <Compile Include="Mods\IKeyBindingMod.cs" />
     <Compile Include="Mods\ManiaKeyMod.cs" />
     <Compile Include="Mods\ManiaModAutoplay.cs" />
     <Compile Include="Mods\ManiaModDaycore.cs" />
