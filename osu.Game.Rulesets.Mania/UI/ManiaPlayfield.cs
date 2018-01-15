@@ -3,13 +3,11 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
-using OpenTK;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -18,11 +16,6 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaPlayfield : ScrollingPlayfield
     {
-        /// <summary>
-        /// <see cref="ManiaStage"/>s contained by this <see cref="ManiaPlayfield"/>.
-        /// </summary>
-        private readonly FillFlowContainer<ManiaStage> stages;
-
         /// <summary>
         /// Whether this playfield should be inverted. This flips everything inside the playfield.
         /// </summary>
@@ -34,6 +27,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public Bindable<SpecialColumnPosition> SpecialColumnPosition = new Bindable<SpecialColumnPosition>();
 
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
+        private readonly List<ManiaStage> stages = new List<ManiaStage>();
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
             : base(ScrollingDirection.Up)
@@ -46,20 +40,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Inverted.Value = true;
 
-            var stageSpacing = 300 / stageDefinitions.Count;
-
-            InternalChildren = new Drawable[]
+            GridContainer playfieldGrid;
+            InternalChild = playfieldGrid = new GridContainer
             {
-                stages = new FillFlowContainer<ManiaStage>
-                {
-                    Name = "Stages",
-                    Direction = FillDirection.Horizontal,
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Spacing = new Vector2(stageSpacing),
-                }
+                RelativeSizeAxes = Axes.Both,
+                Content = new[] { new Drawable[stageDefinitions.Count] }
             };
 
             int firstColumnIndex = 0;
@@ -69,6 +54,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 newStage.SpecialColumn.BindTo(SpecialColumnPosition);
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
                 newStage.Inverted.BindTo(Inverted);
+
+                playfieldGrid.Content[0][i] = newStage;
 
                 stages.Add(newStage);
                 AddNested(newStage);
