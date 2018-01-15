@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play.HUD
             AlwaysPresent = true;
             RelativeSizeAxes = Axes.Both;
 
-            Child = new FillFlowContainer<PlayerGroup>
+            Child = new FillFlowContainer<PlayerSettingsGroup>
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play.HUD
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 20),
                 Margin = new MarginPadding { Top = 100, Right = 10 },
-                Children = new PlayerGroup[]
+                Children = new PlayerSettingsGroup[]
                 {
                     //CollectionSettings = new CollectionSettings(),
                     //DiscussionSettings = new DiscussionSettings(),

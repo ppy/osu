@@ -9,7 +9,7 @@ using osu.Game.Overlays.Music;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class CollectionSettings : PlayerGroup
+    public class CollectionSettings : PlayerSettingsGroup
     {
         protected override string Title => @"collections";
 

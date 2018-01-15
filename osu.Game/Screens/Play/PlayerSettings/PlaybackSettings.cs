@@ -9,7 +9,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class PlaybackSettings : PlayerGroup
+    public class PlaybackSettings : PlayerSettingsGroup
     {
         private const int padding = 10;
 
