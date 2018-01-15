@@ -397,9 +397,8 @@ namespace osu.Game.Screens.Play
                 .FadeColour(OsuColour.Gray(opacity), duration, Easing.OutQuint)
                 .FadeTo(storyboardVisible && opacity > 0 ? 1 : 0, duration, Easing.OutQuint);
 
-            (Background as BackgroundScreenBeatmap)?
-                .BlurTo(new Vector2((float)blurLevel.Value * 25), duration, Easing.OutQuint)?
-                .FadeTo(!storyboardVisible || beatmap.Background == null ? opacity : 0, duration, Easing.OutQuint);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(new Vector2((float)blurLevel.Value * 25), duration, Easing.OutQuint);
+            Background?.FadeTo(!storyboardVisible || beatmap.Background == null ? opacity : 0, duration, Easing.OutQuint);
         }
 
         private void fadeOut()
