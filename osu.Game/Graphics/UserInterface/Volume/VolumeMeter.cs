@@ -18,6 +18,9 @@ namespace osu.Game.Graphics.UserInterface.Volume
         private readonly Box meterFill;
         public BindableDouble Bindable { get; } = new BindableDouble();
 
+        private double lastVolume;
+        public bool IsMuted { get; private set; }
+
         public VolumeMeter(string meterName)
         {
             Size = new Vector2(40, 180);
@@ -70,21 +73,32 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         public double Volume
         {
-            get { return Bindable.Value; }
+            get => Bindable.Value;
             private set
             {
                 Bindable.Value = value;
+                if (value > 0)
+                    IsMuted = false;
             }
         }
 
         public void Increase()
         {
             Volume += 0.05f;
+            IsMuted = false;
         }
 
         public void Decrease()
         {
             Volume -= 0.05f;
+        }
+
+        public void ToogleMute()
+        {
+            IsMuted = !IsMuted;
+            if (IsMuted)
+                lastVolume = Volume;
+            Volume = IsMuted ? 0.0 : lastVolume;
         }
 
         private void updateFill() => meterFill.ScaleTo(new Vector2(1, (float)Volume), 300, Easing.OutQuint);
