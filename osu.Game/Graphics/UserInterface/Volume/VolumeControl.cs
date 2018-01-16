@@ -76,6 +76,10 @@ namespace osu.Game.Graphics.UserInterface.Volume
                     else
                         volumeMeterMaster.Increase();
                     return true;
+                case GlobalAction.ToggleMute:
+                    Show();
+                    volumeMeterMaster.ToogleMute();
+                    return true;
             }
 
             return false;
