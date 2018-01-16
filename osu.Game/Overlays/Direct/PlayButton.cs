@@ -39,6 +39,8 @@ namespace osu.Game.Overlays.Direct
         private readonly SpriteIcon icon;
         private readonly LoadingAnimation loadingAnimation;
 
+        private MusicController musicController;
+
         private const float transition_duration = 500;
 
         private bool loading
@@ -83,9 +85,12 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load(OsuColour colour, MusicController musicController)
         {
             hoverColour = colour.Yellow;
+            this.musicController = musicController;
+
+            musicController.StartedPlaying += () => Playing.Value = false;
         }
 
         protected override bool OnClick(InputState state)
@@ -128,13 +133,14 @@ namespace osu.Game.Overlays.Direct
                     return;
                 }
 
-                Preview.Seek(0);
-                Preview.Start();
+                Preview.Restart();
+                musicController.Pause();
             }
             else
             {
                 Preview?.Stop();
                 loading = false;
+                musicController.Resume();
             }
         }
 
@@ -142,7 +148,12 @@ namespace osu.Game.Overlays.Direct
 
         private void beginAudioLoad()
         {
-            if (trackLoader != null) return;
+            if (trackLoader != null)
+            {
+                Preview = trackLoader.Preview;
+                Playing.TriggerChange();
+                return;
+            }
 
             loading = true;
 

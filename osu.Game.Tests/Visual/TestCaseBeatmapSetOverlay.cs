@@ -14,15 +14,25 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseBeatmapSetOverlay : OsuTestCase
     {
-        private readonly BeatmapSetOverlay overlay;
+        private RulesetStore rulesets;
+        private readonly BeatmapSetOverlay overlay = new BeatmapSetOverlay();
+        private readonly MusicController musicController = new MusicController();
 
-        public TestCaseBeatmapSetOverlay()
-        {
-            Add(overlay = new BeatmapSetOverlay());
-        }
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
+        {
+            this.rulesets = rulesets;
+            dependencies.Cache(musicController);
+
+            Add(overlay);
+            Add(musicController);
+        }
+
+        protected override void LoadComplete()
         {
             var mania = rulesets.GetRuleset(3);
             var taiko = rulesets.GetRuleset(1);
