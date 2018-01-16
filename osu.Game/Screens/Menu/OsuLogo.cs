@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Menu
         /// <param name="waitForPrevious">If true, the new animation is delayed until all previous transforms finish. If false, existing transformed are cleared.</param>
         public void AppendAnimatingAction(Action action, bool waitForPrevious)
         {
-            Action runnableAction = () =>
+            void runnableAction()
             {
                 if (waitForPrevious)
                     this.DelayUntilTransformsFinished().Schedule(action);
@@ -240,12 +240,12 @@ namespace osu.Game.Screens.Menu
                     ClearTransforms();
                     action();
                 }
-            };
+            }
 
             if (IsLoaded)
                 runnableAction();
             else
-                Schedule(() => runnableAction());
+                Schedule(runnableAction);
         }
 
         [BackgroundDependencyLoader]
