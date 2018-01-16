@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private void applySpeedAdjustment(MultiplierControlPoint controlPoint, ScrollingPlayfield playfield)
         {
             playfield.HitObjects.AddControlPoint(controlPoint);
-            playfield.NestedPlayfields.ForEach(p => applySpeedAdjustment(controlPoint, p));
+            playfield.NestedPlayfields?.OfType<ScrollingPlayfield>().ForEach(p => applySpeedAdjustment(controlPoint, p));
         }
 
         /// <summary>

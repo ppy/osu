@@ -265,7 +265,7 @@ namespace osu.Game.Screens.Tournament
 
         private void writeResults(string text)
         {
-            Action writeAction = () =>
+            void writeAction()
             {
                 try
                 {
@@ -280,9 +280,9 @@ namespace osu.Game.Screens.Tournament
                 {
                     Logger.Error(ex, "Failed to write results.");
                 }
-            };
+            }
 
-            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run(writeAction);
+            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run((Action)writeAction);
         }
 
         private void reloadTeams()
