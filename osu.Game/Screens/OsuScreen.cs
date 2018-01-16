@@ -35,9 +35,12 @@ namespace osu.Game.Screens
         /// </summary>
         public virtual bool ShowOverlaysOnEnter => true;
 
-        protected new OsuGameBase Game => base.Game as OsuGameBase;
+        /// <summary>
+        /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.
+        /// </summary>
+        public virtual bool CursorVisible => true;
 
-        public virtual bool HasLocalCursorDisplayed => false;
+        protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         private OsuLogo logo;
 

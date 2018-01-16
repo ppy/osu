@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mods
     /// Interface for a <see cref="Mod"/> that applies changes to a <see cref="BeatmapConverter{TObject}"/>.
     /// </summary>
     /// <typeparam name="TObject">The type of converted <see cref="HitObject"/>.</typeparam>
-    public interface IApplicableToBeatmapConverter<TObject>
+    public interface IApplicableToBeatmapConverter<TObject> : IApplicableMod
         where TObject : HitObject
     {
         /// <summary>

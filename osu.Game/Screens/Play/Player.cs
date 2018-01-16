@@ -23,21 +23,21 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Game.Screens.Play.BreaksOverlay;
 using osu.Game.Storyboards.Drawables;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : OsuScreen
+    public class Player : OsuScreen, IProvideCursor
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         public override bool ShowOverlaysOnEnter => false;
-
-        public override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && RulesetContainer.ProvidingUserCursor;
 
         public Action RestartRequested;
 
@@ -50,6 +50,9 @@ namespace osu.Game.Screens.Play
         public bool AllowResults { get; set; } = true;
 
         public int RestartCount;
+
+        public CursorContainer Cursor => RulesetContainer.Cursor;
+        public bool ProvidingUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded;
 
         private IAdjustableClock adjustableSourceClock;
         private FramedOffsetClock offsetClock;
@@ -67,6 +70,7 @@ namespace osu.Game.Screens.Play
         #region User Settings
 
         private Bindable<double> dimLevel;
+        private Bindable<double> blurLevel;
         private Bindable<bool> showStoryboard;
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
@@ -90,6 +94,7 @@ namespace osu.Game.Screens.Play
             this.api = api;
 
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            blurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
@@ -174,13 +179,13 @@ namespace osu.Game.Screens.Play
                     },
                     Children = new Drawable[]
                     {
-                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Clock = offsetClock,
                             Child = RulesetContainer,
                         },
+                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                         hudOverlay = new HUDOverlay
                         {
                             Anchor = Anchor.Centre,
@@ -192,7 +197,7 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre,
                             Clock = decoupledClock,
                             Breaks = beatmap.Breaks
-                        },
+                        }
                     }
                 },
                 failOverlay = new FailOverlay
@@ -316,10 +321,9 @@ namespace osu.Game.Screens.Play
             if (!loadedSuccessfully)
                 return;
 
-            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1000, Easing.OutQuint);
-
-            dimLevel.ValueChanged += dimLevel_ValueChanged;
-            showStoryboard.ValueChanged += showStoryboard_ValueChanged;
+            dimLevel.ValueChanged += _ => updateBackgroundElements();
+            blurLevel.ValueChanged += _ => updateBackgroundElements();
+            showStoryboard.ValueChanged += _ => updateBackgroundElements();
             updateBackgroundElements();
 
             Content.Alpha = 0;
@@ -375,14 +379,12 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        private void dimLevel_ValueChanged(double newValue)
-            => updateBackgroundElements();
-
-        private void showStoryboard_ValueChanged(bool newValue)
-            => updateBackgroundElements();
-
         private void updateBackgroundElements()
         {
+            if (!IsCurrentScreen) return;
+
+            const float duration = 800;
+
             var opacity = 1 - (float)dimLevel;
 
             if (showStoryboard && storyboard == null)
@@ -391,17 +393,16 @@ namespace osu.Game.Screens.Play
             var beatmap = Beatmap.Value;
             var storyboardVisible = showStoryboard && beatmap.Storyboard.HasDrawable;
 
-            storyboardContainer.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
-            storyboardContainer.FadeTo(storyboardVisible && opacity > 0 ? 1 : 0);
+            storyboardContainer
+                .FadeColour(OsuColour.Gray(opacity), duration, Easing.OutQuint)
+                .FadeTo(storyboardVisible && opacity > 0 ? 1 : 0, duration, Easing.OutQuint);
 
-            Background?.FadeTo(!storyboardVisible || beatmap.Background == null ? opacity : 0, 800, Easing.OutQuint);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(new Vector2((float)blurLevel.Value * 25), duration, Easing.OutQuint);
+            Background?.FadeTo(!storyboardVisible || beatmap.Background == null ? opacity : 0, duration, Easing.OutQuint);
         }
 
         private void fadeOut()
         {
-            dimLevel.ValueChanged -= dimLevel_ValueChanged;
-            showStoryboard.ValueChanged -= showStoryboard_ValueChanged;
-
             const float fade_out_duration = 250;
 
             RulesetContainer?.FadeOut(fade_out_duration);

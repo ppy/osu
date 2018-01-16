@@ -122,7 +122,7 @@ namespace osu.Game.Overlays
             trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.AudioDevice), v => display(v, "Audio Device", string.IsNullOrEmpty(v) ? "Default" : v, v));
             trackSetting(frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay), v => display(v, "Debug Logs", v ? "visible" : "hidden", "Ctrl+F10"));
 
-            Action displayResolution = delegate { display(null, "Screen Resolution", frameworkConfig.Get<int>(FrameworkSetting.Width) + "x" + frameworkConfig.Get<int>(FrameworkSetting.Height)); };
+            void displayResolution() => display(null, "Screen Resolution", frameworkConfig.Get<int>(FrameworkSetting.Width) + "x" + frameworkConfig.Get<int>(FrameworkSetting.Height));
 
             trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Width), v => displayResolution());
             trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Height), v => displayResolution());

@@ -93,7 +93,6 @@ namespace osu.Game.Rulesets.Mania.Objects
                     Column = Column
                 });
             }
-
         }
 
         /// <summary>

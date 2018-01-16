@@ -230,7 +230,6 @@ namespace osu.Game.Overlays.Music
                 items.ChangeChildDepth(draggedItem, dstIndex);
             }
 
-
             private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
             {
                 public IEnumerable<string> FilterTerms => new string[] { };
