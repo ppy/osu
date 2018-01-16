@@ -205,12 +205,12 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             hitObject.Depth = (float)hitObject.HitObject.StartTime;
             hitObject.AccentColour = AccentColour;
-            hitObject.OnJudgement += OnJudgement;
+            hitObject.OnJudgement += onJudgement;
 
             HitObjects.Add(hitObject);
         }
 
-        public void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             if (!judgement.IsHit)
                 return;
