@@ -70,6 +70,8 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             h.Depth = (float)h.HitObject.StartTime;
 
+            h.OnJudgement += onJudgement;
+
             var c = h as IDrawableHitObjectWithProxiedApproach;
             if (c != null && ProxyApproachCircles)
                 approachCircles.Add(c.ProxiedLayer.CreateProxy());
@@ -84,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 .OrderBy(h => h.StartTime).OfType<OsuHitObject>();
         }
 
-        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             var osuJudgement = (OsuJudgement)judgement;
             var osuObject = (OsuHitObject)judgedObject.HitObject;

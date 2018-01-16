@@ -167,6 +167,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (nestedHitObjects == null)
                 nestedHitObjects = new List<DrawableHitObject>();
+
+            h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
+            h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
+            h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
+
             nestedHitObjects.Add(h);
         }
 
