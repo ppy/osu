@@ -12,8 +12,8 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float opacity_pressed = 0.25f;
 
         public Column()
-            : base(Axes.Y)
+            : base(ScrollingDirection.Up)
         {
             Width = column_width;
 
@@ -204,12 +204,13 @@ namespace osu.Game.Rulesets.Mania.UI
         public override void Add(DrawableHitObject hitObject)
         {
             hitObject.Depth = (float)hitObject.HitObject.StartTime;
-
             hitObject.AccentColour = AccentColour;
+            hitObject.OnJudgement += onJudgement;
+
             HitObjects.Add(hitObject);
         }
 
-        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             if (!judgement.IsHit)
                 return;

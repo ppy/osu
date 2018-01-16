@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         private const double hit_window_100 = 80;
         private const double hit_window_300 = 30;
 
+        public float TimePreempt = 600;
+        public float TimeFadein = 400;
+
         public Vector2 Position { get; set; }
         public float X => Position.X;
         public float Y => Position.Y;
@@ -40,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Color4 ComboColour { get; set; } = Color4.Gray;
         public virtual bool NewCombo { get; set; }
-        public int ComboIndex { get; set; }
+        public int IndexInCurrentCombo { get; set; }
 
         public double HitWindowFor(HitResult result)
         {
@@ -71,6 +74,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
+
+            TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
+            TimeFadein = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1200, 800, 300);
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }

@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {
@@ -29,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     colourIndex = (colourIndex + 1) % beatmap.ComboColors.Count;
                 }
 
-                obj.ComboIndex = comboIndex++;
+                obj.IndexInCurrentCombo = comboIndex++;
                 obj.ComboColour = beatmap.ComboColors[colourIndex];
             }
         }
@@ -37,7 +36,6 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         private void applyStacking(Beatmap<OsuHitObject> beatmap)
         {
             const int stack_distance = 3;
-            float stackThreshold = DrawableOsuHitObject.TIME_PREEMPT * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
 
             // Reset stacking
             for (int i = 0; i <= beatmap.HitObjects.Count - 1; i++)
@@ -58,6 +56,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         continue;
 
                     double endTime = (stackBaseObject as IHasEndTime)?.EndTime ?? stackBaseObject.StartTime;
+                    float stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
 
                     if (objectN.StartTime - endTime > stackThreshold)
                         //We are no longer within stacking range of the next object.
@@ -99,6 +98,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
                 OsuHitObject objectI = beatmap.HitObjects[i];
                 if (objectI.StackHeight != 0 || objectI is Spinner) continue;
+
+                float stackThreshold = objectI.TimePreempt * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
 
                 /* If this object is a hitcircle, then we enter this "special" case.
                     * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.

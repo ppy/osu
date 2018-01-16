@@ -4,19 +4,18 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
     public class SettingsSlider<T> : SettingsSlider<T, OsuSliderBar<T>>
-        where T : struct, IEquatable<T>
+        where T : struct, IEquatable<T>, IComparable, IConvertible
     {
     }
 
     public class SettingsSlider<T, U> : SettingsItem<T>
-        where T : struct, IEquatable<T>
-        where U : SliderBar<T>, new()
+        where T : struct, IEquatable<T>, IComparable, IConvertible
+        where U : OsuSliderBar<T>, new()
     {
         protected override Drawable CreateControl() => new U
         {

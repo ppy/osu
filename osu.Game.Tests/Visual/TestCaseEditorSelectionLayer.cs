@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,26 +19,10 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(SelectionLayer) };
 
-        public TestCaseEditorSelectionLayer()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            var playfield = new OsuEditPlayfield
-            {
-                new DrawableHitCircle(new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f }),
-                new DrawableHitCircle(new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f }),
-                new DrawableSlider(new Slider
-                {
-                    ControlPoints = new List<Vector2>
-                    {
-                        new Vector2(128, 256),
-                        new Vector2(344, 256),
-                    },
-                    Distance = 400,
-                    Position = new Vector2(128, 256),
-                    Velocity = 1,
-                    TickDistance = 100,
-                    Scale = 0.5f
-                })
-            };
+            var playfield = new OsuEditPlayfield();
 
             Children = new Drawable[]
             {
@@ -49,6 +34,22 @@ namespace osu.Game.Tests.Visual
                 },
                 new SelectionLayer(playfield)
             };
+
+            playfield.Add(new DrawableHitCircle(new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f }));
+            playfield.Add(new DrawableHitCircle(new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f }));
+            playfield.Add(new DrawableSlider(new Slider
+            {
+                ControlPoints = new List<Vector2>
+                {
+                    new Vector2(128, 256),
+                    new Vector2(344, 256),
+                },
+                Distance = 400,
+                Position = new Vector2(128, 256),
+                Velocity = 1,
+                TickDistance = 100,
+                Scale = 0.5f
+            }));
         }
     }
 }

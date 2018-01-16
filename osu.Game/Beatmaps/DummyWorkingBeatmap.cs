@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps
 
                 public override string ShortName => "dummy";
 
-                public DummyRuleset(RulesetInfo rulesetInfo)
+                public DummyRuleset(RulesetInfo rulesetInfo = null)
                     : base(rulesetInfo)
                 {
                 }

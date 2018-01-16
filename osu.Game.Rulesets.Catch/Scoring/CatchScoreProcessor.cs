@@ -10,7 +10,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.Scoring
 {
-    internal class CatchScoreProcessor : ScoreProcessor<CatchHitObject>
+    public class CatchScoreProcessor : ScoreProcessor<CatchHitObject>
     {
         public CatchScoreProcessor(RulesetContainer<CatchHitObject> rulesetContainer)
             : base(rulesetContainer)
@@ -21,23 +21,25 @@ namespace osu.Game.Rulesets.Catch.Scoring
         {
             foreach (var obj in beatmap.HitObjects)
             {
-                var stream = obj as JuiceStream;
-
-                if (stream != null)
+                switch (obj)
                 {
-                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-
-                    foreach (var unused in stream.NestedHitObjects.OfType<CatchHitObject>())
+                    case JuiceStream stream:
+                        AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
                         AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
 
-                    continue;
+                        foreach (var _ in stream.NestedHitObjects.Cast<CatchHitObject>())
+                            AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+                        break;
+                    case BananaShower shower:
+                        AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+
+                        foreach (var _ in shower.NestedHitObjects.Cast<CatchHitObject>())
+                            AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+                        break;
+                    case Fruit _:
+                        AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+                        break;
                 }
-
-                var fruit = obj as Fruit;
-
-                if (fruit != null)
-                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
             }
 
             base.SimulateAutoplay(beatmap);

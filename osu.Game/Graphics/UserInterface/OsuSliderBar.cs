@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Globalization;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -17,7 +18,7 @@ using osu.Framework.Graphics.Shapes;
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
-        where T : struct, IEquatable<T>
+        where T : struct, IEquatable<T>, IComparable, IConvertible
     {
         private SampleChannel sample;
         private double lastSampleTime;
@@ -32,18 +33,25 @@ namespace osu.Game.Graphics.UserInterface
             get
             {
                 var bindableDouble = CurrentNumber as BindableNumber<double>;
-                if (bindableDouble != null)
+                var bindableFloat = CurrentNumber as BindableNumber<float>;
+                var floatValue = bindableDouble?.Value ?? bindableFloat?.Value;
+
+                if (floatValue != null)
                 {
-                    if (bindableDouble.MaxValue == 1 && (bindableDouble.MinValue == 0 || bindableDouble.MinValue == -1))
-                        return bindableDouble.Value.ToString(@"P0");
-                    return bindableDouble.Value.ToString(@"n1");
+                    var floatMinValue = bindableDouble?.MinValue ?? bindableFloat.MinValue;
+                    var floatMaxValue = bindableDouble?.MaxValue ?? bindableFloat.MaxValue;
+
+                    if (floatMaxValue == 1 && (floatMinValue == 0 || floatMinValue == -1))
+                        return floatValue.Value.ToString("P0");
+
+                    return floatValue.Value.ToString("N1");
                 }
 
                 var bindableInt = CurrentNumber as BindableNumber<int>;
                 if (bindableInt != null)
-                    return bindableInt.Value.ToString(@"n0");
+                    return bindableInt.Value.ToString("N0");
 
-                return Current.Value.ToString();
+                return Current.Value.ToString(CultureInfo.InvariantCulture);
             }
         }
 
