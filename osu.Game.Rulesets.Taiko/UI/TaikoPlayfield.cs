@@ -209,6 +209,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             h.Depth = (float)h.HitObject.StartTime;
 
+            h.OnJudgement += OnJudgement;
+
             base.Add(h);
 
             var barline = h as DrawableBarLine;
@@ -221,7 +223,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
         }
 
-        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
