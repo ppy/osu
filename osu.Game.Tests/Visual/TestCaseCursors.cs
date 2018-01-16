@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing.Input;
 using osu.Game.Graphics.Cursor;
@@ -198,6 +199,8 @@ namespace osu.Game.Tests.Visual
             public CursorContainer Cursor { get; }
             public bool ProvidingUserCursor { get; }
 
+            private readonly Box background;
+
             public CustomCursorBox(Color4 cursorColour, bool providesUserCursor = true)
             {
                 ProvidingUserCursor = providesUserCursor;
@@ -207,7 +210,7 @@ namespace osu.Game.Tests.Visual
 
                 Children = new Drawable[]
                 {
-                    new Box
+                    background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0.1f
@@ -223,6 +226,18 @@ namespace osu.Game.Tests.Visual
                         State = providesUserCursor ? Visibility.Hidden : Visibility.Visible,
                     }
                 };
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                background.FadeTo(0.4f, 250, Easing.OutQuint);
+                return false;
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                background.FadeTo(0.1f, 250);
+                base.OnHoverLost(state);
             }
         }
 
