@@ -489,9 +489,8 @@ namespace osu.Game.Overlays.Profile
             {
                 private readonly OsuHoverContainer content;
 
-                public override bool HandleKeyboardInput => handleInput;
-                public override bool HandleMouseInput => handleInput;
-                private bool handleInput => content.Action != null;
+                public override bool HandleKeyboardInput => content.Action != null;
+                public override bool HandleMouseInput => content.Action != null;
 
                 protected override Container<Drawable> Content => content ?? (Container<Drawable>)this;
 
