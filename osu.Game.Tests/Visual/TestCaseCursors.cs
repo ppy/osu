@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -81,10 +82,14 @@ namespace osu.Game.Tests.Visual
             };
 
             returnUserInput();
+
+            AddToggleStep("Smooth transitions", b => cursorBoxes.ForEach(box => box.SmoothTransition = b));
+
             testUserCursor();
             testLocalCursor();
             testUserCursorOverride();
             testMultipleLocalCursors();
+            returnUserInput();
         }
 
         /// <summary>
@@ -196,8 +201,12 @@ namespace osu.Game.Tests.Visual
 
         private class CustomCursorBox : Container, IProvideCursor
         {
+            public bool SmoothTransition;
+
             public CursorContainer Cursor { get; }
             public bool ProvidingUserCursor { get; }
+
+            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => base.ReceiveMouseInputAt(screenSpacePos) || SmoothTransition && !ProvidingUserCursor;
 
             private readonly Box background;
 
