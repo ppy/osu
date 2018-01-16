@@ -199,7 +199,9 @@ namespace osu.Game.Screens.Menu
 
         private MenuState state;
 
-        public override bool HandleInput => state != MenuState.Exit;
+        public override bool HandleKeyboardInput => handleInput;
+        public override bool HandleMouseInput => handleInput;
+        private bool handleInput=> state != MenuState.Exit;
 
         public MenuState State
         {
