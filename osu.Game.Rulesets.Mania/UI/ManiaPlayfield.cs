@@ -192,11 +192,8 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            var maniaObject = (ManiaHitObject)judgedObject.HitObject;
-            columns[maniaObject.Column].OnJudgement(judgedObject, judgement);
-
             judgements.Clear();
             judgements.Add(new DrawableManiaJudgement(judgement)
             {
@@ -224,7 +221,11 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void Add(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column).Add(h);
+        public override void Add(DrawableHitObject h)
+        {
+            h.OnJudgement += OnJudgement;
+            Columns.ElementAt(((ManiaHitObject)h.HitObject).Column).Add(h);
+        }
 
         public void Add(DrawableBarLine barline) => HitObjects.Add(barline);
 

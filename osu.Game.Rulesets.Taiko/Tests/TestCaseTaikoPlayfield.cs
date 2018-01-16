@@ -143,18 +143,18 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            rulesetContainer.Playfield.OnJudgement(h, new TaikoJudgement { Result = hitResult });
+            ((TaikoPlayfield)rulesetContainer.Playfield).OnJudgement(h, new TaikoJudgement { Result = hitResult });
 
             if (RNG.Next(10) == 0)
             {
-                rulesetContainer.Playfield.OnJudgement(h, new TaikoJudgement { Result = hitResult });
-                rulesetContainer.Playfield.OnJudgement(h, new TaikoStrongHitJudgement());
+                ((TaikoPlayfield)rulesetContainer.Playfield).OnJudgement(h, new TaikoJudgement { Result = hitResult });
+                ((TaikoPlayfield)rulesetContainer.Playfield).OnJudgement(h, new TaikoStrongHitJudgement());
             }
         }
 
         private void addMissJudgement()
         {
-            rulesetContainer.Playfield.OnJudgement(new DrawableTestHit(new Hit()), new TaikoJudgement { Result = HitResult.Miss });
+            ((TaikoPlayfield)rulesetContainer.Playfield).OnJudgement(new DrawableTestHit(new Hit()), new TaikoJudgement { Result = HitResult.Miss });
         }
 
         private void addBarLine(bool major, double delay = scroll_time)
