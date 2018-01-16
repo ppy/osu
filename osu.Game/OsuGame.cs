@@ -115,6 +115,8 @@ namespace osu.Game
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
+
+            muteWhenInactive = LocalConfig.GetBindable<bool>(OsuSetting.MuteWhenInactive);
         }
 
         private ScheduledDelegate scoreLoad;
@@ -384,6 +386,28 @@ namespace osu.Game
             }
 
             return false;
+        }
+
+        private Bindable<bool> muteWhenInactive = new Bindable<bool>();
+        private bool wasMuted;
+
+        protected override void OnDeactivated()
+        {
+            base.OnDeactivated();
+            if (muteWhenInactive)
+            {
+                wasMuted = volume.IsMuted;
+                volume.Mute();
+            }
+        }
+
+        protected override void OnActivated()
+        {
+            base.OnActivated();
+            if (IsLoaded && muteWhenInactive && !wasMuted)
+            {
+                volume.Unmute();
+            }
         }
 
         public bool OnReleased(GlobalAction action) => false;

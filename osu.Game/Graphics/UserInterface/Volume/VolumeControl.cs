@@ -91,6 +91,24 @@ namespace osu.Game.Graphics.UserInterface.Volume
             schedulePopOut();
         }
 
+        public bool IsMuted => volumeMeterMaster.IsMuted;
+
+        public void Mute()
+        {
+            if (!IsMuted)
+            {
+                volumeMeterMaster.ToogleMute();
+            }
+        }
+
+        public void Unmute()
+        {
+            if (IsMuted)
+            {
+                volumeMeterMaster.ToogleMute();
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
