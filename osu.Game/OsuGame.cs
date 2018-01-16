@@ -79,6 +79,8 @@ namespace osu.Game
 
         private SettingsOverlay settings;
 
+        private bool exiting;
+
         public OsuGame(string[] args = null)
         {
             this.args = args;
@@ -117,6 +119,13 @@ namespace osu.Game
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
 
             muteWhenInactive = LocalConfig.GetBindable<bool>(OsuSetting.MuteWhenInactive);
+            Host.Window.Exited += () =>
+            {
+                //Prevent not saving audio levels when user alt tabs before the window closes
+                if (volume.IsMuted)
+                    volume.Unmute();
+                exiting = true;
+            };
         }
 
         private ScheduledDelegate scoreLoad;
@@ -394,7 +403,7 @@ namespace osu.Game
         protected override void OnDeactivated()
         {
             base.OnDeactivated();
-            if (muteWhenInactive)
+            if (muteWhenInactive && !exiting)
             {
                 wasMuted = volume.IsMuted;
                 volume.Mute();
@@ -404,7 +413,7 @@ namespace osu.Game
         protected override void OnActivated()
         {
             base.OnActivated();
-            if (IsLoaded && muteWhenInactive && !wasMuted)
+            if (IsLoaded && muteWhenInactive && !wasMuted && !exiting)
             {
                 volume.Unmute();
             }
