@@ -566,7 +566,6 @@ namespace osu.Game.Beatmaps
             using (var stream = new StreamReader(reader.GetStream(mapName)))
                 metadata = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
 
-
             // check if a set already exists with the same online id.
             if (metadata.OnlineBeatmapSetID != null)
                 beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID);
@@ -580,7 +579,6 @@ namespace osu.Game.Beatmaps
                     Files = fileInfos,
                     Metadata = metadata
                 };
-
 
             var mapNames = reader.Filenames.Where(f => f.EndsWith(".osu"));
 
@@ -693,7 +691,6 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-
                     using (var beatmap = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                     {
                         Decoder decoder = Decoder.GetDecoder(beatmap);

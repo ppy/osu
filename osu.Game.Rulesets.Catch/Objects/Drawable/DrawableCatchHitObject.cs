@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 using osu.Game.Rulesets.Scoring;
 
@@ -13,13 +14,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     public abstract class PalpableCatchHitObject<TObject> : DrawableCatchHitObject<TObject>
         where TObject : CatchHitObject
     {
+        public override bool CanBePlated => true;
+
         protected PalpableCatchHitObject(TObject hitObject)
             : base(hitObject)
         {
             Scale = new Vector2(HitObject.Scale);
         }
     }
-
 
     public abstract class DrawableCatchHitObject<TObject> : DrawableCatchHitObject
         where TObject : CatchHitObject
@@ -36,6 +38,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
     public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
+        public virtual bool CanBePlated => false;
+
         protected DrawableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {
@@ -47,8 +51,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
+            if (CheckPosition == null) return;
+
             if (timeOffset > 0)
-                AddJudgement(new Judgement { Result = CheckPosition?.Invoke(HitObject) ?? false ? HitResult.Perfect : HitResult.Miss });
+                AddJudgement(new Judgement { Result = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss });
         }
 
         private const float preempt = 1000;
@@ -56,17 +62,21 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         protected override void UpdateState(ArmedState state)
         {
             using (BeginAbsoluteSequence(HitObject.StartTime - preempt))
-            {
-                // animation
                 this.FadeIn(200);
-            }
 
-            switch (state)
+            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+
+            using (BeginAbsoluteSequence(endTime, true))
             {
-                case ArmedState.Miss:
-                    using (BeginAbsoluteSequence(HitObject.StartTime, true))
-                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out);
-                    break;
+                switch (state)
+                {
+                    case ArmedState.Miss:
+                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out).Expire();
+                        break;
+                    case ArmedState.Hit:
+                        this.FadeOut().Expire();
+                        break;
+                }
             }
         }
     }

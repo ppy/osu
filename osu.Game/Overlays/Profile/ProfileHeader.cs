@@ -318,11 +318,11 @@ namespace osu.Game.Overlays.Profile
                 colourBar.Show();
             }
 
-            Action<SpriteText> boldItalic = t =>
+            void boldItalic(SpriteText t)
             {
                 t.Font = @"Exo2.0-BoldItalic";
                 t.Alpha = 1;
-            };
+            }
 
             if (user.Age != null)
             {

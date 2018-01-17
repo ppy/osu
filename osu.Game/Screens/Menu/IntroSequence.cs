@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
@@ -188,7 +187,7 @@ namespace osu.Game.Screens.Menu
             mediumRing.ResizeTo(130, 340, Easing.OutQuad);
             mediumRing.Foreground.ResizeTo(1, 880, Easing.Out);
 
-            Func<double> remainingTime = () => length - TransformDelay;
+            double remainingTime() => length - TransformDelay;
 
             using (BeginDelayedSequence(250, true))
             {
