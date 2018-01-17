@@ -98,8 +98,6 @@ namespace osu.Game.Screens.Play
                     OnSeek = position => OnSeek?.Invoke(position),
                 },
             };
-
-            replayLoaded.ValueChanged += v => AllowSeeking = v;
         }
 
         protected override void LoadComplete()

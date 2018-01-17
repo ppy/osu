@@ -59,7 +59,6 @@ namespace osu.Game.Screens.Play
                     ReplaySettingsOverlay = CreateReplaySettingsOverlay(),
                 }
             });
-
         }
 
         [BackgroundDependencyLoader(true)]
