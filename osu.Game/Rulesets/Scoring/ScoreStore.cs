@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -129,7 +130,14 @@ namespace osu.Game.Rulesets.Scoring
             {
                 var split = l.Split('|');
 
-                if (split.Length < 4 || float.Parse(split[0]) < 0) continue;
+                if (split.Length < 4)
+                    continue;
+
+                if (split[0] == "-12345")
+                {
+                    // Todo: The seed is provided in split[3], which we'll need to use at some point
+                    continue;
+                }
 
                 lastTime += float.Parse(split[0]);
 
@@ -141,7 +149,7 @@ namespace osu.Game.Rulesets.Scoring
                 ));
             }
 
-            return new Replay { Frames = frames };
+            return new Replay { Frames = frames.OrderBy(f => f.Time).ToList() };
         }
     }
 }
