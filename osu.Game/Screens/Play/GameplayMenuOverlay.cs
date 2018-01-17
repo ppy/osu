@@ -142,8 +142,6 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public override bool HandleInput => State == Visibility.Visible;
-
         protected override void PopIn() => this.FadeIn(transition_duration, Easing.In);
         protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);
 
