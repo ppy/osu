@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Play
                 if (!RulesetContainer.Objects.Any())
                     throw new InvalidOperationException("Beatmap contains no hit objects!");
 
-                var rulesetConfig = rulesetInstance.CreateConfigManager();
+                var rulesetConfig = rulesetInstance.GetConfigManager(storage);
                 if (rulesetConfig != null)
                     dependencies.Cache(rulesetConfig);
             }
