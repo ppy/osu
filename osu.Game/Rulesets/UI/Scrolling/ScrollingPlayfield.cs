@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -74,25 +73,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private void load()
         {
             HitObjects.TimeRange.BindTo(VisibleTimeRange);
-        }
-
-        private List<ScrollingPlayfield> nestedPlayfields;
-        /// <summary>
-        /// All the <see cref="ScrollingPlayfield"/>s nested inside this playfield.
-        /// </summary>
-        public IEnumerable<ScrollingPlayfield> NestedPlayfields => nestedPlayfields;
-
-        /// <summary>
-        /// Adds a <see cref="ScrollingPlayfield"/> to this playfield. The nested <see cref="ScrollingPlayfield"/>
-        /// will be given all of the same speed adjustments as this playfield.
-        /// </summary>
-        /// <param name="otherPlayfield">The <see cref="ScrollingPlayfield"/> to add.</param>
-        protected void AddNested(ScrollingPlayfield otherPlayfield)
-        {
-            if (nestedPlayfields == null)
-                nestedPlayfields = new List<ScrollingPlayfield>();
-
-            nestedPlayfields.Add(otherPlayfield);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)

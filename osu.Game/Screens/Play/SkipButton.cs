@@ -21,7 +21,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipButton : Container, IKeyBindingHandler<GlobalAction>
+    public class SkipButton : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
         public IAdjustableClock AudioClock;
@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Play
         public SkipButton(double startTime)
         {
             this.startTime = startTime;
+
+            State = Visibility.Visible;
 
             RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.Both;
@@ -110,6 +112,16 @@ namespace osu.Game.Screens.Play
             displayTime = Time.Current;
 
             Expire();
+        }
+
+        protected override void PopIn()
+        {
+            this.FadeIn();
+        }
+
+        protected override void PopOut()
+        {
+            this.FadeOut();
         }
 
         protected override void Update()

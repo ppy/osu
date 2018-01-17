@@ -117,8 +117,8 @@ namespace osu.Game.Tests.Beatmaps.IO
             //ensure we were stored to beatmap database backing...
             Assert.IsTrue(resultSets.Count() == 1, $@"Incorrect result count found ({resultSets.Count()} but should be 1).");
 
-            Func<IEnumerable<BeatmapInfo>> queryBeatmaps = () => store.QueryBeatmaps(s => s.BeatmapSet.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0);
-            Func<IEnumerable<BeatmapSetInfo>> queryBeatmapSets = () => store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526);
+            IEnumerable<BeatmapInfo> queryBeatmaps() => store.QueryBeatmaps(s => s.BeatmapSet.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0);
+            IEnumerable<BeatmapSetInfo> queryBeatmapSets() => store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526);
 
             //if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
             waitForOrAssert(() => queryBeatmaps().Count() == 12,

@@ -23,21 +23,21 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Game.Screens.Play.BreaksOverlay;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : OsuScreen
+    public class Player : OsuScreen, IProvideCursor
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         public override bool ShowOverlaysOnEnter => false;
-
-        public override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && RulesetContainer.ProvidingUserCursor;
 
         public Action RestartRequested;
 
@@ -50,6 +50,9 @@ namespace osu.Game.Screens.Play
         public bool AllowResults { get; set; } = true;
 
         public int RestartCount;
+
+        public CursorContainer Cursor => RulesetContainer.Cursor;
+        public bool ProvidingUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded;
 
         private IAdjustableClock adjustableSourceClock;
         private FramedOffsetClock offsetClock;
@@ -176,13 +179,13 @@ namespace osu.Game.Screens.Play
                     },
                     Children = new Drawable[]
                     {
-                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Clock = offsetClock,
                             Child = RulesetContainer,
                         },
+                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                         hudOverlay = new HUDOverlay
                         {
                             Anchor = Anchor.Centre,
@@ -194,7 +197,7 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre,
                             Clock = decoupledClock,
                             Breaks = beatmap.Breaks
-                        },
+                        }
                     }
                 },
                 failOverlay = new FailOverlay

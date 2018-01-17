@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Configuration;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -79,6 +80,11 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             return null;
+        }
+
+        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        {
+            getStageByColumn(((ManiaHitObject)judgedObject.HitObject).Column).OnJudgement(judgedObject, judgement);
         }
     }
 }

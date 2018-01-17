@@ -19,7 +19,8 @@ namespace osu.Game.Screens.Menu
 {
     public class MenuSideFlashes : BeatSyncedContainer
     {
-        public override bool HandleInput => false;
+        public override bool HandleKeyboardInput => false;
+        public override bool HandleMouseInput => false;
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 

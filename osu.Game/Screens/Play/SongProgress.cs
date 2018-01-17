@@ -28,7 +28,8 @@ namespace osu.Game.Screens.Play
 
         public Action<double> OnSeek;
 
-        public override bool HandleInput => AllowSeeking;
+        public override bool HandleKeyboardInput => AllowSeeking;
+        public override bool HandleMouseInput => AllowSeeking;
 
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = info.AudioClock = value; } }
