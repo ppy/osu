@@ -33,9 +33,8 @@
     <Reference Include="DeepEqual, Version=1.6.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(SolutionDir)\packages\DeepEqual.1.6.0.0\lib\net40\DeepEqual.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="nunit.framework, Version=3.9.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
       <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0.11\lib\net45\OpenTK.dll</HintPath>
