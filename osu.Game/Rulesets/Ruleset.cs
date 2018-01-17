@@ -9,6 +9,7 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -88,6 +89,11 @@ namespace osu.Game.Rulesets
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
         public virtual string GetVariantName(int variant) => string.Empty;
+
+        /// <summary>
+        /// The <see cref="ConfigManager{T}"/> that is used for settings specific to this <see cref="Ruleset"/>.
+        /// </summary>
+        public virtual IRulesetConfigManager CreateConfigManager() => null;
 
         /// <summary>
         /// Create a ruleset info based on this ruleset.
