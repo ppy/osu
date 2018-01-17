@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual
             // this is by no means clean. should be replacing inside of OsuGameBase somehow.
             var context = new OsuDbContext();
 
-            Func<OsuDbContext> contextFactory = () => context;
+            OsuDbContext contextFactory() => context;
 
             dependencies.Cache(rulesets = new RulesetStore(contextFactory));
             dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)

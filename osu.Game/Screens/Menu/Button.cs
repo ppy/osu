@@ -222,7 +222,8 @@ namespace osu.Game.Screens.Menu
             boxHoverLayer.FadeOut(800, Easing.OutExpo);
         }
 
-        public override bool HandleInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
+        public override bool HandleKeyboardInput => state != ButtonState.Exploded;
+        public override bool HandleMouseInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
 
         protected override void Update()
         {

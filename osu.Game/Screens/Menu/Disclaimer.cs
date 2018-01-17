@@ -19,8 +19,7 @@ namespace osu.Game.Screens.Menu
         private Color4 iconColour;
 
         public override bool ShowOverlaysOnEnter => false;
-
-        public override bool HasLocalCursorDisplayed => true;
+        public override bool CursorVisible => false;
 
         public Disclaimer()
         {

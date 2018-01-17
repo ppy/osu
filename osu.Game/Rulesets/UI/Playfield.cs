@@ -1,11 +1,12 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
-using osu.Game.Rulesets.Judgements;
 using osu.Framework.Allocation;
 
 namespace osu.Game.Rulesets.UI
@@ -19,13 +20,15 @@ namespace osu.Game.Rulesets.UI
 
         public Container<Drawable> ScaledContent;
 
-        /// <summary>
-        /// Whether we are currently providing the local user a gameplay cursor.
-        /// </summary>
-        public virtual bool ProvidingUserCursor => false;
-
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
+
+        private List<Playfield> nestedPlayfields;
+
+        /// <summary>
+        /// All the <see cref="Playfield"/>s nested inside this playfield.
+        /// </summary>
+        public IReadOnlyList<Playfield> NestedPlayfields => nestedPlayfields;
 
         /// <summary>
         /// A container for keeping track of DrawableHitObjects.
@@ -61,7 +64,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Performs post-processing tasks (if any) after all DrawableHitObjects are loaded into this Playfield.
         /// </summary>
-        public virtual void PostProcess() { }
+        public virtual void PostProcess() => nestedPlayfields?.ForEach(p => p.PostProcess());
 
         /// <summary>
         /// Adds a DrawableHitObject to this Playfield.
@@ -76,11 +79,17 @@ namespace osu.Game.Rulesets.UI
         public virtual void Remove(DrawableHitObject h) => HitObjects.Remove(h);
 
         /// <summary>
-        /// Triggered when a new <see cref="Judgement"/> occurs on a <see cref="DrawableHitObject"/>.
+        /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
+        /// This does not add the <see cref="Playfield"/> to the draw hierarchy.
         /// </summary>
-        /// <param name="judgedObject">The object that <paramref name="judgement"/> occured for.</param>
-        /// <param name="judgement">The <see cref="Judgement"/> that occurred.</param>
-        public virtual void OnJudgement(DrawableHitObject judgedObject, Judgement judgement) { }
+        /// <param name="otherPlayfield">The <see cref="Playfield"/> to add.</param>
+        protected void AddNested(Playfield otherPlayfield)
+        {
+            if (nestedPlayfields == null)
+                nestedPlayfields = new List<Playfield>();
+
+            nestedPlayfields.Add(otherPlayfield);
+        }
 
         /// <summary>
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
