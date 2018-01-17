@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -143,7 +142,11 @@ namespace osu.Game.Rulesets.Scoring
                     continue;
                 }
 
-                lastTime += float.Parse(split[0]);
+                var diff = float.Parse(split[0]);
+                lastTime += diff;
+
+                if (diff < 0)
+                    continue;
 
                 frames.Add(new ReplayFrame(
                     lastTime,
@@ -153,7 +156,7 @@ namespace osu.Game.Rulesets.Scoring
                 ));
             }
 
-            return new Replay { Frames = frames.OrderBy(f => f.Time).ToList() };
+            return new Replay { Frames = frames };
         }
     }
 }
