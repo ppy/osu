@@ -91,10 +91,18 @@ namespace osu.Game.Rulesets
         /// <returns>A descriptive name of the variant.</returns>
         public virtual string GetVariantName(int variant) => string.Empty;
 
+        private static readonly Dictionary<Type, IRulesetConfigManager> config_manager_cache = new Dictionary<Type, IRulesetConfigManager>();
+        public IRulesetConfigManager GetConfigManager(Storage storage)
+        {
+            if (config_manager_cache.TryGetValue(GetType(), out var existing))
+                return existing;
+            return config_manager_cache[GetType()] = CreateConfigManager(storage);
+        }
+
         /// <summary>
         /// The <see cref="ConfigManager{T}"/> that is used for settings specific to this <see cref="Ruleset"/>.
         /// </summary>
-        public virtual IRulesetConfigManager CreateConfigManager(Storage storage) => null;
+        protected virtual IRulesetConfigManager CreateConfigManager(Storage storage) => null;
 
         /// <summary>
         /// Create a ruleset info based on this ruleset.

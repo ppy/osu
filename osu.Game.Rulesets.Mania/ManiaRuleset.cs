@@ -158,6 +158,6 @@ namespace osu.Game.Rulesets.Mania
 
         public override string GetVariantName(int variant) => $"{variant}K";
 
-        public override IRulesetConfigManager CreateConfigManager(Storage storage) => new ManiaConfigManager(this, storage);
+        protected override IRulesetConfigManager CreateConfigManager(Storage storage) => new ManiaConfigManager(this, storage);
     }
 }
