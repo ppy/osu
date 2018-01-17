@@ -18,8 +18,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
         private readonly Box meterFill;
         public BindableDouble Bindable { get; } = new BindableDouble();
 
-        private double lastVolume;
-
         public VolumeMeter(string meterName)
         {
             Size = new Vector2(40, 180);
