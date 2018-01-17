@@ -11,6 +11,7 @@ using osu.Game.Database;
 using osu.Game.IO.Legacy;
 using osu.Game.IPC;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Users;
 using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Rulesets.Scoring
@@ -55,7 +56,7 @@ namespace osu.Game.Rulesets.Scoring
                 var beatmapHash = sr.ReadString();
                 score.Beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == beatmapHash);
                 /* score.PlayerName = */
-                sr.ReadString();
+                score.User = new User { Username = sr.ReadString() };
                 /* var localScoreChecksum = */
                 sr.ReadString();
                 /* score.Count300 = */
@@ -108,7 +109,10 @@ namespace osu.Game.Rulesets.Scoring
 
                     using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
                     using (var reader = new StreamReader(lzma))
+                    {
                         score.Replay = createLegacyReplay(reader);
+                        score.Replay.User = score.User;
+                    }
                 }
             }
 
