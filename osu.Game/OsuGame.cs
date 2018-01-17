@@ -119,13 +119,11 @@ namespace osu.Game
 
         private ScheduledDelegate scoreLoad;
 
-        #region chat link actions
+        public void OpenChannel(string channelName) => chat.OpenChannel(chat.AvailableChannels.Find(c => c.Name == channelName));
 
-        internal void OpenChannel(string channelName) => chat.OpenChannel(chat.AvailableChannels.Find(c => c.Name == channelName));
+        public void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
 
-        internal void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
-
-        internal void LoadEditorTimestamp()
+        public void LoadEditorTimestamp()
         {
             notifications.Post(new SimpleNotification
             {
@@ -134,7 +132,7 @@ namespace osu.Game
             });
         }
 
-        internal void LoadSpectatorScreen()
+        public void LoadSpectatorScreen()
         {
             notifications.Post(new SimpleNotification
             {
@@ -143,7 +141,7 @@ namespace osu.Game
             });
         }
 
-        internal void JoinMultiplayerMatch(int matchId)
+        public void JoinMultiplayerMatch(int matchId)
         {
             notifications.Post(new SimpleNotification
             {
@@ -151,8 +149,6 @@ namespace osu.Game
                 Icon = FontAwesome.fa_life_saver,
             });
         }
-
-        #endregion
 
         protected void LoadScore(Score s)
         {
