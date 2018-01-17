@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Game.Rulesets.Replays;
@@ -45,9 +46,9 @@ namespace osu.Game.Rulesets.UI
         public PassThroughInputManager KeyBindingInputManager;
 
         /// <summary>
-        /// Whether we have a replay loaded currently.
+        /// Whether a replay is currently loaded.
         /// </summary>
-        public bool HasReplayLoaded => ReplayInputManager?.ReplayInputHandler != null;
+        public readonly BindableBool HasReplayLoaded = new BindableBool();
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
@@ -99,6 +100,8 @@ namespace osu.Game.Rulesets.UI
 
             Replay = replay;
             ReplayInputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
+
+            HasReplayLoaded.Value = ReplayInputManager.ReplayInputHandler != null;
         }
 
 
