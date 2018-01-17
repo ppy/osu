@@ -150,7 +150,12 @@ namespace osu.Game.Overlays.Direct
 
         private void beginAudioLoad()
         {
-            if (trackLoader != null) return;
+            if (trackLoader != null)
+            {
+                Preview = trackLoader.Preview;
+                Playing.TriggerChange();
+                return;
+            }
 
             loading = true;
 
