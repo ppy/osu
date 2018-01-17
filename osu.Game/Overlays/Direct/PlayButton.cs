@@ -132,8 +132,7 @@ namespace osu.Game.Overlays.Direct
                     return;
                 }
 
-                Preview.Seek(0);
-                Preview.Start();
+                Preview.Restart();
 
                 audio.Track.AddAdjustment(AdjustableProperty.Volume, muteBindable);
             }
