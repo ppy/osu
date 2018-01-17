@@ -8,6 +8,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -22,11 +24,19 @@ namespace osu.Game.Graphics.Containers
 
         private OsuGame game;
 
+        private Action showNotImplementedError;
+
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game)
+        private void load(OsuGame game, NotificationOverlay notifications)
         {
             // will be null in tests
             this.game = game;
+
+            showNotImplementedError = () => notifications?.Post(new SimpleNotification
+            {
+                Text = @"This link type is not yet supported!",
+                Icon = FontAwesome.fa_life_saver,
+            });
         }
 
         public void AddLinks(string text, List<Link> links)
@@ -72,14 +82,9 @@ namespace osu.Game.Graphics.Containers
                             game?.OpenChannel(linkArgument);
                             break;
                         case LinkAction.OpenEditorTimestamp:
-                            game?.LoadEditorTimestamp();
-                            break;
                         case LinkAction.JoinMultiplayerMatch:
-                            if (int.TryParse(linkArgument, out int matchId))
-                                game?.JoinMultiplayerMatch(matchId);
-                            break;
                         case LinkAction.Spectate:
-                            // todo: implement this when spectating exists
+                            showNotImplementedError?.Invoke();
                             break;
                         case LinkAction.External:
                             Process.Start(url);
@@ -87,7 +92,7 @@ namespace osu.Game.Graphics.Containers
                         default:
                             throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
                     }
-                }
+                },
             });
         }
     }

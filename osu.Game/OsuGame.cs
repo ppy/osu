@@ -123,33 +123,6 @@ namespace osu.Game
 
         public void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
 
-        public void LoadEditorTimestamp()
-        {
-            notifications.Post(new SimpleNotification
-            {
-                Text = @"Sorry, but this is not fully implemented yet!",
-                Icon = FontAwesome.fa_life_saver,
-            });
-        }
-
-        public void LoadSpectatorScreen()
-        {
-            notifications.Post(new SimpleNotification
-            {
-                Text = @"Sorry, but spectating is not implemented yet!",
-                Icon = FontAwesome.fa_life_saver,
-            });
-        }
-
-        public void JoinMultiplayerMatch(int matchId)
-        {
-            notifications.Post(new SimpleNotification
-            {
-                Text = @"Sorry, but the multiplayer lobby is not implemented yet!",
-                Icon = FontAwesome.fa_life_saver,
-            });
-        }
-
         protected void LoadScore(Score s)
         {
             scoreLoad?.Cancel();
