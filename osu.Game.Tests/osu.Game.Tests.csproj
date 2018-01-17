@@ -104,6 +104,7 @@
     <Compile Include="Visual\TestCaseBreakOverlay.cs" />
     <Compile Include="Visual\TestCaseChatDisplay.cs" />
     <Compile Include="Visual\TestCaseContextMenu.cs" />
+    <Compile Include="Visual\TestCaseCursors.cs" />
     <Compile Include="Visual\TestCaseDialogOverlay.cs" />
     <Compile Include="Visual\TestCaseDirect.cs" />
     <Compile Include="Visual\TestCaseDrawableRoom.cs" />
