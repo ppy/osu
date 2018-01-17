@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Configuration
     public abstract class RulesetConfigManager<T> : ConfigManager<T>, IRulesetConfigManager
         where T : struct
     {
-        protected override string Filename => ruleset?.ShortName;
+        protected override string Filename => ruleset?.ShortName == null ? null : $"{ruleset.ShortName}.ini";
         private readonly Ruleset ruleset;
 
         protected RulesetConfigManager(Ruleset ruleset, Storage storage)
