@@ -12,10 +12,17 @@ namespace osu.Game.Rulesets.Mania.Configuration
             : base(ruleset, storage)
         {
         }
+
+        protected override void InitialiseDefaults()
+        {
+            base.InitialiseDefaults();
+
+            Set(ManiaSetting.ScrollTime, 1500.0, 50.0, 10000.0, 50.0);
+        }
     }
 
     public enum ManiaSetting
     {
-        ScrollSpeed
+        ScrollTime
     }
 }
