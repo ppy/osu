@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
         public readonly ReplaySettingsOverlay ReplaySettingsOverlay;
 
         private Bindable<bool> showHud;
-        private bool replayLoaded;
+        private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
 
@@ -59,6 +59,24 @@ namespace osu.Game.Screens.Play
                     ReplaySettingsOverlay = CreateReplaySettingsOverlay(),
                 }
             });
+
+            replayLoaded.ValueChanged += replayLoadedValueChanged;
+        }
+
+        private void replayLoadedValueChanged(bool loaded)
+        {
+            ReplaySettingsOverlay.ReplayLoaded = loaded;
+
+            if (loaded)
+            {
+                ReplaySettingsOverlay.Show();
+                ModDisplay.FadeIn(200);
+            }
+            else
+            {
+                ReplaySettingsOverlay.Hide();
+                ModDisplay.Delay(2000).FadeOut(200);
+            }
         }
 
         [BackgroundDependencyLoader(true)]
@@ -95,16 +113,10 @@ namespace osu.Game.Screens.Play
         {
             (rulesetContainer.KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(KeyCounter);
 
-            replayLoaded = rulesetContainer.HasReplayLoaded;
+            replayLoaded.BindTo(rulesetContainer.HasReplayLoaded);
+            replayLoaded.TriggerChange();
 
-            ReplaySettingsOverlay.ReplayLoaded = replayLoaded;
-
-            // in the case a replay isn't loaded, we want some elements to only appear briefly.
-            if (!replayLoaded)
-            {
-                ReplaySettingsOverlay.Hide();
-                ModDisplay.Delay(2000).FadeOut(200);
-            }
+            Progress.BindRulestContainer(rulesetContainer);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
