@@ -60,23 +60,6 @@ namespace osu.Game.Screens.Play
                 }
             });
 
-            replayLoaded.ValueChanged += replayLoadedValueChanged;
-        }
-
-        private void replayLoadedValueChanged(bool loaded)
-        {
-            ReplaySettingsOverlay.ReplayLoaded = loaded;
-
-            if (loaded)
-            {
-                ReplaySettingsOverlay.Show();
-                ModDisplay.FadeIn(200);
-            }
-            else
-            {
-                ReplaySettingsOverlay.Hide();
-                ModDisplay.Delay(2000).FadeOut(200);
-            }
         }
 
         [BackgroundDependencyLoader(true)]
@@ -109,12 +92,35 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            replayLoaded.ValueChanged += replayLoadedValueChanged;
+            replayLoaded.TriggerChange();
+        }
+
+        private void replayLoadedValueChanged(bool loaded)
+        {
+            ReplaySettingsOverlay.ReplayLoaded = loaded;
+
+            if (loaded)
+            {
+                ReplaySettingsOverlay.Show();
+                ModDisplay.FadeIn(200);
+            }
+            else
+            {
+                ReplaySettingsOverlay.Hide();
+                ModDisplay.Delay(2000).FadeOut(200);
+            }
+        }
+
         public virtual void BindRulesetContainer(RulesetContainer rulesetContainer)
         {
             (rulesetContainer.KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(KeyCounter);
 
             replayLoaded.BindTo(rulesetContainer.HasReplayLoaded);
-            replayLoaded.TriggerChange();
 
             Progress.BindRulestContainer(rulesetContainer);
         }

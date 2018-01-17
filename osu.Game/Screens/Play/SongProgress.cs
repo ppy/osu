@@ -105,12 +105,14 @@ namespace osu.Game.Screens.Play
         protected override void LoadComplete()
         {
             State = Visibility.Visible;
+
+            replayLoaded.ValueChanged += v => AllowSeeking = v;
+            replayLoaded.TriggerChange();
         }
 
         public void BindRulestContainer(RulesetContainer rulesetContainer)
         {
             replayLoaded.BindTo(rulesetContainer.HasReplayLoaded);
-            replayLoaded.TriggerChange();
         }
 
         private bool allowSeeking;
