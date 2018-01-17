@@ -145,6 +145,8 @@ namespace osu.Game.Rulesets.Scoring
                 var diff = float.Parse(split[0]);
                 lastTime += diff;
 
+                // Todo: At some point we probably want to rewind and play back the negative-time frames
+                // but for now we'll achieve equal playback to stable by skipping negative frames
                 if (diff < 0)
                     continue;
 
