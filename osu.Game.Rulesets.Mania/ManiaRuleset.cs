@@ -9,7 +9,10 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Platform;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Configuration;
+using osu.Game.Rulesets.Mania.Configuration;
 
 namespace osu.Game.Rulesets.Mania
 {
@@ -154,5 +157,7 @@ namespace osu.Game.Rulesets.Mania
         }
 
         public override string GetVariantName(int variant) => $"{variant}K";
+
+        public override IRulesetConfigManager CreateConfigManager(Storage storage) => new ManiaConfigManager(this, storage);
     }
 }
