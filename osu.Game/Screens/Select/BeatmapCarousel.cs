@@ -51,7 +51,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public Action<BeatmapInfo> SelectionChanged;
 
-        public override bool HandleInput => AllowSelection;
+        public override bool HandleKeyboardInput => AllowSelection;
+        public override bool HandleMouseInput => AllowSelection;
 
         /// <summary>
         /// Used to avoid firing null selections before the initial beatmaps have been loaded via <see cref="BeatmapSets"/>.
