@@ -60,7 +60,9 @@ namespace osu.Game.Graphics.Containers
                     switch (linkType)
                     {
                         case LinkAction.OpenBeatmap:
-                            // todo: implement this when overlay.ShowBeatmap(id) exists
+                            // todo: replace this with overlay.ShowBeatmap(id) once an appropriate API call is implemented.
+                            if (int.TryParse(linkArgument, out int beatmapId))
+                                Process.Start($"https://osu.ppy.sh/b/{beatmapId}");
                             break;
                         case LinkAction.OpenBeatmapSet:
                             if (int.TryParse(linkArgument, out int setId))
