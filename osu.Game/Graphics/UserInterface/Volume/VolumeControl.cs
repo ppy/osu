@@ -38,22 +38,23 @@ namespace osu.Game.Graphics.UserInterface.Volume
                     Spacing = new Vector2(15, 0),
                     Children = new Drawable[]
                     {
-                        muteIcon = new IconButton(),
+                        muteIcon = new IconButton
+                        {
+                            Icon = FontAwesome.fa_volume_up,
+                            Scale = new Vector2(2.0f),
+                            Action = () =>
+                            {
+                                if (IsMuted)
+                                    Unmute();
+                                else
+                                    Mute();
+                            },
+                        },
                         volumeMeterMaster = new VolumeMeter("Master"),
                         volumeMeterEffect = new VolumeMeter("Effects"),
                         volumeMeterMusic = new VolumeMeter("Music")
                     }
                 }
-            };
-
-            muteIcon.Icon = FontAwesome.fa_volume_up;
-            muteIcon.Scale = new Vector2(2.0f);
-            muteIcon.Action = () =>
-            {
-                if (IsMuted)
-                    Unmute();
-                else
-                    Mute();
             };
         }
 
