@@ -78,7 +78,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
                     return true;
                 case GlobalAction.ToggleMute:
                     Show();
-                    volumeMeterMaster.ToogleMute();
+                    volumeMeterMaster.ToggleMute();
                     return true;
             }
 
@@ -96,17 +96,13 @@ namespace osu.Game.Graphics.UserInterface.Volume
         public void Mute()
         {
             if (!IsMuted)
-            {
-                volumeMeterMaster.ToogleMute();
-            }
+                volumeMeterMaster.ToggleMute();
         }
 
         public void Unmute()
         {
             if (IsMuted)
-            {
-                volumeMeterMaster.ToogleMute();
-            }
+                volumeMeterMaster.ToggleMute();
         }
 
         [BackgroundDependencyLoader]

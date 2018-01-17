@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
             Volume -= 0.05f;
         }
 
-        public void ToogleMute()
+        public void ToggleMute()
         {
             IsMuted = !IsMuted;
             if (IsMuted)
