@@ -19,7 +19,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
         public BindableDouble Bindable { get; } = new BindableDouble();
 
         private double lastVolume;
-        public bool IsMuted { get; private set; }
 
         public VolumeMeter(string meterName)
         {
@@ -74,31 +73,17 @@ namespace osu.Game.Graphics.UserInterface.Volume
         public double Volume
         {
             get => Bindable.Value;
-            private set
-            {
-                Bindable.Value = value;
-                if (value > 0)
-                    IsMuted = false;
-            }
+            private set => Bindable.Value = value;
         }
 
         public void Increase()
         {
             Volume += 0.05f;
-            IsMuted = false;
         }
 
         public void Decrease()
         {
             Volume -= 0.05f;
-        }
-
-        public void ToggleMute()
-        {
-            IsMuted = !IsMuted;
-            if (IsMuted)
-                lastVolume = Volume;
-            Volume = IsMuted ? 0.0 : lastVolume;
         }
 
         private void updateFill() => meterFill.ScaleTo(new Vector2(1, (float)Volume), 300, Easing.OutQuint);

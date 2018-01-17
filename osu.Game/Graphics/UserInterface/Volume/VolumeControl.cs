@@ -7,12 +7,15 @@ using osu.Framework.Threading;
 using OpenTK;
 using osu.Framework.Audio;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
     public class VolumeControl : OverlayContainer
     {
+        private AudioManager audio;
+
         private readonly VolumeMeter volumeMeterMaster;
 
         protected override bool BlockPassThroughMouse => false;
@@ -77,8 +80,10 @@ namespace osu.Game.Graphics.UserInterface.Volume
                         volumeMeterMaster.Increase();
                     return true;
                 case GlobalAction.ToggleMute:
-                    Show();
-                    volumeMeterMaster.ToggleMute();
+                    if (IsMuted)
+                        Unmute();
+                    else
+                        Mute();
                     return true;
             }
 
@@ -91,23 +96,32 @@ namespace osu.Game.Graphics.UserInterface.Volume
             schedulePopOut();
         }
 
-        public bool IsMuted => volumeMeterMaster.IsMuted;
+        private readonly BindableDouble muteBindable = new BindableDouble();
+
+        public bool IsMuted { get; private set; }
 
         public void Mute()
         {
-            if (!IsMuted)
-                volumeMeterMaster.ToggleMute();
+            if (IsMuted)
+                return;
+
+            audio.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+            IsMuted = true;
         }
 
         public void Unmute()
         {
-            if (IsMuted)
-                volumeMeterMaster.ToggleMute();
+            if (!IsMuted)
+                return;
+
+            audio.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+            IsMuted = false;
         }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            this.audio = audio;
             volumeMeterMaster.Bindable.BindTo(audio.Volume);
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
