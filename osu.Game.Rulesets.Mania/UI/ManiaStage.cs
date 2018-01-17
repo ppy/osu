@@ -193,10 +193,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            var maniaObject = (ManiaHitObject)judgedObject.HitObject;
-            int columnIndex = maniaObject.Column - firstColumnIndex;
-            //Columns[columnIndex].OnJudgement(judgedObject, judgement);
-
             judgements.Clear();
             judgements.Add(new DrawableManiaJudgement(judgement)
             {
