@@ -49,7 +49,7 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// The links found in this message.
         /// </summary>
-        /// <remarks>The links' positions are according to <see cref="DisplayContent"/></remarks>
+        /// <remarks>The <see cref="Link"/>s' <see cref="Link.Index"/> and <see cref="Link.Length"/>s are according to <see cref="DisplayContent"/></remarks>
         public List<Link> Links;
 
         public Message(long? id)
