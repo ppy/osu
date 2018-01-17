@@ -17,6 +17,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
         private AudioManager audio;
 
         private readonly VolumeMeter volumeMeterMaster;
+        private readonly IconButton muteIcon;
 
         protected override bool BlockPassThroughMouse => false;
 
@@ -37,11 +38,22 @@ namespace osu.Game.Graphics.UserInterface.Volume
                     Spacing = new Vector2(15, 0),
                     Children = new Drawable[]
                     {
+                        muteIcon = new IconButton(),
                         volumeMeterMaster = new VolumeMeter("Master"),
                         volumeMeterEffect = new VolumeMeter("Effects"),
                         volumeMeterMusic = new VolumeMeter("Music")
                     }
                 }
+            };
+
+            muteIcon.Icon = FontAwesome.fa_volume_up;
+            muteIcon.Scale = new Vector2(2.0f);
+            muteIcon.Action = () =>
+            {
+                if (IsMuted)
+                    Unmute();
+                else
+                    Mute();
             };
         }
 
@@ -80,6 +92,8 @@ namespace osu.Game.Graphics.UserInterface.Volume
                         volumeMeterMaster.Increase();
                     return true;
                 case GlobalAction.ToggleMute:
+                    if (State == Visibility.Hidden)
+                        Show();
                     if (IsMuted)
                         Unmute();
                     else
@@ -107,6 +121,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
             audio.AddAdjustment(AdjustableProperty.Volume, muteBindable);
             IsMuted = true;
+            muteIcon.Icon = FontAwesome.fa_volume_off;
         }
 
         public void Unmute()
@@ -116,6 +131,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
             audio.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
             IsMuted = false;
+            muteIcon.Icon = FontAwesome.fa_volume_up;
         }
 
         [BackgroundDependencyLoader]
