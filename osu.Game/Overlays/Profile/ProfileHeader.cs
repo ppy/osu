@@ -440,7 +440,7 @@ namespace osu.Game.Overlays.Profile
         {
             public string TooltipText => "View Profile in Browser";
 
-            public override bool HandleInput => true;
+            public override bool HandleMouseInput => true;
 
             public ProfileLink(User user)
             {
