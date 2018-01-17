@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
@@ -93,7 +94,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// The <see cref="ConfigManager{T}"/> that is used for settings specific to this <see cref="Ruleset"/>.
         /// </summary>
-        public virtual IRulesetConfigManager CreateConfigManager() => null;
+        public virtual IRulesetConfigManager CreateConfigManager(Storage storage) => null;
 
         /// <summary>
         /// Create a ruleset info based on this ruleset.
