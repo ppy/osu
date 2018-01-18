@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Drawing.Imaging;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
@@ -11,7 +12,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableRepeatPoint : DrawableOsuHitObject
+    public class DrawableRepeatPoint : DrawableOsuHitObject, ITrackSnaking
     {
         private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
@@ -71,5 +72,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
             }
         }
+
+        public void UpdateSnakingPosition(Vector2 start, Vector2 end) => Position = repeatPoint.RepeatIndex / 2 == 0 ? end : start;
     }
 }
