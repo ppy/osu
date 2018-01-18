@@ -24,7 +24,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
@@ -89,13 +88,8 @@ namespace osu.Game.Screens.Play
 
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
-
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, APIAccess api, Storage storage)
+        private void load(AudioManager audio, OsuConfigManager config, APIAccess api)
         {
             this.api = api;
 
@@ -135,10 +129,6 @@ namespace osu.Game.Screens.Play
 
                 if (!RulesetContainer.Objects.Any())
                     throw new InvalidOperationException("Beatmap contains no hit objects!");
-
-                var rulesetConfig = rulesetInstance.GetConfigManager(storage);
-                if (rulesetConfig != null)
-                    dependencies.Cache(rulesetConfig);
             }
             catch (Exception e)
             {

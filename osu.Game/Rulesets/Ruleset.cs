@@ -6,11 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -90,19 +88,6 @@ namespace osu.Game.Rulesets
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
         public virtual string GetVariantName(int variant) => string.Empty;
-
-        private static readonly Dictionary<Type, IRulesetConfigManager> config_manager_cache = new Dictionary<Type, IRulesetConfigManager>();
-        public IRulesetConfigManager GetConfigManager(Storage storage)
-        {
-            if (config_manager_cache.TryGetValue(GetType(), out var existing))
-                return existing;
-            return config_manager_cache[GetType()] = CreateConfigManager(storage);
-        }
-
-        /// <summary>
-        /// The <see cref="ConfigManager{T}"/> that is used for settings specific to this <see cref="Ruleset"/>.
-        /// </summary>
-        protected virtual IRulesetConfigManager CreateConfigManager(Storage storage) => null;
 
         /// <summary>
         /// Create a ruleset info based on this ruleset.

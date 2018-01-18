@@ -15,6 +15,9 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
+using osu.Framework.Platform;
+using osu.Game.Overlays;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using OpenTK;
@@ -64,6 +67,13 @@ namespace osu.Game.Rulesets.UI
 
         protected readonly Ruleset Ruleset;
 
+        private IRulesetConfigManager rulesetConfig;
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+
         /// <summary>
         /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
         /// </summary>
@@ -74,6 +84,26 @@ namespace osu.Game.Rulesets.UI
             playfield = new Lazy<Playfield>(CreatePlayfield);
 
             Cursor = CreateCursor();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(Storage storage, OnScreenDisplay onScreenDisplay)
+        {
+            rulesetConfig = getConfig(storage);
+
+            if (rulesetConfig != null)
+            {
+                dependencies.Cache(rulesetConfig);
+                onScreenDisplay?.Register(rulesetConfig);
+            }
+        }
+
+        private static readonly Dictionary<Type, IRulesetConfigManager> config_cache = new Dictionary<Type, IRulesetConfigManager>();
+        private IRulesetConfigManager getConfig(Storage storage)
+        {
+            if (config_cache.TryGetValue(GetType(), out var existing))
+                return existing;
+            return config_cache[GetType()] = CreateConfig(Ruleset, storage);
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -107,11 +137,19 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected virtual CursorContainer CreateCursor() => null;
 
+        protected virtual IRulesetConfigManager CreateConfig(Ruleset ruleset, Storage storage) => null;
+
         /// <summary>
         /// Creates a Playfield.
         /// </summary>
         /// <returns>The Playfield.</returns>
         protected abstract Playfield CreatePlayfield();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            rulesetConfig.Save();
+        }
     }
 
     /// <summary>
