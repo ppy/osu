@@ -161,10 +161,18 @@ namespace osu.Game.Rulesets.Mania.UI
             judgements.Scale = Scale;
         }
 
+        private Bindable<double> scrollTime;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, ManiaConfigManager maniaConfig)
         {
             maniaConfig.BindWith(ManiaSetting.ScrollTime, VisibleTimeRange);
+
+            // Todo: The following two lines shouldn't be required, but is an effect of not having config databased
+            // 1. ValueChanged is run prior to values being propagated
+            // 2. We want the config to be saved ASAP, in-case a new ManiaPlayfield is instantiated
+            scrollTime = maniaConfig.GetBindable<double>(ManiaSetting.ScrollTime);
+            scrollTime.ValueChanged += v => maniaConfig.Save();
 
             normalColumnColours = new List<Color4>
             {

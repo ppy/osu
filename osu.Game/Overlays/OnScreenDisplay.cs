@@ -118,16 +118,16 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
         {
-            Register(frameworkConfig);
+            Register(this, frameworkConfig);
         }
 
-        private readonly Dictionary<object, TrackedSettings> trackedConfigManagers = new Dictionary<object, TrackedSettings>();
+        private readonly Dictionary<(IDisposable, IConfigManager), TrackedSettings> trackedConfigManagers = new Dictionary<(IDisposable, IConfigManager), TrackedSettings>();
 
-        public void Register(ITrackableConfigManager configManager)
+        public void Register(IDisposable source, ITrackableConfigManager configManager)
         {
             if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
 
-            if (trackedConfigManagers.ContainsKey(configManager))
+            if (trackedConfigManagers.ContainsKey((source, configManager)))
                 return;
 
             var trackedSettings = configManager.CreateTrackedSettings();
@@ -138,20 +138,20 @@ namespace osu.Game.Overlays
 
             trackedSettings.SettingChanged += display;
 
-            trackedConfigManagers.Add(configManager, trackedSettings);
+            trackedConfigManagers.Add((source, configManager), trackedSettings);
         }
 
-        public void Unregister(ITrackableConfigManager configManager)
+        public void Unregister(IDisposable source, ITrackableConfigManager configManager)
         {
             if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
 
-            if (!trackedConfigManagers.TryGetValue(configManager, out var existing))
+            if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
                 return;
 
             existing.Unload();
             existing.SettingChanged -= display;
 
-            trackedConfigManagers.Remove(configManager);
+            trackedConfigManagers.Remove((source, configManager));
         }
 
         private void display(SettingDescription description)
