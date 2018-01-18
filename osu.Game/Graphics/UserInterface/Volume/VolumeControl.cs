@@ -14,8 +14,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
 {
     public class VolumeControl : OverlayContainer
     {
-        private AudioManager audio;
-
         private readonly VolumeMeter volumeMeterMaster;
         private readonly IconButton muteIcon;
 
@@ -42,13 +40,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
                         {
                             Icon = FontAwesome.fa_volume_up,
                             Scale = new Vector2(2.0f),
-                            Action = () =>
-                            {
-                                if (IsMuted)
-                                    Unmute();
-                                else
-                                    Mute();
-                            },
+                            Action = () => Adjust(GlobalAction.ToggleMute),
                         },
                         volumeMeterMaster = new VolumeMeter("Master"),
                         volumeMeterEffect = new VolumeMeter("Effects"),
@@ -113,35 +105,36 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         private readonly BindableDouble muteBindable = new BindableDouble();
 
-        public bool IsMuted { get; private set; }
+        private readonly BindableBool muted = new BindableBool();
+
+        public bool IsMuted => muted.Value;
 
         public void Mute()
         {
-            if (IsMuted)
-                return;
-
-            audio.AddAdjustment(AdjustableProperty.Volume, muteBindable);
-            IsMuted = true;
-            muteIcon.Icon = FontAwesome.fa_volume_off;
+            muted.Value = true;
         }
 
         public void Unmute()
         {
-            if (!IsMuted)
-                return;
-
-            audio.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
-            IsMuted = false;
-            muteIcon.Icon = FontAwesome.fa_volume_up;
+            muted.Value = false;
         }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            this.audio = audio;
             volumeMeterMaster.Bindable.BindTo(audio.Volume);
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
+
+            muted.ValueChanged += mute =>
+            {
+                if (mute)
+                    audio.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+                else
+                    audio.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+
+                muteIcon.Icon = mute ? FontAwesome.fa_volume_off : FontAwesome.fa_volume_up;
+            };
         }
 
         private ScheduledDelegate popOutDelegate;
