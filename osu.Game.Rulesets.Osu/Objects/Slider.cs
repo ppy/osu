@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
+using osu.Framework.Audio.Sample;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -131,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     var distanceProgress = d / length;
                     var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
 
-                    var firstSample = Samples.FirstOrDefault();
+                    var firstSample = Samples.FirstOrDefault(s => s.Name == SampleInfo.HIT_NORMAL) ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
                     var sampleList = new List<SampleInfo>();
 
                     if (firstSample != null)
