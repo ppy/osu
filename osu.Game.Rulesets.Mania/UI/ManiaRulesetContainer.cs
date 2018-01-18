@@ -9,9 +9,12 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
@@ -98,5 +101,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(1, 0.8f);
 
         protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay, this);
+
+        protected override IRulesetConfigManager CreateConfig(Ruleset ruleset, Storage storage) => new ManiaConfigManager(ruleset, storage);
     }
 }
