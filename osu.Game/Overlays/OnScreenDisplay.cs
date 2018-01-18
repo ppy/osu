@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -118,43 +117,50 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
         {
-            trackSetting(frameworkConfig.GetBindable<FrameSync>(FrameworkSetting.FrameSync), v => display(v, "Frame Limiter", v.GetDescription(), "Ctrl+F7"));
-            trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.AudioDevice), v => display(v, "Audio Device", string.IsNullOrEmpty(v) ? "Default" : v, v));
-            trackSetting(frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay), v => display(v, "Debug Logs", v ? "visible" : "hidden", "Ctrl+F10"));
-
-            void displayResolution() => display(null, "Screen Resolution", frameworkConfig.Get<int>(FrameworkSetting.Width) + "x" + frameworkConfig.Get<int>(FrameworkSetting.Height));
-
-            trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Width), v => displayResolution());
-            trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Height), v => displayResolution());
-
-            trackSetting(frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity), v => display(v, "Cursor Sensitivity", v.ToString(@"0.##x"), "Ctrl+Alt+R to reset"));
-            trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.ActiveInputHandlers),
-                delegate (string v)
-                {
-                    bool raw = v.Contains("Raw");
-                    display(raw, "Raw Input", raw ? "enabled" : "disabled", "Ctrl+Alt+R to reset");
-                });
-
-            trackSetting(frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode), v => display(v, "Screen Mode", v.ToString(), "Alt+Enter"));
+            Register(frameworkConfig);
         }
 
-        private readonly List<IBindable> references = new List<IBindable>();
+        private readonly Dictionary<object, ITrackedSettings> trackedConfigManagers = new Dictionary<object, ITrackedSettings>();
 
-        private void trackSetting<T>(Bindable<T> bindable, Action<T> action)
+        public void Register<T>(ConfigManager<T> configManager)
+            where T : struct
         {
-            // we need to keep references as we bind
-            references.Add(bindable);
+            if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
 
-            bindable.ValueChanged += action;
+            if (trackedConfigManagers.ContainsKey(configManager))
+                throw new InvalidOperationException($"{nameof(configManager)} is already registered.");
+
+            var trackedSettings = configManager.CreateTrackedSettings();
+            if (trackedSettings == null)
+                return;
+
+            trackedSettings.LoadFrom(configManager);
+            trackedSettings.SettingChanged += display;
+
+            trackedConfigManagers.Add(configManager, trackedSettings);
         }
 
-        private void display(object rawValue, string settingName, string settingValue, string shortcut = @"")
+        public void Unregister<T>(ConfigManager<T> configManager)
+            where T : struct
+        {
+            if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
+
+            if (!trackedConfigManagers.TryGetValue(configManager, out var existing))
+                return;
+
+            existing.Unload();
+            existing.SettingChanged -= display;
+
+            trackedConfigManagers.Remove(configManager);
+        }
+
+        private void display(SettingDescription description)
         {
             Schedule(() =>
             {
-                textLine1.Text = settingName.ToUpper();
-                textLine2.Text = settingValue;
-                textLine3.Text = shortcut.ToUpper();
+                textLine1.Text = description.Name.ToUpper();
+                textLine2.Text = description.Value;
+                textLine3.Text = description.Shortcut.ToUpper();
 
                 box.Animate(
                     b => b.FadeIn(500, Easing.OutQuint),
@@ -167,16 +173,16 @@ namespace osu.Game.Overlays
                 int optionCount = 0;
                 int selectedOption = -1;
 
-                if (rawValue is bool)
+                if (description.RawValue is bool)
                 {
                     optionCount = 1;
-                    if ((bool)rawValue) selectedOption = 0;
+                    if ((bool)description.RawValue) selectedOption = 0;
                 }
-                else if (rawValue is Enum)
+                else if (description.RawValue is Enum)
                 {
-                    var values = Enum.GetValues(rawValue.GetType());
+                    var values = Enum.GetValues(description.RawValue.GetType());
                     optionCount = values.Length;
-                    selectedOption = Convert.ToInt32(rawValue);
+                    selectedOption = Convert.ToInt32(description.RawValue);
                 }
 
                 textLine2.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;
