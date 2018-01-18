@@ -68,6 +68,7 @@ namespace osu.Game.Rulesets.UI
         protected readonly Ruleset Ruleset;
 
         private IRulesetConfigManager rulesetConfig;
+        private OnScreenDisplay onScreenDisplay;
 
         private DependencyContainer dependencies;
 
@@ -89,21 +90,15 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(Storage storage, OnScreenDisplay onScreenDisplay)
         {
-            rulesetConfig = getConfig(storage);
+            this.onScreenDisplay = onScreenDisplay;
+
+            rulesetConfig = CreateConfig(Ruleset, storage);
 
             if (rulesetConfig != null)
             {
                 dependencies.Cache(rulesetConfig);
-                onScreenDisplay?.Register(rulesetConfig);
+                onScreenDisplay?.Register(this, rulesetConfig);
             }
-        }
-
-        private static readonly Dictionary<Type, IRulesetConfigManager> config_cache = new Dictionary<Type, IRulesetConfigManager>();
-        private IRulesetConfigManager getConfig(Storage storage)
-        {
-            if (config_cache.TryGetValue(GetType(), out var existing))
-                return existing;
-            return config_cache[GetType()] = CreateConfig(Ruleset, storage);
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -148,7 +143,12 @@ namespace osu.Game.Rulesets.UI
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            rulesetConfig.Save();
+
+            if (rulesetConfig != null)
+            {
+                onScreenDisplay?.Unregister(this, rulesetConfig);
+                rulesetConfig = null;
+            }
         }
     }
 
