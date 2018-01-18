@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Configuration.Tracking;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -120,28 +121,27 @@ namespace osu.Game.Overlays
             Register(frameworkConfig);
         }
 
-        private readonly Dictionary<object, ITrackedSettings> trackedConfigManagers = new Dictionary<object, ITrackedSettings>();
+        private readonly Dictionary<object, TrackedSettings> trackedConfigManagers = new Dictionary<object, TrackedSettings>();
 
-        public void Register<T>(ConfigManager<T> configManager)
-            where T : struct
+        public void Register(ITrackableConfigManager configManager)
         {
             if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
 
             if (trackedConfigManagers.ContainsKey(configManager))
-                throw new InvalidOperationException($"{nameof(configManager)} is already registered.");
+                return;
 
             var trackedSettings = configManager.CreateTrackedSettings();
             if (trackedSettings == null)
                 return;
 
-            trackedSettings.LoadFrom(configManager);
+            configManager.LoadInto(trackedSettings);
+
             trackedSettings.SettingChanged += display;
 
             trackedConfigManagers.Add(configManager, trackedSettings);
         }
 
-        public void Unregister<T>(ConfigManager<T> configManager)
-            where T : struct
+        public void Unregister(ITrackableConfigManager configManager)
         {
             if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
 
