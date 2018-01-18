@@ -118,35 +118,48 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
         {
-            Register(this, frameworkConfig);
+            BeginTracking(this, frameworkConfig);
         }
 
-        private readonly Dictionary<(IDisposable, IConfigManager), TrackedSettings> trackedConfigManagers = new Dictionary<(IDisposable, IConfigManager), TrackedSettings>();
+        private readonly Dictionary<(object, IConfigManager), TrackedSettings> trackedConfigManagers = new Dictionary<(object, IConfigManager), TrackedSettings>();
 
-        public void Register(IDisposable source, ITrackableConfigManager configManager)
+        /// <summary>
+        /// Registers a <see cref="ConfigManager{T}"/> to have its settings tracked by this <see cref="OnScreenDisplay"/>.
+        /// </summary>
+        /// <param name="source">The object that is registering the <see cref="ConfigManager{T}"/> to be tracked.</param>
+        /// <param name="configManager">The <see cref="ConfigManager{T}"/> to be tracked.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="configManager"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is already being tracked from the same <paramref name="source"/>.</exception>
+        public void BeginTracking(object source, ITrackableConfigManager configManager)
         {
             if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
 
             if (trackedConfigManagers.ContainsKey((source, configManager)))
-                return;
+                throw new InvalidOperationException($"{nameof(configManager)} is already registered.");
 
             var trackedSettings = configManager.CreateTrackedSettings();
             if (trackedSettings == null)
                 return;
 
             configManager.LoadInto(trackedSettings);
-
             trackedSettings.SettingChanged += display;
 
             trackedConfigManagers.Add((source, configManager), trackedSettings);
         }
 
-        public void Unregister(IDisposable source, ITrackableConfigManager configManager)
+        /// <summary>
+        /// Unregisters a <see cref="ConfigManager{T}"/> from having its settings tracked by this <see cref="OnScreenDisplay"/>.
+        /// </summary>
+        /// <param name="source">The object that registered the <see cref="ConfigManager{T}"/> to be tracked.</param>
+        /// <param name="configManager">The <see cref="ConfigManager{T}"/> that is being tracked.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="configManager"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is not being tracked from the same <see cref="source"/>.</exception>
+        public void StopTracking(object source, ITrackableConfigManager configManager)
         {
             if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
 
             if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
-                return;
+                throw new InvalidOperationException($"{nameof(configManager)} is not registered.");
 
             existing.Unload();
             existing.SettingChanged -= display;
