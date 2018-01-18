@@ -71,6 +71,7 @@
     <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
     <Compile Include="Judgements\OsuJudgement.cs" />
     <Compile Include="Objects\Drawables\DrawableRepeatPoint.cs" />
+    <Compile Include="Objects\Drawables\ITrackSnaking.cs" />
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerBackground.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
