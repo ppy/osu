@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.UI
             if (rulesetConfig != null)
             {
                 dependencies.Cache(rulesetConfig);
-                onScreenDisplay?.Register(this, rulesetConfig);
+                onScreenDisplay?.BeginTracking(this, rulesetConfig);
             }
         }
 
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.UI
 
             if (rulesetConfig != null)
             {
-                onScreenDisplay?.Unregister(this, rulesetConfig);
+                onScreenDisplay?.StopTracking(this, rulesetConfig);
                 rulesetConfig = null;
             }
         }
