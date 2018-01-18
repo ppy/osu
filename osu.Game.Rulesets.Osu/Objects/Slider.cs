@@ -137,8 +137,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                     if (firstSample != null)
                         sampleList.Add(new SampleInfo
                         {
-                            Bank = firstSample?.Bank,
-                            Volume = firstSample?.Volume ?? 100,
+                            Bank = firstSample.Bank,
+                            Volume = firstSample.Volume,
                             Name = @"slidertick",
                         });
 
