@@ -72,6 +72,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        public void UpdateSnakingPosition(Vector2 start, Vector2 end) => Position = repeatPoint.RepeatIndex % 2 == 1 ? start : end;
+        public void UpdateSnakingPosition(Vector2 start, Vector2 end) => Position = repeatPoint.RepeatIndex % 2 == 1 ? end : start;
     }
 }
