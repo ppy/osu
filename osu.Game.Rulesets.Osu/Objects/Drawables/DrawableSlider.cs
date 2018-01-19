@@ -60,7 +60,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Samples = s.Samples,
                     SampleControlPoint = s.SampleControlPoint,
                     TimePreempt = s.TimePreempt,
-                    TimeFadein = s.TimeFadein
+                    TimeFadein = s.TimeFadein,
+                    HitWindow300 = s.HitWindow300,
+                    HitWindow100 = s.HitWindow100,
+                    HitWindow50 = s.HitWindow50
                 })
             };
 
