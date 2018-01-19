@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -27,6 +27,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using OpenTK.Graphics;
 
 namespace osu.Game
 {
@@ -156,6 +157,11 @@ namespace osu.Game
         {
             base.LoadComplete();
 
+            // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
+            // in the cursor being shown for a few frames during the intro.
+            // This prevents the cursor from showing until we have a screen with CursorVisible = true
+            CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
+
             // hook up notifications to components.
             BeatmapManager.PostNotification = n => notifications?.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
@@ -284,10 +290,10 @@ namespace osu.Game
 
             notifications.Enabled.BindTo(ShowOverlays);
 
-            ShowOverlays.ValueChanged += visible =>
+            ShowOverlays.ValueChanged += show =>
             {
                 //central game screen change logic.
-                if (!visible)
+                if (!show)
                 {
                     hideAllOverlays();
                     musicController.State = Visibility.Hidden;
@@ -296,8 +302,6 @@ namespace osu.Game
                 else
                     Toolbar.State = Visibility.Visible;
             };
-
-            Cursor.State = Visibility.Hidden;
         }
 
         private void forwardLoggedErrorsToNotifications()
@@ -331,10 +335,21 @@ namespace osu.Game
         }
 
         private Task asyncLoadStream;
+        private int visibleOverlayCount;
 
         private void loadComponentSingleFile<T>(T d, Action<T> add)
             where T : Drawable
         {
+            var focused = d as FocusedOverlayContainer;
+            if (focused != null)
+            {
+                focused.StateChanged += s =>
+                {
+                    visibleOverlayCount += s == Visibility.Visible ? 1 : -1;
+                    screenStack.FadeColour(visibleOverlayCount > 0 ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+                };
+            }
+
             // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
             // we could avoid the need for scheduling altogether.
@@ -435,7 +450,7 @@ namespace osu.Game
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
-            Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
+            CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
         private void screenAdded(Screen newScreen)

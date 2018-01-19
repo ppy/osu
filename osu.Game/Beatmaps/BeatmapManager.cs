@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Textures;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Online.API;
@@ -101,15 +102,26 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Storage> GetStableStorage { private get; set; }
 
+        private void refreshImportContext()
+        {
+            lock (importContextLock)
+            {
+                importContext?.Value?.Dispose();
+
+                importContext = new Lazy<OsuDbContext>(() =>
+                {
+                    var c = createContext();
+                    c.Database.AutoTransactionsEnabled = false;
+                    return c;
+                });
+            }
+        }
+
         public BeatmapManager(Storage storage, Func<OsuDbContext> context, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
         {
             createContext = context;
-            importContext = new Lazy<OsuDbContext>(() =>
-            {
-                var c = createContext();
-                c.Database.AutoTransactionsEnabled = false;
-                return c;
-            });
+
+            refreshImportContext();
 
             beatmaps = createBeatmapStore(context);
             files = new FileStore(context, storage);
@@ -174,13 +186,16 @@ namespace osu.Game.Beatmaps
                 {
                     e = e.InnerException ?? e;
                     Logger.Error(e, $@"Could not import beatmap set ({Path.GetFileName(path)})");
+                    refreshImportContext();
                 }
             }
 
             notification.State = ProgressNotificationState.Completed;
         }
 
-        private readonly Lazy<OsuDbContext> importContext;
+        private readonly object importContextLock = new object();
+
+        private Lazy<OsuDbContext> importContext;
 
         /// <summary>
         /// Import a beatmap from an <see cref="ArchiveReader"/>.
@@ -189,7 +204,7 @@ namespace osu.Game.Beatmaps
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
             // let's only allow one concurrent import at a time for now.
-            lock (importContext)
+            lock (importContextLock)
             {
                 var context = importContext.Value;
 
@@ -314,7 +329,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap set to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            lock (importContext)
+            lock (importContextLock)
             {
                 var context = importContext.Value;
 
@@ -377,7 +392,7 @@ namespace osu.Game.Beatmaps
             if (beatmapSet.Protected)
                 return;
 
-            lock (importContext)
+            lock (importContextLock)
             {
                 var context = importContext.Value;
 
@@ -551,7 +566,6 @@ namespace osu.Game.Beatmaps
             using (var stream = new StreamReader(reader.GetStream(mapName)))
                 metadata = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
 
-
             // check if a set already exists with the same online id.
             if (metadata.OnlineBeatmapSetID != null)
                 beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID);
@@ -565,7 +579,6 @@ namespace osu.Game.Beatmaps
                     Files = fileInfos,
                     Metadata = metadata
                 };
-
 
             var mapNames = reader.Filenames.Where(f => f.EndsWith(".osu"));
 
@@ -651,7 +664,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return new TextureStore(new RawTextureLoaderStore(store), false).Get(getPathForFile(Metadata.BackgroundFile));
+                    return new LargeTextureStore(new RawTextureLoaderStore(store)).Get(getPathForFile(Metadata.BackgroundFile));
                 }
                 catch
                 {
@@ -676,19 +689,18 @@ namespace osu.Game.Beatmaps
 
             protected override Storyboard GetStoryboard()
             {
-                if (BeatmapInfo?.Path == null && BeatmapSetInfo?.StoryboardFile == null)
-                    return new Storyboard();
-
                 try
                 {
-                    Decoder decoder;
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo?.Path))))
-                        decoder = Decoder.GetDecoder(stream);
+                    using (var beatmap = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    {
+                        Decoder decoder = Decoder.GetDecoder(beatmap);
 
-                    // try for .osb first and fall back to .osu
-                    string storyboardFile = BeatmapSetInfo.StoryboardFile ?? BeatmapInfo.Path;
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(storyboardFile))))
-                        return decoder.GetStoryboardDecoder().DecodeStoryboard(stream);
+                        if (BeatmapSetInfo?.StoryboardFile == null)
+                            return decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap);
+
+                        using (var storyboard = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
+                            return decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap, storyboard);
+                    }
                 }
                 catch
                 {

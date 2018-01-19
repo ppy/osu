@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -141,8 +141,6 @@ namespace osu.Game.Screens.Play
                     updateRetryCount();
             }
         }
-
-        public override bool HandleInput => State == Visibility.Visible;
 
         protected override void PopIn() => this.FadeIn(transition_duration, Easing.In);
         protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);

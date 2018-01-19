@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -22,7 +22,8 @@ namespace osu.Game.Overlays
     {
         private readonly Container box;
 
-        public override bool HandleInput => false;
+        public override bool HandleKeyboardInput => false;
+        public override bool HandleMouseInput => false;
 
         private readonly SpriteText textLine1;
         private readonly SpriteText textLine2;
@@ -121,7 +122,7 @@ namespace osu.Game.Overlays
             trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.AudioDevice), v => display(v, "Audio Device", string.IsNullOrEmpty(v) ? "Default" : v, v));
             trackSetting(frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay), v => display(v, "Debug Logs", v ? "visible" : "hidden", "Ctrl+F10"));
 
-            Action displayResolution = delegate { display(null, "Screen Resolution", frameworkConfig.Get<int>(FrameworkSetting.Width) + "x" + frameworkConfig.Get<int>(FrameworkSetting.Height)); };
+            void displayResolution() => display(null, "Screen Resolution", frameworkConfig.Get<int>(FrameworkSetting.Width) + "x" + frameworkConfig.Get<int>(FrameworkSetting.Height));
 
             trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Width), v => displayResolution());
             trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Height), v => displayResolution());
@@ -139,7 +140,7 @@ namespace osu.Game.Overlays
 
         private readonly List<IBindable> references = new List<IBindable>();
 
-        private void trackSetting<T>(Bindable<T> bindable, Bindable<T>.BindableValueChanged<T> action)
+        private void trackSetting<T>(Bindable<T> bindable, Action<T> action)
         {
             // we need to keep references as we bind
             references.Add(bindable);

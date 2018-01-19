@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -93,7 +93,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return scope; }
             set
             {
-                if (value == scope) return;
+                if (value == scope)
+                    return;
 
                 scope = value;
                 updateScores();
@@ -107,7 +108,15 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return placeholderState; }
             set
             {
-                if (value == placeholderState) return;
+                if (value != PlaceholderState.Successful)
+                {
+                    getScoresRequest?.Cancel();
+                    getScoresRequest = null;
+                    Scores = null;
+                }
+
+                if (value == placeholderState)
+                    return;
 
                 switch (placeholderState = value)
                 {
@@ -164,7 +173,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return beatmap; }
             set
             {
-                if (beatmap == value) return;
+                if (beatmap == value)
+                    return;
 
                 beatmap = value;
                 Scores = null;
@@ -211,10 +221,6 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void updateScores()
         {
-            getScoresRequest?.Cancel();
-            getScoresRequest = null;
-            Scores = null;
-
             if (Scope == LeaderboardScope.Local)
             {
                 // TODO: get local scores from wherever here.
@@ -234,15 +240,14 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return;
             }
 
-            PlaceholderState = PlaceholderState.Retrieving;
-            loading.Show();
-
             if (Scope != LeaderboardScope.Global && !api.LocalUser.Value.IsSupporter)
             {
-                loading.Hide();
                 PlaceholderState = PlaceholderState.NotSupporter;
                 return;
             }
+
+            PlaceholderState = PlaceholderState.Retrieving;
+            loading.Show();
 
             getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value ?? Beatmap.Ruleset, Scope);
             getScoresRequest.Success += r =>
@@ -257,7 +262,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void onUpdateFailed(Exception e)
         {
-            if (e is OperationCanceledException) return;
+            if (e is OperationCanceledException)
+                return;
 
             PlaceholderState = PlaceholderState.NetworkFailure;
             Logger.Error(e, @"Couldn't fetch beatmap scores!");
@@ -292,7 +298,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (!scrollContainer.IsScrolledToEnd())
                 fadeStart -= LeaderboardScore.HEIGHT;
 
-            if (scrollFlow == null) return;
+            if (scrollFlow == null)
+                return;
 
             foreach (var c in scrollFlow.Children)
             {

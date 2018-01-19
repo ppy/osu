@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
@@ -30,7 +30,9 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         private const float edge_smoothness = 1;
 
-        public override bool HandleInput => false;
+        public override bool HandleKeyboardInput => false;
+        public override bool HandleMouseInput => false;
+
 
         public Color4 ColourLight = Color4.White;
         public Color4 ColourDark = Color4.Black;

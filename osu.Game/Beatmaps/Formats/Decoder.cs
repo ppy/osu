@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -70,10 +70,11 @@ namespace osu.Game.Beatmaps.Formats
 
         protected abstract void ParseBeatmap(StreamReader stream, Beatmap beatmap);
 
-        public virtual Storyboard DecodeStoryboard(StreamReader stream)
+        public virtual Storyboard DecodeStoryboard(params StreamReader[] streams)
         {
             var storyboard = new Storyboard();
-            ParseStoryboard(stream, storyboard);
+            foreach (StreamReader stream in streams)
+                ParseStoryboard(stream, storyboard);
             return storyboard;
         }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Size = BaseSize * Parent.RelativeChildSize;
 
             // Make the swell stop at the hit target
-            X = (float)Math.Max(Time.Current, HitObject.StartTime);
+            X = Math.Max(0, X);
 
             double t = Math.Min(HitObject.StartTime, Time.Current);
             if (t == HitObject.StartTime && !hasStarted)
