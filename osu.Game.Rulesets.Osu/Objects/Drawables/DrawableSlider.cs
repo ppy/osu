@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public readonly DrawableHitCircle InitialCircle;
 
-        private readonly List<ISliderProgress> components = new List<ISliderProgress>();
+        private readonly List<Drawable> components = new List<Drawable>();
 
         private readonly Container<DrawableSliderTick> ticks;
         private readonly Container<DrawableRepeatPoint> repeatPoints;
@@ -101,6 +101,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 };
 
                 repeatPoints.Add(drawableRepeatPoint);
+                components.Add(drawableRepeatPoint);
                 AddNested(drawableRepeatPoint);
             }
         }
@@ -126,7 +127,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!InitialCircle.Judgements.Any(j => j.IsHit))
                 InitialCircle.Position = slider.Curve.PositionAt(progress);
 
-            foreach (var c in components) c.UpdateProgress(progress, repeat);
+            foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(progress, repeat);
+            foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
             foreach (var t in ticks.Children) t.Tracking = Ball.Tracking;
         }
 
