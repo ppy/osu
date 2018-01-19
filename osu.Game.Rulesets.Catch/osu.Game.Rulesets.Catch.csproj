@@ -49,11 +49,28 @@
     <Compile Include="Beatmaps\CatchBeatmapProcessor.cs" />
     <Compile Include="CatchDifficultyCalculator.cs" />
     <Compile Include="CatchInputManager.cs" />
+    <Compile Include="Mods\CatchModDaycore.cs" />
+    <Compile Include="Mods\CatchModDoubleTime.cs" />
+    <Compile Include="Mods\CatchModEasy.cs" />
+    <Compile Include="Mods\CatchModFlashlight.cs" />
+    <Compile Include="Mods\CatchModHalfTime.cs" />
+    <Compile Include="Mods\CatchModHardRock.cs" />
+    <Compile Include="Mods\CatchModHidden.cs" />
+    <Compile Include="Mods\CatchModNightcore.cs" />
+    <Compile Include="Mods\CatchModPerfect.cs" />
+    <Compile Include="Mods\CatchModRelax.cs" />
+    <Compile Include="Mods\CatchModSuddenDeath.cs" />
+    <Compile Include="Mods\CatchModAutoplay.cs" />
+    <Compile Include="Objects\BananaShower.cs" />
+    <Compile Include="Objects\Drawable\DrawableBananaShower.cs" />
     <Compile Include="Objects\Drawable\DrawableCatchHitObject.cs" />
     <Compile Include="Objects\Drawable\DrawableDroplet.cs" />
     <Compile Include="Objects\Drawable\DrawableJuiceStream.cs" />
     <Compile Include="Objects\Drawable\Pieces\Pulp.cs" />
     <Compile Include="Objects\JuiceStream.cs" />
+    <Compile Include="Replays\CatchAutoGenerator.cs" />
+    <Compile Include="Replays\CatchFramedReplayInputHandler.cs" />
+    <Compile Include="Replays\CatchReplayFrame.cs" />
     <Compile Include="Scoring\CatchScoreProcessor.cs" />
     <Compile Include="Judgements\CatchJudgement.cs" />
     <Compile Include="Objects\CatchHitObject.cs" />
@@ -62,8 +79,10 @@
     <Compile Include="Objects\Fruit.cs" />
     <Compile Include="Objects\TinyDroplet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\TestCaseBananaShower.cs" />
     <Compile Include="Tests\TestCaseCatcherArea.cs" />
     <Compile Include="Tests\TestCaseCatchStacker.cs" />
+    <Compile Include="Tests\TestCaseFruitObjects.cs" />
     <Compile Include="Tests\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\TestCaseCatchPlayer.cs" />
     <Compile Include="Tests\TestCaseHyperdash.cs" />
@@ -71,7 +90,7 @@
     <Compile Include="UI\CatchRulesetContainer.cs" />
     <Compile Include="UI\CatchPlayfield.cs" />
     <Compile Include="CatchRuleset.cs" />
-    <Compile Include="Mods\CatchMod.cs" />
+    <Compile Include="Mods\CatchModNoFail.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

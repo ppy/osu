@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -222,7 +222,8 @@ namespace osu.Game.Screens.Menu
             boxHoverLayer.FadeOut(800, Easing.OutExpo);
         }
 
-        public override bool HandleInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
+        public override bool HandleKeyboardInput => state != ButtonState.Exploded;
+        public override bool HandleMouseInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
 
         protected override void Update()
         {

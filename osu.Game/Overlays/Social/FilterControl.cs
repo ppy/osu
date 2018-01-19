@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
@@ -22,7 +22,8 @@ namespace osu.Game.Overlays.Social
     public enum SocialSortCriteria
     {
         Rank,
-        //Location,
+        Name,
+        Location,
         //[Description("Time Zone")]
         //TimeZone,
         //[Description("World Map")]
