@@ -298,13 +298,15 @@ namespace osu.Game.Overlays
                 Task.Run(() =>
                 {
                     var onlineIds = response.Select(r => r.OnlineBeatmapSetID).ToList();
-                    var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID)).Select(r => r.OnlineBeatmapSetID).ToList();
-                    var sets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID)).ToList();
+                    var presentSets = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID)).ToList();
+
+                    var responseSets = response.Select(r => r.ToBeatmapSet(rulesets)).ToList();
+                    var finalSets = responseSets.Where(b => !presentSets.Any(s => s.OnlineBeatmapSetID == b.OnlineBeatmapSetID && !s.DeletePending)).ToList();
 
                     // may not need scheduling; loads async internally.
                     Schedule(() =>
                     {
-                        BeatmapSets = sets;
+                        BeatmapSets = finalSets;
                         recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
                     });
                 });
