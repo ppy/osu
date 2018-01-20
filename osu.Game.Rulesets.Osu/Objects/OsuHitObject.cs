@@ -78,9 +78,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
             TimeFadein = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1200, 800, 300);
 
-            HitWindow50 = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 100, 150, 200);
-            HitWindow100 = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 60, 100, 140);
-            HitWindow300 = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 20, 50, 80);
+            HitWindow50 = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 200, 150, 100);
+            HitWindow100 = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 140, 100, 60);
+            HitWindow300 = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 80, 50, 20);
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }
