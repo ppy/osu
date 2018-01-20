@@ -85,12 +85,8 @@ namespace osu.Game.Graphics.UserInterface.Volume
                         volumeMeterMaster.Increase();
                     return true;
                 case GlobalAction.ToggleMute:
-                    if (State == Visibility.Hidden)
-                        Show();
-                    if (IsMuted)
-                        Unmute();
-                    else
-                        Mute();
+                    Show();
+                    Muted = !Muted;
                     return true;
             }
 
@@ -107,16 +103,10 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         private readonly BindableBool muted = new BindableBool();
 
-        public bool IsMuted => muted.Value;
-
-        public void Mute()
+        public bool Muted
         {
-            muted.Value = true;
-        }
-
-        public void Unmute()
-        {
-            muted.Value = false;
+            get => muted.Value;
+            set => muted.Value = value;
         }
 
         [BackgroundDependencyLoader]
@@ -129,11 +119,15 @@ namespace osu.Game.Graphics.UserInterface.Volume
             muted.ValueChanged += mute =>
             {
                 if (mute)
+                {
                     audio.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+                    muteIcon.Icon = FontAwesome.fa_volume_off;
+                }
                 else
+                {
                     audio.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
-
-                muteIcon.Icon = mute ? FontAwesome.fa_volume_off : FontAwesome.fa_volume_up;
+                    muteIcon.Icon = FontAwesome.fa_volume_up;
+                }
             };
         }
 
