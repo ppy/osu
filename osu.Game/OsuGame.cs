@@ -396,8 +396,8 @@ namespace osu.Game
             base.OnDeactivated();
             if (muteWhenInactive)
             {
-                wasMuted = volume.IsMuted;
-                volume.Mute();
+                wasMuted = volume.Muted;
+                volume.Muted = true;
             }
         }
 
@@ -405,7 +405,7 @@ namespace osu.Game
         {
             base.OnActivated();
             if (IsLoaded && muteWhenInactive && !wasMuted)
-                volume.Unmute();
+                volume.Muted = false;
         }
 
         public bool OnReleased(GlobalAction action) => false;
