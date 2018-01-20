@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
-        public override bool ShowOverlays => false;
+        public override bool ShowOverlaysOnEnter => false;
 
         private readonly Box bottomBackground;
         private readonly Container screenContainer;
@@ -67,6 +67,8 @@ namespace osu.Game.Screens.Edit
                             {
                                 Items = new[]
                                 {
+                                    new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap),
+                                    new EditorMenuItemSpacer(),
                                     new EditorMenuItem("Exit", MenuItemType.Standard, Exit)
                                 }
                             }
@@ -134,6 +136,11 @@ namespace osu.Game.Screens.Edit
         private void load(OsuColour colours)
         {
             bottomBackground.Colour = colours.Gray2;
+        }
+
+        private void exportBeatmap()
+        {
+            Beatmap.Value.Save();
         }
 
         private void onModeChanged(EditorScreenMode mode)

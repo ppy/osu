@@ -21,8 +21,7 @@ namespace osu.Game.Beatmaps
                 Metadata = new BeatmapMetadata
                 {
                     Artist = "please load a beatmap!",
-                    Title = "no beatmaps available!",
-                    AuthorString = "no one",
+                    Title = "no beatmaps available!"
                 },
                 BeatmapSet = new BeatmapSetInfo(),
                 BaseDifficulty = new BeatmapDifficulty
@@ -62,6 +61,8 @@ namespace osu.Game.Beatmaps
                 public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => null;
 
                 public override string Description => "dummy";
+
+                public override string ShortName => "dummy";
 
                 public DummyRuleset(RulesetInfo rulesetInfo)
                     : base(rulesetInfo)

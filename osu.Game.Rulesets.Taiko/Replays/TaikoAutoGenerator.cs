@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -83,9 +84,9 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 }
                 else if (drumRoll != null)
                 {
-                    foreach (var tick in drumRoll.Ticks)
+                    foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
                     {
-                        Frames.Add(new ReplayFrame(tick.StartTime, null, null, hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2));
+                        Frames.Add(new ReplayFrame(tick.StartTime, null, null, hitButton ? ReplayButtonState.Right1 : ReplayButtonState.Right2));
                         hitButton = !hitButton;
                     }
                 }

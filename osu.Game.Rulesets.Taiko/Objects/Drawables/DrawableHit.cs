@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
@@ -67,6 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             validKeyPressed = HitActions.Contains(action);
 
+            // Only count this as handled if the new judgement is a hit
             return UpdateJudgement(true);
         }
 
