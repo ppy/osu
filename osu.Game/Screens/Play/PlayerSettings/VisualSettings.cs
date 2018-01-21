@@ -29,7 +29,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 if (autohide && hideStopWatch == null)
                     hideStopWatch = Stopwatch.StartNew();
                 else if (!autohide)
+                {
+                    this.FadeIn(50);
                     hideStopWatch = null;
+                }
             }
         }
 

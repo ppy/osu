@@ -68,7 +68,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private bool judgementFinalized => judgements.LastOrDefault()?.Final == true;
 
         public bool Interactive = true;
-        public override bool HandleInput => Interactive;
+        public override bool HandleKeyboardInput => Interactive;
+        public override bool HandleMouseInput => Interactive;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -167,6 +168,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (nestedHitObjects == null)
                 nestedHitObjects = new List<DrawableHitObject>();
+
+            h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
+            h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
+            h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
+
             nestedHitObjects.Add(h);
         }
 

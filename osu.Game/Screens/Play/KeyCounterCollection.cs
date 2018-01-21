@@ -111,7 +111,8 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public override bool HandleInput => receptor == null;
+        public override bool HandleKeyboardInput => receptor == null;
+        public override bool HandleMouseInput => receptor == null;
 
         private Receptor receptor;
 

@@ -165,7 +165,8 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         }
 
         private bool isActive = true;
-        public override bool HandleInput => isActive;
+        public override bool HandleKeyboardInput => isActive;
+        public override bool HandleMouseInput => isActive;
 
         public override void Hide()
         {

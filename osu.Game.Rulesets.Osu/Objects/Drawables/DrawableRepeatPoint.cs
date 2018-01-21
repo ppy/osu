@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableRepeatPoint : DrawableOsuHitObject
+    public class DrawableRepeatPoint : DrawableOsuHitObject, ITrackSnaking
     {
         private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
@@ -71,5 +71,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
             }
         }
+
+        public void UpdateSnakingPosition(Vector2 start, Vector2 end) => Position = repeatPoint.RepeatIndex % 2 == 1 ? end : start;
     }
 }
