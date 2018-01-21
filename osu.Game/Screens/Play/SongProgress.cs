@@ -9,9 +9,12 @@ using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using System.Linq;
+using osu.Framework.Configuration;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.UI;
+
 namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer
@@ -28,7 +31,8 @@ namespace osu.Game.Screens.Play
 
         public Action<double> OnSeek;
 
-        public override bool HandleInput => AllowSeeking;
+        public override bool HandleKeyboardInput => AllowSeeking;
+        public override bool HandleMouseInput => AllowSeeking;
 
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = info.AudioClock = value; } }
@@ -52,6 +56,8 @@ namespace osu.Game.Screens.Play
                 bar.EndTime = lastHitTime;
             }
         }
+
+        private readonly BindableBool replayLoaded = new BindableBool();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -97,6 +103,14 @@ namespace osu.Game.Screens.Play
         protected override void LoadComplete()
         {
             State = Visibility.Visible;
+
+            replayLoaded.ValueChanged += v => AllowSeeking = v;
+            replayLoaded.TriggerChange();
+        }
+
+        public void BindRulestContainer(RulesetContainer rulesetContainer)
+        {
+            replayLoaded.BindTo(rulesetContainer.HasReplayLoaded);
         }
 
         private bool allowSeeking;

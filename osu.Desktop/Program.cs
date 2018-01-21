@@ -43,7 +43,6 @@ namespace osu.Desktop
                             host.Run(new OsuGameDesktop(args));
                             break;
                     }
-
                 }
                 return 0;
             }
