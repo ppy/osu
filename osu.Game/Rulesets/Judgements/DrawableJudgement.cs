@@ -40,7 +40,8 @@ namespace osu.Game.Rulesets.Judgements
                     Anchor = Anchor.Centre,
                     Text = judgement.Result.GetDescription().ToUpper(),
                     Font = @"Venera",
-                    TextSize = 16
+                    Scale = new Vector2(0.85f, 1),
+                    TextSize = 12
                 }
             };
         }

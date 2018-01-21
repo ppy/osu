@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             holdStartTime = null;
 
             // If the key has been released too early, the user should not receive full score for the release
-            if (!tail.AllJudged)
+            if (!tail.IsHit)
                 hasBroken = true;
 
             return true;

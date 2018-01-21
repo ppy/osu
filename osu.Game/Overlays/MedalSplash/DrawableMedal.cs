@@ -183,8 +183,6 @@ namespace osu.Game.Overlays.MedalSplash
                     description.FadeInFromZero(duration * 2);
                     break;
             }
-
-
         }
     }
 
