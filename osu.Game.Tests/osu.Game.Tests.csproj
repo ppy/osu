@@ -104,6 +104,7 @@
     <Compile Include="Visual\TestCaseBreakOverlay.cs" />
     <Compile Include="Visual\TestCaseChatDisplay.cs" />
     <Compile Include="Visual\TestCaseContextMenu.cs" />
+    <Compile Include="Visual\TestCaseCursors.cs" />
     <Compile Include="Visual\TestCaseDialogOverlay.cs" />
     <Compile Include="Visual\TestCaseDirect.cs" />
     <Compile Include="Visual\TestCaseDrawableRoom.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="Visual\TestCasePlaySongSelect.cs" />
     <Compile Include="Visual\TestCasePopupDialog.cs" />
     <Compile Include="Visual\TestCaseRankGraph.cs" />
+    <Compile Include="Visual\TestCaseAutoplay.cs" />
     <Compile Include="Visual\TestCaseReplay.cs" />
     <Compile Include="Visual\TestCaseReplaySettingsOverlay.cs" />
     <Compile Include="Visual\TestCaseResults.cs" />

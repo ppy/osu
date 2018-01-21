@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         private Bindable<bool> showHud;
-        private bool replayLoaded;
+        private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
-                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
+                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay()
                 }
             });
         }
@@ -91,21 +91,38 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public virtual void BindRulesetContainer(RulesetContainer rulesetContainer)
+        protected override void LoadComplete()
         {
-            (rulesetContainer.KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(KeyCounter);
+            base.LoadComplete();
 
-            replayLoaded = rulesetContainer.HasReplayLoaded;
+            replayLoaded.ValueChanged += replayLoadedValueChanged;
+            replayLoaded.TriggerChange();
+        }
 
-            PlayerSettingsOverlay.ReplayLoaded = replayLoaded;
+        private void replayLoadedValueChanged(bool loaded)
+        {
+            PlayerSettingsOverlay.ReplayLoaded = loaded;
 
-            // in the case a replay isn't loaded, we want some elements to only appear briefly.
-            if (!replayLoaded)
+            if (loaded)
+            {
+                PlayerSettingsOverlay.PlaybackSettings.Show();
+                ModDisplay.FadeIn(200);
+            }
+            else
             {
                 PlayerSettingsOverlay.PlaybackSettings.Hide();
                 PlayerSettingsOverlay.VisualSettings.Autohide = true;
                 ModDisplay.Delay(2000).FadeOut(200);
             }
+        }
+
+        public virtual void BindRulesetContainer(RulesetContainer rulesetContainer)
+        {
+            (rulesetContainer.KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(KeyCounter);
+
+            replayLoaded.BindTo(rulesetContainer.HasReplayLoaded);
+
+            Progress.BindRulestContainer(rulesetContainer);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)

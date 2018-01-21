@@ -10,6 +10,7 @@ using osu.Game.Database;
 using osu.Game.IO.Legacy;
 using osu.Game.IPC;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Users;
 using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Rulesets.Scoring
@@ -54,7 +55,7 @@ namespace osu.Game.Rulesets.Scoring
                 var beatmapHash = sr.ReadString();
                 score.Beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == beatmapHash);
                 /* score.PlayerName = */
-                sr.ReadString();
+                score.User = new User { Username = sr.ReadString() };
                 /* var localScoreChecksum = */
                 sr.ReadString();
                 /* score.Count300 = */
@@ -107,7 +108,10 @@ namespace osu.Game.Rulesets.Scoring
 
                     using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
                     using (var reader = new StreamReader(lzma))
+                    {
                         score.Replay = createLegacyReplay(reader);
+                        score.Replay.User = score.User;
+                    }
                 }
             }
 
@@ -129,9 +133,22 @@ namespace osu.Game.Rulesets.Scoring
             {
                 var split = l.Split('|');
 
-                if (split.Length < 4 || float.Parse(split[0]) < 0) continue;
+                if (split.Length < 4)
+                    continue;
 
-                lastTime += float.Parse(split[0]);
+                if (split[0] == "-12345")
+                {
+                    // Todo: The seed is provided in split[3], which we'll need to use at some point
+                    continue;
+                }
+
+                var diff = float.Parse(split[0]);
+                lastTime += diff;
+
+                // Todo: At some point we probably want to rewind and play back the negative-time frames
+                // but for now we'll achieve equal playback to stable by skipping negative frames
+                if (diff < 0)
+                    continue;
 
                 frames.Add(new ReplayFrame(
                     lastTime,

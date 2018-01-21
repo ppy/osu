@@ -319,11 +319,11 @@ namespace osu.Game.Overlays.Profile
                 colourBar.Show();
             }
 
-            Action<SpriteText> boldItalic = t =>
+            void boldItalic(SpriteText t)
             {
                 t.Font = @"Exo2.0-BoldItalic";
                 t.Alpha = 1;
-            };
+            }
 
             if (user.Age != null)
             {
@@ -474,7 +474,8 @@ namespace osu.Game.Overlays.Profile
 
         private class LinkFlowContainer : OsuTextFlowContainer
         {
-            public override bool HandleInput => true;
+            public override bool HandleKeyboardInput => true;
+            public override bool HandleMouseInput => true;
 
             public LinkFlowContainer(Action<SpriteText> defaultCreationParameters = null) : base(defaultCreationParameters)
             {
@@ -488,7 +489,8 @@ namespace osu.Game.Overlays.Profile
             {
                 private readonly OsuHoverContainer content;
 
-                public override bool HandleInput => content.Action != null;
+                public override bool HandleKeyboardInput => content.Action != null;
+                public override bool HandleMouseInput => content.Action != null;
 
                 protected override Container<Drawable> Content => content ?? (Container<Drawable>)this;
 
