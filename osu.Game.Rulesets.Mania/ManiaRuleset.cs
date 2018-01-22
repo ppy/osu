@@ -124,9 +124,9 @@ namespace osu.Game.Rulesets.Mania
             get
             {
                 for (int i = 1; i <= 9; i++)
-                    yield return (int)ManiaKeyBindingVariantType.Solo + i;
+                    yield return (int)ManiaKeyBindingVariantType.Single + i;
                 for (int i = 2; i <= 18; i++)
-                    yield return (int)ManiaKeyBindingVariantType.Coop + i;
+                    yield return (int)ManiaKeyBindingVariantType.Dual + i;
             }
         }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Mania
         {
             switch (getVariantType(variant))
             {
-                case ManiaKeyBindingVariantType.Solo:
+                case ManiaKeyBindingVariantType.Single:
                     return new VariantMappingGenerator
                     {
                         LeftKeys = new[]
@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Mania
                         SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1,
                     }.GenerateKeyBindingsFor(variant, out _);
-                case ManiaKeyBindingVariantType.Coop:
+                case ManiaKeyBindingVariantType.Dual:
                     getDualStageKeyCounts(variant, out int s1K, out int s2K);
 
                     var stage1Bindings = new VariantMappingGenerator
@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Mania
             {
                 default:
                     return $"{variant}K";
-                case ManiaKeyBindingVariantType.Coop:
+                case ManiaKeyBindingVariantType.Dual:
                 {
                     getDualStageKeyCounts(variant, out int s1K, out int s2K);
                     return $"{s1K}K + {s2K}K";
@@ -221,14 +221,14 @@ namespace osu.Game.Rulesets.Mania
         }
 
         /// <summary>
-        /// Finds the number of keys for each stage in a <see cref="ManiaKeyBindingVariantType.Coop"/> variant.
+        /// Finds the number of keys for each stage in a <see cref="ManiaKeyBindingVariantType.Dual"/> variant.
         /// </summary>
         /// <param name="variant">The variant.</param>
         /// <param name="stage1">The number of keys for the first stage.</param>
         /// <param name="stage2">The number of keys for the second stage.</param>
         private void getDualStageKeyCounts(int variant, out int stage1, out int stage2)
         {
-            int totalKeys = variant - (int)ManiaKeyBindingVariantType.Coop;
+            int totalKeys = variant - (int)ManiaKeyBindingVariantType.Dual;
             stage1 = (int)Math.Ceiling(totalKeys / 2f);
             stage2 = (int)Math.Floor(totalKeys / 2f);
         }
@@ -300,12 +300,15 @@ namespace osu.Game.Rulesets.Mania
     public enum ManiaKeyBindingVariantType
     {
         /// <summary>
-        /// Solo play keybinding variant (single stage).
+        /// A single stage.
+        /// Number of columns in this stage lies at (item - Single).
         /// </summary>
-        Solo = 0,
+        Single = 0,
         /// <summary>
-        /// Co-op play keybinding variant (multiple stages).
+        /// A split stage.
+        /// Overall number of columns lies at (item - Dual), further computation is required for
+        /// number of columns in each individual stage.
         /// </summary>
-        Coop = 1000,
+        Dual = 1000,
     }
 }
