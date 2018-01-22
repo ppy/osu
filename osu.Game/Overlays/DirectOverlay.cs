@@ -191,7 +191,13 @@ namespace osu.Game.Overlays
         private void setAdded(BeatmapSetInfo set)
         {
             // if a new map was imported, we should remove it from search results (download completed etc.)
-            panels?.FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID)?.FadeOut(400).Expire();
+            var existingPanel = panels?.FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID);
+            if (existingPanel != null)
+            {
+                existingPanel.PreviewPlaying.Value = false;
+                existingPanel.FadeOut(400).Expire();
+            }
+
             BeatmapSets = BeatmapSets?.Where(b => b.OnlineBeatmapSetID != set.OnlineBeatmapSetID);
         }
 
