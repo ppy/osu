@@ -93,7 +93,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
                 {
-                    FadeInTime = repeatPoint.StartTime - s.RepeatDuration / 2,
                     Position = repeatPoint.Position
                 };
 
