@@ -208,12 +208,12 @@ namespace osu.Game.Screens.Play
                 new HotkeyRetryOverlay
                 {
                     Action = () => {
-                        if (IsCurrentScreen) {
-                            //we want to hide the hitrenderer immediately (looks better).
-                            //we may be able to remove this once the mouse cursor trail is improved.
-                            RulesetContainer?.Hide();
-                            Restart();
-                        }
+                        if (!IsCurrentScreen) return;
+
+                        //we want to hide the hitrenderer immediately (looks better).
+                        //we may be able to remove this once the mouse cursor trail is improved.
+                        RulesetContainer?.Hide();
+                        Restart();
                     },
                 }
             };
@@ -290,17 +290,16 @@ namespace osu.Game.Screens.Play
             {
                 onCompletionEvent = Schedule(delegate
                 {
-                    if (IsCurrentScreen)
+                    if (!IsCurrentScreen) return;
+
+                    var score = new Score
                     {
-                        var score = new Score
-                        {
-                            Beatmap = Beatmap.Value.BeatmapInfo,
-                            Ruleset = ruleset
-                        };
-                        scoreProcessor.PopulateScore(score);
-                        score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
-                        Push(new Results(score));
-                    }
+                        Beatmap = Beatmap.Value.BeatmapInfo,
+                        Ruleset = ruleset
+                    };
+                    scoreProcessor.PopulateScore(score);
+                    score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
+                    Push(new Results(score));
                 });
             }
         }
