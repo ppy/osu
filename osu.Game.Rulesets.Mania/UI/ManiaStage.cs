@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
-        public readonly Bindable<SpecialColumnPosition> SpecialColumn = new Bindable<SpecialColumnPosition>();
+        public readonly Bindable<SpecialColumnPosition> SpecialColumnPosition = new Bindable<SpecialColumnPosition>();
 
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
@@ -169,14 +169,14 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <returns>Whether the column is a special column.</returns>
         private bool isSpecialColumn(int column)
         {
-            switch (SpecialColumn.Value)
+            switch (SpecialColumnPosition.Value)
             {
                 default:
-                case SpecialColumnPosition.Normal:
+                case UI.SpecialColumnPosition.Normal:
                     return definition.Columns % 2 == 1 && column == definition.Columns / 2;
-                case SpecialColumnPosition.Left:
+                case UI.SpecialColumnPosition.Left:
                     return column == 0;
-                case SpecialColumnPosition.Right:
+                case UI.SpecialColumnPosition.Right:
                     return column == definition.Columns - 1;
             }
         }
