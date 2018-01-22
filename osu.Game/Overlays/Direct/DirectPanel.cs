@@ -109,6 +109,8 @@ namespace osu.Game.Overlays.Direct
             beatmaps.BeatmapDownloadBegan += attachDownload;
         }
 
+        public override bool DisposeOnDeathRemoval => true;
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
