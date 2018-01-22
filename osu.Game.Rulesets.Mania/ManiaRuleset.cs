@@ -293,12 +293,12 @@ namespace osu.Game.Rulesets.Mania
     public enum PlayfieldType
     {
         /// <summary>
-        /// A single stage.
+        /// Columns are grouped into a single stage.
         /// Number of columns in this stage lies at (item - Single).
         /// </summary>
         Single = 0,
         /// <summary>
-        /// A split stage.
+        /// Columns are grouped into two stages.
         /// Overall number of columns lies at (item - Dual), further computation is required for
         /// number of columns in each individual stage.
         /// </summary>
