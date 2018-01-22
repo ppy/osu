@@ -88,8 +88,6 @@ namespace osu.Game.Screens.Play
 
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
-        private bool allowRestart = true;
-
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config, APIAccess api)
         {
@@ -210,7 +208,7 @@ namespace osu.Game.Screens.Play
                 new HotkeyRetryOverlay
                 {
                     Action = () => {
-                        if (allowRestart) {
+                        if (IsCurrentScreen) {
                             //we want to hide the hitrenderer immediately (looks better).
                             //we may be able to remove this once the mouse cursor trail is improved.
                             RulesetContainer?.Hide();
@@ -294,8 +292,6 @@ namespace osu.Game.Screens.Play
                 {
                     if (IsCurrentScreen)
                     {
-                        allowRestart = false;
-
                         var score = new Score
                         {
                             Beatmap = Beatmap.Value.BeatmapInfo,
