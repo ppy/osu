@@ -61,6 +61,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public int RepeatCount { get; set; } = 1;
 
         private int stackHeight;
+
         public override int StackHeight
         {
             get { return stackHeight; }
@@ -130,6 +131,17 @@ namespace osu.Game.Rulesets.Osu.Objects
                     var distanceProgress = d / length;
                     var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
 
+                    var firstSample = Samples.FirstOrDefault(s => s.Name == SampleInfo.HIT_NORMAL) ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+                    var sampleList = new List<SampleInfo>();
+
+                    if (firstSample != null)
+                        sampleList.Add(new SampleInfo
+                        {
+                            Bank = firstSample.Bank,
+                            Volume = firstSample.Volume,
+                            Name = @"slidertick",
+                        });
+
                     AddNested(new SliderTick
                     {
                         RepeatIndex = repeat,
@@ -138,12 +150,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         StackHeight = StackHeight,
                         Scale = Scale,
                         ComboColour = ComboColour,
-                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
-                        {
-                            Bank = s.Bank,
-                            Name = @"slidertick",
-                            Volume = s.Volume
-                        }))
+                        Samples = sampleList
                     });
                 }
             }

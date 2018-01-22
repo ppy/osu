@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Play
         public int RestartCount;
 
         public CursorContainer Cursor => RulesetContainer.Cursor;
-        public bool ProvidingUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded;
+        public bool ProvidingUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded.Value;
 
         private IAdjustableClock adjustableSourceClock;
         private FramedOffsetClock offsetClock;
@@ -226,7 +226,6 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.Progress.Objects = RulesetContainer.Objects;
             hudOverlay.Progress.AudioClock = decoupledClock;
-            hudOverlay.Progress.AllowSeeking = RulesetContainer.HasReplayLoaded;
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
             hudOverlay.ModDisplay.Current.BindTo(working.Mods);

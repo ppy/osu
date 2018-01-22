@@ -137,6 +137,7 @@
     <Compile Include="Visual\TestCasePlaySongSelect.cs" />
     <Compile Include="Visual\TestCasePopupDialog.cs" />
     <Compile Include="Visual\TestCaseRankGraph.cs" />
+    <Compile Include="Visual\TestCaseAutoplay.cs" />
     <Compile Include="Visual\TestCaseReplay.cs" />
     <Compile Include="Visual\TestCaseReplaySettingsOverlay.cs" />
     <Compile Include="Visual\TestCaseResults.cs" />
