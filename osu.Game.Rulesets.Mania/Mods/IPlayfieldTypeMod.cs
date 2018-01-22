@@ -1,13 +1,15 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Rulesets.Mods;
+
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public interface IKeyBindingMod
+    public interface IPlayfieldTypeMod : IApplicableMod
     {
         /// <summary>
-        /// The keybinding variant which this <see cref="IKeyBindingMod"/> requires.
+        /// The <see cref="PlayfieldType"/> which this <see cref="IPlayfieldTypeMod"/> requires.
         /// </summary>
-        PlayfieldType Variant { get; }
+        PlayfieldType PlayfieldType { get; }
     }
 }
