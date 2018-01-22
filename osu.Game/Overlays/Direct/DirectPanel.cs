@@ -16,7 +16,6 @@ using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
-using osu.Framework.Logging;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Configuration;
 using osu.Framework.Audio.Track;
