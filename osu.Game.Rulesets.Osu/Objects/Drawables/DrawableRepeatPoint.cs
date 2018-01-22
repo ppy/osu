@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
 
-        public double FadeInTime;
         private double animDuration;
 
         public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
@@ -48,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdatePreemptState()
         {
-            animDuration = Math.Min(150, repeatPoint.StartTime - FadeInTime);
+            animDuration = Math.Min(150, repeatPoint.RepeatDuration / 2);
 
             this.FadeIn(animDuration).ScaleTo(1.2f, animDuration / 2)
                 .Then()
