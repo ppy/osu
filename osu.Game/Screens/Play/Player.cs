@@ -89,7 +89,6 @@ namespace osu.Game.Screens.Play
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         private bool allowRestart = true;
-        private bool exited;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config, APIAccess api)
@@ -271,7 +270,6 @@ namespace osu.Game.Screens.Play
 
         public void Restart()
         {
-            exited = true;
             sampleRestart?.Play();
             ValidForResume = false;
             RestartRequested?.Invoke();
@@ -294,19 +292,19 @@ namespace osu.Game.Screens.Play
             {
                 onCompletionEvent = Schedule(delegate
                 {
-                    // This is here to mimic OsuStable behavior. It could be placed outside the delay timer,
-                    // which would remove the need for the check on Push() below, and would make it impossible
-                    // to quick-restart after hitting the last note.
-                    allowRestart = false;
-
-                    var score = new Score
+                    if (IsCurrentScreen)
                     {
-                        Beatmap = Beatmap.Value.BeatmapInfo,
-                        Ruleset = ruleset
-                    };
-                    scoreProcessor.PopulateScore(score);
-                    score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
-                    if (!exited) Push(new Results(score));
+                        allowRestart = false;
+
+                        var score = new Score
+                        {
+                            Beatmap = Beatmap.Value.BeatmapInfo,
+                            Ruleset = ruleset
+                        };
+                        scoreProcessor.PopulateScore(score);
+                        score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
+                        Push(new Results(score));
+                    }
                 });
             }
         }
