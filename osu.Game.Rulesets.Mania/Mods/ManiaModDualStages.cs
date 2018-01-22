@@ -34,6 +34,10 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             var mrc = (ManiaRulesetContainer)rulesetContainer;
 
+            // Although this can work, for now let's not allow keymods for mania-specific beatmaps
+            if (mrc.IsForCurrentRuleset)
+                return;
+
             var newDefinitions = new List<StageDefinition>();
             foreach (var existing in mrc.Beatmap.Stages)
             {
