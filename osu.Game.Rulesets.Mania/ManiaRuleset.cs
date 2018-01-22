@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Mania
                         NormalActionStart = ManiaAction.Key1,
                     }.GenerateKeyBindingsFor(variant, out _);
                 case PlayfieldType.Dual:
-                    getDualStageKeyCounts(variant, out int s1K, out int s2K);
+                    int keys = getDualStageKeyCount(variant);
 
                     var stage1Bindings = new VariantMappingGenerator
                     {
@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Mania
                         SpecialKey = InputKey.Tilde,
                         SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1
-                    }.GenerateKeyBindingsFor(s1K, out var nextNormal);
+                    }.GenerateKeyBindingsFor(keys, out var nextNormal);
 
                     var stage2Bindings = new VariantMappingGenerator
                     {
@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Mania
                         SpecialKey = InputKey.BackSlash,
                         SpecialAction = ManiaAction.Special2,
                         NormalActionStart = nextNormal
-                    }.GenerateKeyBindingsFor(s2K, out _);
+                    }.GenerateKeyBindingsFor(keys, out _);
 
                     return stage1Bindings.Concat(stage2Bindings);
             }
@@ -214,8 +214,8 @@ namespace osu.Game.Rulesets.Mania
                     return $"{variant}K";
                 case PlayfieldType.Dual:
                 {
-                    getDualStageKeyCounts(variant, out int s1K, out int s2K);
-                    return $"{s1K}K + {s2K}K";
+                    var keys = getDualStageKeyCount(variant);
+                    return $"{keys}K + {keys}K";
                 }
             }
         }
@@ -224,14 +224,7 @@ namespace osu.Game.Rulesets.Mania
         /// Finds the number of keys for each stage in a <see cref="PlayfieldType.Dual"/> variant.
         /// </summary>
         /// <param name="variant">The variant.</param>
-        /// <param name="stage1">The number of keys for the first stage.</param>
-        /// <param name="stage2">The number of keys for the second stage.</param>
-        private void getDualStageKeyCounts(int variant, out int stage1, out int stage2)
-        {
-            int totalKeys = variant - (int)PlayfieldType.Dual;
-            stage1 = (int)Math.Ceiling(totalKeys / 2f);
-            stage2 = (int)Math.Floor(totalKeys / 2f);
-        }
+        private int getDualStageKeyCount(int variant) => (variant - (int)PlayfieldType.Dual) / 2;
 
         /// <summary>
         /// Finds the <see cref="PlayfieldType"/> that corresponds to a variant value.

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -38,8 +37,8 @@ namespace osu.Game.Rulesets.Mania.Mods
             var newDefinitions = new List<StageDefinition>();
             foreach (var existing in mrc.Beatmap.Stages)
             {
-                newDefinitions.Add(new StageDefinition { Columns = (int)Math.Ceiling(existing.Columns / 2f) });
-                newDefinitions.Add(new StageDefinition { Columns = (int)Math.Floor(existing.Columns / 2f) });
+                newDefinitions.Add(new StageDefinition { Columns = existing.Columns / 2 });
+                newDefinitions.Add(new StageDefinition { Columns = existing.Columns / 2 });
             }
 
             mrc.Beatmap.Stages = newDefinitions;
