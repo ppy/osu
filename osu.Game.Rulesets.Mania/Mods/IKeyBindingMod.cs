@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// <summary>
         /// The keybinding variant which this <see cref="IKeyBindingMod"/> requires.
         /// </summary>
-        ManiaKeyBindingVariantType Variant { get; }
+        PlayfieldType Variant { get; }
     }
 }

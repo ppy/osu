@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override PassThroughInputManager CreateInputManager()
         {
-            var variantType = Mods.OfType<IKeyBindingMod>().FirstOrDefault()?.Variant ?? ManiaKeyBindingVariantType.Single;
+            var variantType = Mods.OfType<IKeyBindingMod>().FirstOrDefault()?.Variant ?? PlayfieldType.Single;
             return new ManiaInputManager(Ruleset.RulesetInfo, (int)variantType + Beatmap.TotalColumns);
         }
 
