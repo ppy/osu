@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
-            switch (getVariantType(variant))
+            switch (getPlayfieldType(variant))
             {
                 case PlayfieldType.Single:
                     return new VariantMappingGenerator
@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override string GetVariantName(int variant)
         {
-            switch (getVariantType(variant))
+            switch (getPlayfieldType(variant))
             {
                 default:
                     return $"{variant}K";
@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Mania
         /// </summary>
         /// <param name="variant">The variant value.</param>
         /// <returns>The <see cref="PlayfieldType"/> that corresponds to <paramref name="variant"/>.</returns>
-        private PlayfieldType getVariantType(int variant)
+        private PlayfieldType getPlayfieldType(int variant)
         {
             return (PlayfieldType)Enum.GetValues(typeof(PlayfieldType)).Cast<int>().OrderByDescending(i => i).First(v => variant >= v);
         }
