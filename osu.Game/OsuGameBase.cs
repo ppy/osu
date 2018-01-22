@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -18,8 +18,10 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Game.Database;
+using osu.Game.Graphics.Textures;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
@@ -42,6 +44,8 @@ namespace osu.Game
 
         protected KeyBindingStore KeyBindingStore;
 
+        protected CursorOverrideContainer CursorOverrideContainer;
+
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
         public APIAccess API;
@@ -49,8 +53,6 @@ namespace osu.Game
         private Container content;
 
         protected override Container<Drawable> Content => content;
-
-        protected MenuCursor Cursor;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
@@ -88,6 +90,8 @@ namespace osu.Game
         private void load()
         {
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
+
+            dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
 
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
@@ -207,21 +211,14 @@ namespace osu.Game
 
             GlobalKeyBindingInputManager globalBinding;
 
-            base.Content.Add(new DrawSizePreservingFillContainer
+            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
+            CursorOverrideContainer.Child = globalBinding = new GlobalKeyBindingInputManager(this)
             {
-                Children = new Drawable[]
-                {
-                    Cursor = new MenuCursor(),
-                    globalBinding = new GlobalKeyBindingInputManager(this)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = content = new OsuTooltipContainer(Cursor)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    }
-                }
-            });
+                RelativeSizeAxes = Axes.Both,
+                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both　}
+            };
+
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);

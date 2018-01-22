@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public readonly DrawableHitCircle InitialCircle;
 
-        private readonly List<ISliderProgress> components = new List<ISliderProgress>();
+        private readonly List<Drawable> components = new List<Drawable>();
 
         private readonly Container<DrawableSliderTick> ticks;
         private readonly Container<DrawableRepeatPoint> repeatPoints;
@@ -54,11 +54,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     StartTime = s.StartTime,
                     Position = s.StackedPosition,
-                    ComboIndex = s.ComboIndex,
+                    IndexInCurrentCombo = s.IndexInCurrentCombo,
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
                     Samples = s.Samples,
-                    SampleControlPoint = s.SampleControlPoint
+                    SampleControlPoint = s.SampleControlPoint,
+                    TimePreempt = s.TimePreempt,
+                    TimeFadein = s.TimeFadein,
+                    HitWindow300 = s.HitWindow300,
+                    HitWindow100 = s.HitWindow100,
+                    HitWindow50 = s.HitWindow50
                 })
             };
 
@@ -71,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
                 var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? FadeInDuration : FadeInDuration / 2);
+                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? HitObject.TimeFadein : HitObject.TimeFadein / 2);
                 var fadeOutTime = repeatStartTime + repeatDuration;
 
                 var drawableTick = new DrawableSliderTick(tick)
@@ -88,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
                 var repeatStartTime = s.StartTime + repeatPoint.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? FadeInDuration : FadeInDuration / 2);
+                var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? HitObject.TimeFadein : HitObject.TimeFadein / 2);
                 var fadeOutTime = repeatStartTime + repeatDuration;
 
                 var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
@@ -99,18 +104,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 };
 
                 repeatPoints.Add(drawableRepeatPoint);
+                components.Add(drawableRepeatPoint);
                 AddNested(drawableRepeatPoint);
             }
         }
 
         private int currentRepeat;
         public bool Tracking;
-
-        public override double FadeInDuration
-        {
-            get { return base.FadeInDuration; }
-            set { InitialCircle.FadeInDuration = base.FadeInDuration = value; }
-        }
 
         protected override void Update()
         {
@@ -130,7 +130,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!InitialCircle.Judgements.Any(j => j.IsHit))
                 InitialCircle.Position = slider.Curve.PositionAt(progress);
 
-            foreach (var c in components) c.UpdateProgress(progress, repeat);
+            foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(progress, repeat);
+            foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
             foreach (var t in ticks.Children) t.Tracking = Ball.Tracking;
         }
 
@@ -158,14 +159,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void UpdateCurrentState(ArmedState state)
         {
             Ball.FadeIn();
+            Ball.ScaleTo(HitObject.Scale);
 
             using (BeginDelayedSequence(slider.Duration, true))
             {
-                Body.FadeOut(160);
-                Ball.FadeOut(160);
+                const float fade_out_time = 450;
 
-                this.FadeOut(800)
-                    .Expire();
+                // intentionally pile on an extra FadeOut to make it happen much faster.
+                Ball.FadeOut(fade_out_time / 4, Easing.Out);
+
+                switch (state)
+                {
+                    case ArmedState.Hit:
+                        Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
+                        break;
+                }
+
+                this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
             }
         }
 

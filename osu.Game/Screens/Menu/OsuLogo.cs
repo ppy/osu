@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Menu
         /// <param name="waitForPrevious">If true, the new animation is delayed until all previous transforms finish. If false, existing transformed are cleared.</param>
         public void AppendAnimatingAction(Action action, bool waitForPrevious)
         {
-            Action runnableAction = () =>
+            void runnableAction()
             {
                 if (waitForPrevious)
                     this.DelayUntilTransformsFinished().Schedule(action);
@@ -240,12 +240,12 @@ namespace osu.Game.Screens.Menu
                     ClearTransforms();
                     action();
                 }
-            };
+            }
 
             if (IsLoaded)
                 runnableAction();
             else
-                Schedule(() => runnableAction());
+                Schedule(runnableAction);
         }
 
         [BackgroundDependencyLoader]
