@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Screens.Play.ReplaySettings
 {
     public class ReplaySliderBar<T> : SettingsSlider<T>
-        where T : struct, IEquatable<T>
+        where T : struct, IEquatable<T>, IComparable, IConvertible
     {
         protected override Drawable CreateControl() => new Sliderbar
         {
@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         private class Sliderbar : OsuSliderBar<T>
         {
+            public override string TooltipText => $"{CurrentNumber.Value}";
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {

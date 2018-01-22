@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
@@ -34,15 +34,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
-            Width = (float)HitObject.Duration;
+            RelativeSizeAxes = Axes.Y;
 
             Container<DrawableDrumRollTick> tickContainer;
-            MainPiece.Add(tickContainer = new Container<DrawableDrumRollTick>
-            {
-                RelativeSizeAxes = Axes.Both,
-                RelativeChildOffset = new Vector2((float)HitObject.StartTime, 0),
-                RelativeChildSize = new Vector2((float)HitObject.Duration, 1)
-            });
+            MainPiece.Add(tickContainer = new Container<DrawableDrumRollTick> { RelativeSizeAxes = Axes.Both });
 
             foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
             {
@@ -86,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (timeOffset < 0)
                 return;
 
-            int countHit = NestedHitObjects.Count(o => o.AllJudged);
+            int countHit = NestedHitObjects.Count(o => o.IsHit);
 
             if (countHit > HitObject.RequiredGoodHits)
             {
@@ -100,6 +95,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+            switch (state)
+            {
+                case ArmedState.Hit:
+                case ArmedState.Miss:
+                    this.FadeOut(100).Expire();
+                    break;
+            }
         }
     }
 }

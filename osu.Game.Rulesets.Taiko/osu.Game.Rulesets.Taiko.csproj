@@ -49,6 +49,18 @@
     <Compile Include="Judgements\TaikoDrumRollTickJudgement.cs" />
     <Compile Include="Judgements\TaikoStrongHitJudgement.cs" />
     <Compile Include="Judgements\TaikoJudgement.cs" />
+    <Compile Include="Mods\TaikoModAutoplay.cs" />
+    <Compile Include="Mods\TaikoModDaycore.cs" />
+    <Compile Include="Mods\TaikoModDoubleTime.cs" />
+    <Compile Include="Mods\TaikoModEasy.cs" />
+    <Compile Include="Mods\TaikoModFlashlight.cs" />
+    <Compile Include="Mods\TaikoModHalfTime.cs" />
+    <Compile Include="Mods\TaikoModHardRock.cs" />
+    <Compile Include="Mods\TaikoModHidden.cs" />
+    <Compile Include="Mods\TaikoModNightcore.cs" />
+    <Compile Include="Mods\TaikoModPerfect.cs" />
+    <Compile Include="Mods\TaikoModRelax.cs" />
+    <Compile Include="Mods\TaikoModSuddenDeath.cs" />
     <Compile Include="Objects\BarLine.cs" />
     <Compile Include="Objects\Drawables\DrawableBarLine.cs" />
     <Compile Include="Objects\Drawables\DrawableBarLineMajor.cs" />
@@ -94,7 +106,7 @@
     <Compile Include="UI\TaikoRulesetContainer.cs" />
     <Compile Include="UI\TaikoPlayfield.cs" />
     <Compile Include="TaikoRuleset.cs" />
-    <Compile Include="Mods\TaikoMod.cs" />
+    <Compile Include="Mods\TaikoModNoFail.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

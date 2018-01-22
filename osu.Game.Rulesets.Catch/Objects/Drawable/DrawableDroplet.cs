@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -8,15 +8,13 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
-    public class DrawableDroplet : DrawableCatchHitObject<Droplet>
+    public class DrawableDroplet : PalpableCatchHitObject<Droplet>
     {
         public DrawableDroplet(Droplet h)
             : base(h)
         {
             Origin = Anchor.Centre;
-
-            Size = new Vector2(Pulp.PULP_SIZE);
-
+            Size = new Vector2((float)CatchHitObject.OBJECT_RADIUS) / 4;
             AccentColour = h.ComboColour;
             Masking = false;
         }
@@ -27,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Child = new Pulp
             {
                 AccentColour = AccentColour,
-                Scale = new Vector2(0.8f),
+                Size = Size
             };
         }
     }

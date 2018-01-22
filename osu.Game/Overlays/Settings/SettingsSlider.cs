@@ -1,22 +1,21 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
     public class SettingsSlider<T> : SettingsSlider<T, OsuSliderBar<T>>
-        where T : struct, IEquatable<T>
+        where T : struct, IEquatable<T>, IComparable, IConvertible
     {
     }
 
     public class SettingsSlider<T, U> : SettingsItem<T>
-        where T : struct, IEquatable<T>
-        where U : SliderBar<T>, new()
+        where T : struct, IEquatable<T>, IComparable, IConvertible
+        where U : OsuSliderBar<T>, new()
     {
         protected override Drawable CreateControl() => new U
         {
