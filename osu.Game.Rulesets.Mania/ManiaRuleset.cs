@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Mania
                             },
                         },
                         new ManiaModRandom(),
-                        new ManiaModKeyCoop(),
+                        new ManiaModDualStages(),
                         new MultiMod
                         {
                             Mods = new Mod[]
