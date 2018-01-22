@@ -145,6 +145,12 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Playing.Value = false;
+        }
+
         private TrackLoader trackLoader;
         private AudioManager audio;
 
