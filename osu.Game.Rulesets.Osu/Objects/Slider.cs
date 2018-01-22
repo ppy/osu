@@ -60,6 +60,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
         public int RepeatCount { get; set; } = 1;
 
+        /// <summary>
+        /// The length of one repeat if any repeats are present, otherwise it equals the <see cref="Duration"/>.
+        /// </summary>
+        public double RepeatDuration => RepeatCount > 1 ? Distance / Velocity : Duration;
+
         private int stackHeight;
 
         public override int StackHeight
@@ -114,13 +119,12 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             var length = Curve.Distance;
             var tickDistance = Math.Min(TickDistance, length);
-            var repeatDuration = length / Velocity;
 
             var minDistanceFromEnd = Velocity * 0.01;
 
             for (var repeat = 0; repeat < RepeatCount; repeat++)
             {
-                var repeatStartTime = StartTime + repeat * repeatDuration;
+                var repeatStartTime = StartTime + repeat * RepeatDuration;
                 var reversed = repeat % 2 == 1;
 
                 for (var d = tickDistance; d <= length; d += tickDistance)
@@ -145,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     AddNested(new SliderTick
                     {
                         RepeatIndex = repeat,
-                        StartTime = repeatStartTime + timeProgress * repeatDuration,
+                        StartTime = repeatStartTime + timeProgress * RepeatDuration,
                         Position = Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
                         Scale = Scale,
@@ -158,16 +162,13 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createRepeatPoints()
         {
-            var repeatDuration = Distance / Velocity;
-
             for (var repeat = 1; repeat < RepeatCount; repeat++)
             {
-                var repeatStartTime = StartTime + repeat * repeatDuration;
-
                 AddNested(new RepeatPoint
                 {
                     RepeatIndex = repeat,
-                    StartTime = repeatStartTime,
+                    RepeatDuration = RepeatDuration,
+                    StartTime = StartTime + repeat * RepeatDuration,
                     Position = Curve.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
