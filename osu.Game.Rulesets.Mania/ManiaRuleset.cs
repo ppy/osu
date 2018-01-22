@@ -124,9 +124,9 @@ namespace osu.Game.Rulesets.Mania
             get
             {
                 for (int i = 1; i <= 9; i++)
-                    yield return (int)ManiaKeyBindingVariantType.Single + i;
+                    yield return (int)PlayfieldType.Single + i;
                 for (int i = 2; i <= 18; i++)
-                    yield return (int)ManiaKeyBindingVariantType.Dual + i;
+                    yield return (int)PlayfieldType.Dual + i;
             }
         }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Mania
         {
             switch (getVariantType(variant))
             {
-                case ManiaKeyBindingVariantType.Single:
+                case PlayfieldType.Single:
                     return new VariantMappingGenerator
                     {
                         LeftKeys = new[]
@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Mania
                         SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1,
                     }.GenerateKeyBindingsFor(variant, out _);
-                case ManiaKeyBindingVariantType.Dual:
+                case PlayfieldType.Dual:
                     getDualStageKeyCounts(variant, out int s1K, out int s2K);
 
                     var stage1Bindings = new VariantMappingGenerator
@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Mania
             {
                 default:
                     return $"{variant}K";
-                case ManiaKeyBindingVariantType.Dual:
+                case PlayfieldType.Dual:
                 {
                     getDualStageKeyCounts(variant, out int s1K, out int s2K);
                     return $"{s1K}K + {s2K}K";
@@ -221,26 +221,26 @@ namespace osu.Game.Rulesets.Mania
         }
 
         /// <summary>
-        /// Finds the number of keys for each stage in a <see cref="ManiaKeyBindingVariantType.Dual"/> variant.
+        /// Finds the number of keys for each stage in a <see cref="PlayfieldType.Dual"/> variant.
         /// </summary>
         /// <param name="variant">The variant.</param>
         /// <param name="stage1">The number of keys for the first stage.</param>
         /// <param name="stage2">The number of keys for the second stage.</param>
         private void getDualStageKeyCounts(int variant, out int stage1, out int stage2)
         {
-            int totalKeys = variant - (int)ManiaKeyBindingVariantType.Dual;
+            int totalKeys = variant - (int)PlayfieldType.Dual;
             stage1 = (int)Math.Ceiling(totalKeys / 2f);
             stage2 = (int)Math.Floor(totalKeys / 2f);
         }
 
         /// <summary>
-        /// Finds the <see cref="ManiaKeyBindingVariantType"/> that corresponds to a variant value.
+        /// Finds the <see cref="PlayfieldType"/> that corresponds to a variant value.
         /// </summary>
         /// <param name="variant">The variant value.</param>
-        /// <returns>The <see cref="ManiaKeyBindingVariantType"/> that corresponds to <paramref name="variant"/>.</returns>
-        private ManiaKeyBindingVariantType getVariantType(int variant)
+        /// <returns>The <see cref="PlayfieldType"/> that corresponds to <paramref name="variant"/>.</returns>
+        private PlayfieldType getVariantType(int variant)
         {
-            return (ManiaKeyBindingVariantType)Enum.GetValues(typeof(ManiaKeyBindingVariantType)).Cast<int>().OrderByDescending(i => i).First(v => variant >= v);
+            return (PlayfieldType)Enum.GetValues(typeof(PlayfieldType)).Cast<int>().OrderByDescending(i => i).First(v => variant >= v);
         }
     }
 
@@ -297,7 +297,7 @@ namespace osu.Game.Rulesets.Mania
         }
     }
 
-    public enum ManiaKeyBindingVariantType
+    public enum PlayfieldType
     {
         /// <summary>
         /// A single stage.
