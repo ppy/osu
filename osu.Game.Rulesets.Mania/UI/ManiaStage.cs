@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 {
                                     Name = "Background",
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = new Color4(0, 0, 0, 0.8f)
+                                    Colour = Color4.Black
                                 },
                                 columnFlow = new FillFlowContainer<Column>
                                 {
