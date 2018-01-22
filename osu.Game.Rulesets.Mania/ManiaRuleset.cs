@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Mania
                         SpecialKey = InputKey.Space,
                         SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1,
-                    }.GenerateKeyBindingsFor(variant);
+                    }.GenerateKeyBindingsFor(variant, out _);
                 case ManiaKeyBindingVariantType.Coop:
                 case ManiaKeyBindingVariantType.Versus:
                     getMultiVariantKeyCounts(variant, out int p1K, out int p2K);
@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Mania
                         SpecialKey = InputKey.Tilde,
                         SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1
-                    }.GenerateKeyBindingsFor(p1K);
+                    }.GenerateKeyBindingsFor(p1K, out var nextNormal);
 
                     var player2Bindings = new VariantMappingGenerator
                     {
@@ -199,8 +199,8 @@ namespace osu.Game.Rulesets.Mania
                         },
                         SpecialKey = InputKey.BackSlash,
                         SpecialAction = ManiaAction.Special2,
-                        NormalActionStart = ManiaAction.Key1 + p1K
-                    }.GenerateKeyBindingsFor(p2K);
+                        NormalActionStart = nextNormal
+                    }.GenerateKeyBindingsFor(p2K, out _);
 
                     return player1Bindings.Concat(player2Bindings);
             }
@@ -300,8 +300,9 @@ namespace osu.Game.Rulesets.Mania
         /// Generates a list of <see cref="KeyBinding"/>s for a specific number of columns.
         /// </summary>
         /// <param name="columns">The number of columns that need to be bound.</param>
+        /// <param name="nextNormalAction">The next <see cref="ManiaAction"/> to use for normal columns.</param>
         /// <returns>The keybindings.</returns>
-        public IEnumerable<KeyBinding> GenerateKeyBindingsFor(int columns)
+        public IEnumerable<KeyBinding> GenerateKeyBindingsFor(int columns, out ManiaAction nextNormalAction)
         {
             ManiaAction currentNormalAction = NormalActionStart;
 
@@ -316,6 +317,7 @@ namespace osu.Game.Rulesets.Mania
             if (columns % 2 == 1)
                 bindings.Add(new KeyBinding(SpecialKey, SpecialAction));
 
+            nextNormalAction = currentNormalAction;
             return bindings;
         }
     }

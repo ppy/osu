@@ -49,14 +49,12 @@ namespace osu.Game.Rulesets.Mania.UI
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
 
-        private readonly int stageIndex;
         private readonly int firstColumnIndex;
         private readonly StageDefinition definition;
 
-        public ManiaStage(int stageIndex, int firstColumnIndex, StageDefinition definition)
+        public ManiaStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
             : base(ScrollingDirection.Up)
         {
-            this.stageIndex = stageIndex;
             this.firstColumnIndex = firstColumnIndex;
             this.definition = definition;
 
@@ -134,7 +132,16 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             for (int i = 0; i < definition.Columns; i++)
-                AddColumn(new Column());
+            {
+                var isSpecial = isSpecialColumn(i);
+                var column = new Column
+                {
+                    IsSpecial = isSpecial,
+                    Action = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++
+                };
+
+                AddColumn(column);
+            }
 
             Inverted.ValueChanged += invertedChanged;
             Inverted.TriggerChange();
@@ -153,13 +160,6 @@ namespace osu.Game.Rulesets.Mania.UI
             topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
             columnFlow.Add(c);
             AddNested(c);
-
-            c.IsSpecial = isSpecialColumn(Columns.Count - 1);
-
-            if (c.IsSpecial)
-                c.Action = ManiaAction.Special1 + stageIndex;
-            else
-                c.Action = ManiaAction.Key1 + firstColumnIndex + Columns.Count - 1;
         }
 
         /// <summary>
