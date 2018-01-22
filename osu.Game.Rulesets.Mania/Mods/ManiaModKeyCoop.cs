@@ -12,7 +12,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModKeyCoop : Mod, IKeyBindingMod, IApplicableToBeatmapConverter<ManiaHitObject>, IApplicableToRulesetContainer<ManiaHitObject>
+    public class ManiaModKeyCoop : Mod, IPlayfieldTypeMod, IApplicableToBeatmapConverter<ManiaHitObject>, IApplicableToRulesetContainer<ManiaHitObject>
     {
         public override string Name => "KeyCoop";
         public override string ShortenedName => "2P";
@@ -45,6 +45,6 @@ namespace osu.Game.Rulesets.Mania.Mods
             mrc.Beatmap.Stages = newDefinitions;
         }
 
-        public PlayfieldType Variant => PlayfieldType.Dual;
+        public PlayfieldType PlayfieldType => PlayfieldType.Dual;
     }
 }
