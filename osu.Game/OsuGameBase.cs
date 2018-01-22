@@ -200,7 +200,7 @@ namespace osu.Game
             switch (state)
             {
                 case APIState.Online:
-                    LocalConfig.Set(OsuSetting.Username, LocalConfig.Get<bool>(OsuSetting.SaveUsername) ? API.Username : string.Empty);
+                    LocalConfig.Set(OsuSetting.Username, LocalConfig.Get<bool>(OsuSetting.SaveUsername) ? API.LocalUser.Value.Username : string.Empty);
                     break;
             }
         }
