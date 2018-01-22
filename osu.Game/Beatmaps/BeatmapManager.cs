@@ -287,9 +287,8 @@ namespace osu.Game.Beatmaps
                         Import(archive);
 
                     downloadNotification.State = ProgressNotificationState.Completed;
+                    currentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
-
-                currentDownloads.Remove(request);
             };
 
             request.Failure += error =>
