@@ -48,10 +48,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 Content = new[] { new Drawable[stageDefinitions.Count] }
             };
 
+            var normalColumnAction = ManiaAction.Key1;
+            var specialColumnAction = ManiaAction.Special1;
             int firstColumnIndex = 0;
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new ManiaStage(i, firstColumnIndex, stageDefinitions[i]);
+                var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
                 newStage.SpecialColumn.BindTo(SpecialColumnPosition);
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
                 newStage.Inverted.BindTo(Inverted);
