@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 FillColour
         {
-            set { fill.Colour = value; }
+            set { fill.FadeColour(value, 150, Easing.OutQuint); }
         }
 
         public Color4 BackgroundColour
