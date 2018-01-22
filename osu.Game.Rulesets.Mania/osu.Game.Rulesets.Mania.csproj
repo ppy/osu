@@ -84,7 +84,7 @@
     <Compile Include="Mods\ManiaModKey7.cs" />
     <Compile Include="Mods\ManiaModKey8.cs" />
     <Compile Include="Mods\ManiaModKey9.cs" />
-    <Compile Include="Mods\ManiaModKeyCoop.cs" />
+    <Compile Include="Mods\ManiaModDualStages.cs" />
     <Compile Include="Mods\ManiaModNightcore.cs" />
     <Compile Include="Mods\ManiaModPerfect.cs" />
     <Compile Include="Mods\ManiaModRandom.cs" />

@@ -12,11 +12,11 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModKeyCoop : Mod, IPlayfieldTypeMod, IApplicableToBeatmapConverter<ManiaHitObject>, IApplicableToRulesetContainer<ManiaHitObject>
+    public class ManiaModDualStages : Mod, IPlayfieldTypeMod, IApplicableToBeatmapConverter<ManiaHitObject>, IApplicableToRulesetContainer<ManiaHitObject>
     {
-        public override string Name => "KeyCoop";
-        public override string ShortenedName => "2P";
-        public override string Description => @"Double the key amount, double the fun!";
+        public override string Name => "Dual Stages";
+        public override string ShortenedName => "DS";
+        public override string Description => @"Double the stages, double the fun!";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
 
