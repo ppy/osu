@@ -22,11 +22,6 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
-        /// <summary>
-        /// The style to use for the special column.
-        /// </summary>
-        public Bindable<SpecialColumnPosition> SpecialColumnPosition = new Bindable<SpecialColumnPosition>();
-
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
 
@@ -54,7 +49,6 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
                 var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
-                newStage.SpecialColumnPosition.BindTo(SpecialColumnPosition);
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
                 newStage.Inverted.BindTo(Inverted);
 

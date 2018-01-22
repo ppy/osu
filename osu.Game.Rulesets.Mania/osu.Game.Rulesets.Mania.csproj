@@ -122,7 +122,6 @@
     <Compile Include="UI\ManiaPlayfield.cs" />
     <Compile Include="ManiaRuleset.cs" />
     <Compile Include="Mods\ManiaModNoFail.cs" />
-    <Compile Include="UI\SpecialColumnPosition.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
