@@ -45,6 +45,6 @@ namespace osu.Game.Rulesets.Mania.Mods
             mrc.Beatmap.Stages = newDefinitions;
         }
 
-        public ManiaKeyBindingVariantType Variant => ManiaKeyBindingVariantType.Coop;
+        public ManiaKeyBindingVariantType Variant => ManiaKeyBindingVariantType.Dual;
     }
 }
