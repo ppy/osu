@@ -180,7 +180,6 @@ namespace osu.Game.Overlays.Direct
             {
                 progressBar.Current.Value = 0;
                 progressBar.FadeOut(500);
-                Logger.Error(e, "Failed to get beatmap download information");
             };
 
             request.DownloadProgressed += progress => progressBar.Current.Value = progress;
