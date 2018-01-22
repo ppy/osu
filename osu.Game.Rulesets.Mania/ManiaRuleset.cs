@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Mania
             {
                 for (int i = 1; i <= 9; i++)
                     yield return (int)PlayfieldType.Single + i;
-                for (int i = 2; i <= 18; i++)
+                for (int i = 2; i <= 18; i += 2)
                     yield return (int)PlayfieldType.Dual + i;
             }
         }
