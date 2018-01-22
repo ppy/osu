@@ -92,6 +92,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 };
 
                 playfield.OnJudgement(note, new ManiaJudgement { Result = HitResult.Perfect });
+                playfield.Columns[col].OnJudgement(note, new ManiaJudgement { Result = HitResult.Perfect });
             });
         }
 
