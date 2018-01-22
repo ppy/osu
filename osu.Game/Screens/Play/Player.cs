@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Play
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         private bool allowRestart = true;
-        private bool exited = false;
+        private bool exited;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config, APIAccess api)
