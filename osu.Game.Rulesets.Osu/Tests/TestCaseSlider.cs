@@ -63,6 +63,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Fast Short Slider", () => testShortHighSpeed());
             AddStep("Fast Short Slider 1 Repeat", () => testShortHighSpeed(1));
             AddStep("Fast Short Slider 2 Repeats", () => testShortHighSpeed(2));
+            AddStep("Fast Short Slider 6 Repeats", () => testShortHighSpeed(6));
 
             AddStep("Perfect Curve", testCurve);
             // TODO more curve types?
