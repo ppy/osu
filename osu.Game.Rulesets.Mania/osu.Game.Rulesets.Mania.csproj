@@ -65,6 +65,7 @@
     <Compile Include="Judgements\HoldNoteTickJudgement.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
+    <Compile Include="Mods\IPlayfieldTypeMod.cs" />
     <Compile Include="Mods\ManiaKeyMod.cs" />
     <Compile Include="Mods\ManiaModAutoplay.cs" />
     <Compile Include="Mods\ManiaModDaycore.cs" />
@@ -84,7 +85,7 @@
     <Compile Include="Mods\ManiaModKey7.cs" />
     <Compile Include="Mods\ManiaModKey8.cs" />
     <Compile Include="Mods\ManiaModKey9.cs" />
-    <Compile Include="Mods\ManiaModKeyCoop.cs" />
+    <Compile Include="Mods\ManiaModDualStages.cs" />
     <Compile Include="Mods\ManiaModNightcore.cs" />
     <Compile Include="Mods\ManiaModPerfect.cs" />
     <Compile Include="Mods\ManiaModRandom.cs" />
@@ -116,12 +117,12 @@
     <Compile Include="Tests\TestCasePerformancePoints.cs" />
     <Compile Include="UI\Column.cs" />
     <Compile Include="UI\DrawableManiaJudgement.cs" />
+    <Compile Include="UI\ManiaStage.cs" />
     <Compile Include="UI\HitExplosion.cs" />
     <Compile Include="UI\ManiaRulesetContainer.cs" />
     <Compile Include="UI\ManiaPlayfield.cs" />
     <Compile Include="ManiaRuleset.cs" />
     <Compile Include="Mods\ManiaModNoFail.cs" />
-    <Compile Include="UI\SpecialColumnPosition.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

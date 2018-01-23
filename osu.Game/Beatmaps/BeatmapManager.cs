@@ -287,15 +287,16 @@ namespace osu.Game.Beatmaps
                         Import(archive);
 
                     downloadNotification.State = ProgressNotificationState.Completed;
+                    currentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
-
-                currentDownloads.Remove(request);
             };
 
-            request.Failure += data =>
+            request.Failure += error =>
             {
+                if (error is OperationCanceledException) return;
+
                 downloadNotification.State = ProgressNotificationState.Completed;
-                Logger.Error(data, "Failed to get beatmap download information");
+                Logger.Error(error, "Beatmap download failed!");
                 currentDownloads.Remove(request);
             };
 
