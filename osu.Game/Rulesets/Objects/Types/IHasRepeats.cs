@@ -21,4 +21,13 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         List<List<SampleInfo>> RepeatSamples { get; }
     }
+
+    public static class HasRepeatsExtensions
+    {
+        /// <summary>
+        /// The amount of times the length of this <see cref="IHasRepeats"/> spans.
+        /// </summary>
+        /// <param name="obj">The object that has repeats.</param>
+        public static int SpanCount(this IHasRepeats obj) => obj.RepeatCount + 1;
+    }
 }
