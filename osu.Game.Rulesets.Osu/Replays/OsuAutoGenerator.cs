@@ -385,7 +385,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private void generateReplayFrames()
         {
-            // Loop through each position, and advance buttons accordingly, 
+            // Loop through each position, and advance buttons accordingly
             int buttonIndex = 0;
             var button = buttons.First();
             var buttonIter = buttons.GetEnumerator();
