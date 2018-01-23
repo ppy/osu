@@ -73,12 +73,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             AddNested(InitialCircle);
 
-            var repeatDuration = s.Curve.Distance / s.Velocity;
+            var spanDuration = s.Curve.Distance / s.Velocity;
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
-                var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? HitObject.TimeFadein : HitObject.TimeFadein / 2);
-                var fadeOutTime = repeatStartTime + repeatDuration;
+                var spanStartTime = s.StartTime + tick.SpanIndex * spanDuration;
+                var fadeInTime = spanStartTime + (tick.StartTime - spanStartTime) / 2 - (tick.SpanIndex == 0 ? HitObject.TimeFadein : HitObject.TimeFadein / 2);
+                var fadeOutTime = spanStartTime + spanDuration;
 
                 var drawableTick = new DrawableSliderTick(tick)
                 {
@@ -93,9 +93,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
-                var repeatStartTime = s.StartTime + repeatPoint.RepeatIndex * repeatDuration;
+                var repeatStartTime = s.StartTime + (repeatPoint.RepeatIndex + 1) * spanDuration;
                 var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? HitObject.TimeFadein : HitObject.TimeFadein / 2);
-                var fadeOutTime = repeatStartTime + repeatDuration;
+                var fadeOutTime = repeatStartTime + spanDuration;
 
                 var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
                 {

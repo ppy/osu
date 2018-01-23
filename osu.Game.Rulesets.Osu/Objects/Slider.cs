@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                     AddNested(new SliderTick
                     {
-                        RepeatIndex = span,
+                        SpanIndex = span,
                         StartTime = spanStartTime + timeProgress * spanDuration,
                         Position = Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
@@ -148,19 +148,19 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             var repeatDuration = Distance / Velocity;
 
-            for (var repeat = 1; repeat <= RepeatCount; repeat++)
+            for (int repeatIndex = 0, repeat = 1; repeatIndex < RepeatCount; repeatIndex++, repeat++)
             {
                 var repeatStartTime = StartTime + repeat * repeatDuration;
 
                 AddNested(new RepeatPoint
                 {
-                    RepeatIndex = repeat,
+                    RepeatIndex = repeatIndex,
                     StartTime = repeatStartTime,
                     Position = Curve.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
                     ComboColour = ComboColour,
-                    Samples = new List<SampleInfo>(RepeatSamples[repeat])
+                    Samples = new List<SampleInfo>(RepeatSamples[repeatIndex])
                 });
             }
         }
