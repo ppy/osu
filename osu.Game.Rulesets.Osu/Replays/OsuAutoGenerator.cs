@@ -656,7 +656,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             private ButtonPlan curr = new ButtonPlan();
 
             // Parameters
-            private const bool cycle_when_both_held = false;
+            //private const bool cycle_when_both_held = false;
             private const double alternate_threshold = 150; // 150ms is threshold for 120bpm streams
 
             // Extra metadata to manage state changes (when to alternate after Press, etc)
@@ -696,21 +696,23 @@ namespace osu.Game.Rulesets.Osu.Replays
                 }
                 else if (numHeld == 1)
                 {
-                    if (cycle_when_both_held) {
-                        curr = new ButtonPlan{
-                            Primary   = curr.Primary ^ (Button.Left | Button.Right),
-                            Secondary = curr.Primary
-                        };
-                        setLastUsed(curr.Primary, time);
-                    }
-                    else
-                    {
-                        curr = new ButtonPlan{
-                            Primary   = curr.Primary,
-                            Secondary = curr.Primary ^ (Button.Left | Button.Right)
-                        };
-                        setLastUsed(curr.Secondary, time);
-                    }
+                    // Uncomment these if you want to use this option,
+                    // inspectcode doesn't like either public fields that are never accessed or unreachable code.
+                    // if (cycle_when_both_held) {
+                    //     curr = new ButtonPlan{
+                    //         Primary   = curr.Primary ^ (Button.Left | Button.Right),
+                    //         Secondary = curr.Primary
+                    //     };
+                    //     setLastUsed(curr.Primary, time);
+                    // }
+                    // else
+                    // {
+                    curr = new ButtonPlan{
+                        Primary   = curr.Primary,
+                        Secondary = curr.Primary ^ (Button.Left | Button.Right)
+                    };
+                    setLastUsed(curr.Secondary, time);
+                    // }
                 }
                 else
                 {
