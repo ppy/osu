@@ -16,7 +16,6 @@ namespace osu.Game.Overlays.Direct
     {
         private readonly Circle circle;
         private readonly DownloadIcon iconDown;
-        public bool Downloading;
         private readonly DirectPanel panel;
 
         private class DownloadIcon : CircularContainer
