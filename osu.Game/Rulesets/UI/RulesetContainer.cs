@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Whether the specified beatmap is assumed to be specific to the current ruleset.
         /// </summary>
-        protected readonly bool IsForCurrentRuleset;
+        public readonly bool IsForCurrentRuleset;
 
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
