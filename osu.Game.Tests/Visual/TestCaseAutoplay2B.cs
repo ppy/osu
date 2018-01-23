@@ -11,7 +11,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
-    [Description("Player instantiated with an autoplay mod.")]
+    [Description("Player instantiated with an autoplay mod with a 2B map.")]
     public class TestCaseAutoplay2B : TestCaseAutoplay
     {
         protected override Beatmap CreateBeatmap()
@@ -295,8 +295,8 @@ SliderBorder : 255,255,255
 472,340,52547,1,0,0:0:0:0:
 372,192,53016,6,0,L|504:192,1,115
 372,192,53250,2,0,L|372:68,1,115
-372,192,53484,2,0,L|372:312,1,115
-372,192,53719,2,0,L|248:192,1,115
+372,192,53484,2,0,L|248:192,1,115
+372,192,53719,2,0,L|372:312,1,115
 484,192,53953,6,0,L|484:63,1,115
 373,77,54187,2,0,L|244:77,1,115
 257,192,54422,2,0,L|257:322,1,115
