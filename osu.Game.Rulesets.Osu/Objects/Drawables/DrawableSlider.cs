@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly Container<DrawableSliderTick> ticks;
         private readonly Container<DrawableRepeatPoint> repeatPoints;
 
+        public List<Vector2> CurrentCurve => Body.CurrentCurve;
+
         public readonly SliderBody Body;
         public readonly SliderBall Ball;
 
