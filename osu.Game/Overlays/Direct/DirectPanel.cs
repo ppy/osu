@@ -39,6 +39,7 @@ namespace osu.Game.Overlays.Direct
 
         public Track Preview => PlayButton.Preview;
         public Bindable<bool> PreviewPlaying => PlayButton.Playing;
+        public bool Downloading;
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
 
@@ -164,6 +165,7 @@ namespace osu.Game.Overlays.Direct
             }
 
             beatmaps.Download(SetInfo);
+            Downloading = true;
         }
 
         private void attachDownload(DownloadBeatmapSetRequest request)
@@ -181,14 +183,16 @@ namespace osu.Game.Overlays.Direct
                 progressBar.Current.Value = 0;
                 progressBar.FadeOut(500);
                 Logger.Error(e, "Failed to get beatmap download information");
+                Downloading = false;
             };
 
-            request.DownloadProgressed += progress => progressBar.Current.Value = progress;
+            request.DownloadProgressed += progress => { progressBar.Current.Value = progress; Downloading = true; };
 
             request.Success += data =>
             {
                 progressBar.Current.Value = 1;
                 progressBar.FadeOut(500);
+                Downloading = false;
             };
         }
 
