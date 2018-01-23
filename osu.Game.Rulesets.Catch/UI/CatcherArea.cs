@@ -21,7 +21,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatcherArea : Container, IKeyBindingHandler<CatchAction>
+    public class CatcherArea : Container
     {
         public const float CATCHER_SIZE = 172;
 
@@ -84,16 +84,14 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        public bool OnPressed(CatchAction action)
+        protected override void Update()
         {
-            if (action != CatchAction.PositionUpdate) return false;
+            base.Update();
 
-            CatchFramedReplayInputHandler.CatchReplayState state = (CatchFramedReplayInputHandler.CatchReplayState)GetContainingInputManager().CurrentState;
+            var state = GetContainingInputManager().CurrentState as CatchFramedReplayInputHandler.CatchReplayState;
 
-            if (state.CatcherX.HasValue)
+            if (state?.CatcherX != null)
                 MovableCatcher.X = state.CatcherX.Value;
-
-            return true;
         }
 
         public bool OnReleased(CatchAction action) => false;

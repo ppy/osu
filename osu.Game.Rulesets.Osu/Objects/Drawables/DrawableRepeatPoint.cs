@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdatePreemptState()
         {
-            animDuration = Math.Min(150, repeatPoint.RepeatDuration / 2);
+            animDuration = Math.Min(150, repeatPoint.SpanDuration / 2);
 
             this.FadeIn(animDuration).ScaleTo(1.2f, animDuration / 2)
                 .Then()
@@ -71,6 +71,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        public void UpdateSnakingPosition(Vector2 start, Vector2 end) => Position = repeatPoint.RepeatIndex % 2 == 1 ? end : start;
+        public void UpdateSnakingPosition(Vector2 start, Vector2 end) => Position = repeatPoint.RepeatIndex % 2 == 0 ? end : start;
     }
 }

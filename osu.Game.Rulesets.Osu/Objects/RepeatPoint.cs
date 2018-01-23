@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Osu.Objects
     public class RepeatPoint : OsuHitObject
     {
         public int RepeatIndex { get; set; }
-        public double RepeatDuration { get; set; }
+        public double SpanDuration { get; set; }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             // We want to show the first RepeatPoint as the TimePreempt dictates but on short (and possibly fast) sliders
             // we may need to cut down this time on following RepeatPoints to only show up to two RepeatPoints at any given time.
-            if (RepeatIndex > 1 && TimePreempt > RepeatDuration * 2)
-                TimePreempt = (float)RepeatDuration * 2;
+            if (RepeatIndex > 0 && TimePreempt > SpanDuration * 2)
+                TimePreempt = (float)SpanDuration * 2;
         }
     }
 }
