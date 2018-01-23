@@ -91,6 +91,43 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         protected static Vector2 CirclePosition(double t, double radius) => new Vector2((float)(Math.Cos(t) * radius), (float)(Math.Sin(t) * radius));
 
+        protected static Vector2 calcSpinnerStartPos(Vector2 prevPos)
+        {
+            Vector2 spinCentreOffset = SPINNER_CENTRE - prevPos;
+            float distFromCentre = spinCentreOffset.Length;
+
+            if (distFromCentre > SPIN_RADIUS)
+            {
+                // Previous cursor position was outside spin circle, set startPosition to the tangent point.
+
+                // Angle between centre offset and tangent point offset.
+                double a = Math.Asin(SPIN_RADIUS / distFromCentre);
+
+                // Angle between centre to tangent and centre offset
+                double b = Math.PI / 2 - a;
+
+                // Rotate clockwise by b to get tangent point direction
+                Vector2 tangentPointDirection;
+                tangentPointDirection.X = spinCentreOffset.X * (float)Math.Cos(b) - spinCentreOffset.Y * (float)Math.Sin(b);
+                tangentPointDirection.Y = spinCentreOffset.X * (float)Math.Sin(b) + spinCentreOffset.Y * (float)Math.Cos(b);
+
+                // Normalise tangent point direction to get tangent point
+                tangentPointDirection *= SPIN_RADIUS / tangentPointDirection.Length;
+
+                return SPINNER_CENTRE - tangentPointDirection;
+            }
+            else if (spinCentreOffset.Length > 0)
+            {
+                // Previous cursor position was inside spin circle, set startPosition to the nearest point on spin circle.
+                return SPINNER_CENTRE - spinCentreOffset * (SPIN_RADIUS / spinCentreOffset.Length);
+            }
+            else
+            {
+                // Degenerate case where cursor position is exactly at the centre of the spin circle.
+                return SPINNER_CENTRE + new Vector2(0, -SPIN_RADIUS);
+            }
+        }
+
         #endregion
     }
 }
