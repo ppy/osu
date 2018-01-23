@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Objects.Types;
-using System;
 using System.Collections.Generic;
 using OpenTK;
 using osu.Game.Audio;
@@ -18,33 +17,22 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// </summary>
         private const float base_scoring_distance = 100;
 
+        /// <summary>
+        /// <see cref="ConvertSlider"/>s don't need a curve since they're converted to ruleset-specific hitobjects.
+        /// </summary>
+        public SliderCurve Curve { get; } = null;
         public List<Vector2> ControlPoints { get; set; }
         public CurveType CurveType { get; set; }
 
         public double Distance { get; set; }
 
         public List<List<SampleInfo>> RepeatSamples { get; set; }
-        public int RepeatCount { get; set; } = 1;
+        public int RepeatCount { get; set; }
 
-        public double EndTime => StartTime + RepeatCount * Distance / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
         public double Velocity = 1;
-
-        public Vector2 PositionAt(double progress)
-        {
-            throw new NotImplementedException();
-        }
-
-        public double ProgressAt(double progress)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int RepeatAt(double progress)
-        {
-            throw new NotImplementedException();
-        }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {

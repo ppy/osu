@@ -15,6 +15,7 @@ using OpenTK;
 using OpenTK.Graphics.ES30;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -164,14 +165,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return true;
         }
 
-        public void UpdateProgress(double progress, int repeat)
+        public void UpdateProgress(double progress, int span)
         {
             double start = 0;
             double end = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadein, 0, 1) : 1;
 
-            if (repeat >= slider.RepeatCount - 1)
+            if (span >= slider.SpanCount() - 1)
             {
-                if (Math.Min(repeat, slider.RepeatCount - 1) % 2 == 1)
+                if (Math.Min(span, slider.SpanCount() - 1) % 2 == 1)
                 {
                     start = 0;
                     end = snakingOut ? progress : 1;
