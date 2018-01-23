@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Scoring;
 using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Osu.Replays
@@ -151,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     addHitpoint(slider, slider.StartTime, true, false);
 
                     // Slider ticks and repeats
-                    foreach (OsuHitObject n in slider.NestedHitObjects)
+                    foreach (var n in slider.NestedHitObjects)
                     {
                         if (n is SliderTick || n is RepeatPoint)
                         {
@@ -272,7 +271,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                         }
                     }
                     buttons[ibutton.Key] = ReplayButtonState.Left1 | ReplayButtonState.Right1;
-                    buttons[keyUpTime] = ibutton.Value.PrimaryRBS;
+                    buttons[keyUpTime] = ibutton.Value.PrimaryRbs;
                 }
                 i++;
                 prev = ibutton.Value;
@@ -633,7 +632,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             public Button Primary;
             public Button Secondary;
 
-            private static ReplayButtonState toRBS(Button button)
+            private static ReplayButtonState toRbs(Button button)
             {
                 switch (button)
                 {
@@ -647,8 +646,8 @@ namespace osu.Game.Rulesets.Osu.Replays
                 }
             }
 
-            public ReplayButtonState Rbs => toRBS(Primary) | toRBS(Secondary);
-            public ReplayButtonState PrimaryRBS => toRBS(Primary);
+            public ReplayButtonState Rbs => toRbs(Primary) | toRbs(Secondary);
+            public ReplayButtonState PrimaryRbs => toRbs(Primary);
         }
 
         // Handles alternating buttons and 2B style playing
@@ -657,14 +656,14 @@ namespace osu.Game.Rulesets.Osu.Replays
             private ButtonPlan curr = new ButtonPlan();
 
             // Parameters
-            public virtual bool cycleWhenBothHeld => false;
-            public virtual double alternate_threshold => 150; // 150ms is threshold for 120bpm streams
+            private const bool cycle_when_both_held = false;
+            private const double alternate_threshold = 150; // 150ms is threshold for 120bpm streams
 
             // Extra metadata to manage state changes (when to alternate after Press, etc)
             private double lastUsedLeft  = double.NegativeInfinity;
             private double lastUsedRight = double.NegativeInfinity;
 
-            private int numHeld = 0; // Buttons currently held
+            private int numHeld; // Buttons currently held
 
             private void setLastUsed(Button b, double time)
             {
@@ -697,7 +696,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                 }
                 else if (numHeld == 1)
                 {
-                    if (cycleWhenBothHeld) {
+                    if (cycle_when_both_held) {
                         curr = new ButtonPlan{
                             Primary   = curr.Primary ^ (Button.Left | Button.Right),
                             Secondary = curr.Primary
@@ -728,7 +727,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                 if (numHeld == 1)
                 {
                     setLastUsed(curr.Primary, time);
-                    curr = new ButtonPlan{};
+                    curr = new ButtonPlan();
                 }
                 else if (numHeld == 2)
                 {
