@@ -53,13 +53,10 @@ namespace osu.Game.Overlays.Direct
             protected override void Update()
             {
                 base.Update();
-                if (Animating)
+                if (Animating && icon1.Transforms.Count == 0)
                 {
-                    if (icon1.Transforms.Count == 0)
-                    {
-                        icon1.MoveToY(30, 1000).Then().MoveToY(-2);
-                        icon2.MoveToY(-2, 1000).Then().MoveToY(-34);
-                    }
+                    icon1.MoveToY(30, 1000).Then().MoveToY(-2);
+                    icon2.MoveToY(-2, 1000).Then().MoveToY(-34);
                 }
             }
         }
