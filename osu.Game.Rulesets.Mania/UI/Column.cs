@@ -47,6 +47,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public Column()
             : base(ScrollingDirection.Up)
         {
+            RelativeSizeAxes = Axes.Y;
             Width = column_width;
 
             InternalChildren = new Drawable[]
@@ -61,7 +62,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Name = "Hit target + hit objects",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = ManiaPlayfield.HIT_TARGET_POSITION },
+                    Padding = new MarginPadding { Top = ManiaStage.HIT_TARGET_POSITION },
                     Children = new Drawable[]
                     {
                         new Container
@@ -115,7 +116,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Name = "Key",
                     RelativeSizeAxes = Axes.X,
-                    Height = ManiaPlayfield.HIT_TARGET_POSITION,
+                    Height = ManiaStage.HIT_TARGET_POSITION,
                     Children = new Drawable[]
                     {
                         new Box
@@ -205,12 +206,12 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             hitObject.Depth = (float)hitObject.HitObject.StartTime;
             hitObject.AccentColour = AccentColour;
-            hitObject.OnJudgement += onJudgement;
+            hitObject.OnJudgement += OnJudgement;
 
             HitObjects.Add(hitObject);
         }
 
-        private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             if (!judgement.IsHit)
                 return;

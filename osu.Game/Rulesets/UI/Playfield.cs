@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -36,8 +35,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width.</param>
         protected Playfield(float? customWidth = null)
         {
-            // Default height since we force relative size axes
-            Size = Vector2.One;
+            RelativeSizeAxes = Axes.Both;
 
             AddInternal(ScaledContent = new ScaledContainer
             {
@@ -60,12 +58,6 @@ namespace osu.Game.Rulesets.UI
             HitObjects.RelativeSizeAxes = Axes.Both;
 
             Add(HitObjects);
-        }
-
-        public override Axes RelativeSizeAxes
-        {
-            get { return Axes.Both; }
-            set { throw new InvalidOperationException($@"{nameof(Playfield)}'s {nameof(RelativeSizeAxes)} should never be changed from {Axes.Both}"); }
         }
 
         /// <summary>
