@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
@@ -15,6 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
+        private bool isEndRepeat => repeatPoint.RepeatIndex % 2 == 0;
 
         public double FadeInTime;
         public double FadeOutTime;
@@ -25,17 +27,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             this.repeatPoint = repeatPoint;
             this.drawableSlider = drawableSlider;
 
-            Size = new Vector2(32 * repeatPoint.Scale);
+            Size = new Vector2(45 * repeatPoint.Scale);
 
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
-
+            
             Children = new Drawable[]
             {
                 new SpriteIcon
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.fa_eercast
+                    Icon = FontAwesome.fa_chevron_right
                 }
             };
         }
@@ -72,6 +74,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        public void UpdateSnakingPosition(Vector2 start, Vector2 end) => Position = repeatPoint.RepeatIndex % 2 == 0 ? end : start;
+        public void UpdateSnakingPosition(Vector2 start, Vector2 end)
+        {
+            Position = isEndRepeat ? end : start;
+            var curve = drawableSlider.CurrentCurve;
+            if (curve.Count < 3 || curve.All(p => p == Position))
+                return;
+            var referencePoint = curve[isEndRepeat ? curve.IndexOf(Position) - 1 : curve.LastIndexOf(Position) + 1];
+            Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(referencePoint.Y - Position.Y, referencePoint.X - Position.X));
+        }
     }
 }
