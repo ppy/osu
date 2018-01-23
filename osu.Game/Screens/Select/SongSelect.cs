@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
         {
-            dependencies.Cache(this);
+            dependencies.CacheAs<SongSelect>(this);
 
             if (Footer != null)
             {

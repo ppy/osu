@@ -20,12 +20,12 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public readonly SliderCurve Curve = new SliderCurve();
-
-        public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
-        public override Vector2 EndPosition => PositionAt(1);
+        public override Vector2 EndPosition => this.PositionAt(1);
+
+        public SliderCurve Curve { get; } = new SliderCurve();
 
         public List<Vector2> ControlPoints
         {
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         internal float LazyTravelDistance;
 
         public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
-        public int RepeatCount { get; set; } = 1;
+        public int RepeatCount { get; set; }
 
         private int stackHeight;
 
@@ -88,18 +88,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             TickDistance = scoringDistance / difficulty.SliderTickRate;
         }
 
-        public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
-
-        public double ProgressAt(double progress)
-        {
-            double p = progress * RepeatCount % 1;
-            if (RepeatAt(progress) % 2 == 1)
-                p = 1 - p;
-            return p;
-        }
-
-        public int RepeatAt(double progress) => (int)(progress * RepeatCount);
-
         protected override void CreateNestedHitObjects()
         {
             base.CreateNestedHitObjects();
@@ -114,14 +102,14 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             var length = Curve.Distance;
             var tickDistance = Math.Min(TickDistance, length);
-            var repeatDuration = length / Velocity;
+            var spanDuration = length / Velocity;
 
             var minDistanceFromEnd = Velocity * 0.01;
 
-            for (var repeat = 0; repeat < RepeatCount; repeat++)
+            for (var span = 0; span < this.SpanCount(); span++)
             {
-                var repeatStartTime = StartTime + repeat * repeatDuration;
-                var reversed = repeat % 2 == 1;
+                var spanStartTime = StartTime + span * spanDuration;
+                var reversed = span % 2 == 1;
 
                 for (var d = tickDistance; d <= length; d += tickDistance)
                 {
@@ -144,8 +132,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                     AddNested(new SliderTick
                     {
-                        RepeatIndex = repeat,
-                        StartTime = repeatStartTime + timeProgress * repeatDuration,
+                        SpanIndex = span,
+                        StartTime = spanStartTime + timeProgress * spanDuration,
                         Position = Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
                         Scale = Scale,
@@ -160,19 +148,19 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             var repeatDuration = Distance / Velocity;
 
-            for (var repeat = 1; repeat < RepeatCount; repeat++)
+            for (int repeatIndex = 0, repeat = 1; repeatIndex < RepeatCount; repeatIndex++, repeat++)
             {
                 var repeatStartTime = StartTime + repeat * repeatDuration;
 
                 AddNested(new RepeatPoint
                 {
-                    RepeatIndex = repeat,
+                    RepeatIndex = repeatIndex,
                     StartTime = repeatStartTime,
                     Position = Curve.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
                     ComboColour = ComboColour,
-                    Samples = new List<SampleInfo>(RepeatSamples[repeat])
+                    Samples = new List<SampleInfo>(RepeatSamples[repeatIndex])
                 });
             }
         }

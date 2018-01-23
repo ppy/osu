@@ -1,18 +1,18 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Input;
-using OpenTK.Input;
 using osu.Framework.Allocation;
 using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class HotkeyRetryOverlay : Container
+    public class HotkeyRetryOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         public Action Action;
 
@@ -40,28 +40,20 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public bool OnPressed(GlobalAction action)
         {
-            if (args.Repeat) return false;
+            if (action != GlobalAction.QuickRetry) return false;
 
-            if (args.Key == Key.Tilde)
-            {
-                overlay.FadeIn(activate_delay, Easing.Out);
-                return true;
-            }
-
-            return base.OnKeyDown(state, args);
+            overlay.FadeIn(activate_delay, Easing.Out);
+            return true;
         }
 
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        public bool OnReleased(GlobalAction action)
         {
-            if (args.Key == Key.Tilde && !fired)
-            {
-                overlay.FadeOut(fadeout_delay, Easing.Out);
-                return true;
-            }
+            if (action != GlobalAction.QuickRetry) return false;
 
-            return base.OnKeyUp(state, args);
+            overlay.FadeOut(fadeout_delay, Easing.Out);
+            return true;
         }
 
         protected override void Update()

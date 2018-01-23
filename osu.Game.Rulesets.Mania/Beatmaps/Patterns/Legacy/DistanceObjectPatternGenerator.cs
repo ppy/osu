@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private readonly double endTime;
         private readonly double segmentDuration;
-        private readonly int repeatCount;
+        private readonly int spanCount;
 
         private PatternType convertType;
 
@@ -39,25 +39,25 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             var distanceData = hitObject as IHasDistance;
             var repeatsData = hitObject as IHasRepeats;
 
-            repeatCount = repeatsData?.RepeatCount ?? 1;
+            spanCount = repeatsData?.SpanCount() ?? 1;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
             DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(hitObject.StartTime);
 
             // The true distance, accounting for any repeats
-            double distance = (distanceData?.Distance ?? 0) * repeatCount;
+            double distance = (distanceData?.Distance ?? 0) * spanCount;
             // The velocity of the osu! hit object - calculated as the velocity of a slider
             double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / timingPoint.BeatLength;
             // The duration of the osu! hit object
             double osuDuration = distance / osuVelocity;
 
             endTime = hitObject.StartTime + osuDuration;
-            segmentDuration = (endTime - HitObject.StartTime) / repeatCount;
+            segmentDuration = (endTime - HitObject.StartTime) / spanCount;
         }
 
         public override Pattern Generate()
         {
-            if (repeatCount > 1)
+            if (spanCount > 1)
             {
                 if (segmentDuration <= 90)
                     return generateRandomHoldNotes(HitObject.StartTime, 1);
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 if (segmentDuration <= 120)
                 {
                     convertType |= PatternType.ForceNotStack;
-                    return generateRandomNotes(HitObject.StartTime, repeatCount + 1);
+                    return generateRandomNotes(HitObject.StartTime, spanCount + 1);
                 }
 
                 if (segmentDuration <= 160)
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 if (duration >= 4000)
                     return generateNRandomNotes(HitObject.StartTime, 0.23, 0, 0);
 
-                if (segmentDuration > 400 && repeatCount < TotalColumns - 1 - RandomStart)
+                if (segmentDuration > 400 && spanCount < TotalColumns - 1 - RandomStart)
                     return generateTiledHoldNotes(HitObject.StartTime);
 
                 return generateHoldAndNormalNotes(HitObject.StartTime);
@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int column = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
             bool increasing = Random.NextDouble() > 0.5;
 
-            for (int i = 0; i <= repeatCount; i++)
+            for (int i = 0; i <= spanCount; i++)
             {
                 addToPattern(pattern, column, startTime, startTime);
                 startTime += segmentDuration;
@@ -262,7 +262,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int interval = Random.Next(1, TotalColumns - (legacy ? 1 : 0));
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
-            for (int i = 0; i <= repeatCount; i++)
+            for (int i = 0; i <= spanCount; i++)
             {
                 addToPattern(pattern, nextColumn, startTime, startTime);
 
@@ -350,7 +350,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             var pattern = new Pattern();
 
-            int columnRepeat = Math.Min(repeatCount, TotalColumns);
+            int columnRepeat = Math.Min(spanCount, TotalColumns);
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
             if ((convertType & PatternType.ForceNotStack) > 0 && PreviousPattern.ColumnWithObjects < TotalColumns)
@@ -409,7 +409,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int nextColumn = Random.Next(RandomStart, TotalColumns);
 
             var rowPattern = new Pattern();
-            for (int i = 0; i <= repeatCount; i++)
+            for (int i = 0; i <= spanCount; i++)
             {
                 if (!(ignoreHead && startTime == HitObject.StartTime))
                 {
@@ -442,7 +442,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (curveData == null)
                 return HitObject.Samples;
 
-            double segmentTime = (endTime - HitObject.StartTime) / repeatCount;
+            double segmentTime = (endTime - HitObject.StartTime) / spanCount;
 
             int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
             return curveData.RepeatSamples[index];

@@ -10,6 +10,7 @@ using System.Linq;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -72,12 +73,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             AddNested(InitialCircle);
 
-            var repeatDuration = s.Curve.Distance / s.Velocity;
+            var spanDuration = s.Curve.Distance / s.Velocity;
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
-                var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? HitObject.TimeFadein : HitObject.TimeFadein / 2);
-                var fadeOutTime = repeatStartTime + repeatDuration;
+                var spanStartTime = s.StartTime + tick.SpanIndex * spanDuration;
+                var fadeInTime = spanStartTime + (tick.StartTime - spanStartTime) / 2 - (tick.SpanIndex == 0 ? HitObject.TimeFadein : HitObject.TimeFadein / 2);
+                var fadeOutTime = spanStartTime + spanDuration;
 
                 var drawableTick = new DrawableSliderTick(tick)
                 {
@@ -92,9 +93,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
-                var repeatStartTime = s.StartTime + repeatPoint.RepeatIndex * repeatDuration;
+                var repeatStartTime = s.StartTime + (repeatPoint.RepeatIndex + 1) * spanDuration;
                 var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? HitObject.TimeFadein : HitObject.TimeFadein / 2);
-                var fadeOutTime = repeatStartTime + repeatDuration;
+                var fadeOutTime = repeatStartTime + spanDuration;
 
                 var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
                 {
@@ -109,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        private int currentRepeat;
+        private int currentSpan;
         public bool Tracking;
 
         protected override void Update()
@@ -120,17 +121,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
-            int repeat = slider.RepeatAt(progress);
+            int span = slider.SpanAt(progress);
             progress = slider.ProgressAt(progress);
 
-            if (repeat > currentRepeat)
-                currentRepeat = repeat;
+            if (span > currentSpan)
+                currentSpan = span;
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (!InitialCircle.Judgements.Any(j => j.IsHit))
                 InitialCircle.Position = slider.Curve.PositionAt(progress);
 
-            foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(progress, repeat);
+            foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(progress, span);
             foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
             foreach (var t in ticks.Children) t.Tracking = Ball.Tracking;
         }
