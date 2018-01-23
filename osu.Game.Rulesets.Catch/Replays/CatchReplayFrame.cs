@@ -9,8 +9,8 @@ namespace osu.Game.Rulesets.Catch.Replays
     {
         public override bool IsImportant => MouseX > 0;
 
-        public CatchReplayFrame(double time, float? x = null)
-            : base(time, x ?? -1, null, ReplayButtonState.None)
+        public CatchReplayFrame(double time, float? x = null, ReplayButtonState button = ReplayButtonState.None)
+            : base(time, x ?? -1, null, button)
         {
         }
     }
