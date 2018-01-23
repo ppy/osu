@@ -21,9 +21,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public readonly SliderCurve Curve = new SliderCurve();
-
-        public int RepeatCount { get; set; } = 1;
+        public int RepeatCount { get; set; }
 
         public double Velocity;
         public double TickDistance;
@@ -55,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             var length = Curve.Distance;
             var tickDistance = Math.Min(TickDistance, length);
-            var repeatDuration = length / Velocity;
+            var spanDuration = length / Velocity;
 
             var minDistanceFromEnd = Velocity * 0.01;
 
@@ -67,10 +65,10 @@ namespace osu.Game.Rulesets.Catch.Objects
                 X = X
             });
 
-            for (var repeat = 0; repeat < RepeatCount; repeat++)
+            for (var span = 0; span < this.SpanCount(); span++)
             {
-                var repeatStartTime = StartTime + repeat * repeatDuration;
-                var reversed = repeat % 2 == 1;
+                var spanStartTime = StartTime + span * spanDuration;
+                var reversed = span % 2 == 1;
 
                 for (var d = tickDistance; d <= length; d += tickDistance)
                 {
@@ -80,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                     var timeProgress = d / length;
                     var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
 
-                    var lastTickTime = repeatStartTime + timeProgress * repeatDuration;
+                    var lastTickTime = spanStartTime + timeProgress * spanDuration;
                     AddNested(new Droplet
                     {
                         StartTime = lastTickTime,
@@ -95,17 +93,17 @@ namespace osu.Game.Rulesets.Catch.Objects
                     });
                 }
 
-                double tinyTickInterval = tickDistance / length * repeatDuration;
+                double tinyTickInterval = tickDistance / length * spanDuration;
                 while (tinyTickInterval > 100)
                     tinyTickInterval /= 2;
 
-                for (double t = 0; t < repeatDuration; t += tinyTickInterval)
+                for (double t = 0; t < spanDuration; t += tinyTickInterval)
                 {
-                    double progress = reversed ? 1 - t / repeatDuration : t / repeatDuration;
+                    double progress = reversed ? 1 - t / spanDuration : t / spanDuration;
 
                     AddNested(new TinyDroplet
                     {
-                        StartTime = repeatStartTime + t,
+                        StartTime = spanStartTime + t,
                         ComboColour = ComboColour,
                         X = Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
                         Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
@@ -121,15 +119,15 @@ namespace osu.Game.Rulesets.Catch.Objects
                 {
                     Samples = Samples,
                     ComboColour = ComboColour,
-                    StartTime = repeatStartTime + repeatDuration,
+                    StartTime = spanStartTime + spanDuration,
                     X = Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
                 });
             }
         }
 
-        public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
 
-        public float EndX => Curve.PositionAt(ProgressAt(1)).X / CatchPlayfield.BASE_WIDTH;
+        public float EndX => Curve.PositionAt(this.ProgressAt(1)).X / CatchPlayfield.BASE_WIDTH;
 
         public double Duration => EndTime - StartTime;
 
@@ -138,6 +136,8 @@ namespace osu.Game.Rulesets.Catch.Objects
             get { return Curve.Distance; }
             set { Curve.Distance = value; }
         }
+
+        public SliderCurve Curve { get; } = new SliderCurve();
 
         public List<Vector2> ControlPoints
         {
@@ -152,17 +152,5 @@ namespace osu.Game.Rulesets.Catch.Objects
             get { return Curve.CurveType; }
             set { Curve.CurveType = value; }
         }
-
-        public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
-
-        public double ProgressAt(double progress)
-        {
-            double p = progress * RepeatCount % 1;
-            if (RepeatAt(progress) % 2 == 1)
-                p = 1 - p;
-            return p;
-        }
-
-        public int RepeatAt(double progress) => (int)(progress * RepeatCount);
     }
 }
