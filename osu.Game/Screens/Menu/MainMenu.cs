@@ -161,6 +161,8 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(last);
 
+            Beatmap.Value.Track.ResetSpeedAdjustments();
+
             background.Next();
 
             //we may have consumed our preloaded instance, so let's make another.
