@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.UI
             return null;
         }
 
-                private Bindable<double> scrollTime;
+        private Bindable<double> scrollTime;
 
         [BackgroundDependencyLoader]
         private void load(ManiaConfigManager maniaConfig)
