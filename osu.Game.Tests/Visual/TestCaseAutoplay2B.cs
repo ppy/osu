@@ -3,11 +3,8 @@
 
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
@@ -26,7 +23,7 @@ namespace osu.Game.Tests.Visual
         }
 
         private const string test_beatmap_data =
-        @"osu file format v12
+            @"osu file format v12
 
 [General]
 AudioFilename: Touhou - Iosys Tewis Mapaku To Endless Wi PV .mp3
