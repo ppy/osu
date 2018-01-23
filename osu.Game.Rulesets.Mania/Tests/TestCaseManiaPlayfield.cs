@@ -2,11 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -31,15 +33,43 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var rng = new Random(1337);
 
-            AddStep("1 column", () => createPlayfield(1, SpecialColumnPosition.Normal));
-            AddStep("4 columns", () => createPlayfield(4, SpecialColumnPosition.Normal));
-            AddStep("Left special style", () => createPlayfield(4, SpecialColumnPosition.Left));
-            AddStep("Right special style", () => createPlayfield(4, SpecialColumnPosition.Right));
-            AddStep("5 columns", () => createPlayfield(5, SpecialColumnPosition.Normal));
-            AddStep("8 columns", () => createPlayfield(8, SpecialColumnPosition.Normal));
-            AddStep("Left special style", () => createPlayfield(8, SpecialColumnPosition.Left));
-            AddStep("Right special style", () => createPlayfield(8, SpecialColumnPosition.Right));
-            AddStep("Reversed", () => createPlayfield(4, SpecialColumnPosition.Normal, true));
+            AddStep("1 column", () => createPlayfield(1));
+            AddStep("4 columns", () => createPlayfield(4));
+            AddStep("5 columns", () => createPlayfield(5));
+            AddStep("8 columns", () => createPlayfield(8));
+            AddStep("4 + 4 columns", () =>
+            {
+                var stages = new List<StageDefinition>
+                {
+                    new StageDefinition { Columns = 4 },
+                    new StageDefinition { Columns = 4 },
+                };
+                createPlayfield(stages);
+            });
+
+            AddStep("2 + 4 + 2 columns", () =>
+            {
+                var stages = new List<StageDefinition>
+                {
+                    new StageDefinition { Columns = 2 },
+                    new StageDefinition { Columns = 4 },
+                    new StageDefinition { Columns = 2 },
+                };
+                createPlayfield(stages);
+            });
+
+            AddStep("1 + 8 + 1 columns", () =>
+            {
+                var stages = new List<StageDefinition>
+                {
+                    new StageDefinition { Columns = 1 },
+                    new StageDefinition { Columns = 8 },
+                    new StageDefinition { Columns = 1 },
+                };
+                createPlayfield(stages);
+            });
+
+            AddStep("Reversed", () => createPlayfield(4, true));
 
             AddStep("Notes with input", () => createPlayfieldWithNotes());
             AddStep("Notes with input (reversed)", () => createPlayfieldWithNotes(true));
@@ -48,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddStep("Hit explosion", () =>
             {
-                var playfield = createPlayfield(4, SpecialColumnPosition.Normal);
+                var playfield = createPlayfield(4);
 
                 int col = rng.Next(0, 4);
 
@@ -58,6 +88,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 };
 
                 playfield.OnJudgement(note, new ManiaJudgement { Result = HitResult.Perfect });
+                playfield.Columns[col].OnJudgement(note, new ManiaJudgement { Result = HitResult.Perfect });
             });
         }
 
@@ -67,19 +98,29 @@ namespace osu.Game.Rulesets.Mania.Tests
             maniaRuleset = rulesets.GetRuleset(3);
         }
 
-        private ManiaPlayfield createPlayfield(int cols, SpecialColumnPosition specialPos, bool inverted = false)
+        private ManiaPlayfield createPlayfield(int cols, bool inverted = false)
+        {
+            var stages = new List<StageDefinition>
+            {
+                new StageDefinition { Columns = cols },
+            };
+
+            return createPlayfield(stages, inverted);
+        }
+
+        private ManiaPlayfield createPlayfield(List<StageDefinition> stages, bool inverted = false)
         {
             Clear();
 
-            var inputManager = new ManiaInputManager(maniaRuleset, cols) { RelativeSizeAxes = Axes.Both };
+            var inputManager = new ManiaInputManager(maniaRuleset, stages.Sum(g => g.Columns)) { RelativeSizeAxes = Axes.Both };
             Add(inputManager);
 
             ManiaPlayfield playfield;
-            inputManager.Add(playfield = new ManiaPlayfield(cols)
+
+            inputManager.Add(playfield = new ManiaPlayfield(stages)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                SpecialColumnPosition = specialPos
             });
 
             playfield.Inverted.Value = inverted;
@@ -97,7 +138,12 @@ namespace osu.Game.Rulesets.Mania.Tests
             Add(inputManager);
 
             ManiaPlayfield playfield;
-            inputManager.Add(playfield = new ManiaPlayfield(4)
+            var stages = new List<StageDefinition>
+            {
+                new StageDefinition { Columns = 4 },
+            };
+
+            inputManager.Add(playfield = new ManiaPlayfield(stages)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
