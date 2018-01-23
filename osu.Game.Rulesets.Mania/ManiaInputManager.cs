@@ -22,12 +22,10 @@ namespace osu.Game.Rulesets.Mania
         [Description("Special 2")]
         Special2,
 
-        /// <summary>
-        /// This offsets the start value of normal keys in-case we add more special keys
-        /// above at a later time, without breaking replays/configs.
-        /// </summary>
+        // This offsets the start value of normal keys in-case we add more special keys
+        // above at a later time, without breaking replays/configs.
         [Description("Key 1")]
-        Key1 = 1000,
+        Key1 = 10,
         [Description("Key 2")]
         Key2,
         [Description("Key 3")]
