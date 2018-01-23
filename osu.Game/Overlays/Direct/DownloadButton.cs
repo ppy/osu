@@ -18,14 +18,13 @@ namespace osu.Game.Overlays.Direct
         private readonly DownloadIcon iconDown;
         public bool Downloading;
         private readonly DirectPanel panel;
-        private float animationStep;
 
         private class DownloadIcon : CircularContainer
         {
             private readonly SpriteIcon icon1;
             private readonly SpriteIcon icon2;
             public bool Animating;
-            public DownloadIcon()
+            public DownloadIcon(Color4 baseColor)
             {
                 Children = new Drawable[]
                 {
@@ -34,7 +33,7 @@ namespace osu.Game.Overlays.Direct
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(24),
-                        Colour = Color4.Gray,
+                        Colour = baseColor,
                         Icon = FontAwesome.fa_angle_double_down,
                         Y = -2,
                     },
@@ -43,9 +42,9 @@ namespace osu.Game.Overlays.Direct
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(24),
-                        Colour = Color4.Gray,
+                        Colour = baseColor,
                         Icon = FontAwesome.fa_angle_double_down,
-                        Y = -34,
+                        Y = -28,
                     },
                 };
             }
@@ -55,13 +54,13 @@ namespace osu.Game.Overlays.Direct
                 base.Update();
                 if (Animating && icon1.Transforms.Count == 0)
                 {
-                    icon1.MoveToY(30, 1000).Then().MoveToY(-2);
-                    icon2.MoveToY(-2, 1000).Then().MoveToY(-34);
+                    icon1.MoveToY(24, 1000).Then().MoveToY(-2);
+                    icon2.MoveToY(-2, 1000).Then().MoveToY(-28);
                 }
             }
         }
 
-        public DownloadButton(DirectPanel panel)
+        public DownloadButton(DirectPanel panel, Color4 baseColor)
         {
             this.panel = panel;
             Children = new Drawable[]
@@ -72,7 +71,7 @@ namespace osu.Game.Overlays.Direct
                     Origin = Anchor.Centre,
                     Size = new Vector2(32),
                     Masking = true,
-                    BorderColour = Color4.Gray,
+                    BorderColour = baseColor,
                     BorderThickness = 4f,
                     Children = new Drawable[]
                     {
@@ -84,11 +83,11 @@ namespace osu.Game.Overlays.Direct
                         }
                     }
                 },
-                iconDown = new DownloadIcon
+                iconDown = new DownloadIcon(baseColor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(32),
+                    Size = new Vector2(26),
                     Masking = true,
                 }
             };

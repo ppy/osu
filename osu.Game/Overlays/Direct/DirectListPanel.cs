@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Direct
                                 },
                             },
                         },
-                        new DownloadButton(this)
+                        new DownloadButton(this, Color4.White)
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
