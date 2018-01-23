@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime;
 using osu.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
@@ -15,6 +16,8 @@ namespace osu.Desktop
         [STAThread]
         public static int Main(string[] args)
         {
+            useMulticoreJit();
+
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
 
@@ -46,6 +49,16 @@ namespace osu.Desktop
                 }
                 return 0;
             }
+        }
+
+        private static void useMulticoreJit()
+        {
+            var profilesFolder = Path.Combine(Environment.CurrentDirectory, "Profiles");
+            if (!Directory.Exists(profilesFolder))
+                Directory.CreateDirectory(profilesFolder);
+
+            ProfileOptimization.SetProfileRoot(profilesFolder);
+            ProfileOptimization.StartProfile("Startup.Profile");
         }
     }
 }
