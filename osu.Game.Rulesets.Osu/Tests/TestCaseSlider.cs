@@ -84,14 +84,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void createSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2)
         {
-            repeats++; // The first run through the slider is considered a repeat
-
             var repeatSamples = new List<List<SampleInfo>>();
-            if (repeats > 1)
-            {
-                for (int i = 0; i < repeats; i++)
-                    repeatSamples.Add(new List<SampleInfo>());
-            }
+            for (int i = 0; i < repeats; i++)
+                repeatSamples.Add(new List<SampleInfo>());
 
             var slider = new Slider
             {
