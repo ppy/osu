@@ -16,7 +16,6 @@ using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
-using osu.Framework.Logging;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Configuration;
 using osu.Framework.Audio.Track;
@@ -185,7 +184,6 @@ namespace osu.Game.Overlays.Direct
             {
                 progressBar.Current.Value = 0;
                 progressBar.FadeOut(500);
-                Logger.Error(e, "Failed to get beatmap download information");
             };
 
             request.DownloadProgressed += progress => progressBar.Current.Value = progress;
