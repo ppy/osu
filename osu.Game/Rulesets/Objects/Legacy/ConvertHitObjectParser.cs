@@ -77,6 +77,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     if (repeatCount > 9000)
                         throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
 
+                    // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
+                    repeatCount = Math.Max(0, repeatCount - 1);
+
+
                     if (split.Length > 7)
                         length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
 
@@ -84,8 +88,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         readCustomSampleBanks(split[10], bankInfo);
 
                     // One node for each repeat + the start and end nodes
-                    // Note that the first length of the slider is considered a repeat, but there are no actual repeats happening
-                    int nodes = Math.Max(0, repeatCount - 1) + 2;
+                    int nodes = repeatCount + 2;
 
                     // Populate node sample bank infos with the default hit object sample bank
                     var nodeBankInfos = new List<SampleBankInfo>();
@@ -128,7 +131,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                     // Generate the final per-node samples
                     var nodeSamples = new List<List<SampleInfo>>(nodes);
-                    for (int i = 0; i <= repeatCount; i++)
+                    for (int i = 0; i < nodes; i++)
                         nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
                     result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, nodeSamples);
