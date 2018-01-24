@@ -266,7 +266,6 @@
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
     <Compile Include="Configuration\DatabasedSetting.cs" />
-    <Compile Include="Configuration\Setting.cs" />
     <Compile Include="Configuration\SettingsStore.cs" />
     <Compile Include="Configuration\DatabasedConfigManager.cs" />
     <Compile Include="Configuration\SpeedChangeVisualisationMethod.cs" />
