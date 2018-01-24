@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -13,9 +12,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -95,6 +96,7 @@ namespace osu.Game.Screens.Select
                 removeAutoModOnResume = false;
             }
 
+            Beatmap.Value.Mods.BindTo(modSelect.SelectedMods);
             Beatmap.Value.Track.Looping = true;
 
             base.OnResuming(last);
@@ -120,6 +122,8 @@ namespace osu.Game.Screens.Select
 
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
+
+            Beatmap.Value.Mods.Value = new Mod[] { };
 
             return false;
         }
