@@ -136,7 +136,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
-        protected void PlaySamples() => Samples.ForEach(s => s?.Play());
+        /// <summary>
+        /// Plays all the hitsounds for this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public void PlaySamples() => Samples.ForEach(s => s?.Play());
 
         protected override void Update()
         {
