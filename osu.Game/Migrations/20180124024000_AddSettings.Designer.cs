@@ -10,9 +10,10 @@ using System;
 namespace osu.Game.Migrations
 {
     [DbContext(typeof(OsuDbContext))]
-    partial class OsuDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180124024000_AddSettings")]
+    partial class AddSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
