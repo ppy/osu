@@ -41,7 +41,8 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         private readonly InfoContainer info;
         private readonly ArrowsOverlay arrowsOverlay;
 
-        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor) : this(letterboxing)
+        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
+            : this(letterboxing)
         {
             bindProcessor(scoreProcessor);
         }

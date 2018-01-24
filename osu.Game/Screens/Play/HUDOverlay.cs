@@ -41,8 +41,7 @@ namespace osu.Game.Screens.Play
 
         private static bool hasShownNotificationOnce;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, DecoupleableInterpolatingFramedClock decoupledClock, WorkingBeatmap working,
-                          IAdjustableClock adjustableSourceClock)
+        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, DecoupleableInterpolatingFramedClock decoupledClock, WorkingBeatmap working, IAdjustableClock adjustableSourceClock)
         {
             RelativeSizeAxes = Axes.Both;
 
