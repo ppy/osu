@@ -16,7 +16,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
-        private bool isEndRepeat => repeatPoint.RepeatIndex % 2 == 0;
+
+        /// <summary>
+        /// Are we located in the last ControlPoint of our <see cref="DrawableSlider.CurrentCurve"/>
+        /// </summary>
+        private bool isRepeatAtEnd => repeatPoint.RepeatIndex % 2 == 0;
 
         public double FadeInTime;
         public double FadeOutTime;
@@ -76,11 +80,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
-            Position = isEndRepeat ? end : start;
+            Position = isRepeatAtEnd ? end : start;
             var curve = drawableSlider.CurrentCurve;
             if (curve.Count < 3 || curve.All(p => p == Position))
                 return;
-            var referencePoint = curve[isEndRepeat ? curve.IndexOf(Position, curve.Count - 2) - 1 : curve[0] == curve[1] ? 2 : 1];
+            var referencePoint = curve[isRepeatAtEnd ? curve.IndexOf(Position, curve.Count - 2) - 1 : curve[0] == curve[1] ? 2 : 1];
             Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(referencePoint.Y - Position.Y, referencePoint.X - Position.X));
         }
     }
