@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 if (curveData == null)
                     return HitObject.Samples;
 
-                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.RepeatCount;
+                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();
 
                 int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
                 return curveData.RepeatSamples[index];

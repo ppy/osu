@@ -37,7 +37,8 @@ namespace osu.Game.Input.Bindings
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
         {
-            new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene)
+            new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene),
+            new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry)
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
@@ -65,6 +66,8 @@ namespace osu.Game.Input.Bindings
 
         // In-Game Keybindings
         [Description("Skip Cutscene")]
-        SkipCutscene
+        SkipCutscene,
+        [Description("Quick Retry (Hold)")]
+        QuickRetry,
     }
 }

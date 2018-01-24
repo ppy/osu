@@ -5,6 +5,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public interface ISliderProgress
     {
-        void UpdateProgress(double progress, int repeat);
+        void UpdateProgress(double progress, int span);
     }
 }
