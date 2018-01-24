@@ -16,7 +16,8 @@ namespace osu.Desktop
         [STAThread]
         public static int Main(string[] args)
         {
-            useMulticoreJit();
+            if (!RuntimeInfo.IsMono)
+                useMulticoreJit();
 
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
@@ -47,6 +48,7 @@ namespace osu.Desktop
                             break;
                     }
                 }
+
                 return 0;
             }
         }
