@@ -26,14 +26,13 @@ namespace osu.Game.Configuration
         public List<DatabasedSetting> Query(int? rulesetId = null) =>
             GetContext().DatabasedSetting.Where(b => b.RulesetID == rulesetId).ToList();
 
-        public void Update(Setting setting)
+        public void Update(DatabasedSetting setting)
         {
-            var dbSetting = (DatabasedSetting)setting;
-
             var context = GetContext();
 
-            Refresh(ref dbSetting);
-            dbSetting.Value = setting.Value;
+            Refresh(ref setting);
+
+            setting.Value = setting.Value;
             context.SaveChanges();
 
             SettingChanged?.Invoke();

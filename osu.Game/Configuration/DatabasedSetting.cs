@@ -7,7 +7,7 @@ using osu.Game.Database;
 namespace osu.Game.Configuration
 {
     [Table("Settings")]
-    public class DatabasedSetting : Setting, IHasPrimaryKey
+    public class DatabasedSetting : IHasPrimaryKey
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
@@ -27,5 +27,23 @@ namespace osu.Game.Configuration
             get => Value.ToString();
             set => Value = value;
         }
+
+        public object Key;
+        public object Value;
+
+        public DatabasedSetting(object key, object value)
+        {
+            Key = key;
+            Value = value;
+        }
+
+        /// <summary>
+        /// Constructor for derived classes that may require serialisation.
+        /// </summary>
+        public DatabasedSetting()
+        {
+        }
+
+        public override string ToString() => $"{Key}=>{Value}";
     }
 }
