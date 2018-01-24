@@ -61,9 +61,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         public int RepeatCount { get; set; }
 
         /// <summary>
-        /// The length of one repeat if any repeats are present, otherwise it equals the <see cref="Duration"/>.
+        /// The length of one span of this <see cref="Slider"/>.
         /// </summary>
-        public double SpanDuration => RepeatCount > 0 ? Distance / Velocity : Duration;
+        public double SpanDuration => Duration / this.SpanCount();
 
         private int stackHeight;
 
