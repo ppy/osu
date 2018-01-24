@@ -126,6 +126,7 @@ namespace osu.Game.Online.API
                         userReq.Success += u =>
                         {
                             LocalUser.Value = u;
+                            Username = LocalUser.Value.Username;
                             failureCount = 0;
 
                             //we're connected!
