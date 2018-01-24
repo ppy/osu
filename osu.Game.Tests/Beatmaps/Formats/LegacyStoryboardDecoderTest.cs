@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(new Vector2(320, 240), sprite.InitialPosition);
                 Assert.IsTrue(sprite.IsDrawable);
                 Assert.AreEqual(Anchor.Centre, sprite.Origin);
-                Assert.AreEqual(Path.Combine("SB", "lyric", "ja-21.png"), sprite.Path);
+                Assert.AreEqual("SB/lyric/ja-21.png", sprite.Path);
 
                 var animation = background.Elements.ElementAt(12) as StoryboardAnimation;
                 Assert.NotNull(animation);
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsTrue(animation.IsDrawable);
                 Assert.AreEqual(AnimationLoopType.LoopForever, animation.LoopType);
                 Assert.AreEqual(Anchor.Centre, animation.Origin);
-                Assert.AreEqual(Path.Combine("SB", "red jitter", "red_0000.jpg"), animation.Path);
+                Assert.AreEqual("SB/red jitter/red_0000.jpg", animation.Path);
                 Assert.AreEqual(78993, animation.StartTime);
             }
         }
