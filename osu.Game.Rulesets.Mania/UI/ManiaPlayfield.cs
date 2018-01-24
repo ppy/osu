@@ -7,10 +7,12 @@ using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -76,6 +78,20 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             return null;
+        }
+
+        private Bindable<double> scrollTime;
+
+        [BackgroundDependencyLoader]
+        private void load(ManiaConfigManager maniaConfig)
+        {
+            maniaConfig.BindWith(ManiaSetting.ScrollTime, VisibleTimeRange);
+
+            // Todo: The following two lines shouldn't be required, but is an effect of not having config databased
+            // 1. ValueChanged is run prior to values being propagated
+            // 2. We want the config to be saved ASAP, in-case a new ManiaPlayfield is instantiated
+            scrollTime = maniaConfig.GetBindable<double>(ManiaSetting.ScrollTime);
+            scrollTime.ValueChanged += v => maniaConfig.Save();
         }
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
