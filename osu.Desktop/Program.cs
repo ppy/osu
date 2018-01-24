@@ -55,7 +55,7 @@ namespace osu.Desktop
 
         private static void useMulticoreJit()
         {
-            var profilesFolder = Path.Combine(Environment.CurrentDirectory, "Profiles");
+            var profilesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Profiles");
             if (!Directory.Exists(profilesFolder))
                 Directory.CreateDirectory(profilesFolder);
 
