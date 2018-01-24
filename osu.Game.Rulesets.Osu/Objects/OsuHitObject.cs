@@ -16,9 +16,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         public const double OBJECT_RADIUS = 64;
 
         private const double hittable_range = 300;
-        private const double hit_window_50 = 150;
-        private const double hit_window_100 = 80;
-        private const double hit_window_300 = 30;
+        public double HitWindow50 = 150;
+        public double HitWindow100 = 80;
+        public double HitWindow300 = 30;
 
         public float TimePreempt = 600;
         public float TimeFadein = 400;
@@ -50,13 +50,13 @@ namespace osu.Game.Rulesets.Osu.Objects
             switch (result)
             {
                 default:
-                    return 300;
+                    return hittable_range;
                 case HitResult.Meh:
-                    return 150;
+                    return HitWindow50;
                 case HitResult.Good:
-                    return 80;
+                    return HitWindow100;
                 case HitResult.Great:
-                    return 30;
+                    return HitWindow300;
             }
         }
 
@@ -77,6 +77,10 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
             TimeFadein = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1200, 800, 300);
+
+            HitWindow50 = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 200, 150, 100);
+            HitWindow100 = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 140, 100, 60);
+            HitWindow300 = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 80, 50, 20);
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }
