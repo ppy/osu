@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
-            
+
             Children = new Drawable[]
             {
                 new SpriteIcon
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             var curve = drawableSlider.CurrentCurve;
             if (curve.Count < 3 || curve.All(p => p == Position))
                 return;
-            var referencePoint = curve[isEndRepeat ? curve.IndexOf(Position) - 1 : curve.LastIndexOf(Position) + 1];
+            var referencePoint = curve[isEndRepeat ? curve.IndexOf(Position, curve.Count - 2) - 1 : curve[0] == curve[1] ? 2 : 1];
             Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(referencePoint.Y - Position.Y, referencePoint.X - Position.X));
         }
     }
