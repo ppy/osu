@@ -30,9 +30,12 @@ namespace osu.Game.Configuration
         {
             var context = GetContext();
 
+            var newValue = setting.Value;
+
             Refresh(ref setting);
 
-            setting.Value = setting.Value;
+            setting.Value = newValue;
+
             context.SaveChanges();
 
             SettingChanged?.Invoke();

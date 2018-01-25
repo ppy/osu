@@ -13,6 +13,8 @@ namespace osu.Game.Configuration
     {
         private readonly SettingsStore settings;
 
+        private int variant;
+
         private readonly List<DatabasedSetting> databasedSettings;
 
         private readonly RulesetInfo ruleset;
@@ -21,6 +23,7 @@ namespace osu.Game.Configuration
         {
             this.settings = settings;
             this.ruleset = ruleset;
+            this.variant = variant;
 
             databasedSettings = settings.Query(ruleset?.ID, variant);
 
@@ -51,7 +54,8 @@ namespace osu.Game.Configuration
                 {
                     Key = lookup,
                     Value = bindable.Value,
-                    RulesetID = ruleset?.ID
+                    RulesetID = ruleset?.ID,
+                    Variant = variant,
                 });
 
                 databasedSettings.Add(setting);
