@@ -136,8 +136,19 @@ namespace osu.Game.Rulesets.UI
             int loops = 0;
 
             while (validState && requireMoreUpdateLoops && loops++ < max_catch_up_updates_per_frame)
+            {
                 if (!base.UpdateSubTree())
                     return false;
+
+                if (isAttached)
+                {
+                    // When handling replay input, we need to consider the possibility of fast-forwarding, which may cause the clock to be updated
+                    // to a point very far into the future, then playing a frame at that time. In such a case, lifetime MUST be updated before
+                    // input is handled. This is why base.Update is not called from the derived Update when handling replay input, and is instead
+                    // called manually at the correct time here.
+                    base.Update();
+                }
+            }
 
             return true;
         }
@@ -173,8 +184,11 @@ namespace osu.Game.Rulesets.UI
             // to ensure that the its time is valid for our children before input is processed
             Clock.ProcessFrame();
 
-            // Process input
-            base.Update();
+            if (!isAttached)
+            {
+                // For non-replay input handling, this provides equivalent input ordering as if Update was not overridden
+                base.Update();
+            }
         }
 
         #endregion

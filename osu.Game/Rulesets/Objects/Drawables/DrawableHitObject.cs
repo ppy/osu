@@ -71,6 +71,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool HandleKeyboardInput => Interactive;
         public override bool HandleMouseInput => Interactive;
 
+        public override bool MaskingAffectsInput => false;
+
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
