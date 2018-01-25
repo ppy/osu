@@ -475,8 +475,13 @@ namespace osu.Game.Screens.Select
             {
                 case Key.KeypadEnter:
                 case Key.Enter:
-                    FinaliseSelection();
-                    return true;
+                    if (!state.Keyboard.AltPressed)
+                    {
+                        FinaliseSelection();
+                        return true;
+                    }
+
+                    break;
                 case Key.Delete:
                     if (state.Keyboard.ShiftPressed)
                     {

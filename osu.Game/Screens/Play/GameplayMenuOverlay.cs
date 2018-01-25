@@ -274,6 +274,9 @@ namespace osu.Game.Screens.Play
                 if (args.Repeat || args.Key != Key.Enter || !Selected)
                     return false;
 
+                if (state != null && state.Keyboard.AltPressed)
+                    return false;
+
                 OnClick(state);
                 return true;
             }
