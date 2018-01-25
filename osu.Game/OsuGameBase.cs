@@ -27,6 +27,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game
 {
@@ -94,6 +95,9 @@ namespace osu.Game
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
 
             dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
+
+            var skinManager = new SkinManager { CurrentSkin = { Value = new LegacySkin("Andromeda", Host.Storage) } };
+            dependencies.Cache(skinManager);
 
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
