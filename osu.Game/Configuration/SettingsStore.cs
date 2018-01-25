@@ -23,8 +23,8 @@ namespace osu.Game.Configuration
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
         /// <returns></returns>
-        public List<DatabasedSetting> Query(int? rulesetId = null) =>
-            GetContext().DatabasedSetting.Where(b => b.RulesetID == rulesetId).ToList();
+        public List<DatabasedSetting> Query(int? rulesetId = null, int? variant = null) =>
+            GetContext().DatabasedSetting.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
 
         public void Update(DatabasedSetting setting)
         {

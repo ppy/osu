@@ -39,6 +39,11 @@ namespace osu.Game.Rulesets.UI
         public bool AspectAdjust = true;
 
         /// <summary>
+        /// The selected variant.
+        /// </summary>
+        public virtual int Variant => 0;
+
+        /// <summary>
         /// The input manager for this RulesetContainer.
         /// </summary>
         internal IHasReplayHandler ReplayInputManager => KeyBindingInputManager as IHasReplayHandler;

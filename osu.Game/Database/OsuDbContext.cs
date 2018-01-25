@@ -91,7 +91,7 @@ namespace osu.Game.Database
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => new { b.RulesetID, b.Variant });
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.IntAction);
 
-            modelBuilder.Entity<DatabasedSetting>().HasIndex(b => b.RulesetID);
+            modelBuilder.Entity<DatabasedSetting>().HasIndex(b => new { b.RulesetID, b.Variant });
 
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.Hash).IsUnique();
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.ReferenceCount);
