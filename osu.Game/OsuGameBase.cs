@@ -37,6 +37,8 @@ namespace osu.Game
 
         protected BeatmapManager BeatmapManager;
 
+        protected SkinManager SkinManager;
+
         protected RulesetStore RulesetStore;
 
         protected FileStore FileStore;
@@ -96,8 +98,7 @@ namespace osu.Game
 
             dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
 
-            var skinManager = new SkinManager { CurrentSkin = { Value = new LegacySkin("Andromeda", Host.Storage) } };
-            dependencies.Cache(skinManager);
+            dependencies.Cache(SkinManager = new SkinManager(contextFactory, Host.Storage));
 
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);

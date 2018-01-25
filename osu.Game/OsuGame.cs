@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -114,7 +115,20 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                Task.Run(() => BeatmapManager.Import(paths.ToArray()));
+
+                var firstPath = paths.FirstOrDefault();
+                if (firstPath != null)
+                {
+                    switch (Path.GetExtension(firstPath))
+                    {
+                        case ".osz":
+                            Task.Run(() => BeatmapManager.Import(paths.ToArray()));
+                            break;
+                        case ".osk":
+                            Task.Run(() => SkinManager.Import(paths.ToArray()));
+                            break;
+                    }
+                }
             }
 
             dependencies.CacheAs(this);

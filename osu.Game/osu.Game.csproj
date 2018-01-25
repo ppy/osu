@@ -848,6 +848,7 @@
     <Compile Include="Skinning\Skin.cs" />
     <Compile Include="Skinning\SkinManager.cs" />
     <Compile Include="Skinning\SkinnableComponent.cs" />
+    <Compile Include="Skinning\SkinStore.cs" />
     <Compile Include="Storyboards\CommandLoop.cs" />
     <Compile Include="Storyboards\CommandTimeline.cs" />
     <Compile Include="Storyboards\CommandTimelineGroup.cs" />
