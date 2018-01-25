@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps
 
     public abstract class DifficultyCalculator<T> : DifficultyCalculator where T : HitObject
     {
-        protected readonly Beatmap<T> Beatmap;
+        protected Beatmap<T> Beatmap;
         protected readonly Mod[] Mods;
 
         protected DifficultyCalculator(Beatmap beatmap, Mod[] mods = null)

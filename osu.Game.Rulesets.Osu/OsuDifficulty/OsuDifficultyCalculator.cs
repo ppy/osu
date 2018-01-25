@@ -29,8 +29,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
 
         protected override void PreprocessHitObjects()
         {
-            foreach (OsuHitObject h in Beatmap.HitObjects)
-                (h as Slider)?.Curve?.Calculate();
+            new OsuBeatmapProcessor().PostProcess(Beatmap);
         }
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
