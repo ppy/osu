@@ -14,6 +14,8 @@ namespace osu.Game.Configuration
 
         public int? RulesetID { get; set; }
 
+        public int? Variant { get; set; }
+
         [Column("Key")]
         public int IntKey
         {

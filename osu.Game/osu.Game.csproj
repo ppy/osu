@@ -272,9 +272,9 @@
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
-    <Compile Include="Migrations\20180124024000_AddSettings.cs" />
-    <Compile Include="Migrations\20180124024000_AddSettings.designer.cs">
-      <DependentUpon>20180124024000_AddSettings.cs</DependentUpon>
+    <Compile Include="Migrations\20180125143340_Settings.cs" />
+    <Compile Include="Migrations\20180125143340_Settings.designer.cs">
+      <DependentUpon>20180125143340_Settings.cs</DependentUpon>
     </Compile>
     <Compile Include="Overlays\Profile\SupporterIcon.cs" />
     <Compile Include="Online\API\Requests\GetFriendsRequest.cs" />

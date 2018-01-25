@@ -17,12 +17,12 @@ namespace osu.Game.Configuration
 
         private readonly RulesetInfo ruleset;
 
-        protected DatabasedConfigManager(SettingsStore settings, RulesetInfo ruleset = null)
+        protected DatabasedConfigManager(SettingsStore settings, RulesetInfo ruleset = null, int variant = 0)
         {
             this.settings = settings;
             this.ruleset = ruleset;
 
-            databasedSettings = settings.Query(ruleset?.ID);
+            databasedSettings = settings.Query(ruleset?.ID, variant);
 
             InitialiseDefaults();
         }

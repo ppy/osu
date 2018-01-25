@@ -10,8 +10,8 @@ using System;
 namespace osu.Game.Migrations
 {
     [DbContext(typeof(OsuDbContext))]
-    [Migration("20180124024000_AddSettings")]
-    partial class AddSettings
+    [Migration("20180125143340_Settings")]
+    partial class Settings
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -202,14 +202,16 @@ namespace osu.Game.Migrations
                     b.Property<int>("IntKey")
                         .HasColumnName("Key");
 
-                    b.Property<int>("IntValue")
+                    b.Property<int?>("RulesetID");
+
+                    b.Property<string>("StringValue")
                         .HasColumnName("Value");
 
-                    b.Property<int?>("RulesetID");
+                    b.Property<int?>("Variant");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("RulesetID");
+                    b.HasIndex("RulesetID", "Variant");
 
                     b.ToTable("Settings");
                 });

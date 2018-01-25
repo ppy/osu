@@ -9,8 +9,8 @@ namespace osu.Game.Rulesets.Mania.Configuration
 {
     public class ManiaConfigManager : RulesetConfigManager<ManiaSetting>
     {
-        public ManiaConfigManager(RulesetInfo ruleset, SettingsStore settings)
-            : base(ruleset, settings)
+        public ManiaConfigManager(SettingsStore settings, RulesetInfo ruleset, int variant)
+            : base(settings, ruleset, variant)
         {
         }
 

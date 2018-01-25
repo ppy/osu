@@ -201,14 +201,16 @@ namespace osu.Game.Migrations
                     b.Property<int>("IntKey")
                         .HasColumnName("Key");
 
-                    b.Property<int>("IntValue")
+                    b.Property<int?>("RulesetID");
+
+                    b.Property<string>("StringValue")
                         .HasColumnName("Value");
 
-                    b.Property<int?>("RulesetID");
+                    b.Property<int?>("Variant");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("RulesetID");
+                    b.HasIndex("RulesetID", "Variant");
 
                     b.ToTable("Settings");
                 });
