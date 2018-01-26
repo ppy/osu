@@ -188,15 +188,17 @@ namespace osu.Game.Overlays.Mods
                 start = Mods.Length - 1;
 
             for (int i = start; i < Mods.Length && i >= 0; i += direction)
-            {
-                if (Mods[i].HasImplementation)
-                {
-                    changeSelectedIndex(i);
-                    return;
-                }
-            }
+                if (SelectAt(i)) return;
 
             Deselect();
+        }
+
+        public bool SelectAt(int index)
+        {
+            if (!Mods[index].HasImplementation) return false;
+
+            changeSelectedIndex(index);
+            return true;
         }
 
         public void Deselect() => changeSelectedIndex(-1);
