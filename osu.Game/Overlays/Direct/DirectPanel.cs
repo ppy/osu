@@ -16,7 +16,6 @@ using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
-using osu.Framework.Logging;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Configuration;
 using osu.Framework.Audio.Track;
@@ -65,11 +64,14 @@ namespace osu.Game.Overlays.Direct
             Colour = Color4.Black.Opacity(0.3f),
         };
 
+        private OsuColour colours;
+
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay)
         {
             this.beatmaps = beatmaps;
             this.beatmapSetOverlay = beatmapSetOverlay;
+            this.colours = colours;
 
             AddInternal(content = new Container
             {
@@ -105,6 +107,8 @@ namespace osu.Game.Overlays.Direct
 
             beatmaps.BeatmapDownloadBegan += attachDownload;
         }
+
+        public override bool DisposeOnDeathRemoval => true;
 
         protected override void Dispose(bool isDisposing)
         {
@@ -180,7 +184,6 @@ namespace osu.Game.Overlays.Direct
             {
                 progressBar.Current.Value = 0;
                 progressBar.FadeOut(500);
-                Logger.Error(e, "Failed to get beatmap download information");
             };
 
             request.DownloadProgressed += progress => progressBar.Current.Value = progress;
@@ -188,7 +191,7 @@ namespace osu.Game.Overlays.Direct
             request.Success += data =>
             {
                 progressBar.Current.Value = 1;
-                progressBar.FadeOut(500);
+                progressBar.FillColour = colours.Yellow;
             };
         }
 

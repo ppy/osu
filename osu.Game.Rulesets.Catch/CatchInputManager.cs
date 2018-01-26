@@ -23,6 +23,5 @@ namespace osu.Game.Rulesets.Catch
         MoveRight,
         [Description("Engage dash")]
         Dash,
-        PositionUpdate
     }
 }
