@@ -44,6 +44,8 @@ namespace osu.Game
 
         protected KeyBindingStore KeyBindingStore;
 
+        protected SettingsStore SettingsStore;
+
         protected CursorOverrideContainer CursorOverrideContainer;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
@@ -109,6 +111,7 @@ namespace osu.Game
             dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory.GetContext, RulesetStore, API, Host));
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory.GetContext, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory.GetContext, RulesetStore));
+            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory.GetContext));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.

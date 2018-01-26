@@ -2,15 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration.Tracking;
-using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 
 namespace osu.Game.Rulesets.Mania.Configuration
 {
     public class ManiaConfigManager : RulesetConfigManager<ManiaSetting>
     {
-        public ManiaConfigManager(Ruleset ruleset, Storage storage)
-            : base(ruleset, storage)
+        public ManiaConfigManager(SettingsStore settings, RulesetInfo ruleset, int variant)
+            : base(settings, ruleset, variant)
         {
         }
 

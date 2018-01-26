@@ -8,9 +8,9 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
@@ -80,11 +80,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        public override PassThroughInputManager CreateInputManager()
-        {
-            var variantType = Mods.OfType<IPlayfieldTypeMod>().FirstOrDefault()?.PlayfieldType ?? PlayfieldType.Single;
-            return new ManiaInputManager(Ruleset.RulesetInfo, (int)variantType + Beatmap.TotalColumns);
-        }
+        public override int Variant => (int)(Mods.OfType<IPlayfieldTypeMod>().FirstOrDefault()?.PlayfieldType ?? PlayfieldType.Single) + Beatmap.TotalColumns;
+
+        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter(IsForCurrentRuleset, WorkingBeatmap.Beatmap);
 
@@ -107,6 +105,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay, this);
 
-        protected override IRulesetConfigManager CreateConfig(Ruleset ruleset, Storage storage) => new ManiaConfigManager(ruleset, storage);
+        protected override IRulesetConfigManager CreateConfig(Ruleset ruleset, SettingsStore settings) => new ManiaConfigManager(settings, Ruleset.RulesetInfo, Variant);
     }
 }

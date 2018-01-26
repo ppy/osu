@@ -1,24 +1,15 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Configuration;
-using osu.Framework.Platform;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Configuration
 {
-    public abstract class RulesetConfigManager<T> : ConfigManager<T>, IRulesetConfigManager
+    public abstract class RulesetConfigManager<T> : DatabasedConfigManager<T>, IRulesetConfigManager
         where T : struct
     {
-        protected override string Filename => ruleset?.ShortName == null ? null : $"{ruleset.ShortName}.ini";
-        private readonly Ruleset ruleset;
-
-        protected RulesetConfigManager(Ruleset ruleset, Storage storage)
-            : base(storage)
+        protected RulesetConfigManager(SettingsStore settings, RulesetInfo ruleset, int variant) : base(settings, ruleset, variant)
         {
-            this.ruleset = ruleset;
-
-            // Re-load with the ruleset
-            Load();
         }
     }
 }

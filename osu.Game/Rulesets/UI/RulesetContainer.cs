@@ -16,7 +16,7 @@ using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
-using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Replays;
@@ -37,6 +37,11 @@ namespace osu.Game.Rulesets.UI
         /// Whether to apply adjustments to the child <see cref="Playfield"/> based on our own size.
         /// </summary>
         public bool AspectAdjust = true;
+
+        /// <summary>
+        /// The selected variant.
+        /// </summary>
+        public virtual int Variant => 0;
 
         /// <summary>
         /// The input manager for this RulesetContainer.
@@ -89,11 +94,11 @@ namespace osu.Game.Rulesets.UI
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(Storage storage, OnScreenDisplay onScreenDisplay)
+        private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
         {
             this.onScreenDisplay = onScreenDisplay;
 
-            rulesetConfig = CreateConfig(Ruleset, storage);
+            rulesetConfig = CreateConfig(Ruleset, settings);
 
             if (rulesetConfig != null)
             {
@@ -135,7 +140,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected virtual CursorContainer CreateCursor() => null;
 
-        protected virtual IRulesetConfigManager CreateConfig(Ruleset ruleset, Storage storage) => null;
+        protected virtual IRulesetConfigManager CreateConfig(Ruleset ruleset, SettingsStore settings) => null;
 
         /// <summary>
         /// Creates a Playfield.
