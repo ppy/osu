@@ -13,7 +13,7 @@ namespace osu.Game.Configuration
     {
         private readonly SettingsStore settings;
 
-        private int variant;
+        private readonly int variant;
 
         private readonly List<DatabasedSetting> databasedSettings;
 
