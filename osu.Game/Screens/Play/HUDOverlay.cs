@@ -6,6 +6,8 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -39,7 +41,7 @@ namespace osu.Game.Screens.Play
 
         private static bool hasShownNotificationOnce;
 
-        public HUDOverlay()
+        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, DecoupleableInterpolatingFramedClock decoupledClock, WorkingBeatmap working, IAdjustableClock adjustableSourceClock)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -59,6 +61,18 @@ namespace osu.Game.Screens.Play
                     ReplaySettingsOverlay = CreateReplaySettingsOverlay(),
                 }
             });
+
+            BindProcessor(scoreProcessor);
+            BindRulesetContainer(rulesetContainer);
+
+            Progress.Objects = rulesetContainer.Objects;
+            Progress.AudioClock = decoupledClock;
+            Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
+            Progress.OnSeek = pos => decoupledClock.Seek(pos);
+
+            ModDisplay.Current.BindTo(working.Mods);
+
+            ReplaySettingsOverlay.PlaybackSettings.AdjustableClock = adjustableSourceClock;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -115,7 +129,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public virtual void BindRulesetContainer(RulesetContainer rulesetContainer)
+        protected virtual void BindRulesetContainer(RulesetContainer rulesetContainer)
         {
             (rulesetContainer.KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(KeyCounter);
 
@@ -201,7 +215,7 @@ namespace osu.Game.Screens.Play
 
         protected virtual ReplaySettingsOverlay CreateReplaySettingsOverlay() => new ReplaySettingsOverlay();
 
-        public virtual void BindProcessor(ScoreProcessor processor)
+        protected virtual void BindProcessor(ScoreProcessor processor)
         {
             ScoreCounter?.Current.BindTo(processor.TotalScore);
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
