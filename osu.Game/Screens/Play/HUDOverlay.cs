@@ -119,13 +119,12 @@ namespace osu.Game.Screens.Play
 
             if (loaded)
             {
-                PlayerSettingsOverlay.PlaybackSettings.Show();
+                PlayerSettingsOverlay.Show();
                 ModDisplay.FadeIn(200);
             }
             else
             {
-                PlayerSettingsOverlay.PlaybackSettings.Hide();
-                PlayerSettingsOverlay.VisualSettings.Autohide = true;
+                PlayerSettingsOverlay.Hide();
                 ModDisplay.Delay(2000).FadeOut(200);
             }
         }
