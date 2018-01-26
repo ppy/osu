@@ -14,15 +14,29 @@ namespace osu.Game.Rulesets.Catch.Replays
         {
         }
 
-        public override List<InputState> GetPendingStates() => new List<InputState>
+        public override List<InputState> GetPendingStates()
         {
-            new CatchReplayState
+            if (!Position.HasValue) return new List<InputState>();
+
+            var action = new List<CatchAction>();
+
+            if (CurrentFrame.ButtonState == ReplayButtonState.Left1)
+                action.Add(CatchAction.Dash);
+
+            if (Position.Value.X > CurrentFrame.Position.X)
+                action.Add(CatchAction.MoveRight);
+            else if (Position.Value.X < CurrentFrame.Position.X)
+                action.Add(CatchAction.MoveLeft);
+
+            return new List<InputState>
             {
-                PressedActions = new List<CatchAction> { CatchAction.PositionUpdate },
-                CatcherX = ((CatchReplayFrame)CurrentFrame).MouseX
-            },
-            new CatchReplayState { PressedActions = new List<CatchAction>() },
-        };
+                new CatchReplayState
+                {
+                    PressedActions = action,
+                    CatcherX = Position.Value.X
+                },
+            };
+        }
 
         public class CatchReplayState : ReplayState<CatchAction>
         {

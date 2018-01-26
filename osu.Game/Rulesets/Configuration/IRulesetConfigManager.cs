@@ -1,10 +1,11 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-namespace osu.Game.Rulesets.Osu.Objects
+using osu.Framework.Configuration.Tracking;
+
+namespace osu.Game.Rulesets.Configuration
 {
-    public interface ISliderProgress
+    public interface IRulesetConfigManager : ITrackableConfigManager
     {
-        void UpdateProgress(double progress, int span);
     }
 }
