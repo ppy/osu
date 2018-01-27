@@ -12,6 +12,11 @@ namespace osu.Game.Rulesets.Objects.Types
     public interface IHasCurve : IHasDistance, IHasRepeats
     {
         /// <summary>
+        /// The curve.
+        /// </summary>
+        SliderCurve Curve { get; }
+
+        /// <summary>
         /// The control points that shape the curve.
         /// </summary>
         List<Vector2> ControlPoints { get; }
@@ -20,7 +25,10 @@ namespace osu.Game.Rulesets.Objects.Types
         /// The type of curve.
         /// </summary>
         CurveType CurveType { get; }
+    }
 
+    public static class HasCurveExtensions
+    {
         /// <summary>
         /// Computes the position on the curve at a given progress, accounting for repeat logic.
         /// <para>
@@ -28,20 +36,28 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </para>
         /// </summary>
         /// <param name="progress">[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</param>
-        Vector2 PositionAt(double progress);
+        public static Vector2 PositionAt(this IHasCurve obj, double progress)
+            => obj.Curve.PositionAt(obj.ProgressAt(progress));
 
         /// <summary>
         /// Finds the progress along the curve, accounting for repeat logic.
         /// </summary>
         /// <param name="progress">[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</param>
         /// <returns>[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</returns>
-        double ProgressAt(double progress);
+        public static double ProgressAt(this IHasCurve obj, double progress)
+        {
+            double p = progress * obj.SpanCount() % 1;
+            if (obj.SpanAt(progress) % 2 == 1)
+                p = 1 - p;
+            return p;
+        }
 
         /// <summary>
-        /// Determines which repeat of the curve the progress point is on.
+        /// Determines which span of the curve the progress point is on.
         /// </summary>
         /// <param name="progress">[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</param>
-        /// <returns>[0, RepeatCount] where 0 is the first run.</returns>
-        int RepeatAt(double progress);
+        /// <returns>[0, SpanCount) where 0 is the first run.</returns>
+        public static int SpanAt(this IHasCurve obj, double progress)
+            => (int)(progress * obj.SpanCount());
     }
 }

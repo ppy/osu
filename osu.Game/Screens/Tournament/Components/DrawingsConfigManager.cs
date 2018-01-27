@@ -6,7 +6,7 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Screens.Tournament.Components
 {
-    public class DrawingsConfigManager : ConfigManager<DrawingsConfig>
+    public class DrawingsConfigManager : IniConfigManager<DrawingsConfig>
     {
         protected override string Filename => @"drawings.ini";
 
