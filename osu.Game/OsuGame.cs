@@ -71,6 +71,7 @@ namespace osu.Game
         private OsuScreen screenStack;
 
         private VolumeControl volume;
+        private OnScreenDisplay onscreenDisplay;
 
         private Bindable<int> configRuleset;
         public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
@@ -110,7 +111,7 @@ namespace osu.Game
                 Task.Run(() => BeatmapManager.Import(paths.ToArray()));
             }
 
-            dependencies.Cache(this);
+            dependencies.CacheAs<OsuGame>(this);
 
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
@@ -207,7 +208,7 @@ namespace osu.Game
             }, overlayContent.Add);
 
             loadComponentSingleFile(volume = new VolumeControl(), Add);
-            loadComponentSingleFile(new OnScreenDisplay(), Add);
+            loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
@@ -244,6 +245,7 @@ namespace osu.Game
             forwardLoggedErrorsToNotifications();
 
             dependencies.Cache(settings);
+            dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
             dependencies.Cache(direct);
             dependencies.Cache(chat);

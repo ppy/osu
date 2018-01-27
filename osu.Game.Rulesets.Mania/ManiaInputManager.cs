@@ -17,8 +17,13 @@ namespace osu.Game.Rulesets.Mania
 
     public enum ManiaAction
     {
-        [Description("Special")]
-        Special,
+        [Description("Special 1")]
+        Special1 = 1,
+        [Description("Special 2")]
+        Special2,
+
+        // This offsets the start value of normal keys in-case we add more special keys
+        // above at a later time, without breaking replays/configs.
         [Description("Key 1")]
         Key1 = 10,
         [Description("Key 2")]
@@ -36,6 +41,24 @@ namespace osu.Game.Rulesets.Mania
         [Description("Key 8")]
         Key8,
         [Description("Key 9")]
-        Key9
+        Key9,
+        [Description("Key 10")]
+        Key10,
+        [Description("Key 11")]
+        Key11,
+        [Description("Key 12")]
+        Key12,
+        [Description("Key 13")]
+        Key13,
+        [Description("Key 14")]
+        Key14,
+        [Description("Key 15")]
+        Key15,
+        [Description("Key 16")]
+        Key16,
+        [Description("Key 17")]
+        Key17,
+        [Description("Key 18")]
+        Key18,
     }
 }
