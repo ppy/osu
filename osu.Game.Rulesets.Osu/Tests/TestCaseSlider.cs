@@ -17,7 +17,6 @@ using OpenTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
