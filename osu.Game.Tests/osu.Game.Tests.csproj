@@ -90,6 +90,7 @@
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoderTest.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReaderTest.cs" />
     <Compile Include="Beatmaps\IO\ImportBeatmapTest.cs" />
+    <Compile Include="Chat\MessageFormatterTests.cs" />
     <Compile Include="Resources\Resource.cs" />
     <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoderTest.cs" />
     <Compile Include="Visual\TestCaseBeatmapCarousel.cs" />
