@@ -67,7 +67,7 @@ namespace osu.Game.Online.Chat
                     result.Links.ForEach(l => l.Index -= l.Index > index ? m.Length - displayText.Length : 0);
 
                     var details = getLinkDetails(linkText);
-                    result.Links.Add(new Link(linkText, index, displayText.Length, linkActionOverride ?? details.linkType, details.linkArgument));
+                    result.Links.Add(new Link(linkText, index, displayText.Length, linkActionOverride ?? details.Action, details.Argument));
 
                     //adjust the offset for processing the current matches group.
                     captureOffset += m.Length - displayText.Length;
@@ -95,11 +95,11 @@ namespace osu.Game.Online.Chat
                 }
 
                 var details = getLinkDetails(link);
-                result.Links.Add(new Link(link, index, indexLength, details.linkType, details.linkArgument));
+                result.Links.Add(new Link(link, index, indexLength, details.Action, details.Argument));
             }
         }
 
-        private static (LinkAction linkType, string linkArgument) getLinkDetails(string url)
+        private static LinkDetails getLinkDetails(string url)
         {
             var args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
@@ -115,19 +115,19 @@ namespace osu.Game.Online.Chat
                         {
                             case "b":
                             case "beatmaps":
-                                return (LinkAction.OpenBeatmap, args[3]);
+                                return new LinkDetails(LinkAction.OpenBeatmap, args[3]);
                             case "s":
                             case "beatmapsets":
                             case "d":
-                                return (LinkAction.OpenBeatmapSet, args[3]);
+                                return new LinkDetails(LinkAction.OpenBeatmapSet, args[3]);
                         }
                     }
 
-                    return (LinkAction.External, null);
+                    return new LinkDetails(LinkAction.External, null);
                 case "osu":
                     // every internal link also needs some kind of argument
                     if (args.Length < 3)
-                        return (LinkAction.External, null);
+                        return new LinkDetails(LinkAction.External, null);
 
                     LinkAction linkType;
                     switch (args[1])
@@ -153,11 +153,11 @@ namespace osu.Game.Online.Chat
                             break;
                     }
 
-                    return (linkType, args[2]);
+                    return new LinkDetails(linkType, args[2]);
                 case "osump":
-                    return (LinkAction.JoinMultiplayerMatch, args[1]);
+                    return new LinkDetails(LinkAction.JoinMultiplayerMatch, args[1]);
                 default:
-                    return (LinkAction.External, null);
+                    return new LinkDetails(LinkAction.External, null);
             }
         }
 
@@ -213,6 +213,18 @@ namespace osu.Game.Online.Chat
             public MessageFormatterResult(string text)
             {
                 OriginalText = Text = text;
+            }
+        }
+
+        public class LinkDetails
+        {
+            public LinkAction Action;
+            public string Argument;
+
+            public LinkDetails(LinkAction action, string argument)
+            {
+                Action = action;
+                Argument = argument;
             }
         }
     }
