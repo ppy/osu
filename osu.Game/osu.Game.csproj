@@ -265,10 +265,17 @@
     <Compile Include="Beatmaps\Formats\JsonBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
+    <Compile Include="Configuration\DatabasedSetting.cs" />
+    <Compile Include="Configuration\SettingsStore.cs" />
+    <Compile Include="Configuration\DatabasedConfigManager.cs" />
     <Compile Include="Configuration\SpeedChangeVisualisationMethod.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
+    <Compile Include="Migrations\20180125143340_Settings.cs" />
+    <Compile Include="Migrations\20180125143340_Settings.Designer.cs">
+      <DependentUpon>20180125143340_Settings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Overlays\Profile\SupporterIcon.cs" />
     <Compile Include="Online\API\Requests\GetFriendsRequest.cs" />
     <Compile Include="Overlays\Settings\DangerousSettingsButton.cs" />
@@ -314,6 +321,8 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\Sections\Gameplay\ScrollingSettings.cs" />
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
+    <Compile Include="Rulesets\Configuration\IRulesetConfigManager.cs" />
+    <Compile Include="Rulesets\Configuration\RulesetConfigManager.cs" />
     <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />
