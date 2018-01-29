@@ -10,7 +10,9 @@ using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Users;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Tests.Visual
@@ -19,6 +21,16 @@ namespace osu.Game.Tests.Visual
     {
         private readonly TestChatLineContainer textContainer;
         private Color4 linkColour;
+
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(ChatLine),
+            typeof(Message),
+            typeof(LinkFlowContainer),
+            typeof(DummyEchoMessage),
+            typeof(LocalEchoMessage),
+            typeof(MessageFormatter)
+        };
 
         public TestCaseChatLink()
         {
