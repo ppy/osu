@@ -277,7 +277,7 @@
     <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
     <Compile Include="Migrations\20180125143340_Settings.cs" />
-    <Compile Include="Migrations\20180125143340_Settings.designer.cs">
+    <Compile Include="Migrations\20180125143340_Settings.Designer.cs">
       <DependentUpon>20180125143340_Settings.cs</DependentUpon>
     </Compile>
     <Compile Include="Overlays\Profile\SupporterIcon.cs" />
