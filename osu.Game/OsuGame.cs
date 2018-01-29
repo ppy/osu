@@ -111,7 +111,7 @@ namespace osu.Game
                 Task.Run(() => BeatmapManager.Import(paths.ToArray()));
             }
 
-            dependencies.CacheAs<OsuGame>(this);
+            dependencies.CacheAs(this);
 
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
