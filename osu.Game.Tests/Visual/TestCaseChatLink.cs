@@ -50,13 +50,14 @@ namespace osu.Game.Tests.Visual
 
         private void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false, bool isImportant = false, params LinkAction[] expectedActions)
         {
-            var newLine = new ChatLine(new DummyMessage(text, isAction, isImportant));
+            int index = textContainer.Count + 1;
+            var newLine = new ChatLine(new DummyMessage(text, isAction, isImportant, index));
             textContainer.Add(newLine);
 
-            AddAssert($"msg #{textContainer.Count} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
-            AddAssert($"msg #{textContainer.Count} has the right action", hasExpectedActions);
-            AddAssert($"msg #{textContainer.Count} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
-            AddAssert($"msg #{textContainer.Count} shows {linkAmount} link(s)", isShowingLinks);
+            AddAssert($"msg #{index} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
+            AddAssert($"msg #{index} has the right action", hasExpectedActions);
+            AddAssert($"msg #{index} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
+            AddAssert($"msg #{index} shows {linkAmount} link(s)", isShowingLinks);
 
             bool hasExpectedActions()
             {
@@ -106,14 +107,14 @@ namespace osu.Game.Tests.Visual
                 expectedActions: new[] { LinkAction.External, LinkAction.OpenBeatmap, LinkAction.External });
             // note that there's 0 links here (they get removed if a channel is not found)
             addMessageWithChecks("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
-            addMessageWithChecks("Join my multiplayer game osump://12346.", expectedActions: LinkAction.JoinMultiplayerMatch);
-            addMessageWithChecks("Join my [multiplayer game](osump://12346).", expectedActions: LinkAction.JoinMultiplayerMatch);
-            addMessageWithChecks("Join my [#english](osu://chan/english).", expectedActions: LinkAction.OpenChannel);
-            addMessageWithChecks("Join my osu://chan/english.", expectedActions: LinkAction.OpenChannel);
-            addMessageWithChecks("Join my #english.", expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks("I am important!", 0, false, true);
             addMessageWithChecks("feels important", 0, true, true);
             addMessageWithChecks("likes to post this [https://osu.ppy.sh/home link].", 1, true, true, expectedActions: LinkAction.External);
+            addMessageWithChecks("Join my multiplayer game osump://12346.",1, expectedActions: LinkAction.JoinMultiplayerMatch);
+            addMessageWithChecks("Join my [multiplayer game](osump://12346).", 1, expectedActions: LinkAction.JoinMultiplayerMatch);
+            addMessageWithChecks("Join my [#english](osu://chan/english).", 1, expectedActions: LinkAction.OpenChannel);
+            addMessageWithChecks("Join my osu://chan/english.", 1, expectedActions: LinkAction.OpenChannel);
+            addMessageWithChecks("Join my #english.", 1, expectedActions: LinkAction.OpenChannel);
         }
 
         private void testEcho()
@@ -173,12 +174,17 @@ namespace osu.Game.Tests.Visual
 
             public new DateTimeOffset Timestamp = DateTimeOffset.Now;
 
-            public DummyMessage(string text, bool isAction = false, bool isImportant = false)
+            public DummyMessage(string text, bool isAction = false, bool isImportant = false, int number = 0)
                 : base(messageCounter++)
             {
                 Content = text;
                 IsAction = isAction;
-                Sender = isImportant ? TEST_SENDER_BACKGROUND : TEST_SENDER;
+                Sender = new User
+                {
+                    Username = $"User {number}",
+                    Id = number,
+                    Colour = isImportant ? "#250cc9" : null,
+                };
             }
         }
 
