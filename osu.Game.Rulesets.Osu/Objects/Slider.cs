@@ -60,6 +60,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
         public int RepeatCount { get; set; }
 
+        /// <summary>
+        /// The length of one span of this <see cref="Slider"/>.
+        /// </summary>
+        public double SpanDuration => Duration / this.SpanCount();
+
         private int stackHeight;
 
         public override int StackHeight
@@ -102,13 +107,12 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             var length = Curve.Distance;
             var tickDistance = Math.Min(TickDistance, length);
-            var spanDuration = length / Velocity;
 
             var minDistanceFromEnd = Velocity * 0.01;
 
             for (var span = 0; span < this.SpanCount(); span++)
             {
-                var spanStartTime = StartTime + span * spanDuration;
+                var spanStartTime = StartTime + span * SpanDuration;
                 var reversed = span % 2 == 1;
 
                 for (var d = tickDistance; d <= length; d += tickDistance)
@@ -133,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     AddNested(new SliderTick
                     {
                         SpanIndex = span,
-                        StartTime = spanStartTime + timeProgress * spanDuration,
+                        StartTime = spanStartTime + timeProgress * SpanDuration,
                         Position = Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
                         Scale = Scale,
@@ -146,16 +150,13 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createRepeatPoints()
         {
-            var repeatDuration = Distance / Velocity;
-
             for (int repeatIndex = 0, repeat = 1; repeatIndex < RepeatCount; repeatIndex++, repeat++)
             {
-                var repeatStartTime = StartTime + repeat * repeatDuration;
-
                 AddNested(new RepeatPoint
                 {
                     RepeatIndex = repeatIndex,
-                    StartTime = repeatStartTime,
+                    SpanDuration = SpanDuration,
+                    StartTime = StartTime + repeat * SpanDuration,
                     Position = Curve.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,

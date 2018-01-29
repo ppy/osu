@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions;
+using osu.Framework.Configuration.Tracking;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -118,43 +118,62 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
         {
-            trackSetting(frameworkConfig.GetBindable<FrameSync>(FrameworkSetting.FrameSync), v => display(v, "Frame Limiter", v.GetDescription(), "Ctrl+F7"));
-            trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.AudioDevice), v => display(v, "Audio Device", string.IsNullOrEmpty(v) ? "Default" : v, v));
-            trackSetting(frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay), v => display(v, "Debug Logs", v ? "visible" : "hidden", "Ctrl+F10"));
-
-            void displayResolution() => display(null, "Screen Resolution", frameworkConfig.Get<int>(FrameworkSetting.Width) + "x" + frameworkConfig.Get<int>(FrameworkSetting.Height));
-
-            trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Width), v => displayResolution());
-            trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Height), v => displayResolution());
-
-            trackSetting(frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity), v => display(v, "Cursor Sensitivity", v.ToString(@"0.##x"), "Ctrl+Alt+R to reset"));
-            trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.ActiveInputHandlers),
-                delegate (string v)
-                {
-                    bool raw = v.Contains("Raw");
-                    display(raw, "Raw Input", raw ? "enabled" : "disabled", "Ctrl+Alt+R to reset");
-                });
-
-            trackSetting(frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode), v => display(v, "Screen Mode", v.ToString(), "Alt+Enter"));
+            BeginTracking(this, frameworkConfig);
         }
 
-        private readonly List<IBindable> references = new List<IBindable>();
+        private readonly Dictionary<(object, IConfigManager), TrackedSettings> trackedConfigManagers = new Dictionary<(object, IConfigManager), TrackedSettings>();
 
-        private void trackSetting<T>(Bindable<T> bindable, Action<T> action)
+        /// <summary>
+        /// Registers a <see cref="ConfigManager{T}"/> to have its settings tracked by this <see cref="OnScreenDisplay"/>.
+        /// </summary>
+        /// <param name="source">The object that is registering the <see cref="ConfigManager{T}"/> to be tracked.</param>
+        /// <param name="configManager">The <see cref="ConfigManager{T}"/> to be tracked.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="configManager"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is already being tracked from the same <paramref name="source"/>.</exception>
+        public void BeginTracking(object source, ITrackableConfigManager configManager)
         {
-            // we need to keep references as we bind
-            references.Add(bindable);
+            if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
 
-            bindable.ValueChanged += action;
+            if (trackedConfigManagers.ContainsKey((source, configManager)))
+                throw new InvalidOperationException($"{nameof(configManager)} is already registered.");
+
+            var trackedSettings = configManager.CreateTrackedSettings();
+            if (trackedSettings == null)
+                return;
+
+            configManager.LoadInto(trackedSettings);
+            trackedSettings.SettingChanged += display;
+
+            trackedConfigManagers.Add((source, configManager), trackedSettings);
         }
 
-        private void display(object rawValue, string settingName, string settingValue, string shortcut = @"")
+        /// <summary>
+        /// Unregisters a <see cref="ConfigManager{T}"/> from having its settings tracked by this <see cref="OnScreenDisplay"/>.
+        /// </summary>
+        /// <param name="source">The object that registered the <see cref="ConfigManager{T}"/> to be tracked.</param>
+        /// <param name="configManager">The <see cref="ConfigManager{T}"/> that is being tracked.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="configManager"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is not being tracked from the same <see cref="source"/>.</exception>
+        public void StopTracking(object source, ITrackableConfigManager configManager)
+        {
+            if (configManager == null)　throw new ArgumentNullException(nameof(configManager));
+
+            if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
+                throw new InvalidOperationException($"{nameof(configManager)} is not registered.");
+
+            existing.Unload();
+            existing.SettingChanged -= display;
+
+            trackedConfigManagers.Remove((source, configManager));
+        }
+
+        private void display(SettingDescription description)
         {
             Schedule(() =>
             {
-                textLine1.Text = settingName.ToUpper();
-                textLine2.Text = settingValue;
-                textLine3.Text = shortcut.ToUpper();
+                textLine1.Text = description.Name.ToUpper();
+                textLine2.Text = description.Value;
+                textLine3.Text = description.Shortcut.ToUpper();
 
                 box.Animate(
                     b => b.FadeIn(500, Easing.OutQuint),
@@ -167,16 +186,16 @@ namespace osu.Game.Overlays
                 int optionCount = 0;
                 int selectedOption = -1;
 
-                if (rawValue is bool)
+                if (description.RawValue is bool)
                 {
                     optionCount = 1;
-                    if ((bool)rawValue) selectedOption = 0;
+                    if ((bool)description.RawValue) selectedOption = 0;
                 }
-                else if (rawValue is Enum)
+                else if (description.RawValue is Enum)
                 {
-                    var values = Enum.GetValues(rawValue.GetType());
+                    var values = Enum.GetValues(description.RawValue.GetType());
                     optionCount = values.Length;
-                    selectedOption = Convert.ToInt32(rawValue);
+                    selectedOption = Convert.ToInt32(description.RawValue);
                 }
 
                 textLine2.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;
