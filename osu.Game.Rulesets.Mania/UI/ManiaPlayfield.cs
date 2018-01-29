@@ -7,10 +7,12 @@ using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -76,6 +78,12 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             return null;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(ManiaConfigManager maniaConfig)
+        {
+            maniaConfig.BindWith(ManiaSetting.ScrollTime, VisibleTimeRange);
         }
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
