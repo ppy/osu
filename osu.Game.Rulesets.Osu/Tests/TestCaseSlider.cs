@@ -17,6 +17,7 @@ using OpenTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -27,7 +28,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             typeof(SliderBall),
             typeof(SliderBody),
+            typeof(SliderTick),
             typeof(DrawableSlider),
+            typeof(DrawableSliderTick),
             typeof(DrawableRepeatPoint),
             typeof(DrawableOsuHitObject)
         };
@@ -131,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             var cpi = new ControlPointInfo();
             cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
-            slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize });
+            slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize, SliderTickRate = 3 });
 
             var drawable = new DrawableSlider(slider)
             {
