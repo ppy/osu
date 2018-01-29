@@ -95,7 +95,7 @@ namespace osu.Game
 
             dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
 
-            dependencies.CacheAs<OsuGameBase>(this);
+            dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
 
             runMigrations();
