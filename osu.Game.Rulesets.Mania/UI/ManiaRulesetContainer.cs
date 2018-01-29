@@ -10,8 +10,11 @@ using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
@@ -77,11 +80,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        public override PassThroughInputManager CreateInputManager()
-        {
-            var variantType = Mods.OfType<IPlayfieldTypeMod>().FirstOrDefault()?.PlayfieldType ?? PlayfieldType.Single;
-            return new ManiaInputManager(Ruleset.RulesetInfo, (int)variantType + Beatmap.TotalColumns);
-        }
+        public override int Variant => (int)(Mods.OfType<IPlayfieldTypeMod>().FirstOrDefault()?.PlayfieldType ?? PlayfieldType.Single) + Beatmap.TotalColumns;
+
+        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter(IsForCurrentRuleset, WorkingBeatmap.Beatmap);
 
@@ -103,5 +104,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(1, 0.8f);
 
         protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay, this);
+
+        protected override IRulesetConfigManager CreateConfig(Ruleset ruleset, SettingsStore settings) => new ManiaConfigManager(settings, Ruleset.RulesetInfo, Variant);
     }
 }

@@ -16,6 +16,9 @@ using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
+using osu.Game.Configuration;
+using osu.Game.Overlays;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using OpenTK;
@@ -34,6 +37,11 @@ namespace osu.Game.Rulesets.UI
         /// Whether to apply adjustments to the child <see cref="Playfield"/> based on our own size.
         /// </summary>
         public bool AspectAdjust = true;
+
+        /// <summary>
+        /// The selected variant.
+        /// </summary>
+        public virtual int Variant => 0;
 
         /// <summary>
         /// The input manager for this RulesetContainer.
@@ -65,6 +73,14 @@ namespace osu.Game.Rulesets.UI
 
         protected readonly Ruleset Ruleset;
 
+        private IRulesetConfigManager rulesetConfig;
+        private OnScreenDisplay onScreenDisplay;
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+
         /// <summary>
         /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
         /// </summary>
@@ -75,6 +91,20 @@ namespace osu.Game.Rulesets.UI
             playfield = new Lazy<Playfield>(CreatePlayfield);
 
             Cursor = CreateCursor();
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
+        {
+            this.onScreenDisplay = onScreenDisplay;
+
+            rulesetConfig = CreateConfig(Ruleset, settings);
+
+            if (rulesetConfig != null)
+            {
+                dependencies.Cache(rulesetConfig);
+                onScreenDisplay?.BeginTracking(this, rulesetConfig);
+            }
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -110,11 +140,24 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected virtual CursorContainer CreateCursor() => null;
 
+        protected virtual IRulesetConfigManager CreateConfig(Ruleset ruleset, SettingsStore settings) => null;
+
         /// <summary>
         /// Creates a Playfield.
         /// </summary>
         /// <returns>The Playfield.</returns>
         protected abstract Playfield CreatePlayfield();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesetConfig != null)
+            {
+                onScreenDisplay?.StopTracking(this, rulesetConfig);
+                rulesetConfig = null;
+            }
+        }
     }
 
     /// <summary>
