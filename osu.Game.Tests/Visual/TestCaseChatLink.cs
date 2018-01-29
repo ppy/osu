@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual
                 var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
 
                 return linkSprites.All(d => d.Colour == linkColour)
-                    && newLine.ContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
+                       && newLine.ContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
             }
         }
 
@@ -102,9 +102,15 @@ namespace osu.Game.Tests.Visual
             addMessageWithChecks("[https://osu.ppy.sh/home This is only a link to the new osu webpage but this is supposed to test word wrap.]", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("is now listening to [https://osu.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", 1, true, expectedActions: LinkAction.OpenBeatmapSet);
             addMessageWithChecks("is now playing [https://osu.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", 1, true, expectedActions: LinkAction.OpenBeatmap);
-            addMessageWithChecks("Let's (try)[https://osu.ppy.sh/home] [https://osu.ppy.sh/b/252238 multiple links] https://osu.ppy.sh/home", 3, expectedActions: new[] { LinkAction.External, LinkAction.OpenBeatmap, LinkAction.External });
+            addMessageWithChecks("Let's (try)[https://osu.ppy.sh/home] [https://osu.ppy.sh/b/252238 multiple links] https://osu.ppy.sh/home", 3,
+                expectedActions: new[] { LinkAction.External, LinkAction.OpenBeatmap, LinkAction.External });
             // note that there's 0 links here (they get removed if a channel is not found)
             addMessageWithChecks("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
+            addMessageWithChecks("Join my multiplayer game osump://12346.", expectedActions: LinkAction.JoinMultiplayerMatch);
+            addMessageWithChecks("Join my [multiplayer game](osump://12346).", expectedActions: LinkAction.JoinMultiplayerMatch);
+            addMessageWithChecks("Join my [#english](osu://chan/english).", expectedActions: LinkAction.OpenChannel);
+            addMessageWithChecks("Join my osu://chan/english.", expectedActions: LinkAction.OpenChannel);
+            addMessageWithChecks("Join my #english.", expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks("I am important!", 0, false, true);
             addMessageWithChecks("feels important", 0, true, true);
             addMessageWithChecks("likes to post this [https://osu.ppy.sh/home link].", 1, true, true, expectedActions: LinkAction.External);
