@@ -43,7 +43,7 @@ namespace osu.Game.Online.Chat
         private static readonly Regex time_regex = new Regex(@"\d\d:\d\d:\d\d\d? [^-]*");
 
         // #osu
-        private static readonly Regex channel_regex = new Regex(@"#[a-zA-Z]+[a-zA-Z0-9]+");
+        private static readonly Regex channel_regex = new Regex(@"(#[a-zA-Z]+[a-zA-Z0-9]+)");
 
         // Unicode emojis
         private static readonly Regex emoji_regex = new Regex(@"(\uD83D[\uDC00-\uDE4F])");
