@@ -94,7 +94,19 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate;
+        }
 
+        protected override void CreateNestedHitObjects()
+        {
+            base.CreateNestedHitObjects();
+
+            createSliderEnds();
+            createTicks();
+            createRepeatPoints();
+        }
+
+        private void createSliderEnds()
+        {
             HeadCircle = new HitCircle
             {
                 StartTime = StartTime,
@@ -115,16 +127,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                 SampleControlPoint = SampleControlPoint
             };
 
-            HeadCircle.ApplyDefaults(controlPointInfo, difficulty);
-            TailCircle.ApplyDefaults(controlPointInfo, difficulty);
-        }
-
-        protected override void CreateNestedHitObjects()
-        {
-            base.CreateNestedHitObjects();
-
-            createTicks();
-            createRepeatPoints();
+            AddNested(HeadCircle);
+            AddNested(TailCircle);
         }
 
         private void createTicks()
