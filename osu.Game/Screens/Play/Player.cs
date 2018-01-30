@@ -209,6 +209,8 @@ namespace osu.Game.Screens.Play
                 {
                     Action = () =>
                     {
+                        if (!IsCurrentScreen) return;
+
                         //we want to hide the hitrenderer immediately (looks better).
                         //we may be able to remove this once the mouse cursor trail is improved.
                         RulesetContainer?.Hide();
@@ -274,6 +276,8 @@ namespace osu.Game.Screens.Play
             {
                 onCompletionEvent = Schedule(delegate
                 {
+                    if (!IsCurrentScreen) return;
+
                     var score = new Score
                     {
                         Beatmap = Beatmap.Value.BeatmapInfo,
