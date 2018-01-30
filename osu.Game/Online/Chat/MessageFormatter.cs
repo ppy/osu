@@ -25,7 +25,6 @@ namespace osu.Game.Online.Chat
         // This is in the format (<required>, [optional]):
         //      http[s]://<domain>.<tld>[:port][/path][?query][#fragment]
         private static readonly Regex advanced_link_regex = new Regex(
-                @"(?<paren>\([^)]*)?" +
                 // protocol
                 @"(?<link>[a-z]*?:\/\/" +
                 // domain + tld
@@ -90,19 +89,8 @@ namespace osu.Game.Online.Chat
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
                 var index = m.Index;
-                var prefix = m.Groups["paren"].Value;
                 var link = m.Groups["link"].Value;
                 var indexLength = link.Length;
-
-                if (!String.IsNullOrEmpty(prefix))
-                {
-                    index += prefix.Length;
-                    if (link.EndsWith(")"))
-                    {
-                        indexLength = indexLength - 1;
-                        link = link.Remove(link.Length - 1);
-                    }
-                }
 
                 var details = getLinkDetails(link);
                 result.Links.Add(new Link(link, index, indexLength, details.Action, details.Argument));
