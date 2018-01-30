@@ -108,9 +108,9 @@ namespace osu.Game.Tests.Chat
         [Test]
         public void TestOldFormatLink()
         {
-            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a (simple test)[https://osu.ppy.sh]." });
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a (simple test)[https://osu.ppy.sh] of links." });
 
-            Assert.AreEqual("This is a simple test.", result.DisplayContent);
+            Assert.AreEqual("This is a simple test of links.", result.DisplayContent);
             Assert.AreEqual(1, result.Links.Count);
             Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
             Assert.AreEqual(10, result.Links[0].Index);
@@ -127,6 +127,62 @@ namespace osu.Game.Tests.Chat
             Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
             Assert.AreEqual(10, result.Links[0].Index);
             Assert.AreEqual(11, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestMarkdownFormatLink()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a [simple test](https://osu.ppy.sh)." });
+
+            Assert.AreEqual("This is a simple test.", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(10, result.Links[0].Index);
+            Assert.AreEqual(11, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestChannelLink()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is an #english and #japanese." });
+
+            Assert.AreEqual("This is an #english and #japanese.", result.DisplayContent);
+            Assert.AreEqual(2, result.Links.Count);
+            Assert.AreEqual("osu://chan/#english", result.Links[0].Url);
+            Assert.AreEqual("osu://chan/#japanese", result.Links[1].Url);
+        }
+
+        [Test]
+        public void TestOsuProtocol()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a custom protocol osu://chan/#english." });
+
+            Assert.AreEqual("This is a custom protocol osu://chan/#english.", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("osu://chan/#english", result.Links[0].Url);
+            Assert.AreEqual(26, result.Links[0].Index);
+            Assert.AreEqual(19, result.Links[0].Length);
+
+            result = MessageFormatter.FormatMessage(new Message { Content = "This is a [custom protocol](osu://chan/#english)." });
+
+            Assert.AreEqual("This is a custom protocol.", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("osu://chan/#english", result.Links[0].Url);
+            Assert.AreEqual("#english", result.Links[0].Argument);
+            Assert.AreEqual(10, result.Links[0].Index);
+            Assert.AreEqual(15, result.Links[0].Length);
+        }
+
+        [Test]
+        public void TestOsuMpProtocol()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "Join my multiplayer game osump://12346." });
+
+            Assert.AreEqual(result.Content, result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("osump://12346", result.Links[0].Url);
+            Assert.AreEqual(25, result.Links[0].Index);
+            Assert.AreEqual(13, result.Links[0].Length);
         }
 
         [Test]
