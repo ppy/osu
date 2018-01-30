@@ -156,6 +156,7 @@ namespace osu.Game.Beatmaps
 
         public IQueryable<BeatmapInfo> Beatmaps => GetContext().BeatmapInfo
                                                                .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
+                                                               .Include(b => b.BeatmapSet).ThenInclude(s => s.Files).ThenInclude(f => f.FileInfo)
                                                                .Include(b => b.Metadata)
                                                                .Include(b => b.Ruleset)
                                                                .Include(b => b.BaseDifficulty);

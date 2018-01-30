@@ -137,7 +137,7 @@ namespace osu.Game.Beatmaps.Formats
             CentreRight,
             BottomLeft,
             BottomRight
-        };
+        }
 
         internal enum StoryLayer
         {

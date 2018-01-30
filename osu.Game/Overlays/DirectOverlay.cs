@@ -298,7 +298,7 @@ namespace osu.Game.Overlays
                 Task.Run(() =>
                 {
                     var onlineIds = response.Select(r => r.OnlineBeatmapSetID).ToList();
-                    var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID)).Select(r => r.OnlineBeatmapSetID).ToList();
+                    var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID) && !s.DeletePending).Select(r => r.OnlineBeatmapSetID).ToList();
                     var sets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID)).ToList();
 
                     // may not need scheduling; loads async internally.
@@ -311,6 +311,14 @@ namespace osu.Game.Overlays
             };
 
             api.Queue(getSetsRequest);
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+
+            if (playing != null)
+                playing.PreviewPlaying.Value = false;
         }
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;

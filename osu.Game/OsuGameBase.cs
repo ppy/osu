@@ -44,6 +44,10 @@ namespace osu.Game
 
         protected KeyBindingStore KeyBindingStore;
 
+        protected SettingsStore SettingsStore;
+
+        protected CursorOverrideContainer CursorOverrideContainer;
+
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
         public APIAccess API;
@@ -51,8 +55,6 @@ namespace osu.Game
         private Container content;
 
         protected override Container<Drawable> Content => content;
-
-        protected MenuCursor Cursor;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
@@ -93,7 +95,7 @@ namespace osu.Game
 
             dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
 
-            dependencies.Cache(this);
+            dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
 
             runMigrations();
@@ -109,10 +111,11 @@ namespace osu.Game
             dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory.GetContext, RulesetStore, API, Host));
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory.GetContext, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory.GetContext, RulesetStore));
+            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory.GetContext));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 }, true);
+            dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 });
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
@@ -209,23 +212,16 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            GlobalKeyBindingInputManager globalBinding;
+            GlobalActionContainer globalBinding;
 
-            base.Content.Add(new DrawSizePreservingFillContainer
+            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
+            CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
             {
-                Children = new Drawable[]
-                {
-                    Cursor = new MenuCursor(),
-                    globalBinding = new GlobalKeyBindingInputManager(this)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = content = new OsuTooltipContainer(Cursor)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    }
-                }
-            });
+                RelativeSizeAxes = Axes.Both,
+                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both　}
+            };
+
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);

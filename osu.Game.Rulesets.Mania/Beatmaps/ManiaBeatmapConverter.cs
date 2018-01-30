@@ -58,7 +58,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(Beatmap original)
         {
-
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
             int seed = (int)Math.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)Math.Round(difficulty.ApproachRate);
@@ -217,7 +216,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 if (curveData == null)
                     return HitObject.Samples;
 
-                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.RepeatCount;
+                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();
 
                 int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
                 return curveData.RepeatSamples[index];

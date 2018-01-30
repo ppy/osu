@@ -287,15 +287,16 @@ namespace osu.Game.Beatmaps
                         Import(archive);
 
                     downloadNotification.State = ProgressNotificationState.Completed;
+                    currentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
-
-                currentDownloads.Remove(request);
             };
 
-            request.Failure += data =>
+            request.Failure += error =>
             {
+                if (error is OperationCanceledException) return;
+
                 downloadNotification.State = ProgressNotificationState.Completed;
-                Logger.Error(data, "Failed to get beatmap download information");
+                Logger.Error(error, "Beatmap download failed!");
                 currentDownloads.Remove(request);
             };
 
@@ -566,7 +567,6 @@ namespace osu.Game.Beatmaps
             using (var stream = new StreamReader(reader.GetStream(mapName)))
                 metadata = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
 
-
             // check if a set already exists with the same online id.
             if (metadata.OnlineBeatmapSetID != null)
                 beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID);
@@ -580,7 +580,6 @@ namespace osu.Game.Beatmaps
                     Files = fileInfos,
                     Metadata = metadata
                 };
-
 
             var mapNames = reader.Filenames.Where(f => f.EndsWith(".osu"));
 
@@ -693,7 +692,6 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-
                     using (var beatmap = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                     {
                         Decoder decoder = Decoder.GetDecoder(beatmap);

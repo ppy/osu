@@ -180,7 +180,6 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-
             protected class OsuTabDropdownHeader : OsuDropdownHeader
             {
                 public override Color4 AccentColour

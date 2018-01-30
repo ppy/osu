@@ -113,6 +113,23 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        /// <summary>
+        /// Select one or more mods in this section.
+        /// </summary>
+        /// <param name="mods">The types of <see cref="Mod"/>s which should be deselected.</param>
+        public void SelectTypes(IEnumerable<Mod> mods)
+        {
+            foreach (var button in buttons)
+            {
+                for (int i = 0; i < button.Mods.Length; i++)
+                {
+                    foreach (var mod in mods)
+                        if (mod.GetType().IsInstanceOfType(button.Mods[i]))
+                            button.SelectAt(i);
+                }
+            }
+        }
+
         protected ModSection()
         {
             AutoSizeAxes = Axes.Y;
