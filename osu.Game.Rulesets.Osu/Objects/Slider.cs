@@ -80,6 +80,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double Velocity;
         public double TickDistance;
 
+        public HitCircle HeadCircle;
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
@@ -91,6 +93,18 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate;
+
+            HeadCircle = new HitCircle
+            {
+                StartTime = StartTime,
+                Position = StackedPosition,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboColour = ComboColour,
+                Samples = Samples,
+                SampleControlPoint = SampleControlPoint
+            };
+
+            HeadCircle.ApplyDefaults(controlPointInfo, difficulty);
         }
 
         protected override void CreateNestedHitObjects()
