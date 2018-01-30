@@ -193,6 +193,28 @@ namespace osu.Game.Migrations
                     b.ToTable("BeatmapSetInfo");
                 });
 
+            modelBuilder.Entity("osu.Game.Configuration.DatabasedSetting", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("IntKey")
+                        .HasColumnName("Key");
+
+                    b.Property<int?>("RulesetID");
+
+                    b.Property<string>("StringValue")
+                        .HasColumnName("Value");
+
+                    b.Property<int?>("Variant");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("RulesetID", "Variant");
+
+                    b.ToTable("Settings");
+                });
+
             modelBuilder.Entity("osu.Game.Input.Bindings.DatabasedKeyBinding", b =>
                 {
                     b.Property<int>("ID")
@@ -212,7 +234,7 @@ namespace osu.Game.Migrations
 
                     b.HasIndex("IntAction");
 
-                    b.HasIndex("Variant");
+                    b.HasIndex("RulesetID", "Variant");
 
                     b.ToTable("KeyBinding");
                 });

@@ -5,8 +5,6 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -20,10 +18,12 @@ using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.Music;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Music;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -63,6 +63,12 @@ namespace osu.Game.Overlays
 
             // required to let MusicController handle beatmap cycling.
             AlwaysPresent = true;
+        }
+
+        protected override bool OnDragStart(InputState state)
+        {
+            base.OnDragStart(state);
+            return true;
         }
 
         protected override bool OnDrag(InputState state)
