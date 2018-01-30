@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -27,6 +28,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Mods;
 using OpenTK.Graphics;
 
 namespace osu.Game
@@ -80,6 +82,9 @@ namespace osu.Game
 
         private SettingsOverlay settings;
 
+        // todo: move this to SongSelect once Screen has the ability to unsuspend.
+        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
+
         public OsuGame(string[] args = null)
         {
             this.args = args;
@@ -111,7 +116,7 @@ namespace osu.Game
                 Task.Run(() => BeatmapManager.Import(paths.ToArray()));
             }
 
-            dependencies.CacheAs<OsuGame>(this);
+            dependencies.CacheAs(this);
 
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
