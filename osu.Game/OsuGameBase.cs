@@ -212,10 +212,10 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            GlobalKeyBindingContainer globalBinding;
+            GlobalActionContainer globalBinding;
 
             CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
-            CursorOverrideContainer.Child = globalBinding = new GlobalKeyBindingContainer(this)
+            CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both　}
