@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -225,7 +226,7 @@ namespace osu.Game.Overlays.Chat
             username.Text = $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
 
             // remove non-existent channels from the link list
-            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chat?.AvailableChannels.TrueForAll(c => c.Name != link.Argument) != false);
+            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chat?.AvailableChannels.Any(c => c.Name == link.Argument) != true);
 
             contentFlow.Clear();
             contentFlow.AddLinks(message.DisplayContent, message.Links);

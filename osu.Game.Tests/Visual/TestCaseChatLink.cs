@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
 {
@@ -32,6 +33,9 @@ namespace osu.Game.Tests.Visual
             typeof(MessageFormatter)
         };
 
+        private DependencyContainer dependencies;
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
+
         public TestCaseChatLink()
         {
             Add(textContainer = new TestChatLineContainer
@@ -40,6 +44,20 @@ namespace osu.Game.Tests.Visual
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
+            });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            linkColour = colours.Blue;
+            dependencies.Cache(new ChatOverlay
+            {
+                AvailableChannels =
+                {
+                    new Channel { Name = "#english" },
+                    new Channel { Name = "#japanese" }
+                }
             });
 
             testLinksGeneral();
@@ -111,11 +129,12 @@ namespace osu.Game.Tests.Visual
             addMessageWithChecks("I am important!", 0, false, true);
             addMessageWithChecks("feels important", 0, true, true);
             addMessageWithChecks("likes to post this [https://osu.ppy.sh/home link].", 1, true, true, expectedActions: LinkAction.External);
-            addMessageWithChecks("Join my multiplayer game osump://12346.",1, expectedActions: LinkAction.JoinMultiplayerMatch);
+            addMessageWithChecks("Join my multiplayer game osump://12346.", 1, expectedActions: LinkAction.JoinMultiplayerMatch);
             addMessageWithChecks("Join my [multiplayer game](osump://12346).", 1, expectedActions: LinkAction.JoinMultiplayerMatch);
-            addMessageWithChecks("Join my [#english](osu://chan/english).", 1, expectedActions: LinkAction.OpenChannel);
+            addMessageWithChecks("Join my [#english](osu://chan/#english).", 1, expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks("Join my osu://chan/#english.", 1, expectedActions: LinkAction.OpenChannel);
-            addMessageWithChecks("Join my #english or #japanese channels.", 2, expectedActions: new [] { LinkAction.OpenChannel, LinkAction.OpenChannel });
+            addMessageWithChecks("Join my #english or #japanese channels.", 2, expectedActions: new[] { LinkAction.OpenChannel, LinkAction.OpenChannel });
+            addMessageWithChecks("Join my #english or #nonexistent #hashtag channels.", 1, expectedActions: LinkAction.OpenChannel);
         }
 
         private void testEcho()
@@ -141,12 +160,6 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            linkColour = colours.Blue;
-        }
-
         private class DummyEchoMessage : LocalEchoMessage
         {
             public DummyEchoMessage(string text)
@@ -160,6 +173,7 @@ namespace osu.Game.Tests.Visual
         private class DummyMessage : Message
         {
             private static long messageCounter;
+
             internal static readonly User TEST_SENDER_BACKGROUND = new User
             {
                 Username = @"i-am-important",
