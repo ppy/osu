@@ -54,10 +54,11 @@ namespace osu.Game.Graphics.Containers
             foreach (var link in links)
             {
                 AddText(text.Substring(previousLinkEnd, link.Index - previousLinkEnd));
-
                 AddLink(text.Substring(link.Index, link.Length), link.Url, link.Action, link.Argument);
                 previousLinkEnd = link.Index + link.Length;
             }
+
+            AddText(text.Substring(previousLinkEnd));
         }
 
         public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
