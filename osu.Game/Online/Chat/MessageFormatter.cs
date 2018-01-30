@@ -24,13 +24,20 @@ namespace osu.Game.Online.Chat
         // advanced, RFC-compatible regular expression that matches any possible URL, *but* allows certain invalid characters that are widely used
         // This is in the format (<required>, [optional]):
         //      http[s]://<domain>.<tld>[:port][/path][?query][#fragment]
-        private static readonly Regex advanced_link_regex = new Regex(@"(?<paren>\([^)]*)?" +
-                @"(?<link>https?:\/\/" +
-                    @"(?<domain>(?:[a-z0-9]\.|[a-z0-9][a-z0-9-]*[a-z0-9]\.)*[a-z][a-z0-9-]*[a-z0-9]" + // domain, TLD
-                    @"(?::\d+)?)" + // port
-                        @"(?<path>(?:(?:\/+(?:[a-z0-9$_\.\+!\*\',;:\(\)@&~=-]|%[0-9a-f]{2})*)*" + // path
-                        @"(?:\?(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?" + // query
-                        @"(?:#(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?)", // fragment
+        private static readonly Regex advanced_link_regex = new Regex(
+                @"(?<paren>\([^)]*)?" +
+                // protocol
+                @"(?<link>[a-z]*?:\/\/" +
+                // domain + tld
+                @"(?<domain>(?:[a-z0-9]\.|[a-z0-9][a-z0-9-]*[a-z0-9]\.)*[a-z0-9-]*[a-z0-9]" +
+                // port (optional)
+                @"(?::\d+)?)" +
+                // path (optional)
+                @"(?<path>(?:(?:\/+(?:[a-z0-9$_\.\+!\*\',;:\(\)@&~=-]|%[0-9a-f]{2})*)*" +
+                // query (optional)
+                @"(?:\?(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?" +
+                // fragment (optional)
+                @"(?:#(?:[a-z0-9$_\+!\*\',;:\(\)@&=\/~-]|%[0-9a-f]{2})*)?)?)",
                 RegexOptions.IgnoreCase);
 
         // 00:00:000 (1,2,3) - test
