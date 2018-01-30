@@ -100,6 +100,7 @@ namespace osu.Game.Tests.Visual
             addMessageWithChecks("Wiki link for tasty [[Performance Points]]", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("(osu forums)[https://osu.ppy.sh/forum] (old link format)", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("[https://osu.ppy.sh/home New site] (new link format)", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("[osu forums](https://osu.ppy.sh/forum) (new link format 2)", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("[https://osu.ppy.sh/home This is only a link to the new osu webpage but this is supposed to test word wrap.]", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("is now listening to [https://osu.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", 1, true, expectedActions: LinkAction.OpenBeatmapSet);
             addMessageWithChecks("is now playing [https://osu.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", 1, true, expectedActions: LinkAction.OpenBeatmap);
@@ -113,8 +114,8 @@ namespace osu.Game.Tests.Visual
             addMessageWithChecks("Join my multiplayer game osump://12346.",1, expectedActions: LinkAction.JoinMultiplayerMatch);
             addMessageWithChecks("Join my [multiplayer game](osump://12346).", 1, expectedActions: LinkAction.JoinMultiplayerMatch);
             addMessageWithChecks("Join my [#english](osu://chan/english).", 1, expectedActions: LinkAction.OpenChannel);
-            addMessageWithChecks("Join my osu://chan/english.", 1, expectedActions: LinkAction.OpenChannel);
-            addMessageWithChecks("Join my #english.", 1, expectedActions: LinkAction.OpenChannel);
+            addMessageWithChecks("Join my osu://chan/#english.", 1, expectedActions: LinkAction.OpenChannel);
+            addMessageWithChecks("Join my #english or #japanese channels.", 2, expectedActions: new [] { LinkAction.OpenChannel, LinkAction.OpenChannel });
         }
 
         private void testEcho()
