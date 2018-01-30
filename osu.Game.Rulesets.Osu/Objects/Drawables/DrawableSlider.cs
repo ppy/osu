@@ -18,14 +18,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableSlider : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
         private readonly Slider slider;
-
-        public readonly DrawableHitCircle HeadCircle;
-
         private readonly List<Drawable> components = new List<Drawable>();
 
-        private readonly Container<DrawableSliderTick> ticks;
-        private readonly Container<DrawableRepeatPoint> repeatPoints;
-
+        public readonly DrawableHitCircle HeadCircle;
         public readonly SliderBody Body;
         public readonly SliderBall Ball;
 
@@ -33,6 +28,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             : base(s)
         {
             slider = s;
+
+            DrawableSliderTail tail;
+            Container<DrawableSliderTick> ticks;
+            Container<DrawableRepeatPoint> repeatPoints;
 
             Children = new Drawable[]
             {
@@ -51,13 +50,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableHitCircle(s.HeadCircle)
+                HeadCircle = new DrawableHitCircle(s.HeadCircle),
+                tail = new DrawableSliderTail(s.TailCircle)
             };
 
             components.Add(Body);
             components.Add(Ball);
 
             AddNested(HeadCircle);
+
+            AddNested(tail);
+            components.Add(tail);
 
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
@@ -73,6 +76,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 };
 
                 ticks.Add(drawableTick);
+                components.Add(drawableTick);
                 AddNested(drawableTick);
             }
 
@@ -112,17 +116,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(progress, span);
             foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
-            foreach (var t in ticks.Children) t.Tracking = Ball.Tracking;
+            foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
-                var judgementsCount = ticks.Children.Count + repeatPoints.Children.Count + 1;
-                var judgementsHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit)) + repeatPoints.Children.Count(t => t.Judgements.Any(j => j.IsHit));
-                if (HeadCircle.Judgements.Any(j => j.IsHit))
-                    judgementsHit++;
+                var judgementsCount = NestedHitObjects.Count;
+                var judgementsHit = NestedHitObjects.Count(h => h.IsHit);
 
                 var hitFraction = (double)judgementsHit / judgementsCount;
                 if (hitFraction == 1 && HeadCircle.Judgements.Any(j => j.Result == HitResult.Great))
