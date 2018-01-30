@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 currentSpan = span;
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (!HeadCircle.Judgements.Any(j => j.IsHit))
+            if (!HeadCircle.IsHit)
                 HeadCircle.Position = slider.Curve.PositionAt(progress);
 
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(progress, span);
