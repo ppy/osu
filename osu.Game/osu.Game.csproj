@@ -446,8 +446,8 @@
     <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeMeter.cs" />
     <Compile Include="Input\Bindings\DatabasedKeyBinding.cs" />
-    <Compile Include="Input\Bindings\DatabasedKeyBindingInputManager.cs" />
-    <Compile Include="Input\Bindings\GlobalKeyBindingInputManager.cs" />
+    <Compile Include="Input\Bindings\DatabasedKeyBindingContainer.cs" />
+    <Compile Include="Input\Bindings\GlobalActionContainer.cs" />
     <Compile Include="Input\Handlers\ReplayInputHandler.cs" />
     <Compile Include="Input\KeyBindingStore.cs" />
     <Compile Include="IO\FileInfo.cs" />
