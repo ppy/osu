@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Chat
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a http://www.basic-link.com/?test=test." });
 
-            Assert.AreEqual("This is a http://www.basic-link.com/?test=test.", result.DisplayContent);
+            Assert.AreEqual(result.Content, result.DisplayContent);
             Assert.AreEqual(1, result.Links.Count);
             Assert.AreEqual("http://www.basic-link.com/?test=test", result.Links[0].Url);
             Assert.AreEqual(10, result.Links[0].Index);
@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Chat
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a http://test.io/link#fragment. (see https://twitter.com). Also, This string should not be altered. http://example.com/" });
 
-            Assert.AreEqual("This is a http://test.io/link#fragment. (see https://twitter.com). Also, This string should not be altered. http://example.com/", result.DisplayContent);
+            Assert.AreEqual(result.Content, result.DisplayContent);
             Assert.AreEqual(3, result.Links.Count);
 
             Assert.AreEqual("http://test.io/link#fragment", result.Links[0].Url);
@@ -47,7 +47,8 @@ namespace osu.Game.Tests.Chat
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "https://twitter.com/#!/hashbanglinks" });
 
-            Assert.AreEqual("https://twitter.com/#!/hashbanglinks", result.DisplayContent);
+            Assert.AreEqual(result.Content, result.DisplayContent);
+            Assert.AreEqual(result.Content, result.Links[0].Url);
             Assert.AreEqual(0, result.Links[0].Index);
             Assert.AreEqual(36, result.Links[0].Length);
         }
@@ -57,7 +58,8 @@ namespace osu.Game.Tests.Chat
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "http://www.chiark.greenend.org.uk/~sgtatham/putty/" });
 
-            Assert.AreEqual("http://www.chiark.greenend.org.uk/~sgtatham/putty/", result.DisplayContent);
+            Assert.AreEqual(result.Content, result.DisplayContent);
+            Assert.AreEqual(result.Content, result.Links[0].Url);
             Assert.AreEqual(0, result.Links[0].Index);
             Assert.AreEqual(50, result.Links[0].Length);
         }
@@ -67,7 +69,7 @@ namespace osu.Game.Tests.Chat
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "look: http://puu.sh/7Ggh8xcC6/asf0asd9876.NEF" });
 
-            Assert.AreEqual("look: http://puu.sh/7Ggh8xcC6/asf0asd9876.NEF", result.DisplayContent);
+            Assert.AreEqual(result.Content, result.DisplayContent);
             Assert.AreEqual(6, result.Links[0].Index);
             Assert.AreEqual(39, result.Links[0].Length);
         }
@@ -146,7 +148,7 @@ namespace osu.Game.Tests.Chat
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "This is an #english and #japanese." });
 
-            Assert.AreEqual("This is an #english and #japanese.", result.DisplayContent);
+            Assert.AreEqual(result.Content, result.DisplayContent);
             Assert.AreEqual(2, result.Links.Count);
             Assert.AreEqual("osu://chan/#english", result.Links[0].Url);
             Assert.AreEqual("osu://chan/#japanese", result.Links[1].Url);
@@ -157,7 +159,7 @@ namespace osu.Game.Tests.Chat
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a custom protocol osu://chan/#english." });
 
-            Assert.AreEqual("This is a custom protocol osu://chan/#english.", result.DisplayContent);
+            Assert.AreEqual(result.Content, result.DisplayContent);
             Assert.AreEqual(1, result.Links.Count);
             Assert.AreEqual("osu://chan/#english", result.Links[0].Url);
             Assert.AreEqual(26, result.Links[0].Index);
