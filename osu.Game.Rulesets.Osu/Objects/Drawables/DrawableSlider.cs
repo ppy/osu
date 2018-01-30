@@ -133,9 +133,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
-                var judgementsCount = ticks.Children.Count + repeatPoints.Children.Count + 1;
+                var judgementsCount = ticks.Children.Count + repeatPoints.Children.Count + 2;
                 var judgementsHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit)) + repeatPoints.Children.Count(t => t.Judgements.Any(j => j.IsHit));
                 if (InitialCircle.Judgements.Any(j => j.IsHit))
+                    judgementsHit++;
+                if (Ball.Tracking)
                     judgementsHit++;
 
                 var hitFraction = (double)judgementsHit / judgementsCount;
