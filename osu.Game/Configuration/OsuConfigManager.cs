@@ -8,7 +8,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Configuration
 {
-    public class OsuConfigManager : ConfigManager<OsuSetting>
+    public class OsuConfigManager : IniConfigManager<OsuSetting>
     {
         protected override void InitialiseDefaults()
         {
