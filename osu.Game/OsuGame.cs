@@ -19,6 +19,7 @@ using OpenTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Audio;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -122,7 +123,7 @@ namespace osu.Game
             Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
 
-            muteWhenInactive = LocalConfig.GetBindable<bool>(OsuSetting.MuteWhenInactive);
+            LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveDuckVolume);
         }
 
         private ScheduledDelegate scoreLoad;
@@ -400,24 +401,19 @@ namespace osu.Game
             return false;
         }
 
-        private Bindable<bool> muteWhenInactive = new Bindable<bool>();
-        private bool wasMuted;
+        private readonly BindableDouble inactiveDuckVolume = new BindableDouble();
 
         protected override void OnDeactivated()
         {
             base.OnDeactivated();
-            if (muteWhenInactive)
-            {
-                wasMuted = volume.Muted;
-                volume.Muted = true;
-            }
+            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveDuckVolume);
         }
 
         protected override void OnActivated()
         {
             base.OnActivated();
-            if (IsLoaded && muteWhenInactive && !wasMuted)
-                volume.Muted = false;
+            Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveDuckVolume);
+
         }
 
         public bool OnReleased(GlobalAction action) => false;
