@@ -32,6 +32,10 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\JetBrains.Annotations.11.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -58,12 +62,14 @@
     <Compile Include="Beatmaps\Patterns\Legacy\PatternType.cs" />
     <Compile Include="Beatmaps\ManiaBeatmapConverter.cs" />
     <Compile Include="Beatmaps\Patterns\Pattern.cs" />
+    <Compile Include="Configuration\ManiaConfigManager.cs" />
     <Compile Include="MathUtils\FastRandom.cs" />
     <Compile Include="Judgements\HitWindows.cs" />
     <Compile Include="Judgements\HoldNoteTailJudgement.cs" />
     <Compile Include="Judgements\HoldNoteTickJudgement.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
+    <Compile Include="Mods\IPlayfieldTypeMod.cs" />
     <Compile Include="Mods\ManiaKeyMod.cs" />
     <Compile Include="Mods\ManiaModAutoplay.cs" />
     <Compile Include="Mods\ManiaModDaycore.cs" />
@@ -83,7 +89,7 @@
     <Compile Include="Mods\ManiaModKey7.cs" />
     <Compile Include="Mods\ManiaModKey8.cs" />
     <Compile Include="Mods\ManiaModKey9.cs" />
-    <Compile Include="Mods\ManiaModKeyCoop.cs" />
+    <Compile Include="Mods\ManiaModDualStages.cs" />
     <Compile Include="Mods\ManiaModNightcore.cs" />
     <Compile Include="Mods\ManiaModPerfect.cs" />
     <Compile Include="Mods\ManiaModRandom.cs" />
@@ -115,12 +121,12 @@
     <Compile Include="Tests\TestCasePerformancePoints.cs" />
     <Compile Include="UI\Column.cs" />
     <Compile Include="UI\DrawableManiaJudgement.cs" />
+    <Compile Include="UI\ManiaStage.cs" />
     <Compile Include="UI\HitExplosion.cs" />
     <Compile Include="UI\ManiaRulesetContainer.cs" />
     <Compile Include="UI\ManiaPlayfield.cs" />
     <Compile Include="ManiaRuleset.cs" />
     <Compile Include="Mods\ManiaModNoFail.cs" />
-    <Compile Include="UI\SpecialColumnPosition.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

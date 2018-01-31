@@ -5,6 +5,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class SliderTick : OsuHitObject
     {
-        public int RepeatIndex { get; set; }
+        public int SpanIndex { get; set; }
     }
 }

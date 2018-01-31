@@ -11,13 +11,14 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
+using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class Column : ScrollingPlayfield, IHasAccentColour
+    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
         private const float key_icon_size = 10;
         private const float key_icon_corner_radius = 3;
@@ -47,6 +48,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public Column()
             : base(ScrollingDirection.Up)
         {
+            RelativeSizeAxes = Axes.Y;
             Width = column_width;
 
             InternalChildren = new Drawable[]
@@ -61,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Name = "Hit target + hit objects",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = ManiaPlayfield.HIT_TARGET_POSITION },
+                    Padding = new MarginPadding { Top = ManiaStage.HIT_TARGET_POSITION },
                     Children = new Drawable[]
                     {
                         new Container
@@ -115,7 +117,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Name = "Key",
                     RelativeSizeAxes = Axes.X,
-                    Height = ManiaPlayfield.HIT_TARGET_POSITION,
+                    Height = ManiaStage.HIT_TARGET_POSITION,
                     Children = new Drawable[]
                     {
                         new Box
@@ -205,12 +207,12 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             hitObject.Depth = (float)hitObject.HitObject.StartTime;
             hitObject.AccentColour = AccentColour;
-            hitObject.OnJudgement += onJudgement;
+            hitObject.OnJudgement += OnJudgement;
 
             HitObjects.Add(hitObject);
         }
 
-        private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             if (!judgement.IsHit)
                 return;
@@ -258,5 +260,26 @@ namespace osu.Game.Rulesets.Mania.UI
             public bool OnPressed(ManiaAction action) => Pressed?.Invoke(action) ?? false;
             public bool OnReleased(ManiaAction action) => Released?.Invoke(action) ?? false;
         }
+
+        public bool OnPressed(ManiaAction action)
+        {
+            // Play the sounds of the next hitobject
+            if (HitObjects.AliveObjects.Any())
+            {
+                // If there are alive hitobjects, we can abuse the fact that AliveObjects are sorted by time (see: Add())
+                HitObjects.AliveObjects.First().PlaySamples();
+            }
+            else
+            {
+                // If not, we do a slow search - we might want to do a BinarySearch here if this becomes problematic
+                // We fallback to LastOrDefault() if we're beyond the last note in the map
+                var hitObject = HitObjects.Objects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ?? HitObjects.Objects.LastOrDefault();
+                hitObject?.PlaySamples();
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(ManiaAction action) => false;
     }
 }
