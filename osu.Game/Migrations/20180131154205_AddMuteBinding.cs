@@ -18,7 +18,7 @@ namespace osu.Game.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("DELETE FROM KeyBinding WHERE RulesetID IS NULL AND Variant IS NULL AND Action = 8");
+            migrationBuilder.Sql($"DELETE FROM KeyBinding WHERE RulesetID IS NULL AND Variant IS NULL AND Action = {(int)GlobalAction.ToggleMute}");
             migrationBuilder.Sql($"UPDATE KeyBinding SET Action = Action - 1 WHERE RulesetID IS NULL AND Variant IS NULL AND Action > {(int)GlobalAction.ToggleMute}");
         }
     }
