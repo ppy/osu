@@ -39,8 +39,6 @@ namespace osu.Game.Configuration
             };
 
             // Audio
-            Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
-
             Set(OsuSetting.MenuVoice, true);
             Set(OsuSetting.MenuMusic, true);
 
@@ -103,7 +101,6 @@ namespace osu.Game.Configuration
         MouseDisableButtons,
         MouseDisableWheel,
         AudioOffset,
-        VolumeInactive,
         MenuMusic,
         MenuVoice,
         CursorRotation,
