@@ -59,18 +59,10 @@ namespace osu.Game.Graphics.UserInterface.Volume
         {
             base.LoadComplete();
 
-            volumeMeterMaster.Bindable.ValueChanged += volumeChanged;
-            volumeMeterEffect.Bindable.ValueChanged += volumeChanged;
-            volumeMeterMusic.Bindable.ValueChanged += volumeChanged;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            volumeMeterMaster.Bindable.ValueChanged -= volumeChanged;
-            volumeMeterEffect.Bindable.ValueChanged -= volumeChanged;
-            volumeMeterMusic.Bindable.ValueChanged -= volumeChanged;
+            volumeMeterMaster.Bindable.ValueChanged += _ => settingChanged();
+            volumeMeterEffect.Bindable.ValueChanged += _ => settingChanged();
+            volumeMeterMusic.Bindable.ValueChanged += _ => settingChanged();
+            muted.ValueChanged += _ => settingChanged();
         }
 
         public bool Adjust(GlobalAction action)
@@ -98,13 +90,13 @@ namespace osu.Game.Graphics.UserInterface.Volume
             return false;
         }
 
-        private void volumeChanged(double newVolume)
+        private void settingChanged()
         {
             Show();
             schedulePopOut();
         }
 
-        private readonly BindableDouble muteBindable = new BindableDouble();
+        private readonly BindableDouble muteAdjustment = new BindableDouble();
 
         private readonly BindableBool muted = new BindableBool();
 
@@ -119,12 +111,12 @@ namespace osu.Game.Graphics.UserInterface.Volume
             {
                 if (mute)
                 {
-                    audio.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+                    audio.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);
                     muteIcon.Icon = FontAwesome.fa_volume_off;
                 }
                 else
                 {
-                    audio.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+                    audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
                     muteIcon.Icon = FontAwesome.fa_volume_up;
                 }
             };
