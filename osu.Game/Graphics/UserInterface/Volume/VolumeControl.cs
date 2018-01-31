@@ -7,6 +7,7 @@ using osu.Framework.Threading;
 using OpenTK;
 using osu.Framework.Audio;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface.Volume
@@ -14,6 +15,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
     public class VolumeControl : OverlayContainer
     {
         private readonly VolumeMeter volumeMeterMaster;
+        private readonly IconButton muteIcon;
 
         protected override bool BlockPassThroughMouse => false;
 
@@ -34,6 +36,17 @@ namespace osu.Game.Graphics.UserInterface.Volume
                     Spacing = new Vector2(15, 0),
                     Children = new Drawable[]
                     {
+                        new Container
+                        {
+                            Size = new Vector2(IconButton.BUTTON_SIZE),
+                            Child = muteIcon = new IconButton
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Icon = FontAwesome.fa_volume_up,
+                                Action = () => Adjust(GlobalAction.ToggleMute),
+                            }
+                        },
                         volumeMeterMaster = new VolumeMeter("Master"),
                         volumeMeterEffect = new VolumeMeter("Effects"),
                         volumeMeterMusic = new VolumeMeter("Music")
@@ -46,18 +59,10 @@ namespace osu.Game.Graphics.UserInterface.Volume
         {
             base.LoadComplete();
 
-            volumeMeterMaster.Bindable.ValueChanged += volumeChanged;
-            volumeMeterEffect.Bindable.ValueChanged += volumeChanged;
-            volumeMeterMusic.Bindable.ValueChanged += volumeChanged;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            volumeMeterMaster.Bindable.ValueChanged -= volumeChanged;
-            volumeMeterEffect.Bindable.ValueChanged -= volumeChanged;
-            volumeMeterMusic.Bindable.ValueChanged -= volumeChanged;
+            volumeMeterMaster.Bindable.ValueChanged += _ => settingChanged();
+            volumeMeterEffect.Bindable.ValueChanged += _ => settingChanged();
+            volumeMeterMusic.Bindable.ValueChanged += _ => settingChanged();
+            muted.ValueChanged += _ => settingChanged();
         }
 
         public bool Adjust(GlobalAction action)
@@ -76,16 +81,24 @@ namespace osu.Game.Graphics.UserInterface.Volume
                     else
                         volumeMeterMaster.Increase();
                     return true;
+                case GlobalAction.ToggleMute:
+                    Show();
+                    muted.Toggle();
+                    return true;
             }
 
             return false;
         }
 
-        private void volumeChanged(double newVolume)
+        private void settingChanged()
         {
             Show();
             schedulePopOut();
         }
+
+        private readonly BindableDouble muteAdjustment = new BindableDouble();
+
+        private readonly BindableBool muted = new BindableBool();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -93,6 +106,20 @@ namespace osu.Game.Graphics.UserInterface.Volume
             volumeMeterMaster.Bindable.BindTo(audio.Volume);
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
+
+            muted.ValueChanged += mute =>
+            {
+                if (mute)
+                {
+                    audio.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);
+                    muteIcon.Icon = FontAwesome.fa_volume_off;
+                }
+                else
+                {
+                    audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
+                    muteIcon.Icon = FontAwesome.fa_volume_up;
+                }
+            };
         }
 
         private ScheduledDelegate popOutDelegate;
