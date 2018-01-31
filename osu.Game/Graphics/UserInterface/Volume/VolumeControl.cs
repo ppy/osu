@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
                     return true;
                 case GlobalAction.ToggleMute:
                     Show();
-                    Muted = !Muted;
+                    muted.Toggle();
                     return true;
             }
 
@@ -102,12 +102,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
         private readonly BindableDouble muteBindable = new BindableDouble();
 
         private readonly BindableBool muted = new BindableBool();
-
-        public bool Muted
-        {
-            get => muted.Value;
-            set => muted.Value = value;
-        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
