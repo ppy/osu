@@ -36,11 +36,16 @@ namespace osu.Game.Graphics.UserInterface.Volume
                     Spacing = new Vector2(15, 0),
                     Children = new Drawable[]
                     {
-                        muteIcon = new IconButton
+                        new Container
                         {
-                            Icon = FontAwesome.fa_volume_up,
-                            Scale = new Vector2(2.0f),
-                            Action = () => Adjust(GlobalAction.ToggleMute),
+                            Size = new Vector2(IconButton.BUTTON_SIZE),
+                            Child = muteIcon = new IconButton
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Icon = FontAwesome.fa_volume_up,
+                                Action = () => Adjust(GlobalAction.ToggleMute),
+                            }
                         },
                         volumeMeterMaster = new VolumeMeter("Master"),
                         volumeMeterEffect = new VolumeMeter("Effects"),
