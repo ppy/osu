@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler
         where T : struct
     {
-        public class RulesetKeyBindingContainer : DatabasedKeyBindingInputManager<T>
+        public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
         {
             public RulesetKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
