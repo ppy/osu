@@ -413,7 +413,6 @@ namespace osu.Game
         {
             base.OnActivated();
             Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
-
         }
 
         public bool OnReleased(GlobalAction action) => false;
