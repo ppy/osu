@@ -19,7 +19,6 @@ using OpenTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework.Audio;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -122,8 +121,6 @@ namespace osu.Game
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
-
-            LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveDuckVolume);
         }
 
         private ScheduledDelegate scoreLoad;
@@ -399,21 +396,6 @@ namespace osu.Game
             }
 
             return false;
-        }
-
-        private readonly BindableDouble inactiveDuckVolume = new BindableDouble();
-
-        protected override void OnDeactivated()
-        {
-            base.OnDeactivated();
-            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveDuckVolume);
-        }
-
-        protected override void OnActivated()
-        {
-            base.OnActivated();
-            Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveDuckVolume);
-
         }
 
         public bool OnReleased(GlobalAction action) => false;
