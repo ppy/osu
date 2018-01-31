@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double HitWindow100 = 80;
         public double HitWindow300 = 30;
 
-        public float TimePreempt = 600;
-        public float TimeFadein = 400;
+        public double TimePreempt = 600;
+        public double TimeFadein = 400;
 
         public Vector2 Position { get; set; }
         public float X => Position.X;
