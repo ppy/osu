@@ -35,10 +35,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             ScaledContent.AddRange(new Drawable[]
             {
-                content = new Container<Drawable>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
                 explodingFruitContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -49,7 +45,11 @@ namespace osu.Game.Rulesets.Catch.UI
                     ExplodingFruitTarget = explodingFruitContainer,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
-                }
+                },
+                content = new Container<Drawable>
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
             });
         }
 

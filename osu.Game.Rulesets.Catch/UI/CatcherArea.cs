@@ -84,9 +84,9 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             var state = GetContainingInputManager().CurrentState as CatchFramedReplayInputHandler.CatchReplayState;
 
