@@ -41,6 +41,12 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         private readonly InfoContainer info;
         private readonly ArrowsOverlay arrowsOverlay;
 
+        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
+            : this(letterboxing)
+        {
+            bindProcessor(scoreProcessor);
+        }
+
         public BreakOverlay(bool letterboxing)
         {
             this.letterboxing = letterboxing;
@@ -148,7 +154,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             arrowsOverlay.Hide();
         }
 
-        public void BindProcessor(ScoreProcessor processor)
+        private void bindProcessor(ScoreProcessor processor)
         {
             info.AccuracyDisplay.Current.BindTo(processor.Accuracy);
             info.GradeDisplay.Current.BindTo(processor.Rank);

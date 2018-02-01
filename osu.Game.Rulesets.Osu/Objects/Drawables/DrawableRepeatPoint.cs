@@ -22,8 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         private bool isRepeatAtEnd => repeatPoint.RepeatIndex % 2 == 0;
 
-        public double FadeInTime;
-        public double FadeOutTime;
+        private double animDuration;
 
         public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
             : base(repeatPoint)
@@ -54,11 +53,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdatePreemptState()
         {
-            var animIn = Math.Min(150, repeatPoint.StartTime - FadeInTime);
+            animDuration = Math.Min(150, repeatPoint.SpanDuration / 2);
 
-            this.FadeIn(animIn).ScaleTo(1.2f, animIn)
+            this.FadeIn(animDuration).ScaleTo(1.2f, animDuration / 2)
                 .Then()
-                .ScaleTo(1, 150, Easing.Out);
+                .ScaleTo(1, animDuration / 2, Easing.Out);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -66,14 +65,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(FadeOutTime - repeatPoint.StartTime).FadeOut();
+                    this.Delay(HitObject.TimePreempt).FadeOut();
                     break;
                 case ArmedState.Miss:
-                    this.FadeOut(160);
+                    this.FadeOut(animDuration);
                     break;
                 case ArmedState.Hit:
-                    this.FadeOut(120, Easing.OutQuint)
-                        .ScaleTo(Scale * 1.5f, 120, Easing.OutQuint);
+                    this.FadeOut(animDuration, Easing.OutQuint)
+                        .ScaleTo(Scale * 1.5f, animDuration, Easing.OutQuint);
                     break;
             }
         }
