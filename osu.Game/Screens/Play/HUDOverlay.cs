@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
-        public readonly ReplaySettingsOverlay ReplaySettingsOverlay;
+        public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         private Bindable<bool> showHud;
         private readonly BindableBool replayLoaded = new BindableBool();
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
-                    ReplaySettingsOverlay = CreateReplaySettingsOverlay(),
+                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay()
                 }
             });
 
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play
 
             ModDisplay.Current.BindTo(working.Mods);
 
-            ReplaySettingsOverlay.PlaybackSettings.AdjustableClock = adjustableSourceClock;
+            PlayerSettingsOverlay.PlaybackSettings.AdjustableClock = adjustableSourceClock;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -115,16 +115,16 @@ namespace osu.Game.Screens.Play
 
         private void replayLoadedValueChanged(bool loaded)
         {
-            ReplaySettingsOverlay.ReplayLoaded = loaded;
+            PlayerSettingsOverlay.ReplayLoaded = loaded;
 
             if (loaded)
             {
-                ReplaySettingsOverlay.Show();
+                PlayerSettingsOverlay.Show();
                 ModDisplay.FadeIn(200);
             }
             else
             {
-                ReplaySettingsOverlay.Hide();
+                PlayerSettingsOverlay.Hide();
                 ModDisplay.Delay(2000).FadeOut(200);
             }
         }
@@ -213,7 +213,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
-        protected virtual ReplaySettingsOverlay CreateReplaySettingsOverlay() => new ReplaySettingsOverlay();
+        protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
         protected virtual void BindProcessor(ScoreProcessor processor)
         {
