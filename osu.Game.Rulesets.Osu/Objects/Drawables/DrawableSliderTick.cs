@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
@@ -14,10 +13,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderTick : DrawableOsuHitObject, IRequireTracking
     {
-        private readonly SliderTick sliderTick;
-
-        public double FadeInTime;
-        public double FadeOutTime;
+        private const double anim_duration = 150;
 
         public bool Tracking { get; set; }
 
@@ -25,8 +21,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
-            this.sliderTick = sliderTick;
-
             Size = new Vector2(16) * sliderTick.Scale;
 
             Masking = true;
@@ -56,13 +50,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdatePreemptState()
         {
-            var animIn = Math.Min(150, sliderTick.StartTime - FadeInTime);
-
             this.Animate(
-                d => d.FadeIn(animIn),
-                d => d.ScaleTo(0.5f).ScaleTo(1.2f, animIn)
+                d => d.FadeIn(anim_duration),
+                d => d.ScaleTo(0.5f).ScaleTo(1.2f, anim_duration / 2)
             ).Then(
-                d => d.ScaleTo(1, 150, Easing.Out)
+                d => d.ScaleTo(1, anim_duration / 2, Easing.Out)
             );
         }
 
@@ -71,15 +63,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(FadeOutTime - sliderTick.StartTime).FadeOut();
+                    this.Delay(HitObject.TimePreempt).FadeOut();
                     break;
                 case ArmedState.Miss:
-                    this.FadeOut(160)
-                        .FadeColour(Color4.Red, 80);
+                    this.FadeOut(anim_duration)
+                        .FadeColour(Color4.Red, anim_duration / 2);
                     break;
                 case ArmedState.Hit:
-                    this.FadeOut(120, Easing.OutQuint)
-                        .ScaleTo(Scale * 1.5f, 120, Easing.OutQuint);
+                    this.FadeOut(anim_duration, Easing.OutQuint)
+                        .ScaleTo(Scale * 1.5f, anim_duration, Easing.OutQuint);
                     break;
             }
         }
