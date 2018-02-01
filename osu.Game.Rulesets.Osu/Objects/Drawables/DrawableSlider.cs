@@ -18,14 +18,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableSlider : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
         private readonly Slider slider;
-
-        public readonly DrawableHitCircle InitialCircle;
-
         private readonly List<Drawable> components = new List<Drawable>();
 
-        private readonly Container<DrawableSliderTick> ticks;
-        private readonly Container<DrawableRepeatPoint> repeatPoints;
-
+        public readonly DrawableHitCircle HeadCircle;
         public readonly SliderBody Body;
         public readonly SliderBall Ball;
 
@@ -33,6 +28,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             : base(s)
         {
             slider = s;
+
+            DrawableSliderTail tail;
+            Container<DrawableSliderTick> ticks;
+            Container<DrawableRepeatPoint> repeatPoints;
 
             Children = new Drawable[]
             {
@@ -51,27 +50,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                InitialCircle = new DrawableHitCircle(new HitCircle
-                {
-                    StartTime = s.StartTime,
-                    Position = s.StackedPosition,
-                    IndexInCurrentCombo = s.IndexInCurrentCombo,
-                    Scale = s.Scale,
-                    ComboColour = s.ComboColour,
-                    Samples = s.Samples,
-                    SampleControlPoint = s.SampleControlPoint,
-                    TimePreempt = s.TimePreempt,
-                    TimeFadein = s.TimeFadein,
-                    HitWindow300 = s.HitWindow300,
-                    HitWindow100 = s.HitWindow100,
-                    HitWindow50 = s.HitWindow50
-                })
+                HeadCircle = new DrawableHitCircle(s.HeadCircle),
+                tail = new DrawableSliderTail(s.TailCircle)
             };
 
             components.Add(Body);
             components.Add(Ball);
 
-            AddNested(InitialCircle);
+            AddNested(HeadCircle);
+
+            AddNested(tail);
+            components.Add(tail);
 
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
@@ -87,6 +76,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 };
 
                 ticks.Add(drawableTick);
+                components.Add(drawableTick);
                 AddNested(drawableTick);
             }
 
@@ -121,27 +111,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 currentSpan = span;
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (!InitialCircle.Judgements.Any(j => j.IsHit))
-                InitialCircle.Position = slider.Curve.PositionAt(progress);
+            if (!HeadCircle.IsHit)
+                HeadCircle.Position = slider.Curve.PositionAt(progress);
 
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(progress, span);
             foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
-            foreach (var t in ticks.Children) t.Tracking = Ball.Tracking;
+            foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
-                var judgementsCount = ticks.Children.Count + repeatPoints.Children.Count + 1;
-                var judgementsHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit)) + repeatPoints.Children.Count(t => t.Judgements.Any(j => j.IsHit));
-                if (InitialCircle.Judgements.Any(j => j.IsHit))
-                    judgementsHit++;
+                var judgementsCount = NestedHitObjects.Count;
+                var judgementsHit = NestedHitObjects.Count(h => h.IsHit);
 
                 var hitFraction = (double)judgementsHit / judgementsCount;
-                if (hitFraction == 1 && InitialCircle.Judgements.Any(j => j.Result == HitResult.Great))
+                if (hitFraction == 1 && HeadCircle.Judgements.Any(j => j.Result == HitResult.Great))
                     AddJudgement(new OsuJudgement { Result = HitResult.Great });
-                else if (hitFraction >= 0.5 && InitialCircle.Judgements.Any(j => j.Result >= HitResult.Good))
+                else if (hitFraction >= 0.5 && HeadCircle.Judgements.Any(j => j.Result >= HitResult.Good))
                     AddJudgement(new OsuJudgement { Result = HitResult.Good });
                 else if (hitFraction > 0)
                     AddJudgement(new OsuJudgement { Result = HitResult.Meh });
@@ -173,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        public Drawable ProxiedLayer => InitialCircle.ApproachCircle;
+        public Drawable ProxiedLayer => HeadCircle.ApproachCircle;
 
         public override Vector2 SelectionPoint => ToScreenSpace(Body.Position);
         public override Quad SelectionQuad => Body.PathDrawQuad;
