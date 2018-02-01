@@ -19,6 +19,7 @@ using System.Linq;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -71,6 +72,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Fast Short Slider 6 Repeats", () => testShortHighSpeed(6));
 
             AddStep("Perfect Curve", testCurve);
+
+            AddStep("Catmull", () => testCatmull());
+            AddStep("Catmull 1 Repeat", () => testCatmull(1));
+
             // TODO more curve types?
         }
 
@@ -129,6 +134,35 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             addSlider(slider, 2, 3);
+        }
+
+        private void testCatmull(int repeats = 0) => createCatmull(repeats);
+
+        private void createCatmull(int repeats = 0)
+        {
+            var repeatSamples = new List<List<SampleInfo>>();
+            for (int i = 0; i < repeats; i++)
+                repeatSamples.Add(new List<SampleInfo>());
+
+            var slider = new Slider
+            {
+                StartTime = Time.Current + 1000,
+                Position = new Vector2(-100, 0),
+                ComboColour = Color4.LightSeaGreen,
+                CurveType = CurveType.Catmull,
+                ControlPoints = new List<Vector2>
+                {
+                    new Vector2(-100, 0),
+                    new Vector2(-50, -50),
+                    new Vector2(50, 50),
+                    new Vector2(100, 0)
+                },
+                Distance = 300,
+                RepeatCount = repeats,
+                RepeatSamples = repeatSamples
+            };
+
+            addSlider(slider, 3, 1);
         }
 
         private void addSlider(Slider slider, float circleSize, double speedMultiplier)

@@ -340,6 +340,7 @@
     <Compile Include="Overlays\Social\SocialPanel.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Screens\Play\PlayerSettings\VisualSettings.cs" />
+    <Compile Include="Rulesets\Objects\CatmullApproximator.cs" />
     <Compile Include="Rulesets\UI\HitObjectContainer.cs" />
     <Compile Include="Rulesets\UI\Scrolling\Visualisers\SequentialSpeedChangeVisualiser.cs" />
     <Compile Include="Rulesets\UI\Scrolling\Visualisers\ISpeedChangeVisualiser.cs" />
