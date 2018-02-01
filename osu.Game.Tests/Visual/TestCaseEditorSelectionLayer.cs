@@ -8,6 +8,8 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
@@ -35,9 +37,9 @@ namespace osu.Game.Tests.Visual
                 new SelectionLayer(playfield)
             };
 
-            playfield.Add(new DrawableHitCircle(new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f }));
-            playfield.Add(new DrawableHitCircle(new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f }));
-            playfield.Add(new DrawableSlider(new Slider
+            var hitCircle1 = new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f };
+            var hitCircle2 = new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f };
+            var slider = new Slider
             {
                 ControlPoints = new List<Vector2>
                 {
@@ -48,8 +50,16 @@ namespace osu.Game.Tests.Visual
                 Position = new Vector2(128, 256),
                 Velocity = 1,
                 TickDistance = 100,
-                Scale = 0.5f
-            }));
+                Scale = 0.5f,
+            };
+
+            hitCircle1.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            hitCircle2.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+            playfield.Add(new DrawableHitCircle(hitCircle1));
+            playfield.Add(new DrawableHitCircle(hitCircle2));
+            playfield.Add(new DrawableSlider(slider));
         }
     }
 }

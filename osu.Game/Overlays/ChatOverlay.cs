@@ -60,6 +60,7 @@ namespace osu.Game.Overlays
 
         public Bindable<double> ChatHeight { get; set; }
 
+        public List<Channel> AvailableChannels { get; private set; } = new List<Channel>();
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
 
@@ -190,6 +191,8 @@ namespace osu.Game.Overlays
         private double startDragChatHeight;
         private bool isDragging;
 
+        public void OpenChannel(Channel channel) => addChannel(channel);
+
         protected override bool OnDragStart(InputState state)
         {
             isDragging = tabsArea.IsHovered;
@@ -298,6 +301,8 @@ namespace osu.Game.Overlays
             ListChannelsRequest req = new ListChannelsRequest();
             req.Success += delegate (List<Channel> channels)
             {
+                AvailableChannels = channels;
+
                 Scheduler.Add(delegate
                 {
                     addChannel(channels.Find(c => c.Name == @"#lazer"));

@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -47,9 +48,12 @@ namespace osu.Game.Screens.Select
         private SampleChannel sampleConfirm;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay)
+        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay, OsuGame game)
         {
             sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
+
+            if (game != null)
+                modSelect.SelectedMods.BindTo(game.SelectedMods);
 
             Footer.AddButton(@"mods", colours.Yellow, modSelect, Key.F1, float.MaxValue);
 
@@ -120,6 +124,9 @@ namespace osu.Game.Screens.Select
 
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
+
+            Beatmap.Value.Mods.UnbindBindings();
+            Beatmap.Value.Mods.Value = new Mod[] { };
 
             return false;
         }
