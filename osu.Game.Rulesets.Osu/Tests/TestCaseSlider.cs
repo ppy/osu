@@ -30,7 +30,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             typeof(SliderBall),
             typeof(SliderBody),
+            typeof(SliderTick),
             typeof(DrawableSlider),
+            typeof(DrawableSliderTick),
             typeof(DrawableRepeatPoint),
             typeof(DrawableOsuHitObject)
         };
@@ -134,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             var cpi = new ControlPointInfo();
             cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
-            slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize });
+            slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize, SliderTickRate = 3 });
 
             var drawable = new DrawableSlider(slider)
             {

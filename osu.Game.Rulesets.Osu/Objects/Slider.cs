@@ -167,6 +167,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     AddNested(new SliderTick
                     {
                         SpanIndex = span,
+                        SpanStartTime = spanStartTime,
                         StartTime = spanStartTime + timeProgress * SpanDuration,
                         Position = Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
