@@ -275,11 +275,14 @@
     <Compile Include="Configuration\SpeedChangeVisualisationMethod.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
+    <Compile Include="Graphics\Containers\LinkFlowContainer.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
+    <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Migrations\20180125143340_Settings.cs" />
     <Compile Include="Migrations\20180125143340_Settings.Designer.cs">
       <DependentUpon>20180125143340_Settings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20180131154205_AddMuteBinding.cs" />
     <Compile Include="Overlays\Profile\SupporterIcon.cs" />
     <Compile Include="Online\API\Requests\GetFriendsRequest.cs" />
     <Compile Include="Overlays\Settings\DangerousSettingsButton.cs" />
@@ -305,6 +308,8 @@
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
+    <Compile Include="Online\Chat\DrawableLinkCompiler.cs" />
+    <Compile Include="Online\Chat\MessageFormatter.cs" />
     <Compile Include="Online\API\Requests\APIResponseBeatmapSet.cs" />
     <Compile Include="Online\API\Requests\GetUserMostPlayedBeatmapsRequest.cs" />
     <Compile Include="Overlays\BeatmapSet\Scores\ClickableUsername.cs" />
@@ -470,7 +475,6 @@
     <Compile Include="Online\API\Requests\SearchBeatmapSetsRequest.cs" />
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
     <Compile Include="Online\API\Requests\GetScoresRequest.cs" />
-    <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
     <Compile Include="Online\API\Requests\ListChannelsRequest.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
