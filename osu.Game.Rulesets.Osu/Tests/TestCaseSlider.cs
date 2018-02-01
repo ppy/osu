@@ -73,13 +73,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Linear Slider 1 Repeat", () => testLinear(1));
             AddStep("Linear Slider 2 Repeats", () => testLinear(2));
 
-            AddStep("Beizer Slider", () => testBeizer());
-            AddStep("Beizer Slider 1 Repeat", () => testBeizer(1));
-            AddStep("Beizer Slider 2 Repeats", () => testBeizer(2));
+            AddStep("Bezier Slider", () => testBeizer());
+            AddStep("Bezier Slider 1 Repeat", () => testBeizer(1));
+            AddStep("Bezier Slider 2 Repeats", () => testBeizer(2));
 
-            AddStep("Linear Overlaping", () => testLinearOverlaping());
-            AddStep("Linear Overlaping 1 Repeat", () => testLinearOverlaping(1));
-            AddStep("Linear Overlaping 2 Repeats", () => testLinearOverlaping(2));
+            AddStep("Linear Overlapping", () => testLinearOverlaping());
+            AddStep("Linear Overlapping 1 Repeat", () => testLinearOverlaping(1));
+            AddStep("Linear Overlapping 2 Repeats", () => testLinearOverlaping(2));
             // TODO add catmull
         }
 
