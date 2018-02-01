@@ -94,6 +94,7 @@
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoderTest.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReaderTest.cs" />
     <Compile Include="Beatmaps\IO\ImportBeatmapTest.cs" />
+    <Compile Include="Chat\MessageFormatterTests.cs" />
     <Compile Include="Resources\Resource.cs" />
     <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoderTest.cs" />
     <Compile Include="Visual\TestCaseBeatmapCarousel.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Visual\TestCaseOnScreenDisplay.cs" />
     <Compile Include="Visual\TestCaseAllPlayers.cs" />
     <Compile Include="Visual\TestCaseOsuGame.cs" />
+    <Compile Include="Visual\TestCaseChatLink.cs" />
     <Compile Include="Visual\TestCasePlaybackControl.cs" />
     <Compile Include="Visual\TestCasePlaySongSelect.cs" />
     <Compile Include="Visual\TestCasePopupDialog.cs" />
