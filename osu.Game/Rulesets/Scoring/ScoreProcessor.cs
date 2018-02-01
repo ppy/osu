@@ -171,10 +171,10 @@ namespace osu.Game.Rulesets.Scoring
 
         public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
 
-        protected sealed override bool HasCompleted => Hits == MaxHits;
+        protected sealed override bool HasCompleted => JudgedHits == MaxHits;
 
         protected int MaxHits { get; private set; }
-        protected int Hits { get; private set; }
+        protected int JudgedHits { get; private set; }
 
         private double maxHighestCombo;
 
@@ -259,7 +259,7 @@ namespace osu.Game.Rulesets.Scoring
                 baseScore += judgement.NumericResult;
                 rollingMaxBaseScore += judgement.MaxNumericResult;
 
-                Hits++;
+                JudgedHits++;
             }
             else if (judgement.IsHit)
                 bonusScore += judgement.NumericResult;
@@ -279,7 +279,7 @@ namespace osu.Game.Rulesets.Scoring
                 baseScore -= judgement.NumericResult;
                 rollingMaxBaseScore -= judgement.MaxNumericResult;
 
-                Hits--;
+                JudgedHits--;
             }
             else if (judgement.IsHit)
                 bonusScore -= judgement.NumericResult;
@@ -305,14 +305,14 @@ namespace osu.Game.Rulesets.Scoring
         {
             if (storeResults)
             {
-                MaxHits = Hits;
+                MaxHits = JudgedHits;
                 maxHighestCombo = HighestCombo;
                 maxBaseScore = baseScore;
             }
 
             base.Reset(storeResults);
 
-            Hits = 0;
+            JudgedHits = 0;
             baseScore = 0;
             rollingMaxBaseScore = 0;
             bonusScore = 0;
