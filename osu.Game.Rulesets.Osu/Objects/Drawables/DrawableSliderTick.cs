@@ -12,14 +12,14 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderTick : DrawableOsuHitObject
+    public class DrawableSliderTick : DrawableOsuHitObject, IRequireTracking
     {
         private readonly SliderTick sliderTick;
 
         public double FadeInTime;
         public double FadeOutTime;
 
-        public bool Tracking;
+        public bool Tracking { get; set; }
 
         public override bool DisplayJudgement => false;
 

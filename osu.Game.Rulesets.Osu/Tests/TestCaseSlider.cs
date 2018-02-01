@@ -16,6 +16,9 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -142,7 +145,34 @@ namespace osu.Game.Rulesets.Osu.Tests
             foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
+            drawable.OnJudgement += onJudgement;
+
             Add(drawable);
+        }
+
+        private float judgementOffsetDirection = 1;
+        private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        {
+            var osuObject = judgedObject as DrawableOsuHitObject;
+            if (osuObject == null)
+                return;
+
+            OsuSpriteText text;
+            Add(text = new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Text = judgement.IsHit ? "Hit!" : "Miss!",
+                Colour = judgement.IsHit ? Color4.Green : Color4.Red,
+                TextSize = 30,
+                Position = osuObject.HitObject.StackedEndPosition + judgementOffsetDirection * new Vector2(0, 45)
+            });
+
+            text.Delay(150)
+                .Then().FadeOut(200)
+                .Then().Expire();
+
+            judgementOffsetDirection *= -1;
         }
     }
 }
