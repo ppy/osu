@@ -13,6 +13,7 @@ using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using osu.Framework.Localisation;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Screens.Play
 {
@@ -21,6 +22,7 @@ namespace osu.Game.Screens.Play
         private Player player;
 
         private BeatmapMetadataDisplay info;
+        private VisualSettings visualSettings;
 
         private bool showOverlays = true;
         public override bool ShowOverlaysOnEnter => showOverlays;
@@ -48,6 +50,12 @@ namespace osu.Game.Screens.Play
                 Alpha = 0,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+            });
+            Add(visualSettings = new VisualSettings
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                Margin = new MarginPadding(25)
             });
 
             LoadComponentAsync(player);
@@ -110,7 +118,7 @@ namespace osu.Game.Screens.Play
 
         private void pushWhenLoaded()
         {
-            if (player.LoadState != LoadState.Ready)
+            if (player.LoadState != LoadState.Ready || visualSettings.IsHovered)
             {
                 Schedule(pushWhenLoaded);
                 return;
