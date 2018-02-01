@@ -3,29 +3,30 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Play.ReplaySettings;
 using OpenTK;
 using osu.Framework.Input;
+using osu.Game.Screens.Play.PlayerSettings;
 using OpenTK.Input;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class ReplaySettingsOverlay : VisibilityContainer
+    public class PlayerSettingsOverlay : VisibilityContainer
     {
         private const int fade_duration = 200;
 
         public bool ReplayLoaded;
 
         public readonly PlaybackSettings PlaybackSettings;
+        public readonly VisualSettings VisualSettings;
         //public readonly CollectionSettings CollectionSettings;
         //public readonly DiscussionSettings DiscussionSettings;
 
-        public ReplaySettingsOverlay()
+        public PlayerSettingsOverlay()
         {
             AlwaysPresent = true;
             RelativeSizeAxes = Axes.Both;
 
-            Child = new FillFlowContainer<ReplayGroup>
+            Child = new FillFlowContainer<PlayerSettingsGroup>
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -33,11 +34,12 @@ namespace osu.Game.Screens.Play.HUD
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 20),
                 Margin = new MarginPadding { Top = 100, Right = 10 },
-                Children = new[]
+                Children = new PlayerSettingsGroup[]
                 {
                     //CollectionSettings = new CollectionSettings(),
                     //DiscussionSettings = new DiscussionSettings(),
                     PlaybackSettings = new PlaybackSettings(),
+                    VisualSettings = new VisualSettings()
                 }
             };
 

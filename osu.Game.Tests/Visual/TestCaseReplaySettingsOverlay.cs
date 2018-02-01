@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.ReplaySettings;
+using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Tests.Visual
 {
@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual
         {
             ExampleContainer container;
 
-            Add(new ReplaySettingsOverlay
+            Add(new PlayerSettingsOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual
                 Text = @"Button",
             }));
 
-            AddStep(@"Add checkbox", () => container.Add(new ReplayCheckbox
+            AddStep(@"Add checkbox", () => container.Add(new PlayerCheckbox
             {
                 LabelText = "Checkbox",
             }));
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual
             }));
         }
 
-        private class ExampleContainer : ReplayGroup
+        private class ExampleContainer : PlayerSettingsGroup
         {
             protected override string Title => @"example";
         }

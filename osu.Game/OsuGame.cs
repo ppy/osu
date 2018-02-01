@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -18,6 +19,7 @@ using OpenTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Audio;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -27,6 +29,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Mods;
 using OpenTK.Graphics;
 
 namespace osu.Game
@@ -80,6 +83,9 @@ namespace osu.Game
 
         private SettingsOverlay settings;
 
+        // todo: move this to SongSelect once Screen has the ability to unsuspend.
+        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
+
         public OsuGame(string[] args = null)
         {
             this.args = args;
@@ -111,14 +117,28 @@ namespace osu.Game
                 Task.Run(() => BeatmapManager.Import(paths.ToArray()));
             }
 
-            dependencies.CacheAs<OsuGame>(this);
+            dependencies.CacheAs(this);
 
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
+
+            LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
         }
 
         private ScheduledDelegate scoreLoad;
+
+        /// <summary>
+        /// Open chat to a channel matching the provided name, if present.
+        /// </summary>
+        /// <param name="channelName">The name of the channel.</param>
+        public void OpenChannel(string channelName) => chat.OpenChannel(chat.AvailableChannels.Find(c => c.Name == channelName));
+
+        /// <summary>
+        /// Show a beatmap set as an overlay.
+        /// </summary>
+        /// <param name="setId">The set to display.</param>
+        public void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
 
         protected void LoadScore(Score s)
         {
@@ -391,6 +411,20 @@ namespace osu.Game
             }
 
             return false;
+        }
+
+        private readonly BindableDouble inactiveVolumeAdjust = new BindableDouble();
+
+        protected override void OnDeactivated()
+        {
+            base.OnDeactivated();
+            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+        }
+
+        protected override void OnActivated()
+        {
+            base.OnActivated();
+            Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
         }
 
         public bool OnReleased(GlobalAction action) => false;

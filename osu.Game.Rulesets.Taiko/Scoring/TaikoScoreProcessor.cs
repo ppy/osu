@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// <summary>
         /// Taiko fails at the end of the map if the player has not half-filled their HP bar.
         /// </summary>
-        protected override bool DefaultFailCondition => Hits == MaxHits && Health.Value <= 0.5;
+        protected override bool DefaultFailCondition => JudgedHits == MaxHits && Health.Value <= 0.5;
 
         private double hpIncreaseTick;
         private double hpIncreaseGreat;
