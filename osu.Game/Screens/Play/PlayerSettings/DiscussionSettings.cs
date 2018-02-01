@@ -6,9 +6,9 @@ using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Screens.Play.ReplaySettings
+namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class DiscussionSettings : ReplayGroup
+    public class DiscussionSettings : PlayerSettingsGroup
     {
         protected override string Title => @"discussions";
 
@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
         {
             Children = new Drawable[]
             {
-                new ReplayCheckbox
+                new PlayerCheckbox
                 {
                     LabelText = "Show floating comments",
                     Bindable = config.GetBindable<bool>(OsuSetting.FloatingComments)
