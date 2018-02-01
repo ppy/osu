@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Newtonsoft.Json;
 using osu.Game.Users;
@@ -39,6 +40,17 @@ namespace osu.Game.Online.Chat
         public Message()
         {
         }
+
+        /// <summary>
+        /// The text that is displayed in chat.
+        /// </summary>
+        public string DisplayContent { get; set; }
+
+        /// <summary>
+        /// The links found in this message.
+        /// </summary>
+        /// <remarks>The <see cref="Link"/>s' <see cref="Link.Index"/> and <see cref="Link.Length"/>s are according to <see cref="DisplayContent"/></remarks>
+        public List<Link> Links;
 
         public Message(long? id)
         {
