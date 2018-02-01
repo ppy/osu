@@ -128,6 +128,18 @@ namespace osu.Game
 
         private ScheduledDelegate scoreLoad;
 
+        /// <summary>
+        /// Open chat to a channel matching the provided name, if present.
+        /// </summary>
+        /// <param name="channelName">The name of the channel.</param>
+        public void OpenChannel(string channelName) => chat.OpenChannel(chat.AvailableChannels.Find(c => c.Name == channelName));
+
+        /// <summary>
+        /// Show a beatmap set as an overlay.
+        /// </summary>
+        /// <param name="setId">The set to display.</param>
+        public void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
+
         protected void LoadScore(Score s)
         {
             scoreLoad?.Cancel();
