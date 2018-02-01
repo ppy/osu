@@ -240,12 +240,12 @@ namespace osu.Game.Rulesets.UI
             foreach (var mod in Mods.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(Beatmap.BeatmapInfo.BaseDifficulty);
 
+            // Post-process the beatmap
+            processor.PostProcess(Beatmap);
+
             // Apply defaults
             foreach (var h in Beatmap.HitObjects)
                 h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
-
-            // Post-process the beatmap
-            processor.PostProcess(Beatmap);
 
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;

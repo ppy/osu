@@ -95,6 +95,7 @@
     <Compile Include="Replays\TaikoAutoGenerator.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="Objects\TaikoHitObjectDifficulty.cs" />
+    <Compile Include="Replays\TaikoReplayFrame.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scoring\TaikoScoreProcessor.cs" />
