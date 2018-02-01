@@ -55,6 +55,7 @@
     <Compile Include="Edit\OsuEditPlayfield.cs" />
     <Compile Include="Edit\OsuEditRulesetContainer.cs" />
     <Compile Include="Edit\OsuHitObjectComposer.cs" />
+    <Compile Include="Judgements\OsuSliderTailJudgement.cs" />
     <Compile Include="Mods\OsuModAutopilot.cs" />
     <Compile Include="Mods\OsuModAutoplay.cs" />
     <Compile Include="Mods\OsuModDaycore.cs" />
@@ -75,6 +76,8 @@
     <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
     <Compile Include="Judgements\OsuJudgement.cs" />
     <Compile Include="Objects\Drawables\DrawableRepeatPoint.cs" />
+    <Compile Include="Objects\Drawables\DrawableSliderTail.cs" />
+    <Compile Include="Objects\Drawables\IRequireTracking.cs" />
     <Compile Include="Objects\Drawables\ITrackSnaking.cs" />
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerBackground.cs" />
