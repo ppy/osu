@@ -81,6 +81,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double Velocity;
         public double TickDistance;
 
+        public HitCircle HeadCircle;
+        public HitCircle TailCircle;
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
@@ -98,8 +101,35 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.CreateNestedHitObjects();
 
+            createSliderEnds();
             createTicks();
             createRepeatPoints();
+        }
+
+        private void createSliderEnds()
+        {
+            HeadCircle = new HitCircle
+            {
+                StartTime = StartTime,
+                Position = StackedPosition,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboColour = ComboColour,
+                Samples = Samples,
+                SampleControlPoint = SampleControlPoint
+            };
+
+            TailCircle = new HitCircle
+            {
+                StartTime = EndTime,
+                Position = StackedEndPosition,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboColour = ComboColour,
+                Samples = Samples,
+                SampleControlPoint = SampleControlPoint
+            };
+
+            AddNested(HeadCircle);
+            AddNested(TailCircle);
         }
 
         private void createTicks()
@@ -138,6 +168,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     AddNested(new SliderTick
                     {
                         SpanIndex = span,
+                        SpanStartTime = spanStartTime,
                         StartTime = spanStartTime + timeProgress * SpanDuration,
                         Position = Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,

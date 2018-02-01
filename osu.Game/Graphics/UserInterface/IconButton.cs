@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class IconButton : OsuClickableContainer
     {
-        private const float button_size = 30;
+        public const float BUTTON_SIZE = 30;
 
         private Color4? flashColour;
         /// <summary>
@@ -106,7 +106,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Size = new Vector2(button_size),
+                    Size = new Vector2(BUTTON_SIZE),
                     CornerRadius = 5,
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
