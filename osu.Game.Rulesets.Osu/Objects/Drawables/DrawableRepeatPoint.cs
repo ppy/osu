@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly DrawableSlider drawableSlider;
 
         /// <summary>
-        /// Are we located in the last ControlPoint of our <see cref="DrawableSlider.CurrentCurve"/>
+        /// Whether currently in the last ControlPoint of the slider body's curve.
         /// </summary>
         private bool isRepeatAtEnd => repeatPoint.RepeatIndex % 2 == 0;
 
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
             Position = isRepeatAtEnd ? end : start;
-            var curve = drawableSlider.CurrentCurve;
+            var curve = drawableSlider.Body.CurrentCurve;
             if (curve.Count < 3 || curve.All(p => p == Position))
                 return;
             var referencePoint = curve[isRepeatAtEnd ? curve.IndexOf(Position, curve.Count - 2) - 1 : curve[0] == curve[1] ? 2 : 1];
