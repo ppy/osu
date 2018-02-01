@@ -100,7 +100,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             public SensitivitySetting()
             {
-                KeyboardStep = 0.01f;
+                SmallKeyboardStep = 0.01f;
+                LargeKeyboardStep = 0.05f;
             }
         }
 

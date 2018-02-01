@@ -50,13 +50,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         {
                             LabelText = "Horizontal position",
                             Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionX),
-                            KeyboardStep = 0.1f
+                            SmallKeyboardStep = 0.1f,
+                            LargeKeyboardStep = 0.5f
                         },
                         new SettingsSlider<double>
                         {
                             LabelText = "Vertical position",
                             Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionY),
-                            KeyboardStep = 0.1f
+                            SmallKeyboardStep = 0.1f,
+                            LargeKeyboardStep = 0.5f
                         },
                     }
                 },
