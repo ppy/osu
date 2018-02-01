@@ -396,15 +396,16 @@ namespace osu.Game.Overlays.Profile
                 scoreText.Add(createScoreText("Replays Watched by Others"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.ReplaysWatched.ToString(@"#,0")));
 
+                gradeSSPlus.DisplayCount = user.Statistics.GradesCount.SSPlus;
+                gradeSSPlus.Show();
                 gradeSS.DisplayCount = user.Statistics.GradesCount.SS;
                 gradeSS.Show();
+                gradeSPlus.DisplayCount = user.Statistics.GradesCount.SPlus;
+                gradeSPlus.Show();
                 gradeS.DisplayCount = user.Statistics.GradesCount.S;
                 gradeS.Show();
                 gradeA.DisplayCount = user.Statistics.GradesCount.A;
                 gradeA.Show();
-
-                gradeSPlus.DisplayCount = 0;
-                gradeSSPlus.DisplayCount = 0;
 
                 rankGraph.User.Value = user;
             }

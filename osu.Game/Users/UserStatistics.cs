@@ -51,8 +51,14 @@ namespace osu.Game.Users
 
         public struct Grades
         {
+            [JsonProperty(@"ssh")]
+            public int SSPlus;
+
             [JsonProperty(@"ss")]
             public int SS;
+
+            [JsonProperty(@"sh")]
+            public int SPlus;
 
             [JsonProperty(@"s")]
             public int S;
