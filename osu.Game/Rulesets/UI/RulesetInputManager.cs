@@ -140,6 +140,8 @@ namespace osu.Game.Rulesets.UI
                 if (!base.UpdateSubTree())
                     return false;
 
+                UpdateSubTreeMasking(ScreenSpaceDrawQuad.AABBFloat);
+
                 if (isAttached)
                 {
                     // When handling replay input, we need to consider the possibility of fast-forwarding, which may cause the clock to be updated
