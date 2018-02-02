@@ -23,32 +23,32 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Hit window for a <see cref="HitResult.Perfect"/> hit.
         /// </summary>
-        public double Perfect;
+        public double Perfect { get; private set; }
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Great"/> hit.
         /// </summary>
-        public double Great;
+        public double Great { get; private set; }
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Good"/> hit.
         /// </summary>
-        public double Good;
+        public double Good { get; private set; }
 
         /// <summary>
         /// Hit window for an <see cref="HitResult.OK"/> hit.
         /// </summary>
-        public double Ok;
+        public double Ok { get; private set; }
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Meh"/> hit.
         /// </summary>
-        public double Meh;
+        public double Meh { get; private set; }
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Miss"/> hit.
         /// </summary>
-        public double Miss;
+        public double Miss { get; private set; }
 
         /// <summary>
         /// Constructs hit windows by fitting a parameter to a 2-part piecewise linear function for each hit window.
