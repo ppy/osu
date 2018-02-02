@@ -64,17 +64,17 @@ namespace osu.Game.Rulesets.Objects
         private const double ok_max = 254;
 
         /// <summary>
-        /// BAD hit window at OD = 10.
+        /// MEH hit window at OD = 10.
         /// </summary>
-        private const double bad_min = 242;
+        private const double meh_min = 242;
         /// <summary>
-        /// BAD hit window at OD = 5.
+        /// MEH hit window at OD = 5.
         /// </summary>
-        private const double bad_mid = 272;
+        private const double meh_mid = 272;
         /// <summary>
-        /// BAD hit window at OD = 0.
+        /// MEH hit window at OD = 0.
         /// </summary>
-        private const double bad_max = 302;
+        private const double meh_max = 302;
 
         /// <summary>
         /// MISS hit window at OD = 10.
@@ -112,9 +112,9 @@ namespace osu.Game.Rulesets.Objects
         public double Ok = ok_mid;
 
         /// <summary>
-        /// Hit window for a BAD hit.
+        /// Hit window for a MEH hit.
         /// </summary>
-        public double Bad = bad_mid;
+        public double Meh = meh_mid;
 
         /// <summary>
         /// Hit window for a MISS hit.
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Objects
             Great = BeatmapDifficulty.DifficultyRange(difficulty, great_max, great_mid, great_min);
             Good = BeatmapDifficulty.DifficultyRange(difficulty, good_max, good_mid, good_min);
             Ok = BeatmapDifficulty.DifficultyRange(difficulty, ok_max, ok_mid, ok_min);
-            Bad = BeatmapDifficulty.DifficultyRange(difficulty, bad_max, bad_mid, bad_min);
+            Meh = BeatmapDifficulty.DifficultyRange(difficulty, meh_max, meh_mid, meh_min);
             Miss = BeatmapDifficulty.DifficultyRange(difficulty, miss_max, miss_mid, miss_min);
         }
 
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Objects
                 return HitResult.Good;
             if (timeOffset <= Ok / 2)
                 return HitResult.Ok;
-            if (timeOffset <= Bad / 2)
+            if (timeOffset <= Meh / 2)
                 return HitResult.Meh;
             if (timeOffset <= Miss / 2)
                 return HitResult.Miss;
@@ -169,11 +169,11 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Given a time offset, whether the <see cref="HitObject"/> can ever be hit in the future.
-        /// This happens if <paramref name="timeOffset"/> > <see cref="Bad"/>.
+        /// This happens if <paramref name="timeOffset"/> > <see cref="Meh"/>.
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
         /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>
-        public bool CanBeHit(double timeOffset) => timeOffset <= Bad / 2;
+        public bool CanBeHit(double timeOffset) => timeOffset <= Meh / 2;
 
         /// <summary>
         /// Multiplies all hit windows by a value.
@@ -186,7 +186,7 @@ namespace osu.Game.Rulesets.Objects
             windows.Great *= value;
             windows.Good *= value;
             windows.Ok *= value;
-            windows.Bad *= value;
+            windows.Meh *= value;
             windows.Miss *= value;
 
             return windows;
@@ -203,7 +203,7 @@ namespace osu.Game.Rulesets.Objects
             windows.Great /= value;
             windows.Good /= value;
             windows.Ok /= value;
-            windows.Bad /= value;
+            windows.Meh /= value;
             windows.Miss /= value;
 
             return windows;
