@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Scoring;
 
@@ -144,57 +145,68 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Retrieves the hit result for a time offset.
         /// </summary>
-        /// <param name="hitOffset">The time offset.</param>
-        /// <returns>The hit result, or null if the time offset results in a miss.</returns>
-        public HitResult? ResultFor(double hitOffset)
+        /// <param name="timeOffset">The time offset. This should always be a positive value indicating the absolute time offset.</param>
+        /// <returns>The hit result, or null if <paramref name="timeOffset"/> doesn't result in a judgement.</returns>
+        public HitResult? ResultFor(double timeOffset)
         {
-            if (hitOffset <= Perfect / 2)
+            timeOffset = Math.Abs(timeOffset);
+
+            if (timeOffset <= Perfect / 2)
                 return HitResult.Perfect;
-            if (hitOffset <= Great / 2)
+            if (timeOffset <= Great / 2)
                 return HitResult.Great;
-            if (hitOffset <= Good / 2)
+            if (timeOffset <= Good / 2)
                 return HitResult.Good;
-            if (hitOffset <= Ok / 2)
+            if (timeOffset <= Ok / 2)
                 return HitResult.Ok;
-            if (hitOffset <= Bad / 2)
+            if (timeOffset <= Bad / 2)
                 return HitResult.Meh;
+            if (timeOffset <= Miss / 2)
+                return HitResult.Miss;
+
             return null;
         }
 
         /// <summary>
-        /// Constructs new hit windows which have been multiplied by a value.
+        /// Given a time offset, whether the <see cref="HitObject"/> can ever be hit in the future.
+        /// This happens if <paramref name="timeOffset"/> > <see cref="Bad"/>.
         /// </summary>
-        /// <param name="windows">The original hit windows.</param>
+        /// <param name="timeOffset">The time offset.</param>
+        /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>
+        public bool CanBeHit(double timeOffset) => timeOffset <= Bad / 2;
+
+        /// <summary>
+        /// Multiplies all hit windows by a value.
+        /// </summary>
+        /// <param name="windows">The hit windows to multiply.</param>
         /// <param name="value">The value to multiply each hit window by.</param>
         public static HitWindows operator *(HitWindows windows, double value)
         {
-            return new HitWindows
-            {
-                Perfect = windows.Perfect * value,
-                Great = windows.Great * value,
-                Good = windows.Good * value,
-                Ok = windows.Ok * value,
-                Bad = windows.Bad * value,
-                Miss = windows.Miss * value
-            };
+            windows.Perfect *= value;
+            windows.Great *= value;
+            windows.Good *= value;
+            windows.Ok *= value;
+            windows.Bad *= value;
+            windows.Miss *= value;
+
+            return windows;
         }
 
         /// <summary>
-        /// Constructs new hit windows which have been divided by a value.
+        /// Divides all hit windows by a value.
         /// </summary>
-        /// <param name="windows">The original hit windows.</param>
+        /// <param name="windows">The hit windows to divide.</param>
         /// <param name="value">The value to divide each hit window by.</param>
         public static HitWindows operator /(HitWindows windows, double value)
         {
-            return new HitWindows
-            {
-                Perfect = windows.Perfect / value,
-                Great = windows.Great / value,
-                Good = windows.Good / value,
-                Ok = windows.Ok / value,
-                Bad = windows.Bad / value,
-                Miss = windows.Miss / value
-            };
+            windows.Perfect /= value;
+            windows.Great /= value;
+            windows.Good /= value;
+            windows.Ok /= value;
+            windows.Bad /= value;
+            windows.Miss /= value;
+
+            return windows;
         }
     }
 }
