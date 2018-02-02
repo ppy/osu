@@ -20,7 +20,7 @@ namespace osu.Game.Overlays
 {
     public abstract class SettingsOverlay : OsuFocusedOverlayContainer
     {
-        public const float CONTENT_MARGINS = 10;
+        public const float CONTENT_MARGINS = 15;
 
         public const float TRANSITION_LENGTH = 600;
 
