@@ -38,30 +38,27 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             if (!userTriggered)
             {
-                if (timeOffset > HitObject.HitWindowGood)
+                if (!HitObject.HitWindows.CanBeHit(timeOffset))
                     AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
                 return;
             }
 
-            double hitOffset = Math.Abs(timeOffset);
-
-            if (hitOffset > HitObject.HitWindowMiss)
+            var result = HitObject.HitWindows.ResultFor(Math.Abs(timeOffset));
+            if (result == null)
                 return;
 
-            if (!validKeyPressed)
+            if (!validKeyPressed || result == HitResult.Miss)
                 AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
-            else if (hitOffset < HitObject.HitWindowGood)
+            else
             {
                 AddJudgement(new TaikoJudgement
                 {
-                    Result = hitOffset < HitObject.HitWindowGreat ? HitResult.Great : HitResult.Good,
+                    Result = result.Value,
                     Final = !HitObject.IsStrong
                 });
 
                 SecondHitAllowed = true;
             }
-            else
-                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
         }
 
         public override bool OnPressed(TaikoAction action)
@@ -90,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 switch (State.Value)
                 {
                     case ArmedState.Idle:
-                        this.Delay(HitObject.HitWindowMiss).Expire();
+                        this.Delay(HitObject.HitWindows.Miss / 2).Expire();
                         break;
                     case ArmedState.Miss:
                         this.FadeOut(100)
