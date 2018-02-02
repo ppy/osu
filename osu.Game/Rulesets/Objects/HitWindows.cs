@@ -65,28 +65,55 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
-        /// Retrieves the hit result for a time offset.
+        /// Retrieves the <see cref="HitResult"/> for a time offset.
         /// </summary>
-        /// <param name="timeOffset">The time offset. This should always be a positive value indicating the absolute time offset.</param>
+        /// <param name="timeOffset">The time offset.</param>
         /// <returns>The hit result, or null if <paramref name="timeOffset"/> doesn't result in a judgement.</returns>
         public HitResult? ResultFor(double timeOffset)
         {
             timeOffset = Math.Abs(timeOffset);
 
-            if (timeOffset <= Perfect / 2)
+            if (timeOffset <= HalfWindowFor(HitResult.Perfect))
                 return HitResult.Perfect;
-            if (timeOffset <= Great / 2)
+            if (timeOffset <= HalfWindowFor(HitResult.Great))
                 return HitResult.Great;
-            if (timeOffset <= Good / 2)
+            if (timeOffset <= HalfWindowFor(HitResult.Good))
                 return HitResult.Good;
-            if (timeOffset <= Ok / 2)
+            if (timeOffset <= HalfWindowFor(HitResult.Ok))
                 return HitResult.Ok;
-            if (timeOffset <= Meh / 2)
+            if (timeOffset <= HalfWindowFor(HitResult.Meh))
                 return HitResult.Meh;
-            if (timeOffset <= Miss / 2)
+            if (timeOffset <= HalfWindowFor(HitResult.Miss))
                 return HitResult.Miss;
 
             return null;
+        }
+
+        /// <summary>
+        /// Retrieves half the hit window for a <see cref="HitResult"/>.
+        /// This is useful if the of the hit window for one half of the hittable range of a <see cref="HitObject"/> is required.
+        /// </summary>
+        /// <param name="result">The expected <see cref="HitResult"/>.</param>
+        /// <returns>One half of the hit window for <paramref name="result"/>.</returns>
+        public double HalfWindowFor(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Perfect:
+                    return Perfect / 2;
+                case HitResult.Great:
+                    return Great / 2;
+                case HitResult.Good:
+                    return Good / 2;
+                case HitResult.Ok:
+                    return Ok / 2;
+                case HitResult.Meh:
+                    return Meh / 2;
+                case HitResult.Miss:
+                    return Miss / 2;
+                default:
+                    throw new ArgumentException(nameof(result));
+            }
         }
 
         /// <summary>
@@ -95,7 +122,7 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
         /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>
-        public bool CanBeHit(double timeOffset) => timeOffset <= Meh / 2;
+        public bool CanBeHit(double timeOffset) => timeOffset <= HalfWindowFor(HitResult.Meh);
 
         /// <summary>
         /// Multiplies all hit windows by a value.
