@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 switch (State.Value)
                 {
                     case ArmedState.Idle:
-                        this.Delay(HitObject.HitWindows.Miss / 2).Expire();
+                        this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
                         break;
                     case ArmedState.Miss:
                         this.FadeOut(100)
