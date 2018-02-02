@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Scoring;
 
@@ -9,124 +10,45 @@ namespace osu.Game.Rulesets.Objects
 {
     public class HitWindows
     {
-        #region Constants
-
-        /// <summary>
-        /// PERFECT hit window at OD = 10.
-        /// </summary>
-        private const double perfect_min = 27.8;
-        /// <summary>
-        /// PERFECT hit window at OD = 5.
-        /// </summary>
-        private const double perfect_mid = 38.8;
-        /// <summary>
-        /// PERFECT hit window at OD = 0.
-        /// </summary>
-        private const double perfect_max = 44.8;
-
-        /// <summary>
-        /// GREAT hit window at OD = 10.
-        /// </summary>
-        private const double great_min = 68;
-        /// <summary>
-        /// GREAT hit window at OD = 5.
-        /// </summary>
-        private const double great_mid = 98;
-        /// <summary>
-        /// GREAT hit window at OD = 0.
-        /// </summary>
-        private const double great_max = 128;
-
-        /// <summary>
-        /// GOOD hit window at OD = 10.
-        /// </summary>
-        private const double good_min = 134;
-        /// <summary>
-        /// GOOD hit window at OD = 5.
-        /// </summary>
-        private const double good_mid = 164;
-        /// <summary>
-        /// GOOD hit window at OD = 0.
-        /// </summary>
-        private const double good_max = 194;
-
-        /// <summary>
-        /// OK hit window at OD = 10.
-        /// </summary>
-        private const double ok_min = 194;
-        /// <summary>
-        /// OK hit window at OD = 5.
-        /// </summary>
-        private const double ok_mid = 224;
-        /// <summary>
-        /// OK hit window at OD = 0.
-        /// </summary>
-        private const double ok_max = 254;
-
-        /// <summary>
-        /// MEH hit window at OD = 10.
-        /// </summary>
-        private const double meh_min = 242;
-        /// <summary>
-        /// MEH hit window at OD = 5.
-        /// </summary>
-        private const double meh_mid = 272;
-        /// <summary>
-        /// MEH hit window at OD = 0.
-        /// </summary>
-        private const double meh_max = 302;
-
-        /// <summary>
-        /// MISS hit window at OD = 10.
-        /// </summary>
-        private const double miss_min = 316;
-        /// <summary>
-        /// MISS hit window at OD = 5.
-        /// </summary>
-        private const double miss_mid = 346;
-        /// <summary>
-        /// MISS hit window at OD = 0.
-        /// </summary>
-        private const double miss_max = 376;
-
-        #endregion
-
-        /// <summary>
-        /// Hit window for a PERFECT hit.
-        /// </summary>
-        public double Perfect = perfect_mid;
-
-        /// <summary>
-        /// Hit window for a GREAT hit.
-        /// </summary>
-        public double Great = great_mid;
-
-        /// <summary>
-        /// Hit window for a GOOD hit.
-        /// </summary>
-        public double Good = good_mid;
-
-        /// <summary>
-        /// Hit window for an OK hit.
-        /// </summary>
-        public double Ok = ok_mid;
-
-        /// <summary>
-        /// Hit window for a MEH hit.
-        /// </summary>
-        public double Meh = meh_mid;
-
-        /// <summary>
-        /// Hit window for a MISS hit.
-        /// </summary>
-        public double Miss = miss_mid;
-
-        /// <summary>
-        /// Constructs default hit windows.
-        /// </summary>
-        public HitWindows()
+        private static readonly IReadOnlyDictionary<HitResult, (double max, double mid, double min)> base_ranges = new Dictionary<HitResult, (double, double, double)>
         {
-        }
+            { HitResult.Perfect, (44.8, 38.8, 27.8) },
+            { HitResult.Great, (128, 98, 68 ) },
+            { HitResult.Good, (194, 164, 134) },
+            { HitResult.Ok, (254, 224, 194) },
+            { HitResult.Meh, (382, 272, 242) },
+            { HitResult.Miss, (376, 346, 316) },
+        };
+
+        /// <summary>
+        /// Hit window for a <see cref="HitResult.Perfect"/> hit.
+        /// </summary>
+        public double Perfect;
+
+        /// <summary>
+        /// Hit window for a <see cref="HitResult.Great"/> hit.
+        /// </summary>
+        public double Great;
+
+        /// <summary>
+        /// Hit window for a <see cref="HitResult.Good"/> hit.
+        /// </summary>
+        public double Good;
+
+        /// <summary>
+        /// Hit window for an <see cref="HitResult.OK"/> hit.
+        /// </summary>
+        public double Ok;
+
+        /// <summary>
+        /// Hit window for a <see cref="HitResult.Meh"/> hit.
+        /// </summary>
+        public double Meh;
+
+        /// <summary>
+        /// Hit window for a <see cref="HitResult.Miss"/> hit.
+        /// </summary>
+        public double Miss;
 
         /// <summary>
         /// Constructs hit windows by fitting a parameter to a 2-part piecewise linear function for each hit window.
@@ -134,12 +56,12 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="difficulty">The parameter.</param>
         public HitWindows(double difficulty)
         {
-            Perfect = BeatmapDifficulty.DifficultyRange(difficulty, perfect_max, perfect_mid, perfect_min);
-            Great = BeatmapDifficulty.DifficultyRange(difficulty, great_max, great_mid, great_min);
-            Good = BeatmapDifficulty.DifficultyRange(difficulty, good_max, good_mid, good_min);
-            Ok = BeatmapDifficulty.DifficultyRange(difficulty, ok_max, ok_mid, ok_min);
-            Meh = BeatmapDifficulty.DifficultyRange(difficulty, meh_max, meh_mid, meh_min);
-            Miss = BeatmapDifficulty.DifficultyRange(difficulty, miss_max, miss_mid, miss_min);
+            Perfect = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Perfect]);
+            Great = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Great]);
+            Good = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Good]);
+            Ok = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Ok]);
+            Meh = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Meh]);
+            Miss = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Miss]);
         }
 
         /// <summary>
