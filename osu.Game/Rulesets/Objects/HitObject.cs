@@ -56,7 +56,11 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The keypress hit windows for this <see cref="HitObject"/>.
         /// </summary>
-        public HitWindows HitWindows => hitWindows ?? (hitWindows = new HitWindows(overallDifficulty));
+        public HitWindows HitWindows
+        {
+            get => hitWindows ?? (hitWindows = new HitWindows(overallDifficulty));
+            protected set => hitWindows = value;
+        }
 
         private readonly SortedList<HitObject> nestedHitObjects = new SortedList<HitObject>((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
