@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -82,16 +83,18 @@ namespace osu.Game.Overlays.Chat
 
         private Message message;
         private OsuSpriteText username;
-        private OsuTextFlowContainer contentFlow;
+        private LinkFlowContainer contentFlow;
+
+        public LinkFlowContainer ContentFlow => contentFlow;
 
         public Message Message
         {
-            get { return message; }
+            get => message;
             set
             {
                 if (message == value) return;
 
-                message = value;
+                message = MessageFormatter.FormatMessage(value);
 
                 if (!IsLoaded)
                     return;
@@ -101,8 +104,9 @@ namespace osu.Game.Overlays.Chat
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, ChatOverlay chat)
         {
+            this.chat = chat;
             customUsernameColour = colours.ChatBlue;
         }
 
@@ -187,7 +191,18 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
-                        contentFlow = new OsuTextFlowContainer(t => { t.TextSize = text_size; })
+                        contentFlow = new LinkFlowContainer(t =>
+                        {
+                            if (Message.IsAction)
+                            {
+                                t.Font = @"Exo2.0-MediumItalic";
+
+                                if (senderHasBackground)
+                                    t.Colour = OsuColour.FromHex(message.Sender.Colour);
+                            }
+
+                            t.TextSize = text_size;
+                        })
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
@@ -195,12 +210,12 @@ namespace osu.Game.Overlays.Chat
                     }
                 }
             };
-            if (message.IsAction && senderHasBackground)
-                contentFlow.Colour = OsuColour.FromHex(message.Sender.Colour);
 
             updateMessageContent();
             FinishTransforms(true);
         }
+
+        private ChatOverlay chat;
 
         private void updateMessageContent()
         {
@@ -208,17 +223,13 @@ namespace osu.Game.Overlays.Chat
             timestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
 
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
-            username.Text = $@"{message.Sender.Username}" + (senderHasBackground ? "" : ":");
+            username.Text = $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
 
-            if (message.IsAction)
-            {
-                contentFlow.Clear();
-                contentFlow.AddText("[", sprite => sprite.Padding = new MarginPadding { Right = action_padding });
-                contentFlow.AddText(message.Content, sprite => sprite.Font = @"Exo2.0-MediumItalic");
-                contentFlow.AddText("]", sprite => sprite.Padding = new MarginPadding { Left = action_padding });
-            }
-            else
-                contentFlow.Text = message.Content;
+            // remove non-existent channels from the link list
+            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chat?.AvailableChannels.Any(c => c.Name == link.Argument) != true);
+
+            contentFlow.Clear();
+            contentFlow.AddLinks(message.DisplayContent, message.Links);
         }
 
         private class MessageSender : OsuClickableContainer, IHasContextMenu

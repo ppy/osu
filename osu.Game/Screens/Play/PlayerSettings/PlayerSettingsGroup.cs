@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,10 +8,12 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Play.ReplaySettings
+namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public abstract class ReplayGroup : Container
+    public abstract class PlayerSettingsGroup : Container
     {
         /// <summary>
         /// The title to be displayed in the header of this group.
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         private Color4 buttonActiveColour;
 
-        protected ReplayGroup()
+        protected PlayerSettingsGroup()
         {
             AutoSizeAxes = Axes.Y;
             Width = container_width;
