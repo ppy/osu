@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
+        public Vector2 StackedPositionAt(double t) => this.PositionAt(t) + StackOffset;
         public override Vector2 EndPosition => this.PositionAt(1);
 
         public SliderCurve Curve { get; } = new SliderCurve();
@@ -167,6 +168,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     AddNested(new SliderTick
                     {
                         SpanIndex = span,
+                        SpanStartTime = spanStartTime,
                         StartTime = spanStartTime + timeProgress * SpanDuration,
                         Position = Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,

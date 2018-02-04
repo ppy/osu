@@ -64,15 +64,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
-                var spanStartTime = s.StartTime + tick.SpanIndex * s.SpanDuration;
-                var fadeInTime = spanStartTime + (tick.StartTime - spanStartTime) / 2 - (tick.SpanIndex == 0 ? HitObject.TimeFadein : HitObject.TimeFadein / 2);
-                var fadeOutTime = spanStartTime + s.SpanDuration;
-
                 var drawableTick = new DrawableSliderTick(tick)
                 {
-                    FadeInTime = fadeInTime,
-                    FadeOutTime = fadeOutTime,
-                    Position = tick.Position,
+                    Position = tick.Position
                 };
 
                 ticks.Add(drawableTick);

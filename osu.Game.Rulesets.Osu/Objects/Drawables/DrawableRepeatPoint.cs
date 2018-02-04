@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly DrawableSlider drawableSlider;
 
         /// <summary>
-        /// Whether currently in the last ControlPoint of the slider body's curve.
+        /// Whether this repeat point is at the end of the slider's curve.
         /// </summary>
         private bool isRepeatAtEnd => repeatPoint.RepeatIndex % 2 == 0;
 
@@ -83,8 +83,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             var curve = drawableSlider.Body.CurrentCurve;
             if (curve.Count < 3 || curve.All(p => p == Position))
                 return;
-            var referencePoint = curve[isRepeatAtEnd ? curve.IndexOf(Position, curve.Count - 2) - 1 : curve[0] == curve[1] ? 2 : 1];
-            Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(referencePoint.Y - Position.Y, referencePoint.X - Position.X));
+            int referenceIndex;
+            //We are looking for the next point in the curve different than our position
+            //Since there can be more than one point equal to our position, we iterate until one is found
+            if (isRepeatAtEnd)
+            {
+                referenceIndex = curve.Count - 1;
+                while (curve[referenceIndex] == Position)
+                    referenceIndex--;
+            }
+            else
+            {
+                referenceIndex = 0;
+                while (curve[referenceIndex] == Position)
+                    referenceIndex++;
+            }
+            Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(curve[referenceIndex].Y - Position.Y, curve[referenceIndex].X - Position.X));
         }
     }
 }

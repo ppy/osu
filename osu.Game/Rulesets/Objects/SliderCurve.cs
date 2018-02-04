@@ -41,6 +41,8 @@ namespace osu.Game.Rulesets.Objects
                         break;
 
                     return subpath;
+                case CurveType.Catmull:
+                    return new CatmullApproximator(subControlPoints).CreateCatmull();
             }
 
             return new BezierApproximator(subControlPoints).CreateBezier();

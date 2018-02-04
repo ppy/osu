@@ -31,7 +31,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             typeof(SliderBall),
             typeof(SliderBody),
+            typeof(SliderTick),
             typeof(DrawableSlider),
+            typeof(DrawableSliderTick),
             typeof(DrawableRepeatPoint),
             typeof(DrawableOsuHitObject)
         };
@@ -45,6 +47,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public TestCaseSlider()
         {
             base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
+
             AddStep("Big Single", () => testSimpleBig());
             AddStep("Medium Single", () => testSimpleMedium());
             AddStep("Small Single", () => testSimpleSmall());
@@ -76,14 +79,17 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Linear Slider 1 Repeat", () => testLinear(1));
             AddStep("Linear Slider 2 Repeats", () => testLinear(2));
 
-            AddStep("Bezier Slider", () => testBeizer());
-            AddStep("Bezier Slider 1 Repeat", () => testBeizer(1));
-            AddStep("Bezier Slider 2 Repeats", () => testBeizer(2));
+            AddStep("Bezier Slider", () => testBezier());
+            AddStep("Bezier Slider 1 Repeat", () => testBezier(1));
+            AddStep("Bezier Slider 2 Repeats", () => testBezier(2));
 
-            AddStep("Linear Overlapping", () => testLinearOverlaping());
-            AddStep("Linear Overlapping 1 Repeat", () => testLinearOverlaping(1));
-            AddStep("Linear Overlapping 2 Repeats", () => testLinearOverlaping(2));
-            // TODO add catmull
+            AddStep("Linear Overlapping", () => testLinearOverlapping());
+            AddStep("Linear Overlapping 1 Repeat", () => testLinearOverlapping(1));
+            AddStep("Linear Overlapping 2 Repeats", () => testLinearOverlapping(2));
+
+            AddStep("Catmull Slider", () => testCatmull());
+            AddStep("Catmull Slider 1 Repeat", () => testCatmull(1));
+            AddStep("Catmull Slider 2 Repeats", () => testCatmull(2));
         }
 
         private void testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
@@ -120,7 +126,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSlider(slider, circleSize, speedMultiplier);
         }
 
-        private void testPerfect(int repeats = 0)
+        private void testPerfect(int repeats = 0) => createPerfect(repeats);
+
+        private void createPerfect(int repeats)
         {
             var slider = new Slider
             {
@@ -141,7 +149,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSlider(slider, 2, 3);
         }
 
-        private void testLinear(int repeats = 0)
+        private void testLinear(int repeats = 0) => createLinear(repeats);
+
+        private void createLinear(int repeats)
         {
             var slider = new Slider
             {
@@ -166,7 +176,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSlider(slider, 2, 3);
         }
 
-        private void testBeizer(int repeats = 0)
+        private void testBezier(int repeats = 0) => createBezier(repeats);
+
+        private void createBezier(int repeats)
         {
             var slider = new Slider
             {
@@ -190,7 +202,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSlider(slider, 2, 3);
         }
 
-        private void testLinearOverlaping(int repeats = 0)
+        private void testLinearOverlapping(int repeats = 0) => createOverlapping(repeats);
+
+        private void createOverlapping(int repeats)
         {
             var slider = new Slider
             {
@@ -215,6 +229,35 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSlider(slider, 2, 3);
         }
 
+        private void testCatmull(int repeats = 0) => createCatmull(repeats);
+
+        private void createCatmull(int repeats = 0)
+        {
+            var repeatSamples = new List<List<SampleInfo>>();
+            for (int i = 0; i < repeats; i++)
+                repeatSamples.Add(new List<SampleInfo>());
+
+            var slider = new Slider
+            {
+                StartTime = Time.Current + 1000,
+                Position = new Vector2(-100, 0),
+                ComboColour = Color4.LightSeaGreen,
+                CurveType = CurveType.Catmull,
+                ControlPoints = new List<Vector2>
+                {
+                    new Vector2(-100, 0),
+                    new Vector2(-50, -50),
+                    new Vector2(50, 50),
+                    new Vector2(100, 0)
+                },
+                Distance = 300,
+                RepeatCount = repeats,
+                RepeatSamples = repeatSamples
+            };
+
+            addSlider(slider, 3, 1);
+        }
+
         private List<List<SampleInfo>> createEmptySamples(int repeats)
         {
             var repeatSamples = new List<List<SampleInfo>>();
@@ -228,7 +271,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             var cpi = new ControlPointInfo();
             cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
-            slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize });
+            slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize, SliderTickRate = 3 });
 
             var drawable = new DrawableSlider(slider)
             {
