@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
-using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -32,6 +31,7 @@ namespace osu.Game.Screens.Play
         private FadeContainer fadeContainer;
         private double displayTime;
 
+
         public SkipButton(double startTime)
         {
             this.startTime = startTime;
@@ -47,10 +47,16 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.Centre;
         }
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnHover(InputState state)
         {
             fadeContainer.State = Visibility.Visible;
-            return base.OnMouseMove(state);
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            fadeContainer.State = Visibility.Hidden;
+            base.OnHoverLost(state);
         }
 
         [BackgroundDependencyLoader]
@@ -149,7 +155,6 @@ namespace osu.Game.Screens.Play
             public event Action<Visibility> StateChanged;
 
             private Visibility state;
-            private ScheduledDelegate scheduledHide;
 
             public Visibility State
             {
@@ -162,20 +167,12 @@ namespace osu.Game.Screens.Play
                     if (state == value)
                         return;
 
-                    var lastState = state;
                     state = value;
-
-                    scheduledHide?.Cancel();
 
                     switch (state)
                     {
                         case Visibility.Visible:
-                            if (lastState == Visibility.Hidden)
-                                this.FadeIn(500, Easing.OutExpo);
-
-                            if (!IsHovered)
-                                using (BeginDelayedSequence(1000))
-                                    scheduledHide = Schedule(() => State = Visibility.Hidden);
+                            this.FadeIn(500, Easing.OutExpo);
                             break;
                         case Visibility.Hidden:
                             this.FadeOut(1000, Easing.OutExpo);
@@ -190,6 +187,11 @@ namespace osu.Game.Screens.Play
             {
                 base.LoadComplete();
                 State = Visibility.Visible;
+                if (!IsHovered)
+                {
+                    using (BeginDelayedSequence(1000))
+                        State = Visibility.Hidden;
+                }
             }
         }
 
