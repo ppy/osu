@@ -155,7 +155,6 @@ namespace osu.Game.Screens.Play
             public event Action<Visibility> StateChanged;
 
             private Visibility state;
-            private ScheduledDelegate scheduledHide;
 
             public Visibility State
             {
@@ -169,8 +168,6 @@ namespace osu.Game.Screens.Play
                         return;
 
                     state = value;
-
-                    scheduledHide?.Cancel();
 
                     switch (state)
                     {
@@ -190,6 +187,11 @@ namespace osu.Game.Screens.Play
             {
                 base.LoadComplete();
                 State = Visibility.Visible;
+                if (!IsHovered)
+                {
+                    using (BeginDelayedSequence(1000))
+                        State = Visibility.Hidden;
+                }
             }
         }
 
