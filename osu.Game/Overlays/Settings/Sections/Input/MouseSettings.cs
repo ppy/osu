@@ -33,6 +33,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = "Cursor Sensitivity",
                     Bindable = config.GetBindable<double>(FrameworkSetting.CursorSensitivity)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Map absolute input to window",
+                    Bindable = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
+                },
                 new SettingsEnumDropdown<ConfineMouseMode>
                 {
                     LabelText = "Confine mouse cursor to window",
