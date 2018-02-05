@@ -47,10 +47,16 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.Centre;
         }
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnHover(InputState state)
         {
             fadeContainer.State = Visibility.Visible;
-            return base.OnMouseMove(state);
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            fadeContainer.State = Visibility.Hidden;
+            base.OnHoverLost(state);
         }
 
         [BackgroundDependencyLoader]
