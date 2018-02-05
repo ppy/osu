@@ -168,7 +168,6 @@ namespace osu.Game.Screens.Play
                     if (state == value)
                         return;
 
-                    var lastState = state;
                     state = value;
 
                     scheduledHide?.Cancel();
