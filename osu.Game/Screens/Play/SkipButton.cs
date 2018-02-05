@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
-using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -31,6 +30,7 @@ namespace osu.Game.Screens.Play
 
         private FadeContainer fadeContainer;
         private double displayTime;
+
 
         public SkipButton(double startTime)
         {
