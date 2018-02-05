@@ -93,6 +93,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     // this bindable will still act as the "interactive" bindable displayed during a drag.
                     base.Bindable = new BindableDouble(doubleValue.Value)
                     {
+                        Default = doubleValue.Default,
                         MinValue = doubleValue.MinValue,
                         MaxValue = doubleValue.MaxValue
                     };
