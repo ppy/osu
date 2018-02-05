@@ -176,12 +176,7 @@ namespace osu.Game.Screens.Play
                     switch (state)
                     {
                         case Visibility.Visible:
-                            if (lastState == Visibility.Hidden)
-                                this.FadeIn(500, Easing.OutExpo);
-
-                            if (!IsHovered)
-                                using (BeginDelayedSequence(1000))
-                                    scheduledHide = Schedule(() => State = Visibility.Hidden);
+                            this.FadeIn(500, Easing.OutExpo);
                             break;
                         case Visibility.Hidden:
                             this.FadeOut(1000, Easing.OutExpo);
