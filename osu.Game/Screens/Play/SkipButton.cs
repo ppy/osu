@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Play
         private FadeContainer fadeContainer;
         private double displayTime;
 
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+
         public SkipButton(double startTime)
         {
             this.startTime = startTime;
