@@ -26,9 +26,9 @@ namespace osu.Game.Users
         [JsonProperty(@"age")]
         public int? Age;
 
-        public int GlobalRank { get => Statistics.Ranks.GlobalRank; set => Statistics.Ranks.GlobalRank = value; }
+        public int GlobalRank { get => Statistics?.Ranks.GlobalRank ?? 0; set => Statistics.Ranks.GlobalRank = value; }
 
-        public int CountryRank { get => Statistics.Ranks.CountryRank; set => Statistics.Ranks.CountryRank = value; }
+        public int CountryRank { get => Statistics?.Ranks.CountryRank ?? 0; set => Statistics.Ranks.CountryRank = value; }
 
         //public Team Team;
 

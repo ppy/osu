@@ -42,12 +42,12 @@ namespace osu.Game.Tests.Visual
                 LastVisit = DateTimeOffset.Now,
                 Age = 1,
                 ProfileOrder = new[] { "me" },
-                CountryRank = 1,
                 Statistics = new UserStatistics
                 {
                     Rank = 2148,
                     PP = 4567.89m
                 },
+                CountryRank = 1,
                 RankHistory = new User.RankHistoryData
                 {
                     Mode = @"osu",
