@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
                 case ArmedState.Hit:
                     this.FadeOut(anim_duration, Easing.OutQuint)
-                        .ScaleTo(Scale * 1.5f, anim_duration, Easing.OutQuint);
+                        .ScaleTo(Scale * 1.5f, anim_duration, Easing.Out);
                     break;
             }
         }
