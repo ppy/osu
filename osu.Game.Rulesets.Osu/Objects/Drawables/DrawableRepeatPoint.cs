@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
@@ -80,25 +79,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
             Position = isRepeatAtEnd ? end : start;
+
             var curve = drawableSlider.Body.CurrentCurve;
-            if (curve.Count < 3 || curve.All(p => p == Position))
+
+            if (curve.Count < 2)
                 return;
-            int referenceIndex;
-            //We are looking for the next point in the curve different than our position
-            //Since there can be more than one point equal to our position, we iterate until one is found
-            if (isRepeatAtEnd)
+
+            int searchStart = isRepeatAtEnd ? curve.Count - 1 : 0;
+            int direction = isRepeatAtEnd ? -1 : 1;
+
+            // find the next vector2 in the curve which is not equal to our current position to infer a rotation.
+            for (int i = searchStart; i >= 0 && i < curve.Count; i += direction)
             {
-                referenceIndex = curve.Count - 1;
-                while (curve[referenceIndex] == Position)
-                    referenceIndex--;
+                if (curve[i] == Position)
+                    continue;
+
+                Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(curve[i].Y - Position.Y, curve[i].X - Position.X));
+                break;
             }
-            else
-            {
-                referenceIndex = 0;
-                while (curve[referenceIndex] == Position)
-                    referenceIndex++;
-            }
-            Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(curve[referenceIndex].Y - Position.Y, curve[referenceIndex].X - Position.X));
         }
     }
 }
