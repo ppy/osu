@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
@@ -15,11 +16,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
-
-        /// <summary>
-        /// Whether this repeat point is at the end of the slider's curve.
-        /// </summary>
-        private bool isRepeatAtEnd => repeatPoint.RepeatIndex % 2 == 0;
 
         private double animDuration;
 
@@ -79,9 +75,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
-            Position = isRepeatAtEnd ? end : start;
+            bool isRepeatAtEnd = repeatPoint.RepeatIndex % 2 == 0;
+            List<Vector2> curve = drawableSlider.Body.CurrentCurve;
 
-            var curve = drawableSlider.Body.CurrentCurve;
+            Position = isRepeatAtEnd ? end : start;
 
             if (curve.Count < 2)
                 return;
