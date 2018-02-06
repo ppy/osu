@@ -155,16 +155,11 @@ namespace osu.Game.Screens.Play
 
             public Visibility State
             {
-                get
-                {
-                    return state;
-                }
+                get { return state; }
                 set
                 {
-                    if (state == value)
-                        return;
+                    bool stateChanged = value != state;
 
-                    var lastState = state;
                     state = value;
 
                     scheduledHide?.Cancel();
@@ -172,7 +167,8 @@ namespace osu.Game.Screens.Play
                     switch (state)
                     {
                         case Visibility.Visible:
-                            if (lastState == Visibility.Hidden)
+                            // we may be triggered to become visible mnultiple times but we only want to transform once.
+                            if (stateChanged)
                                 this.FadeIn(500, Easing.OutExpo);
 
                             if (!IsHovered)
