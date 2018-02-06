@@ -54,9 +54,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             animDuration = Math.Min(150, repeatPoint.SpanDuration / 2);
 
-            this.FadeIn(animDuration).ScaleTo(1.2f, animDuration / 2)
-                .Then()
-                .ScaleTo(1, animDuration / 2, Easing.Out);
+            this.Animate(
+                d => d.FadeIn(animDuration),
+                d => d.ScaleTo(0.5f).ScaleTo(1f, animDuration * 4, Easing.OutElasticHalf)
+            );
         }
 
         protected override void UpdateCurrentState(ArmedState state)
