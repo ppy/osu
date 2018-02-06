@@ -126,9 +126,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addSlider(slider, circleSize, speedMultiplier);
         }
 
-        private void testPerfect(int repeats = 0) => createPerfect(repeats);
-
-        private void createPerfect(int repeats)
+        private void testPerfect(int repeats = 0)
         {
             var slider = new Slider
             {
