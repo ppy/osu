@@ -20,6 +20,11 @@ namespace osu.Game.Graphics.UserInterface
     public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
         where T : struct, IEquatable<T>, IComparable, IConvertible
     {
+        /// <summary>
+        /// Maximum number of decimal digits to be displayed in the tooltip.
+        /// </summary>
+        private const int max_decimal_digits = 5;
+
         private SampleChannel sample;
         private double lastSampleTime;
         private T lastSampleValue;
@@ -45,11 +50,12 @@ namespace osu.Game.Graphics.UserInterface
                     if (floatMaxValue == 1 && (floatMinValue == 0 || floatMinValue == -1))
                         return floatValue.Value.ToString("P0");
 
-                    // We don't really care about more than 5 decimal digits
-                    var decimalPrecision = normalize(Math.Round((decimal)floatPrecision, 5));
-                    var precisionDigits = (decimal.GetBits(decimalPrecision)[3] >> 16) & 255;
+                    var decimalPrecision = normalise((decimal)floatPrecision, max_decimal_digits);
 
-                    return floatValue.Value.ToString($"N{precisionDigits}");
+                    // Find the number of significant digits (we could have less than 5 after normalize())
+                    var significantDigits = (decimal.GetBits(decimalPrecision)[3] >> 16) & 255;
+
+                    return floatValue.Value.ToString($"N{significantDigits}");
                 }
 
                 var bindableInt = CurrentNumber as BindableNumber<int>;
@@ -57,8 +63,6 @@ namespace osu.Game.Graphics.UserInterface
                     return bindableInt.Value.ToString("N0");
 
                 return Current.Value.ToString(CultureInfo.InvariantCulture);
-
-                decimal normalize(decimal d) => decimal.Parse(d.ToString("0.############################", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
             }
         }
 
@@ -184,5 +188,14 @@ namespace osu.Game.Graphics.UserInterface
         {
             Nub.MoveToX(RangePadding + UsableWidth * value, 250, Easing.OutQuint);
         }
+
+        /// <summary>
+        /// Removes all non-significant digits, keeping at most a requested number of decimal digits.
+        /// </summary>
+        /// <param name="d">The decimal to normalize.</param>
+        /// <param name="sd">The maximum number of decimal digits to keep. The final result may have fewer decimal digits than this value.</param>
+        /// <returns>The normalised decimal.</returns>
+        private decimal normalise(decimal d, int sd)
+            => decimal.Parse(Math.Round(d, sd).ToString(string.Concat("0.", new string('#', sd)), CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
     }
 }
