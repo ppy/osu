@@ -44,10 +44,9 @@ namespace osu.Game.Tests.Visual
                 ProfileOrder = new[] { "me" },
                 Statistics = new UserStatistics
                 {
-                    Rank = 2148,
-                    PP = 4567.89m
+                    Ranks = new UserStatistics.UserRanks { Global = 2148, Country = 1 },
+                    PP = 4567.89m,
                 },
-                CountryRank = 1,
                 RankHistory = new User.RankHistoryData
                 {
                     Mode = @"osu",

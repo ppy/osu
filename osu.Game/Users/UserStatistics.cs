@@ -23,23 +23,10 @@ namespace osu.Game.Users
         public decimal? PP;
 
         [JsonProperty(@"pp_rank")]
-        public int Rank
-        {
-            get => Ranks.GlobalRank ?? 0;
-            set => Ranks.GlobalRank = value;
-        }
+        private int rank { set => Ranks.Global = value; }
 
         [JsonProperty(@"rank")]
-        public UserRank Ranks;
-
-        public struct UserRank
-        {
-            [JsonProperty(@"global")]
-            public int? GlobalRank;
-
-            [JsonProperty(@"country")]
-            public int? CountryRank;
-        }
+        public UserRanks Ranks;
 
         [JsonProperty(@"ranked_score")]
         public long RankedScore;
@@ -82,5 +69,15 @@ namespace osu.Game.Users
             [JsonProperty(@"a")]
             public int A;
         }
+
+        public struct UserRanks
+        {
+            [JsonProperty(@"global")]
+            public int Global;
+
+            [JsonProperty(@"country")]
+            public int Country;
+        }
+
     }
 }
