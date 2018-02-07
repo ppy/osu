@@ -13,7 +13,6 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    [Ignore("getting CI working")]
     public class TestCaseCatcherArea : OsuTestCase
     {
         private RulesetInfo catchRuleset;

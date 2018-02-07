@@ -19,7 +19,6 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    [Ignore("getting CI working")]
     public class TestCaseManiaPlayfield : OsuTestCase
     {
         private const double start_time = 500;
