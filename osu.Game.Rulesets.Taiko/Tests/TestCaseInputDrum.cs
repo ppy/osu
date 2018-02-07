@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,7 +14,6 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    [Ignore("getting CI working")]
     public class TestCaseInputDrum : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
