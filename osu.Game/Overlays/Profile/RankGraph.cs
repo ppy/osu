@@ -124,9 +124,11 @@ namespace osu.Game.Overlays.Profile
 
         private void updateRankTexts()
         {
-            rankText.Text = User.Value.Statistics.Ranks.Global > 0 ? $"#{User.Value.Statistics.Ranks.Global:#,0}" : "no rank";
-            performanceText.Text = User.Value.Statistics.PP != null ? $"{User.Value.Statistics.PP:#,0}pp" : string.Empty;
-            relativeText.Text = $"{User.Value.Country?.FullName} #{User.Value.Statistics.Ranks.Country:#,0}";
+            var user = User.Value;
+
+            performanceText.Text = user.Statistics.PP != null ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
+            rankText.Text = user.Statistics.Ranks.Global > 0 ? $"#{user.Statistics.Ranks.Global:#,0}" : "no rank";
+            relativeText.Text = user.Country != null && user.Statistics.Ranks.Country > 0 ? $"{user.Country.FullName} #{user.Statistics.Ranks.Country:#,0}" : "no rank";
         }
 
         private void showHistoryRankTexts(int dayIndex)
