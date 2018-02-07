@@ -37,6 +37,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                 ensureLoaded(osu);
 
                 waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
+
+                host.Exit();
             }
         }
 
@@ -64,6 +66,9 @@ namespace osu.Game.Tests.Beatmaps.IO
                 ensureLoaded(osu);
 
                 waitForOrAssert(() => !File.Exists(temp), "Temporary still exists after IPC import", 5000);
+
+                host.Exit();
+                client.Exit();
             }
         }
 
@@ -86,6 +91,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                 File.Delete(temp);
 
                 Assert.IsFalse(File.Exists(temp), "We likely held a read lock on the file when we shouldn't");
+
+                host.Exit();
             }
         }
 
