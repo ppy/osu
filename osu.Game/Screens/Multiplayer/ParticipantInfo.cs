@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Multiplayer
         {
             set
             {
-                var ranks = value.Select(u => u.GlobalRank);
+                var ranks = value.Select(u => u.Statistics.Ranks.Global);
                 levelRangeLower.Text = ranks.Min().ToString();
                 levelRangeHigher.Text = ranks.Max().ToString();
             }
