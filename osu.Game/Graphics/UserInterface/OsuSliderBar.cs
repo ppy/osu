@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.UserInterface
                     var decimalPrecision = normalise((decimal)floatPrecision, max_decimal_digits);
 
                     // Find the number of significant digits (we could have less than 5 after normalize())
-                    var significantDigits = (decimal.GetBits(decimalPrecision)[3] >> 16) & 255;
+                    var significantDigits = findPrecision(decimalPrecision);
 
                     return floatValue.Value.ToString($"N{significantDigits}");
                 }
@@ -197,5 +197,22 @@ namespace osu.Game.Graphics.UserInterface
         /// <returns>The normalised decimal.</returns>
         private decimal normalise(decimal d, int sd)
             => decimal.Parse(Math.Round(d, sd).ToString(string.Concat("0.", new string('#', sd)), CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Finds the number of digits after the decimal.
+        /// </summary>
+        /// <param name="d">The value to find the number of decimal digits for.</param>
+        /// <returns>The number decimal digits.</returns>
+        private int findPrecision(decimal d)
+        {
+            int precision = 0;
+            while (d != Math.Round(d))
+            {
+                d *= 10;
+                precision++;
+            }
+
+            return precision;
+        }
     }
 }
