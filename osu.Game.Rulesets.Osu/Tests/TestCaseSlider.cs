@@ -71,12 +71,25 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Fast Short Slider 2 Repeats", () => testShortHighSpeed(2));
             AddStep("Fast Short Slider 6 Repeats", () => testShortHighSpeed(6));
 
-            AddStep("Perfect Curve", testCurve);
+            AddStep("Perfect Curve", () => testPerfect());
+            AddStep("Perfect Curve 1 Repeat", () => testPerfect(1));
+            AddStep("Perfect Curve 2 Repeats", () => testPerfect(2));
 
-            AddStep("Catmull", () => testCatmull());
-            AddStep("Catmull 1 Repeat", () => testCatmull(1));
+            AddStep("Linear Slider", () => testLinear());
+            AddStep("Linear Slider 1 Repeat", () => testLinear(1));
+            AddStep("Linear Slider 2 Repeats", () => testLinear(2));
 
-            // TODO more curve types?
+            AddStep("Bezier Slider", () => testBezier());
+            AddStep("Bezier Slider 1 Repeat", () => testBezier(1));
+            AddStep("Bezier Slider 2 Repeats", () => testBezier(2));
+
+            AddStep("Linear Overlapping", () => testLinearOverlapping());
+            AddStep("Linear Overlapping 1 Repeat", () => testLinearOverlapping(1));
+            AddStep("Linear Overlapping 2 Repeats", () => testLinearOverlapping(2));
+
+            AddStep("Catmull Slider", () => testCatmull());
+            AddStep("Catmull Slider 1 Repeat", () => testCatmull(1));
+            AddStep("Catmull Slider 2 Repeats", () => testCatmull(2));
         }
 
         private void testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
@@ -95,10 +108,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void createSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2)
         {
-            var repeatSamples = new List<List<SampleInfo>>();
-            for (int i = 0; i < repeats; i++)
-                repeatSamples.Add(new List<SampleInfo>());
-
             var slider = new Slider
             {
                 StartTime = Time.Current + 1000,
@@ -111,13 +120,13 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
                 Distance = distance,
                 RepeatCount = repeats,
-                RepeatSamples = repeatSamples
+                RepeatSamples = createEmptySamples(repeats)
             };
 
             addSlider(slider, circleSize, speedMultiplier);
         }
 
-        private void testCurve()
+        private void testPerfect(int repeats = 0)
         {
             var slider = new Slider
             {
@@ -130,7 +139,89 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(0, 200),
                     new Vector2(200, 0)
                 },
-                Distance = 600
+                Distance = 600,
+                RepeatCount = repeats,
+                RepeatSamples = createEmptySamples(repeats)
+            };
+
+            addSlider(slider, 2, 3);
+        }
+
+        private void testLinear(int repeats = 0) => createLinear(repeats);
+
+        private void createLinear(int repeats)
+        {
+            var slider = new Slider
+            {
+                CurveType = CurveType.Linear,
+                StartTime = Time.Current + 1000,
+                Position = new Vector2(-200, 0),
+                ComboColour = Color4.LightSeaGreen,
+                ControlPoints = new List<Vector2>
+                {
+                    new Vector2(-200, 0),
+                    new Vector2(-50, 75),
+                    new Vector2(0, 100),
+                    new Vector2(100, -200),
+                    new Vector2(200, 0),
+                    new Vector2(230, 0)
+                },
+                Distance = 793.4417,
+                RepeatCount = repeats,
+                RepeatSamples = createEmptySamples(repeats)
+            };
+
+            addSlider(slider, 2, 3);
+        }
+
+        private void testBezier(int repeats = 0) => createBezier(repeats);
+
+        private void createBezier(int repeats)
+        {
+            var slider = new Slider
+            {
+                CurveType = CurveType.Bezier,
+                StartTime = Time.Current + 1000,
+                Position = new Vector2(-200, 0),
+                ComboColour = Color4.LightSeaGreen,
+                ControlPoints = new List<Vector2>
+                {
+                    new Vector2(-200, 0),
+                    new Vector2(-50, 75),
+                    new Vector2(0, 100),
+                    new Vector2(100, -200),
+                    new Vector2(230, 0)
+                },
+                Distance = 480,
+                RepeatCount = repeats,
+                RepeatSamples = createEmptySamples(repeats)
+            };
+
+            addSlider(slider, 2, 3);
+        }
+
+        private void testLinearOverlapping(int repeats = 0) => createOverlapping(repeats);
+
+        private void createOverlapping(int repeats)
+        {
+            var slider = new Slider
+            {
+                CurveType = CurveType.Linear,
+                StartTime = Time.Current + 1000,
+                Position = new Vector2(0, 0),
+                ComboColour = Color4.LightSeaGreen,
+                ControlPoints = new List<Vector2>
+                {
+                    new Vector2(0, 0),
+                    new Vector2(-200, 0),
+                    new Vector2(0, 0),
+                    new Vector2(0, -200),
+                    new Vector2(-200, -200),
+                    new Vector2(0, -200)
+                },
+                Distance = 1000,
+                RepeatCount = repeats,
+                RepeatSamples = createEmptySamples(repeats)
             };
 
             addSlider(slider, 2, 3);
@@ -163,6 +254,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             addSlider(slider, 3, 1);
+        }
+
+        private List<List<SampleInfo>> createEmptySamples(int repeats)
+        {
+            var repeatSamples = new List<List<SampleInfo>>();
+            for (int i = 0; i < repeats; i++)
+                repeatSamples.Add(new List<SampleInfo>());
+            return repeatSamples;
         }
 
         private void addSlider(Slider slider, float circleSize, double speedMultiplier)
