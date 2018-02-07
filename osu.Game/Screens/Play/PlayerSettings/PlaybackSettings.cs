@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Text = "1.00x",
+                            Text = "1.0x",
                             Font = @"Exo2.0-Bold",
                         }
                     },
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         Default = 1,
                         MinValue = 0.5,
                         MaxValue = 2,
-                        Precision = 0.01,
+                        Precision = 0.1,
                     },
                 }
             };
