@@ -35,6 +35,7 @@ namespace osu.Game.Graphics.UserInterface
                 var bindableDouble = CurrentNumber as BindableNumber<double>;
                 var bindableFloat = CurrentNumber as BindableNumber<float>;
                 var floatValue = bindableDouble?.Value ?? bindableFloat?.Value;
+                var floatPrecision = bindableDouble?.Precision ?? bindableFloat?.Precision;
 
                 if (floatValue != null)
                 {
@@ -44,7 +45,11 @@ namespace osu.Game.Graphics.UserInterface
                     if (floatMaxValue == 1 && (floatMinValue == 0 || floatMinValue == -1))
                         return floatValue.Value.ToString("P0");
 
-                    return floatValue.Value.ToString("N1");
+                    // We don't really care about more than 5 decimal digits
+                    var decimalPrecision = normalize(Math.Round((decimal)floatPrecision, 5));
+                    var precisionDigits = (decimal.GetBits(decimalPrecision)[3] >> 16) & 255;
+
+                    return floatValue.Value.ToString($"N{precisionDigits}");
                 }
 
                 var bindableInt = CurrentNumber as BindableNumber<int>;
@@ -52,6 +57,8 @@ namespace osu.Game.Graphics.UserInterface
                     return bindableInt.Value.ToString("N0");
 
                 return Current.Value.ToString(CultureInfo.InvariantCulture);
+
+                decimal normalize(decimal d) => decimal.Parse(d.ToString("0.############################", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
             }
         }
 
