@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Objects
             { HitResult.Great, (128, 98, 68 ) },
             { HitResult.Good, (194, 164, 134) },
             { HitResult.Ok, (254, 224, 194) },
-            { HitResult.Meh, (382, 272, 242) },
+            { HitResult.Meh, (302, 272, 242) },
             { HitResult.Miss, (376, 346, 316) },
         };
 
