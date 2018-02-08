@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected virtual bool UserScrollSpeedAdjustment => true;
 
         /// <summary>
-        /// The container that contains the <see cref="SpeedAdjustmentContainer"/>s and <see cref="DrawableHitObject"/>s.
+        /// The container that contains the <see cref="DrawableHitObject"/>s.
         /// </summary>
         public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
 
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// Creates a new <see cref="ScrollingPlayfield"/>.
         /// </summary>
-        /// <param name="scrollingAxes">The axes on which <see cref="DrawableHitObject"/>s in this container should scroll.</param>
+        /// <param name="direction">The direction in which <see cref="DrawableHitObject"/>s in this container should scroll.</param>
         /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width</param>
         protected ScrollingPlayfield(ScrollingDirection direction, float? customWidth = null)
             : base(customWidth)
