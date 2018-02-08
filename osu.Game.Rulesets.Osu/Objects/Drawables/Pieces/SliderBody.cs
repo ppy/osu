@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -15,6 +15,7 @@ using OpenTK;
 using OpenTK.Graphics.ES30;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -88,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 // We want the container to have the same size as the slider,
                 // and to be positioned such that the slider head is at (0,0).
                 container.Size = path.Size;
-                container.Position = -path.PositionInBoundingBox(slider.Curve.PositionAt(0) - currentCurve[0]);
+                container.Position = -path.PositionInBoundingBox(slider.Curve.PositionAt(0) - CurrentCurve[0]);
 
                 container.ForceRedraw();
             }
@@ -147,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             path.Texture = texture;
         }
 
-        private readonly List<Vector2> currentCurve = new List<Vector2>();
+        public readonly List<Vector2> CurrentCurve = new List<Vector2>();
         private bool updateSnaking(double p0, double p1)
         {
             if (SnakedStart == p0 && SnakedEnd == p1) return false;
@@ -155,23 +156,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             SnakedStart = p0;
             SnakedEnd = p1;
 
-            slider.Curve.GetPathToProgress(currentCurve, p0, p1);
+            slider.Curve.GetPathToProgress(CurrentCurve, p0, p1);
 
             path.ClearVertices();
-            foreach (Vector2 p in currentCurve)
-                path.AddVertex(p - currentCurve[0]);
+            foreach (Vector2 p in CurrentCurve)
+                path.AddVertex(p - CurrentCurve[0]);
 
             return true;
         }
 
-        public void UpdateProgress(double progress, int repeat)
+        public void UpdateProgress(double progress, int span)
         {
             double start = 0;
-            double end = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - DrawableOsuHitObject.TIME_PREEMPT)) / DrawableOsuHitObject.TIME_FADEIN, 0, 1) : 1;
+            double end = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadein, 0, 1) : 1;
 
-            if (repeat >= slider.RepeatCount - 1)
+            if (span >= slider.SpanCount() - 1)
             {
-                if (Math.Min(repeat, slider.RepeatCount - 1) % 2 == 1)
+                if (Math.Min(span, slider.SpanCount() - 1) % 2 == 1)
                 {
                     start = 0;
                     end = snakingOut ? progress : 1;

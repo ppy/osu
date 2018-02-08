@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Multiplayer
         {
             set
             {
-                var ranks = value.Select(u => u.GlobalRank);
+                var ranks = value.Select(u => u.Statistics.Ranks.Global);
                 levelRangeLower.Text = ranks.Min().ToString();
                 levelRangeHigher.Text = ranks.Max().ToString();
             }

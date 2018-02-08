@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -110,6 +110,23 @@ namespace osu.Game.Overlays.Mods
                         else
                             Scheduler.AddDelayed(() => button.Deselect(), delay += 50);
                     }
+            }
+        }
+
+        /// <summary>
+        /// Select one or more mods in this section.
+        /// </summary>
+        /// <param name="mods">The types of <see cref="Mod"/>s which should be deselected.</param>
+        public void SelectTypes(IEnumerable<Mod> mods)
+        {
+            foreach (var button in buttons)
+            {
+                for (int i = 0; i < button.Mods.Length; i++)
+                {
+                    foreach (var mod in mods)
+                        if (mod.GetType().IsInstanceOfType(button.Mods[i]))
+                            button.SelectAt(i);
+                }
             }
         }
 

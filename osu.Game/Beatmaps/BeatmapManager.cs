@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -287,15 +287,16 @@ namespace osu.Game.Beatmaps
                         Import(archive);
 
                     downloadNotification.State = ProgressNotificationState.Completed;
+                    currentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
-
-                currentDownloads.Remove(request);
             };
 
-            request.Failure += data =>
+            request.Failure += error =>
             {
+                if (error is OperationCanceledException) return;
+
                 downloadNotification.State = ProgressNotificationState.Completed;
-                Logger.Error(data, "Failed to get beatmap download information");
+                Logger.Error(error, "Beatmap download failed!");
                 currentDownloads.Remove(request);
             };
 
@@ -567,7 +568,6 @@ namespace osu.Game.Beatmaps
             using (var stream = new StreamReader(reader.GetStream(mapName)))
                 metadata = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
 
-
             // check if a set already exists with the same online id.
             if (metadata.OnlineBeatmapSetID != null)
                 beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID);
@@ -581,7 +581,6 @@ namespace osu.Game.Beatmaps
                     Files = fileInfos,
                     Metadata = metadata
                 };
-
 
             var mapNames = reader.Filenames.Where(f => f.EndsWith(".osu"));
 
@@ -692,19 +691,18 @@ namespace osu.Game.Beatmaps
 
             protected override Storyboard GetStoryboard()
             {
-                if (BeatmapInfo?.Path == null && BeatmapSetInfo?.StoryboardFile == null)
-                    return new Storyboard();
-
                 try
                 {
-                    Decoder decoder;
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo?.Path))))
-                        decoder = Decoder.GetDecoder(stream);
+                    using (var beatmap = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    {
+                        Decoder decoder = Decoder.GetDecoder(beatmap);
 
-                    // try for .osb first and fall back to .osu
-                    string storyboardFile = BeatmapSetInfo.StoryboardFile ?? BeatmapInfo.Path;
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(storyboardFile))))
-                        return decoder.GetStoryboardDecoder().DecodeStoryboard(stream);
+                        if (BeatmapSetInfo?.StoryboardFile == null)
+                            return decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap);
+
+                        using (var storyboard = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
+                            return decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap, storyboard);
+                    }
                 }
                 catch
                 {

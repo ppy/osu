@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -82,7 +82,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (Playing.Value && preview != null)
             {
-                progress.Width = (float)(preview.CurrentTime / preview.Length);
+                // prevent negative (potential infinite) width if a track without length was loaded
+                progress.Width = preview.Length > 0 ? (float)(preview.CurrentTime / preview.Length) : 0f;
             }
         }
 

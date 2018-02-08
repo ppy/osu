@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -29,8 +29,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
 
         protected override void PreprocessHitObjects()
         {
-            foreach (OsuHitObject h in Beatmap.HitObjects)
-                (h as Slider)?.Curve?.Calculate();
+            new OsuBeatmapProcessor().PostProcess(Beatmap);
         }
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)

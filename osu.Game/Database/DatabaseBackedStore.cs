@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -34,8 +34,14 @@ namespace osu.Game.Database
             if (context.Entry(obj).State != EntityState.Detached) return;
 
             var id = obj.ID;
-            obj = lookupSource?.SingleOrDefault(t => t.ID == id) ?? context.Find<T>(id);
-            context.Entry(obj).Reload();
+            var foundObject = lookupSource?.SingleOrDefault(t => t.ID == id) ?? context.Find<T>(id);
+            if (foundObject != null)
+            {
+                obj = foundObject;
+                context.Entry(obj).Reload();
+            }
+            else
+                context.Add(obj);
         }
 
         /// <summary>

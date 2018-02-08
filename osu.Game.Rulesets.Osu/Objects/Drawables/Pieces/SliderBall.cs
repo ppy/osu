@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        public void UpdateProgress(double progress, int repeat)
+        public void UpdateProgress(double progress, int span)
         {
             Position = slider.Curve.PositionAt(progress);
         }

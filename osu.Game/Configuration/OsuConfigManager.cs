@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
@@ -8,7 +8,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Configuration
 {
-    public class OsuConfigManager : ConfigManager<OsuSetting>
+    public class OsuConfigManager : IniConfigManager<OsuSetting>
     {
         protected override void InitialiseDefaults()
         {
@@ -39,6 +39,8 @@ namespace osu.Game.Configuration
             };
 
             // Audio
+            Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
+
             Set(OsuSetting.MenuVoice, true);
             Set(OsuSetting.MenuMusic, true);
 
@@ -65,11 +67,14 @@ namespace osu.Game.Configuration
 
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
+            Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
 
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.KeyOverlay, false);
 
             Set(OsuSetting.FloatingComments, false);
+
+            Set(OsuSetting.SpeedChangeVisualisation, SpeedChangeVisualisationMethod.Sequential);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -90,6 +95,7 @@ namespace osu.Game.Configuration
         GameplayCursorSize,
         AutoCursorSize,
         DimLevel,
+        BlurLevel,
         ShowStoryboard,
         KeyOverlay,
         FloatingComments,
@@ -97,6 +103,7 @@ namespace osu.Game.Configuration
         MouseDisableButtons,
         MouseDisableWheel,
         AudioOffset,
+        VolumeInactive,
         MenuMusic,
         MenuVoice,
         CursorRotation,
@@ -114,6 +121,7 @@ namespace osu.Game.Configuration
         ShowFpsDisplay,
         ChatDisplayHeight,
         Version,
-        ShowConvertedBeatmaps
+        ShowConvertedBeatmaps,
+        SpeedChangeVisualisation
     }
 }
