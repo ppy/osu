@@ -123,9 +123,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 StartTime = EndTime,
                 Position = StackedEndPosition,
                 IndexInCurrentCombo = IndexInCurrentCombo,
-                ComboColour = ComboColour,
-                Samples = Samples,
-                SampleControlPoint = SampleControlPoint
+                ComboColour = ComboColour
             };
 
             AddNested(HeadCircle);
