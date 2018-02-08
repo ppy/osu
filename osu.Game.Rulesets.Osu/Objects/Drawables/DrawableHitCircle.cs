@@ -78,12 +78,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
-            if (result == null)
+            if (result == HitResult.None)
                 return;
 
             AddJudgement(new OsuJudgement
             {
-                Result = result.Value,
+                Result = result,
                 PositionOffset = Vector2.Zero //todo: set to correct value
             });
         }

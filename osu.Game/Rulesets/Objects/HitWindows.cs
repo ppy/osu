@@ -80,8 +80,8 @@ namespace osu.Game.Rulesets.Objects
         /// Retrieves the <see cref="HitResult"/> for a time offset.
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
-        /// <returns>The hit result, or null if <paramref name="timeOffset"/> doesn't result in a judgement.</returns>
-        public HitResult? ResultFor(double timeOffset)
+        /// <returns>The hit result, or <see cref="HitResult.None"/> if <paramref name="timeOffset"/> doesn't result in a judgement.</returns>
+        public HitResult ResultFor(double timeOffset)
         {
             timeOffset = Math.Abs(timeOffset);
 
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Objects
             if (timeOffset <= HalfWindowFor(HitResult.Miss))
                 return HitResult.Miss;
 
-            return null;
+            return HitResult.None;
         }
 
         /// <summary>
