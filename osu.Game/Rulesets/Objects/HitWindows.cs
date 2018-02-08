@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Objects
 {
     public class HitWindows
     {
-        private static readonly IReadOnlyDictionary<HitResult, (double max, double mid, double min)> base_ranges = new Dictionary<HitResult, (double, double, double)>
+        private static readonly IReadOnlyDictionary<HitResult, (double od0, double od5, double od10)> base_ranges = new Dictionary<HitResult, (double, double, double)>
         {
             { HitResult.Perfect, (44.8, 38.8, 27.8) },
             { HitResult.Great, (128, 98, 68 ) },
@@ -23,32 +23,32 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Hit window for a <see cref="HitResult.Perfect"/> hit.
         /// </summary>
-        public double Perfect { get; private set; }
+        public double Perfect { get; protected set; }
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Great"/> hit.
         /// </summary>
-        public double Great { get; private set; }
+        public double Great { get; protected set; }
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Good"/> hit.
         /// </summary>
-        public double Good { get; private set; }
+        public double Good { get; protected set; }
 
         /// <summary>
         /// Hit window for an <see cref="HitResult.OK"/> hit.
         /// </summary>
-        public double Ok { get; private set; }
+        public double Ok { get; protected set; }
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Meh"/> hit.
         /// </summary>
-        public double Meh { get; private set; }
+        public double Meh { get; protected set; }
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Miss"/> hit.
         /// </summary>
-        public double Miss { get; private set; }
+        public double Miss { get; protected set; }
 
         /// <summary>
         /// Constructs hit windows by fitting a parameter to a 2-part piecewise linear function for each hit window.
