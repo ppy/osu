@@ -433,7 +433,13 @@ namespace osu.Game.Overlays.Profile
             if (string.IsNullOrEmpty(str)) return;
 
             infoTextRight.AddIcon(icon);
-            infoTextRight.AddLink(" " + str, url);
+            if (url != null)
+            {
+                infoTextRight.AddLink(" " + str, url);
+            } else
+            {
+                infoTextRight.AddText(" " + str);
+            }
             infoTextRight.NewLine();
         }
 
