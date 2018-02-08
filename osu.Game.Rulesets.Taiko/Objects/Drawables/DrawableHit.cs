@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
-            if (result == null)
+            if (result == HitResult.None)
                 return;
 
             if (!validKeyPressed || result == HitResult.Miss)
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
                 AddJudgement(new TaikoJudgement
                 {
-                    Result = result.Value,
+                    Result = result,
                     Final = !HitObject.IsStrong
                 });
 

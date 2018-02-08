@@ -224,12 +224,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 }
 
                 var result = HitObject.HitWindows.ResultFor(timeOffset);
-                if (result == null)
+                if (result == HitResult.None)
                     return;
 
                 AddJudgement(new HoldNoteTailJudgement
                 {
-                    Result = result.Value,
+                    Result = result,
                     HasBroken = holdNote.hasBroken
                 });
             }
