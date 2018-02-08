@@ -26,10 +26,6 @@ namespace osu.Game.Users
         [JsonProperty(@"age")]
         public int? Age;
 
-        public int GlobalRank;
-
-        public int CountryRank;
-
         //public Team Team;
 
         [JsonProperty(@"profile_colour")]
