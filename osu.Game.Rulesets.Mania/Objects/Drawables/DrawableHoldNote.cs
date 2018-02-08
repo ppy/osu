@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Linq;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
@@ -212,7 +211,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             {
                 if (!userTriggered)
                 {
-                    if (timeOffset > HitObject.HitWindows.Bad / 2)
+                    if (!HitObject.HitWindows.CanBeHit(timeOffset))
                     {
                         AddJudgement(new HoldNoteTailJudgement
                         {
@@ -224,14 +223,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return;
                 }
 
-                double offset = Math.Abs(timeOffset);
-
-                if (offset > HitObject.HitWindows.Miss / 2)
+                var result = HitObject.HitWindows.ResultFor(timeOffset);
+                if (result == HitResult.None)
                     return;
 
                 AddJudgement(new HoldNoteTailJudgement
                 {
-                    Result = HitObject.HitWindows.ResultFor(offset) ?? HitResult.Miss,
+                    Result = result,
                     HasBroken = holdNote.hasBroken
                 });
             }

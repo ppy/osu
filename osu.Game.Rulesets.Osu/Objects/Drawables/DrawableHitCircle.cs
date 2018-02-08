@@ -72,14 +72,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (!userTriggered)
             {
-                if (timeOffset > HitObject.HitWindowFor(HitResult.Meh))
+                if (!HitObject.HitWindows.CanBeHit(timeOffset))
                     AddJudgement(new OsuJudgement { Result = HitResult.Miss });
                 return;
             }
 
+            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            if (result == HitResult.None)
+                return;
+
             AddJudgement(new OsuJudgement
             {
-                Result = HitObject.ScoreResultForOffset(Math.Abs(timeOffset)),
+                Result = result,
                 PositionOffset = Vector2.Zero //todo: set to correct value
             });
         }
@@ -104,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Expire(true);
 
                     // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
-                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindowFor(HitResult.Miss);
+                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.HalfWindowFor(HitResult.Miss);
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
