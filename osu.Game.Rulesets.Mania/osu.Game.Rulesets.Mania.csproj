@@ -64,7 +64,6 @@
     <Compile Include="Beatmaps\Patterns\Pattern.cs" />
     <Compile Include="Configuration\ManiaConfigManager.cs" />
     <Compile Include="MathUtils\FastRandom.cs" />
-    <Compile Include="Judgements\HitWindows.cs" />
     <Compile Include="Judgements\HoldNoteTailJudgement.cs" />
     <Compile Include="Judgements\HoldNoteTickJudgement.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
