@@ -262,10 +262,7 @@ namespace osu.Game.Screens.Play
             if (!loadedSuccessfully)
                 return;
 
-            DimLevel.ValueChanged += _ => UpdateBackgroundElements();
-            BlurLevel.ValueChanged += _ => UpdateBackgroundElements();
-            ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();
-            UpdateBackgroundElements();
+            ConfigureBackgroundUpdate();
 
             Content.Alpha = 0;
             Content
