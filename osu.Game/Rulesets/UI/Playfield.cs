@@ -1,15 +1,12 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
-using osu.Game.Rulesets.Judgements;
 using osu.Framework.Allocation;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -18,17 +15,19 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The HitObjects contained in this Playfield.
         /// </summary>
-        public HitObjectContainer HitObjects { get; protected set; }
+        public HitObjectContainer HitObjects { get; private set; }
 
         public Container<Drawable> ScaledContent;
 
-        /// <summary>
-        /// Whether we are currently providing the local user a gameplay cursor.
-        /// </summary>
-        public virtual bool ProvidingUserCursor => false;
-
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
+
+        private List<Playfield> nestedPlayfields;
+
+        /// <summary>
+        /// All the <see cref="Playfield"/>s nested inside this playfield.
+        /// </summary>
+        public IReadOnlyList<Playfield> NestedPlayfields => nestedPlayfields;
 
         /// <summary>
         /// A container for keeping track of DrawableHitObjects.
@@ -36,8 +35,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width.</param>
         protected Playfield(float? customWidth = null)
         {
-            // Default height since we force relative size axes
-            Size = Vector2.One;
+            RelativeSizeAxes = Axes.Both;
 
             AddInternal(ScaledContent = new ScaledContainer
             {
@@ -51,29 +49,21 @@ namespace osu.Game.Rulesets.UI
                     }
                 }
             });
-
-            HitObjects = new HitObjectContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-            };
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(HitObjects);
-        }
+            HitObjects = CreateHitObjectContainer();
+            HitObjects.RelativeSizeAxes = Axes.Both;
 
-        public override Axes RelativeSizeAxes
-        {
-            get { return Axes.Both; }
-            set { throw new InvalidOperationException($@"{nameof(Playfield)}'s {nameof(RelativeSizeAxes)} should never be changed from {Axes.Both}"); }
+            Add(HitObjects);
         }
 
         /// <summary>
         /// Performs post-processing tasks (if any) after all DrawableHitObjects are loaded into this Playfield.
         /// </summary>
-        public virtual void PostProcess() { }
+        public virtual void PostProcess() => nestedPlayfields?.ForEach(p => p.PostProcess());
 
         /// <summary>
         /// Adds a DrawableHitObject to this Playfield.
@@ -88,18 +78,22 @@ namespace osu.Game.Rulesets.UI
         public virtual void Remove(DrawableHitObject h) => HitObjects.Remove(h);
 
         /// <summary>
-        /// Triggered when a new <see cref="Judgement"/> occurs on a <see cref="DrawableHitObject"/>.
+        /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
+        /// This does not add the <see cref="Playfield"/> to the draw hierarchy.
         /// </summary>
-        /// <param name="judgedObject">The object that <paramref name="judgement"/> occured for.</param>
-        /// <param name="judgement">The <see cref="Judgement"/> that occurred.</param>
-        public virtual void OnJudgement(DrawableHitObject judgedObject, Judgement judgement) { }
-
-        public class HitObjectContainer : CompositeDrawable
+        /// <param name="otherPlayfield">The <see cref="Playfield"/> to add.</param>
+        protected void AddNested(Playfield otherPlayfield)
         {
-            public virtual IEnumerable<DrawableHitObject> Objects => InternalChildren.OfType<DrawableHitObject>();
-            public virtual void Add(DrawableHitObject hitObject) => AddInternal(hitObject);
-            public virtual bool Remove(DrawableHitObject hitObject) => RemoveInternal(hitObject);
+            if (nestedPlayfields == null)
+                nestedPlayfields = new List<Playfield>();
+
+            nestedPlayfields.Add(otherPlayfield);
         }
+
+        /// <summary>
+        /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
 
         private class ScaledContainer : Container
         {
@@ -110,6 +104,12 @@ namespace osu.Game.Rulesets.UI
 
             //dividing by the customwidth will effectively scale our content to the required container size.
             protected override Vector2 DrawScale => CustomWidth.HasValue ? new Vector2(DrawSize.X / CustomWidth.Value) : base.DrawScale;
+
+            protected override void Update()
+            {
+                base.Update();
+                RelativeChildSize = new Vector2(DrawScale.X, RelativeChildSize.Y);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -29,59 +29,55 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public virtual Color4 AccentColour { get; set; } = Color4.Gray;
 
+        // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
+        protected virtual string SampleNamespace => null;
+
+        protected List<SampleChannel> Samples = new List<SampleChannel>();
+        protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
+
+        private List<DrawableHitObject> nestedHitObjects;
+        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+
+        public event Action<DrawableHitObject, Judgement> OnJudgement;
+        public event Action<DrawableHitObject, Judgement> OnJudgementRemoved;
+
+        public IReadOnlyList<Judgement> Judgements => judgements;
+        private readonly List<Judgement> judgements = new List<Judgement>();
+
         /// <summary>
         /// Whether a visible judgement should be displayed when this representation is hit.
         /// </summary>
         public virtual bool DisplayJudgement => true;
 
-        public override bool RemoveCompletedTransforms => false;
-        public override bool RemoveWhenNotAlive => false;
-
-        protected DrawableHitObject(HitObject hitObject)
-        {
-            HitObject = hitObject;
-        }
+        /// <summary>
+        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been hit.
+        /// </summary>
+        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && (NestedHitObjects?.All(n => n.IsHit) ?? true);
 
         /// <summary>
-        /// The screen-space point that causes this <see cref="DrawableHitObject"/> to be selected in the Editor.
+        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public virtual Vector2 SelectionPoint => ScreenSpaceDrawQuad.Centre;
-
-        /// <summary>
-        /// The screen-space quad that outlines this <see cref="DrawableHitObject"/> for selections in the Editor.
-        /// </summary>
-        public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
-    }
-
-    public abstract class DrawableHitObject<TObject> : DrawableHitObject
-        where TObject : HitObject
-    {
-        public event Action<DrawableHitObject, Judgement> OnJudgement;
-        public event Action<DrawableHitObject, Judgement> OnJudgementRemoved;
-
-        public new readonly TObject HitObject;
-
-        public override bool HandleInput => Interactive;
-        public bool Interactive = true;
+        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> can be judged.
         /// </summary>
         protected virtual bool ProvidesJudgement => true;
 
-        private readonly List<Judgement> judgements = new List<Judgement>();
-        public IReadOnlyList<Judgement> Judgements => judgements;
+        private bool judgementOccurred;
+        private bool judgementFinalized => judgements.LastOrDefault()?.Final == true;
 
-        protected List<SampleChannel> Samples = new List<SampleChannel>();
-        protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
+        public bool Interactive = true;
+        public override bool HandleKeyboardInput => Interactive;
+        public override bool HandleMouseInput => Interactive;
 
-        // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
-        protected virtual string SampleNamespace => null;
+        public override bool RemoveWhenNotAlive => false;
+        public override bool RemoveCompletedTransforms => false;
+        protected override bool RequiresChildrenUpdate => true;
 
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
-        protected DrawableHitObject(TObject hitObject)
-            : base(hitObject)
+        protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
         }
@@ -133,18 +129,55 @@ namespace osu.Game.Rulesets.Objects.Drawables
             State.TriggerChange();
         }
 
-        protected void PlaySamples()
-        {
-            Samples.ForEach(s => s?.Play());
-        }
-
-        private bool judgementOccurred;
-        private bool judgementFinalized => judgements.LastOrDefault()?.Final == true;
+        protected abstract void UpdateState(ArmedState state);
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
+        /// Bind to apply a custom state which can override the default implementation.
         /// </summary>
-        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
+        public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
+
+        /// <summary>
+        /// Plays all the hitsounds for this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public void PlaySamples() => Samples.ForEach(s => s?.Play());
+
+        protected override void Update()
+        {
+            base.Update();
+
+            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+
+            while (judgements.Count > 0)
+            {
+                var lastJudgement = judgements[judgements.Count - 1];
+                if (lastJudgement.TimeOffset + endTime <= Time.Current)
+                    break;
+
+                judgements.RemoveAt(judgements.Count - 1);
+                State.Value = ArmedState.Idle;
+
+                OnJudgementRemoved?.Invoke(this, lastJudgement);
+            }
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            UpdateJudgement(false);
+        }
+
+        protected virtual void AddNested(DrawableHitObject h)
+        {
+            if (nestedHitObjects == null)
+                nestedHitObjects = new List<DrawableHitObject>();
+
+            h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
+            h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
+            h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
+
+            nestedHitObjects.Add(h);
+        }
 
         /// <summary>
         /// Notifies that a new judgement has occurred for this <see cref="DrawableHitObject"/>.
@@ -209,53 +242,30 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="userTriggered">Whether the user triggered this check.</param>
         /// <param name="timeOffset">The offset from the <see cref="HitObject"/> end time at which this check occurred. A <paramref name="timeOffset"/> &gt; 0
         /// implies that this check occurred after the end time of <see cref="HitObject"/>. </param>
-        protected virtual void CheckForJudgements(bool userTriggered, double timeOffset) { }
-
-        protected override void Update()
+        protected virtual void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            base.Update();
-
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-
-            while (judgements.Count > 0)
-            {
-                var lastJudgement = judgements[judgements.Count - 1];
-                if (lastJudgement.TimeOffset + endTime <= Time.Current)
-                    break;
-
-                judgements.RemoveAt(judgements.Count - 1);
-                State.Value = ArmedState.Idle;
-
-                OnJudgementRemoved?.Invoke(this, lastJudgement);
-            }
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            UpdateJudgement(false);
-        }
-
-        private List<DrawableHitObject<TObject>> nestedHitObjects;
-        protected IEnumerable<DrawableHitObject<TObject>> NestedHitObjects => nestedHitObjects;
-
-        protected virtual void AddNested(DrawableHitObject<TObject> h)
-        {
-            if (nestedHitObjects == null)
-                nestedHitObjects = new List<DrawableHitObject<TObject>>();
-
-            h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
-            h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
-            h.ApplyCustomUpdateState += (d, s) => ApplyCustomUpdateState?.Invoke(d, s);
-            nestedHitObjects.Add(h);
         }
 
         /// <summary>
-        /// Bind to apply a custom state which can override the default implementation.
+        /// The screen-space point that causes this <see cref="DrawableHitObject"/> to be selected in the Editor.
         /// </summary>
-        public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
+        public virtual Vector2 SelectionPoint => ScreenSpaceDrawQuad.Centre;
 
-        protected abstract void UpdateState(ArmedState state);
+        /// <summary>
+        /// The screen-space quad that outlines this <see cref="DrawableHitObject"/> for selections in the Editor.
+        /// </summary>
+        public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
+    }
+
+    public abstract class DrawableHitObject<TObject> : DrawableHitObject
+        where TObject : HitObject
+    {
+        public new readonly TObject HitObject;
+
+        protected DrawableHitObject(TObject hitObject)
+            : base(hitObject)
+        {
+            HitObject = hitObject;
+        }
     }
 }

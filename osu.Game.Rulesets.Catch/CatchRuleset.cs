@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Catch
                         {
                             Mods = new Mod[]
                             {
-                                new ModAutoplay(),
+                                new CatchModAutoplay(),
                                 new ModCinema(),
                             },
                         },
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override int LegacyID => 2;
 
-        public CatchRuleset(RulesetInfo rulesetInfo)
+        public CatchRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
         {
         }

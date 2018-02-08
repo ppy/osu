@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -40,7 +40,8 @@ namespace osu.Game.Rulesets.Judgements
                     Anchor = Anchor.Centre,
                     Text = judgement.Result.GetDescription().ToUpper(),
                     Font = @"Venera",
-                    TextSize = 16
+                    Scale = new Vector2(0.85f, 1),
+                    TextSize = 12
                 }
             };
         }

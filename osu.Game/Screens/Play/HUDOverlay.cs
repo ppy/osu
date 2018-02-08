@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -6,6 +6,8 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -32,14 +34,14 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
-        public readonly ReplaySettingsOverlay ReplaySettingsOverlay;
+        public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         private Bindable<bool> showHud;
-        private bool replayLoaded;
+        private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
 
-        public HUDOverlay()
+        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, DecoupleableInterpolatingFramedClock decoupledClock, WorkingBeatmap working, IAdjustableClock adjustableSourceClock)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -56,9 +58,21 @@ namespace osu.Game.Screens.Play
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
-                    ReplaySettingsOverlay = CreateReplaySettingsOverlay(),
+                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay()
                 }
             });
+
+            BindProcessor(scoreProcessor);
+            BindRulesetContainer(rulesetContainer);
+
+            Progress.Objects = rulesetContainer.Objects;
+            Progress.AudioClock = decoupledClock;
+            Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
+            Progress.OnSeek = pos => decoupledClock.Seek(pos);
+
+            ModDisplay.Current.BindTo(working.Mods);
+
+            PlayerSettingsOverlay.PlaybackSettings.AdjustableClock = adjustableSourceClock;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -91,20 +105,37 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public virtual void BindRulesetContainer(RulesetContainer rulesetContainer)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            replayLoaded.ValueChanged += replayLoadedValueChanged;
+            replayLoaded.TriggerChange();
+        }
+
+        private void replayLoadedValueChanged(bool loaded)
+        {
+            PlayerSettingsOverlay.ReplayLoaded = loaded;
+
+            if (loaded)
+            {
+                PlayerSettingsOverlay.Show();
+                ModDisplay.FadeIn(200);
+            }
+            else
+            {
+                PlayerSettingsOverlay.Hide();
+                ModDisplay.Delay(2000).FadeOut(200);
+            }
+        }
+
+        protected virtual void BindRulesetContainer(RulesetContainer rulesetContainer)
         {
             (rulesetContainer.KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(KeyCounter);
 
-            replayLoaded = rulesetContainer.HasReplayLoaded;
+            replayLoaded.BindTo(rulesetContainer.HasReplayLoaded);
 
-            ReplaySettingsOverlay.ReplayLoaded = replayLoaded;
-
-            // in the case a replay isn't loaded, we want some elements to only appear briefly.
-            if (!replayLoaded)
-            {
-                ReplaySettingsOverlay.Hide();
-                ModDisplay.Delay(2000).FadeOut(200);
-            }
+            Progress.BindRulestContainer(rulesetContainer);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -182,9 +213,9 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
-        protected virtual ReplaySettingsOverlay CreateReplaySettingsOverlay() => new ReplaySettingsOverlay();
+        protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
-        public virtual void BindProcessor(ScoreProcessor processor)
+        protected virtual void BindProcessor(ScoreProcessor processor)
         {
             ScoreCounter?.Current.BindTo(processor.TotalScore);
             AccuracyCounter?.Current.BindTo(processor.Accuracy);

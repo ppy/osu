@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using NUnit.Framework;
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                                 RelativeChildSize = new Vector2(1, 10000),
                                 Children = new[]
                                 {
-                                    new DrawableHoldNote(new HoldNote(), ManiaAction.Key1)
+                                    new DrawableHoldNote(new HoldNote { Duration = 1000 } , ManiaAction.Key1)
                                     {
                                         Y = 5000,
                                         Height = 1000,
