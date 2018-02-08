@@ -42,7 +42,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Text = "1.0x",
                             Font = @"Exo2.0-Bold",
                         }
                     },
@@ -60,6 +59,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             };
 
             sliderbar.Bindable.ValueChanged += rateMultiplier => multiplierText.Text = $"{sliderbar.Bar.TooltipText}x";
+            sliderbar.Bindable.TriggerChange();
         }
 
         protected override void LoadComplete()
