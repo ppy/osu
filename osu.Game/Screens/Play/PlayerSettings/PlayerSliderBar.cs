@@ -13,6 +13,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
     public class PlayerSliderBar<T> : SettingsSlider<T>
         where T : struct, IEquatable<T>, IComparable, IConvertible
     {
+        public OsuSliderBar<T> Bar => (OsuSliderBar<T>)Control;
+
         protected override Drawable CreateControl() => new Sliderbar
         {
             Margin = new MarginPadding { Top = 5, Bottom = 5 },
@@ -21,8 +23,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private class Sliderbar : OsuSliderBar<T>
         {
-            public override string TooltipText => $"{CurrentNumber.Value}";
-
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {

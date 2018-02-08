@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual
                 {
                     Statistics = new UserStatistics
                     {
-                        Rank = 123456,
+                        Ranks = new UserStatistics.UserRanks { Global = 123456 },
                         PP = 12345,
                     }
                 };
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual
                 {
                     Statistics = new UserStatistics
                     {
-                        Rank = 89000,
+                        Ranks = new UserStatistics.UserRanks { Global = 89000 },
                         PP = 12345,
                     },
                     RankHistory = new User.RankHistoryData
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual
                 {
                     Statistics = new UserStatistics
                     {
-                        Rank = 89000,
+                        Ranks = new UserStatistics.UserRanks { Global = 89000 },
                         PP = 12345,
                     },
                     RankHistory = new User.RankHistoryData
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual
                 {
                     Statistics = new UserStatistics
                     {
-                        Rank = 12000,
+                        Ranks = new UserStatistics.UserRanks { Global = 12000 },
                         PP = 12345,
                     },
                     RankHistory = new User.RankHistoryData
