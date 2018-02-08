@@ -42,7 +42,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
-      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0.11\lib\net45\OpenTK.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0.13\lib\net45\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SQLitePCLRaw.batteries_green, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a84b7dcfb1391f7f, processorArchitecture=MSIL">
