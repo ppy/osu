@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Objects
         public double Good { get; protected set; }
 
         /// <summary>
-        /// Hit window for an <see cref="HitResult.OK"/> result.
+        /// Hit window for an <see cref="HitResult.Ok"/> result.
         /// The user can only achieve this result if <see cref="AllowsOk"/> is true.
         /// </summary>
         public double Ok { get; protected set; }
@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Given a time offset, whether the <see cref="HitObject"/> can ever be hit in the future with a non-<see cref="HitResult.Miss"/> result.
-        /// This happens if <paramref name="timeOffset"/> &le; <see cref="Meh"/>.
+        /// This happens if <paramref name="timeOffset"/> is less than what is required for a <see cref="Meh"/> result.
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
         /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>
