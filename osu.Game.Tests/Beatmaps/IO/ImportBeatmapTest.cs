@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public void TestImportWhenClosed()
         {
             //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new HeadlessGameHost("TestImportWhenClosed"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportWhenClosed"))
             {
                 var osu = loadOsu(host);
 
@@ -47,8 +47,8 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Ignore("Binding IPC on Appveyor isn't working (port in use). Need to figure out why")]
         public void TestImportOverIPC()
         {
-            using (HeadlessGameHost host = new HeadlessGameHost("host", true))
-            using (HeadlessGameHost client = new HeadlessGameHost("client", true))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("host", true))
+            using (HeadlessGameHost client = new CleanRunHeadlessGameHost("client", true))
             {
                 Assert.IsTrue(host.IsPrimaryInstance);
                 Assert.IsFalse(client.IsPrimaryInstance);
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestImportWhenFileOpen()
         {
-            using (HeadlessGameHost host = new HeadlessGameHost("TestImportWhenFileOpen"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportWhenFileOpen"))
             {
                 var osu = loadOsu(host);
 
