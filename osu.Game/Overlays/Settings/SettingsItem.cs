@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.Settings
             {
                 hovering = true;
                 UpdateState();
-                return true;
+                return false;
             }
 
             protected override void OnHoverLost(InputState state)
