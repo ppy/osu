@@ -68,7 +68,6 @@ namespace osu.Game.Tests.Beatmaps.IO
                 waitForOrAssert(() => !File.Exists(temp), "Temporary still exists after IPC import", 5000);
 
                 host.Exit();
-                client.Exit();
             }
         }
 
