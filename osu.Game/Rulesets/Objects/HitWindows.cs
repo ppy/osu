@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Retrieves half the hit window for a <see cref="HitResult"/>.
-        /// This is useful if the of the hit window for one half of the hittable range of a <see cref="HitObject"/> is required.
+        /// This is useful if the hit window for one half of the hittable range of a <see cref="HitObject"/> is required.
         /// </summary>
         /// <param name="result">The expected <see cref="HitResult"/>.</param>
         /// <returns>One half of the hit window for <paramref name="result"/>.</returns>
@@ -129,8 +129,8 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
-        /// Given a time offset, whether the <see cref="HitObject"/> can ever be hit in the future.
-        /// This happens if <paramref name="timeOffset"/> > <see cref="Meh"/>.
+        /// Given a time offset, whether the <see cref="HitObject"/> can ever be hit in the future with a non-<see cref="HitResult.Miss"/> result.
+        /// This happens if <paramref name="timeOffset"/> &le; <see cref="Meh"/>.
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
         /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>
