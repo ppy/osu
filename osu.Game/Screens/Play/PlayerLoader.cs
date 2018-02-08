@@ -9,7 +9,6 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using osu.Framework.Localisation;
 using osu.Game.Screens.Menu;
@@ -17,7 +16,7 @@ using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Screens.Play
 {
-    public class PlayerLoader : OsuScreen
+    public class PlayerLoader : PlayerBase
     {
         private Player player;
 
@@ -26,10 +25,6 @@ namespace osu.Game.Screens.Play
 
         private bool showOverlays = true;
         public override bool ShowOverlaysOnEnter => showOverlays;
-
-        public override bool AllowBeatmapRulesetChange => false;
-
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         public PlayerLoader(Player player)
         {
