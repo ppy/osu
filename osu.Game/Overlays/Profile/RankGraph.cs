@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.Profile
                 return;
             }
 
-            int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
+            int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Ranks.Global };
             ranks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
 
             if (ranks.Length > 1)
@@ -124,9 +124,11 @@ namespace osu.Game.Overlays.Profile
 
         private void updateRankTexts()
         {
-            rankText.Text = User.Value.Statistics.Rank > 0 ? $"#{User.Value.Statistics.Rank:#,0}" : "no rank";
-            performanceText.Text = User.Value.Statistics.PP != null ? $"{User.Value.Statistics.PP:#,0}pp" : string.Empty;
-            relativeText.Text = $"{User.Value.Country?.FullName} #{User.Value.CountryRank:#,0}";
+            var user = User.Value;
+
+            performanceText.Text = user.Statistics.PP != null ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
+            rankText.Text = user.Statistics.Ranks.Global > 0 ? $"#{user.Statistics.Ranks.Global:#,0}" : "no rank";
+            relativeText.Text = user.Country != null && user.Statistics.Ranks.Country > 0 ? $"{user.Country.FullName} #{user.Statistics.Ranks.Country:#,0}" : "no rank";
         }
 
         private void showHistoryRankTexts(int dayIndex)
