@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.UI
                 if (!base.UpdateSubTree())
                     return false;
 
-                UpdateSubTreeMasking(ScreenSpaceDrawQuad.AABBFloat);
+                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
 
                 if (isAttached)
                 {

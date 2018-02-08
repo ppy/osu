@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 // We want the container to have the same size as the slider,
                 // and to be positioned such that the slider head is at (0,0).
                 container.Size = path.Size;
-                container.Position = -path.PositionInBoundingBox(slider.Curve.PositionAt(0) - currentCurve[0]);
+                container.Position = -path.PositionInBoundingBox(slider.Curve.PositionAt(0) - CurrentCurve[0]);
 
                 container.ForceRedraw();
             }
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             path.Texture = texture;
         }
 
-        private readonly List<Vector2> currentCurve = new List<Vector2>();
+        public readonly List<Vector2> CurrentCurve = new List<Vector2>();
         private bool updateSnaking(double p0, double p1)
         {
             if (SnakedStart == p0 && SnakedEnd == p1) return false;
@@ -156,11 +156,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             SnakedStart = p0;
             SnakedEnd = p1;
 
-            slider.Curve.GetPathToProgress(currentCurve, p0, p1);
+            slider.Curve.GetPathToProgress(CurrentCurve, p0, p1);
 
             path.ClearVertices();
-            foreach (Vector2 p in currentCurve)
-                path.AddVertex(p - currentCurve[0]);
+            foreach (Vector2 p in CurrentCurve)
+                path.AddVertex(p - CurrentCurve[0]);
 
             return true;
         }
