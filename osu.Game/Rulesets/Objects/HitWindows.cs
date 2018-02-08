@@ -21,34 +21,46 @@ namespace osu.Game.Rulesets.Objects
         };
 
         /// <summary>
-        /// Hit window for a <see cref="HitResult.Perfect"/> hit.
+        /// Hit window for a <see cref="HitResult.Perfect"/> result.
+        /// The user can only achieve receive this result if <see cref="AllowsPerfect"/> is true.
         /// </summary>
         public double Perfect { get; protected set; }
 
         /// <summary>
-        /// Hit window for a <see cref="HitResult.Great"/> hit.
+        /// Hit window for a <see cref="HitResult.Great"/> result.
         /// </summary>
         public double Great { get; protected set; }
 
         /// <summary>
-        /// Hit window for a <see cref="HitResult.Good"/> hit.
+        /// Hit window for a <see cref="HitResult.Good"/> result.
         /// </summary>
         public double Good { get; protected set; }
 
         /// <summary>
-        /// Hit window for an <see cref="HitResult.OK"/> hit.
+        /// Hit window for an <see cref="HitResult.OK"/> result.
+        /// The user can only achieve this result if <see cref="AllowsOk"/> is true.
         /// </summary>
         public double Ok { get; protected set; }
 
         /// <summary>
-        /// Hit window for a <see cref="HitResult.Meh"/> hit.
+        /// Hit window for a <see cref="HitResult.Meh"/> result.
         /// </summary>
         public double Meh { get; protected set; }
 
         /// <summary>
-        /// Hit window for a <see cref="HitResult.Miss"/> hit.
+        /// Hit window for a <see cref="HitResult.Miss"/> result.
         /// </summary>
         public double Miss { get; protected set; }
+
+        /// <summary>
+        /// Whether it's possible to achieve a <see cref="HitResult.Perfect"/> result.
+        /// </summary>
+        public bool AllowsPerfect;
+
+        /// <summary>
+        /// Whether it's possible to achieve a <see cref="HitResult.Ok"/> result.
+        /// </summary>
+        public bool AllowsOk;
 
         /// <summary>
         /// Constructs hit windows by fitting a parameter to a 2-part piecewise linear function for each hit window.
@@ -73,13 +85,13 @@ namespace osu.Game.Rulesets.Objects
         {
             timeOffset = Math.Abs(timeOffset);
 
-            if (timeOffset <= HalfWindowFor(HitResult.Perfect))
+            if (AllowsPerfect && timeOffset <= HalfWindowFor(HitResult.Perfect))
                 return HitResult.Perfect;
             if (timeOffset <= HalfWindowFor(HitResult.Great))
                 return HitResult.Great;
             if (timeOffset <= HalfWindowFor(HitResult.Good))
                 return HitResult.Good;
-            if (timeOffset <= HalfWindowFor(HitResult.Ok))
+            if (AllowsOk && timeOffset <= HalfWindowFor(HitResult.Ok))
                 return HitResult.Ok;
             if (timeOffset <= HalfWindowFor(HitResult.Meh))
                 return HitResult.Meh;
