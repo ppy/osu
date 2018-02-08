@@ -46,6 +46,14 @@ namespace osu.Game.Screens.Play
             UserAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
         }
 
+        protected void ConfigureBackgroundUpdate()
+        {
+            DimLevel.ValueChanged += _ => UpdateBackgroundElements();
+            BlurLevel.ValueChanged += _ => UpdateBackgroundElements();
+            ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();
+            UpdateBackgroundElements();
+        }
+
         protected void UpdateBackgroundElements()
         {
             if (!IsCurrentScreen) return;
@@ -60,7 +68,7 @@ namespace osu.Game.Screens.Play
             var beatmap = Beatmap.Value;
             var storyboardVisible = ShowStoryboard && beatmap.Storyboard.HasDrawable;
 
-            StoryboardContainer
+            StoryboardContainer?
                 .FadeColour(OsuColour.Gray(opacity), duration, Easing.OutQuint)
                 .FadeTo(storyboardVisible && opacity > 0 ? 1 : 0, duration, Easing.OutQuint);
 
@@ -70,6 +78,9 @@ namespace osu.Game.Screens.Play
 
         protected void InitializeStoryboard(bool asyncLoad)
         {
+            if (StoryboardContainer == null)
+                return;
+
             var beatmap = Beatmap.Value;
 
             Storyboard = beatmap.Storyboard.CreateDrawable(Beatmap.Value);

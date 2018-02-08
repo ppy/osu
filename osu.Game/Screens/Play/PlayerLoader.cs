@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            Background.FadeTo(0.4f, 250);
+            ConfigureBackgroundUpdate();
 
             Content.ScaleTo(0.7f);
 
