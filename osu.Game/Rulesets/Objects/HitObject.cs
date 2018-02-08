@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Objects
         private HitWindows hitWindows;
 
         /// <summary>
-        /// The keypress hit windows for this <see cref="HitObject"/>.
+        /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
         public HitWindows HitWindows
         {
