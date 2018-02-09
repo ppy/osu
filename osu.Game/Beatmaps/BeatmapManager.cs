@@ -65,7 +65,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public WorkingBeatmap DefaultBeatmap { private get; set; }
 
-        private readonly Storage storage;
+        private FileStore getFileStoreWithContext(OsuDbContext context) => new FileStore(() => context, files.Storage);
 
         private BeatmapStore getBeatmapStoreWithContext(OsuDbContext context) => getBeatmapStoreWithContext(() => context);
 
@@ -128,7 +128,6 @@ namespace osu.Game.Beatmaps
             beatmaps = getBeatmapStoreWithContext(context);
             files = new FileStore(context, storage);
 
-            this.storage = files.Storage;
             this.rulesets = rulesets;
             this.api = api;
 
@@ -233,7 +232,7 @@ namespace osu.Game.Beatmaps
                             Delete(existingOnlineId);
                     }
 
-                    beatmapSet.Files = createFileInfos(archive, new FileStore(() => context, storage));
+                    beatmapSet.Files = createFileInfos(archive, getFileStoreWithContext(context));
                     beatmapSet.Beatmaps = createBeatmapDifficulties(archive);
 
                     // remove metadata from difficulties where it matches the set
@@ -373,7 +372,7 @@ namespace osu.Game.Beatmaps
                     if (getBeatmapStoreWithContext(context).Delete(beatmapSet))
                     {
                         if (!beatmapSet.Protected)
-                            new FileStore(() => context, storage).Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+                            getFileStoreWithContext(context).Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
                     }
 
                     context.ChangeTracker.AutoDetectChangesEnabled = true;
@@ -426,7 +425,7 @@ namespace osu.Game.Beatmaps
                 {
                     context.ChangeTracker.AutoDetectChangesEnabled = false;
 
-                    undelete(getBeatmapStoreWithContext(context), new FileStore(() => context, storage), beatmapSet);
+                    undelete(getBeatmapStoreWithContext(context), getFileStoreWithContext(context), beatmapSet);
 
                     context.ChangeTracker.AutoDetectChangesEnabled = true;
                     context.SaveChanges(transaction);
@@ -528,7 +527,7 @@ namespace osu.Game.Beatmaps
         {
             if (ZipFile.IsZipFile(path))
                 // ReSharper disable once InconsistentlySynchronizedField
-                return new OszArchiveReader(storage.GetStream(path));
+                return new OszArchiveReader(files.Storage.GetStream(path));
             return new LegacyFilesystemReader(path);
         }
 
