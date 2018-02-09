@@ -9,31 +9,26 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ionic.Zip;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Textures;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    public class BeatmapManager
+    public partial class BeatmapManager
     {
         /// <summary>
         /// Fired when a new <see cref="BeatmapSetInfo"/> becomes available in the database.
@@ -625,86 +620,6 @@ namespace osu.Game.Beatmaps
             store.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
             store.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
             return store;
-        }
-
-        protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
-        {
-            private readonly IResourceStore<byte[]> store;
-
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo)
-                : base(beatmapInfo)
-            {
-                this.store = store;
-            }
-
-            protected override Beatmap GetBeatmap()
-            {
-                try
-                {
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
-                    {
-                        Decoder decoder = Decoder.GetDecoder(stream);
-                        return decoder.DecodeBeatmap(stream);
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
-
-            protected override Texture GetBackground()
-            {
-                if (Metadata?.BackgroundFile == null)
-                    return null;
-
-                try
-                {
-                    return new LargeTextureStore(new RawTextureLoaderStore(store)).Get(getPathForFile(Metadata.BackgroundFile));
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-
-            protected override Track GetTrack()
-            {
-                try
-                {
-                    var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : new TrackBass(trackData);
-                }
-                catch
-                {
-                    return new TrackVirtual();
-                }
-            }
-
-            protected override Waveform GetWaveform() => new Waveform(store.GetStream(getPathForFile(Metadata.AudioFile)));
-
-            protected override Storyboard GetStoryboard()
-            {
-                try
-                {
-                    using (var beatmap = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
-                    {
-                        Decoder decoder = Decoder.GetDecoder(beatmap);
-
-                        if (BeatmapSetInfo?.StoryboardFile == null)
-                            return decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap);
-
-                        using (var storyboard = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
-                            return decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap, storyboard);
-                    }
-                }
-                catch
-                {
-                    return new Storyboard();
-                }
-            }
         }
 
         public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
