@@ -362,7 +362,7 @@ namespace osu.Game.Screens.Play
 
             if (loadedSuccessfully)
             {
-                pauseContainer.Pause();
+                pauseContainer?.Pause();
             }
 
             return true;
