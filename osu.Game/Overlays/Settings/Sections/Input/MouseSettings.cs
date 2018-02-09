@@ -97,6 +97,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     doubleValue.ValueChanged += newValue => base.Bindable.Value = newValue;
                 }
             }
+
+            public SensitivitySetting()
+            {
+                KeyboardStep = 0.01f;
+            }
         }
 
         private class SensitivitySlider : OsuSliderBar<double>
@@ -105,8 +110,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             public SensitivitySlider()
             {
-                KeyboardStep = 0.01f;
-
                 Current.ValueChanged += newValue =>
                 {
                     if (!isDragging && Sensitivity != null)

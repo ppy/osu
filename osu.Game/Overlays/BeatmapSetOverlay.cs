@@ -104,7 +104,7 @@ namespace osu.Game.Overlays
 
             scores.IsLoading = true;
 
-            getScoresRequest = new GetScoresRequest(beatmap);
+            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
             getScoresRequest.Success += r =>
             {
                 scores.Scores = r.Scores;

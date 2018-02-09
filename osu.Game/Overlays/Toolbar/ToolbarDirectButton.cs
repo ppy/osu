@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Toolbar
             SetIcon(FontAwesome.fa_osu_chevron_down_o);
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(DirectOverlay direct)
         {
             StateContainer = direct;

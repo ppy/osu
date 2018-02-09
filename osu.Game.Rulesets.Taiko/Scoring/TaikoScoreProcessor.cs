@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                 }
                 else if (obj is DrumRoll)
                 {
-                    for (int i = 0; i < ((DrumRoll)obj).TotalTicks; i++)
+                    for (int i = 0; i < ((DrumRoll)obj).NestedHitObjects.OfType<DrumRollTick>().Count(); i++)
                     {
                         AddJudgement(new TaikoDrumRollTickJudgement { Result = HitResult.Great });
 

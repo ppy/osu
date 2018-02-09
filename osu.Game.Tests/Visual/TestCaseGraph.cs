@@ -8,7 +8,7 @@ using OpenTK;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseGraph : OsuTestCase
+    public class TestCaseGraph : OsuTestCase
     {
         public TestCaseGraph()
         {

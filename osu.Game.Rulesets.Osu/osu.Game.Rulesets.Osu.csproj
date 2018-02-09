@@ -4,7 +4,6 @@
 
   <PropertyGroup Label="Project">
     <OutputType>Library</OutputType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Company>ppy Pty Ltd</Company>
     <Version>1.0.0.0</Version>

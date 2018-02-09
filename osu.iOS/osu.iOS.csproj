@@ -1,12 +1,13 @@
-﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
     <ProjectGuid>{80B89BDA-D5C8-4987-A03D-037C483ABEF0}</ProjectGuid>
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
-    <RootNamespace>osu!lazer</RootNamespace>
-    <AssemblyName>osu!lazer</AssemblyName>
+    <RootNamespace>osu.iOS</RootNamespace>
+    <AssemblyName>osu.iOS</AssemblyName>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
@@ -22,10 +23,11 @@
     <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
     <MtouchFastDev>true</MtouchFastDev>
     <IOSDebuggerPort>44544</IOSDebuggerPort>
-    <MtouchLink>None</MtouchLink>
+    <MtouchLink>Full</MtouchLink>
     <MtouchArch>x86_64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <PlatformTarget>x86</PlatformTarget>
+    <MtouchExtraArgs>--nolinkaway -gcc_flags "-lstdc++ -framework AudioToolbox -framework SystemConfiguration -framework CFNetwork -framework Accelerate -force_load ../osu-framework/Libraries/libbass.a -force_load ../osu-framework/Libraries/libbass_fx.a"</MtouchExtraArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>pdbonly</DebugType>
@@ -36,10 +38,11 @@
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchFloat32>true</MtouchFloat32>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <MtouchLink>None</MtouchLink>
+    <MtouchLink>Full</MtouchLink>
     <MtouchArch>ARM64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <PlatformTarget>x86</PlatformTarget>
+    <MtouchExtraArgs>--nolinkaway -gcc_flags "-lstdc++ -framework AudioToolbox -framework SystemConfiguration -framework CFNetwork -framework Accelerate -force_load ../osu-framework/Libraries/libbass.a -force_load ../osu-framework/Libraries/libbass_fx.a"</MtouchExtraArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -62,7 +65,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Developer: Dan Balasescu (5ZR88P6ZE7)</CodesignKey>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchDebug>true</MtouchDebug>
     <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
@@ -70,10 +73,12 @@
     <MtouchFloat32>true</MtouchFloat32>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <IOSDebuggerPort>16591</IOSDebuggerPort>
-    <MtouchLink>None</MtouchLink>
+    <MtouchLink>Full</MtouchLink>
     <MtouchArch>ARM64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <PlatformTarget>x86</PlatformTarget>
+    <MtouchExtraArgs>--nolinkaway -gcc_flags "-lstdc++ -framework AudioToolbox -framework SystemConfiguration -framework CFNetwork -framework Accelerate -force_load ../Libraries/libbass.a -force_load ../Libraries/libbass_fx.a"</MtouchExtraArgs>
+    <MtouchEnableSGenConc>false</MtouchEnableSGenConc>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -85,14 +90,22 @@
     <Reference Include="OpenTK">
       <HintPath>..\osu-framework\Libraries\OpenTK.dll</HintPath>
     </Reference>
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
-    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
-    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
+    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
+      <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
+      <Name>osu.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj">
+      <Project>{B306C976-5A6E-40BF-849B-8396F795468D}</Project>
+      <Name>osu.Game.Rulesets.Osu</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
+      <Project>{858407F2-FBA9-4CB6-8E7D-8A059D0100FB}</Project>
+      <Name>osu.Game</Name>
+    </ProjectReference>
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
-      <Project>{D9A367C9-4C1A-489F-9B05-A0CEA2B53B58}</Project>
+      <Project>{E798E898-855F-4375-87D2-C53B5CB83323}</Project>
       <Name>osu.Game.Resources</Name>
     </ProjectReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -100,18 +113,29 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
-    <Compile Include="Main.cs" />
     <None Include="Entitlements.plist" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="GameView.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="..\osu-framework\Libraries\libbass.a">
+      <Kind>Static</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="..\osu-framework\Libraries\libbass_fx.a">
+      <Kind>Static</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

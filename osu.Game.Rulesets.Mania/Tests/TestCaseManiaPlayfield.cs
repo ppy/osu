@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Mania.UI;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Tests.Visual;
 
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
     [Ignore("getting CI working")]
-    internal class TestCaseManiaPlayfield : OsuTestCase
+    public class TestCaseManiaPlayfield : OsuTestCase
     {
         private const double start_time = 500;
         private const double duration = 500;

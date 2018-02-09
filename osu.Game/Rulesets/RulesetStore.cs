@@ -39,6 +39,13 @@ namespace osu.Game.Rulesets
         public RulesetInfo GetRuleset(int id) => AvailableRulesets.FirstOrDefault(r => r.ID == id);
 
         /// <summary>
+        /// Retrieve a ruleset using a known short name.
+        /// </summary>
+        /// <param name="shortName">The ruleset's short name.</param>
+        /// <returns>A ruleset, if available, else null.</returns>
+        public RulesetInfo GetRuleset(string shortName) => AvailableRulesets.FirstOrDefault(r => r.ShortName == shortName);
+
+        /// <summary>
         /// All available rulesets.
         /// </summary>
         public IEnumerable<RulesetInfo> AvailableRulesets;
@@ -83,7 +90,11 @@ namespace osu.Game.Rulesets
             {
                 try
                 {
-                    r.CreateInstance();
+                    var instance = r.CreateInstance();
+
+                    r.Name = instance.Description;
+                    r.ShortName = instance.ShortName;
+
                     r.Available = true;
                 }
                 catch
@@ -117,6 +128,7 @@ namespace osu.Game.Rulesets
         private RulesetInfo createRulesetInfo(Ruleset ruleset) => new RulesetInfo
         {
             Name = ruleset.Description,
+            ShortName = ruleset.ShortName,
             InstantiationInfo = ruleset.GetType().AssemblyQualifiedName,
             ID = ruleset.LegacyID
         };

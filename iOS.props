@@ -2,14 +2,6 @@
   <PropertyGroup Label="Project">
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842}</ProjectTypeGuids>
     <TargetFramework>xamarinios10</TargetFramework>
-    <CodesignKey>iPhone Developer</CodesignKey>
-    <MtouchDebug>true</MtouchDebug>
-    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
-    <MtouchFastDev>true</MtouchFastDev>
-    <IOSDebuggerPort>60677</IOSDebuggerPort>
-    <DeviceSpecificBuild>false</DeviceSpecificBuild>
-    <MtouchLink></MtouchLink>
-    <MtouchHttpClientHandler></MtouchHttpClientHandler>
   </PropertyGroup>
 
   <ItemGroup Label="Package References">

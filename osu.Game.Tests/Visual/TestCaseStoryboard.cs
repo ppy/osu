@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseStoryboard : OsuTestCase
+    public class TestCaseStoryboard : OsuTestCase
     {
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
 
-            storyboard = working.Beatmap.Storyboard.CreateDrawable(beatmapBacking);
+            storyboard = working.Storyboard.CreateDrawable(beatmapBacking);
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);

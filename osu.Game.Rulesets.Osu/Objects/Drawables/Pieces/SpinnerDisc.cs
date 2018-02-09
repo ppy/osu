@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private const float idle_alpha = 0.2f;
         private const float tracking_alpha = 0.4f;
 
+        public override bool IsPresent => true; // handle input when hidden
+
         public SpinnerDisc(Spinner s)
         {
             spinner = s;

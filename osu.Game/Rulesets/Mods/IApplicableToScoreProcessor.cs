@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// An interface for mods that make general adjustments to score processor.
     /// </summary>
-    public interface IApplicableToScoreProcessor
+    public interface IApplicableToScoreProcessor : IApplicableMod
     {
         void ApplyToScoreProcessor(ScoreProcessor scoreProcessor);
     }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
@@ -76,10 +77,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     Duration = endTime - HitObject.StartTime
                 };
 
-                hold.Head.Samples.Add(new SampleInfo
-                {
-                    Name = SampleInfo.HIT_NORMAL
-                });
+                if (hold.Head.Samples == null)
+                    hold.Head.Samples = new List<SampleInfo>();
+
+                hold.Head.Samples.Add(new SampleInfo { Name = SampleInfo.HIT_NORMAL });
 
                 hold.Tail.Samples = HitObject.Samples;
 
