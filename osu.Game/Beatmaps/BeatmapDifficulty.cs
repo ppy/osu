@@ -20,7 +20,7 @@ namespace osu.Game.Beatmaps
         public float DrainRate { get; set; } = DEFAULT_DIFFICULTY;
         public float CircleSize { get; set; } = DEFAULT_DIFFICULTY;
         public float OverallDifficulty { get; set; } = DEFAULT_DIFFICULTY;
-        private float? approachRate = null;
+        private float? approachRate;
         public float ApproachRate
         {
             get
