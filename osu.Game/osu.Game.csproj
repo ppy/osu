@@ -248,6 +248,7 @@
     <Compile Include="Beatmaps\BeatmapDifficulty.cs" />
     <Compile Include="Beatmaps\BeatmapInfo.cs" />
     <Compile Include="Beatmaps\BeatmapManager.cs" />
+    <Compile Include="Beatmaps\BeatmapManager_WorkingBeatmap.cs" />
     <Compile Include="Beatmaps\BeatmapMetadata.cs" />
     <Compile Include="Beatmaps\BeatmapMetrics.cs" />
     <Compile Include="Beatmaps\BeatmapOnlineInfo.cs" />
