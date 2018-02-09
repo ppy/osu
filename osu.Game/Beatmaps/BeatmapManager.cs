@@ -67,7 +67,9 @@ namespace osu.Game.Beatmaps
 
         private readonly Storage storage;
 
-        private BeatmapStore createBeatmapStore(Func<OsuDbContext> context)
+        private BeatmapStore getBeatmapStoreWithContext(OsuDbContext context) => getBeatmapStoreWithContext(() => context);
+
+        private BeatmapStore getBeatmapStoreWithContext(Func<OsuDbContext> context)
         {
             var store = new BeatmapStore(context);
             store.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
@@ -123,7 +125,7 @@ namespace osu.Game.Beatmaps
 
             refreshImportContext();
 
-            beatmaps = createBeatmapStore(context);
+            beatmaps = getBeatmapStoreWithContext(context);
             files = new FileStore(context, storage);
 
             this.storage = files.Storage;
@@ -368,14 +370,10 @@ namespace osu.Game.Beatmaps
                     // re-fetch the beatmap set on the import context.
                     beatmapSet = context.BeatmapSetInfo.Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == beatmapSet.ID);
 
-                    // create local stores so we can isolate and thread safely, and share a context/transaction.
-                    var iFiles = new FileStore(() => context, storage);
-                    var iBeatmaps = createBeatmapStore(() => context);
-
-                    if (iBeatmaps.Delete(beatmapSet))
+                    if (getBeatmapStoreWithContext(context).Delete(beatmapSet))
                     {
                         if (!beatmapSet.Protected)
-                            iFiles.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+                            new FileStore(() => context, storage).Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
                     }
 
                     context.ChangeTracker.AutoDetectChangesEnabled = true;
@@ -428,10 +426,7 @@ namespace osu.Game.Beatmaps
                 {
                     context.ChangeTracker.AutoDetectChangesEnabled = false;
 
-                    var iFiles = new FileStore(() => context, storage);
-                    var iBeatmaps = createBeatmapStore(() => context);
-
-                    undelete(iBeatmaps, iFiles, beatmapSet);
+                    undelete(getBeatmapStoreWithContext(context), new FileStore(() => context, storage), beatmapSet);
 
                     context.ChangeTracker.AutoDetectChangesEnabled = true;
                     context.SaveChanges(transaction);
@@ -522,7 +517,7 @@ namespace osu.Game.Beatmaps
         /// <returns>Results from the provided query.</returns>
         public IEnumerable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
-        private void import(BeatmapSetInfo beatmapSet, OsuDbContext context) => createBeatmapStore(() => context).Add(beatmapSet);
+        private void import(BeatmapSetInfo beatmapSet, OsuDbContext context) => getBeatmapStoreWithContext(context).Add(beatmapSet);
 
         /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
