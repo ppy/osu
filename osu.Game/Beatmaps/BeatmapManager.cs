@@ -120,7 +120,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Import one or more <see cref="BeatmapSetInfo"/> from filesystem <paramref name="paths"/>.
-        /// This will post a notification tracking import progress.
+        /// This will post notifications tracking progress.
         /// </summary>
         /// <param name="paths">One or more beatmap locations on disk.</param>
         public List<BeatmapSetInfo> Import(params string[] paths)
@@ -250,6 +250,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Downloads a beatmap.
+        /// This will post notifications tracking progress.
         /// </summary>
         /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to be downloaded.</param>
         /// <param name="noVideo">Whether the beatmap should be downloaded without video. Defaults to false.</param>
@@ -361,6 +362,10 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        /// <summary>
+        /// Restore all beatmaps that were previously deleted.
+        /// This will post notifications tracking progress.
+        /// </summary>
         public void UndeleteAll()
         {
             var deleteMaps = QueryBeatmapSets(bs => bs.DeletePending).ToList();
@@ -392,6 +397,10 @@ namespace osu.Game.Beatmaps
             notification.State = ProgressNotificationState.Completed;
         }
 
+        /// <summary>
+        /// Restore a beatmap that was previously deleted. Is a no-op if the beatmap is not in a deleted state, or has its protected flag set.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmap to restore</param>
         public void Undelete(BeatmapSetInfo beatmapSet)
         {
             if (beatmapSet.Protected)
@@ -502,6 +511,9 @@ namespace osu.Game.Beatmaps
         /// <returns>Results from the provided query.</returns>
         public IEnumerable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
+        /// <summary>
+        /// Denotes whether an osu-stable installation is present to perform automated imports from.
+        /// </summary>
         public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
 
         /// <summary>
@@ -520,6 +532,10 @@ namespace osu.Game.Beatmaps
             await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs")), TaskCreationOptions.LongRunning);
         }
 
+        /// <summary>
+        /// Delete all beatmaps.
+        /// This will post notifications tracking progress.
+        /// </summary>
         public void DeleteAll()
         {
             var maps = GetAllUsableBeatmapSets();
@@ -569,6 +585,9 @@ namespace osu.Game.Beatmaps
             return new LegacyFilesystemReader(path);
         }
 
+        /// <summary>
+        /// Create a SHA-2 hash from the provided archive based on contained beatmap filenames.
+        /// </summary>
         private string computeBeatmapSetHash(ArchiveReader reader)
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
