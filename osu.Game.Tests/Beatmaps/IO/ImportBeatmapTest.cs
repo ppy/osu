@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     manager.Delete(imported.First());
 
                     Assert.IsTrue(manager.GetAllUsableBeatmapSets().Count == 0);
-                    Assert.IsTrue(manager.QueryBeatmapSets(_ => true).ToList().Count() == 1);
+                    Assert.IsTrue(manager.QueryBeatmapSets(_ => true).ToList().Count == 1);
                     Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
 
                     temp = prepareTempCopy(osz_path);
