@@ -210,7 +210,12 @@ namespace osu.Game.Beatmaps
                     {
                         var existingOnlineId = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
                         if (existingOnlineId != null)
+                        {
+                            // {Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException: Database operation expected to affect 1 row(s) but actually affected 0 row(s). Data may have been modified or deleted since entities were loaded. See http://go.microsoft.com/fwlink/?LinkId=527962…}
+
                             Delete(existingOnlineId);
+                            beatmaps.Cleanup(s => s.ID == existingOnlineId.ID);
+                        }
                     }
 
                     beatmapSet.Files = createFileInfos(archive, getFileStoreWithContext(context));
@@ -331,6 +336,12 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmap">The <see cref="BeatmapSetInfo"/> whose download request is wanted.</param>
         /// <returns>The <see cref="DownloadBeatmapSetRequest"/> object if it exists, or null.</returns>
         public DownloadBeatmapSetRequest GetExistingDownload(BeatmapSetInfo beatmap) => currentDownloads.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
+
+        /// <summary>
+        /// Update a BeatmapSetInfo with all changes. TODO: This only supports very basic updates currently.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmap set to update.</param>
+        public void Update(BeatmapSetInfo beatmap) => beatmaps.Update(beatmap);
 
         /// <summary>
         /// Delete a beatmap from the manager.

@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
 
@@ -45,6 +46,22 @@ namespace osu.Game.Beatmaps
             }
 
             context.BeatmapSetInfo.Attach(beatmapSet);
+            context.SaveChanges();
+
+            BeatmapSetAdded?.Invoke(beatmapSet);
+        }
+
+        /// <summary>
+        /// Update a <see cref="BeatmapSetInfo"/> in the database. TODO: This only supports very basic updates currently.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmap to update.</param>
+        public void Update(BeatmapSetInfo beatmapSet)
+        {
+            BeatmapSetRemoved?.Invoke(beatmapSet);
+
+            var context = GetContext();
+
+            context.BeatmapSetInfo.Update(beatmapSet);
             context.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
@@ -126,14 +143,17 @@ namespace osu.Game.Beatmaps
             return true;
         }
 
-        public override void Cleanup()
+        public override void Cleanup() => Cleanup(_ => true);
+
+        public void Cleanup(Expression<Func<BeatmapSetInfo, bool>> query)
         {
             var context = GetContext();
 
             var purgeable = context.BeatmapSetInfo.Where(s => s.DeletePending && !s.Protected)
-                   .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                   .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
-                   .Include(s => s.Metadata);
+                                   .Where(query)
+                                   .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                                   .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                                   .Include(s => s.Metadata);
 
             // metadata is M-N so we can't rely on cascades
             context.BeatmapMetadata.RemoveRange(purgeable.Select(s => s.Metadata));

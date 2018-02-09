@@ -88,6 +88,40 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        public void TestImportThenImportDifferentHash()
+        {
+            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportThenImportDifferentHash"))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var imported = loadOszIntoOsu(osu);
+
+                    //var change = manager.QueryBeatmapSets(_ => true).First();
+                    imported.Hash += "-changed";
+                    manager.Update(imported);
+
+                    var importedSecondTime = loadOszIntoOsu(osu);
+
+                    // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
+                    Assert.IsTrue(imported.ID == importedSecondTime.ID);
+                    Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
+
+
+                    Assert.IsTrue(manager.GetAllUsableBeatmapSets().Count == 1);
+                    Assert.IsTrue(manager.QueryBeatmapSets(_ => true).ToList().Count == 1);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
         public void TestImportThenDeleteThenImport()
         {
             //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
