@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -14,13 +14,14 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Ranking;
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipButton : Container
+    public class SkipButton : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
         public IAdjustableClock AudioClock;
@@ -31,9 +32,13 @@ namespace osu.Game.Screens.Play
         private FadeContainer fadeContainer;
         private double displayTime;
 
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+
         public SkipButton(double startTime)
         {
             this.startTime = startTime;
+
+            State = Visibility.Visible;
 
             RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.Both;
@@ -111,25 +116,35 @@ namespace osu.Game.Screens.Play
             Expire();
         }
 
+        protected override void PopIn()
+        {
+            this.FadeIn();
+        }
+
+        protected override void PopOut()
+        {
+            this.FadeOut();
+        }
+
         protected override void Update()
         {
             base.Update();
             remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, Easing.OutQuint);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public bool OnPressed(GlobalAction action)
         {
-            if (args.Repeat) return false;
-
-            switch (args.Key)
+            switch (action)
             {
-                case Key.Space:
+                case GlobalAction.SkipCutscene:
                     button.TriggerOnClick();
                     return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
+
+        public bool OnReleased(GlobalAction action) => false;
 
         private class FadeContainer : Container, IStateful<Visibility>
         {
@@ -140,16 +155,11 @@ namespace osu.Game.Screens.Play
 
             public Visibility State
             {
-                get
-                {
-                    return state;
-                }
+                get { return state; }
                 set
                 {
-                    if (state == value)
-                        return;
+                    bool stateChanged = value != state;
 
-                    var lastState = state;
                     state = value;
 
                     scheduledHide?.Cancel();
@@ -157,7 +167,8 @@ namespace osu.Game.Screens.Play
                     switch (state)
                     {
                         case Visibility.Visible:
-                            if (lastState == Visibility.Hidden)
+                            // we may be triggered to become visible mnultiple times but we only want to transform once.
+                            if (stateChanged)
                                 this.FadeIn(500, Easing.OutExpo);
 
                             if (!IsHovered)

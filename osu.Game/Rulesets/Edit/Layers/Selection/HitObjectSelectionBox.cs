@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -165,7 +165,8 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         }
 
         private bool isActive = true;
-        public override bool HandleInput => isActive;
+        public override bool HandleKeyboardInput => isActive;
+        public override bool HandleMouseInput => isActive;
 
         public override void Hide()
         {

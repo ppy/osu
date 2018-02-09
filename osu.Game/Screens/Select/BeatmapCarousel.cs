@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -51,7 +51,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public Action<BeatmapInfo> SelectionChanged;
 
-        public override bool HandleInput => AllowSelection;
+        public override bool HandleKeyboardInput => AllowSelection;
+        public override bool HandleMouseInput => AllowSelection;
 
         /// <summary>
         /// Used to avoid firing null selections before the initial beatmaps have been loaded via <see cref="BeatmapSets"/>.
@@ -235,8 +236,8 @@ namespace osu.Game.Screens.Select
         /// <returns>True if a selection could be made, else False.</returns>
         public bool SelectNextRandom()
         {
-            var visible = beatmapSets.Where(s => !s.Filtered).ToList();
-            if (!visible.Any())
+            var visibleSets = beatmapSets.Where(s => !s.Filtered).ToList();
+            if (!visibleSets.Any())
                 return false;
 
             if (selectedBeatmap != null)
@@ -253,20 +254,21 @@ namespace osu.Game.Screens.Select
 
             if (RandomAlgorithm == RandomSelectAlgorithm.RandomPermutation)
             {
-                var notYetVisitedSets = visible.Except(previouslyVisitedRandomSets).ToList();
+                var notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomSets).ToList();
                 if (!notYetVisitedSets.Any())
                 {
-                    previouslyVisitedRandomSets.Clear();
-                    notYetVisitedSets = visible;
+                    previouslyVisitedRandomSets.RemoveAll(s => visibleSets.Contains(s));
+                    notYetVisitedSets = visibleSets;
                 }
 
                 set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
                 previouslyVisitedRandomSets.Add(set);
             }
             else
-                set = visible.ElementAt(RNG.Next(visible.Count));
+                set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
 
-            select(set.Beatmaps.Skip(RNG.Next(set.Beatmaps.Count())).FirstOrDefault());
+            var visibleBeatmaps = set.Beatmaps.Where(s => !s.Filtered).ToList();
+            select(visibleBeatmaps[RNG.Next(visibleBeatmaps.Count)]);
             return true;
         }
 

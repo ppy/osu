@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Diagnostics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -9,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -16,9 +18,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
-using System.Diagnostics;
-using System.Collections.Generic;
-using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -103,7 +102,7 @@ namespace osu.Game.Overlays.Profile
                                             Y = -75,
                                             Size = new Vector2(25, 25)
                                         },
-                                        new LinkFlowContainer.ProfileLink(user)
+                                        new ProfileLink(user)
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
@@ -319,22 +318,24 @@ namespace osu.Game.Overlays.Profile
                 colourBar.Show();
             }
 
-            Action<SpriteText> boldItalic = t =>
+            void boldItalic(SpriteText t)
             {
                 t.Font = @"Exo2.0-BoldItalic";
                 t.Alpha = 1;
-            };
+            }
 
             if (user.Age != null)
             {
                 infoTextLeft.AddText($"{user.Age} years old ", boldItalic);
             }
+
             if (user.Country != null)
             {
                 infoTextLeft.AddText("from ");
                 infoTextLeft.AddText(user.Country.FullName, boldItalic);
                 countryFlag.Country = user.Country;
             }
+
             infoTextLeft.NewParagraph();
 
             if (user.JoinDate.ToUniversalTime().Year < 2008)
@@ -346,6 +347,7 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText("Joined ");
                 infoTextLeft.AddText(user.JoinDate.LocalDateTime.ToShortDateString(), boldItalic);
             }
+
             infoTextLeft.NewLine();
             infoTextLeft.AddText("Last seen ");
             infoTextLeft.AddText(user.LastVisit.LocalDateTime.ToShortDateString(), boldItalic);
@@ -394,15 +396,16 @@ namespace osu.Game.Overlays.Profile
                 scoreText.Add(createScoreText("Replays Watched by Others"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.ReplaysWatched.ToString(@"#,0")));
 
+                gradeSSPlus.DisplayCount = user.Statistics.GradesCount.SSPlus;
+                gradeSSPlus.Show();
                 gradeSS.DisplayCount = user.Statistics.GradesCount.SS;
                 gradeSS.Show();
+                gradeSPlus.DisplayCount = user.Statistics.GradesCount.SPlus;
+                gradeSPlus.Show();
                 gradeS.DisplayCount = user.Statistics.GradesCount.S;
                 gradeS.Show();
                 gradeA.DisplayCount = user.Statistics.GradesCount.A;
                 gradeA.Show();
-
-                gradeSPlus.DisplayCount = 0;
-                gradeSSPlus.DisplayCount = 0;
 
                 rankGraph.User.Value = user;
             }
@@ -430,9 +433,37 @@ namespace osu.Game.Overlays.Profile
             if (string.IsNullOrEmpty(str)) return;
 
             infoTextRight.AddIcon(icon);
-            infoTextRight.AddLink(" " + str, url);
+            if (url != null)
+            {
+                infoTextRight.AddLink(" " + str, url);
+            } else
+            {
+                infoTextRight.AddText(" " + str);
+            }
             infoTextRight.NewLine();
         }
+
+        private class ProfileLink : OsuHoverContainer, IHasTooltip
+        {
+            public string TooltipText => "View Profile in Browser";
+
+            public override bool HandleMouseInput => true;
+
+            public ProfileLink(User user)
+            {
+                Action = () => Process.Start($@"https://osu.ppy.sh/users/{user.Id}");
+
+                AutoSizeAxes = Axes.Both;
+
+                Child = new OsuSpriteText
+                {
+                    Text = user.Username,
+                    Font = @"Exo2.0-RegularItalic",
+                    TextSize = 30,
+                };
+            }
+        }
+
 
         private class GradeBadge : Container
         {
@@ -469,60 +500,6 @@ namespace osu.Game.Overlays.Profile
             private void load(TextureStore textures)
             {
                 badge.Texture = textures.Get($"Grades/{grade}");
-            }
-        }
-
-        private class LinkFlowContainer : OsuTextFlowContainer
-        {
-            public override bool HandleInput => true;
-
-            public LinkFlowContainer(Action<SpriteText> defaultCreationParameters = null) : base(defaultCreationParameters)
-            {
-            }
-
-            protected override SpriteText CreateSpriteText() => new LinkText();
-
-            public void AddLink(string text, string url) => AddText(text, link => ((LinkText)link).Url = url);
-
-            public class LinkText : OsuSpriteText
-            {
-                private readonly OsuHoverContainer content;
-
-                public override bool HandleInput => content.Action != null;
-
-                protected override Container<Drawable> Content => content ?? (Container<Drawable>)this;
-
-                protected override IEnumerable<Drawable> FlowingChildren => Children;
-
-                public string Url
-                {
-                    set
-                    {
-                        if (value != null)
-                            content.Action = () => Process.Start(value);
-                    }
-                }
-
-                public LinkText()
-                {
-                    AddInternal(content = new OsuHoverContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                    });
-                }
-            }
-
-            public class ProfileLink : LinkText, IHasTooltip
-            {
-                public string TooltipText => "View Profile in Browser";
-
-                public ProfileLink(User user)
-                {
-                    Text = user.Username;
-                    Url = $@"https://osu.ppy.sh/users/{user.Id}";
-                    Font = @"Exo2.0-RegularItalic";
-                    TextSize = 30;
-                }
             }
         }
     }

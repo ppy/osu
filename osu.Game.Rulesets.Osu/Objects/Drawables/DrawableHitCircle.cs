@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 number = new NumberPiece
                 {
-                    Text = (HitObject.ComboIndex + 1).ToString(),
+                    Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
                 },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
@@ -72,14 +72,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (!userTriggered)
             {
-                if (timeOffset > HitObject.HitWindowFor(HitResult.Meh))
+                if (!HitObject.HitWindows.CanBeHit(timeOffset))
                     AddJudgement(new OsuJudgement { Result = HitResult.Miss });
                 return;
             }
 
+            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            if (result == HitResult.None)
+                return;
+
             AddJudgement(new OsuJudgement
             {
-                Result = HitObject.ScoreResultForOffset(Math.Abs(timeOffset)),
+                Result = result,
                 PositionOffset = Vector2.Zero //todo: set to correct value
             });
         }
@@ -88,8 +92,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            ApproachCircle.FadeIn(Math.Min(FadeInDuration * 2, TIME_PREEMPT));
-            ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
+            ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadein * 2, HitObject.TimePreempt));
+            ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -99,12 +103,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(TIME_PREEMPT).FadeOut(500);
+                    this.Delay(HitObject.TimePreempt).FadeOut(500);
 
                     Expire(true);
 
                     // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
-                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindowFor(HitResult.Miss);
+                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.HalfWindowFor(HitResult.Miss);
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Audio;
@@ -20,5 +20,14 @@ namespace osu.Game.Rulesets.Objects.Types
         /// The samples to be played when each repeat node is hit (0 -> first repeat node, 1 -> second repeat node, etc).
         /// </summary>
         List<List<SampleInfo>> RepeatSamples { get; }
+    }
+
+    public static class HasRepeatsExtensions
+    {
+        /// <summary>
+        /// The amount of times the length of this <see cref="IHasRepeats"/> spans.
+        /// </summary>
+        /// <param name="obj">The object that has repeats.</param>
+        public static int SpanCount(this IHasRepeats obj) => obj.RepeatCount + 1;
     }
 }

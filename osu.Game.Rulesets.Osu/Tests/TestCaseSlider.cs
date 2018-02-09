@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -16,6 +16,10 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -27,7 +31,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             typeof(SliderBall),
             typeof(SliderBody),
+            typeof(SliderTick),
             typeof(DrawableSlider),
+            typeof(DrawableSliderTick),
             typeof(DrawableRepeatPoint),
             typeof(DrawableOsuHitObject)
         };
@@ -63,9 +69,27 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Fast Short Slider", () => testShortHighSpeed());
             AddStep("Fast Short Slider 1 Repeat", () => testShortHighSpeed(1));
             AddStep("Fast Short Slider 2 Repeats", () => testShortHighSpeed(2));
+            AddStep("Fast Short Slider 6 Repeats", () => testShortHighSpeed(6));
 
-            AddStep("Perfect Curve", testCurve);
-            // TODO more curve types?
+            AddStep("Perfect Curve", () => testPerfect());
+            AddStep("Perfect Curve 1 Repeat", () => testPerfect(1));
+            AddStep("Perfect Curve 2 Repeats", () => testPerfect(2));
+
+            AddStep("Linear Slider", () => testLinear());
+            AddStep("Linear Slider 1 Repeat", () => testLinear(1));
+            AddStep("Linear Slider 2 Repeats", () => testLinear(2));
+
+            AddStep("Bezier Slider", () => testBezier());
+            AddStep("Bezier Slider 1 Repeat", () => testBezier(1));
+            AddStep("Bezier Slider 2 Repeats", () => testBezier(2));
+
+            AddStep("Linear Overlapping", () => testLinearOverlapping());
+            AddStep("Linear Overlapping 1 Repeat", () => testLinearOverlapping(1));
+            AddStep("Linear Overlapping 2 Repeats", () => testLinearOverlapping(2));
+
+            AddStep("Catmull Slider", () => testCatmull());
+            AddStep("Catmull Slider 1 Repeat", () => testCatmull(1));
+            AddStep("Catmull Slider 2 Repeats", () => testCatmull(2));
         }
 
         private void testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
@@ -84,15 +108,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void createSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2)
         {
-            repeats++; // The first run through the slider is considered a repeat
-
-            var repeatSamples = new List<List<SampleInfo>>();
-            if (repeats > 1)
-            {
-                for (int i = 0; i < repeats; i++)
-                    repeatSamples.Add(new List<SampleInfo>());
-            }
-
             var slider = new Slider
             {
                 StartTime = Time.Current + 1000,
@@ -105,13 +120,13 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
                 Distance = distance,
                 RepeatCount = repeats,
-                RepeatSamples = repeatSamples
+                RepeatSamples = createEmptySamples(repeats)
             };
 
             addSlider(slider, circleSize, speedMultiplier);
         }
 
-        private void testCurve()
+        private void testPerfect(int repeats = 0)
         {
             var slider = new Slider
             {
@@ -124,10 +139,129 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(0, 200),
                     new Vector2(200, 0)
                 },
-                Distance = 600
+                Distance = 600,
+                RepeatCount = repeats,
+                RepeatSamples = createEmptySamples(repeats)
             };
 
             addSlider(slider, 2, 3);
+        }
+
+        private void testLinear(int repeats = 0) => createLinear(repeats);
+
+        private void createLinear(int repeats)
+        {
+            var slider = new Slider
+            {
+                CurveType = CurveType.Linear,
+                StartTime = Time.Current + 1000,
+                Position = new Vector2(-200, 0),
+                ComboColour = Color4.LightSeaGreen,
+                ControlPoints = new List<Vector2>
+                {
+                    new Vector2(-200, 0),
+                    new Vector2(-50, 75),
+                    new Vector2(0, 100),
+                    new Vector2(100, -200),
+                    new Vector2(200, 0),
+                    new Vector2(230, 0)
+                },
+                Distance = 793.4417,
+                RepeatCount = repeats,
+                RepeatSamples = createEmptySamples(repeats)
+            };
+
+            addSlider(slider, 2, 3);
+        }
+
+        private void testBezier(int repeats = 0) => createBezier(repeats);
+
+        private void createBezier(int repeats)
+        {
+            var slider = new Slider
+            {
+                CurveType = CurveType.Bezier,
+                StartTime = Time.Current + 1000,
+                Position = new Vector2(-200, 0),
+                ComboColour = Color4.LightSeaGreen,
+                ControlPoints = new List<Vector2>
+                {
+                    new Vector2(-200, 0),
+                    new Vector2(-50, 75),
+                    new Vector2(0, 100),
+                    new Vector2(100, -200),
+                    new Vector2(230, 0)
+                },
+                Distance = 480,
+                RepeatCount = repeats,
+                RepeatSamples = createEmptySamples(repeats)
+            };
+
+            addSlider(slider, 2, 3);
+        }
+
+        private void testLinearOverlapping(int repeats = 0) => createOverlapping(repeats);
+
+        private void createOverlapping(int repeats)
+        {
+            var slider = new Slider
+            {
+                CurveType = CurveType.Linear,
+                StartTime = Time.Current + 1000,
+                Position = new Vector2(0, 0),
+                ComboColour = Color4.LightSeaGreen,
+                ControlPoints = new List<Vector2>
+                {
+                    new Vector2(0, 0),
+                    new Vector2(-200, 0),
+                    new Vector2(0, 0),
+                    new Vector2(0, -200),
+                    new Vector2(-200, -200),
+                    new Vector2(0, -200)
+                },
+                Distance = 1000,
+                RepeatCount = repeats,
+                RepeatSamples = createEmptySamples(repeats)
+            };
+
+            addSlider(slider, 2, 3);
+        }
+
+        private void testCatmull(int repeats = 0) => createCatmull(repeats);
+
+        private void createCatmull(int repeats = 0)
+        {
+            var repeatSamples = new List<List<SampleInfo>>();
+            for (int i = 0; i < repeats; i++)
+                repeatSamples.Add(new List<SampleInfo>());
+
+            var slider = new Slider
+            {
+                StartTime = Time.Current + 1000,
+                Position = new Vector2(-100, 0),
+                ComboColour = Color4.LightSeaGreen,
+                CurveType = CurveType.Catmull,
+                ControlPoints = new List<Vector2>
+                {
+                    new Vector2(-100, 0),
+                    new Vector2(-50, -50),
+                    new Vector2(50, 50),
+                    new Vector2(100, 0)
+                },
+                Distance = 300,
+                RepeatCount = repeats,
+                RepeatSamples = repeatSamples
+            };
+
+            addSlider(slider, 3, 1);
+        }
+
+        private List<List<SampleInfo>> createEmptySamples(int repeats)
+        {
+            var repeatSamples = new List<List<SampleInfo>>();
+            for (int i = 0; i < repeats; i++)
+                repeatSamples.Add(new List<SampleInfo>());
+            return repeatSamples;
         }
 
         private void addSlider(Slider slider, float circleSize, double speedMultiplier)
@@ -135,7 +269,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             var cpi = new ControlPointInfo();
             cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
-            slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize });
+            slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize, SliderTickRate = 3 });
 
             var drawable = new DrawableSlider(slider)
             {
@@ -146,7 +280,34 @@ namespace osu.Game.Rulesets.Osu.Tests
             foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
+            drawable.OnJudgement += onJudgement;
+
             Add(drawable);
+        }
+
+        private float judgementOffsetDirection = 1;
+        private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        {
+            var osuObject = judgedObject as DrawableOsuHitObject;
+            if (osuObject == null)
+                return;
+
+            OsuSpriteText text;
+            Add(text = new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Text = judgement.IsHit ? "Hit!" : "Miss!",
+                Colour = judgement.IsHit ? Color4.Green : Color4.Red,
+                TextSize = 30,
+                Position = osuObject.HitObject.StackedEndPosition + judgementOffsetDirection * new Vector2(0, 45)
+            });
+
+            text.Delay(150)
+                .Then().FadeOut(200)
+                .Then().Expire();
+
+            judgementOffsetDirection *= -1;
         }
     }
 }

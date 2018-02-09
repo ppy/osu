@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
@@ -87,7 +87,8 @@ namespace osu.Game.Overlays.Toolbar
                 ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault();
         }
 
-        public override bool HandleInput => !ruleset.Disabled;
+        public override bool HandleKeyboardInput => !ruleset.Disabled;
+        public override bool HandleMouseInput => !ruleset.Disabled;
 
         private void disabledChanged(bool isDisabled) => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
 

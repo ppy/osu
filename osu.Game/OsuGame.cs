@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -18,6 +19,7 @@ using OpenTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Audio;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -27,6 +29,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Mods;
 using OpenTK.Graphics;
 
 namespace osu.Game
@@ -71,6 +74,7 @@ namespace osu.Game
         private OsuScreen screenStack;
 
         private VolumeControl volume;
+        private OnScreenDisplay onscreenDisplay;
 
         private Bindable<int> configRuleset;
         public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
@@ -78,6 +82,9 @@ namespace osu.Game
         private readonly string[] args;
 
         private SettingsOverlay settings;
+
+        // todo: move this to SongSelect once Screen has the ability to unsuspend.
+        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
 
         public OsuGame(string[] args = null)
         {
@@ -110,14 +117,28 @@ namespace osu.Game
                 Task.Run(() => BeatmapManager.Import(paths.ToArray()));
             }
 
-            dependencies.Cache(this);
+            dependencies.CacheAs(this);
 
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
+
+            LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
         }
 
         private ScheduledDelegate scoreLoad;
+
+        /// <summary>
+        /// Open chat to a channel matching the provided name, if present.
+        /// </summary>
+        /// <param name="channelName">The name of the channel.</param>
+        public void OpenChannel(string channelName) => chat.OpenChannel(chat.AvailableChannels.Find(c => c.Name == channelName));
+
+        /// <summary>
+        /// Show a beatmap set as an overlay.
+        /// </summary>
+        /// <param name="setId">The set to display.</param>
+        public void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
 
         protected void LoadScore(Score s)
         {
@@ -157,6 +178,11 @@ namespace osu.Game
         {
             base.LoadComplete();
 
+            // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
+            // in the cursor being shown for a few frames during the intro.
+            // This prevents the cursor from showing until we have a screen with CursorVisible = true
+            CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
+
             // hook up notifications to components.
             BeatmapManager.PostNotification = n => notifications?.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
@@ -190,7 +216,7 @@ namespace osu.Game
             }, overlayContent.Add);
 
             loadComponentSingleFile(volume = new VolumeControl(), Add);
-            loadComponentSingleFile(new OnScreenDisplay(), Add);
+            loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
@@ -227,6 +253,7 @@ namespace osu.Game
             forwardLoggedErrorsToNotifications();
 
             dependencies.Cache(settings);
+            dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
             dependencies.Cache(direct);
             dependencies.Cache(chat);
@@ -297,8 +324,6 @@ namespace osu.Game
                 else
                     Toolbar.State = Visibility.Visible;
             };
-
-            Cursor.State = Visibility.Hidden;
         }
 
         private void forwardLoggedErrorsToNotifications()
@@ -388,6 +413,20 @@ namespace osu.Game
             return false;
         }
 
+        private readonly BindableDouble inactiveVolumeAdjust = new BindableDouble();
+
+        protected override void OnDeactivated()
+        {
+            base.OnDeactivated();
+            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+        }
+
+        protected override void OnActivated()
+        {
+            base.OnActivated();
+            Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+        }
+
         public bool OnReleased(GlobalAction action) => false;
 
         private Container mainContent;
@@ -447,7 +486,7 @@ namespace osu.Game
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
-            Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
+            CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
         private void screenAdded(Screen newScreen)
