@@ -28,17 +28,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             {
                 try
                 {
-                    var osu = loadOsu(host);
-
-                    var temp = prepareTempCopy(osz_path);
-
-                    Assert.IsTrue(File.Exists(temp));
-
-                    osu.Dependencies.Get<BeatmapManager>().Import(temp);
-
-                    ensureLoaded(osu);
-
-                    waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
+                    loadOszIntoOsu(loadOsu(host));
                 }
                 finally
                 {
@@ -57,22 +47,9 @@ namespace osu.Game.Tests.Beatmaps.IO
                 {
                     var osu = loadOsu(host);
 
-                    var temp = prepareTempCopy(osz_path);
-                    Assert.IsTrue(File.Exists(temp));
+                    var imported = loadOszIntoOsu(osu);
 
-                    var manager = osu.Dependencies.Get<BeatmapManager>();
-
-                    var imported = manager.Import(temp);
-
-                    ensureLoaded(osu);
-
-                    manager.Delete(imported.First());
-
-                    Assert.IsTrue(manager.GetAllUsableBeatmapSets().Count == 0);
-                    Assert.IsTrue(manager.QueryBeatmapSets(_ => true).ToList().Count == 1);
-                    Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
-
-                    waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
+                    deleteBeatmapSet(imported, osu);
                 }
                 finally
                 {
@@ -91,32 +68,15 @@ namespace osu.Game.Tests.Beatmaps.IO
                 {
                     var osu = loadOsu(host);
 
-                    var temp = prepareTempCopy(osz_path);
-                    Assert.IsTrue(File.Exists(temp));
+                    var imported = loadOszIntoOsu(osu);
 
-                    var manager = osu.Dependencies.Get<BeatmapManager>();
+                    deleteBeatmapSet(imported, osu);
 
-                    var imported = manager.Import(temp);
-
-                    ensureLoaded(osu);
-
-                    manager.Delete(imported.First());
-
-                    Assert.IsTrue(manager.GetAllUsableBeatmapSets().Count == 0);
-                    Assert.IsTrue(manager.QueryBeatmapSets(_ => true).ToList().Count == 1);
-                    Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
-
-                    temp = prepareTempCopy(osz_path);
-                    Assert.IsTrue(File.Exists(temp));
-                    var importedSecondTime = manager.Import(temp);
-
-                    ensureLoaded(osu);
+                    var importedSecondTime = loadOszIntoOsu(osu);
 
                     // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
-                    Assert.IsTrue(imported.First().ID == importedSecondTime.First().ID);
-                    Assert.IsTrue(imported.First().Beatmaps.First().ID == importedSecondTime.First().Beatmaps.First().ID);
-
-                    waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
+                    Assert.IsTrue(imported.ID == importedSecondTime.ID);
+                    Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
                 }
                 finally
                 {
@@ -141,7 +101,6 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = loadOsu(host);
 
                     var temp = prepareTempCopy(osz_path);
-
                     Assert.IsTrue(File.Exists(temp));
 
                     var importer = new BeatmapIPCChannel(client);
@@ -180,6 +139,31 @@ namespace osu.Game.Tests.Beatmaps.IO
                     host.Exit();
                 }
             }
+        }
+
+        private BeatmapSetInfo loadOszIntoOsu(OsuGameBase osu)
+        {
+            var temp = prepareTempCopy(osz_path);
+
+            Assert.IsTrue(File.Exists(temp));
+
+            var imported = osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+            ensureLoaded(osu);
+
+            waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
+
+            return imported.FirstOrDefault();
+        }
+
+        private void deleteBeatmapSet(BeatmapSetInfo imported, OsuGameBase osu)
+        {
+            var manager = osu.Dependencies.Get<BeatmapManager>();
+            manager.Delete(imported);
+
+            Assert.IsTrue(manager.GetAllUsableBeatmapSets().Count == 0);
+            Assert.IsTrue(manager.QueryBeatmapSets(_ => true).ToList().Count == 1);
+            Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
         }
 
         private string prepareTempCopy(string path)
