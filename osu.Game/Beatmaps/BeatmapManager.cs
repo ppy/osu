@@ -503,6 +503,9 @@ namespace osu.Game.Beatmaps
         /// <returns>Results from the provided query.</returns>
         public IEnumerable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
+        /// <summary>
+        /// Import a <see cref="BeatmapSetInfo"/> into the beatmap store.
+        /// </summary>
         private void import(BeatmapSetInfo beatmapSet, OsuDbContext context) => getBeatmapStoreWithContext(context).Add(beatmapSet);
 
         /// <summary>
@@ -530,10 +533,8 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        ///
+        /// Create a <see cref="BeatmapSetInfo"/> from a provided archive.
         /// </summary>
-        /// <param name="reader"></param>
-        /// <returns></returns>
         private BeatmapSetInfo createBeatmapSetInfo(ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
@@ -553,6 +554,9 @@ namespace osu.Game.Beatmaps
             };
         }
 
+        /// <summary>
+        /// Create all required <see cref="FileInfo"/>s for the provided archive, adding them to the global file store.
+        /// </summary>
         private List<BeatmapSetFileInfo> createFileInfos(ArchiveReader reader, FileStore files)
         {
             List<BeatmapSetFileInfo> fileInfos = new List<BeatmapSetFileInfo>();
