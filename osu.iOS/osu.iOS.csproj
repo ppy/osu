@@ -90,21 +90,20 @@
     <Reference Include="OpenTK">
       <HintPath>..\osu-framework\Libraries\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Remove="OpenTK-1.0" />
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
       <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
       <Name>osu.Framework</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj">
-      <Project>{7D448020-7E7C-4C18-8E50-40AC7A466FA0}</Project>
+      <Project>{B306C976-5A6E-40BF-849B-8396F795468D}</Project>
       <Name>osu.Game.Rulesets.Osu</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}</Project>
+      <Project>{858407F2-FBA9-4CB6-8E7D-8A059D0100FB}</Project>
       <Name>osu.Game</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
-      <Project>{D24A4D81-EBBC-4F4B-BA5B-CF7D7CFBF78F}</Project>
+      <Project>{E798E898-855F-4375-87D2-C53B5CB83323}</Project>
       <Name>osu.Game.Resources</Name>
     </ProjectReference>
   </ItemGroup>
