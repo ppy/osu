@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -49,6 +49,19 @@ namespace osu.Game.Rulesets.Objects
         [JsonIgnore]
         public bool Kiai { get; private set; }
 
+        private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
+
+        private HitWindows hitWindows;
+
+        /// <summary>
+        /// The hit windows for this <see cref="HitObject"/>.
+        /// </summary>
+        public HitWindows HitWindows
+        {
+            get => hitWindows ?? (hitWindows = new HitWindows(overallDifficulty));
+            protected set => hitWindows = value;
+        }
+
         private readonly SortedList<HitObject> nestedHitObjects = new SortedList<HitObject>((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
         [JsonIgnore]
@@ -75,6 +88,9 @@ namespace osu.Game.Rulesets.Objects
 
             Kiai = effectPoint.KiaiMode;
             SampleControlPoint = samplePoint;
+
+            overallDifficulty = difficulty.OverallDifficulty;
+            hitWindows = null;
         }
 
         protected virtual void CreateNestedHitObjects()

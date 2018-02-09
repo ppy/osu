@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Globalization;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -17,8 +18,13 @@ using osu.Framework.Graphics.Shapes;
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
-        where T : struct, IEquatable<T>
+        where T : struct, IEquatable<T>, IComparable, IConvertible
     {
+        /// <summary>
+        /// Maximum number of decimal digits to be displayed in the tooltip.
+        /// </summary>
+        private const int max_decimal_digits = 5;
+
         private SampleChannel sample;
         private double lastSampleTime;
         private T lastSampleValue;
@@ -32,18 +38,31 @@ namespace osu.Game.Graphics.UserInterface
             get
             {
                 var bindableDouble = CurrentNumber as BindableNumber<double>;
-                if (bindableDouble != null)
+                var bindableFloat = CurrentNumber as BindableNumber<float>;
+                var floatValue = bindableDouble?.Value ?? bindableFloat?.Value;
+                var floatPrecision = bindableDouble?.Precision ?? bindableFloat?.Precision;
+
+                if (floatValue != null)
                 {
-                    if (bindableDouble.MaxValue == 1 && (bindableDouble.MinValue == 0 || bindableDouble.MinValue == -1))
-                        return bindableDouble.Value.ToString(@"P0");
-                    return bindableDouble.Value.ToString(@"n1");
+                    var floatMinValue = bindableDouble?.MinValue ?? bindableFloat.MinValue;
+                    var floatMaxValue = bindableDouble?.MaxValue ?? bindableFloat.MaxValue;
+
+                    if (floatMaxValue == 1 && (floatMinValue == 0 || floatMinValue == -1))
+                        return floatValue.Value.ToString("P0");
+
+                    var decimalPrecision = normalise((decimal)floatPrecision, max_decimal_digits);
+
+                    // Find the number of significant digits (we could have less than 5 after normalize())
+                    var significantDigits = findPrecision(decimalPrecision);
+
+                    return floatValue.Value.ToString($"N{significantDigits}");
                 }
 
                 var bindableInt = CurrentNumber as BindableNumber<int>;
                 if (bindableInt != null)
-                    return bindableInt.Value.ToString(@"n0");
+                    return bindableInt.Value.ToString("N0");
 
-                return Current.Value.ToString();
+                return Current.Value.ToString(CultureInfo.InvariantCulture);
             }
         }
 
@@ -168,6 +187,32 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateValue(float value)
         {
             Nub.MoveToX(RangePadding + UsableWidth * value, 250, Easing.OutQuint);
+        }
+
+        /// <summary>
+        /// Removes all non-significant digits, keeping at most a requested number of decimal digits.
+        /// </summary>
+        /// <param name="d">The decimal to normalize.</param>
+        /// <param name="sd">The maximum number of decimal digits to keep. The final result may have fewer decimal digits than this value.</param>
+        /// <returns>The normalised decimal.</returns>
+        private decimal normalise(decimal d, int sd)
+            => decimal.Parse(Math.Round(d, sd).ToString(string.Concat("0.", new string('#', sd)), CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Finds the number of digits after the decimal.
+        /// </summary>
+        /// <param name="d">The value to find the number of decimal digits for.</param>
+        /// <returns>The number decimal digits.</returns>
+        private int findPrecision(decimal d)
+        {
+            int precision = 0;
+            while (d != Math.Round(d))
+            {
+                d *= 10;
+                precision++;
+            }
+
+            return precision;
         }
     }
 }

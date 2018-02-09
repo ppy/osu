@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -102,8 +102,14 @@ namespace osu.Game.Rulesets.Replays
 
             if (hasFrames)
             {
-                //if we changed frames, we want to execute once *exactly* on the frame's time.
-                if (currentDirection == time.CompareTo(NextFrame.Time) && advanceFrame())
+                // check if the next frame is in the "future" for the current playback direction
+                if (currentDirection != time.CompareTo(NextFrame.Time))
+                {
+                    // if we didn't change frames, we need to ensure we are allowed to run frames in between, else return null.
+                    if (inImportantSection)
+                        return null;
+                }
+                else if (advanceFrame())
                 {
                     // If going backwards, we need to execute once _before_ the frame time to reverse any judgements
                     // that would occur as a result of this frame in forward playback
@@ -111,10 +117,6 @@ namespace osu.Game.Rulesets.Replays
                         return currentTime = CurrentFrame.Time - 1;
                     return currentTime = CurrentFrame.Time;
                 }
-
-                //if we didn't change frames, we need to ensure we are allowed to run frames in between, else return null.
-                if (inImportantSection)
-                    return null;
             }
 
             return currentTime = time;

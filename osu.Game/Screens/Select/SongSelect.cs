@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
         {
-            dependencies.Cache(this);
+            dependencies.CacheAs(this);
 
             if (Footer != null)
             {
@@ -266,7 +266,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         private void carouselSelectionChanged(BeatmapInfo beatmap)
         {
-            Action performLoad = delegate
+            void performLoad()
             {
                 // We may be arriving here due to another component changing the bindable Beatmap.
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
@@ -279,7 +279,7 @@ namespace osu.Game.Screens.Select
                 }
 
                 UpdateBeatmap(Beatmap.Value);
-            };
+            }
 
             if (beatmap?.Equals(beatmapNoDebounce) == true)
                 return;

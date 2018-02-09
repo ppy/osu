@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
@@ -40,6 +40,12 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         private readonly RemainingTimeCounter remainingTimeCounter;
         private readonly InfoContainer info;
         private readonly ArrowsOverlay arrowsOverlay;
+
+        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
+            : this(letterboxing)
+        {
+            bindProcessor(scoreProcessor);
+        }
 
         public BreakOverlay(bool letterboxing)
         {
@@ -148,7 +154,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             arrowsOverlay.Hide();
         }
 
-        public void BindProcessor(ScoreProcessor processor)
+        private void bindProcessor(ScoreProcessor processor)
         {
             info.AccuracyDisplay.Current.BindTo(processor.Accuracy);
             info.GradeDisplay.Current.BindTo(processor.Rank);

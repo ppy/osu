@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -32,15 +32,6 @@ namespace osu.Game.Graphics.Containers
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => BlockScreenWideMouse || base.ReceiveMouseInputAt(screenSpacePos);
-
-        protected override bool OnWheel(InputState state)
-        {
-            // always allow wheel to pass through to stuff outside our DrawRectangle.
-            if (!base.ReceiveMouseInputAt(state.Mouse.NativeState.Position))
-                return false;
-
-            return BlockPassThroughMouse;
-        }
 
         protected override bool OnClick(InputState state)
         {

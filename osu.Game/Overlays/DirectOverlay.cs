@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -298,7 +298,7 @@ namespace osu.Game.Overlays
                 Task.Run(() =>
                 {
                     var onlineIds = response.Select(r => r.OnlineBeatmapSetID).ToList();
-                    var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID)).Select(r => r.OnlineBeatmapSetID).ToList();
+                    var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID) && !s.DeletePending).Select(r => r.OnlineBeatmapSetID).ToList();
                     var sets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID)).ToList();
 
                     // may not need scheduling; loads async internally.
@@ -311,6 +311,14 @@ namespace osu.Game.Overlays
             };
 
             api.Queue(getSetsRequest);
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+
+            if (playing != null)
+                playing.PreviewPlaying.Value = false;
         }
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;

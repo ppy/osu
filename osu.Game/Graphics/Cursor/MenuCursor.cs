@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -100,8 +100,8 @@ namespace osu.Game.Graphics.Cursor
 
         protected override void PopOut()
         {
-            ActiveCursor.FadeTo(0, 900, Easing.OutQuint);
-            ActiveCursor.ScaleTo(0, 500, Easing.In);
+            ActiveCursor.FadeTo(0, 250, Easing.OutQuint);
+            ActiveCursor.ScaleTo(0.6f, 250, Easing.In);
         }
 
         [BackgroundDependencyLoader]
