@@ -65,20 +65,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public WorkingBeatmap DefaultBeatmap { private get; set; }
 
-        private FileStore getFileStoreWithContext(OsuDbContext context) => new FileStore(() => context, files.Storage);
-
-        private BeatmapStore getBeatmapStoreWithContext(OsuDbContext context) => getBeatmapStoreWithContext(() => context);
-
-        private BeatmapStore getBeatmapStoreWithContext(Func<OsuDbContext> context)
-        {
-            var store = new BeatmapStore(context);
-            store.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
-            store.BeatmapSetRemoved += s => BeatmapSetRemoved?.Invoke(s);
-            store.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
-            store.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
-            return store;
-        }
-
         private readonly Func<OsuDbContext> createContext;
 
         private readonly FileStore files;
@@ -496,6 +482,12 @@ namespace osu.Game.Beatmaps
         public BeatmapSetInfo Refresh(BeatmapSetInfo beatmapSet) => QueryBeatmapSet(s => s.ID == beatmapSet.ID);
 
         /// <summary>
+        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
+        /// </summary>
+        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => beatmaps.BeatmapSets.Where(s => !s.DeletePending).ToList();
+
+        /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
@@ -621,11 +613,19 @@ namespace osu.Game.Beatmaps
             return beatmapInfos;
         }
 
-        /// <summary>
-        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
-        /// </summary>
-        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => beatmaps.BeatmapSets.Where(s => !s.DeletePending).ToList();
+        private FileStore getFileStoreWithContext(OsuDbContext context) => new FileStore(() => context, files.Storage);
+
+        private BeatmapStore getBeatmapStoreWithContext(OsuDbContext context) => getBeatmapStoreWithContext(() => context);
+
+        private BeatmapStore getBeatmapStoreWithContext(Func<OsuDbContext> context)
+        {
+            var store = new BeatmapStore(context);
+            store.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
+            store.BeatmapSetRemoved += s => BeatmapSetRemoved?.Invoke(s);
+            store.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
+            store.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
+            return store;
+        }
 
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
