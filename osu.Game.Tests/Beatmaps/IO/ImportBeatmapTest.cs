@@ -43,6 +43,35 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        public void TestImportThenDelete()
+        {
+            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportThenDelete"))
+            {
+                var osu = loadOsu(host);
+
+                var temp = prepareTempCopy(osz_path);
+                Assert.IsTrue(File.Exists(temp));
+
+                var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                var imported = manager.Import(temp);
+
+                ensureLoaded(osu);
+
+                manager.Delete(imported.First());
+
+                Assert.IsTrue(manager.GetAllUsableBeatmapSets().Count == 0);
+                Assert.IsTrue(manager.QueryBeatmapSets(_ => true).ToList().Count() == 1);
+                Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
+
+                waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
+
+                host.Exit();
+            }
+        }
+
+        [Test]
         [NonParallelizable]
         [Ignore("Binding IPC on Appveyor isn't working (port in use). Need to figure out why")]
         public void TestImportOverIPC()

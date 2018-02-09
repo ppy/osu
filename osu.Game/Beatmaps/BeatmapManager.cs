@@ -141,7 +141,7 @@ namespace osu.Game.Beatmaps
         /// This will post a notification tracking import progress.
         /// </summary>
         /// <param name="paths">One or more beatmap locations on disk.</param>
-        public void Import(params string[] paths)
+        public List<BeatmapSetInfo> Import(params string[] paths)
         {
             var notification = new ProgressNotification
             {
@@ -153,18 +153,20 @@ namespace osu.Game.Beatmaps
 
             PostNotification?.Invoke(notification);
 
+            List<BeatmapSetInfo> imported = new List<BeatmapSetInfo>();
+
             int i = 0;
             foreach (string path in paths)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)
                     // user requested abort
-                    return;
+                    return imported;
 
                 try
                 {
                     notification.Text = $"Importing ({i} of {paths.Length})\n{Path.GetFileName(path)}";
                     using (ArchiveReader reader = getReaderFrom(path))
-                        Import(reader);
+                        imported.Add(Import(reader));
 
                     notification.Progress = (float)++i / paths.Length;
 
@@ -191,6 +193,7 @@ namespace osu.Game.Beatmaps
             }
 
             notification.State = ProgressNotificationState.Completed;
+            return imported;
         }
 
         private readonly object importContextLock = new object();
