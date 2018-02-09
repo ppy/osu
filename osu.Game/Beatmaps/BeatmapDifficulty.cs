@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps
             }
             set
             {
-                approachRate = DEFAULT_DIFFICULTY;
+                approachRate = value;
             }
         }
         public float SliderMultiplier { get; set; } = 1;
