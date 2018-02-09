@@ -230,7 +230,6 @@ namespace osu.Game.Beatmaps
             }
         }
 
-
         /// <summary>
         /// Import a beatmap from a <see cref="BeatmapSetInfo"/>.
         /// </summary>
@@ -503,6 +502,55 @@ namespace osu.Game.Beatmaps
         /// <returns>Results from the provided query.</returns>
         public IEnumerable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
+        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
+
+        /// <summary>
+        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
+        /// </summary>
+        public async Task ImportFromStable()
+        {
+            var stable = GetStableStorage?.Invoke();
+
+            if (stable == null)
+            {
+                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
+                return;
+            }
+
+            await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs")), TaskCreationOptions.LongRunning);
+        }
+
+        public void DeleteAll()
+        {
+            var maps = GetAllUsableBeatmapSets();
+
+            if (maps.Count == 0) return;
+
+            var notification = new ProgressNotification
+            {
+                Progress = 0,
+                CompletionText = "Deleted all beatmaps!",
+                State = ProgressNotificationState.Active,
+            };
+
+            PostNotification?.Invoke(notification);
+
+            int i = 0;
+
+            foreach (var b in maps)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
+                notification.Text = $"Deleting ({i} of {maps.Count})";
+                notification.Progress = (float)++i / maps.Count;
+                Delete(b);
+            }
+
+            notification.State = ProgressNotificationState.Completed;
+        }
+
         /// <summary>
         /// Import a <see cref="BeatmapSetInfo"/> into the beatmap store.
         /// </summary>
@@ -624,55 +672,6 @@ namespace osu.Game.Beatmaps
             store.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
             store.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
             return store;
-        }
-
-        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
-
-        /// <summary>
-        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
-        /// </summary>
-        public async Task ImportFromStable()
-        {
-            var stable = GetStableStorage?.Invoke();
-
-            if (stable == null)
-            {
-                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return;
-            }
-
-            await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs")), TaskCreationOptions.LongRunning);
-        }
-
-        public void DeleteAll()
-        {
-            var maps = GetAllUsableBeatmapSets();
-
-            if (maps.Count == 0) return;
-
-            var notification = new ProgressNotification
-            {
-                Progress = 0,
-                CompletionText = "Deleted all beatmaps!",
-                State = ProgressNotificationState.Active,
-            };
-
-            PostNotification?.Invoke(notification);
-
-            int i = 0;
-
-            foreach (var b in maps)
-            {
-                if (notification.State == ProgressNotificationState.Cancelled)
-                    // user requested abort
-                    return;
-
-                notification.Text = $"Deleting ({i} of {maps.Count})";
-                notification.Progress = (float)++i / maps.Count;
-                Delete(b);
-            }
-
-            notification.State = ProgressNotificationState.Completed;
         }
     }
 }
