@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Timing;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Timing;
 using osu.Game.Graphics.Sprites;
 
-namespace osu.Game.Screens.Play.ReplaySettings
+namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class PlaybackSettings : ReplayGroup
+    public class PlaybackSettings : PlayerSettingsGroup
     {
         private const int padding = 10;
 
@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         public IAdjustableClock AdjustableClock { set; get; }
 
-        private readonly ReplaySliderBar<double> sliderbar;
+        private readonly PlayerSliderBar<double> sliderbar;
 
         public PlaybackSettings()
         {
@@ -42,24 +42,24 @@ namespace osu.Game.Screens.Play.ReplaySettings
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Text = "1x",
                             Font = @"Exo2.0-Bold",
                         }
                     },
                 },
-                sliderbar = new ReplaySliderBar<double>
+                sliderbar = new PlayerSliderBar<double>
                 {
                     Bindable = new BindableDouble(1)
                     {
                         Default = 1,
                         MinValue = 0.5,
                         MaxValue = 2,
-                        Precision = 0.01,
+                        Precision = 0.1,
                     },
                 }
             };
 
-            sliderbar.Bindable.ValueChanged += rateMultiplier => multiplierText.Text = $"{rateMultiplier}x";
+            sliderbar.Bindable.ValueChanged += rateMultiplier => multiplierText.Text = $"{sliderbar.Bar.TooltipText}x";
+            sliderbar.Bindable.TriggerChange();
         }
 
         protected override void LoadComplete()

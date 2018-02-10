@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             this.repeatPoint = repeatPoint;
             this.drawableSlider = drawableSlider;
 
-            Size = new Vector2(32 * repeatPoint.Scale);
+            Size = new Vector2(45 * repeatPoint.Scale);
 
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 new SpriteIcon
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.fa_eercast
+                    Icon = FontAwesome.fa_chevron_right
                 }
             };
         }
@@ -49,9 +50,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             animDuration = Math.Min(150, repeatPoint.SpanDuration / 2);
 
-            this.FadeIn(animDuration).ScaleTo(1.2f, animDuration / 2)
-                .Then()
-                .ScaleTo(1, animDuration / 2, Easing.Out);
+            this.Animate(
+                d => d.FadeIn(animDuration),
+                d => d.ScaleTo(0.5f).ScaleTo(1f, animDuration * 4, Easing.OutElasticHalf)
+            );
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -66,11 +68,33 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
                 case ArmedState.Hit:
                     this.FadeOut(animDuration, Easing.OutQuint)
-                        .ScaleTo(Scale * 1.5f, animDuration, Easing.OutQuint);
+                        .ScaleTo(Scale * 1.5f, animDuration, Easing.Out);
                     break;
             }
         }
 
-        public void UpdateSnakingPosition(Vector2 start, Vector2 end) => Position = repeatPoint.RepeatIndex % 2 == 0 ? end : start;
+        public void UpdateSnakingPosition(Vector2 start, Vector2 end)
+        {
+            bool isRepeatAtEnd = repeatPoint.RepeatIndex % 2 == 0;
+            List<Vector2> curve = drawableSlider.Body.CurrentCurve;
+
+            Position = isRepeatAtEnd ? end : start;
+
+            if (curve.Count < 2)
+                return;
+
+            int searchStart = isRepeatAtEnd ? curve.Count - 1 : 0;
+            int direction = isRepeatAtEnd ? -1 : 1;
+
+            // find the next vector2 in the curve which is not equal to our current position to infer a rotation.
+            for (int i = searchStart; i >= 0 && i < curve.Count; i += direction)
+            {
+                if (curve[i] == Position)
+                    continue;
+
+                Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(curve[i].Y - Position.Y, curve[i].X - Position.X));
+                break;
+            }
+        }
     }
 }

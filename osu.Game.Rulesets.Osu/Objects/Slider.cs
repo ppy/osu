@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
+        public Vector2 StackedPositionAt(double t) => this.PositionAt(t) + StackOffset;
         public override Vector2 EndPosition => this.PositionAt(1);
 
         public SliderCurve Curve { get; } = new SliderCurve();
@@ -80,6 +81,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double Velocity;
         public double TickDistance;
 
+        public HitCircle HeadCircle;
+        public HitCircle TailCircle;
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
@@ -97,8 +101,33 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.CreateNestedHitObjects();
 
+            createSliderEnds();
             createTicks();
             createRepeatPoints();
+        }
+
+        private void createSliderEnds()
+        {
+            HeadCircle = new HitCircle
+            {
+                StartTime = StartTime,
+                Position = StackedPosition,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboColour = ComboColour,
+                Samples = Samples,
+                SampleControlPoint = SampleControlPoint
+            };
+
+            TailCircle = new HitCircle
+            {
+                StartTime = EndTime,
+                Position = StackedEndPosition,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboColour = ComboColour
+            };
+
+            AddNested(HeadCircle);
+            AddNested(TailCircle);
         }
 
         private void createTicks()
@@ -137,6 +166,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     AddNested(new SliderTick
                     {
                         SpanIndex = span,
+                        SpanStartTime = spanStartTime,
                         StartTime = spanStartTime + timeProgress * SpanDuration,
                         Position = Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,

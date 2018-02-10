@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -95,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
             var computeVertex = new Action<double>(t =>
             {
                 // ReSharper disable once PossibleInvalidOperationException (bugged in current r# version)
-                var diff = slider.PositionAt(t) - slider.LazyEndPosition.Value;
+                var diff = slider.StackedPositionAt(t) - slider.LazyEndPosition.Value;
                 float dist = diff.Length;
 
                 if (dist > approxFollowCircleRadius)
