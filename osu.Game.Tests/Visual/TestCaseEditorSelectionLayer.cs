@@ -23,7 +23,8 @@ namespace osu.Game.Tests.Visual
         {
             typeof(HitObjectCapturer),
             typeof(SelectionDragger),
-            typeof(SelectionLayer)
+            typeof(SelectionLayer),
+            typeof(CaptureBox)
         };
 
         [BackgroundDependencyLoader]
