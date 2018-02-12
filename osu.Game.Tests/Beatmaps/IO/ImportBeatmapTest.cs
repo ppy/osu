@@ -107,9 +107,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var importedSecondTime = loadOszIntoOsu(osu);
 
                     // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
-                    Assert.IsTrue(imported.ID == importedSecondTime.ID);
-                    Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
-
+                    Assert.IsTrue(imported.ID != importedSecondTime.ID);
+                    Assert.IsTrue(imported.Beatmaps.First().ID < importedSecondTime.Beatmaps.First().ID);
 
                     Assert.IsTrue(manager.GetAllUsableBeatmapSets().Count == 1);
                     Assert.IsTrue(manager.QueryBeatmapSets(_ => true).ToList().Count == 1);
