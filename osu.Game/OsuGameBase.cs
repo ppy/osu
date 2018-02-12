@@ -218,7 +218,7 @@ namespace osu.Game
             CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both　}
+                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both }
             };
 
             base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
