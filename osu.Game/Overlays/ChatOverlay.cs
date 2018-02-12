@@ -39,9 +39,9 @@ namespace osu.Game.Overlays
 
         private readonly LoadingAnimation loading;
 
-        protected readonly FocusedTextBox textbox;
+        protected readonly FocusedTextBox Textbox;
 
-        protected APIAccess api;
+        protected APIAccess Api;
 
         private const int transition_length = 500;
 
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays
                                     },
                                     Children = new Drawable[]
                                     {
-                                        textbox = new FocusedTextBox
+                                        Textbox = new FocusedTextBox
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Height = 1,
@@ -179,12 +179,12 @@ namespace osu.Game.Overlays
 
                 if (state == Visibility.Visible)
                 {
-                    textbox.HoldFocus = false;
+                    Textbox.HoldFocus = false;
                     if (1f - ChatHeight.Value < channel_selection_min_height)
                         transformChatHeightTo(1f - channel_selection_min_height, 800, Easing.OutQuint);
                 }
                 else
-                    textbox.HoldFocus = true;
+                    Textbox.HoldFocus = true;
             };
         }
 
@@ -246,7 +246,7 @@ namespace osu.Game.Overlays
         protected override void OnFocus(InputState state)
         {
             //this is necessary as textbox is masked away and therefore can't get focus :(
-            GetContainingInputManager().ChangeFocus(textbox);
+            GetContainingInputManager().ChangeFocus(Textbox);
             base.OnFocus(state);
         }
 
@@ -255,7 +255,7 @@ namespace osu.Game.Overlays
             this.MoveToY(0, transition_length, Easing.OutQuint);
             this.FadeIn(transition_length, Easing.OutQuint);
 
-            textbox.HoldFocus = true;
+            Textbox.HoldFocus = true;
             base.PopIn();
         }
 
@@ -264,14 +264,14 @@ namespace osu.Game.Overlays
             this.MoveToY(Height, transition_length, Easing.InSine);
             this.FadeOut(transition_length, Easing.InSine);
 
-            textbox.HoldFocus = false;
+            Textbox.HoldFocus = false;
             base.PopOut();
         }
 
         [BackgroundDependencyLoader]
         private void load(APIAccess api, OsuConfigManager config, OsuColour colours)
         {
-            this.api = api;
+            Api = api;
             api.Register(this);
 
             ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
@@ -324,7 +324,7 @@ namespace osu.Game.Overlays
                 messageRequest = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
             };
 
-            api.Queue(req);
+            Api.Queue(req);
         }
 
         private Channel currentChannel;
@@ -343,14 +343,14 @@ namespace osu.Game.Overlays
                 if (value == null)
                 {
                     currentChannel = null;
-                    textbox.Current.Disabled = true;
+                    Textbox.Current.Disabled = true;
                     currentChannelContainer.Clear(false);
                     return;
                 }
 
                 currentChannel = value;
 
-                textbox.Current.Disabled = currentChannel.ReadOnly;
+                Textbox.Current.Disabled = currentChannel.ReadOnly;
                 channelTabs.Current.Value = value;
 
                 var loaded = loadedChannels.Find(d => d.Channel == value);
@@ -433,7 +433,7 @@ namespace osu.Game.Overlays
                 Debug.Write("failure!");
             };
 
-            api.Queue(req);
+            Api.Queue(req);
         }
 
         private void fetchNewMessages()
@@ -459,7 +459,7 @@ namespace osu.Game.Overlays
                 fetchReq = null;
             };
 
-            api.Queue(fetchReq);
+            Api.Queue(fetchReq);
         }
 
         private void postMessage(TextBox textbox, bool newText)
@@ -475,7 +475,7 @@ namespace osu.Game.Overlays
 
             if (target == null) return;
 
-            if (!api.IsLoggedIn)
+            if (!Api.IsLoggedIn)
             {
                 target.AddNewMessages(new ErrorMessage("Please login to participate in chat!"));
                 return;
@@ -515,7 +515,7 @@ namespace osu.Game.Overlays
 
             var message = new LocalEchoMessage
             {
-                Sender = api.LocalUser.Value,
+                Sender = Api.LocalUser.Value,
                 Timestamp = DateTimeOffset.Now,
                 TargetType = TargetType.Channel, //TODO: read this from channel
                 TargetId = target.Id,
@@ -529,7 +529,7 @@ namespace osu.Game.Overlays
             req.Failure += e => target.ReplaceMessage(message, null);
             req.Success += m => target.ReplaceMessage(message, m);
 
-            api.Queue(req);
+            Api.Queue(req);
         }
 
         private void transformChatHeightTo(double newChatHeight, double duration = 0, Easing easing = Easing.None)

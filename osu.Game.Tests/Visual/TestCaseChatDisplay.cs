@@ -5,11 +5,9 @@ using System.ComponentModel;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Users;
 using osu.Game.Online.Chat;
-using osu.Game.Configuration;
 using osu.Framework.Graphics.UserInterface;
 using System;
 
@@ -19,22 +17,28 @@ namespace osu.Game.Tests.Visual
     public class TestCaseChatDisplay : OsuTestCase
     {
 
-        DummyChatOverlay chat;
+        private readonly DummyChatOverlay chat;
 
         public TestCaseChatDisplay()
         {
-             chat = new DummyChatOverlay
-             {
-                 State = Visibility.Visible
-             };
+            chat = new DummyChatOverlay
+            {
+                State = Visibility.Visible
+            };
             Add(chat);
-            
+
+            AddStep("Set Username DummyUser", () => chat.Username = "DummyUser");
+            AddStep("Type \"Hello\"", () => chat.PostDummyMessage("Hello"));
+            AddStep("Set Long Username", () => chat.Username = "Over15LengthUserName");
+            AddStep("Type \"Over15LengthUserName\"", () => chat.PostDummyMessage("Over15LengthUserName"));
+            AddStep("Set Wide Username", () => chat.Username = "WWWWWWWWWWWWWWW");
+            AddStep("Type \"Wide!\"", () => chat.PostDummyMessage("Wide!"));
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, OsuConfigManager config, OsuColour colours)
+        private void load(APIAccess api)
         {
-            var channel = new DummyChannel()
+            var channel = new DummyChannel
             {
                 Name = "#Dummy",
                 Topic = "Test Chat",
@@ -42,12 +46,12 @@ namespace osu.Game.Tests.Visual
                 Id = 0
             };
 
-            api.Scheduler.Add(delegate { 
-            channel.AddNewMessage("This message for test from offline.");
-            channel.AddNewMessage("TestMessage");
-            channel.AddNewMessage("!@#$%^&&*()");
-            channel.AddNewMessage("testTEST");
-            chat.OpenChannel(channel);
+            api.Scheduler.Add(delegate {
+                channel.AddNewMessage("This message for test from offline.");
+                channel.AddNewMessage("TestMessage");
+                channel.AddNewMessage("!@#$%^&&*()");
+                channel.AddNewMessage("testTEST");
+                chat.OpenChannel(channel);
             });
 
         }
@@ -55,25 +59,23 @@ namespace osu.Game.Tests.Visual
         private class DummyChatOverlay : ChatOverlay
         {
 
+            public string Username = "DummyUser";
+
             [BackgroundDependencyLoader]
-            private void load(APIAccess api, OsuConfigManager config, OsuColour colours)
+            private void load(APIAccess api)
             {
-                textbox.OnCommit = postDummyMessage;
-                base.api = api;
+                Textbox.OnCommit = postDummyMessage;
+                Api = api;
                 api.Register(this);
 
             }
 
-            private void postDummyMessage(TextBox textbox, bool newText)
+            public void PostDummyMessage(string postText)
             {
-                var postText = textbox.Text;
-
-                textbox.Text = string.Empty;
-
                 if (string.IsNullOrWhiteSpace(postText))
                     return;
 
-                var target = base.CurrentChannel;
+                var target = CurrentChannel;
 
                 if (target == null) return;
 
@@ -109,8 +111,16 @@ namespace osu.Game.Tests.Visual
                     }
                 }
 
-                var message = new DummyMessage(postText, "DummyUser", isAction, false, 0);
-                api.Scheduler.Add(delegate { CurrentChannel.AddNewMessages(message); });
+                var message = new DummyMessage(postText, Username, isAction);
+                Api.Scheduler.Add(delegate { CurrentChannel.AddNewMessages(message); });
+            }
+
+            private void postDummyMessage(TextBox textbox, bool newText)
+            {
+                var postText = textbox.Text;
+
+                textbox.Text = string.Empty;
+                PostDummyMessage(postText);
             }
         }
 
@@ -122,7 +132,7 @@ namespace osu.Game.Tests.Visual
             //Should be call "API Thread"
             public void AddNewMessage(string message)
             {
-                base.AddNewMessages(new DummyMessage(message, null, false, false, messageCounter++));
+                AddNewMessages(new DummyMessage(message, null, false, false, messageCounter++));
             }
         }
 
@@ -135,9 +145,9 @@ namespace osu.Game.Tests.Visual
                 Content = text;
                 IsAction = isAction;
                 Timestamp = DateTimeOffset.Now;
-                Sender = new User 
+                Sender = new User
                 {
-                    Username = (username != null)? username : $"User " + number + "",
+                    Username = username ?? $"User {number}",
                     Id = number,
                     Colour = isImportant ? "#250cc9" : null,
                 };
