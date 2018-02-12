@@ -31,9 +31,9 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to add.</param>
         public void Add(BeatmapSetInfo beatmapSet)
         {
-            using (var db = ContextFactory.GetForWrite())
+            using (var usage = ContextFactory.GetForWrite())
             {
-                var context = db.Context;
+                var context = usage.Context;
 
                 foreach (var beatmap in beatmapSet.Beatmaps.Where(b => b.Metadata != null))
                 {
@@ -48,6 +48,7 @@ namespace osu.Game.Beatmaps
                 }
 
                 context.BeatmapSetInfo.Attach(beatmapSet);
+
                 BeatmapSetAdded?.Invoke(beatmapSet);
             }
         }
@@ -73,11 +74,12 @@ namespace osu.Game.Beatmaps
         /// <returns>Whether the beatmap's <see cref="BeatmapSetInfo.DeletePending"/> was changed.</returns>
         public bool Delete(BeatmapSetInfo beatmapSet)
         {
-            using ( ContextFactory.GetForWrite())
+            using (ContextFactory.GetForWrite())
             {
                 Refresh(ref beatmapSet, BeatmapSets);
 
                 if (beatmapSet.DeletePending) return false;
+
                 beatmapSet.DeletePending = true;
             }
 
@@ -92,11 +94,12 @@ namespace osu.Game.Beatmaps
         /// <returns>Whether the beatmap's <see cref="BeatmapSetInfo.DeletePending"/> was changed.</returns>
         public bool Undelete(BeatmapSetInfo beatmapSet)
         {
-            using ( ContextFactory.GetForWrite())
+            using (ContextFactory.GetForWrite())
             {
                 Refresh(ref beatmapSet, BeatmapSets);
 
                 if (!beatmapSet.DeletePending) return false;
+
                 beatmapSet.DeletePending = false;
             }
 
@@ -116,6 +119,7 @@ namespace osu.Game.Beatmaps
                 Refresh(ref beatmap, Beatmaps);
 
                 if (beatmap.Hidden) return false;
+
                 beatmap.Hidden = true;
 
                 BeatmapHidden?.Invoke(beatmap);
@@ -136,6 +140,7 @@ namespace osu.Game.Beatmaps
                 Refresh(ref beatmap, Beatmaps);
 
                 if (!beatmap.Hidden) return false;
+
                 beatmap.Hidden = false;
             }
 
@@ -155,7 +160,9 @@ namespace osu.Game.Beatmaps
                                        .Where(query)
                                        .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
                                        .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
-                                       .Include(s => s.Metadata);
+                                       .Include(s => s.Metadata).ToList();
+
+                if (!purgeable.Any()) return;
 
                 // metadata is M-N so we can't rely on cascades
                 context.BeatmapMetadata.RemoveRange(purgeable.Select(s => s.Metadata));

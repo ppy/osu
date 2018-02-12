@@ -36,8 +36,6 @@ namespace osu.Game.Input
         {
             using (var usage = ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
-
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
                 {
@@ -49,7 +47,7 @@ namespace osu.Game.Input
 
                     foreach (var insertable in group.Skip(count).Take(aimCount - count))
                         // insert any defaults which are missing.
-                        context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
+                        usage.Context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
                         {
                             KeyCombination = insertable.KeyCombination,
                             Action = insertable.Action,
@@ -75,6 +73,10 @@ namespace osu.Game.Input
             {
                 var dbKeyBinding = (DatabasedKeyBinding)keyBinding;
                 Refresh(ref dbKeyBinding);
+
+                if (dbKeyBinding.KeyCombination.Equals(keyBinding.KeyCombination))
+                    return;
+
                 dbKeyBinding.KeyCombination = keyBinding.KeyCombination;
             }
 

@@ -30,11 +30,9 @@ namespace osu.Game.IO
         {
             using (var usage = ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
-
                 string hash = data.ComputeSHA2Hash();
 
-                var existing = context.FileInfo.FirstOrDefault(f => f.Hash == hash);
+                var existing = usage.Context.FileInfo.FirstOrDefault(f => f.Hash == hash);
 
                 var info = existing ?? new FileInfo { Hash = hash };
 
@@ -60,6 +58,8 @@ namespace osu.Game.IO
 
         public void Reference(params FileInfo[] files)
         {
+            if (files.Length == 0) return;
+
             using (var usage = ContextFactory.GetForWrite())
             {
                 var context = usage.Context;
@@ -75,9 +75,12 @@ namespace osu.Game.IO
 
         public void Dereference(params FileInfo[] files)
         {
+            if (files.Length == 0) return;
+
             using (var usage = ContextFactory.GetForWrite())
             {
                 var context = usage.Context;
+
                 foreach (var f in files.GroupBy(f => f.ID))
                 {
                     var refetch = context.FileInfo.Find(f.Key);

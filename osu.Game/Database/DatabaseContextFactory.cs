@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Platform;
 
@@ -18,6 +19,7 @@ namespace osu.Game.Database
 
         private OsuDbContext writeContext;
 
+        private bool currentWriteDidWrite;
         private volatile int currentWriteUsages;
 
         public DatabaseContextFactory(GameHost host)
@@ -38,24 +40,41 @@ namespace osu.Game.Database
         /// <returns>A usage containing a usable context.</returns>
         public DatabaseWriteUsage GetForWrite()
         {
-            lock (writeLock)
-            {
-                var usage = new DatabaseWriteUsage(writeContext ?? (writeContext = threadContexts.Value), usageCompleted);
-                Interlocked.Increment(ref currentWriteUsages);
-                return usage;
-            }
+            Monitor.Enter(writeLock);
+
+            Trace.Assert(currentWriteUsages == 0, "Database writes in a bad state");
+            Interlocked.Increment(ref currentWriteUsages);
+
+            return new DatabaseWriteUsage(writeContext ?? (writeContext = threadContexts.Value), usageCompleted);
         }
 
         private void usageCompleted(DatabaseWriteUsage usage)
         {
             int usages = Interlocked.Decrement(ref currentWriteUsages);
-            if (usages == 0)
+
+            try
             {
-                writeContext.Dispose();
+                currentWriteDidWrite |= usage.PerformedWrite;
+
+                if (usages > 0) return;
+
+
+                if (currentWriteDidWrite)
+                {
+                    writeContext.Dispose();
+                    currentWriteDidWrite = false;
+
+                    // once all writes are complete, we want to refresh thread-specific contexts to make sure they don't have stale local caches.
+                    recycleThreadContexts();
+                }
+
+                // always set to null (even when a write didn't occur) so we get the correct thread context on next write request.
                 writeContext = null;
 
-                // once all writes are complete, we want to refresh thread-specific contexts to make sure they don't have stale local caches.
-                recycleThreadContexts();
+            }
+            finally
+            {
+                Monitor.Exit(writeLock);
             }
         }
 
