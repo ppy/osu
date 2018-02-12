@@ -275,7 +275,9 @@
     <Compile Include="Configuration\DatabasedConfigManager.cs" />
     <Compile Include="Configuration\SpeedChangeVisualisationMethod.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
+    <Compile Include="Database\DatabaseWriteUsage.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
+    <Compile Include="Database\SingletonContextFactory.cs" />
     <Compile Include="Graphics\Containers\LinkFlowContainer.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
