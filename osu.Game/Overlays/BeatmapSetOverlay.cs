@@ -147,9 +147,10 @@ namespace osu.Game.Overlays
             api.Queue(req);
         }
 
-        public void ShowBeatmapSet(BeatmapSetInfo set)
+        public void ShowBeatmapSet(BeatmapSetInfo set, bool withDownloadButtons = true)
         {
             header.BeatmapSet = info.BeatmapSet = set;
+            header.DownloadButtonsVisible = withDownloadButtons;
             Show();
             scroll.ScrollTo(0);
         }

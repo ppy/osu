@@ -73,6 +73,12 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
+        public bool DownloadButtonsVisible
+        {
+            get => downloadButtonsContainer.IsPresent;
+            set => downloadButtonsContainer.Alpha = value ? 1 : 0;
+        }
+
         public Header()
         {
             RelativeSizeAxes = Axes.X;

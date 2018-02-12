@@ -2,8 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Users;
@@ -18,6 +21,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private readonly BeatmapSetType type;
 
         private DirectPanel currentlyPlaying;
+        private BeatmapManager manager;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
             : base(user, header, missing)
@@ -27,6 +31,19 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             ItemsPerPage = 6;
 
             ItemsContainer.Spacing = new Vector2(panel_padding);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(BeatmapManager manager)
+        {
+            this.manager = manager;
+
+            manager.BeatmapSetAdded += set =>
+            {
+                var displayedSet = ItemsContainer.Children.OfType<GridPanel>().FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID);
+
+                displayedSet?.FadeOutDownloadIndicators();
+            };
         }
 
         protected override void ShowMore()
@@ -51,7 +68,9 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     if (!s.OnlineBeatmapSetID.HasValue)
                         continue;
 
-                    var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets));
+                    bool beatmapExists = manager.QueryBeatmapSet(b => b.OnlineBeatmapSetID == s.OnlineBeatmapSetID) != null;
+
+                    var panel = new GridPanel(s.ToBeatmapSet(Rulesets), !beatmapExists);
                     ItemsContainer.Add(panel);
 
                     panel.PreviewPlaying.ValueChanged += isPlaying =>
@@ -67,6 +86,39 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             };
 
             Api.Queue(req);
+        }
+
+        private class GridPanel : DirectGridPanel
+        {
+            private const double fade_out_duration = 200;
+
+            private bool downloadIndicatorsVisible;
+
+            public GridPanel(BeatmapSetInfo value, bool downloadIndicatorsVisible = true) : base(value)
+            {
+                this.downloadIndicatorsVisible = downloadIndicatorsVisible;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                if (!downloadIndicatorsVisible)
+                    DownloadButton.Alpha = 0;
+            }
+
+            protected override bool OnClick(InputState state)
+            {
+                ShowInformation(downloadIndicatorsVisible);
+                PreviewPlaying.Value = false;
+                return true;
+            }
+
+            public void FadeOutDownloadIndicators()
+            {
+                downloadIndicatorsVisible = false;
+                DownloadButton.FadeOut(fade_out_duration).Expire();
+                ProgressBar.FadeOut(fade_out_duration).Expire();
+            }
         }
     }
 }

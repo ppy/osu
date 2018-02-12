@@ -32,7 +32,6 @@ namespace osu.Game.Overlays.Direct
 
         private Container content;
 
-        private ProgressBar progressBar;
         private BeatmapManager beatmaps;
         private BeatmapSetOverlay beatmapSetOverlay;
 
@@ -40,6 +39,9 @@ namespace osu.Game.Overlays.Direct
         public Bindable<bool> PreviewPlaying => PlayButton.Playing;
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
+
+        protected ProgressBar ProgressBar;
+        protected DownloadButton DownloadButton;
 
         protected override Container<Drawable> Content => content;
 
@@ -87,7 +89,7 @@ namespace osu.Game.Overlays.Direct
                         Colour = Color4.Black,
                     },
                     CreateBackground(),
-                    progressBar = new ProgressBar
+                    ProgressBar = new ProgressBar
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
@@ -152,7 +154,7 @@ namespace osu.Game.Overlays.Direct
             return true;
         }
 
-        protected void ShowInformation() => beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
+        protected void ShowInformation(bool withDownloadButtons = true) => beatmapSetOverlay?.ShowBeatmapSet(SetInfo, withDownloadButtons);
 
         protected void StartDownload()
         {
@@ -175,23 +177,23 @@ namespace osu.Game.Overlays.Direct
             if (request.BeatmapSet.OnlineBeatmapSetID != SetInfo.OnlineBeatmapSetID)
                 return;
 
-            progressBar.FadeIn(400, Easing.OutQuint);
-            progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
+            ProgressBar.FadeIn(400, Easing.OutQuint);
+            ProgressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
 
-            progressBar.Current.Value = 0;
+            ProgressBar.Current.Value = 0;
 
             request.Failure += e =>
             {
-                progressBar.Current.Value = 0;
-                progressBar.FadeOut(500);
+                ProgressBar.Current.Value = 0;
+                ProgressBar.FadeOut(500);
             };
 
             request.DownloadProgressed += progress => Schedule(() => progressBar.Current.Value = progress);
 
             request.Success += data =>
             {
-                progressBar.Current.Value = 1;
-                progressBar.FillColour = colours.Yellow;
+                ProgressBar.Current.Value = 1;
+                ProgressBar.FillColour = colours.Yellow;
             };
         }
 
