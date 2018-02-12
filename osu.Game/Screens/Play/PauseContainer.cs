@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
+using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 
@@ -26,8 +28,10 @@ namespace osu.Game.Screens.Play
 
         private const double pause_cooldown = 1000;
         private double lastPauseActionTime;
+        private Vector2? lastCursorPosition;
 
         private readonly PauseOverlay pauseOverlay;
+        private readonly ResumeOverlay resumeOverlay;
 
         private readonly Container content;
 
@@ -52,6 +56,8 @@ namespace osu.Game.Screens.Play
 
             AddInternal(content = new Container { RelativeSizeAxes = Axes.Both });
 
+            AddInternal(resumeOverlay = new ResumeOverlay(resumeInternal, () => pauseOverlay.Show()));
+
             AddInternal(pauseOverlay = new PauseOverlay
             {
                 OnResume = () => this.Delay(400).Schedule(Resume),
@@ -60,11 +66,14 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        public void Pause(bool force = false)
+        public void Pause(Vector2? cursorPosition, bool force = false)
         {
             if (!CanPause && !force) return;
 
             if (IsPaused) return;
+
+            lastCursorPosition = cursorPosition;
+            if (lastCursorPosition.HasValue) resumeOverlay.SetResumeButtonPosition(lastCursorPosition.Value);
 
             // stop the decoupled clock (stops the audio eventually)
             AudioClock.Stop();
@@ -91,6 +100,17 @@ namespace osu.Game.Screens.Play
         {
             if (!IsPaused) return;
 
+            if (!lastCursorPosition.HasValue)
+                resumeInternal();
+            else
+                resumeOverlay.Show();
+        }
+
+        private void resumeInternal()
+        {
+            pauseOverlay.Hide();
+            resumeOverlay.Hide();
+
             IsPaused = false;
             FramedClock.ProcessSourceClockFrames = true;
 
@@ -98,7 +118,6 @@ namespace osu.Game.Screens.Play
 
             OnResume?.Invoke();
 
-            pauseOverlay.Hide();
             AudioClock.Start();
         }
 
@@ -114,7 +133,7 @@ namespace osu.Game.Screens.Play
         {
             // eagerly pause when we lose window focus (if we are locally playing).
             if (!game.IsActive && CanPause)
-                Pause();
+                Pause(lastCursorPosition);
 
             base.Update();
         }
@@ -144,6 +163,44 @@ namespace osu.Game.Screens.Play
                 AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
                 AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
             }
+        }
+
+        public class ResumeOverlay : GameplayMenuOverlay
+        {
+            private readonly Action escAction;
+            public override string Header => "Click the button to resume";
+            public override string Description => string.Empty;
+
+            private readonly TriangleButton resumeButton;
+
+            public ResumeOverlay(Action resumeAction, Action escAction)
+            {
+                this.escAction = escAction;
+                resumeButton = new TriangleButton
+                {
+                    Action = resumeAction,
+                    Size = new Vector2(24)
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Add(resumeButton);
+            }
+
+            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+            {
+                if (!args.Repeat && args.Key == Key.Escape)
+                {
+                    escAction();
+                    return true;
+                }
+
+                return base.OnKeyDown(state, args);
+            }
+
+            public void SetResumeButtonPosition(Vector2 newPosition) => resumeButton.MoveTo(newPosition);
         }
     }
 }
