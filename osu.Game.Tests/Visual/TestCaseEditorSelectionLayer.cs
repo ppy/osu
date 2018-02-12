@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(HitObjectCapturer),
-            typeof(HitObjectSelectionBox),
+            typeof(SelectionDragger),
             typeof(SelectionLayer)
         };
 

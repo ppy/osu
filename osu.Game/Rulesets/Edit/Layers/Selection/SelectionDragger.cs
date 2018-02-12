@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
     /// <summary>
     /// A box that represents a drag selection.
     /// </summary>
-    public class HitObjectSelectionBox : CompositeDrawable
+    public class SelectionDragger : CompositeDrawable
     {
         private readonly Container borderMask;
         private readonly Drawable background;
@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         private RectangleF dragRectangle;
 
         /// <summary>
-        /// Creates a new <see cref="HitObjectSelectionBox"/>.
+        /// Creates a new <see cref="SelectionDragger"/>.
         /// </summary>
-        public HitObjectSelectionBox()
+        public SelectionDragger()
         {
             InternalChildren = new Drawable[]
             {

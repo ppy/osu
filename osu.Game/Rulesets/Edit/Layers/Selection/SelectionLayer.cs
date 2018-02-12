@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             RelativeSizeAxes = Axes.Both;
         }
 
-        private HitObjectSelectionBox selectionBox;
+        private SelectionDragger selectionDragger;
         private HitObjectCapturer capturer;
 
         [BackgroundDependencyLoader]
@@ -32,15 +32,15 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             capturer.HitObjectCaptured += hitObjectCaptured;
         }
 
-        private void hitObjectCaptured(DrawableHitObject hitObject) => selectionBox.AddCaptured(hitObject);
+        private void hitObjectCaptured(DrawableHitObject hitObject) => selectionDragger.AddCaptured(hitObject);
 
         protected override bool OnDragStart(InputState state)
         {
             // Hide the previous drag box - we won't be working with it any longer
-            selectionBox?.Hide();
-            selectionBox?.Expire();
+            selectionDragger?.Hide();
+            selectionDragger?.Expire();
 
-            AddInternal(selectionBox = new HitObjectSelectionBox());
+            AddInternal(selectionDragger = new SelectionDragger());
 
             return true;
         }
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
             var screenSpaceDragQuad = new Quad(dragStartPosition.X, dragStartPosition.Y, dragPosition.X - dragStartPosition.X, dragPosition.Y - dragStartPosition.Y);
 
-            selectionBox.SetDragRectangle(screenSpaceDragQuad.AABBFloat);
+            selectionDragger.SetDragRectangle(screenSpaceDragQuad.AABBFloat);
             capturer.CaptureQuad(screenSpaceDragQuad);
 
             return true;
@@ -62,16 +62,16 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         {
             // Due to https://github.com/ppy/osu-framework/issues/1382, we may get here after OnClick has set the selectionBox to null
             // In the case that the user dragged within the click distance out of an object
-            if (selectionBox == null)
+            if (selectionDragger == null)
                 return true;
 
-            selectionBox.FinishCapture();
+            selectionDragger.FinishCapture();
 
             // If there are no hitobjects, remove the selection box
-            if (!selectionBox.HasCaptured)
+            if (!selectionDragger.HasCaptured)
             {
-                selectionBox.Expire();
-                selectionBox = null;
+                selectionDragger.Expire();
+                selectionDragger = null;
             }
 
             return true;
@@ -80,20 +80,20 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         protected override bool OnClick(InputState state)
         {
             // We could be coming here without a previous selection box
-            if (selectionBox == null)
-                AddInternal(selectionBox = new HitObjectSelectionBox { Position = ToLocalSpace(state.Mouse.NativeState.Position), Alpha = 0 });
+            if (selectionDragger == null)
+                AddInternal(selectionDragger = new SelectionDragger { Position = ToLocalSpace(state.Mouse.NativeState.Position), Alpha = 0 });
 
             // If we're coming here with a previous selection, unselect those hitobjects
-            selectionBox.ClearCaptured();
+            selectionDragger.ClearCaptured();
             if (capturer.CapturePoint(state.Mouse.NativeState.Position))
             {
-                selectionBox.Alpha = 1;
-                selectionBox.FinishCapture(true);
+                selectionDragger.Alpha = 1;
+                selectionDragger.FinishCapture(true);
             }
             else
             {
-                selectionBox.Hide();
-                selectionBox = null;
+                selectionDragger.Hide();
+                selectionDragger = null;
             }
 
             return true;
