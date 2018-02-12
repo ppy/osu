@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Platform;
 
@@ -42,7 +41,6 @@ namespace osu.Game.Database
         {
             Monitor.Enter(writeLock);
 
-            Trace.Assert(currentWriteUsages == 0, "Database writes in a bad state");
             Interlocked.Increment(ref currentWriteUsages);
 
             return new DatabaseWriteUsage(writeContext ?? (writeContext = threadContexts.Value), usageCompleted);
