@@ -15,7 +15,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Create a new <see cref="OsuDbContext"/> instance (separate from the shared context via <see cref="GetContext"/> for performing isolated operations.
         /// </summary>
-        protected readonly DatabaseContextFactory ContextFactory;
+        protected readonly IDatabaseContextFactory ContextFactory;
 
         /// <summary>
         /// Refresh an instance potentially from a different thread with a local context-tracked instance.
@@ -40,7 +40,7 @@ namespace osu.Game.Database
             }
         }
 
-        protected DatabaseBackedStore(DatabaseContextFactory contextFactory, Storage storage = null)
+        protected DatabaseBackedStore(IDatabaseContextFactory contextFactory, Storage storage = null)
         {
             ContextFactory = contextFactory;
             Storage = storage;

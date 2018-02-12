@@ -6,7 +6,7 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Database
 {
-    public class DatabaseContextFactory
+    public class DatabaseContextFactory : IDatabaseContextFactory
     {
         private readonly GameHost host;
 

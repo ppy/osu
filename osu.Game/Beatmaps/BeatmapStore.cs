@@ -20,7 +20,7 @@ namespace osu.Game.Beatmaps
         public event Action<BeatmapInfo> BeatmapHidden;
         public event Action<BeatmapInfo> BeatmapRestored;
 
-        public BeatmapStore(DatabaseContextFactory factory)
+        public BeatmapStore(IDatabaseContextFactory factory)
             : base(factory)
         {
         }
