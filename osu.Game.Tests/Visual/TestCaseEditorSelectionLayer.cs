@@ -21,8 +21,7 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(HitObjectCapturer),
-            typeof(SelectionDragger),
+            typeof(SelectionBox),
             typeof(SelectionLayer),
             typeof(CaptureBox)
         };

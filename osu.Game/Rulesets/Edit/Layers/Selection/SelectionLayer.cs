@@ -3,13 +3,13 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Edit.Layers.Selection
 {
@@ -24,18 +24,10 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             RelativeSizeAxes = Axes.Both;
         }
 
-        private SelectionDragger selectionDragger;
+        private SelectionBox selectionBox;
         private CaptureBox captureBox;
-        private HitObjectCapturer capturer;
 
         private readonly List<DrawableHitObject> capturedHitObjects = new List<DrawableHitObject>();
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            capturer = new HitObjectCapturer(playfield.HitObjects.Objects);
-            capturer.HitObjectCaptured += h => capturedHitObjects.Add(h);
-        }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
@@ -46,7 +38,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
         protected override bool OnDragStart(InputState state)
         {
-            AddInternal(selectionDragger = new SelectionDragger());
+            AddInternal(selectionBox = new SelectionBox());
             return true;
         }
 
@@ -57,15 +49,15 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
             var screenSpaceDragQuad = new Quad(dragStartPosition.X, dragStartPosition.Y, dragPosition.X - dragStartPosition.X, dragPosition.Y - dragStartPosition.Y);
 
-            selectionDragger.SetDragRectangle(screenSpaceDragQuad.AABBFloat);
-            capturer.CaptureQuad(screenSpaceDragQuad);
+            selectionBox.SetDragRectangle(screenSpaceDragQuad.AABBFloat);
+            captureQuad(screenSpaceDragQuad);
 
             return true;
         }
 
         protected override bool OnDragEnd(InputState state)
         {
-            selectionDragger.Hide();
+            selectionBox.Hide();
             finishCapture();
 
             return true;
@@ -73,10 +65,33 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
         protected override bool OnClick(InputState state)
         {
-            if (capturer.CapturePoint(state.Mouse.NativeState.Position))
-                finishCapture();
+            capturePoint(state.Mouse.NativeState.Position);
+            finishCapture();
 
             return true;
+        }
+
+        /// <summary>
+        /// Captures all hitobjects that are present within the area of a <see cref="Quad"/>.
+        /// </summary>
+        /// <param name="screenSpaceQuad">The capture <see cref="Quad"/>.</param>
+        private void captureQuad(Quad screenSpaceQuad)
+        {
+            foreach (var obj in playfield.HitObjects.Objects.Where(h => h.IsAlive && h.IsPresent && screenSpaceQuad.Contains(h.SelectionPoint)))
+                capturedHitObjects.Add(obj);
+        }
+
+        /// <summary>
+        /// Captures the top-most hitobject that is present under a specific point.
+        /// </summary>
+        /// <param name="screenSpacePoint">The <see cref="Vector2"/> to capture at.</param>
+        private void capturePoint(Vector2 screenSpacePoint)
+        {
+            var captured = playfield.HitObjects.Objects.Reverse().Where(h => h.IsAlive && h.IsPresent).FirstOrDefault(h => h.ReceiveMouseInputAt(screenSpacePoint));
+            if (captured == null)
+                return;
+
+            capturedHitObjects.Add(captured);
         }
 
         private void finishCapture()

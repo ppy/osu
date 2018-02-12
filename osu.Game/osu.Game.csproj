@@ -333,7 +333,6 @@
     <Compile Include="Rulesets\Configuration\IRulesetConfigManager.cs" />
     <Compile Include="Rulesets\Configuration\RulesetConfigManager.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\CaptureBox.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectCapturer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />
@@ -354,9 +353,9 @@
     <Compile Include="Screens\Select\ImportFromStablePopup.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\OriginHandle.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionDragger.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\Handle.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\HandleContainer.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionBox.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\SelectionLayer.cs" />
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
     <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
