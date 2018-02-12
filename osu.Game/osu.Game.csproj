@@ -357,7 +357,6 @@
     <Compile Include="Rulesets\Edit\Layers\Selection\SelectionDragger.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\Handle.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\HandleContainer.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionInfo.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\SelectionLayer.cs" />
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
     <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
