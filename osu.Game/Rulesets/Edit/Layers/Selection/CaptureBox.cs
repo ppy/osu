@@ -20,26 +20,20 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         private readonly IDrawable captureArea;
         private readonly IReadOnlyList<DrawableHitObject> capturedObjects;
 
-        private readonly Container borderContainer;
-
         public CaptureBox(IDrawable captureArea, IReadOnlyList<DrawableHitObject> capturedObjects)
         {
             this.captureArea = captureArea;
             this.capturedObjects = capturedObjects;
 
             Origin = Anchor.Centre;
+            Masking = true;
+            BorderThickness = 3;
 
-            InternalChild = borderContainer = new Container
+            InternalChild = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                BorderThickness = 3,
-                Child = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    AlwaysPresent = true,
-                    Alpha = 0
-                }
+                AlwaysPresent = true,
+                Alpha = 0
             };
 
             State = Visibility.Visible;
@@ -48,7 +42,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            borderContainer.BorderColour = colours.Yellow;
+            BorderColour = colours.Yellow;
 
             // Move the rectangle to cover the hitobjects
             var topLeft = new Vector2(float.MaxValue, float.MaxValue);
