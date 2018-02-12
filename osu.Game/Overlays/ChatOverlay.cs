@@ -39,9 +39,9 @@ namespace osu.Game.Overlays
 
         private readonly LoadingAnimation loading;
 
-        private readonly FocusedTextBox textbox;
+        protected readonly FocusedTextBox textbox;
 
-        private APIAccess api;
+        protected APIAccess api;
 
         private const int transition_length = 500;
 
