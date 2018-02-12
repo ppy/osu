@@ -25,10 +25,10 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
-        private Action<BeatmapSetInfo> deleteRequested;
         private Action<BeatmapSetInfo> restoreHiddenRequested;
         private Action<int> viewDetails;
 
+        private DialogOverlay dialogOverlay;
         private readonly BeatmapSetInfo beatmapSet;
 
         public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
@@ -38,13 +38,13 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(LocalisationEngine localisation, BeatmapManager manager, BeatmapSetOverlay beatmapOverlay)
+        private void load(LocalisationEngine localisation, BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay)
         {
             if (localisation == null)
                 throw new ArgumentNullException(nameof(localisation));
 
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
-            deleteRequested = manager.Delete;
+            dialogOverlay = overlay;
             if (beatmapOverlay != null)
                 viewDetails = beatmapOverlay.ShowBeatmapSet;
 
@@ -89,6 +89,12 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
+        private void delete(BeatmapSetInfo beatmap)
+        {
+            if (beatmap == null) return;
+            dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
+        }
+
         public MenuItem[] ContextMenuItems
         {
             get
@@ -104,7 +110,7 @@ namespace osu.Game.Screens.Select.Carousel
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested?.Invoke(beatmapSet)));
 
-                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => deleteRequested?.Invoke(beatmapSet)));
+                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => delete(beatmapSet)));
 
                 return items.ToArray();
             }
