@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,7 +11,6 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Edit.Layers.Selection
 {
@@ -21,29 +19,18 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
     /// </summary>
     public class HitObjectSelectionBox : CompositeDrawable
     {
-        public readonly Bindable<SelectionInfo> Selection = new Bindable<SelectionInfo>();
-
-        /// <summary>
-        /// The <see cref="DrawableHitObject"/>s that can be selected through a drag-selection.
-        /// </summary>
-        public IEnumerable<DrawableHitObject> CapturableObjects;
-
         private readonly Container borderMask;
         private readonly Drawable background;
         private readonly HandleContainer handles;
 
         private Color4 captureFinishedColour;
-
-        private readonly Vector2 startPos;
+        private RectangleF dragRectangle;
 
         /// <summary>
         /// Creates a new <see cref="HitObjectSelectionBox"/>.
         /// </summary>
-        /// <param name="startPos">The point at which the drag was initiated, in the parent's coordinates.</param>
-        public HitObjectSelectionBox(Vector2 startPos)
+        public HitObjectSelectionBox()
         {
-            this.startPos = startPos;
-
             InternalChildren = new Drawable[]
             {
                 new Container
@@ -70,8 +57,8 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
                     GetDragRectangle = () => dragRectangle,
-                    UpdateDragRectangle = updateDragRectangle,
-                    FinishDrag = FinishCapture
+                    UpdateDragRectangle = SetDragRectangle,
+                    FinishDrag = () => FinishCapture()
                 }
             };
         }
@@ -82,49 +69,29 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             captureFinishedColour = colours.Yellow;
         }
 
-        /// <summary>
-        /// The secondary corner of the drag selection box. A rectangle will be fit between the starting position and this value.
-        /// </summary>
-        public Vector2 DragEndPosition { set => updateDragRectangle(RectangleF.FromLTRB(startPos.X, startPos.Y, value.X, value.Y)); }
-
-        private RectangleF dragRectangle;
-        private void updateDragRectangle(RectangleF rectangle)
+        public void SetDragRectangle(RectangleF rectangle)
         {
             dragRectangle = rectangle;
 
-            Position = new Vector2(
-                Math.Min(rectangle.Left, rectangle.Right),
-                Math.Min(rectangle.Top, rectangle.Bottom));
+            var topLeft = Parent.ToLocalSpace(rectangle.TopLeft);
+            var bottomRight = Parent.ToLocalSpace(rectangle.BottomRight);
 
-            Size = new Vector2(
-                Math.Max(rectangle.Left, rectangle.Right) - Position.X,
-                Math.Max(rectangle.Top, rectangle.Bottom) - Position.Y);
+            Position = topLeft;
+            Size = bottomRight - topLeft;
         }
 
         private readonly List<DrawableHitObject> capturedHitObjects = new List<DrawableHitObject>();
 
-        /// <summary>
-        /// Processes hitobjects to determine which ones are captured by the drag selection.
-        /// Captured hitobjects will be enclosed by the drag selection upon <see cref="FinishCapture"/>.
-        /// </summary>
-        public void BeginCapture()
-        {
-            capturedHitObjects.Clear();
+        public bool HasCaptured => capturedHitObjects.Count > 0;
 
-            foreach (var obj in CapturableObjects)
-            {
-                if (!obj.IsAlive || !obj.IsPresent)
-                    continue;
+        public void AddCaptured(DrawableHitObject hitObject) => capturedHitObjects.Add(hitObject);
 
-                if (ScreenSpaceDrawQuad.Contains(obj.SelectionPoint))
-                    capturedHitObjects.Add(obj);
-            }
-        }
+        public void ClearCaptured() => capturedHitObjects.Clear();
 
         /// <summary>
         /// Encloses hitobjects captured through <see cref="BeginCapture"/> in the drag selection box.
         /// </summary>
-        public void FinishCapture()
+        public void FinishCapture(bool instant = false)
         {
             if (capturedHitObjects.Count == 0)
             {
@@ -145,8 +112,8 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             topLeft -= new Vector2(5);
             bottomRight += new Vector2(5);
 
-            this.MoveTo(topLeft, 200, Easing.OutQuint)
-                .ResizeTo(bottomRight - topLeft, 200, Easing.OutQuint);
+            this.MoveTo(topLeft, instant ? 0 : 100, Easing.OutQuint)
+                .ResizeTo(bottomRight - topLeft, instant ? 0 : 100, Easing.OutQuint);
 
             dragRectangle = RectangleF.FromLTRB(topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y);
 
@@ -156,12 +123,6 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             // Transform into markers to let the user modify the drag selection further.
             background.Delay(50).FadeOut(200);
             handles.FadeIn(200);
-
-            Selection.Value = new SelectionInfo
-            {
-                Objects = capturedHitObjects,
-                SelectionQuad = Parent.ToScreenSpace(dragRectangle)
-            };
         }
 
         private bool isActive = true;
@@ -171,9 +132,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         public override void Hide()
         {
             isActive = false;
-            this.FadeOut(400, Easing.OutQuint).Expire();
-
-            Selection.Value = null;
+            this.FadeOut(400, Easing.OutQuint);
         }
     }
 }
