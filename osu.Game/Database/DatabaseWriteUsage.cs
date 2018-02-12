@@ -19,10 +19,28 @@ namespace osu.Game.Database
             usageCompleted = onCompleted;
         }
 
+        public bool PerformedWrite { get; private set; }
+
+        private bool isDisposed;
+
+        protected void Dispose(bool disposing)
+        {
+            if (isDisposed) return;
+            isDisposed = true;
+
+            PerformedWrite |= Context.SaveChanges(transaction) > 0;
+            usageCompleted?.Invoke(this);
+        }
+
         public void Dispose()
         {
-            Context.SaveChanges(transaction);
-            usageCompleted?.Invoke(this);
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~DatabaseWriteUsage()
+        {
+            Dispose(false);
         }
     }
 }

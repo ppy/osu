@@ -111,7 +111,7 @@ namespace osu.Game.Database
         public int SaveChanges(IDbContextTransaction transaction = null)
         {
             var ret = base.SaveChanges();
-            transaction?.Commit();
+            if (ret > 0) transaction?.Commit();
             return ret;
         }
 

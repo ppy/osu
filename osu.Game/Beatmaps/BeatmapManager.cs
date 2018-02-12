@@ -172,7 +172,7 @@ namespace osu.Game.Beatmaps
         /// <param name="archive">The beatmap to be imported.</param>
         public BeatmapSetInfo Import(ArchiveReader archive)
         {
-            using ( contextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
+            using (contextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
             {
                 // create a new set info (don't yet add to database)
                 var beatmapSet = createBeatmapSetInfo(archive);
@@ -181,7 +181,7 @@ namespace osu.Game.Beatmaps
                 var existingHashMatch = beatmaps.BeatmapSets.FirstOrDefault(b => b.Hash == beatmapSet.Hash);
                 if (existingHashMatch != null)
                 {
-                    undelete(existingHashMatch);
+                    Undelete(existingHashMatch);
                     return existingHashMatch;
                 }
 
@@ -315,9 +315,9 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap set to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            using (var db = contextFactory.GetForWrite())
+            using (var usage = contextFactory.GetForWrite())
             {
-                var context = db.Context;
+                var context = usage.Context;
 
                 context.ChangeTracker.AutoDetectChangesEnabled = false;
 
@@ -378,11 +378,16 @@ namespace osu.Game.Beatmaps
             if (beatmapSet.Protected)
                 return;
 
-            using (var db = contextFactory.GetForWrite())
+            using (var usage = contextFactory.GetForWrite())
             {
-                db.Context.ChangeTracker.AutoDetectChangesEnabled = false;
-                undelete(beatmapSet);
-                db.Context.ChangeTracker.AutoDetectChangesEnabled = true;
+                usage.Context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                if (!beatmaps.Undelete(beatmapSet)) return;
+
+                if (!beatmapSet.Protected)
+                    files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+
+                usage.Context.ChangeTracker.AutoDetectChangesEnabled = true;
             }
         }
 
@@ -397,21 +402,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmap">The beatmap difficulty to restore.</param>
         public void Restore(BeatmapInfo beatmap) => beatmaps.Restore(beatmap);
-
-        /// <summary>
-        /// Returns a <see cref="BeatmapSetInfo"/> to a usable state if it has previously been deleted but not yet purged.
-        /// Is a no-op for already usable beatmaps.
-        /// </summary>
-        /// <param name="beatmaps">The store to restore beatmaps from.</param>
-        /// <param name="files">The store to restore beatmap files from.</param>
-        /// <param name="beatmapSet">The beatmap to restore.</param>
-        private void undelete(BeatmapSetInfo beatmapSet)
-        {
-            if (!beatmaps.Undelete(beatmapSet)) return;
-
-            if (!beatmapSet.Protected)
-                files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
-        }
 
         /// <summary>
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
