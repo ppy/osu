@@ -3,19 +3,17 @@
 
 namespace osu.Game.Database
 {
-    public class SingletonContextFactory : DatabaseContextFactory
+    public class SingletonContextFactory : IDatabaseContextFactory
     {
         private readonly OsuDbContext context;
 
         public SingletonContextFactory(OsuDbContext context)
-            : base(null)
         {
             this.context = context;
         }
 
-        protected override OsuDbContext CreateContext()
-        {
-            return context;
-        }
+        public OsuDbContext Get() => context;
+
+        public DatabaseWriteUsage GetForWrite() => new DatabaseWriteUsage(context, null);
     }
 }

@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets
                 loadRulesetFromFile(file);
         }
 
-        public RulesetStore(DatabaseContextFactory factory)
+        public RulesetStore(IDatabaseContextFactory factory)
             : base(factory)
         {
             AddMissingRulesets();
