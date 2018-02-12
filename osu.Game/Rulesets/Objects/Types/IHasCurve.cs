@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Objects.Types
         /// Ranges from [0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.
         /// </para>
         /// </summary>
+        /// <param name="obj">The curve.</param>
         /// <param name="progress">[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</param>
         public static Vector2 PositionAt(this IHasCurve obj, double progress)
             => obj.Curve.PositionAt(obj.ProgressAt(progress));
@@ -42,6 +43,7 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <summary>
         /// Finds the progress along the curve, accounting for repeat logic.
         /// </summary>
+        /// <param name="obj">The curve.</param>
         /// <param name="progress">[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</param>
         /// <returns>[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</returns>
         public static double ProgressAt(this IHasCurve obj, double progress)
@@ -55,6 +57,7 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <summary>
         /// Determines which span of the curve the progress point is on.
         /// </summary>
+        /// <param name="obj">The curve.</param>
         /// <param name="progress">[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</param>
         /// <returns>[0, SpanCount) where 0 is the first run.</returns>
         public static int SpanAt(this IHasCurve obj, double progress)
