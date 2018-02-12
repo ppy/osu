@@ -353,7 +353,7 @@
     <Compile Include="Screens\Select\ImportFromStablePopup.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\OriginHandle.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectSelectionBox.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionDragger.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\Handle.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\HandleContainer.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\SelectionInfo.cs" />
