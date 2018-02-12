@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public void TestImportThenImport()
         {
             //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportThenDeleteThenImport"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportThenImport"))
             {
                 try
                 {
