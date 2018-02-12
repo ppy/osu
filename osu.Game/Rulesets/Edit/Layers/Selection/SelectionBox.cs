@@ -12,12 +12,12 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
     /// <summary>
     /// A box that represents a drag selection.
     /// </summary>
-    public class SelectionDragger : CompositeDrawable
+    public class SelectionBox : CompositeDrawable
     {
         /// <summary>
-        /// Creates a new <see cref="SelectionDragger"/>.
+        /// Creates a new <see cref="SelectionBox"/>.
         /// </summary>
-        public SelectionDragger()
+        public SelectionBox()
         {
             InternalChildren = new Drawable[]
             {
