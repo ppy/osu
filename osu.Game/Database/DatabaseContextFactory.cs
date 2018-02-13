@@ -56,7 +56,11 @@ namespace osu.Game.Database
 
                 if (currentWriteDidWrite)
                 {
+                    // explicitly dispose to ensure any outstanding flushes happen as soon as possible (and underlying resources are purged).
+                    usage.Context.Dispose();
+
                     currentWriteDidWrite = false;
+
                     // once all writes are complete, we want to refresh thread-specific contexts to make sure they don't have stale local caches.
                     recycleThreadContexts();
                 }
@@ -67,14 +71,7 @@ namespace osu.Game.Database
             }
         }
 
-        private void recycleThreadContexts()
-        {
-            if (threadContexts != null)
-                foreach (var context in threadContexts.Values)
-                    context.Dispose();
-
-            threadContexts = new ThreadLocal<OsuDbContext>(CreateContext, true);
-        }
+        private void recycleThreadContexts() => threadContexts = new ThreadLocal<OsuDbContext>(CreateContext);
 
         protected virtual OsuDbContext CreateContext()
         {
