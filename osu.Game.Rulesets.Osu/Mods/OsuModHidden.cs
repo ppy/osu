@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -47,16 +48,20 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     // fade out immediately after fade in.
                     using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
-                    {
                         circle.FadeOut(fadeOutDuration);
-                    }
 
                     break;
                 case DrawableSlider slider:
                     using (slider.BeginAbsoluteSequence(fadeOutStartTime, true))
-                    {
                         slider.Body.FadeOut(longFadeDuration, Easing.Out);
-                    }
+
+                    break;
+                case DrawableSliderTick sliderTick:
+                    // slider ticks fade out over up to one second
+                    var tickFadeOutDuration = Math.Min(sliderTick.HitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
+
+                    using (sliderTick.BeginAbsoluteSequence(sliderTick.HitObject.StartTime - tickFadeOutDuration, true))
+                        sliderTick.FadeOut(tickFadeOutDuration);
 
                     break;
                 case DrawableSpinner spinner:
@@ -66,9 +71,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     spinner.Background.Hide();
 
                     using (spinner.BeginAbsoluteSequence(fadeOutStartTime + longFadeDuration, true))
-                    {
                         spinner.FadeOut(fadeOutDuration);
-                    }
 
                     break;
             }

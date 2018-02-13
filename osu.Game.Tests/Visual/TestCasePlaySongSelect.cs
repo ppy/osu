@@ -63,12 +63,10 @@ namespace osu.Game.Tests.Visual
             var storage = new TestStorage(@"TestCasePlaySongSelect");
 
             // this is by no means clean. should be replacing inside of OsuGameBase somehow.
-            var context = new OsuDbContext();
+            IDatabaseContextFactory factory = new SingletonContextFactory(new OsuDbContext());
 
-            OsuDbContext contextFactory() => context;
-
-            dependencies.Cache(rulesets = new RulesetStore(contextFactory));
-            dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
+            dependencies.Cache(rulesets = new RulesetStore(factory));
+            dependencies.Cache(manager = new BeatmapManager(storage, factory, rulesets, null)
             {
                 DefaultBeatmap = defaultBeatmap = game.Beatmap.Default
             });
