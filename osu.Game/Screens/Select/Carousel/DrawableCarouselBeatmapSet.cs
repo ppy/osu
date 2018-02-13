@@ -89,12 +89,6 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
-        private void delete(BeatmapSetInfo beatmap)
-        {
-            if (beatmap == null) return;
-            dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
-        }
-
         public MenuItem[] ContextMenuItems
         {
             get
@@ -110,7 +104,7 @@ namespace osu.Game.Screens.Select.Carousel
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
                     items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested?.Invoke(beatmapSet)));
 
-                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => delete(beatmapSet)));
+                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet))));
 
                 return items.ToArray();
             }
