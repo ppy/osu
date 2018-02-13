@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets
                 loadRulesetFromFile(file);
         }
 
-        public RulesetStore(Func<OsuDbContext> factory)
+        public RulesetStore(IDatabaseContextFactory factory)
             : base(factory)
         {
             AddMissingRulesets();
@@ -56,47 +56,50 @@ namespace osu.Game.Rulesets
 
         protected void AddMissingRulesets()
         {
-            var context = GetContext();
-
-            var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
-
-            //add all legacy modes in correct order
-            foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
+            using (var usage = ContextFactory.GetForWrite())
             {
-                if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == r.RulesetInfo.ID) == null)
-                    context.RulesetInfo.Add(r.RulesetInfo);
-            }
+                var context = usage.Context;
 
-            context.SaveChanges();
+                var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
 
-            //add any other modes
-            foreach (var r in instances.Where(r => r.LegacyID < 0))
-                if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
-                    context.RulesetInfo.Add(r.RulesetInfo);
-
-            context.SaveChanges();
-
-            //perform a consistency check
-            foreach (var r in context.RulesetInfo)
-            {
-                try
+                //add all legacy modes in correct order
+                foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
                 {
-                    var instance = r.CreateInstance();
-
-                    r.Name = instance.Description;
-                    r.ShortName = instance.ShortName;
-
-                    r.Available = true;
+                    if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == r.RulesetInfo.ID) == null)
+                        context.RulesetInfo.Add(r.RulesetInfo);
                 }
-                catch
+
+                context.SaveChanges();
+
+                //add any other modes
+                foreach (var r in instances.Where(r => r.LegacyID < 0))
+                    if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
+                        context.RulesetInfo.Add(r.RulesetInfo);
+
+                context.SaveChanges();
+
+                //perform a consistency check
+                foreach (var r in context.RulesetInfo)
                 {
-                    r.Available = false;
+                    try
+                    {
+                        var instance = r.CreateInstance();
+
+                        r.Name = instance.Description;
+                        r.ShortName = instance.ShortName;
+
+                        r.Available = true;
+                    }
+                    catch
+                    {
+                        r.Available = false;
+                    }
                 }
+
+                context.SaveChanges();
+
+                AvailableRulesets = context.RulesetInfo.Where(r => r.Available).ToList();
             }
-
-            context.SaveChanges();
-
-            AvailableRulesets = context.RulesetInfo.Where(r => r.Available).ToList();
         }
 
         private static void loadRulesetFromFile(string file)

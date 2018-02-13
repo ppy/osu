@@ -106,12 +106,12 @@ namespace osu.Game
                 Token = LocalConfig.Get<string>(OsuSetting.Token)
             });
 
-            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory.GetContext));
-            dependencies.Cache(FileStore = new FileStore(contextFactory.GetContext, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory.GetContext, RulesetStore, API, Host));
-            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory.GetContext, Host, BeatmapManager, RulesetStore));
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory.GetContext, RulesetStore));
-            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory.GetContext));
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
+            dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Host));
+            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory, Host, BeatmapManager, RulesetStore));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
+            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
@@ -179,8 +179,8 @@ namespace osu.Game
         {
             try
             {
-                using (var context = contextFactory.GetContext())
-                    context.Migrate();
+                using (var db = contextFactory.GetForWrite())
+                    db.Context.Migrate();
             }
             catch (MigrationFailedException e)
             {
@@ -191,8 +191,8 @@ namespace osu.Game
                 contextFactory.ResetDatabase();
                 Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
 
-                using (var context = contextFactory.GetContext())
-                    context.Migrate();
+                using (var db = contextFactory.GetForWrite())
+                    db.Context.Migrate();
             }
         }
 
@@ -218,7 +218,7 @@ namespace osu.Game
             CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both　}
+                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both }
             };
 
             base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
