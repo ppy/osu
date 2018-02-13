@@ -9,31 +9,26 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ionic.Zip;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Textures;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    public class BeatmapManager
+    public partial class BeatmapManager
     {
         /// <summary>
         /// Fired when a new <see cref="BeatmapSetInfo"/> becomes available in the database.
@@ -65,19 +60,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public WorkingBeatmap DefaultBeatmap { private get; set; }
 
-        private readonly Storage storage;
-
-        private BeatmapStore createBeatmapStore(Func<OsuDbContext> context)
-        {
-            var store = new BeatmapStore(context);
-            store.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
-            store.BeatmapSetRemoved += s => BeatmapSetRemoved?.Invoke(s);
-            store.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
-            store.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
-            return store;
-        }
-
-        private readonly Func<OsuDbContext> createContext;
+        private readonly IDatabaseContextFactory contextFactory;
 
         private readonly FileStore files;
 
@@ -102,31 +85,19 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Storage> GetStableStorage { private get; set; }
 
-        private void refreshImportContext()
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
         {
-            lock (importContextLock)
-            {
-                importContext?.Value?.Dispose();
+            this.contextFactory = contextFactory;
 
-                importContext = new Lazy<OsuDbContext>(() =>
-                {
-                    var c = createContext();
-                    c.Database.AutoTransactionsEnabled = false;
-                    return c;
-                });
-            }
-        }
+            beatmaps = new BeatmapStore(contextFactory);
 
-        public BeatmapManager(Storage storage, Func<OsuDbContext> context, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
-        {
-            createContext = context;
+            beatmaps.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
+            beatmaps.BeatmapSetRemoved += s => BeatmapSetRemoved?.Invoke(s);
+            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
+            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
 
-            refreshImportContext();
+            files = new FileStore(contextFactory, storage);
 
-            beatmaps = createBeatmapStore(context);
-            files = new FileStore(context, storage);
-
-            this.storage = files.Storage;
             this.rulesets = rulesets;
             this.api = api;
 
@@ -138,10 +109,10 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Import one or more <see cref="BeatmapSetInfo"/> from filesystem <paramref name="paths"/>.
-        /// This will post a notification tracking import progress.
+        /// This will post notifications tracking progress.
         /// </summary>
         /// <param name="paths">One or more beatmap locations on disk.</param>
-        public void Import(params string[] paths)
+        public List<BeatmapSetInfo> Import(params string[] paths)
         {
             var notification = new ProgressNotification
             {
@@ -153,18 +124,20 @@ namespace osu.Game.Beatmaps
 
             PostNotification?.Invoke(notification);
 
+            List<BeatmapSetInfo> imported = new List<BeatmapSetInfo>();
+
             int i = 0;
             foreach (string path in paths)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)
                     // user requested abort
-                    return;
+                    return imported;
 
                 try
                 {
                     notification.Text = $"Importing ({i} of {paths.Length})\n{Path.GetFileName(path)}";
                     using (ArchiveReader reader = getReaderFrom(path))
-                        Import(reader);
+                        imported.Add(Import(reader));
 
                     notification.Progress = (float)++i / paths.Length;
 
@@ -186,62 +159,66 @@ namespace osu.Game.Beatmaps
                 {
                     e = e.InnerException ?? e;
                     Logger.Error(e, $@"Could not import beatmap set ({Path.GetFileName(path)})");
-                    refreshImportContext();
                 }
             }
 
             notification.State = ProgressNotificationState.Completed;
+            return imported;
         }
-
-        private readonly object importContextLock = new object();
-
-        private Lazy<OsuDbContext> importContext;
 
         /// <summary>
         /// Import a beatmap from an <see cref="ArchiveReader"/>.
         /// </summary>
-        /// <param name="archiveReader">The beatmap to be imported.</param>
-        public BeatmapSetInfo Import(ArchiveReader archiveReader)
+        /// <param name="archive">The beatmap to be imported.</param>
+        public BeatmapSetInfo Import(ArchiveReader archive)
         {
-            // let's only allow one concurrent import at a time for now.
-            lock (importContextLock)
+            using (contextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
             {
-                var context = importContext.Value;
+                // create a new set info (don't yet add to database)
+                var beatmapSet = createBeatmapSetInfo(archive);
 
-                using (var transaction = context.BeginTransaction())
+                // check if this beatmap has already been imported and exit early if so
+                var existingHashMatch = beatmaps.BeatmapSets.FirstOrDefault(b => b.Hash == beatmapSet.Hash);
+                if (existingHashMatch != null)
                 {
-                    // create local stores so we can isolate and thread safely, and share a context/transaction.
-                    var iFiles = new FileStore(() => context, storage);
-                    var iBeatmaps = createBeatmapStore(() => context);
-
-                    BeatmapSetInfo set = importToStorage(iFiles, iBeatmaps, archiveReader);
-
-                    if (set.ID == 0)
-                    {
-                        iBeatmaps.Add(set);
-                        context.SaveChanges();
-                    }
-
-                    context.SaveChanges(transaction);
-                    return set;
+                    Undelete(existingHashMatch);
+                    return existingHashMatch;
                 }
+
+                // check if a set already exists with the same online id
+                if (beatmapSet.OnlineBeatmapSetID != null)
+                {
+                    var existingOnlineId = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
+                    if (existingOnlineId != null)
+                    {
+                        Delete(existingOnlineId);
+                        beatmaps.Cleanup(s => s.ID == existingOnlineId.ID);
+                    }
+                }
+
+                beatmapSet.Files = createFileInfos(archive, files);
+                beatmapSet.Beatmaps = createBeatmapDifficulties(archive);
+
+                // remove metadata from difficulties where it matches the set
+                foreach (BeatmapInfo b in beatmapSet.Beatmaps)
+                    if (beatmapSet.Metadata.Equals(b.Metadata))
+                        b.Metadata = null;
+
+                // import to beatmap store
+                Import(beatmapSet);
+                return beatmapSet;
             }
         }
 
         /// <summary>
         /// Import a beatmap from a <see cref="BeatmapSetInfo"/>.
         /// </summary>
-        /// <param name="beatmapSetInfo">The beatmap to be imported.</param>
-        public void Import(BeatmapSetInfo beatmapSetInfo)
-        {
-            // If we have an ID then we already exist in the database.
-            if (beatmapSetInfo.ID != 0) return;
-
-            createBeatmapStore(createContext).Add(beatmapSetInfo);
-        }
+        /// <param name="beatmapSet">The beatmap to be imported.</param>
+        public void Import(BeatmapSetInfo beatmapSet) => beatmaps.Add(beatmapSet);
 
         /// <summary>
         /// Downloads a beatmap.
+        /// This will post notifications tracking progress.
         /// </summary>
         /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to be downloaded.</param>
         /// <param name="noVideo">Whether the beatmap should be downloaded without video. Defaults to false.</param>
@@ -324,39 +301,41 @@ namespace osu.Game.Beatmaps
         public DownloadBeatmapSetRequest GetExistingDownload(BeatmapSetInfo beatmap) => currentDownloads.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
 
         /// <summary>
+        /// Update a BeatmapSetInfo with all changes. TODO: This only supports very basic updates currently.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmap set to update.</param>
+        public void Update(BeatmapSetInfo beatmap) => beatmaps.Update(beatmap);
+
+        /// <summary>
         /// Delete a beatmap from the manager.
         /// Is a no-op for already deleted beatmaps.
         /// </summary>
         /// <param name="beatmapSet">The beatmap set to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            lock (importContextLock)
+            using (var usage = contextFactory.GetForWrite())
             {
-                var context = importContext.Value;
+                var context = usage.Context;
 
-                using (var transaction = context.BeginTransaction())
+                context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                // re-fetch the beatmap set on the import context.
+                beatmapSet = context.BeatmapSetInfo.Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == beatmapSet.ID);
+
+                if (beatmaps.Delete(beatmapSet))
                 {
-                    context.ChangeTracker.AutoDetectChangesEnabled = false;
-
-                    // re-fetch the beatmap set on the import context.
-                    beatmapSet = context.BeatmapSetInfo.Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == beatmapSet.ID);
-
-                    // create local stores so we can isolate and thread safely, and share a context/transaction.
-                    var iFiles = new FileStore(() => context, storage);
-                    var iBeatmaps = createBeatmapStore(() => context);
-
-                    if (iBeatmaps.Delete(beatmapSet))
-                    {
-                        if (!beatmapSet.Protected)
-                            iFiles.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
-                    }
-
-                    context.ChangeTracker.AutoDetectChangesEnabled = true;
-                    context.SaveChanges(transaction);
+                    if (!beatmapSet.Protected)
+                        files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
                 }
+
+                context.ChangeTracker.AutoDetectChangesEnabled = true;
             }
         }
 
+        /// <summary>
+        /// Restore all beatmaps that were previously deleted.
+        /// This will post notifications tracking progress.
+        /// </summary>
         public void UndeleteAll()
         {
             var deleteMaps = QueryBeatmapSets(bs => bs.DeletePending).ToList();
@@ -388,27 +367,25 @@ namespace osu.Game.Beatmaps
             notification.State = ProgressNotificationState.Completed;
         }
 
+        /// <summary>
+        /// Restore a beatmap that was previously deleted. Is a no-op if the beatmap is not in a deleted state, or has its protected flag set.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmap to restore</param>
         public void Undelete(BeatmapSetInfo beatmapSet)
         {
             if (beatmapSet.Protected)
                 return;
 
-            lock (importContextLock)
+            using (var usage = contextFactory.GetForWrite())
             {
-                var context = importContext.Value;
+                usage.Context.ChangeTracker.AutoDetectChangesEnabled = false;
 
-                using (var transaction = context.BeginTransaction())
-                {
-                    context.ChangeTracker.AutoDetectChangesEnabled = false;
+                if (!beatmaps.Undelete(beatmapSet)) return;
 
-                    var iFiles = new FileStore(() => context, storage);
-                    var iBeatmaps = createBeatmapStore(() => context);
+                if (!beatmapSet.Protected)
+                    files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
 
-                    undelete(iBeatmaps, iFiles, beatmapSet);
-
-                    context.ChangeTracker.AutoDetectChangesEnabled = true;
-                    context.SaveChanges(transaction);
-                }
+                usage.Context.ChangeTracker.AutoDetectChangesEnabled = true;
             }
         }
 
@@ -423,21 +400,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmap">The beatmap difficulty to restore.</param>
         public void Restore(BeatmapInfo beatmap) => beatmaps.Restore(beatmap);
-
-        /// <summary>
-        /// Returns a <see cref="BeatmapSetInfo"/> to a usable state if it has previously been deleted but not yet purged.
-        /// Is a no-op for already usable beatmaps.
-        /// </summary>
-        /// <param name="beatmaps">The store to restore beatmaps from.</param>
-        /// <param name="files">The store to restore beatmap files from.</param>
-        /// <param name="beatmapSet">The beatmap to restore.</param>
-        private void undelete(BeatmapStore beatmaps, FileStore files, BeatmapSetInfo beatmapSet)
-        {
-            if (!beatmaps.Undelete(beatmapSet)) return;
-
-            if (!beatmapSet.Protected)
-                files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
-        }
 
         /// <summary>
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
@@ -475,6 +437,12 @@ namespace osu.Game.Beatmaps
         public BeatmapSetInfo Refresh(BeatmapSetInfo beatmapSet) => QueryBeatmapSet(s => s.ID == beatmapSet.ID);
 
         /// <summary>
+        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
+        /// </summary>
+        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => beatmaps.BeatmapSets.Where(s => !s.DeletePending).ToList();
+
+        /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
@@ -496,220 +464,8 @@ namespace osu.Game.Beatmaps
         public IEnumerable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
         /// <summary>
-        /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
+        /// Denotes whether an osu-stable installation is present to perform automated imports from.
         /// </summary>
-        /// <param name="path">A file or folder path resolving the beatmap content.</param>
-        /// <returns>A reader giving access to the beatmap's content.</returns>
-        private ArchiveReader getReaderFrom(string path)
-        {
-            if (ZipFile.IsZipFile(path))
-                // ReSharper disable once InconsistentlySynchronizedField
-                return new OszArchiveReader(storage.GetStream(path));
-            return new LegacyFilesystemReader(path);
-        }
-
-        /// <summary>
-        /// Import a beamap into our local <see cref="FileStore"/> storage.
-        /// If the beatmap is already imported, the existing instance will be returned.
-        /// </summary>
-        /// <param name="files">The store to import beatmap files to.</param>
-        /// <param name="beatmaps">The store to import beatmaps to.</param>
-        /// <param name="reader">The beatmap archive to be read.</param>
-        /// <returns>The imported beatmap, or an existing instance if it is already present.</returns>
-        private BeatmapSetInfo importToStorage(FileStore files, BeatmapStore beatmaps, ArchiveReader reader)
-        {
-            // let's make sure there are actually .osu files to import.
-            string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
-            if (string.IsNullOrEmpty(mapName))
-                throw new InvalidOperationException("No beatmap files found in the map folder.");
-
-            // for now, concatenate all .osu files in the set to create a unique hash.
-            MemoryStream hashable = new MemoryStream();
-            foreach (string file in reader.Filenames.Where(f => f.EndsWith(".osu")))
-                using (Stream s = reader.GetStream(file))
-                    s.CopyTo(hashable);
-
-            var hash = hashable.ComputeSHA2Hash();
-
-            // check if this beatmap has already been imported and exit early if so.
-            var beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.Hash == hash);
-
-            if (beatmapSet != null)
-            {
-                undelete(beatmaps, files, beatmapSet);
-
-                // ensure all files are present and accessible
-                foreach (var f in beatmapSet.Files)
-                {
-                    if (!storage.Exists(f.FileInfo.StoragePath))
-                        using (Stream s = reader.GetStream(f.Filename))
-                            files.Add(s, false);
-                }
-
-                // todo: delete any files which shouldn't exist any more.
-
-                return beatmapSet;
-            }
-
-            List<BeatmapSetFileInfo> fileInfos = new List<BeatmapSetFileInfo>();
-
-            // import files to manager
-            foreach (string file in reader.Filenames)
-                using (Stream s = reader.GetStream(file))
-                    fileInfos.Add(new BeatmapSetFileInfo
-                    {
-                        Filename = file,
-                        FileInfo = files.Add(s)
-                    });
-
-            BeatmapMetadata metadata;
-
-            using (var stream = new StreamReader(reader.GetStream(mapName)))
-                metadata = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
-
-            // check if a set already exists with the same online id.
-            if (metadata.OnlineBeatmapSetID != null)
-                beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == metadata.OnlineBeatmapSetID);
-
-            if (beatmapSet == null)
-                beatmapSet = new BeatmapSetInfo
-                {
-                    OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
-                    Beatmaps = new List<BeatmapInfo>(),
-                    Hash = hash,
-                    Files = fileInfos,
-                    Metadata = metadata
-                };
-
-            var mapNames = reader.Filenames.Where(f => f.EndsWith(".osu"));
-
-            foreach (var name in mapNames)
-            {
-                using (var raw = reader.GetStream(name))
-                using (var ms = new MemoryStream()) //we need a memory stream so we can seek and shit
-                using (var sr = new StreamReader(ms))
-                {
-                    raw.CopyTo(ms);
-                    ms.Position = 0;
-
-                    var decoder = Decoder.GetDecoder(sr);
-                    Beatmap beatmap = decoder.DecodeBeatmap(sr);
-
-                    beatmap.BeatmapInfo.Path = name;
-                    beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
-                    beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
-
-                    var existing = beatmaps.Beatmaps.FirstOrDefault(b => b.Hash == beatmap.BeatmapInfo.Hash || beatmap.BeatmapInfo.OnlineBeatmapID != null && b.OnlineBeatmapID == beatmap.BeatmapInfo.OnlineBeatmapID);
-
-                    if (existing == null)
-                    {
-                        // Exclude beatmap-metadata if it's equal to beatmapset-metadata
-                        if (metadata.Equals(beatmap.Metadata))
-                            beatmap.BeatmapInfo.Metadata = null;
-
-                        RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
-
-                        // TODO: this should be done in a better place once we actually need to dynamically update it.
-                        beatmap.BeatmapInfo.Ruleset = ruleset;
-                        beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance()?.CreateDifficultyCalculator(beatmap).Calculate() ?? 0;
-
-                        beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
-                    }
-                }
-            }
-
-            return beatmapSet;
-        }
-
-        /// <summary>
-        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
-        /// </summary>
-        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
-        {
-            return beatmaps.BeatmapSets.Where(s => !s.DeletePending).ToList();
-        }
-
-        protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
-        {
-            private readonly IResourceStore<byte[]> store;
-
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo)
-                : base(beatmapInfo)
-            {
-                this.store = store;
-            }
-
-            protected override Beatmap GetBeatmap()
-            {
-                try
-                {
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
-                    {
-                        Decoder decoder = Decoder.GetDecoder(stream);
-                        return decoder.DecodeBeatmap(stream);
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
-
-            protected override Texture GetBackground()
-            {
-                if (Metadata?.BackgroundFile == null)
-                    return null;
-
-                try
-                {
-                    return new LargeTextureStore(new RawTextureLoaderStore(store)).Get(getPathForFile(Metadata.BackgroundFile));
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-
-            protected override Track GetTrack()
-            {
-                try
-                {
-                    var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : new TrackBass(trackData);
-                }
-                catch
-                {
-                    return new TrackVirtual();
-                }
-            }
-
-            protected override Waveform GetWaveform() => new Waveform(store.GetStream(getPathForFile(Metadata.AudioFile)));
-
-            protected override Storyboard GetStoryboard()
-            {
-                try
-                {
-                    using (var beatmap = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
-                    {
-                        Decoder decoder = Decoder.GetDecoder(beatmap);
-
-                        if (BeatmapSetInfo?.StoryboardFile == null)
-                            return decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap);
-
-                        using (var storyboard = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
-                            return decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap, storyboard);
-                    }
-                }
-                catch
-                {
-                    return new Storyboard();
-                }
-            }
-        }
-
         public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
 
         /// <summary>
@@ -728,6 +484,10 @@ namespace osu.Game.Beatmaps
             await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs")), TaskCreationOptions.LongRunning);
         }
 
+        /// <summary>
+        /// Delete all beatmaps.
+        /// This will post notifications tracking progress.
+        /// </summary>
         public void DeleteAll()
         {
             var maps = GetAllUsableBeatmapSets();
@@ -757,6 +517,110 @@ namespace osu.Game.Beatmaps
             }
 
             notification.State = ProgressNotificationState.Completed;
+        }
+
+        /// <summary>
+        /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
+        /// </summary>
+        /// <param name="path">A file or folder path resolving the beatmap content.</param>
+        /// <returns>A reader giving access to the beatmap's content.</returns>
+        private ArchiveReader getReaderFrom(string path)
+        {
+            if (ZipFile.IsZipFile(path))
+                // ReSharper disable once InconsistentlySynchronizedField
+                return new OszArchiveReader(files.Storage.GetStream(path));
+            return new LegacyFilesystemReader(path);
+        }
+
+        /// <summary>
+        /// Create a SHA-2 hash from the provided archive based on contained beatmap (.osu) file content.
+        /// </summary>
+        private string computeBeatmapSetHash(ArchiveReader reader)
+        {
+            // for now, concatenate all .osu files in the set to create a unique hash.
+            MemoryStream hashable = new MemoryStream();
+            foreach (string file in reader.Filenames.Where(f => f.EndsWith(".osu")))
+                using (Stream s = reader.GetStream(file))
+                    s.CopyTo(hashable);
+
+            return hashable.ComputeSHA2Hash();
+        }
+
+        /// <summary>
+        /// Create a <see cref="BeatmapSetInfo"/> from a provided archive.
+        /// </summary>
+        private BeatmapSetInfo createBeatmapSetInfo(ArchiveReader reader)
+        {
+            // let's make sure there are actually .osu files to import.
+            string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
+            if (string.IsNullOrEmpty(mapName)) throw new InvalidOperationException("No beatmap files found in the map folder.");
+
+            BeatmapMetadata metadata;
+            using (var stream = new StreamReader(reader.GetStream(mapName)))
+                metadata = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
+
+            return new BeatmapSetInfo
+            {
+                OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
+                Beatmaps = new List<BeatmapInfo>(),
+                Hash = computeBeatmapSetHash(reader),
+                Metadata = metadata
+            };
+        }
+
+        /// <summary>
+        /// Create all required <see cref="FileInfo"/>s for the provided archive, adding them to the global file store.
+        /// </summary>
+        private List<BeatmapSetFileInfo> createFileInfos(ArchiveReader reader, FileStore files)
+        {
+            List<BeatmapSetFileInfo> fileInfos = new List<BeatmapSetFileInfo>();
+
+            // import files to manager
+            foreach (string file in reader.Filenames)
+                using (Stream s = reader.GetStream(file))
+                    fileInfos.Add(new BeatmapSetFileInfo
+                    {
+                        Filename = file,
+                        FileInfo = files.Add(s)
+                    });
+
+            return fileInfos;
+        }
+
+        /// <summary>
+        /// Create all required <see cref="BeatmapInfo"/>s for the provided archive.
+        /// </summary>
+        private List<BeatmapInfo> createBeatmapDifficulties(ArchiveReader reader)
+        {
+            var beatmapInfos = new List<BeatmapInfo>();
+
+            foreach (var name in reader.Filenames.Where(f => f.EndsWith(".osu")))
+            {
+                using (var raw = reader.GetStream(name))
+                using (var ms = new MemoryStream()) //we need a memory stream so we can seek and shit
+                using (var sr = new StreamReader(ms))
+                {
+                    raw.CopyTo(ms);
+                    ms.Position = 0;
+
+                    var decoder = Decoder.GetDecoder(sr);
+                    Beatmap beatmap = decoder.DecodeBeatmap(sr);
+
+                    beatmap.BeatmapInfo.Path = name;
+                    beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
+                    beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
+
+                    RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
+
+                    // TODO: this should be done in a better place once we actually need to dynamically update it.
+                    beatmap.BeatmapInfo.Ruleset = ruleset;
+                    beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance()?.CreateDifficultyCalculator(beatmap).Calculate() ?? 0;
+
+                    beatmapInfos.Add(beatmap.BeatmapInfo);
+                }
+            }
+
+            return beatmapInfos;
         }
     }
 }
