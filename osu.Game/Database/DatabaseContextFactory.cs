@@ -16,8 +16,6 @@ namespace osu.Game.Database
 
         private readonly object writeLock = new object();
 
-        private OsuDbContext writeContext;
-
         private bool currentWriteDidWrite;
         private volatile int currentWriteUsages;
 
@@ -43,7 +41,7 @@ namespace osu.Game.Database
 
             Interlocked.Increment(ref currentWriteUsages);
 
-            return new DatabaseWriteUsage(writeContext ?? (writeContext = threadContexts.Value), usageCompleted);
+            return new DatabaseWriteUsage(threadContexts.Value, usageCompleted);
         }
 
         private void usageCompleted(DatabaseWriteUsage usage)
@@ -56,19 +54,12 @@ namespace osu.Game.Database
 
                 if (usages > 0) return;
 
-
                 if (currentWriteDidWrite)
                 {
-                    writeContext.Dispose();
                     currentWriteDidWrite = false;
-
                     // once all writes are complete, we want to refresh thread-specific contexts to make sure they don't have stale local caches.
                     recycleThreadContexts();
                 }
-
-                // always set to null (even when a write didn't occur) so we get the correct thread context on next write request.
-                writeContext = null;
-
             }
             finally
             {
@@ -76,7 +67,14 @@ namespace osu.Game.Database
             }
         }
 
-        private void recycleThreadContexts() => threadContexts = new ThreadLocal<OsuDbContext>(CreateContext);
+        private void recycleThreadContexts()
+        {
+            if (threadContexts != null)
+                foreach (var context in threadContexts.Values)
+                    context.Dispose();
+
+            threadContexts = new ThreadLocal<OsuDbContext>(CreateContext, true);
+        }
 
         protected virtual OsuDbContext CreateContext()
         {
