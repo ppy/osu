@@ -191,8 +191,6 @@ namespace osu.Game.Beatmaps
                     var existingOnlineId = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
                     if (existingOnlineId != null)
                     {
-                        // {Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException: Database operation expected to affect 1 row(s) but actually affected 0 row(s). Data may have been modified or deleted since entities were loaded. See http://go.microsoft.com/fwlink/?LinkId=527962…}
-
                         Delete(existingOnlineId);
                         beatmaps.Cleanup(s => s.ID == existingOnlineId.ID);
                     }
