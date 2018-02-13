@@ -588,11 +588,8 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Import a beamap into our local <see cref="FileStore"/> storage.
-        /// If the beatmap is already imported, the existing instance will be returned.
+        /// Create all required <see cref="BeatmapInfo"/>s for the provided archive.
         /// </summary>
-        /// <param name="reader">The beatmap archive to be read.</param>
-        /// <returns>The imported beatmap, or an existing instance if it is already present.</returns>
         private List<BeatmapInfo> createBeatmapDifficulties(ArchiveReader reader)
         {
             var beatmapInfos = new List<BeatmapInfo>();
