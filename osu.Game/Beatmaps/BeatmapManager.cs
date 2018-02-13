@@ -535,7 +535,7 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Create a SHA-2 hash from the provided archive based on contained beatmap filenames.
+        /// Create a SHA-2 hash from the provided archive based on contained beatmap (.osu) file content.
         /// </summary>
         private string computeBeatmapSetHash(ArchiveReader reader)
         {
