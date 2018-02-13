@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Platform;
 using osu.Framework.Testing;
 
 namespace osu.Game.Tests.Visual
@@ -11,11 +10,8 @@ namespace osu.Game.Tests.Visual
     {
         public override void RunTest()
         {
-            using (var host = new HeadlessGameHost($"test-{Guid.NewGuid()}", realtime: false))
-            {
-                host.Storage.DeleteDirectory(string.Empty);
+            using (var host = new CleanRunHeadlessGameHost($"test-{Guid.NewGuid()}", realtime: false))
                 host.Run(new OsuTestCaseTestRunner(this));
-            }
         }
 
         public class OsuTestCaseTestRunner : OsuGameBase
