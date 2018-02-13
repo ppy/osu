@@ -148,7 +148,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
-      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0.11\lib\net45\OpenTK.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0.13\lib\net45\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Remotion.Linq, Version=2.1.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
@@ -248,6 +248,7 @@
     <Compile Include="Beatmaps\BeatmapDifficulty.cs" />
     <Compile Include="Beatmaps\BeatmapInfo.cs" />
     <Compile Include="Beatmaps\BeatmapManager.cs" />
+    <Compile Include="Beatmaps\BeatmapManager_WorkingBeatmap.cs" />
     <Compile Include="Beatmaps\BeatmapMetadata.cs" />
     <Compile Include="Beatmaps\BeatmapMetrics.cs" />
     <Compile Include="Beatmaps\BeatmapOnlineInfo.cs" />
@@ -274,7 +275,10 @@
     <Compile Include="Configuration\DatabasedConfigManager.cs" />
     <Compile Include="Configuration\SpeedChangeVisualisationMethod.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
+    <Compile Include="Database\DatabaseWriteUsage.cs" />
+    <Compile Include="Database\IDatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
+    <Compile Include="Database\SingletonContextFactory.cs" />
     <Compile Include="Graphics\Containers\LinkFlowContainer.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
@@ -339,6 +343,7 @@
     <Compile Include="Overlays\Social\SocialListPanel.cs" />
     <Compile Include="Overlays\Social\SocialPanel.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
+    <Compile Include="Rulesets\Objects\HitWindows.cs" />
     <Compile Include="Screens\Play\PlayerSettings\VisualSettings.cs" />
     <Compile Include="Rulesets\Objects\CatmullApproximator.cs" />
     <Compile Include="Rulesets\UI\HitObjectContainer.cs" />
@@ -855,6 +860,7 @@
     <Compile Include="Storyboards\StoryboardSample.cs" />
     <Compile Include="Storyboards\StoryboardSprite.cs" />
     <Compile Include="Tests\Beatmaps\TestWorkingBeatmap.cs" />
+    <Compile Include="Tests\CleanRunHeadlessGameHost.cs" />
     <Compile Include="Tests\Platform\TestStorage.cs" />
     <Compile Include="Tests\Visual\OsuTestCase.cs" />
     <Compile Include="Tests\Visual\TestCasePerformancePoints.cs" />

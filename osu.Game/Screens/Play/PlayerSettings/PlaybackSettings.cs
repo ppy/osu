@@ -42,7 +42,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Text = "1x",
                             Font = @"Exo2.0-Bold",
                         }
                     },
@@ -54,12 +53,13 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         Default = 1,
                         MinValue = 0.5,
                         MaxValue = 2,
-                        Precision = 0.01,
+                        Precision = 0.1,
                     },
                 }
             };
 
-            sliderbar.Bindable.ValueChanged += rateMultiplier => multiplierText.Text = $"{rateMultiplier}x";
+            sliderbar.Bindable.ValueChanged += rateMultiplier => multiplierText.Text = $"{sliderbar.Bar.TooltipText}x";
+            sliderbar.Bindable.TriggerChange();
         }
 
         protected override void LoadComplete()

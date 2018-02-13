@@ -41,7 +41,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
-      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0.11\lib\net45\OpenTK.dll</HintPath>
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0.13\lib\net45\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -64,7 +64,6 @@
     <Compile Include="Beatmaps\Patterns\Pattern.cs" />
     <Compile Include="Configuration\ManiaConfigManager.cs" />
     <Compile Include="MathUtils\FastRandom.cs" />
-    <Compile Include="Judgements\HitWindows.cs" />
     <Compile Include="Judgements\HoldNoteTailJudgement.cs" />
     <Compile Include="Judgements\HoldNoteTickJudgement.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
