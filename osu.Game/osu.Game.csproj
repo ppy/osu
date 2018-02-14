@@ -243,6 +243,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\SampleInfo.cs" />
+    <Compile Include="Beatmaps\ArchiveModelImportManager.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
     <Compile Include="Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Beatmaps\BeatmapDifficulty.cs" />
@@ -270,6 +271,7 @@
     <Compile Include="Beatmaps\Formats\JsonBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
+    <Compile Include="Beatmaps\ICanImportArchives.cs" />
     <Compile Include="Configuration\DatabasedSetting.cs" />
     <Compile Include="Configuration\SettingsStore.cs" />
     <Compile Include="Configuration\DatabasedConfigManager.cs" />
@@ -278,9 +280,13 @@
     <Compile Include="Database\DatabaseWriteUsage.cs" />
     <Compile Include="Database\IDatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
+    <Compile Include="Database\INamedFileInfo.cs" />
     <Compile Include="Database\SingletonContextFactory.cs" />
     <Compile Include="Graphics\Containers\LinkFlowContainer.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
+    <Compile Include="IO\IAddableStore.cs" />
+    <Compile Include="IO\IHasFiles.cs" />
+    <Compile Include="Online\API\APIDownloadRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Migrations\20180125143340_Settings.cs" />
     <Compile Include="Migrations\20180125143340_Settings.Designer.cs">
@@ -470,7 +476,7 @@
     <Compile Include="IO\Serialization\Converters\TypedListConverter.cs" />
     <Compile Include="IO\Serialization\Converters\Vector2Converter.cs" />
     <Compile Include="IO\Serialization\IJsonSerializable.cs" />
-    <Compile Include="IPC\BeatmapIPCChannel.cs" />
+    <Compile Include="IPC\ArchiveImportIPCChannel.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />

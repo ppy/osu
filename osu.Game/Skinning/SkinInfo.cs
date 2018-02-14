@@ -3,10 +3,11 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using osu.Game.IO;
 
 namespace osu.Game.Skinning
 {
-    public class SkinInfo
+    public class SkinInfo : IHasFiles<SkinFileInfo>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int? ID { get; set; }

@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using osu.Game.Database;
+using osu.Game.IO;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapSetInfo : IHasPrimaryKey
+    public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }

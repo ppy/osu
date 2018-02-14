@@ -98,7 +98,7 @@ namespace osu.Game
 
             dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
 
-            dependencies.Cache(SkinManager = new SkinManager(contextFactory, Host.Storage));
+            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host));
 
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
