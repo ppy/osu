@@ -319,8 +319,21 @@ namespace osu.Game.Rulesets.Osu.Replays
                     else
                     {
                         // In every other case, just interpolate with preferredEasing
-                        double startTime = Math.Max(left.Time, Math.Min(right.Time - MIN_MOVE_TIME,
-                                right.HitObject.StartTime - Math.Max(0, right.HitObject.TimePreempt - reactionTime)));
+
+                        // Time when we should react to the right hitpoint
+                        double reactionStartTime = right.HitObject.StartTime - Math.Max(0, right.HitObject.TimePreempt - reactionTime);
+                        double startTime;
+                        if (left.Time >= right.Time - MIN_MOVE_TIME) {
+                            startTime = left.Time;
+                        } else if (left.Time + KEY_UP_DELAY >= right.Time - MIN_MOVE_TIME) {
+                            startTime = right.Time - MIN_MOVE_TIME;
+                        } else if (left.Time + KEY_UP_DELAY > reactionStartTime) {
+                            // If possible, hover on the previous object for KEY_UP_DELAY ms
+                            startTime = left.Time + KEY_UP_DELAY;
+                        } else {
+                            startTime = reactionStartTime;
+                        }
+
                         addMovePositions(startTime, right.Time, left.Position, right.Position);
                     }
                 }
