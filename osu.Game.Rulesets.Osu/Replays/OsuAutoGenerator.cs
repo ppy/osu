@@ -65,44 +65,12 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         // Variables for keeping track of the generation process
 
-        // Time periods where at least 1 mouse button should be held
-        private readonly IntervalSet holdZones = new IntervalSet();
-
-        // Time periods where at least 1 spinner is active
-        private readonly IntervalSet spinZones = new IntervalSet();
-        // Time periods where a spinner is visible
-        private readonly IntervalSet spinnerVisibleZones = new IntervalSet();
-
-        // Lists of events of interest
-        private readonly SortedDictionary<double, List<Hitpoint>> hitpoints = new SortedDictionary<double, List<Hitpoint>>();
-        private readonly SortedDictionary<double, KeyFrame> keyFrames       = new SortedDictionary<double, KeyFrame>();
-        private readonly SortedDictionary<double, Hitpoint> activeHitpoints = new SortedDictionary<double, Hitpoint>();
-
-        // These will be combined at the last step to form the actual replay
-        // Cursor positions and mouse buttons
-        private readonly SortedDictionary<double, Vector2> positions         = new SortedDictionary<double, Vector2>();
-        private readonly SortedDictionary<double, ButtonPlan> buttonsPlan    = new SortedDictionary<double, ButtonPlan>();
-        private readonly SortedDictionary<double, ReplayButtonState> buttons = new SortedDictionary<double, ReplayButtonState>();
-
         public override Replay Generate()
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            AddFrameToReplay(new ReplayFrame(-100000, 256, 500, ReplayButtonState.None));
-            AddFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, 256, 500, ReplayButtonState.None));
-            AddFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1000, 256, 192, ReplayButtonState.None));
-
-            positions.Clear();
-            buttonsPlan.Clear();
-            buttons.Clear();
-            positions[Beatmap.HitObjects[0].StartTime - 1000] = new Vector2(256, 192);
-            buttonsPlan[Beatmap.HitObjects[0].StartTime - 1000] = new ButtonPlan();
-            buttons[Beatmap.HitObjects[0].StartTime - 1000] = ReplayButtonState.None;
-            holdZones.Clear();
-            spinZones.Clear();
-            hitpoints.Clear();
-            keyFrames.Clear();
+            Frames.Clear();
 
             // Summary of replay generation:
             // It is split into 6 steps
@@ -115,12 +83,21 @@ namespace osu.Game.Rulesets.Osu.Replays
             //  5) The 5th step generates all cursor positions
             //  6) The 6th step combines cursor locations with button states to produce the actual replayframes
 
-            collectKeyInfo();
-            filterHitpoints();
-            planButtons();
-            generateButtons();
-            generatePositions();
-            generateReplayFrames();
+            collectKeyInfo(out IntervalSet holdZones, out IntervalSet spinZones, out IntervalSet spinnerVisibleZones, out SortedDictionary<double, KeyFrame> keyFrames);
+            filterHitpoints(out SortedDictionary<double, Hitpoint> activeHitpoints,
+                            keyFrames);
+            planButtons(out SortedDictionary<double, ButtonPlan> buttonsPlan,
+                        keyFrames);
+            generateButtons(out SortedDictionary<double, ReplayButtonState> buttons,
+                            buttonsPlan);
+            generatePositions(out SortedDictionary<double, Vector2> positions, activeHitpoints, spinZones, spinnerVisibleZones);
+
+            // Combine to form actual replay
+            AddFrameToReplay(new ReplayFrame(-100000, 256, 500, ReplayButtonState.None));
+            AddFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, 256, 500, ReplayButtonState.None));
+            AddFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1000, 256, 192, ReplayButtonState.None));
+
+            generateReplayFrames(buttons, positions);
 
             sw.Stop();
             Logger.Log("Replay took " + sw.ElapsedMilliseconds + "ms to generate.", LoggingTarget.Performance);
@@ -130,45 +107,62 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Generation steps
 
-        private void collectKeyInfo()
+        private void collectKeyInfo(out IntervalSet holdZones, out IntervalSet spinZones, out IntervalSet spinnerVisibleZones, out SortedDictionary<double, KeyFrame> keyFrames)
         {
+            holdZones           = new IntervalSet();
+            spinZones           = new IntervalSet();
+            spinnerVisibleZones = new IntervalSet();
+            keyFrames           = new SortedDictionary<double, KeyFrame>();
+
             foreach (OsuHitObject obj in Beatmap.HitObjects)
             {
                 // Circles are also "holds" for KEY_UP_DELAY amount of time
-                // so we just call this method for all hitobject types.
-                addHoldZone(obj);
+                // so we just add holdZones regardless of object type
+                {
+                    Interval interval = holdZones.AddInterval(
+                        obj.StartTime,
+                        ((obj as IHasEndTime)?.EndTime ?? obj.StartTime) + KEY_UP_DELAY
+                    );
 
+                    // Create frames for the new hold
+                    addKeyFrame(keyFrames, interval.Start);
+                    addKeyFrame(keyFrames, interval.End);
+                }
+
+                // Now we add hitpoints of interest (clicks and follows or spins)
                 if (obj is HitCircle)
                 {
-                    addHitpoint(obj, obj.StartTime, true, false);
+                    addHitpoint(keyFrames, obj, obj.StartTime, true, false);
                 }
                 else if (obj is Slider)
                 {
                     Slider slider = obj as Slider;
 
                     // Slider head
-                    addHitpoint(slider, slider.StartTime, true, false);
+                    addHitpoint(keyFrames, slider, slider.StartTime, true, false);
 
                     // Slider ticks and repeats
                     foreach (var n in slider.NestedHitObjects)
                     {
                         if (n is SliderTick || n is RepeatPoint)
                         {
-                            addHitpoint(slider, n.StartTime, false, true);
+                            addHitpoint(keyFrames, slider, n.StartTime, false, true);
                         }
                     }
 
                     // Slider tail
-                    addHitpoint(slider, slider.EndTime, false, true);
+                    addHitpoint(keyFrames, slider, slider.EndTime, false, true);
                 }
                 else if (obj is Spinner)
                 {
                     Spinner spinner = (Spinner)obj;
-                    addSpinZone(spinner);
 
-                    // Spinner start and end
-                    addHitpoint(spinner, spinner.StartTime, false, false);
-                    addHitpoint(spinner, spinner.EndTime, false, false);
+                    Interval interval = spinZones.AddInterval(spinner.StartTime, spinner.EndTime);
+                    spinnerVisibleZones.AddInterval(spinner.StartTime - spinner.TimePreempt, spinner.EndTime);
+
+                    // Create frames for the new spin
+                    addKeyFrame(keyFrames, interval.Start);
+                    addKeyFrame(keyFrames, interval.End);
                 }
             }
 
@@ -213,8 +207,11 @@ namespace osu.Game.Rulesets.Osu.Replays
             keyFrameIter.Dispose();
         }
 
-        private void planButtons()
+        private void planButtons(out SortedDictionary<double, ButtonPlan> buttonsPlan, SortedDictionary<double, KeyFrame> keyFrames)
         {
+            buttonsPlan    = new SortedDictionary<double, ButtonPlan>();
+            buttonsPlan[Beatmap.HitObjects[0].StartTime - 1000] = new ButtonPlan();
+
             ButtonPlanner buttonManager = new ButtonPlanner();
             foreach (KeyFrame curr in keyFrames.Values)
             {
@@ -237,8 +234,11 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        private void generateButtons()
+        private void generateButtons(out SortedDictionary<double, ReplayButtonState> buttons, SortedDictionary<double, ButtonPlan> buttonsPlan)
         {
+            buttons = new SortedDictionary<double, ReplayButtonState>();
+            buttons[Beatmap.HitObjects[0].StartTime - 1000]     = ReplayButtonState.None;
+
             var prev = new ButtonPlan();
             int i = 0;
             foreach (var ibutton in buttonsPlan)
@@ -278,8 +278,10 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        private void filterHitpoints()
+        private void filterHitpoints(out SortedDictionary<double, Hitpoint> activeHitpoints,
+            SortedDictionary<double, KeyFrame> keyFrames)
         {
+            activeHitpoints = new SortedDictionary<double, Hitpoint>();
             foreach (var curr in keyFrames.Values)
             {
                 // For now just make it click/move to the first object, prioritising clicks
@@ -296,8 +298,11 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        private void generatePositions()
+        private void generatePositions(out SortedDictionary<double, Vector2> positions, SortedDictionary<double, Hitpoint> activeHitpoints, IntervalSet spinZones, IntervalSet spinnerVisibleZones)
         {
+            positions       = new SortedDictionary<double, Vector2>();
+            positions[Beatmap.HitObjects[0].StartTime - 1000] = new Vector2(256, 192);
+
             // First we "dot in" all the positions *at* hitpoints, before generating positions between hitpoints.
             foreach (Hitpoint curr in activeHitpoints.Values)
                 positions[curr.Time] = curr.Position;
@@ -314,7 +319,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     {
                         // Follow the slider
                         Slider s = (Slider)right.HitObject;
-                        addFollowSliderPositions(left.Time, right.Time, s);
+                        addFollowSliderPositions(positions, left.Time, right.Time, s);
                     }
                     else
                     {
@@ -334,7 +339,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                             startTime = reactionStartTime;
                         }
 
-                        addMovePositions(startTime, right.Time, left.Position, right.Position);
+                        addMovePositions(positions, startTime, right.Time, left.Position, right.Position);
                     }
                 }
                 else
@@ -349,18 +354,18 @@ namespace osu.Game.Rulesets.Osu.Replays
                     double endSpinTime = spins[spins.Count - 1].End;
 
                     foreach (var spin in spins)
-                        curpos = addSpinPositions(curpos, spin);
+                        curpos = addSpinPositions(positions, curpos, spin);
 
                     // Travel from left to spin
                     double spinnerVisible = spinnerVisibleZones.GetIntervalContaining(startSpinTime).Start;
                     double leftStartTime = Math.Max(left.Time, Math.Min(startSpinTime - MIN_MOVE_TIME,
                             spinnerVisible + reactionTime));
-                    addMovePositions(leftStartTime, startSpinTime, left.Position, firstSpinPos);
+                    addMovePositions(positions, leftStartTime, startSpinTime, left.Position, firstSpinPos);
 
                     // Travel from spin to right
                     double rightStartTime = Math.Max(endSpinTime, Math.Min(right.Time - MIN_MOVE_TIME,
                         right.HitObject.StartTime - Math.Max(0, right.HitObject.TimePreempt - reactionTime)));
-                    addMovePositions(rightStartTime, right.Time, curpos, right.Position);
+                    addMovePositions(positions, rightStartTime, right.Time, curpos, right.Position);
                 }
 
                 left = right;
@@ -377,13 +382,13 @@ namespace osu.Game.Rulesets.Osu.Replays
                 Vector2 firstSpinPos = new Vector2(); // will be overwritten, but C# complains about possible null
                 foreach (Interval spin in startSpins)
                 {
-                    firstSpinPos = addSpinPositions(SPINNER_CENTRE + new Vector2(0, -SPIN_RADIUS), spin);
+                    firstSpinPos = addSpinPositions(positions, SPINNER_CENTRE + new Vector2(0, -SPIN_RADIUS), spin);
                 }
 
                 // Travel from spin to first hitpoint
                 double startTime = Math.Max(startSpins.Last().End, Math.Min(firstHitpoint.Time - MIN_MOVE_TIME,
                         firstHitpoint.HitObject.StartTime - Math.Max(0, firstHitpoint.HitObject.TimePreempt - reactionTime)));
-                addMovePositions(startTime, firstHitpoint.Time, firstSpinPos, firstHitpoint.Position);
+                addMovePositions(positions, startTime, firstHitpoint.Time, firstSpinPos, firstHitpoint.Position);
             }
             if (endSpins.Count > 0)
             {
@@ -391,18 +396,18 @@ namespace osu.Game.Rulesets.Osu.Replays
                 Vector2 endSpinPos = CalcSpinnerStartPos(curpos);
                 foreach (Interval spin in endSpins)
                 {
-                    addSpinPositions(curpos, spin);
+                    addSpinPositions(positions, curpos, spin);
                 }
 
                 // Travel from last hitpoint to spin
                 double spinnerVisible = spinnerVisibleZones.GetIntervalContaining(endSpins[0].Start).Start;
                 double startTime = Math.Max(lastHitpoint.Time, Math.Min(endSpins[0].Start - MIN_MOVE_TIME,
                         spinnerVisible + reactionTime));
-                addMovePositions(startTime, endSpins[0].Start, lastHitpoint.Position, endSpinPos);
+                addMovePositions(positions, startTime, endSpins[0].Start, lastHitpoint.Position, endSpinPos);
             }
         }
 
-        private void generateReplayFrames()
+        private void generateReplayFrames(SortedDictionary<double, ReplayButtonState> buttons, SortedDictionary<double, Vector2> positions)
         {
             // Loop through each position, and advance buttons accordingly
             int buttonIndex = 0;
@@ -446,7 +451,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region positions Helpers
 
-        private Vector2 addSpinPositions(Vector2 curpos, Interval spin)
+        private Vector2 addSpinPositions(SortedDictionary<double, Vector2> positions, Vector2 curpos, Interval spin)
         {
             Vector2 startPosition = CalcSpinnerStartPos(curpos);
 
@@ -472,7 +477,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             return endPosition;
         }
 
-        private void addFollowSliderPositions(double startTime, double endTime, Slider s)
+        private void addFollowSliderPositions(SortedDictionary<double, Vector2> positions, double startTime, double endTime, Slider s)
         {
             for (double t = startTime + FrameDelay; t < endTime; t += FrameDelay)
             {
@@ -480,7 +485,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        private void addMovePositions(double startTime, double endTime, Vector2 startPosition, Vector2 endPosition)
+        private void addMovePositions(SortedDictionary<double, Vector2> positions, double startTime, double endTime, Vector2 startPosition, Vector2 endPosition)
         {
             if (!positions.ContainsKey(startTime))
                 positions[startTime] = startPosition;
@@ -497,7 +502,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region keyframe/hitpoint/zones Helpers
 
-        private void addKeyFrame(double time)
+        private void addKeyFrame(SortedDictionary<double, KeyFrame> keyFrames, double time)
         {
             if (!keyFrames.ContainsKey(time))
             {
@@ -505,29 +510,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        private void addHoldZone(OsuHitObject obj)
-        {
-            Interval interval = holdZones.AddInterval(
-                obj.StartTime,
-                ((obj as IHasEndTime)?.EndTime ?? obj.StartTime) + KEY_UP_DELAY
-            );
-
-            // Create frames for the new hold
-            addKeyFrame(interval.Start);
-            addKeyFrame(interval.End);
-        }
-
-        private void addSpinZone(Spinner spinner)
-        {
-            Interval interval = spinZones.AddInterval(spinner.StartTime, spinner.EndTime);
-            spinnerVisibleZones.AddInterval(spinner.StartTime - spinner.TimePreempt, spinner.EndTime);
-
-            // Create frames for the new spin
-            addKeyFrame(interval.Start);
-            addKeyFrame(interval.End);
-        }
-
-        private void addHitpoint(OsuHitObject obj, double time, bool click, bool move)
+        private void addHitpoint(SortedDictionary<double, KeyFrame> keyFrames, OsuHitObject obj, double time, bool click, bool move)
         {
             Hitpoint newhitpoint = new Hitpoint
             {
@@ -535,20 +518,10 @@ namespace osu.Game.Rulesets.Osu.Replays
                 HitObject = obj
             };
 
-            // Add to hitpoints
-            if (hitpoints.ContainsKey(time))
-            {
-                hitpoints[time].Add(newhitpoint);
-            }
-            else
-            {
-                hitpoints[time] = new List<Hitpoint>{newhitpoint};
-            }
-
             // Add click to keyFrames
             if (click)
             {
-                addKeyFrame(time);
+                addKeyFrame(keyFrames, time);
 
                 keyFrames[time].Clicks.Add(newhitpoint);
             }
@@ -556,7 +529,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             // Add move to keyFrames
             if (move)
             {
-                addKeyFrame(time);
+                addKeyFrame(keyFrames, time);
 
                 keyFrames[time].Moves.Add(newhitpoint);
             }
