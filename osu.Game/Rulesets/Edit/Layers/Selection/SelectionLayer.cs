@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             var screenSpaceDragQuad = new Quad(dragStartPosition.X, dragStartPosition.Y, dragPosition.X - dragStartPosition.X, dragPosition.Y - dragStartPosition.Y);
 
             selectionBox.SetDragRectangle(screenSpaceDragQuad.AABBFloat);
-            captureQuad(screenSpaceDragQuad);
+            selectQuad(screenSpaceDragQuad);
 
             return true;
         }
@@ -57,15 +57,15 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         protected override bool OnDragEnd(InputState state)
         {
             selectionBox.Hide();
-            finishCapture(true);
+            finishSelection(true);
 
             return true;
         }
 
         protected override bool OnClick(InputState state)
         {
-            capturePoint(state.Mouse.NativeState.Position);
-            finishCapture(false);
+            selectPoint(state.Mouse.NativeState.Position);
+            finishSelection(false);
 
             return true;
         }
@@ -80,29 +80,29 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         }
 
         /// <summary>
-        /// Captures all hitobjects that are present within the area of a <see cref="Quad"/>.
+        /// Selects all hitobjects that are present within the area of a <see cref="Quad"/>.
         /// </summary>
-        /// <param name="screenSpaceQuad">The capture <see cref="Quad"/>.</param>
-        private void captureQuad(Quad screenSpaceQuad)
+        /// <param name="screenSpaceQuad">The selection <see cref="Quad"/>.</param>
+        private void selectQuad(Quad screenSpaceQuad)
         {
             foreach (var obj in playfield.HitObjects.Objects.Where(h => h.IsAlive && h.IsPresent && screenSpaceQuad.Contains(h.SelectionPoint)))
                 selectedHitObjects.Add(obj);
         }
 
         /// <summary>
-        /// Captures the top-most hitobject that is present under a specific point.
+        /// Selects the top-most hitobject that is present under a specific point.
         /// </summary>
-        /// <param name="screenSpacePoint">The <see cref="Vector2"/> to capture at.</param>
-        private void capturePoint(Vector2 screenSpacePoint)
+        /// <param name="screenSpacePoint">The <see cref="Vector2"/> to select at.</param>
+        private void selectPoint(Vector2 screenSpacePoint)
         {
-            var captured = playfield.HitObjects.Objects.Reverse().Where(h => h.IsAlive && h.IsPresent).FirstOrDefault(h => h.ReceiveMouseInputAt(screenSpacePoint));
-            if (captured == null)
+            var selected = playfield.HitObjects.Objects.Reverse().Where(h => h.IsAlive && h.IsPresent).FirstOrDefault(h => h.ReceiveMouseInputAt(screenSpacePoint));
+            if (selected == null)
                 return;
 
-            selectedHitObjects.Add(captured);
+            selectedHitObjects.Add(selected);
         }
 
-        private void finishCapture(bool fromDrag)
+        private void finishSelection(bool fromDrag)
         {
             if (selectedHitObjects.Count == 0)
                 return;

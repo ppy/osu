@@ -13,7 +13,7 @@ using OpenTK;
 namespace osu.Game.Rulesets.Edit.Layers.Selection
 {
     /// <summary>
-    /// A box which encapsulates captured <see cref="DrawableHitObject"/>s.
+    /// A box which encloses <see cref="DrawableHitObject"/>s.
     /// </summary>
     public abstract class CaptureBox : VisibilityContainer
     {
