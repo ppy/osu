@@ -15,17 +15,26 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
     /// <summary>
     /// A box which encapsulates captured <see cref="DrawableHitObject"/>s.
     /// </summary>
-    public class CaptureBox : VisibilityContainer
+    public abstract class CaptureBox : VisibilityContainer
     {
+        /// <summary>
+        /// Top-left corner of the rectangle that encloses the <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        protected Vector2 FinalPosition { get; private set; }
+
+        /// <summary>
+        /// Size of the rectangle that encloses the <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        protected Vector2 FinalSize { get; private set; }
+
         private readonly IDrawable captureArea;
         private readonly IReadOnlyList<DrawableHitObject> capturedObjects;
 
-        public CaptureBox(IDrawable captureArea, IReadOnlyList<DrawableHitObject> capturedObjects)
+        protected CaptureBox(IDrawable captureArea, IReadOnlyList<DrawableHitObject> capturedObjects)
         {
             this.captureArea = captureArea;
             this.capturedObjects = capturedObjects;
 
-            Origin = Anchor.Centre;
             Masking = true;
             BorderThickness = 3;
 
@@ -57,13 +66,47 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             topLeft -= new Vector2(5);
             bottomRight += new Vector2(5);
 
-            Size = bottomRight - topLeft;
-            Position = topLeft + Size / 2f;
+            FinalSize = bottomRight - topLeft;
+            FinalPosition = topLeft;
         }
 
-        protected override void PopIn() => this.ScaleTo(1.1f)
-                                               .Then()
-                                               .ScaleTo(1f, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
+        protected override void PopIn() => this.MoveTo(FinalPosition).ResizeTo(FinalSize).FadeIn();
+        protected override void PopOut() => this.FadeOut();
+    }
+
+    /// <summary>
+    /// A <see cref="CaptureBox"/> which fully encloses the <see cref="DrawableHitObject"/>s from the start.
+    /// </summary>
+    public class InstantCaptureBox : CaptureBox
+    {
+        public InstantCaptureBox(IDrawable captureArea, IReadOnlyList<DrawableHitObject> capturedObjects)
+            : base(captureArea, capturedObjects)
+        {
+            Origin = Anchor.Centre;
+        }
+
+        protected override void PopIn()
+            => this.MoveTo(FinalPosition + FinalSize / 2f).ResizeTo(FinalSize).ScaleTo(1.1f)
+                   .Then()
+                   .ScaleTo(1f, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
+
+        protected override void PopOut() => this.FadeOut(300, Easing.OutQuint);
+    }
+
+    /// <summary>
+    /// A <see cref="CaptureBox"/> which moves from an initial position + size to enclose <see cref="DrawableHitObject"/>s.
+    /// </summary>
+    public class DragCaptureBox : CaptureBox
+    {
+        public DragCaptureBox(IDrawable captureArea, IReadOnlyList<DrawableHitObject> capturedObjects, Vector2 initialPosition, Vector2 initialSize)
+            : base(captureArea, capturedObjects)
+        {
+            Position = initialPosition;
+            Size = initialSize;
+        }
+
+        protected override void PopIn()
+            => this.MoveTo(FinalPosition, 300, Easing.OutQuint).ResizeTo(FinalSize, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
 
         protected override void PopOut() => this.FadeOut(300, Easing.OutQuint);
     }
