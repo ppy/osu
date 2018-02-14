@@ -6,13 +6,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
+using osu.Game.IO;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/BeatmapSets to the database backing
     /// </summary>
-    public class BeatmapStore : DatabaseBackedStore
+    public class BeatmapStore : DatabaseBackedStore, IAddableStore<BeatmapSetInfo>
     {
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
