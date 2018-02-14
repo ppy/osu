@@ -9,7 +9,6 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    [Ignore("getting CI working")]
     public class TestCaseAutoGeneration : OsuTestCase
     {
         [Test]

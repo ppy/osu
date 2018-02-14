@@ -25,7 +25,6 @@ using osu.Game.Rulesets.Scoring;
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
-    [Ignore("getting CI working")]
     public class TestCaseTaikoPlayfield : OsuTestCase
     {
         private const double default_duration = 1000;
