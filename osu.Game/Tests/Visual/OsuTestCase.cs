@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using System.Reflection;
-using osu.Framework.Platform;
 using osu.Framework.Testing;
 
 namespace osu.Game.Tests.Visual
