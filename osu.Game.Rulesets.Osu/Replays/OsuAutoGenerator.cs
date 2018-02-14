@@ -63,8 +63,6 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Generator
 
-        // Variables for keeping track of the generation process
-
         public override Replay Generate()
         {
             Stopwatch sw = new Stopwatch();
@@ -218,18 +216,15 @@ namespace osu.Game.Rulesets.Osu.Replays
             {
                 if (curr.Hold == IntervalState.Mid && curr.HasClick)
                 {
-                    //buttonFrame[curr.Time] = ButtonFrame.Click;
                     buttonsPlan[curr.Time] = buttonManager.Press(curr.Time);
                     buttonManager.Release(curr.Time);
                 }
                 else if (curr.Hold == IntervalState.End)
                 {
-                    //buttonFrame[curr.Time] = ButtonFrame.Release;
                     buttonsPlan[curr.Time] = buttonManager.Release(curr.Time);
                 }
                 else if (curr.Hold == IntervalState.Start)
                 {
-                    //buttonFrame[curr.Time] = ButtonFrame.Click;
                     buttonsPlan[curr.Time] = buttonManager.Press(curr.Time);
                 }
             }
