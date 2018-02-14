@@ -36,6 +36,7 @@ namespace osu.Game.Screens.Play
         public int Retries { set { pauseOverlay.Retries = value; } }
 
         public bool CanPause => (CheckCanPause?.Invoke() ?? true) && Time.Current >= lastPauseActionTime + pause_cooldown;
+        public bool IsResuming { get; private set; }
 
         public Action OnRetry;
         public Action OnQuit;
@@ -54,7 +55,11 @@ namespace osu.Game.Screens.Play
 
             AddInternal(pauseOverlay = new PauseOverlay
             {
-                OnResume = () => this.Delay(400).Schedule(Resume),
+                OnResume = () =>
+                {
+                    IsResuming = true;
+                    this.Delay(400).Schedule(Resume);
+                },
                 OnRetry = () => OnRetry(),
                 OnQuit = () => OnQuit(),
             });
@@ -100,6 +105,7 @@ namespace osu.Game.Screens.Play
 
             pauseOverlay.Hide();
             AudioClock.Start();
+            IsResuming = false;
         }
 
         private OsuGameBase game;
