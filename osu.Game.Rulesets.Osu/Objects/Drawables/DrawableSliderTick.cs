@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderTick : DrawableOsuHitObject, IRequireTracking
     {
-        private const double anim_duration = 150;
+        public const double ANIM_DURATION = 150;
 
         public bool Tracking { get; set; }
 
@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void UpdatePreemptState()
         {
             this.Animate(
-                d => d.FadeIn(anim_duration),
-                d => d.ScaleTo(0.5f).ScaleTo(1f, anim_duration * 4, Easing.OutElasticHalf)
+                d => d.FadeIn(ANIM_DURATION),
+                d => d.ScaleTo(0.5f).ScaleTo(1f, ANIM_DURATION * 4, Easing.OutElasticHalf)
             );
         }
 
@@ -64,12 +64,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     this.Delay(HitObject.TimePreempt).FadeOut();
                     break;
                 case ArmedState.Miss:
-                    this.FadeOut(anim_duration)
-                        .FadeColour(Color4.Red, anim_duration / 2);
+                    this.FadeOut(ANIM_DURATION)
+                        .FadeColour(Color4.Red, ANIM_DURATION / 2);
                     break;
                 case ArmedState.Hit:
-                    this.FadeOut(anim_duration, Easing.OutQuint)
-                        .ScaleTo(Scale * 1.5f, anim_duration, Easing.Out);
+                    this.FadeOut(ANIM_DURATION, Easing.OutQuint)
+                        .ScaleTo(Scale * 1.5f, ANIM_DURATION, Easing.Out);
                     break;
             }
         }

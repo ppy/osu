@@ -20,7 +20,15 @@ namespace osu.Game.Beatmaps
         public float DrainRate { get; set; } = DEFAULT_DIFFICULTY;
         public float CircleSize { get; set; } = DEFAULT_DIFFICULTY;
         public float OverallDifficulty { get; set; } = DEFAULT_DIFFICULTY;
-        public float ApproachRate { get; set; } = DEFAULT_DIFFICULTY;
+
+        private float? approachRate;
+
+        public float ApproachRate
+        {
+            get => approachRate ?? OverallDifficulty;
+            set => approachRate = value;
+        }
+
         public float SliderMultiplier { get; set; } = 1;
         public float SliderTickRate { get; set; } = 1;
 
@@ -40,5 +48,17 @@ namespace osu.Game.Beatmaps
                 return mid - (mid - min) * (5 - difficulty) / 5;
             return mid;
         }
+
+        /// <summary>
+        /// Maps a difficulty value [0, 10] to a two-piece linear range of values.
+        /// </summary>
+        /// <param name="difficulty">The difficulty value to be mapped.</param>
+        /// <param name="range">The values that define the two linear ranges.</param>
+        /// <param name="range.od0">Minimum of the resulting range which will be achieved by a difficulty value of 0.</param>
+        /// <param name="range.od5">Midpoint of the resulting range which will be achieved by a difficulty value of 5.</param>
+        /// <param name="range.od10">Maximum of the resulting range which will be achieved by a difficulty value of 10.</param>
+        /// <returns>Value to which the difficulty value maps in the specified range.</returns>
+        public static double DifficultyRange(double difficulty, (double od0, double od5, double od10) range)
+            => DifficultyRange(difficulty, range.od0, range.od5, range.od10);
     }
 }
