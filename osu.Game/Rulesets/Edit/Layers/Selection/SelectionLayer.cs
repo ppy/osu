@@ -27,12 +27,11 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         private SelectionBox selectionBox;
         private CaptureBox captureBox;
 
-        private readonly List<DrawableHitObject> capturedHitObjects = new List<DrawableHitObject>();
+        private readonly List<DrawableHitObject> selectedHitObjects = new List<DrawableHitObject>();
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            capturedHitObjects.Clear();
-            captureBox?.Hide();
+            clearSelection();
             return true;
         }
 
@@ -72,13 +71,22 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         }
 
         /// <summary>
+        /// Deselects all selected <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        private void clearSelection()
+        {
+            selectedHitObjects.Clear();
+            captureBox?.Hide();
+        }
+
+        /// <summary>
         /// Captures all hitobjects that are present within the area of a <see cref="Quad"/>.
         /// </summary>
         /// <param name="screenSpaceQuad">The capture <see cref="Quad"/>.</param>
         private void captureQuad(Quad screenSpaceQuad)
         {
             foreach (var obj in playfield.HitObjects.Objects.Where(h => h.IsAlive && h.IsPresent && screenSpaceQuad.Contains(h.SelectionPoint)))
-                capturedHitObjects.Add(obj);
+                selectedHitObjects.Add(obj);
         }
 
         /// <summary>
@@ -91,12 +99,12 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             if (captured == null)
                 return;
 
-            capturedHitObjects.Add(captured);
+            selectedHitObjects.Add(captured);
         }
 
         private void finishCapture(bool fromDrag)
         {
-            if (capturedHitObjects.Count == 0)
+            if (selectedHitObjects.Count == 0)
                 return;
 
             // Due to https://github.com/ppy/osu-framework/issues/1382, we may get here through both
@@ -104,9 +112,9 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             captureBox?.Hide();
 
             if (fromDrag)
-                AddInternal(captureBox = new DragCaptureBox(this, capturedHitObjects.ToList(), selectionBox.Position, selectionBox.Size));
+                AddInternal(captureBox = new DragCaptureBox(this, selectedHitObjects.ToList(), selectionBox.Position, selectionBox.Size));
             else
-                AddInternal(captureBox = new InstantCaptureBox(this, capturedHitObjects.ToList()));
+                AddInternal(captureBox = new InstantCaptureBox(this, selectedHitObjects.ToList()));
         }
     }
 }
