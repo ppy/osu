@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             //  5) The 5th step generates all cursor positions
             //  6) The 6th step combines cursor locations with button states to produce the actual replayframes
 
-            collectKeyInfo(out IntervalSet holdZones, out IntervalSet spinZones, out IntervalSet spinnerVisibleZones, out SortedDictionary<double, KeyFrame> keyFrames);
+            collectKeyInfo(out IntervalSet spinZones, out IntervalSet spinnerVisibleZones, out SortedDictionary<double, KeyFrame> keyFrames);
             filterHitpoints(out SortedDictionary<double, Hitpoint> activeHitpoints,
                             keyFrames);
             planButtons(out SortedDictionary<double, ButtonPlan> buttonsPlan,
@@ -107,12 +107,12 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Generation steps
 
-        private void collectKeyInfo(out IntervalSet holdZones, out IntervalSet spinZones, out IntervalSet spinnerVisibleZones, out SortedDictionary<double, KeyFrame> keyFrames)
+        private void collectKeyInfo(out IntervalSet spinZones, out IntervalSet spinnerVisibleZones, out SortedDictionary<double, KeyFrame> keyFrames)
         {
-            holdZones           = new IntervalSet();
-            spinZones           = new IntervalSet();
-            spinnerVisibleZones = new IntervalSet();
-            keyFrames           = new SortedDictionary<double, KeyFrame>();
+            IntervalSet holdZones = new IntervalSet();
+            spinZones             = new IntervalSet();
+            spinnerVisibleZones   = new IntervalSet();
+            keyFrames             = new SortedDictionary<double, KeyFrame>();
 
             foreach (OsuHitObject obj in Beatmap.HitObjects)
             {
@@ -209,8 +209,9 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private void planButtons(out SortedDictionary<double, ButtonPlan> buttonsPlan, SortedDictionary<double, KeyFrame> keyFrames)
         {
-            buttonsPlan    = new SortedDictionary<double, ButtonPlan>();
-            buttonsPlan[Beatmap.HitObjects[0].StartTime - 1000] = new ButtonPlan();
+            buttonsPlan = new SortedDictionary<double, ButtonPlan> {
+                [Beatmap.HitObjects[0].StartTime - 1000] = new ButtonPlan()
+            };
 
             ButtonPlanner buttonManager = new ButtonPlanner();
             foreach (KeyFrame curr in keyFrames.Values)
@@ -236,8 +237,9 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private void generateButtons(out SortedDictionary<double, ReplayButtonState> buttons, SortedDictionary<double, ButtonPlan> buttonsPlan)
         {
-            buttons = new SortedDictionary<double, ReplayButtonState>();
-            buttons[Beatmap.HitObjects[0].StartTime - 1000]     = ReplayButtonState.None;
+            buttons = new SortedDictionary<double, ReplayButtonState> {
+                [Beatmap.HitObjects[0].StartTime - 1000] = ReplayButtonState.None
+            };
 
             var prev = new ButtonPlan();
             int i = 0;
@@ -300,8 +302,9 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private void generatePositions(out SortedDictionary<double, Vector2> positions, SortedDictionary<double, Hitpoint> activeHitpoints, IntervalSet spinZones, IntervalSet spinnerVisibleZones)
         {
-            positions       = new SortedDictionary<double, Vector2>();
-            positions[Beatmap.HitObjects[0].StartTime - 1000] = new Vector2(256, 192);
+            positions = new SortedDictionary<double, Vector2> {
+                [Beatmap.HitObjects[0].StartTime - 1000] = new Vector2(256, 192)
+            };
 
             // First we "dot in" all the positions *at* hitpoints, before generating positions between hitpoints.
             foreach (Hitpoint curr in activeHitpoints.Values)
