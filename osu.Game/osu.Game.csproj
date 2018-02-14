@@ -286,6 +286,10 @@
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
     <Compile Include="IO\IAddableStore.cs" />
     <Compile Include="IO\IHasFiles.cs" />
+    <Compile Include="Migrations\20180214113409_AddSkins.cs" />
+    <Compile Include="Migrations\20180214113409_AddSkins.designer.cs">
+      <DependentUpon>20180214113409_AddSkins.cs</DependentUpon>
+    </Compile>
     <Compile Include="Online\API\APIDownloadRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Migrations\20180125143340_Settings.cs" />
