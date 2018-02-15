@@ -21,6 +21,11 @@ namespace osu.Game.Database
         {
         }
 
+        /// <summary>
+        /// Access items pre-populated with includes for consumption.
+        /// </summary>
+        public IQueryable<T> ConsumableItems => AddIncludesForConsumption(ContextFactory.Get().Set<T>());
+
         public void Add(T item)
         {
             using (var usage = ContextFactory.GetForWrite())

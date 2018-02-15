@@ -63,13 +63,19 @@ namespace osu.Game.Beatmaps
             return true;
         }
 
-        protected override IQueryable<BeatmapSetInfo> AddIncludesForDeletion(IQueryable<BeatmapSetInfo> query)
-        {
-            return base.AddIncludesForDeletion(query)
+        protected override IQueryable<BeatmapSetInfo> AddIncludesForDeletion(IQueryable<BeatmapSetInfo> query) =>
+            base.AddIncludesForDeletion(query)
                 .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
                 .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
                 .Include(s => s.Metadata);
-        }
+
+        protected override IQueryable<BeatmapSetInfo> AddIncludesForConsumption(IQueryable<BeatmapSetInfo> query) =>
+            base.AddIncludesForConsumption(query)
+                .Include(s => s.Metadata)
+                .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
+                .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                .Include(s => s.Files).ThenInclude(f => f.FileInfo);
 
         protected override void Purge(List<BeatmapSetInfo> items, OsuDbContext context)
         {
@@ -83,18 +89,12 @@ namespace osu.Game.Beatmaps
             base.Purge(items, context);
         }
 
-        public IQueryable<BeatmapSetInfo> BeatmapSets => ContextFactory.Get().BeatmapSetInfo
-                                                                       .Include(s => s.Metadata)
-                                                                       .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
-                                                                       .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
-                                                                       .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                                                                       .Include(s => s.Files).ThenInclude(f => f.FileInfo);
-
-        public IQueryable<BeatmapInfo> Beatmaps => ContextFactory.Get().BeatmapInfo
-                                                                 .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
-                                                                 .Include(b => b.BeatmapSet).ThenInclude(s => s.Files).ThenInclude(f => f.FileInfo)
-                                                                 .Include(b => b.Metadata)
-                                                                 .Include(b => b.Ruleset)
-                                                                 .Include(b => b.BaseDifficulty);
+        public IQueryable<BeatmapInfo> Beatmaps =>
+            ContextFactory.Get().BeatmapInfo
+                          .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
+                          .Include(b => b.BeatmapSet).ThenInclude(s => s.Files).ThenInclude(f => f.FileInfo)
+                          .Include(b => b.Metadata)
+                          .Include(b => b.Ruleset)
+                          .Include(b => b.BaseDifficulty);
     }
 }
