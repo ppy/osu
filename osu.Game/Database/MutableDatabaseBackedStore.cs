@@ -53,7 +53,6 @@ namespace osu.Game.Database
                 Refresh(ref item);
 
                 if (item.DeletePending) return false;
-
                 item.DeletePending = true;
             }
 
@@ -65,16 +64,17 @@ namespace osu.Game.Database
         {
             using (ContextFactory.GetForWrite())
             {
-                Refresh(ref item);
+                Refresh(ref item, ConsumableItems);
 
                 if (!item.DeletePending) return false;
-
                 item.DeletePending = false;
             }
 
             ItemAdded?.Invoke(item);
             return true;
         }
+
+        protected virtual IQueryable<T> AddIncludesForConsumption(IQueryable<T> query) => query;
 
         protected virtual IQueryable<T> AddIncludesForDeletion(IQueryable<T> query) => query;
 
