@@ -34,12 +34,10 @@ namespace osu.Game.Beatmaps
                 Refresh(ref beatmap, Beatmaps);
 
                 if (beatmap.Hidden) return false;
-
                 beatmap.Hidden = true;
-
-                BeatmapHidden?.Invoke(beatmap);
             }
 
+            BeatmapHidden?.Invoke(beatmap);
             return true;
         }
 
@@ -55,7 +53,6 @@ namespace osu.Game.Beatmaps
                 Refresh(ref beatmap, Beatmaps);
 
                 if (!beatmap.Hidden) return false;
-
                 beatmap.Hidden = false;
             }
 
