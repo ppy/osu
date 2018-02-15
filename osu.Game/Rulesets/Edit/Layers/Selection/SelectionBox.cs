@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
     /// <summary>
     /// A box that represents a drag selection.
     /// </summary>
-    public class SelectionBox : CompositeDrawable
+    public class SelectionBox : VisibilityContainer
     {
         /// <summary>
         /// Creates a new <see cref="SelectionBox"/>.
@@ -52,6 +52,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             Size = bottomRight - topLeft;
         }
 
-        public override void Hide() => this.FadeOut(250, Easing.OutQuint).Expire();
+        protected override void PopIn() => this.FadeIn(250, Easing.OutQuint);
+        protected override void PopOut() => this.FadeOut(250, Easing.OutQuint);
     }
 }

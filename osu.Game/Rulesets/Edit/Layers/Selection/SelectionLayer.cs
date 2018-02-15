@@ -43,6 +43,8 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
         protected override bool OnDrag(InputState state)
         {
+            selectionBox.Show();
+
             var dragPosition = state.Mouse.NativeState.Position;
             var dragStartPosition = state.Mouse.NativeState.PositionMouseDown ?? dragPosition;
 
@@ -57,6 +59,8 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         protected override bool OnDragEnd(InputState state)
         {
             selectionBox.Hide();
+            selectionBox.Expire();
+
             finishSelection();
 
             return true;
