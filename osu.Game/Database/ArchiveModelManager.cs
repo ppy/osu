@@ -62,6 +62,8 @@ namespace osu.Game.Database
 
             if (importHost != null)
                 ipc = new ArchiveImportIPCChannel(importHost, this);
+
+            ModelStore.PurgeDeletable();
         }
 
         /// <summary>
@@ -155,6 +157,13 @@ namespace osu.Game.Database
         public void Import(TModel item) => ModelStore.Add(item);
 
         /// <summary>
+        /// Perform an update of the specified item.
+        /// TODO: Support file changes.
+        /// </summary>
+        /// <param name="item">The item to update.</param>
+        public void Update(TModel item) => ModelStore.Update(item);
+
+        /// <summary>
         /// Delete an item from the manager.
         /// Is a no-op for already deleted items.
         /// </summary>
@@ -180,14 +189,48 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Restore all items that were previously deleted.
+        /// Delete multiple items.
         /// This will post notifications tracking progress.
         /// </summary>
-        public void UndeleteAll()
+        public void Delete(List<TModel> items)
         {
-            var deletedItems = queryModel().Where(m => m.DeletePending).ToList();
+            if (items.Count == 0) return;
 
-            if (!deletedItems.Any()) return;
+            var notification = new ProgressNotification
+            {
+                Progress = 0,
+                CompletionText = "Deleted all beatmaps!",
+                State = ProgressNotificationState.Active,
+            };
+
+            PostNotification?.Invoke(notification);
+
+            int i = 0;
+
+            using (ContextFactory.GetForWrite())
+            {
+                foreach (var b in items)
+                {
+                    if (notification.State == ProgressNotificationState.Cancelled)
+                        // user requested abort
+                        return;
+
+                    notification.Text = $"Deleting ({i} of {items.Count})";
+                    notification.Progress = (float)++i / items.Count;
+                    Delete(b);
+                }
+            }
+
+            notification.State = ProgressNotificationState.Completed;
+        }
+
+        /// <summary>
+        /// Restore multiple items that were previously deleted.
+        /// This will post notifications tracking progress.
+        /// </summary>
+        public void Undelete(List<TModel> items)
+        {
+            if (!items.Any()) return;
 
             var notification = new ProgressNotification
             {
@@ -200,15 +243,18 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            foreach (var item in deletedItems)
+            using (ContextFactory.GetForWrite())
             {
-                if (notification.State == ProgressNotificationState.Cancelled)
-                    // user requested abort
-                    return;
+                foreach (var item in items)
+                {
+                    if (notification.State == ProgressNotificationState.Cancelled)
+                        // user requested abort
+                        return;
 
-                notification.Text = $"Restoring ({i} of {deletedItems.Count})";
-                notification.Progress = (float)++i / deletedItems.Count;
-                Undelete(item);
+                    notification.Text = $"Restoring ({i} of {items.Count})";
+                    notification.Progress = (float)++i / items.Count;
+                    Undelete(item);
+                }
             }
 
             notification.State = ProgressNotificationState.Completed;
