@@ -81,6 +81,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         {
             selectedHitObjects.Clear();
             captureBox?.Hide();
+            captureBox?.Expire();
         }
 
         /// <summary>

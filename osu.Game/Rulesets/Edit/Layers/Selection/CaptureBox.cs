@@ -60,8 +60,9 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             Position = topLeft;
         }
 
-        protected override void PopIn() => this.FadeIn();
+        public override bool DisposeOnDeathRemoval => true;
 
+        protected override void PopIn() => this.FadeIn();
         protected override void PopOut() => this.FadeOut();
     }
 }
