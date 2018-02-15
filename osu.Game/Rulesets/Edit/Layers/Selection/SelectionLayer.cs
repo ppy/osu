@@ -111,10 +111,6 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             if (selectedHitObjects.Count == 0)
                 return;
 
-            // Due to https://github.com/ppy/osu-framework/issues/1382, we may get here through both
-            // OnDragEnd and OnClick methods within a single frame, OnMouseDown doesn't help us here
-            captureBox?.Hide();
-
             AddInternal(captureBox = new CaptureBox(this, selectedHitObjects.ToList()));
         }
     }
