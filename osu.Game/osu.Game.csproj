@@ -274,7 +274,7 @@
     <Compile Include="Configuration\SettingsStore.cs" />
     <Compile Include="Configuration\DatabasedConfigManager.cs" />
     <Compile Include="Configuration\SpeedChangeVisualisationMethod.cs" />
-    <Compile Include="Database\ArchiveModelImportManager.cs" />
+    <Compile Include="Database\ArchiveModelManager.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\DatabaseWriteUsage.cs" />
     <Compile Include="Database\ICanImportArchives.cs" />
@@ -282,10 +282,13 @@
     <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Database\INamedFileInfo.cs" />
     <Compile Include="Database\ISoftDelete.cs" />
+    <Compile Include="Database\MutableDatabaseBackedStore.cs" />
     <Compile Include="Database\SingletonContextFactory.cs" />
     <Compile Include="Graphics\Containers\LinkFlowContainer.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
-    <Compile Include="IO\IMutableStore.cs" />
+    <Compile Include="IO\Archives\ArchiveReader.cs" />
+    <Compile Include="IO\Archives\LegacyFilesystemReader.cs" />
+    <Compile Include="IO\Archives\ZipArchiveReader.cs" />
     <Compile Include="IO\IHasFiles.cs" />
     <Compile Include="Migrations\20180214113409_AddSkins.cs" />
     <Compile Include="Migrations\20180214113409_AddSkins.designer.cs">
@@ -382,8 +385,6 @@
     <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
     <Compile Include="Beatmaps\Formats\Decoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoder.cs" />
-    <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
-    <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
     <Compile Include="Online\API\Requests\GetUserScoresRequest.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\RadioButtons\DrawableRadioButton.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\RadioButtons\RadioButton.cs" />
@@ -398,7 +399,6 @@
     <Compile Include="Screens\Play\BreaksOverlay\InfoLine.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\LetterboxOverlay.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\RemainingTimeCounter.cs" />
-    <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
     <Compile Include="Beatmaps\RankStatus.cs" />
     <Compile Include="Beatmaps\Timing\BreakPeriod.cs" />

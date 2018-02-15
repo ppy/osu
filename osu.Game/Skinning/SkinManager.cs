@@ -3,12 +3,12 @@
 
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
+using osu.Game.IO.Archives;
 
 namespace osu.Game.Skinning
 {
-    public class SkinManager : ArchiveModelImportManager<SkinInfo, SkinFileInfo>
+    public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>
     {
         public Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin());
 
