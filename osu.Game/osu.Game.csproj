@@ -849,6 +849,10 @@
     <Compile Include="Screens\Tournament\Teams\DrawingsTeam.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Skinning\SkinFileInfo.cs" />
+    <Compile Include="Skinning\SkinInfo.cs" />
+    <Compile Include="Skinning\SkinManager.cs" />
+    <Compile Include="Skinning\SkinStore.cs" />
     <Compile Include="Storyboards\CommandLoop.cs" />
     <Compile Include="Storyboards\CommandTimeline.cs" />
     <Compile Include="Storyboards\CommandTimelineGroup.cs" />
