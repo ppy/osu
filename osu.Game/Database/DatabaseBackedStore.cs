@@ -49,7 +49,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Perform any common clean-up tasks. Should be run when idle, or whenever necessary.
         /// </summary>
-        public virtual void Cleanup()
+        public virtual void PurgeDeletable()
         {
         }
     }

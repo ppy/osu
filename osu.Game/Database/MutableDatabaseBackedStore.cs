@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using osu.Framework.Platform;
 
 namespace osu.Game.Database
@@ -71,6 +74,38 @@ namespace osu.Game.Database
 
             ItemAdded?.Invoke(item);
             return true;
+        }
+
+        protected virtual IQueryable<T> AddIncludesForDeletion(IQueryable<T> query) => query;
+
+        protected virtual void Purge(List<T> items, OsuDbContext context)
+        {
+            // cascades down to beatmaps.
+            context.RemoveRange(items);
+        }
+
+        /// <summary>
+        /// Purge items in a pending delete state.
+        /// </summary>
+        /// <param name="query">An optional query limiting the scope of the purge.</param>
+        public void PurgeDeletable(Expression<Func<T, bool>> query = null)
+        {
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                var context = usage.Context;
+
+                var lookup = context.Set<T>().Where(s => s.DeletePending);
+
+                if (query != null) lookup = lookup.Where(query);
+
+                AddIncludesForDeletion(lookup);
+
+                var purgeable = lookup.ToList();
+
+                if (!purgeable.Any()) return;
+
+                Purge(purgeable, context);
+            }
         }
     }
 }

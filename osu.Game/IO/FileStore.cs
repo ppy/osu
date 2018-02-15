@@ -90,7 +90,7 @@ namespace osu.Game.IO
             }
         }
 
-        public override void Cleanup()
+        public override void PurgeDeletable()
         {
             using (var usage = ContextFactory.GetForWrite())
             {

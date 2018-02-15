@@ -71,8 +71,6 @@ namespace osu.Game.Beatmaps
 
             this.rulesets = rulesets;
             this.api = api;
-
-            beatmaps.Cleanup();
         }
 
         protected override void Populate(BeatmapSetInfo model, ArchiveReader archive)
@@ -102,7 +100,7 @@ namespace osu.Game.Beatmaps
                 if (existingOnlineId != null)
                 {
                     Delete(existingOnlineId);
-                    beatmaps.Cleanup(s => s.ID == existingOnlineId.ID);
+                    beatmaps.PurgeDeletable(s => s.ID == existingOnlineId.ID);
                 }
             }
 
@@ -194,12 +192,6 @@ namespace osu.Game.Beatmaps
         public DownloadBeatmapSetRequest GetExistingDownload(BeatmapSetInfo beatmap) => currentDownloads.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
 
         /// <summary>
-        /// Update a BeatmapSetInfo with all changes. TODO: This only supports very basic updates currently.
-        /// </summary>
-        /// <param name="beatmapSet">The beatmap set to update.</param>
-        public void Update(BeatmapSetInfo beatmap) => beatmaps.Update(beatmap);
-
-        /// <summary>
         /// Delete a beatmap difficulty.
         /// </summary>
         /// <param name="beatmap">The beatmap difficulty to hide.</param>
@@ -238,13 +230,6 @@ namespace osu.Game.Beatmaps
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.BeatmapSets.AsNoTracking().FirstOrDefault(query);
-
-        /// <summary>
-        /// Refresh an existing instance of a <see cref="BeatmapSetInfo"/> from the store.
-        /// </summary>
-        /// <param name="beatmapSet">A stale instance.</param>
-        /// <returns>A fresh instance.</returns>
-        public BeatmapSetInfo Refresh(BeatmapSetInfo beatmapSet) => QueryBeatmapSet(s => s.ID == beatmapSet.ID);
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
@@ -292,41 +277,6 @@ namespace osu.Game.Beatmaps
             }
 
             await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs")), TaskCreationOptions.LongRunning);
-        }
-
-        /// <summary>
-        /// Delete all beatmaps.
-        /// This will post notifications tracking progress.
-        /// </summary>
-        public void DeleteAll()
-        {
-            var maps = GetAllUsableBeatmapSets();
-
-            if (maps.Count == 0) return;
-
-            var notification = new ProgressNotification
-            {
-                Progress = 0,
-                CompletionText = "Deleted all beatmaps!",
-                State = ProgressNotificationState.Active,
-            };
-
-            PostNotification?.Invoke(notification);
-
-            int i = 0;
-
-            foreach (var b in maps)
-            {
-                if (notification.State == ProgressNotificationState.Cancelled)
-                    // user requested abort
-                    return;
-
-                notification.Text = $"Deleting ({i} of {maps.Count})";
-                notification.Progress = (float)++i / maps.Count;
-                Delete(b);
-            }
-
-            notification.State = ProgressNotificationState.Completed;
         }
 
         /// <summary>

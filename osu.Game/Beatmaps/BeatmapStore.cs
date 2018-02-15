@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
 
@@ -63,32 +63,24 @@ namespace osu.Game.Beatmaps
             return true;
         }
 
-        public override void Cleanup() => Cleanup(_ => true);
-
-        public void Cleanup(Expression<Func<BeatmapSetInfo, bool>> query)
+        protected override IQueryable<BeatmapSetInfo> AddIncludesForDeletion(IQueryable<BeatmapSetInfo> query)
         {
-            using (var usage = ContextFactory.GetForWrite())
-            {
-                var context = usage.Context;
+            return base.AddIncludesForDeletion(query)
+                .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                .Include(s => s.Metadata);
+        }
 
-                var purgeable = context.BeatmapSetInfo.Where(s => s.DeletePending && !s.Protected)
-                                       .Where(query)
-                                       .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                                       .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
-                                       .Include(s => s.Metadata).ToList();
+        protected override void Purge(List<BeatmapSetInfo> items, OsuDbContext context)
+        {
+            // metadata is M-N so we can't rely on cascades
+            context.BeatmapMetadata.RemoveRange(items.Select(s => s.Metadata));
+            context.BeatmapMetadata.RemoveRange(items.SelectMany(s => s.Beatmaps.Select(b => b.Metadata).Where(m => m != null)));
 
-                if (!purgeable.Any()) return;
+            // todo: we can probably make cascades work here with a FK in BeatmapDifficulty. just make to make it work correctly.
+            context.BeatmapDifficulty.RemoveRange(items.SelectMany(s => s.Beatmaps.Select(b => b.BaseDifficulty)));
 
-                // metadata is M-N so we can't rely on cascades
-                context.BeatmapMetadata.RemoveRange(purgeable.Select(s => s.Metadata));
-                context.BeatmapMetadata.RemoveRange(purgeable.SelectMany(s => s.Beatmaps.Select(b => b.Metadata).Where(m => m != null)));
-
-                // todo: we can probably make cascades work here with a FK in BeatmapDifficulty. just make to make it work correctly.
-                context.BeatmapDifficulty.RemoveRange(purgeable.SelectMany(s => s.Beatmaps.Select(b => b.BaseDifficulty)));
-
-                // cascades down to beatmaps.
-                context.BeatmapSetInfo.RemoveRange(purgeable);
-            }
+            base.Purge(items, context);
         }
 
         public IQueryable<BeatmapSetInfo> BeatmapSets => ContextFactory.Get().BeatmapSetInfo

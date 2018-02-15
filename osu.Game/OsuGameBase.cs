@@ -172,7 +172,7 @@ namespace osu.Game
 
             API.Register(this);
 
-            FileStore.Cleanup();
+            FileStore.PurgeDeletable();
         }
 
         private void runMigrations()
