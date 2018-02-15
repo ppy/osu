@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/BeatmapSets to the database backing
     /// </summary>
-    public class BeatmapStore : DatabaseBackedStore, IAddableStore<BeatmapSetInfo>
+    public class BeatmapStore : DatabaseBackedStore, IMutableStore<BeatmapSetInfo>
     {
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
@@ -79,7 +79,7 @@ namespace osu.Game.Beatmaps
             {
                 Refresh(ref beatmapSet, BeatmapSets);
 
-                if (beatmapSet.DeletePending) return false;
+                if (beatmapSet.Protected || beatmapSet.DeletePending) return false;
 
                 beatmapSet.DeletePending = true;
             }
@@ -178,17 +178,17 @@ namespace osu.Game.Beatmaps
         }
 
         public IQueryable<BeatmapSetInfo> BeatmapSets => ContextFactory.Get().BeatmapSetInfo
-                                                                     .Include(s => s.Metadata)
-                                                                     .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
-                                                                     .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
-                                                                     .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                                                                     .Include(s => s.Files).ThenInclude(f => f.FileInfo);
+                                                                       .Include(s => s.Metadata)
+                                                                       .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
+                                                                       .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                                                                       .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                                                                       .Include(s => s.Files).ThenInclude(f => f.FileInfo);
 
         public IQueryable<BeatmapInfo> Beatmaps => ContextFactory.Get().BeatmapInfo
-                                                               .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
-                                                               .Include(b => b.BeatmapSet).ThenInclude(s => s.Files).ThenInclude(f => f.FileInfo)
-                                                               .Include(b => b.Metadata)
-                                                               .Include(b => b.Ruleset)
-                                                               .Include(b => b.BaseDifficulty);
+                                                                 .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
+                                                                 .Include(b => b.BeatmapSet).ThenInclude(s => s.Files).ThenInclude(f => f.FileInfo)
+                                                                 .Include(b => b.Metadata)
+                                                                 .Include(b => b.Ruleset)
+                                                                 .Include(b => b.BaseDifficulty);
     }
 }
