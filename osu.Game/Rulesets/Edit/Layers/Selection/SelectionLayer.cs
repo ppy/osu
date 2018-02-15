@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         protected override bool OnDragEnd(InputState state)
         {
             selectionBox.Hide();
-            finishSelection(true);
+            finishSelection();
 
             return true;
         }
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         protected override bool OnClick(InputState state)
         {
             selectPoint(state.Mouse.NativeState.Position);
-            finishSelection(false);
+            finishSelection();
 
             return true;
         }
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             selectedHitObjects.Add(selected);
         }
 
-        private void finishSelection(bool fromDrag)
+        private void finishSelection()
         {
             if (selectedHitObjects.Count == 0)
                 return;
@@ -111,10 +111,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             // OnDragEnd and OnClick methods within a single frame, OnMouseDown doesn't help us here
             captureBox?.Hide();
 
-            if (fromDrag)
-                AddInternal(captureBox = new DragCaptureBox(this, selectedHitObjects.ToList(), selectionBox.Position, selectionBox.Size));
-            else
-                AddInternal(captureBox = new InstantCaptureBox(this, selectedHitObjects.ToList()));
+            AddInternal(captureBox = new CaptureBox(this, selectedHitObjects.ToList()));
         }
     }
 }
