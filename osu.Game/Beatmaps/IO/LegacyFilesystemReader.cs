@@ -15,7 +15,7 @@ namespace osu.Game.Beatmaps.IO
     {
         private readonly string path;
 
-        public LegacyFilesystemReader(string path)
+        public LegacyFilesystemReader(string path) : base(Path.GetFileName(path))
         {
             this.path = path;
         }
