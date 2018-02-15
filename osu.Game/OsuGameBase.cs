@@ -30,6 +30,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game
 {
@@ -38,6 +39,8 @@ namespace osu.Game
         protected OsuConfigManager LocalConfig;
 
         protected BeatmapManager BeatmapManager;
+
+        protected SkinManager SkinManager;
 
         protected RulesetStore RulesetStore;
 
@@ -97,6 +100,8 @@ namespace osu.Game
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
 
             dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
+
+            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host));
 
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
