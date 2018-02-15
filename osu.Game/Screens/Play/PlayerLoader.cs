@@ -16,7 +16,7 @@ using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Screens.Play
 {
-    public class PlayerLoader : PlayerBase
+    public class PlayerLoader : ScreenWithBeatmapBackground
     {
         private Player player;
 
@@ -262,6 +262,14 @@ namespace osu.Game.Screens.Play
                     }
                 };
             }
+        }
+
+        protected override void UpdateBackgroundElements()
+        {
+            if (!IsCurrentScreen) return;
+
+            base.UpdateBackgroundElements();
+            Background?.FadeTo(Opacity, Duration, Easing.OutQuint);
         }
     }
 }
