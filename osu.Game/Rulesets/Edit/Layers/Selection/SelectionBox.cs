@@ -52,6 +52,8 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             Size = bottomRight - topLeft;
         }
 
+        public override bool DisposeOnDeathRemoval => true;
+
         protected override void PopIn() => this.FadeIn(250, Easing.OutQuint);
         protected override void PopOut() => this.FadeOut(250, Easing.OutQuint);
     }
