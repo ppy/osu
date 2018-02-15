@@ -185,7 +185,7 @@ namespace osu.Game.Overlays
 
             resultCountsContainer.Colour = colours.Yellow;
 
-            beatmaps.BeatmapSetAdded += setAdded;
+            beatmaps.ItemAdded += setAdded;
         }
 
         private void setAdded(BeatmapSetInfo set)

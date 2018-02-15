@@ -12,9 +12,9 @@ using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
@@ -25,22 +25,12 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
-    public partial class BeatmapManager : ArchiveModelImportManager<BeatmapSetInfo, BeatmapSetFileInfo>
+    public partial class BeatmapManager : ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
     {
-        /// <summary>
-        /// Fired when a new <see cref="BeatmapSetInfo"/> becomes available in the database.
-        /// </summary>
-        public event Action<BeatmapSetInfo> BeatmapSetAdded;
-
         /// <summary>
         /// Fired when a single difficulty has been hidden.
         /// </summary>
         public event Action<BeatmapInfo> BeatmapHidden;
-
-        /// <summary>
-        /// Fired when a <see cref="BeatmapSetInfo"/> is removed from the database.
-        /// </summary>
-        public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
         /// <summary>
         /// Fired when a single difficulty has been restored.
@@ -76,8 +66,6 @@ namespace osu.Game.Beatmaps
             : base(storage, contextFactory, new BeatmapStore(contextFactory), importHost)
         {
             beatmaps = (BeatmapStore)ModelStore;
-            beatmaps.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
-            beatmaps.BeatmapSetRemoved += s => BeatmapSetRemoved?.Invoke(s);
             beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
             beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
 
@@ -120,12 +108,6 @@ namespace osu.Game.Beatmaps
 
             return null;
         }
-
-        /// <summary>
-        /// Import a beatmap from a <see cref="BeatmapSetInfo"/>.
-        /// </summary>
-        /// <param name="beatmapSet">The beatmap to be imported.</param>
-        public void Import(BeatmapSetInfo beatmapSet) => beatmaps.Add(beatmapSet);
 
         /// <summary>
         /// Downloads a beatmap.
@@ -171,7 +153,7 @@ namespace osu.Game.Beatmaps
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
                     using (var stream = new MemoryStream(data))
-                    using (var archive = new OszArchiveReader(stream, beatmapSetInfo.ToString()))
+                    using (var archive = new ZipArchiveReader(stream, beatmapSetInfo.ToString()))
                         Import(archive);
 
                     downloadNotification.State = ProgressNotificationState.Completed;
@@ -216,63 +198,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapSet">The beatmap set to update.</param>
         public void Update(BeatmapSetInfo beatmap) => beatmaps.Update(beatmap);
-
-        /// <summary>
-        /// Restore all beatmaps that were previously deleted.
-        /// This will post notifications tracking progress.
-        /// </summary>
-        public void UndeleteAll()
-        {
-            var deleteMaps = QueryBeatmapSets(bs => bs.DeletePending).ToList();
-
-            if (!deleteMaps.Any()) return;
-
-            var notification = new ProgressNotification
-            {
-                CompletionText = "Restored all deleted beatmaps!",
-                Progress = 0,
-                State = ProgressNotificationState.Active,
-            };
-
-            PostNotification?.Invoke(notification);
-
-            int i = 0;
-
-            foreach (var bs in deleteMaps)
-            {
-                if (notification.State == ProgressNotificationState.Cancelled)
-                    // user requested abort
-                    return;
-
-                notification.Text = $"Restoring ({i} of {deleteMaps.Count})";
-                notification.Progress = (float)++i / deleteMaps.Count;
-                Undelete(bs);
-            }
-
-            notification.State = ProgressNotificationState.Completed;
-        }
-
-        /// <summary>
-        /// Restore a beatmap that was previously deleted. Is a no-op if the beatmap is not in a deleted state, or has its protected flag set.
-        /// </summary>
-        /// <param name="beatmapSet">The beatmap to restore</param>
-        public void Undelete(BeatmapSetInfo beatmapSet)
-        {
-            if (beatmapSet.Protected)
-                return;
-
-            using (var usage = ContextFactory.GetForWrite())
-            {
-                usage.Context.ChangeTracker.AutoDetectChangesEnabled = false;
-
-                if (!beatmaps.Undelete(beatmapSet)) return;
-
-                if (!beatmapSet.Protected)
-                    Files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
-
-                usage.Context.ChangeTracker.AutoDetectChangesEnabled = true;
-            }
-        }
 
         /// <summary>
         /// Delete a beatmap difficulty.
