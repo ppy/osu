@@ -83,11 +83,7 @@ namespace osu.Game.Database
 
         protected virtual IQueryable<T> AddIncludesForDeletion(IQueryable<T> query) => query;
 
-        protected virtual void Purge(List<T> items, OsuDbContext context)
-        {
-            // cascades down to beatmaps.
-            context.RemoveRange(items);
-        }
+        protected virtual void Purge(List<T> items, OsuDbContext context) => context.RemoveRange(items);
 
         /// <summary>
         /// Purge items in a pending delete state.

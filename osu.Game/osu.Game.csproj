@@ -279,6 +279,7 @@
     <Compile Include="Database\DatabaseWriteUsage.cs" />
     <Compile Include="Database\ICanAcceptFiles.cs" />
     <Compile Include="Database\IDatabaseContextFactory.cs" />
+    <Compile Include="Database\IHasFiles.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Database\INamedFileInfo.cs" />
     <Compile Include="Database\ISoftDelete.cs" />
@@ -289,7 +290,6 @@
     <Compile Include="IO\Archives\ArchiveReader.cs" />
     <Compile Include="IO\Archives\LegacyFilesystemReader.cs" />
     <Compile Include="IO\Archives\ZipArchiveReader.cs" />
-    <Compile Include="IO\IHasFiles.cs" />
     <Compile Include="Online\API\APIDownloadRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Migrations\20180125143340_Settings.cs" />

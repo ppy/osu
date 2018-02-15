@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using osu.Game.Database;
-using osu.Game.IO;
 
 namespace osu.Game.Beatmaps
 {
