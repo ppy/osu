@@ -197,8 +197,8 @@ namespace osu.Game.Screens.Select
             if (osu != null)
                 Ruleset.BindTo(osu.Ruleset);
 
-            this.beatmaps.BeatmapSetAdded += onBeatmapSetAdded;
-            this.beatmaps.BeatmapSetRemoved += onBeatmapSetRemoved;
+            this.beatmaps.ItemAdded += onBeatmapSetAdded;
+            this.beatmaps.ItemRemoved += onBeatmapSetRemoved;
             this.beatmaps.BeatmapHidden += onBeatmapHidden;
             this.beatmaps.BeatmapRestored += onBeatmapRestored;
 
@@ -401,8 +401,8 @@ namespace osu.Game.Screens.Select
 
             if (beatmaps != null)
             {
-                beatmaps.BeatmapSetAdded -= onBeatmapSetAdded;
-                beatmaps.BeatmapSetRemoved -= onBeatmapSetRemoved;
+                beatmaps.ItemAdded -= onBeatmapSetAdded;
+                beatmaps.ItemRemoved -= onBeatmapSetRemoved;
                 beatmaps.BeatmapHidden -= onBeatmapHidden;
                 beatmaps.BeatmapRestored -= onBeatmapRestored;
             }

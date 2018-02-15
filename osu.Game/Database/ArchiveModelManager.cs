@@ -6,16 +6,21 @@ using Ionic.Zip;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.IO;
 using osu.Game.IO;
+using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
 using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Database
 {
-    public abstract class ArchiveModelImportManager<TModel, TFileModel> : ICanImportArchives
+    /// <summary>
+    /// Encapsulates a model store class to give it import functionality.
+    /// Adds cross-functionality with <see cref="FileStore"/> to give access to the central file store for the provided model.
+    /// </summary>
+    /// <typeparam name="TModel">The model type.</typeparam>
+    /// <typeparam name="TFileModel">The associated file join type.</typeparam>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanImportArchives
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
@@ -24,21 +29,35 @@ namespace osu.Game.Database
         /// </summary>
         public Action<Notification> PostNotification { protected get; set; }
 
+        /// <summary>
+        /// Fired when a new <see cref="TModel"/> becomes available in the database.
+        /// </summary>
+        public event Action<TModel> ItemAdded;
+
+        /// <summary>
+        /// Fired when a <see cref="TModel"/> is removed from the database.
+        /// </summary>
+        public event Action<TModel> ItemRemoved;
+
         public virtual string[] HandledExtensions => new[] { ".zip" };
 
         protected readonly FileStore Files;
 
         protected readonly IDatabaseContextFactory ContextFactory;
 
-        protected readonly IMutableStore<TModel> ModelStore;
+        protected readonly MutableDatabaseBackedStore<TModel> ModelStore;
 
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
-        protected ArchiveModelImportManager(Storage storage, IDatabaseContextFactory contextFactory, IMutableStore<TModel> modelStore, IIpcHost importHost = null)
+        protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStore<TModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
+
             ModelStore = modelStore;
+            ModelStore.ItemAdded += s => ItemAdded?.Invoke(s);
+            ModelStore.ItemRemoved += s => ItemRemoved?.Invoke(s);
+
             Files = new FileStore(contextFactory, storage);
 
             if (importHost != null)
@@ -46,10 +65,10 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Import one or more <see cref="BeatmapSetInfo"/> from filesystem <paramref name="paths"/>.
+        /// Import one or more <see cref="TModel"/> items from filesystem <paramref name="paths"/>.
         /// This will post notifications tracking progress.
         /// </summary>
-        /// <param name="paths">One or more beatmap locations on disk.</param>
+        /// <param name="paths">One or more archive locations on disk.</param>
         public void Import(params string[] paths)
         {
             var notification = new ProgressNotification
@@ -80,7 +99,7 @@ namespace osu.Game.Database
                     notification.Progress = (float)++i / paths.Length;
 
                     // We may or may not want to delete the file depending on where it is stored.
-                    //  e.g. reconstructing/repairing database with beatmaps from default storage.
+                    //  e.g. reconstructing/repairing database with items from default storage.
                     // Also, not always a single file, i.e. for LegacyFilesystemReader
                     // TODO: Add a check to prevent files from storage to be deleted.
                     try
@@ -96,7 +115,7 @@ namespace osu.Game.Database
                 catch (Exception e)
                 {
                     e = e.InnerException ?? e;
-                    Logger.Error(e, $@"Could not import beatmap set ({Path.GetFileName(path)})");
+                    Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
                 }
             }
 
@@ -104,37 +123,43 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Import a model from an <see cref="ArchiveReader"/>.
+        /// Import an item from an <see cref="ArchiveReader"/>.
         /// </summary>
-        /// <param name="archive">The beatmap to be imported.</param>
+        /// <param name="archive">The archive to be imported.</param>
         public TModel Import(ArchiveReader archive)
         {
             using (ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
             {
-                // create a new set info (don't yet add to database)
-                var model = CreateModel(archive);
+                // create a new model (don't yet add to database)
+                var item = CreateModel(archive);
 
-                var existing = CheckForExisting(model);
+                var existing = CheckForExisting(item);
 
                 if (existing != null) return existing;
 
-                model.Files = createFileInfos(archive, Files);
+                item.Files = createFileInfos(archive, Files);
 
-                Populate(model, archive);
+                Populate(item, archive);
 
                 // import to store
-                ModelStore.Add(model);
+                ModelStore.Add(item);
 
-                return model;
+                return item;
             }
         }
 
         /// <summary>
-        /// Delete a model from the manager.
-        /// Is a no-op for already deleted models.
+        /// Import an item from a <see cref="TModel"/>.
         /// </summary>
-        /// <param name="model">The model to delete.</param>
-        public void Delete(TModel model)
+        /// <param name="item">The model to be imported.</param>
+        public void Import(TModel item) => ModelStore.Add(item);
+
+        /// <summary>
+        /// Delete an item from the manager.
+        /// Is a no-op for already deleted items.
+        /// </summary>
+        /// <param name="item">The item to delete.</param>
+        public void Delete(TModel item)
         {
             using (var usage = ContextFactory.GetForWrite())
             {
@@ -143,14 +168,67 @@ namespace osu.Game.Database
                 context.ChangeTracker.AutoDetectChangesEnabled = false;
 
                 // re-fetch the model on the import context.
-                var foundModel = ContextFactory.Get().Set<TModel>().Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == model.ID);
+                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == item.ID);
 
-                if (foundModel.DeletePending || !CheckCanDelete(foundModel)) return;
+                if (foundModel.DeletePending) return;
 
                 if (ModelStore.Delete(foundModel))
                     Files.Dereference(foundModel.Files.Select(f => f.FileInfo).ToArray());
 
                 context.ChangeTracker.AutoDetectChangesEnabled = true;
+            }
+        }
+
+        /// <summary>
+        /// Restore all items that were previously deleted.
+        /// This will post notifications tracking progress.
+        /// </summary>
+        public void UndeleteAll()
+        {
+            var deletedItems = queryModel().Where(m => m.DeletePending).ToList();
+
+            if (!deletedItems.Any()) return;
+
+            var notification = new ProgressNotification
+            {
+                CompletionText = "Restored all deleted items!",
+                Progress = 0,
+                State = ProgressNotificationState.Active,
+            };
+
+            PostNotification?.Invoke(notification);
+
+            int i = 0;
+
+            foreach (var item in deletedItems)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
+                notification.Text = $"Restoring ({i} of {deletedItems.Count})";
+                notification.Progress = (float)++i / deletedItems.Count;
+                Undelete(item);
+            }
+
+            notification.State = ProgressNotificationState.Completed;
+        }
+
+        /// <summary>
+        /// Restore an item that was previously deleted. Is a no-op if the item is not in a deleted state, or has its protected flag set.
+        /// </summary>
+        /// <param name="item">The item to restore</param>
+        public void Undelete(TModel item)
+        {
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                usage.Context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                if (!ModelStore.Undelete(item)) return;
+
+                Files.Reference(item.Files.Select(f => f.FileInfo).ToArray());
+
+                usage.Context.ChangeTracker.AutoDetectChangesEnabled = true;
             }
         }
 
@@ -193,7 +271,7 @@ namespace osu.Game.Database
 
         protected virtual TModel CheckForExisting(TModel model) => null;
 
-        protected virtual bool CheckCanDelete(TModel model) => true;
+        private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
         /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
@@ -203,7 +281,7 @@ namespace osu.Game.Database
         private ArchiveReader getReaderFrom(string path)
         {
             if (ZipFile.IsZipFile(path))
-                return new OszArchiveReader(Files.Storage.GetStream(path), Path.GetFileName(path));
+                return new ZipArchiveReader(Files.Storage.GetStream(path), Path.GetFileName(path));
             return new LegacyFilesystemReader(path);
         }
     }
