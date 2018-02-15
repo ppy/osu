@@ -13,7 +13,8 @@ namespace osu.Game.Beatmaps.IO
         private readonly Stream archiveStream;
         private readonly ZipFile archive;
 
-        public OszArchiveReader(Stream archiveStream)
+        public OszArchiveReader(Stream archiveStream, string name = null)
+            : base(name)
         {
             this.archiveStream = archiveStream;
             archive = ZipFile.Read(archiveStream);
