@@ -277,7 +277,7 @@
     <Compile Include="Database\ArchiveModelManager.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\DatabaseWriteUsage.cs" />
-    <Compile Include="Database\ICanImportArchives.cs" />
+    <Compile Include="Database\ICanAcceptFiles.cs" />
     <Compile Include="Database\IDatabaseContextFactory.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Database\INamedFileInfo.cs" />

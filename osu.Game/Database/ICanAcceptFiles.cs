@@ -1,6 +1,6 @@
 ﻿namespace osu.Game.Database
 {
-    public interface ICanImportArchives
+    public interface ICanAcceptFiles
     {
         void Import(params string[] paths);
 

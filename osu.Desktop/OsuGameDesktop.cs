@@ -115,21 +115,7 @@ namespace osu.Desktop
 
             if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
 
-            switch (firstExtension)
-            {
-                case ".osz":
-                    Task.Factory.StartNew(() => BeatmapManager.Import(filePaths), TaskCreationOptions.LongRunning);
-                    return;
-                case ".osr":
-                    Task.Run(() =>
-                    {
-                        var score = ScoreStore.ReadReplayFile(filePaths.First());
-                        Schedule(() => LoadScore(score));
-                    });
-                    return;
-            }
+            Task.Factory.StartNew(() => Import(filePaths), TaskCreationOptions.LongRunning);
         }
-
-        private static readonly string[] allowed_extensions = { @".osz", @".osr" };
     }
 }
