@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps;
+using osu.Game.Database;
 
 namespace osu.Game.IPC
 {

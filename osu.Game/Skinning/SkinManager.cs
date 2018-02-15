@@ -3,7 +3,6 @@
 
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Database;
 

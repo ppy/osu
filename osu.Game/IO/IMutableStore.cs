@@ -3,12 +3,14 @@
 
 namespace osu.Game.IO
 {
-    public interface IAddableStore<in T>
+    public interface IMutableStore<in T>
     {
         /// <summary>
         /// Add an object to the store.
         /// </summary>
         /// <param name="object">The object to add.</param>
         void Add(T item);
+
+        bool Delete(T item);
     }
 }

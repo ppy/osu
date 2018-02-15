@@ -7,7 +7,7 @@ using osu.Game.IO;
 
 namespace osu.Game.Skinning
 {
-    public class SkinStore : DatabaseBackedStore, IAddableStore<SkinInfo>
+    public class SkinStore : DatabaseBackedStore, IMutableStore<SkinInfo>
     {
         public SkinStore(DatabaseContextFactory contextFactory, Storage storage = null)
             : base(contextFactory, storage)
@@ -21,6 +21,20 @@ namespace osu.Game.Skinning
                 var context = usage.Context;
                 context.SkinInfo.Attach(item);
             }
+        }
+
+        public bool Delete(SkinInfo item)
+        {
+            using (ContextFactory.GetForWrite())
+            {
+                Refresh(ref item);
+
+                if (item.DeletePending) return false;
+
+                item.DeletePending = true;
+            }
+
+            return true;
         }
     }
 }
