@@ -86,7 +86,7 @@ namespace osu.Game.Beatmaps
         protected override BeatmapSetInfo CheckForExisting(BeatmapSetInfo model)
         {
             // check if this beatmap has already been imported and exit early if so
-            var existingHashMatch = beatmaps.BeatmapSets.FirstOrDefault(b => b.Hash == model.Hash);
+            var existingHashMatch = beatmaps.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
             if (existingHashMatch != null)
             {
                 Undelete(existingHashMatch);
@@ -96,7 +96,7 @@ namespace osu.Game.Beatmaps
             // check if a set already exists with the same online id
             if (model.OnlineBeatmapSetID != null)
             {
-                var existingOnlineId = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID);
+                var existingOnlineId = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID);
                 if (existingOnlineId != null)
                 {
                     Delete(existingOnlineId);
@@ -229,20 +229,20 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.BeatmapSets.AsNoTracking().FirstOrDefault(query);
+        public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => beatmaps.BeatmapSets.Where(s => !s.DeletePending && !s.Protected).ToList();
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => beatmaps.ConsumableItems.Where(s => !s.DeletePending && !s.Protected).ToList();
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public IEnumerable<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.BeatmapSets.AsNoTracking().Where(query);
+        public IEnumerable<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().Where(query);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
