@@ -171,7 +171,7 @@ namespace osu.Game.Beatmaps
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
                     using (var stream = new MemoryStream(data))
-                    using (var archive = new OszArchiveReader(stream))
+                    using (var archive = new OszArchiveReader(stream, beatmapSetInfo.ToString()))
                         Import(archive);
 
                     downloadNotification.State = ProgressNotificationState.Completed;

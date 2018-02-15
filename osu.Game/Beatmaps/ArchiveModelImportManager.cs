@@ -174,7 +174,7 @@ namespace osu.Game.Beatmaps
         private ArchiveReader getReaderFrom(string path)
         {
             if (ZipFile.IsZipFile(path))
-                return new OszArchiveReader(Files.Storage.GetStream(path));
+                return new OszArchiveReader(Files.Storage.GetStream(path), Path.GetFileName(path));
             return new LegacyFilesystemReader(path);
         }
     }

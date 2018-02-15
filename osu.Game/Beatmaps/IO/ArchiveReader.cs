@@ -17,6 +17,16 @@ namespace osu.Game.Beatmaps.IO
 
         public abstract void Dispose();
 
+        /// <summary>
+        /// The name of this archive (usually the containing filename).
+        /// </summary>
+        public readonly string Name;
+
+        protected ArchiveReader(string name)
+        {
+            Name = name;
+        }
+
         public abstract IEnumerable<string> Filenames { get; }
 
         public virtual byte[] Get(string name)
