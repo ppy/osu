@@ -120,9 +120,6 @@ namespace osu.Desktop
                 case ".osz":
                     Task.Factory.StartNew(() => BeatmapManager.Import(filePaths), TaskCreationOptions.LongRunning);
                     return;
-                case ".osk":
-                    Task.Factory.StartNew(() => SkinManager.Import(filePaths), TaskCreationOptions.LongRunning);
-                    return;
                 case ".osr":
                     Task.Run(() =>
                     {
