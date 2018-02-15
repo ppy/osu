@@ -52,6 +52,6 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             Size = bottomRight - topLeft;
         }
 
-        public override void Hide() => this.FadeOut(400, Easing.OutQuint).Expire();
+        public override void Hide() => this.FadeOut(250, Easing.OutQuint).Expire();
     }
 }
