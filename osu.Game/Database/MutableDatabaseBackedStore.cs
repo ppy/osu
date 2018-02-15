@@ -26,6 +26,10 @@ namespace osu.Game.Database
         /// </summary>
         public IQueryable<T> ConsumableItems => AddIncludesForConsumption(ContextFactory.Get().Set<T>());
 
+        /// <summary>
+        /// Add a <see cref="T"/> to the database.
+        /// </summary>
+        /// <param name="item">The item to add.</param>
         public void Add(T item)
         {
             using (var usage = ContextFactory.GetForWrite())
@@ -51,6 +55,10 @@ namespace osu.Game.Database
             ItemAdded?.Invoke(item);
         }
 
+        /// <summary>
+        /// Delete a <see cref="T"/> from the database.
+        /// </summary>
+        /// <param name="item">The item to delete.</param>
         public bool Delete(T item)
         {
             using (ContextFactory.GetForWrite())
@@ -65,6 +73,10 @@ namespace osu.Game.Database
             return true;
         }
 
+        /// <summary>
+        /// Restore a <see cref="T"/> from a deleted state.
+        /// </summary>
+        /// <param name="item">The item to undelete.</param>
         public bool Undelete(T item)
         {
             using (ContextFactory.GetForWrite())
@@ -79,11 +91,33 @@ namespace osu.Game.Database
             return true;
         }
 
+        /// <summary>
+        /// Allow implementations to add database-side includes or constraints when querying for consumption of items.
+        /// </summary>
+        /// <param name="query">The input query.</param>
+        /// <returns>A potentially modified output query.</returns>
         protected virtual IQueryable<T> AddIncludesForConsumption(IQueryable<T> query) => query;
 
+        /// <summary>
+        /// Allow implementations to add database-side includes or constraints when deleting items.
+        /// Included properties could then be subsequently deleted by overriding <see cref="Purge"/>.
+        /// </summary>
+        /// <param name="query">The input query.</param>
+        /// <returns>A potentially modified output query.</returns>
         protected virtual IQueryable<T> AddIncludesForDeletion(IQueryable<T> query) => query;
 
+        /// <summary>
+        /// Called when removing an item completely from the database.
+        /// </summary>
+        /// <param name="items">The items to be purged.</param>
+        /// <param name="context">The write context which can be used to perform subsequent deletions.</param>
         protected virtual void Purge(List<T> items, OsuDbContext context) => context.RemoveRange(items);
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+            PurgeDeletable();
+        }
 
         /// <summary>
         /// Purge items in a pending delete state.

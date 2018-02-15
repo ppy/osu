@@ -63,7 +63,7 @@ namespace osu.Game.Database
             if (importHost != null)
                 ipc = new ArchiveImportIPCChannel(importHost, this);
 
-            ModelStore.PurgeDeletable();
+            ModelStore.Cleanup();
         }
 
         /// <summary>
