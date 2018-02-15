@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Framework.IO.Stores;
 
-namespace osu.Game.Beatmaps.IO
+namespace osu.Game.IO.Archives
 {
     public abstract class ArchiveReader : IDisposable, IResourceStore<byte[]>
     {
