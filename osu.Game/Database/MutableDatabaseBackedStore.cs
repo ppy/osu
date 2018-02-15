@@ -98,7 +98,7 @@ namespace osu.Game.Database
 
                 if (query != null) lookup = lookup.Where(query);
 
-                AddIncludesForDeletion(lookup);
+                lookup = AddIncludesForDeletion(lookup);
 
                 var purgeable = lookup.ToList();
 
