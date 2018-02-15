@@ -97,10 +97,10 @@ namespace osu.Game.Beatmaps
                     b.Metadata = null;
         }
 
-        protected override BeatmapSetInfo CheckForExisting(BeatmapSetInfo beatmapSet)
+        protected override BeatmapSetInfo CheckForExisting(BeatmapSetInfo model)
         {
             // check if this beatmap has already been imported and exit early if so
-            var existingHashMatch = beatmaps.BeatmapSets.FirstOrDefault(b => b.Hash == beatmapSet.Hash);
+            var existingHashMatch = beatmaps.BeatmapSets.FirstOrDefault(b => b.Hash == model.Hash);
             if (existingHashMatch != null)
             {
                 Undelete(existingHashMatch);
@@ -108,9 +108,9 @@ namespace osu.Game.Beatmaps
             }
 
             // check if a set already exists with the same online id
-            if (beatmapSet.OnlineBeatmapSetID != null)
+            if (model.OnlineBeatmapSetID != null)
             {
-                var existingOnlineId = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
+                var existingOnlineId = beatmaps.BeatmapSets.FirstOrDefault(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID);
                 if (existingOnlineId != null)
                 {
                     Delete(existingOnlineId);
@@ -216,32 +216,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapSet">The beatmap set to update.</param>
         public void Update(BeatmapSetInfo beatmap) => beatmaps.Update(beatmap);
-
-        /// <summary>
-        /// Delete a beatmap from the manager.
-        /// Is a no-op for already deleted beatmaps.
-        /// </summary>
-        /// <param name="beatmapSet">The beatmap set to delete.</param>
-        public void Delete(BeatmapSetInfo beatmapSet)
-        {
-            using (var usage = ContextFactory.GetForWrite())
-            {
-                var context = usage.Context;
-
-                context.ChangeTracker.AutoDetectChangesEnabled = false;
-
-                // re-fetch the beatmap set on the import context.
-                beatmapSet = context.BeatmapSetInfo.Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == beatmapSet.ID);
-
-                if (beatmaps.Delete(beatmapSet))
-                {
-                    if (!beatmapSet.Protected)
-                        Files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
-                }
-
-                context.ChangeTracker.AutoDetectChangesEnabled = true;
-            }
-        }
 
         /// <summary>
         /// Restore all beatmaps that were previously deleted.
@@ -351,7 +325,7 @@ namespace osu.Game.Beatmaps
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => beatmaps.BeatmapSets.Where(s => !s.DeletePending).ToList();
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => beatmaps.BeatmapSets.Where(s => !s.DeletePending && !s.Protected).ToList();
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
