@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -18,7 +17,7 @@ namespace osu.Game.Skinning
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo
         {
-            Name = archive.Filenames.First()
+            Name = archive.Name
         };
 
         private SkinStore store;
