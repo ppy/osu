@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Ionic.Zip;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.IO;
-using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
 using FileInfo = osu.Game.IO.FileInfo;
 
-namespace osu.Game.Beatmaps
+namespace osu.Game.Database
 {
     public abstract class ArchiveModelImportManager<TModel, TFileModel> : ICanImportArchives
-        where TModel : class, IHasFiles<TFileModel>
+        where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
         /// <summary>
@@ -28,12 +30,12 @@ namespace osu.Game.Beatmaps
 
         protected readonly IDatabaseContextFactory ContextFactory;
 
-        protected readonly IAddableStore<TModel> ModelStore;
+        protected readonly IMutableStore<TModel> ModelStore;
 
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
-        protected ArchiveModelImportManager(Storage storage, IDatabaseContextFactory contextFactory, IAddableStore<TModel> modelStore, IIpcHost importHost = null)
+        protected ArchiveModelImportManager(Storage storage, IDatabaseContextFactory contextFactory, IMutableStore<TModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
             ModelStore = modelStore;
@@ -128,6 +130,31 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
+        /// Delete a model from the manager.
+        /// Is a no-op for already deleted models.
+        /// </summary>
+        /// <param name="model">The model to delete.</param>
+        public void Delete(TModel model)
+        {
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                var context = usage.Context;
+
+                context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                // re-fetch the model on the import context.
+                var foundModel = ContextFactory.Get().Set<TModel>().Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == model.ID);
+
+                if (foundModel.DeletePending || !CheckCanDelete(foundModel)) return;
+
+                if (ModelStore.Delete(foundModel))
+                    Files.Dereference(foundModel.Files.Select(f => f.FileInfo).ToArray());
+
+                context.ChangeTracker.AutoDetectChangesEnabled = true;
+            }
+        }
+
+        /// <summary>
         /// Create all required <see cref="FileInfo"/>s for the provided archive, adding them to the global file store.
         /// </summary>
         private List<TFileModel> createFileInfos(ArchiveReader reader, FileStore files)
@@ -164,13 +191,15 @@ namespace osu.Game.Beatmaps
         {
         }
 
-        protected virtual TModel CheckForExisting(TModel beatmapSet) => null;
+        protected virtual TModel CheckForExisting(TModel model) => null;
+
+        protected virtual bool CheckCanDelete(TModel model) => true;
 
         /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
         /// </summary>
-        /// <param name="path">A file or folder path resolving the beatmap content.</param>
-        /// <returns>A reader giving access to the beatmap's content.</returns>
+        /// <param name="path">A file or folder path resolving the archive content.</param>
+        /// <returns>A reader giving access to the archive's content.</returns>
         private ArchiveReader getReaderFrom(string path)
         {
             if (ZipFile.IsZipFile(path))

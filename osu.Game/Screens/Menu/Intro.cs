@@ -63,7 +63,9 @@ namespace osu.Game.Screens.Menu
                 {
                     // we need to import the default menu background beatmap
                     setInfo = beatmaps.Import(new OszArchiveReader(game.Resources.GetStream(@"Tracks/circles.osz"), "circles.osz"));
+
                     setInfo.Protected = true;
+                    beatmaps.Update(setInfo);
                 }
             }
 
@@ -73,9 +75,6 @@ namespace osu.Game.Screens.Menu
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
-
-            if (setInfo.Protected)
-                beatmaps.Delete(setInfo);
         }
 
         protected override void OnEntering(Screen last)
