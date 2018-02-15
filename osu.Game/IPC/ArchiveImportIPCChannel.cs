@@ -12,9 +12,9 @@ namespace osu.Game.IPC
 {
     public class ArchiveImportIPCChannel : IpcChannel<ArchiveImportMessage>
     {
-        private readonly ICanImportArchives importer;
+        private readonly ICanAcceptFiles importer;
 
-        public ArchiveImportIPCChannel(IIpcHost host, ICanImportArchives importer = null)
+        public ArchiveImportIPCChannel(IIpcHost host, ICanAcceptFiles importer = null)
             : base(host)
         {
             this.importer = importer;
