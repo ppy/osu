@@ -13,10 +13,12 @@ namespace osu.Game.Screens.Play
     public abstract class ScreenWithBeatmapBackground : OsuScreen
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
+
         public override bool AllowBeatmapRulesetChange => false;
 
-        protected float Duration => 800;
-        protected float Opacity => 1 - (float)DimLevel;
+        protected const float BACKGROUND_FADE_DURATION = 800;
+
+        protected float BackgroundOpacity => 1 - (float)DimLevel;
 
         #region User Settings
 
@@ -52,7 +54,8 @@ namespace osu.Game.Screens.Play
         {
             if (!IsCurrentScreen) return;
 
-            (Background as BackgroundScreenBeatmap)?.BlurTo(new Vector2((float)BlurLevel.Value * 25), Duration, Easing.OutQuint);
+            Background?.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
 }
