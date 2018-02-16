@@ -179,20 +179,20 @@ namespace osu.Game.Screens.Play
 
         public abstract class ResumeOverlay : GameplayMenuOverlay
         {
-            private readonly Action escAction;
-            private readonly Action resumeAction;
+            protected readonly Action EscAction;
+            protected readonly Action ResumeAction;
 
             public ResumeOverlay(Action resumeAction, Action escAction)
             {
-                this.resumeAction = resumeAction;
-                this.escAction = escAction;
+                ResumeAction = resumeAction;
+                EscAction = escAction;
             }
 
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
             {
                 if (!args.Repeat && args.Key == Key.Escape)
                 {
-                    escAction();
+                    EscAction();
                     return true;
                 }
 
