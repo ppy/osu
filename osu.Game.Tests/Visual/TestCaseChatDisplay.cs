@@ -1,22 +1,21 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.ComponentModel;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays;
-using osu.Framework.Allocation;
-using osu.Game.Online.API;
-using osu.Game.Users;
-using osu.Game.Online.Chat;
-using osu.Framework.Graphics.UserInterface;
 using System;
+using System.ComponentModel;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.Chat;
+using osu.Game.Overlays;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
     [Description("Testing chat api and overlay")]
     public class TestCaseChatDisplay : OsuTestCase
     {
-
         private readonly DummyChatOverlay chat;
 
         public TestCaseChatDisplay()
@@ -46,19 +45,18 @@ namespace osu.Game.Tests.Visual
                 Id = 0
             };
 
-            api.Scheduler.Add(delegate {
+            api.Scheduler.Add(delegate
+            {
                 channel.AddNewMessage("This message for test from offline.");
                 channel.AddNewMessage("TestMessage");
                 channel.AddNewMessage("!@#$%^&&*()");
                 channel.AddNewMessage("testTEST");
                 chat.OpenChannel(channel);
             });
-
         }
 
         private class DummyChatOverlay : ChatOverlay
         {
-
             public string Username = "DummyUser";
 
             [BackgroundDependencyLoader]
@@ -67,7 +65,6 @@ namespace osu.Game.Tests.Visual
                 Textbox.OnCommit = postDummyMessage;
                 Api = api;
                 api.Register(this);
-
             }
 
             public void PostDummyMessage(string postText)
@@ -126,7 +123,6 @@ namespace osu.Game.Tests.Visual
 
         private class DummyChannel : Channel
         {
-
             private int messageCounter;
 
             //Should be call "API Thread"
@@ -139,6 +135,7 @@ namespace osu.Game.Tests.Visual
         private class DummyMessage : Message
         {
             private static long messageCounter;
+
             public DummyMessage(string text, string username = null, bool isAction = false, bool isImportant = false, int number = 0)
                 : base(messageCounter++)
             {
@@ -153,6 +150,5 @@ namespace osu.Game.Tests.Visual
                 };
             }
         }
-
     }
 }
