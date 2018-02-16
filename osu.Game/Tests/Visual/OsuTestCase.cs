@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.IO;
+using System.Reflection;
 using osu.Framework.Testing;
 
 namespace osu.Game.Tests.Visual
@@ -17,6 +19,8 @@ namespace osu.Game.Tests.Visual
         public class OsuTestCaseTestRunner : OsuGameBase
         {
             private readonly OsuTestCase testCase;
+
+            protected override string MainResourceFile => File.Exists(base.MainResourceFile) ? base.MainResourceFile : Assembly.GetExecutingAssembly().Location;
 
             public OsuTestCaseTestRunner(OsuTestCase testCase)
             {
