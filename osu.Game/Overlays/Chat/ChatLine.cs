@@ -88,6 +88,8 @@ namespace osu.Game.Overlays.Chat
 
         public LinkFlowContainer ContentFlow => contentFlow;
 
+        private ChatOverlay chat;
+
         public Message Message
         {
             get => message;
@@ -217,13 +219,13 @@ namespace osu.Game.Overlays.Chat
             FinishTransforms(true);
         }
 
-        private ChatOverlay chat;
         private string normalizeUsername(string usernameText)
         {
             if(usernameText.Length <= max_username_length)
                 return usernameText;
             return usernameText.Substring(0, max_username_length - 3) + "...";
         }
+
         private void updateMessageContent()
         {
             this.FadeTo(message is LocalEchoMessage ? 0.4f : 1.0f, 500, Easing.OutQuint);
@@ -231,6 +233,7 @@ namespace osu.Game.Overlays.Chat
 
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
             username.Text = $@"{normalizeUsername(message.Sender.Username)}" + (senderHasBackground || message.IsAction ? "" : ":");
+
             // remove non-existent channels from the link list
             message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chat?.AvailableChannels.Any(c => c.Name == link.Argument) != true);
 

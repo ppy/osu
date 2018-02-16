@@ -41,7 +41,7 @@ namespace osu.Game.Overlays
 
         protected readonly FocusedTextBox Textbox;
 
-        protected APIAccess Api;
+        protected IAPIProvider Api;
 
         private const int transition_length = 500;
 
@@ -64,7 +64,8 @@ namespace osu.Game.Overlays
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
 
-        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceiveMouseInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceiveMouseInputAt(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) =>
+            chatContainer.ReceiveMouseInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceiveMouseInputAt(screenSpacePos);
 
         public ChatOverlay()
         {
@@ -139,7 +140,7 @@ namespace osu.Game.Overlays
                                             Height = 1,
                                             PlaceholderText = "type your message",
                                             Exit = () => State = Visibility.Hidden,
-                                            OnCommit = postMessage,
+                                            OnCommit = handleTextboxMessage,
                                             ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
                                         }
@@ -269,7 +270,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, OsuConfigManager config, OsuColour colours)
+        private void load(IAPIProvider api, OsuConfigManager config, OsuColour colours)
         {
             Api = api;
             api.Register(this);
@@ -299,7 +300,7 @@ namespace osu.Game.Overlays
             messageRequest?.Cancel();
 
             ListChannelsRequest req = new ListChannelsRequest();
-            req.Success += delegate (List<Channel> channels)
+            req.Success += delegate(List<Channel> channels)
             {
                 AvailableChannels = channels;
 
@@ -331,10 +332,7 @@ namespace osu.Game.Overlays
 
         protected Channel CurrentChannel
         {
-            get
-            {
-                return currentChannel;
-            }
+            get { return currentChannel; }
 
             set
             {
@@ -422,16 +420,13 @@ namespace osu.Game.Overlays
         {
             var req = new GetMessagesRequest(new List<Channel> { channel }, null);
 
-            req.Success += delegate (List<Message> messages)
+            req.Success += delegate(List<Message> messages)
             {
                 loading.Hide();
                 channel.AddNewMessages(messages.ToArray());
                 Debug.Write("success!");
             };
-            req.Failure += delegate
-            {
-                Debug.Write("failure!");
-            };
+            req.Failure += delegate { Debug.Write("failure!"); };
 
             Api.Queue(req);
         }
@@ -442,32 +437,32 @@ namespace osu.Game.Overlays
 
             fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
 
-            fetchReq.Success += delegate (List<Message> messages)
+            fetchReq.Success += delegate(List<Message> messages)
             {
                 foreach (var group in messages.Where(m => m.TargetType == TargetType.Channel).GroupBy(m => m.TargetId))
                     careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
                 lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
-
-                Debug.Write("success!");
                 fetchReq = null;
             };
 
             fetchReq.Failure += delegate
             {
-                Debug.Write("failure!");
                 fetchReq = null;
             };
 
             Api.Queue(fetchReq);
         }
 
-        private void postMessage(TextBox textbox, bool newText)
+        private void handleTextboxMessage(TextBox textbox, bool newText)
         {
             var postText = textbox.Text;
-
             textbox.Text = string.Empty;
+            PostMessage(postText);
+        }
 
+        protected void PostMessage(string postText)
+        {
             if (string.IsNullOrWhiteSpace(postText))
                 return;
 

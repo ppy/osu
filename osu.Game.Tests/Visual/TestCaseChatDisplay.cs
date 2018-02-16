@@ -5,7 +5,6 @@ using System;
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
@@ -16,28 +15,33 @@ namespace osu.Game.Tests.Visual
     [Description("Testing chat api and overlay")]
     public class TestCaseChatDisplay : OsuTestCase
     {
-        private readonly DummyChatOverlay chat;
+        private DummyChatOverlay chat;
 
-        public TestCaseChatDisplay()
-        {
-            chat = new DummyChatOverlay
-            {
-                State = Visibility.Visible
-            };
-            Add(chat);
+        private DependencyContainer dependencies;
 
-            AddStep("Set Username DummyUser", () => chat.Username = "DummyUser");
-            AddStep("Type \"Hello\"", () => chat.PostDummyMessage("Hello"));
-            AddStep("Set Long Username", () => chat.Username = "Over15LengthUserName");
-            AddStep("Type \"Over15LengthUserName\"", () => chat.PostDummyMessage("Over15LengthUserName"));
-            AddStep("Set Wide Username", () => chat.Username = "WWWWWWWWWWWWWWW");
-            AddStep("Type \"Wide!\"", () => chat.PostDummyMessage("Wide!"));
-        }
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load()
         {
-            var channel = new DummyChannel
+            DummyAPIAccess api;
+
+            dependencies.CacheAs<IAPIProvider>(api = new DummyAPIAccess());
+
+            Add(chat = new DummyChatOverlay
+            {
+                State = Visibility.Visible
+            });
+
+            AddStep("Set Username DummyUser", () => api.LocalUser.Value.Username = "DummyUser");
+            AddStep("Type \"Hello\"", () => chat.PostMessage("Hello"));
+            AddStep("Set Long Username", () => api.LocalUser.Value.Username = "Over15LengthUserName");
+            AddStep("Type \"Over15LengthUserName\"", () => chat.PostMessage("Over15LengthUserName"));
+            AddStep("Set Wide Username", () => api.LocalUser.Value.Username = "WWWWWWWWWWWWWWW");
+            AddStep("Type \"Wide!\"", () => chat.PostMessage("Wide!"));
+
+            var channel = new Channel
             {
                 Name = "#Dummy",
                 Topic = "Test Chat",
@@ -45,91 +49,19 @@ namespace osu.Game.Tests.Visual
                 Id = 0
             };
 
-            api.Scheduler.Add(delegate
-            {
-                channel.AddNewMessage("This message for test from offline.");
-                channel.AddNewMessage("TestMessage");
-                channel.AddNewMessage("!@#$%^&&*()");
-                channel.AddNewMessage("testTEST");
-                chat.OpenChannel(channel);
-            });
+            channel.AddNewMessages(
+                new DummyMessage("This message for test from offline."),
+                new DummyMessage("TestMessage"),
+                new DummyMessage("TestMessage"),
+                new DummyMessage("TestMessage")
+            );
+
+            chat.OpenChannel(channel);
         }
 
         private class DummyChatOverlay : ChatOverlay
         {
-            public string Username = "DummyUser";
-
-            [BackgroundDependencyLoader]
-            private void load(APIAccess api)
-            {
-                Textbox.OnCommit = postDummyMessage;
-                Api = api;
-                api.Register(this);
-            }
-
-            public void PostDummyMessage(string postText)
-            {
-                if (string.IsNullOrWhiteSpace(postText))
-                    return;
-
-                var target = CurrentChannel;
-
-                if (target == null) return;
-
-                bool isAction = false;
-
-                if (postText[0] == '/')
-                {
-                    string[] parameters = postText.Substring(1).Split(new[] { ' ' }, 2);
-                    string command = parameters[0];
-                    string content = parameters.Length == 2 ? parameters[1] : string.Empty;
-
-                    switch (command)
-                    {
-                        case "me":
-
-                            if (string.IsNullOrWhiteSpace(content))
-                            {
-                                CurrentChannel.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
-                                return;
-                            }
-
-                            isAction = true;
-                            postText = content;
-                            break;
-
-                        case "help":
-                            CurrentChannel.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
-                            return;
-
-                        default:
-                            CurrentChannel.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
-                            return;
-                    }
-                }
-
-                var message = new DummyMessage(postText, Username, isAction);
-                Api.Scheduler.Add(delegate { CurrentChannel.AddNewMessages(message); });
-            }
-
-            private void postDummyMessage(TextBox textbox, bool newText)
-            {
-                var postText = textbox.Text;
-
-                textbox.Text = string.Empty;
-                PostDummyMessage(postText);
-            }
-        }
-
-        private class DummyChannel : Channel
-        {
-            private int messageCounter;
-
-            //Should be call "API Thread"
-            public void AddNewMessage(string message)
-            {
-                AddNewMessages(new DummyMessage(message, null, false, false, messageCounter++));
-            }
+            public new void PostMessage(string postText) => base.PostMessage(postText);
         }
 
         private class DummyMessage : Message
