@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using NUnit.Framework;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -16,7 +15,6 @@ using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Tests.Visual
 {
-    [Ignore("CI regularly hangs on this TestCase...")]
     public class TestCaseWaveform : OsuTestCase
     {
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
