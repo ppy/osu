@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -65,9 +64,12 @@ namespace osu.Game.Overlays
             AlwaysPresent = true;
         }
 
+        private Vector2 dragStart;
+
         protected override bool OnDragStart(InputState state)
         {
             base.OnDragStart(state);
+            dragStart = state.Mouse.Position;
             return true;
         }
 
@@ -75,9 +77,7 @@ namespace osu.Game.Overlays
         {
             if (base.OnDrag(state)) return true;
 
-            Trace.Assert(state.Mouse.PositionMouseDown != null, "state.Mouse.PositionMouseDown != null");
-
-            Vector2 change = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
+            Vector2 change = state.Mouse.Position - dragStart;
 
             // Diminish the drag distance as we go further to simulate "rubber band" feeling.
             change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;

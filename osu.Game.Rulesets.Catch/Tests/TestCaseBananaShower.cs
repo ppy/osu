@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Catch.UI;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    [Ignore("getting CI working")]
     public class TestCaseBananaShower : Game.Tests.Visual.TestCasePlayer
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
