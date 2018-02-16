@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
         protected virtual Waveform GetWaveform() => new Waveform();
-        protected virtual Storyboard GetStoryboard() => new Storyboard();
+        protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
 
         public bool BeatmapLoaded => beatmap.IsResultAvailable;
         public Beatmap Beatmap => beatmap.Value.Result;
