@@ -281,6 +281,8 @@
     <Compile Include="Database\SingletonContextFactory.cs" />
     <Compile Include="Graphics\Containers\LinkFlowContainer.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
+    <Compile Include="Online\API\DummyAPIAccess.cs" />
+    <Compile Include="Online\API\IAPIProvider.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Migrations\20180125143340_Settings.cs" />
     <Compile Include="Migrations\20180125143340_Settings.Designer.cs">
