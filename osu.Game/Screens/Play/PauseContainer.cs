@@ -3,13 +3,13 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play
 
             AddInternal(content = new Container { RelativeSizeAxes = Axes.Both });
 
-            AddInternal(resumeOverlay = new ResumeOverlay(resumeInternal, () => pauseOverlay.Show()));
+            AddInternal(resumeOverlay = createResumeOverlay(resumeInternal, () => pauseOverlay.Show()));
 
             AddInternal(pauseOverlay = new PauseOverlay
             {
@@ -64,6 +64,12 @@ namespace osu.Game.Screens.Play
                 OnRetry = () => OnRetry(),
                 OnQuit = () => OnQuit(),
             });
+        }
+
+        private ResumeOverlay createResumeOverlay(Action resumeAction, Action escAction)
+        {
+            var osuResumeOverlayType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.ExportedTypes).SingleOrDefault(t => t.FullName == "osu.Game.Rulesets.Osu.UI.Overlays.OsuResumeOverlay");
+            return Activator.CreateInstance(osuResumeOverlayType, BindingFlags.CreateInstance, resumeAction, escAction) as ResumeOverlay;
         }
 
         public void Pause(Vector2? cursorPosition, bool force = false)
@@ -165,28 +171,15 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public class ResumeOverlay : GameplayMenuOverlay
+        public abstract class ResumeOverlay : GameplayMenuOverlay
         {
             private readonly Action escAction;
-            public override string Header => "Click the button to resume";
-            public override string Description => string.Empty;
-
-            private readonly TriangleButton resumeButton;
+            private readonly Action resumeAction;
 
             public ResumeOverlay(Action resumeAction, Action escAction)
             {
+                this.resumeAction = resumeAction;
                 this.escAction = escAction;
-                resumeButton = new TriangleButton
-                {
-                    Action = resumeAction,
-                    Size = new Vector2(24)
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                Add(resumeButton);
             }
 
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -200,7 +193,7 @@ namespace osu.Game.Screens.Play
                 return base.OnKeyDown(state, args);
             }
 
-            public void SetResumeButtonPosition(Vector2 newPosition) => resumeButton.MoveTo(newPosition);
+            public abstract void SetResumeButtonPosition(Vector2 newPosition);
         }
     }
 }

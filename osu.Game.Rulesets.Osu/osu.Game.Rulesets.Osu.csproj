@@ -134,6 +134,7 @@
     <Compile Include="Mods\OsuModNoFail.cs" />
     <Compile Include="Replays\OsuAutoGenerator.cs" />
     <Compile Include="Replays\OsuAutoGeneratorBase.cs" />
+    <Compile Include="UI\Overlays\OsuResumeOverlay.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
