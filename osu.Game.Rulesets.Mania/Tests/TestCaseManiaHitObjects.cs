@@ -13,7 +13,6 @@ using OpenTK.Graphics;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    [Ignore("getting CI working")]
     public class TestCaseManiaHitObjects : OsuTestCase
     {
         public TestCaseManiaHitObjects()

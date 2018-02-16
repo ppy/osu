@@ -21,86 +21,94 @@ namespace osu.Game.IO
 
         public new Storage Storage => base.Storage;
 
-        public FileStore(Func<OsuDbContext> createContext, Storage storage) : base(createContext, storage.GetStorageForDirectory(@"files"))
+        public FileStore(IDatabaseContextFactory contextFactory, Storage storage) : base(contextFactory, storage.GetStorageForDirectory(@"files"))
         {
             Store = new StorageBackedResourceStore(Storage);
         }
 
         public FileInfo Add(Stream data, bool reference = true)
         {
-            var context = GetContext();
-
-            string hash = data.ComputeSHA2Hash();
-
-            var existing = context.FileInfo.FirstOrDefault(f => f.Hash == hash);
-
-            var info = existing ?? new FileInfo { Hash = hash };
-
-            string path = info.StoragePath;
-
-            // we may be re-adding a file to fix missing store entries.
-            if (!Storage.Exists(path))
+            using (var usage = ContextFactory.GetForWrite())
             {
-                data.Seek(0, SeekOrigin.Begin);
+                string hash = data.ComputeSHA2Hash();
 
-                using (var output = Storage.GetStream(path, FileAccess.Write))
-                    data.CopyTo(output);
+                var existing = usage.Context.FileInfo.FirstOrDefault(f => f.Hash == hash);
 
-                data.Seek(0, SeekOrigin.Begin);
+                var info = existing ?? new FileInfo { Hash = hash };
+
+                string path = info.StoragePath;
+
+                // we may be re-adding a file to fix missing store entries.
+                if (!Storage.Exists(path))
+                {
+                    data.Seek(0, SeekOrigin.Begin);
+
+                    using (var output = Storage.GetStream(path, FileAccess.Write))
+                        data.CopyTo(output);
+
+                    data.Seek(0, SeekOrigin.Begin);
+                }
+
+                if (reference || existing == null)
+                    Reference(info);
+
+                return info;
             }
-
-            if (reference || existing == null)
-                Reference(info);
-
-            return info;
         }
 
-        public void Reference(params FileInfo[] files) => reference(GetContext(), files);
-
-        private void reference(OsuDbContext context, FileInfo[] files)
+        public void Reference(params FileInfo[] files)
         {
-            foreach (var f in files.GroupBy(f => f.ID))
-            {
-                var refetch = context.Find<FileInfo>(f.First().ID) ?? f.First();
-                refetch.ReferenceCount += f.Count();
-                context.FileInfo.Update(refetch);
-            }
+            if (files.Length == 0) return;
 
-            context.SaveChanges();
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                var context = usage.Context;
+
+                foreach (var f in files.GroupBy(f => f.ID))
+                {
+                    var refetch = context.Find<FileInfo>(f.First().ID) ?? f.First();
+                    refetch.ReferenceCount += f.Count();
+                    context.FileInfo.Update(refetch);
+                }
+            }
         }
 
-        public void Dereference(params FileInfo[] files) => dereference(GetContext(), files);
-
-        private void dereference(OsuDbContext context, FileInfo[] files)
+        public void Dereference(params FileInfo[] files)
         {
-            foreach (var f in files.GroupBy(f => f.ID))
-            {
-                var refetch = context.FileInfo.Find(f.Key);
-                refetch.ReferenceCount -= f.Count();
-                context.FileInfo.Update(refetch);
-            }
+            if (files.Length == 0) return;
 
-            context.SaveChanges();
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                var context = usage.Context;
+
+                foreach (var f in files.GroupBy(f => f.ID))
+                {
+                    var refetch = context.FileInfo.Find(f.Key);
+                    refetch.ReferenceCount -= f.Count();
+                    context.FileInfo.Update(refetch);
+                }
+            }
         }
 
         public override void Cleanup()
         {
-            var context = GetContext();
-
-            foreach (var f in context.FileInfo.Where(f => f.ReferenceCount < 1))
+            using (var usage = ContextFactory.GetForWrite())
             {
-                try
+                var context = usage.Context;
+
+                foreach (var f in context.FileInfo.Where(f => f.ReferenceCount < 1))
                 {
-                    Storage.Delete(f.StoragePath);
-                    context.FileInfo.Remove(f);
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not delete beatmap {f}");
+                    try
+                    {
+                        Storage.Delete(f.StoragePath);
+                        context.FileInfo.Remove(f);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not delete beatmap {f}");
+                    }
                 }
             }
-
-            context.SaveChanges();
         }
     }
 }
