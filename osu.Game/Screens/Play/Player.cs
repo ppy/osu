@@ -353,7 +353,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(Screen next)
         {
-            if (!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused != false || RulesetContainer?.HasReplayLoaded != false)
+            if ((!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused != false || RulesetContainer?.HasReplayLoaded != false) && (!pauseContainer?.IsResuming ?? false))
             {
                 // In the case of replays, we may have changed the playback rate.
                 applyRateFromMods();
@@ -364,7 +364,7 @@ namespace osu.Game.Screens.Play
 
             if (loadedSuccessfully)
             {
-                pauseContainer.Pause(ClickToResumeRequired ? Cursor.ActiveCursor.Position : default(Vector2?));
+                pauseContainer?.Pause(ClickToResumeRequired ? Cursor.ActiveCursor.Position : default(Vector2?));
             }
 
             return true;
