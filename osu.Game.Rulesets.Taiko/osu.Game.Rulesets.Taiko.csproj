@@ -44,6 +44,18 @@
       <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0.13\lib\net45\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_green, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a84b7dcfb1391f7f, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\net45\SQLitePCLRaw.batteries_green.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8226ea5df37bcae9, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\net45\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1488e028ca7ab535, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.core.1.1.8\lib\net45\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.e_sqlite3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9c301db686d0bd12, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.provider.e_sqlite3.net45.1.1.8\lib\net45\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -134,11 +146,15 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets" Condition="Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets'))" />
+    <Error Condition="!Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets'))" />
+    <Error Condition="!Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets'))" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets" Condition="Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets')" />
+  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets" Condition="Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets')" />
 </Project>
