@@ -263,13 +263,5 @@ namespace osu.Game.Screens.Play
                 };
             }
         }
-
-        protected override void UpdateBackgroundElements()
-        {
-            if (!IsCurrentScreen) return;
-
-            base.UpdateBackgroundElements();
-            Background?.FadeTo(Opacity, Duration, Easing.OutQuint);
-        }
     }
 }

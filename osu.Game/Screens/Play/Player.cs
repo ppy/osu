@@ -347,7 +347,7 @@ namespace osu.Game.Screens.Play
 
             var beatmap = Beatmap.Value;
 
-            storyboard = beatmap.Storyboard.CreateDrawable(Beatmap.Value);
+            storyboard = beatmap.Storyboard.CreateDrawable();
             storyboard.Masking = true;
 
             if (asyncLoad)
@@ -369,10 +369,11 @@ namespace osu.Game.Screens.Play
             var storyboardVisible = ShowStoryboard && beatmap.Storyboard.HasDrawable;
 
             storyboardContainer?
-                .FadeColour(OsuColour.Gray(Opacity), Duration, Easing.OutQuint)
-                .FadeTo(storyboardVisible && Opacity > 0 ? 1 : 0, Duration, Easing.OutQuint);
+                .FadeColour(OsuColour.Gray(BackgroundOpacity), BACKGROUND_FADE_DURATION, Easing.OutQuint)
+                .FadeTo(storyboardVisible && BackgroundOpacity > 0 ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
-            Background?.FadeTo(!storyboardVisible || beatmap.Background == null ? Opacity : 0, Duration, Easing.OutQuint);
+            if (storyboardVisible && beatmap.Storyboard.ReplacesBackground)
+                Background?.FadeTo(0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
 }
