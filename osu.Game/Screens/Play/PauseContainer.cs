@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using System.Reflection;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -73,8 +72,8 @@ namespace osu.Game.Screens.Play
 
         private ResumeOverlay createResumeOverlay(Action resumeAction, Action escAction)
         {
-            var osuResumeOverlayType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.ExportedTypes).SingleOrDefault(t => t.FullName == "osu.Game.Rulesets.Osu.UI.Overlays.OsuResumeOverlay");
-            return Activator.CreateInstance(osuResumeOverlayType, BindingFlags.CreateInstance, resumeAction, escAction) as ResumeOverlay;
+            var osuResumeOverlayType = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).SelectMany(a => a.ExportedTypes).SingleOrDefault(t => t.FullName == "osu.Game.Rulesets.Osu.UI.Overlays.OsuResumeOverlay");
+            return Activator.CreateInstance(osuResumeOverlayType, resumeAction, escAction) as ResumeOverlay;
         }
 
         public void Pause(Vector2? cursorPosition, bool force = false)
