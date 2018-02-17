@@ -149,8 +149,12 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 {
                     case OsuAction.LeftButton:
                     case OsuAction.RightButton:
-                        resumeAction();
-                        return true;
+                        if (IsHovered)
+                        {
+                            resumeAction();
+                            return true;
+                        }
+                        else return false;
                 }
 
                 return false;

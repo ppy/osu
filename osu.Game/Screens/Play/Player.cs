@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
                     Clock = offsetClock,
                     Alpha = 0,
                 },
-                pauseContainer = new PauseContainer
+                pauseContainer = new PauseContainer(RulesetContainer.CreateInputManager())
                 {
                     AudioClock = decoupledClock,
                     FramedClock = offsetClock,

@@ -21,6 +21,7 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class PauseContainer : Container
     {
+        private readonly PassThroughInputManager rulesetInputManager;
         public bool IsPaused { get; private set; }
 
         public Func<bool> CheckCanPause;
@@ -50,13 +51,19 @@ namespace osu.Game.Screens.Play
         public IAdjustableClock AudioClock;
         public FramedClock FramedClock;
 
-        public PauseContainer()
+        public PauseContainer(PassThroughInputManager rulesetInputManager)
         {
+            this.rulesetInputManager = rulesetInputManager;
+
             RelativeSizeAxes = Axes.Both;
 
             AddInternal(content = new Container { RelativeSizeAxes = Axes.Both });
 
-            AddInternal(resumeOverlay = createResumeOverlay(resumeInternal, () => pauseOverlay.Show()));
+            AddInternal(resumeOverlay = createResumeOverlay(this.rulesetInputManager, resumeInternal, () =>
+             {
+                 IsResuming = false;
+                 pauseOverlay.Show();
+             }));
 
             AddInternal(pauseOverlay = new PauseOverlay
             {
@@ -70,10 +77,10 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private ResumeOverlay createResumeOverlay(Action resumeAction, Action escAction)
+        private ResumeOverlay createResumeOverlay(PassThroughInputManager inputManager, Action resumeAction, Action escAction)
         {
             var osuResumeOverlayType = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).SelectMany(a => a.ExportedTypes).SingleOrDefault(t => t.FullName == "osu.Game.Rulesets.Osu.UI.Overlays.OsuResumeOverlay");
-            return Activator.CreateInstance(osuResumeOverlayType, resumeAction, escAction) as ResumeOverlay;
+            return Activator.CreateInstance(osuResumeOverlayType, inputManager, resumeAction, escAction) as ResumeOverlay;
         }
 
         public void Pause(Vector2? cursorPosition, bool force = false)
