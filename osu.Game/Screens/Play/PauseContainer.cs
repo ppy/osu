@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
+using osu.Game.Rulesets;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -21,7 +22,6 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class PauseContainer : Container
     {
-        private readonly PassThroughInputManager rulesetInputManager;
         public bool IsPaused { get; private set; }
 
         public Func<bool> CheckCanPause;
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Play
 
         protected override Container<Drawable> Content => content;
 
-        public int Retries { set { pauseOverlay.Retries = value; } }
+        public int Retries { set => pauseOverlay.Retries = value; }
 
         public bool CanPause => (CheckCanPause?.Invoke() ?? true) && Time.Current >= lastPauseActionTime + pause_cooldown;
         public bool IsResuming { get; private set; }
@@ -51,19 +51,20 @@ namespace osu.Game.Screens.Play
         public IAdjustableClock AudioClock;
         public FramedClock FramedClock;
 
-        public PauseContainer(PassThroughInputManager rulesetInputManager)
+        public PauseContainer(RulesetInfo rulesetInfo, PassThroughInputManager rulesetInputManager)
         {
-            this.rulesetInputManager = rulesetInputManager;
-
             RelativeSizeAxes = Axes.Both;
 
             AddInternal(content = new Container { RelativeSizeAxes = Axes.Both });
 
-            AddInternal(resumeOverlay = createResumeOverlay(this.rulesetInputManager, resumeInternal, () =>
-             {
-                 IsResuming = false;
-                 pauseOverlay.Show();
-             }));
+            resumeOverlay = createResumeOverlay(rulesetInfo, rulesetInputManager, resumeInternal, () =>
+            {
+                IsResuming = false;
+                pauseOverlay.Show();
+            });
+
+            if (resumeOverlay != null)
+                AddInternal(resumeOverlay);
 
             AddInternal(pauseOverlay = new PauseOverlay
             {
@@ -77,10 +78,14 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        private ResumeOverlay createResumeOverlay(PassThroughInputManager inputManager, Action resumeAction, Action escAction)
+        private ResumeOverlay createResumeOverlay(RulesetInfo rulesetInfo, PassThroughInputManager inputManager, Action resumeAction, Action escAction)
         {
-            var osuResumeOverlayType = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).SelectMany(a => a.ExportedTypes).SingleOrDefault(t => t.FullName == "osu.Game.Rulesets.Osu.UI.Overlays.OsuResumeOverlay");
-            return Activator.CreateInstance(osuResumeOverlayType, inputManager, resumeAction, escAction) as ResumeOverlay;
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var assemblyName = rulesetInfo.InstantiationInfo.Split(',')[1].Trim();
+            var assembly = assemblies.FirstOrDefault(a => !a.IsDynamic && a.FullName.Split(',').First().Trim() == assemblyName);
+
+            var osuResumeOverlayType = assembly?.ExportedTypes.FirstOrDefault(t => !t.IsAbstract && t.IsSubclassOf(typeof(ResumeOverlay)));
+            return osuResumeOverlayType != null ? Activator.CreateInstance(osuResumeOverlayType, inputManager, resumeAction, escAction) as ResumeOverlay : null;
         }
 
         public void Pause(Vector2? cursorPosition, bool force = false)
@@ -90,7 +95,8 @@ namespace osu.Game.Screens.Play
             if (IsPaused) return;
 
             lastCursorPosition = cursorPosition;
-            if (lastCursorPosition.HasValue) resumeOverlay.SetResumeButtonPosition(lastCursorPosition.Value);
+            if (lastCursorPosition.HasValue)
+                resumeOverlay?.SetResumeButtonPosition(lastCursorPosition.Value);
 
             // stop the decoupled clock (stops the audio eventually)
             AudioClock.Stop();
@@ -117,7 +123,7 @@ namespace osu.Game.Screens.Play
         {
             if (!IsPaused) return;
 
-            if (!lastCursorPosition.HasValue)
+            if (resumeOverlay == null)
                 resumeInternal();
             else
                 resumeOverlay.Show();
@@ -126,7 +132,7 @@ namespace osu.Game.Screens.Play
         private void resumeInternal()
         {
             pauseOverlay.Hide();
-            resumeOverlay.Hide();
+            resumeOverlay?.Hide();
 
             IsPaused = false;
             FramedClock.ProcessSourceClockFrames = true;

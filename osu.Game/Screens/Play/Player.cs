@@ -54,8 +54,6 @@ namespace osu.Game.Screens.Play
         public CursorContainer Cursor => RulesetContainer.Cursor;
         public bool ProvidingUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded.Value;
 
-        public bool ClickToResumeRequired => ruleset.Name == "osu!";
-
         private IAdjustableClock adjustableSourceClock;
         private FramedOffsetClock offsetClock;
         private DecoupleableInterpolatingFramedClock decoupledClock;
@@ -166,7 +164,7 @@ namespace osu.Game.Screens.Play
                     Clock = offsetClock,
                     Alpha = 0,
                 },
-                pauseContainer = new PauseContainer(RulesetContainer.CreateInputManager())
+                pauseContainer = new PauseContainer(ruleset, RulesetContainer.CreateInputManager())
                 {
                     AudioClock = decoupledClock,
                     FramedClock = offsetClock,
@@ -364,7 +362,7 @@ namespace osu.Game.Screens.Play
 
             if (loadedSuccessfully)
             {
-                pauseContainer?.Pause(ClickToResumeRequired ? Cursor.ActiveCursor.Position : default(Vector2?));
+                pauseContainer?.Pause(Cursor?.ActiveCursor?.Position);
             }
 
             return true;
