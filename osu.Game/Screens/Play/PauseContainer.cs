@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Play
             protected readonly Action EscAction;
             protected readonly Action ResumeAction;
 
-            public ResumeOverlay(Action resumeAction, Action escAction)
+            protected ResumeOverlay(Action resumeAction, Action escAction)
             {
                 ResumeAction = resumeAction;
                 EscAction = escAction;
