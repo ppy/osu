@@ -290,6 +290,10 @@
     <Compile Include="IO\Archives\ArchiveReader.cs" />
     <Compile Include="IO\Archives\LegacyFilesystemReader.cs" />
     <Compile Include="IO\Archives\ZipArchiveReader.cs" />
+    <Compile Include="Migrations\20180219060912_AddSkins.cs" />
+    <Compile Include="Migrations\20180219060912_AddSkins.designer.cs">
+      <DependentUpon>20180219060912_AddSkins.cs</DependentUpon>
+    </Compile>
     <Compile Include="Online\API\APIDownloadRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Migrations\20180125143340_Settings.cs" />
