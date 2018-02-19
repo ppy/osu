@@ -2,7 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -30,7 +33,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game
 {
-    public class OsuGameBase : Framework.Game, IOnlineComponent
+    public class OsuGameBase : Framework.Game, IOnlineComponent, ICanAcceptFiles
     {
         protected OsuConfigManager LocalConfig;
 
@@ -113,6 +116,9 @@ namespace osu.Game
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(new OsuColour());
+
+            fileImporters.Add(BeatmapManager);
+            fileImporters.Add(ScoreStore);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 });
@@ -257,5 +263,17 @@ namespace osu.Game
 
             base.Dispose(isDisposing);
         }
+
+        private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
+
+        public void Import(params string[] paths)
+        {
+            var extension = Path.GetExtension(paths.First());
+
+            foreach (var importer in fileImporters)
+                if (importer.HandledExtensions.Contains(extension)) importer.Import(paths);
+        }
+
+        public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
     }
 }
