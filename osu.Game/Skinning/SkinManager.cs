@@ -27,6 +27,16 @@ namespace osu.Game.Skinning
             Name = archive.Name
         };
 
+        /// <summary>
+        /// Retrieve a <see cref="Skin"/> instance for the provided <see cref="SkinInfo"/>
+        /// </summary>
+        /// <param name="skinInfo">The skin to lookup.</param>
+        /// <returns>A <see cref="Skin"/> instance correlating to the provided <see cref="SkinInfo"/>.</returns>
+        public Skin GetSkin(SkinInfo skinInfo)
+        {
+            return new LegacySkin(skinInfo, Files.Store);
+        }
+
         private SkinStore store;
 
         public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost)
