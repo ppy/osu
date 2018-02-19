@@ -9,16 +9,16 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableComponent : SkinnableComponent<Drawable>
+    public class SkinnableDrawable : SkinnableDrawable<Drawable>
     {
-        public SkinnableComponent(string name, Func<string,Drawable> defaultImplementation)
+        public SkinnableDrawable(string name, Func<string,Drawable> defaultImplementation)
             : base(name, defaultImplementation)
         {
             RelativeSizeAxes = Axes.Both;
         }
     }
 
-    public class SkinnableComponent<T> : CompositeDrawable
+    public class SkinnableDrawable<T> : CompositeDrawable
         where T : Drawable
     {
         private Bindable<Skin> skin;
@@ -26,7 +26,7 @@ namespace osu.Game.Skinning
 
         public string ComponentName { get; set; }
 
-        public SkinnableComponent(string name, Func<string,T> defaultImplementation)
+        public SkinnableDrawable(string name, Func<string,T> defaultImplementation)
         {
             ComponentName = name;
             CreateDefault = defaultImplementation;
@@ -42,7 +42,7 @@ namespace osu.Game.Skinning
 
         private void updateComponent(Skin skin)
         {
-            InternalChild = skin.GetComponent(ComponentName) ?? CreateDefault(Name);
+            InternalChild = skin.GetDrawableComponent(ComponentName) ?? CreateDefault(Name);
         }
     }
 }

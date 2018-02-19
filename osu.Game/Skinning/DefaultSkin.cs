@@ -1,4 +1,5 @@
-﻿using osu.Framework.Graphics;
+﻿using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -9,6 +10,8 @@ namespace osu.Game.Skinning
         {
         }
 
-        public override Drawable GetComponent(string componentName) => null;
+        public override Drawable GetDrawableComponent(string componentName) => null;
+
+        public override SampleChannel GetSample(string sampleName) => null;
     }
 }

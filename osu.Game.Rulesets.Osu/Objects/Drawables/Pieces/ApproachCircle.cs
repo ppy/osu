@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            Child = new SkinnableComponent("Play/osu/approachcircle", name => new Sprite { Texture = textures.Get(name) });
+            Child = new SkinnableDrawable("Play/osu/approachcircle", name => new Sprite { Texture = textures.Get(name) });
         }
     }
 }
