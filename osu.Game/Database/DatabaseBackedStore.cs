@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Platform;
@@ -23,7 +22,7 @@ namespace osu.Game.Database
         /// <param name="obj">The object to use as a reference when negotiating a local instance.</param>
         /// <param name="lookupSource">An optional lookup source which will be used to query and populate a freshly retrieved replacement. If not provided, the refreshed object will still be returned but will not have any includes.</param>
         /// <typeparam name="T">A valid EF-stored type.</typeparam>
-        protected virtual void Refresh<T>(ref T obj, IEnumerable<T> lookupSource = null) where T : class, IHasPrimaryKey
+        protected virtual void Refresh<T>(ref T obj, IQueryable<T> lookupSource = null) where T : class, IHasPrimaryKey
         {
             using (var usage = ContextFactory.GetForWrite())
             {
