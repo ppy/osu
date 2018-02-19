@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual
             {
                 if (deleteMaps)
                 {
-                    manager.DeleteAll();
+                    manager.Delete(manager.GetAllUsableBeatmapSets());
                     game.Beatmap.SetDefault();
                 }
 

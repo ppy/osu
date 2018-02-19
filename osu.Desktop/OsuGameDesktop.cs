@@ -111,16 +111,11 @@ namespace osu.Desktop
         {
             var filePaths = new [] { e.FileName };
 
-            if (filePaths.All(f => Path.GetExtension(f) == @".osz"))
-                Task.Factory.StartNew(() => BeatmapManager.Import(filePaths), TaskCreationOptions.LongRunning);
-            else if (filePaths.All(f => Path.GetExtension(f) == @".osr"))
-                Task.Run(() =>
-                {
-                    var score = ScoreStore.ReadReplayFile(filePaths.First());
-                    Schedule(() => LoadScore(score));
-                });
-        }
+            var firstExtension = Path.GetExtension(filePaths.First());
 
-        private static readonly string[] allowed_extensions = { @".osz", @".osr" };
+            if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
+
+            Task.Factory.StartNew(() => Import(filePaths), TaskCreationOptions.LongRunning);
+        }
     }
 }
