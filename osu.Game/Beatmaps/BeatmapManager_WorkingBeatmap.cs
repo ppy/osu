@@ -82,7 +82,7 @@ namespace osu.Game.Beatmaps
                     {
                         Decoder decoder = Decoder.GetDecoder(beatmap);
 
-                        // todo: support loading from both set-wide storyboard *and* baetmap specific.
+                        // todo: support loading from both set-wide storyboard *and* beatmap specific.
 
                         if (BeatmapSetInfo?.StoryboardFile == null)
                             storyboard = decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap);
