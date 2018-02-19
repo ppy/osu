@@ -31,6 +31,28 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private bool expanded = true;
 
+        public bool Expanded
+        {
+            get { return expanded; }
+            set
+            {
+                if (expanded == value) return;
+                expanded = value;
+
+                content.ClearTransforms();
+
+                if (expanded)
+                    content.AutoSizeAxes = Axes.Y;
+                else
+                {
+                    content.AutoSizeAxes = Axes.None;
+                    content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+                }
+
+                button.FadeColour(expanded ? buttonActiveColour : Color4.White, 200, Easing.OutQuint);
+            }
+        }
+
         private Color4 buttonActiveColour;
 
         protected PlayerSettingsGroup()
@@ -82,7 +104,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Position = new Vector2(-15, 0),
                                     Icon = FontAwesome.fa_bars,
                                     Scale = new Vector2(0.75f),
-                                    Action = toggleContentVisibility,
+                                    Action = () => Expanded = !Expanded,
                                 },
                             }
                         },
@@ -111,22 +133,5 @@ namespace osu.Game.Screens.Play.PlayerSettings
         }
 
         protected override Container<Drawable> Content => content;
-
-        private void toggleContentVisibility()
-        {
-            content.ClearTransforms();
-
-            expanded = !expanded;
-
-            if (expanded)
-                content.AutoSizeAxes = Axes.Y;
-            else
-            {
-                content.AutoSizeAxes = Axes.None;
-                content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
-            }
-
-            button.FadeColour(expanded ? buttonActiveColour : Color4.White, 200, Easing.OutQuint);
-        }
     }
 }
