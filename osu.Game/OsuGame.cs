@@ -105,6 +105,8 @@ namespace osu.Game
         {
             this.frameworkConfig = frameworkConfig;
 
+            ScoreStore.ScoreImported += score => Schedule(() => LoadScore(score));
+
             if (!Host.IsPrimaryInstance)
             {
                 Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
@@ -114,7 +116,8 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                Task.Run(() => BeatmapManager.Import(paths.ToArray()));
+
+                Task.Run(() => Import(paths.ToArray()));
             }
 
             dependencies.CacheAs(this);
