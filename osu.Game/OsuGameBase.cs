@@ -118,6 +118,7 @@ namespace osu.Game
             dependencies.Cache(new OsuColour());
 
             fileImporters.Add(BeatmapManager);
+            fileImporters.Add(ScoreStore);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 });
