@@ -119,8 +119,6 @@ namespace osu.Game.Screens.Select
                 return true;
             }
 
-            modSelect.SelectedMods.UnbindBindings();
-
             if (base.OnExiting(next))
                 return true;
 
