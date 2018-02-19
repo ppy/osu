@@ -22,7 +22,7 @@ namespace osu.Desktop
             {
                 if (!host.IsPrimaryInstance)
                 {
-                    var importer = new BeatmapIPCChannel(host);
+                    var importer = new ArchiveImportIPCChannel(host);
                     // Restore the cwd so relative paths given at the command line work correctly
                     Directory.SetCurrentDirectory(cwd);
                     foreach (var file in args)
