@@ -3,34 +3,37 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.UI.Overlays
 {
     public class OsuResumeOverlay : PauseContainer.ResumeOverlay
     {
-        private readonly PassThroughInputManager rulesetInputManager;
         private GameplayCursor.OsuClickToResumeCursor clickToResumeCursor;
 
-        public OsuResumeOverlay(PassThroughInputManager rulesetInputManager, Action resumeAction, Action escAction)
-            : base(resumeAction, escAction)
+        public OsuResumeOverlay(PassThroughInputManager rulesetInputManager, CursorContainer cursor, Action resumeAction, Action escAction)
+            : base(rulesetInputManager, cursor, resumeAction, escAction)
         {
-            this.rulesetInputManager = rulesetInputManager;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            rulesetInputManager.Add(clickToResumeCursor = new GameplayCursor.OsuClickToResumeCursor(ResumeAction));
-            Add(rulesetInputManager);
+            RulesetInputManager.Add(clickToResumeCursor = new GameplayCursor.OsuClickToResumeCursor(ResumeAction));
+            Add(RulesetInputManager);
         }
 
         public override string Header => "Click the orange cursor to resume";
         public override string Description => string.Empty;
 
-        public override void SetResumeButtonPosition(Vector2 newPosition) => clickToResumeCursor.MoveTo(newPosition);
+        public override void Show()
+        {
+            if (Cursor != null)
+                clickToResumeCursor.MoveTo(Cursor.ActiveCursor.Position);
+            base.Show();
+        }
     }
 }

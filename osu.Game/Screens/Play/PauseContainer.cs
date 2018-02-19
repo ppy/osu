@@ -3,16 +3,16 @@
 
 using System;
 using System.Linq;
+using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -28,7 +28,6 @@ namespace osu.Game.Screens.Play
 
         private const double pause_cooldown = 1000;
         private double lastPauseActionTime;
-        private Vector2? lastCursorPosition;
 
         private readonly PauseOverlay pauseOverlay;
         private readonly ResumeOverlay resumeOverlay;
@@ -51,13 +50,13 @@ namespace osu.Game.Screens.Play
         public IAdjustableClock AudioClock;
         public FramedClock FramedClock;
 
-        public PauseContainer(RulesetInfo rulesetInfo, PassThroughInputManager rulesetInputManager)
+        public PauseContainer(RulesetInfo rulesetInfo, PassThroughInputManager rulesetInputManager, CursorContainer cursor)
         {
             RelativeSizeAxes = Axes.Both;
 
             AddInternal(content = new Container { RelativeSizeAxes = Axes.Both });
 
-            resumeOverlay = createResumeOverlay(rulesetInfo, rulesetInputManager, resumeInternal, () =>
+            resumeOverlay = createResumeOverlay(rulesetInfo, rulesetInputManager, cursor, resumeInternal, () =>
             {
                 IsResuming = false;
                 pauseOverlay.Show();
@@ -71,32 +70,28 @@ namespace osu.Game.Screens.Play
                 OnResume = () =>
                 {
                     IsResuming = true;
-                    this.Delay(400).Schedule(Resume);
+                    this.Delay(resumeOverlay == null ? 400 : 0).Schedule(Resume);
                 },
                 OnRetry = () => OnRetry(),
                 OnQuit = () => OnQuit(),
             });
         }
 
-        private ResumeOverlay createResumeOverlay(RulesetInfo rulesetInfo, PassThroughInputManager inputManager, Action resumeAction, Action escAction)
+        private ResumeOverlay createResumeOverlay(RulesetInfo rulesetInfo, PassThroughInputManager inputManager, CursorContainer cursor, Action resumeAction, Action escAction)
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             var assemblyName = rulesetInfo.InstantiationInfo.Split(',')[1].Trim();
             var assembly = assemblies.FirstOrDefault(a => !a.IsDynamic && a.FullName.Split(',').First().Trim() == assemblyName);
 
             var osuResumeOverlayType = assembly?.ExportedTypes.FirstOrDefault(t => !t.IsAbstract && t.IsSubclassOf(typeof(ResumeOverlay)));
-            return osuResumeOverlayType != null ? Activator.CreateInstance(osuResumeOverlayType, inputManager, resumeAction, escAction) as ResumeOverlay : null;
+            return osuResumeOverlayType != null ? Activator.CreateInstance(osuResumeOverlayType, inputManager, cursor, resumeAction, escAction) as ResumeOverlay : null;
         }
 
-        public void Pause(Vector2? cursorPosition, bool force = false)
+        public void Pause(bool force = false)
         {
             if (!CanPause && !force) return;
 
             if (IsPaused) return;
-
-            lastCursorPosition = cursorPosition;
-            if (lastCursorPosition.HasValue)
-                resumeOverlay?.SetResumeButtonPosition(lastCursorPosition.Value);
 
             // stop the decoupled clock (stops the audio eventually)
             AudioClock.Stop();
@@ -157,7 +152,7 @@ namespace osu.Game.Screens.Play
         {
             // eagerly pause when we lose window focus (if we are locally playing).
             if (!game.IsActive && CanPause)
-                Pause(lastCursorPosition);
+                Pause();
 
             base.Update();
         }
@@ -191,11 +186,15 @@ namespace osu.Game.Screens.Play
 
         public abstract class ResumeOverlay : GameplayMenuOverlay
         {
+            protected readonly PassThroughInputManager RulesetInputManager;
+            protected readonly CursorContainer Cursor;
             protected readonly Action EscAction;
             protected readonly Action ResumeAction;
 
-            protected ResumeOverlay(Action resumeAction, Action escAction)
+            protected ResumeOverlay(PassThroughInputManager rulesetInputManager, CursorContainer cursor, Action resumeAction, Action escAction)
             {
+                RulesetInputManager = rulesetInputManager;
+                Cursor = cursor;
                 ResumeAction = resumeAction;
                 EscAction = escAction;
             }
@@ -210,8 +209,6 @@ namespace osu.Game.Screens.Play
 
                 return base.OnKeyDown(state, args);
             }
-
-            public abstract void SetResumeButtonPosition(Vector2 newPosition);
         }
     }
 }

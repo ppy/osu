@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -29,7 +30,6 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play.BreaksOverlay;
 using osu.Game.Screens.Ranking;
 using osu.Game.Storyboards.Drawables;
-using OpenTK;
 
 namespace osu.Game.Screens.Play
 {
@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
                     Clock = offsetClock,
                     Alpha = 0,
                 },
-                pauseContainer = new PauseContainer(ruleset, RulesetContainer.CreateInputManager())
+                pauseContainer = new PauseContainer(ruleset, RulesetContainer.CreateInputManager(), Cursor)
                 {
                     AudioClock = decoupledClock,
                     FramedClock = offsetClock,
@@ -362,7 +362,7 @@ namespace osu.Game.Screens.Play
 
             if (loadedSuccessfully)
             {
-                pauseContainer?.Pause(Cursor?.ActiveCursor?.Position);
+                pauseContainer?.Pause();
             }
 
             return true;
