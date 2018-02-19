@@ -34,11 +34,6 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetContainer : Container
     {
         /// <summary>
-        /// Whether to apply adjustments to the child <see cref="Playfield"/> based on our own size.
-        /// </summary>
-        public bool AspectAdjust = true;
-
-        /// <summary>
         /// The selected variant.
         /// </summary>
         public virtual int Variant => 0;
@@ -324,7 +319,7 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
-            Playfield.Size = AspectAdjust ? GetAspectAdjustedSize() : Vector2.One;
+            Playfield.Size = GetAspectAdjustedSize();
         }
 
         /// <summary>
