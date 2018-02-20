@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -25,6 +26,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected ICompositionTool CurrentTool { get; private set; }
 
+        private RulesetContainer rulesetContainer;
+        private readonly Container[] layerContainers = new Container[2];
+
         protected HitObjectComposer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
@@ -35,7 +39,6 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {
-            RulesetContainer rulesetContainer;
             try
             {
                 rulesetContainer = CreateRulesetContainer(ruleset, osuGame.Beatmap.Value);
@@ -45,6 +48,20 @@ namespace osu.Game.Rulesets.Edit
                 Logger.Error(e, "Could not load beatmap sucessfully!");
                 return;
             }
+
+            layerContainers[0] = CreateLayerContainer();
+            layerContainers[0].Child = new Container
+            {
+                Name = "Border",
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                BorderColour = Color4.White,
+                BorderThickness = 2,
+                Child = new Box { RelativeSizeAxes = Axes.Both, Alpha = 0, AlwaysPresent = true }
+            };
+
+            layerContainers[1] = CreateLayerContainer();
+            layerContainers[1].Child = new SelectionLayer(rulesetContainer.Playfield);
 
             RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
@@ -66,20 +83,13 @@ namespace osu.Game.Rulesets.Edit
                         },
                         new Container
                         {
+                            Name = "Content",
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            BorderColour = Color4.White,
-                            BorderThickness = 2,
                             Children = new Drawable[]
                             {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0,
-                                    AlwaysPresent = true,
-                                },
+                                layerContainers[0],
                                 rulesetContainer,
-                                new SelectionLayer(rulesetContainer.Playfield)
+                                layerContainers[1]
                             }
                         }
                     },
@@ -102,10 +112,28 @@ namespace osu.Game.Rulesets.Edit
             toolboxCollection.Items[0].Select();
         }
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            layerContainers.ForEach(l =>
+            {
+                l.Anchor = rulesetContainer.Playfield.Anchor;
+                l.Origin = rulesetContainer.Playfield.Origin;
+                l.Position = rulesetContainer.Playfield.Position;
+                l.Size = rulesetContainer.Playfield.Size;
+            });
+        }
+
         private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
 
         protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap, true);
 
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
+
+        /// <summary>
+        /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
+        /// </summary>
+        protected virtual ScalableContainer CreateLayerContainer() => new ScalableContainer();
     }
 }
