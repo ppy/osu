@@ -290,6 +290,8 @@
     <Compile Include="IO\Archives\ArchiveReader.cs" />
     <Compile Include="IO\Archives\LegacyFilesystemReader.cs" />
     <Compile Include="IO\Archives\ZipArchiveReader.cs" />
+    <Compile Include="Online\API\DummyAPIAccess.cs" />
+    <Compile Include="Online\API\IAPIProvider.cs" />
     <Compile Include="Online\API\APIDownloadRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Migrations\20180125143340_Settings.cs" />
