@@ -78,6 +78,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             container.Attach(RenderbufferInternalFormat.DepthComponent16);
         }
 
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => path.ReceiveMouseInputAt(screenSpacePos);
+
         public void SetRange(double p0, double p1)
         {
             if (p0 > p1)

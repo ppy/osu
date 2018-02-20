@@ -2,23 +2,25 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps;
+using osu.Game.Database;
 
 namespace osu.Game.IPC
 {
-    public class BeatmapIPCChannel : IpcChannel<BeatmapImportMessage>
+    public class ArchiveImportIPCChannel : IpcChannel<ArchiveImportMessage>
     {
-        private readonly BeatmapManager beatmaps;
+        private readonly ICanAcceptFiles importer;
 
-        public BeatmapIPCChannel(IIpcHost host, BeatmapManager beatmaps = null)
+        public ArchiveImportIPCChannel(IIpcHost host, ICanAcceptFiles importer = null)
             : base(host)
         {
-            this.beatmaps = beatmaps;
+            this.importer = importer;
             MessageReceived += msg =>
             {
-                Debug.Assert(beatmaps != null);
+                Debug.Assert(importer != null);
                 ImportAsync(msg.Path).ContinueWith(t =>
                 {
                     if (t.Exception != null) throw t.Exception;
@@ -28,18 +30,19 @@ namespace osu.Game.IPC
 
         public async Task ImportAsync(string path)
         {
-            if (beatmaps == null)
+            if (importer == null)
             {
                 //we want to contact a remote osu! to handle the import.
-                await SendMessageAsync(new BeatmapImportMessage { Path = path });
+                await SendMessageAsync(new ArchiveImportMessage { Path = path });
                 return;
             }
 
-            beatmaps.Import(path);
+            if (importer.HandledExtensions.Contains(Path.GetExtension(path)))
+                importer.Import(path);
         }
     }
 
-    public class BeatmapImportMessage
+    public class ArchiveImportMessage
     {
         public string Path;
     }

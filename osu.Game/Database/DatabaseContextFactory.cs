@@ -26,7 +26,8 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Get a context for read-only usage.
+        /// Get a context for the current thread for read-only usage.
+        /// If a <see cref="DatabaseWriteUsage"/> is in progress, the existing write-safe context will be returned.
         /// </summary>
         public OsuDbContext Get() => threadContexts.Value;
 
