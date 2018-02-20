@@ -17,7 +17,14 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 {
     public class SelectionLayer : CompositeDrawable
     {
+        /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> is selected.
+        /// </summary>
         public event Action<DrawableHitObject> ObjectSelected;
+
+        /// <summary>
+        /// Invoked when a <see cref="DrawableHitObject"/> is deselected.
+        /// </summary>
         public event Action<DrawableHitObject> ObjectDeselected;
 
         private readonly Playfield playfield;
