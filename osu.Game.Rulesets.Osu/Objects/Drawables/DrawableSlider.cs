@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly List<Drawable> components = new List<Drawable>();
 
         public readonly DrawableHitCircle HeadCircle;
+        public readonly DrawableSliderTail TailCircle;
+
         public readonly SliderBody Body;
         public readonly SliderBall Ball;
 
@@ -29,7 +31,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             slider = s;
 
-            DrawableSliderTail tail;
             Container<DrawableSliderTick> ticks;
             Container<DrawableRepeatPoint> repeatPoints;
 
@@ -51,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 },
                 HeadCircle = new DrawableHitCircle(s.HeadCircle),
-                tail = new DrawableSliderTail(s.TailCircle)
+                TailCircle = new DrawableSliderTail(s.TailCircle)
             };
 
             components.Add(Body);
@@ -59,8 +60,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             AddNested(HeadCircle);
 
-            AddNested(tail);
-            components.Add(tail);
+            AddNested(TailCircle);
+            components.Add(TailCircle);
 
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
@@ -96,10 +97,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Tracking = Ball.Tracking;
 
-            double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
-
-            int span = slider.SpanAt(progress);
-            progress = slider.ProgressAt(progress);
+            GetCurrentProgress(out int span, out double progress);
 
             if (span > currentSpan)
                 currentSpan = span;
@@ -153,6 +151,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
             }
+        }
+
+        /// <summary>
+        /// Finds the progress along the slider at the current time.
+        /// </summary>
+        /// <param name="span">The current span.</param>
+        /// <param name="progress">The current progress in the current span.</param>
+        public void GetCurrentProgress(out int span, out double progress)
+        {
+            double offset = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
+
+            span = slider.SpanAt(offset);
+            progress = slider.ProgressAt(offset);
         }
 
         public Drawable ProxiedLayer => HeadCircle.ApproachCircle;

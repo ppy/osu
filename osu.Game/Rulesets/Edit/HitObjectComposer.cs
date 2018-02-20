@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Edit
         protected ICompositionTool CurrentTool { get; private set; }
 
         private RulesetContainer rulesetContainer;
-        private readonly Container[] layerContainers = new Container[2];
+        private readonly ScalableContainer[] layerContainers = new ScalableContainer[2];
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -48,20 +48,6 @@ namespace osu.Game.Rulesets.Edit
                 Logger.Error(e, "Could not load beatmap sucessfully!");
                 return;
             }
-
-            layerContainers[0] = CreateLayerContainer();
-            layerContainers[0].Child = new Container
-            {
-                Name = "Border",
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                BorderColour = Color4.White,
-                BorderThickness = 2,
-                Child = new Box { RelativeSizeAxes = Axes.Both, Alpha = 0, AlwaysPresent = true }
-            };
-
-            layerContainers[1] = CreateLayerContainer();
-            layerContainers[1].Child = new SelectionLayer(rulesetContainer.Playfield);
 
             RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
@@ -87,9 +73,9 @@ namespace osu.Game.Rulesets.Edit
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                layerContainers[0],
+                                createBottomLayer(),
                                 rulesetContainer,
-                                layerContainers[1]
+                                createTopLayer()
                             }
                         }
                     },
@@ -110,6 +96,40 @@ namespace osu.Game.Rulesets.Edit
                 .ToList();
 
             toolboxCollection.Items[0].Select();
+        }
+
+        private ScalableContainer createBottomLayer()
+        {
+            layerContainers[0] = CreateLayerContainer();
+            layerContainers[0].Child = new Container
+            {
+                Name = "Border",
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                BorderColour = Color4.White,
+                BorderThickness = 2,
+                Child = new Box { RelativeSizeAxes = Axes.Both, Alpha = 0, AlwaysPresent = true }
+            };
+
+            return layerContainers[0];
+        }
+
+        private ScalableContainer createTopLayer()
+        {
+            var overlayLayer = CreateHitObjectOverlayLayer();
+            var selectionLayer = new SelectionLayer(rulesetContainer.Playfield);
+
+            selectionLayer.ObjectSelected += overlayLayer.AddOverlay;
+            selectionLayer.ObjectDeselected += overlayLayer.RemoveOverlay;
+
+            layerContainers[1] = CreateLayerContainer();
+            layerContainers[1].Children = new Drawable[]
+            {
+                overlayLayer,
+                selectionLayer,
+            };
+
+            return layerContainers[1];
         }
 
         protected override void UpdateAfterChildren()
@@ -135,5 +155,10 @@ namespace osu.Game.Rulesets.Edit
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
         /// </summary>
         protected virtual ScalableContainer CreateLayerContainer() => new ScalableContainer();
+
+        /// <summary>
+        /// Creates the <see cref="HitObjectOverlayLayer"/> which overlays selected <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        protected virtual HitObjectOverlayLayer CreateHitObjectOverlayLayer() => new HitObjectOverlayLayer();
     }
 }
