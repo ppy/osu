@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Audio;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -12,6 +13,8 @@ namespace osu.Game.Skinning
 {
     public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>
     {
+        private readonly AudioManager audio;
+
         public Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin());
 
         public override string[] HandledExtensions => new[] { ".osk" };
@@ -34,14 +37,17 @@ namespace osu.Game.Skinning
         /// <returns>A <see cref="Skin"/> instance correlating to the provided <see cref="SkinInfo"/>.</returns>
         public Skin GetSkin(SkinInfo skinInfo)
         {
-            return new LegacySkin(skinInfo, Files.Store);
+            return new LegacySkin(skinInfo, Files.Store, audio);
         }
 
         private SkinStore store;
 
-        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost)
+        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost, AudioManager audio)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), importHost)
         {
+            this.audio = audio;
+
+            CurrentSkin.Value = GetSkin(GetAllUsableSkins().First());
         }
     }
 }

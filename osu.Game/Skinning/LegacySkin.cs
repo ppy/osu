@@ -2,7 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.IO;
 using System.Linq;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -17,20 +19,24 @@ namespace osu.Game.Skinning
 
         public SkinInfo SkinInfo;
 
-        public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage)
+        private readonly SampleManager samples;
+
+        public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : base(skin.Name)
         {
             SkinInfo = skin;
+
+            var audioStore = new ResourceStore<byte[]>(storage);
+
+            samples = audioManager.GetSampleManager(audioStore);
             textures = new TextureStore(new RawTextureLoaderStore(storage));
         }
 
-        private string getPathForFile(string filename) => SkinInfo.Files.First(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
+        private string getPathForFile(string filename) => SkinInfo.Files.FirstOrDefault(f => string.Equals(Path.GetFileNameWithoutExtension(f.Filename), filename, StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
 
         public override Drawable GetDrawableComponent(string componentName)
         {
-            var legacyComponentName = componentName.Split('/').Last();
-
-            var texture = textures.Get(getPathForFile(legacyComponentName));
+            var texture = textures.Get(getPathForFile(componentName.Split('/').Last()));
             if (texture == null) return null;
 
             return new Sprite
@@ -41,6 +47,6 @@ namespace osu.Game.Skinning
             };
         }
 
-        public override SampleChannel GetSample(string sampleName) => null;
+        public override SampleChannel GetSample(string sampleName) => samples.Get(getPathForFile(sampleName.Split('/').Last()));
     }
 }
