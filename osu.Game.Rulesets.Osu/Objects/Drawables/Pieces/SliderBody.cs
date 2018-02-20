@@ -51,6 +51,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
+        private Color4 borderColour = Color4.White;
+        /// <summary>
+        /// Used to colour the path border.
+        /// </summary>
+        public new Color4 BorderColour
+        {
+            get { return borderColour; }
+            set
+            {
+                if (borderColour == value)
+                    return;
+                borderColour = value;
+
+                if (LoadState == LoadState.Ready)
+                    Schedule(reloadTexture);
+            }
+        }
+
         public Quad PathDrawQuad => container.ScreenSpaceDrawQuad;
 
         private int textureWidth => (int)PathWidth * 2;
@@ -130,10 +148,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 if (progress <= border_portion)
                 {
-                    bytes[i * 4] = 255;
-                    bytes[i * 4 + 1] = 255;
-                    bytes[i * 4 + 2] = 255;
-                    bytes[i * 4 + 3] = (byte)(Math.Min(progress / aa_portion, 1) * 255);
+                    bytes[i * 4] = (byte)(BorderColour.R * 255);
+                    bytes[i * 4 + 1] = (byte)(BorderColour.G * 255);
+                    bytes[i * 4 + 2] = (byte)(BorderColour.B * 255);
+                    bytes[i * 4 + 3] = (byte)(Math.Min(progress / aa_portion, 1) * (BorderColour.A * 255));
                 }
                 else
                 {
