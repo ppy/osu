@@ -14,32 +14,21 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
     /// </summary>
     public class SelectionBox : VisibilityContainer
     {
+        public const float BORDER_RADIUS = 2;
+
         /// <summary>
         /// Creates a new <see cref="SelectionBox"/>.
         /// </summary>
         public SelectionBox()
         {
-            InternalChildren = new Drawable[]
+            Masking = true;
+            BorderColour = Color4.White;
+            BorderThickness = BORDER_RADIUS;
+
+            Child = new Box
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(-1),
-                    Child = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        BorderColour = Color4.White,
-                        BorderThickness = 2,
-                        MaskingSmoothness = 1,
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.1f,
-                            AlwaysPresent = true
-                        },
-                    }
-                }
+                RelativeSizeAxes = Axes.Both,
+                Alpha = 0.1f
             };
         }
 
