@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.IO;
 
@@ -14,13 +13,6 @@ namespace osu.Game.Storyboards.Drawables
     public class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
         public Storyboard Storyboard { get; private set; }
-
-        private readonly Background background;
-        public Texture BackgroundTexture
-        {
-            get { return background.Texture; }
-            set { background.Texture = value; }
-        }
 
         private readonly Container<DrawableStoryboardLayer> content;
         protected override Container<DrawableStoryboardLayer> Content => content;
@@ -52,11 +44,6 @@ namespace osu.Game.Storyboards.Drawables
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            AddInternal(background = new Background
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            });
             AddInternal(content = new Container<DrawableStoryboardLayer>
             {
                 Size = new Vector2(640, 480),
@@ -78,11 +65,6 @@ namespace osu.Game.Storyboards.Drawables
         {
             foreach (var layer in Children)
                 layer.Enabled = passing ? layer.Layer.EnabledWhenPassing : layer.Layer.EnabledWhenFailing;
-        }
-
-        private class Background : Sprite
-        {
-            protected override Vector2 DrawScale => Texture != null ? new Vector2(Parent.DrawHeight / Texture.DisplayHeight) : base.DrawScale;
         }
     }
 }

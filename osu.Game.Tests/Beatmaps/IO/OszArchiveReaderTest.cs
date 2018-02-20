@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Tests.Resources;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO.Archives;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         {
             using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
             {
-                var reader = new OszArchiveReader(osz);
+                var reader = new ZipArchiveReader(osz);
                 string[] expected =
                 {
                     "Soleily - Renatus (Deif) [Platter].osu",
@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         {
             using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
             {
-                var reader = new OszArchiveReader(osz);
+                var reader = new ZipArchiveReader(osz);
 
                 BeatmapMetadata meta;
                 using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         {
             using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
             {
-                var reader = new OszArchiveReader(osz);
+                var reader = new ZipArchiveReader(osz);
                 using (var stream = new StreamReader(
                     reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {

@@ -6,14 +6,15 @@ using System.IO;
 using System.Linq;
 using Ionic.Zip;
 
-namespace osu.Game.Beatmaps.IO
+namespace osu.Game.IO.Archives
 {
-    public sealed class OszArchiveReader : ArchiveReader
+    public sealed class ZipArchiveReader : ArchiveReader
     {
         private readonly Stream archiveStream;
         private readonly ZipFile archive;
 
-        public OszArchiveReader(Stream archiveStream)
+        public ZipArchiveReader(Stream archiveStream, string name = null)
+            : base(name)
         {
             this.archiveStream = archiveStream;
             archive = ZipFile.Read(archiveStream);
