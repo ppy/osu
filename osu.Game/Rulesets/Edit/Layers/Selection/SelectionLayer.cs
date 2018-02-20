@@ -155,9 +155,16 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         /// Selects all hitobjects that are present within the area of a <see cref="Quad"/>.
         /// </summary>
         /// <param name="screenSpaceQuad">The selection <see cref="Quad"/>.</param>
+        // Todo: If needed we can severely reduce allocations in this method
         private void selectQuad(Quad screenSpaceQuad)
         {
-            playfield.HitObjects.Objects.Where(h => h.IsAlive && h.IsPresent && screenSpaceQuad.Contains(h.SelectionPoint)).ForEach(h => select(h));
+            var expectedSelection = playfield.HitObjects.Objects.Where(h => h.IsAlive && h.IsPresent && screenSpaceQuad.Contains(h.SelectionPoint)).ToList();
+
+            var toRemove = selectedHitObjects.Except(expectedSelection).ToList();
+            foreach (var obj in toRemove)
+                deselect(obj);
+
+            expectedSelection.ForEach(h => select(h));
         }
 
         /// <summary>
