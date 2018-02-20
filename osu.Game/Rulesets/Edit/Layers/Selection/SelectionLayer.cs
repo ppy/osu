@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            clearSelection();
+            DeselectAll();
             return true;
         }
 
@@ -77,9 +77,10 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         /// <summary>
         /// Deselects all selected <see cref="DrawableHitObject"/>s.
         /// </summary>
-        private void clearSelection()
+        public void DeselectAll()
         {
             selectedHitObjects.Clear();
+
             captureBox?.Hide();
             captureBox?.Expire();
         }
