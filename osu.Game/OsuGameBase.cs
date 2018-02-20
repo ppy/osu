@@ -108,6 +108,7 @@ namespace osu.Game
                 Username = LocalConfig.Get<string>(OsuSetting.Username),
                 Token = LocalConfig.Get<string>(OsuSetting.Token)
             });
+            dependencies.CacheAs<IAPIProvider>(API);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
