@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Configuration;
 using OpenTK;
 using OpenTK.Graphics.ES30;
 using OpenTK.Graphics;
@@ -29,6 +28,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             get { return path.PathWidth; }
             set { path.PathWidth = value; }
         }
+
+        public readonly Bindable<bool> SnakingIn = new Bindable<bool>();
+        public readonly Bindable<bool> SnakingOut = new Bindable<bool>();
 
         public double? SnakedStart { get; private set; }
         public double? SnakedEnd { get; private set; }
@@ -115,15 +117,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        private Bindable<bool> snakingIn;
-        private Bindable<bool> snakingOut;
-
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
-            snakingIn = config.GetBindable<bool>(OsuSetting.SnakingInSliders);
-            snakingOut = config.GetBindable<bool>(OsuSetting.SnakingOutSliders);
-
             reloadTexture();
         }
 
@@ -188,18 +184,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public void UpdateProgress(double progress, int span)
         {
             double start = 0;
-            double end = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadein, 0, 1) : 1;
+            double end = SnakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadein, 0, 1) : 1;
 
             if (span >= slider.SpanCount() - 1)
             {
                 if (Math.Min(span, slider.SpanCount() - 1) % 2 == 1)
                 {
                     start = 0;
-                    end = snakingOut ? progress : 1;
+                    end = SnakingOut ? progress : 1;
                 }
                 else
                 {
-                    start = snakingOut ? progress : 0;
+                    start = SnakingOut ? progress : 0;
                 }
             }
 
