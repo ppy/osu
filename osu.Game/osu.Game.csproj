@@ -357,6 +357,7 @@
     <Compile Include="Overlays\Social\SocialPanel.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Rulesets\Objects\HitWindows.cs" />
+    <Compile Include="Rulesets\UI\ScalableContainer.cs" />
     <Compile Include="Screens\Play\PlayerSettings\VisualSettings.cs" />
     <Compile Include="Rulesets\Objects\CatmullApproximator.cs" />
     <Compile Include="Rulesets\UI\HitObjectContainer.cs" />
