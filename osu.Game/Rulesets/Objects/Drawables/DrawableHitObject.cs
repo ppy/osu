@@ -17,6 +17,7 @@ using osu.Framework.Configuration;
 using OpenTK;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -82,8 +83,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject = hitObject;
         }
 
+        private readonly Bindable<Skin> skin = new Bindable<Skin>();
+
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, SkinManager skins)
         {
             var samples = GetSamples();
             if (samples.Any())
@@ -101,12 +104,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
                         Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
                     };
 
-                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample, SampleNamespace);
+                    void loadSamples(Skin skin)
+                    {
+                        SampleChannel channel = localSampleInfo.GetChannel(skin.GetSample, SampleNamespace) ?? localSampleInfo.GetChannel(audio.Sample.Get, SampleNamespace);
 
-                    if (channel == null)
-                        continue;
+                        if (channel == null) return;
 
-                    Samples.Add(channel);
+                        Samples.Add(channel);
+                    }
+
+                    skin.ValueChanged += loadSamples;
+                    skin.BindTo(skins.CurrentSkin);
                 }
             }
         }
