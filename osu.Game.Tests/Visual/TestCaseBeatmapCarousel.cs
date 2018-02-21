@@ -60,7 +60,9 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Load Beatmaps", () => { carousel.BeatmapSets = beatmapSets; });
 
-            AddUntilStep(() => carousel.BeatmapSets.Any(), "Wait for load");
+            bool changed = false;
+            carousel.BeatmapSetsChanged = () => changed = true;
+            AddUntilStep(() => changed, "Wait for load");
 
             testTraversal();
             testFiltering();
