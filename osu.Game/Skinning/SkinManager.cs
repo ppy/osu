@@ -46,6 +46,11 @@ namespace osu.Game.Skinning
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), importHost)
         {
             this.audio = audio;
+
+            // use the first available skin.
+            var userSkin = GetAllUsableSkins().FirstOrDefault();
+            if (userSkin != null)
+                CurrentSkin.Value = GetSkin(userSkin);
         }
     }
 }
