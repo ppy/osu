@@ -167,8 +167,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return true;
         }
 
-        public void UpdateProgress(double progress, int span)
+        public void UpdateProgress(double completionProgress)
         {
+            var span = slider.SpanAt(completionProgress);
+            var spanProgress = slider.ProgressAt(completionProgress);
+
             double start = 0;
             double end = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadein, 0, 1) : 1;
 
@@ -177,11 +180,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 if (Math.Min(span, slider.SpanCount() - 1) % 2 == 1)
                 {
                     start = 0;
-                    end = snakingOut ? progress : 1;
+                    end = snakingOut ? spanProgress : 1;
                 }
                 else
                 {
-                    start = snakingOut ? progress : 0;
+                    start = snakingOut ? spanProgress : 0;
                 }
             }
 
