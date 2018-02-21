@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
-using osu.Framework;
 using osu.Framework.Configuration;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -16,7 +15,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class APIAccess : IUpdateable
+    public class APIAccess : IAPIProvider
     {
         private readonly OAuth authentication;
 
@@ -34,7 +33,7 @@ namespace osu.Game.Online.API
 
         public string Password;
 
-        public Bindable<User> LocalUser = new Bindable<User>(createGuestUser());
+        public Bindable<User> LocalUser { get; } = new Bindable<User>(createGuestUser());
 
         public string Token
         {
