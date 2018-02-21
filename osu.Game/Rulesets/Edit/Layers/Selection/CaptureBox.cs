@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             this.capturedObjects = capturedObjects;
 
             Masking = true;
-            BorderThickness = 3;
+            BorderThickness = SelectionBox.BORDER_RADIUS;
 
             InternalChild = new Box
             {
