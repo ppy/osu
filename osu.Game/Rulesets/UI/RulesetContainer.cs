@@ -34,11 +34,6 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetContainer : Container
     {
         /// <summary>
-        /// Whether to apply adjustments to the child <see cref="Playfield"/> based on our own size.
-        /// </summary>
-        public bool AspectAdjust = true;
-
-        /// <summary>
         /// The selected variant.
         /// </summary>
         public virtual int Variant => 0;
@@ -324,7 +319,7 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
-            Playfield.Size = AspectAdjust ? GetPlayfieldAspectAdjust() : Vector2.One;
+            Playfield.Size = GetAspectAdjustedSize();
         }
 
         /// <summary>
@@ -335,10 +330,11 @@ namespace osu.Game.Rulesets.UI
         protected virtual BeatmapProcessor<TObject> CreateBeatmapProcessor() => new BeatmapProcessor<TObject>();
 
         /// <summary>
-        /// In some cases we want to apply changes to the relative size of our contained <see cref="Playfield"/> based on custom conditions.
+        /// Computes the final size of the <see cref="Playfield"/> in relative coordinate space after all
+        /// aspect and scale adjustments.
         /// </summary>
-        /// <returns></returns>
-        protected virtual Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f); //a sane default
+        /// <returns>The aspect-adjusted size.</returns>
+        protected virtual Vector2 GetAspectAdjustedSize() => new Vector2(0.75f); // A sane default
 
         /// <summary>
         /// Creates a converter to convert Beatmap to a specific mode.
