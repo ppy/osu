@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.UI
             protected override void Update()
             {
                 base.Update();
-                RelativeChildSize = sizeScale;
+                RelativeChildSize = new Vector2(CustomWidth.HasValue ? sizeScale.X : RelativeChildSize.X, CustomHeight.HasValue ? sizeScale.Y : RelativeChildSize.Y);
             }
         }
     }
