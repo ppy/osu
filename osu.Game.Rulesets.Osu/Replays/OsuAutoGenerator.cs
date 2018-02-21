@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// Extracts the most important info from the Beatmap first, which will be further processed to generate the replay.
         /// </summary>
         /// <param name="spinZones">The intervals where spinning will be required.</param>
-        /// <param name="spinVisibleZones">The intervals where at least 1 spinner is visible.</param>
+        /// <param name="spinnerVisibleZones">The intervals where at least 1 spinner is visible.</param>
         /// <param name="keyFrames">A list of <see cref="KeyFrame"/> in the Beatmap, storing important timestamps where clicks/holds/etc. occur.</param>
         private void collectKeyInfo(out IntervalSet spinZones, out IntervalSet spinnerVisibleZones, out SortedDictionary<double, KeyFrame> keyFrames)
         {
@@ -248,7 +248,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// <summary>
         /// Generates the final button presses that will be used in the replay using the buttonsPlan.
         /// </summary>
-        /// <param name="buttons">A list of <see cref="ReplayButtonState"> which will be the actual key presses used in the auto replay.</param>
+        /// <param name="buttons">A list of <see cref="ReplayButtonState"/> which will be the actual key presses used in the auto replay.</param>
         /// <param name="buttonsPlan">A list of <see cref="ButtonPlan"/> which is basically a slightly more informative <see cref="ReplayButtonState"/>.</param>
         private void generateButtons(out SortedDictionary<double, ReplayButtonState> buttons, SortedDictionary<double, ButtonPlan> buttonsPlan)
         {
@@ -580,7 +580,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// Adds a hitpoint to the key frame list, creating a new key frame if necessary.
         /// </summary>
         /// <param name="keyFrames">The key frame list.</param>
-        /// <param name="obj">The <see cref="OsuHitObject"> of this hitpoint.</param>
+        /// <param name="obj">The <see cref="OsuHitObject"/> of this hitpoint.</param>
         /// <param name="time">The timestamp of this hitpoint.</param>
         /// <param name="click">Whether this hitpoint should be clicked or not (a circle or slider head).</param>
         /// <param name="move">Whether the cursor should move to this hitpoint or not (a circle or slider, not a spinner).</param>
