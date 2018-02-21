@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 accentColour = value;
 
                 if (LoadState >= LoadState.Ready)
-                    Schedule(reloadTexture);
+                    reloadTexture();
             }
         }
 
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 borderColour = value;
 
                 if (LoadState >= LoadState.Ready)
-                    Schedule(reloadTexture);
+                    reloadTexture();
             }
         }
 
