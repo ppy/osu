@@ -26,12 +26,16 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// </summary>
         public bool DelayedMovements; // ModManager.CheckActive(Mods.Relax2);
 
-        // The amount of padding added between hitobjects overlapping spinners
-        // before Auto will try to spin the spinner
+        /// <summary>
+        /// The amount of padding added between hitobjects overlapping spinners
+        /// before Auto will try to spin the spinner
+        /// </summary>
         public const double SPIN_BUFFER_TIME = 300; // Won't spin between 100bpm 1/1 beat patterns or faster
 
-        // Auto will try to click reactionTime ms after hit object appears,
-        // unless it's less than MIN_MOVE_TIME ms before hitpoint
+        /// <summary>
+        /// Auto will try to click reactionTime ms after hit object appears,
+        /// unless it's less than MIN_MOVE_TIME ms before hitpoint
+        /// </summary>
         public const double MIN_MOVE_TIME = 50;
 
         #endregion
@@ -105,6 +109,12 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Generation steps
 
+        /// <summary>
+        /// Extracts the most important info from the Beatmap first, which will be further processed to generate the replay.
+        /// </summary>
+        /// <param name="spinZones">The intervals where spinning will be required.</param>
+        /// <param name="spinVisibleZones">The intervals where at least 1 spinner is visible.</param>
+        /// <param name="keyFrames">A list of <see cref="KeyFrame"/> in the Beatmap, storing important timestamps where clicks/holds/etc. occur.</param>
         private void collectKeyInfo(out IntervalSet spinZones, out IntervalSet spinnerVisibleZones, out SortedDictionary<double, KeyFrame> keyFrames)
         {
             IntervalSet holdZones = new IntervalSet();
@@ -205,6 +215,11 @@ namespace osu.Game.Rulesets.Osu.Replays
             keyFrameIter.Dispose();
         }
 
+        /// <summary>
+        /// Determines when and which buttons should be pressed using the key frames given.
+        /// </summary>
+        /// <param name="buttonsPlan">A list of <see cref="ButtonPlan"/> which is basically a slightly more informative <see cref="ReplayButtonState"/>.</param>
+        /// <param name="keyFrames">A list of <see cref="KeyFrame"/> in the Beatmap, storing hitpoints (important timestamps where clicks/holds/etc. occur).</param>
         private void planButtons(out SortedDictionary<double, ButtonPlan> buttonsPlan, SortedDictionary<double, KeyFrame> keyFrames)
         {
             buttonsPlan = new SortedDictionary<double, ButtonPlan> {
@@ -230,6 +245,11 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
+        /// <summary>
+        /// Generates the final button presses that will be used in the replay using the buttonsPlan.
+        /// </summary>
+        /// <param name="buttons">A list of <see cref="ReplayButtonState"> which will be the actual key presses used in the auto replay.</param>
+        /// <param name="buttonsPlan">A list of <see cref="ButtonPlan"/> which is basically a slightly more informative <see cref="ReplayButtonState"/>.</param>
         private void generateButtons(out SortedDictionary<double, ReplayButtonState> buttons, SortedDictionary<double, ButtonPlan> buttonsPlan)
         {
             buttons = new SortedDictionary<double, ReplayButtonState> {
@@ -275,6 +295,12 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
+        /// <summary>
+        /// Determines the actual hitpoints that should be used, as a single KeyFrame may contain multiple hitpoints on the same timestamp.
+        /// The hitpoints will then be used to generate cursor movement.
+        /// </summary>
+        /// <param name="activeHitpoints">The finalised list of <see cref="Hitpoint"/> that will be used to generate positions.</param>
+        /// <param name="keyFrames">A list of <see cref="KeyFrame"/>.</param>
         private void filterHitpoints(out SortedDictionary<double, Hitpoint> activeHitpoints,
             SortedDictionary<double, KeyFrame> keyFrames)
         {
@@ -295,6 +321,14 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
+        /// <summary>
+        /// Generates cursor positions that aim at all the hitpoints given.
+        /// Also spins the cursor if we should be spinning and there is sufficient time between any two hitpoints.
+        /// </summary>
+        /// <param name="positions">The cursor positions.</param>
+        /// <param name="activeHitpoints">The list of <see cref="Hitpoint"/>.</param>
+        /// <param name="spinZones">The intervals where we should spin the cursor.</param>
+        /// <param name="spinnerVisibleZones">The intervals where at least one spinner is visible.</param>
         private void generatePositions(out SortedDictionary<double, Vector2> positions, SortedDictionary<double, Hitpoint> activeHitpoints, IntervalSet spinZones, IntervalSet spinnerVisibleZones)
         {
             positions = new SortedDictionary<double, Vector2> {
@@ -405,6 +439,11 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
+        /// <summary>
+        /// Combines the button presses with cursor positions to generate the final <see cref="ReplayFrame"/>s.
+        /// </summary>
+        /// <param name="buttons">The button presses.</param>
+        /// <param name="positions">The cursor positions.</param>
         private void generateReplayFrames(SortedDictionary<double, ReplayButtonState> buttons, SortedDictionary<double, Vector2> positions)
         {
             // Loop through each position, and advance buttons accordingly
@@ -449,6 +488,13 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region positions Helpers
 
+        /// <summary>
+        /// Create cursor positions that spin in the time interval <paramref name="spin"/>, given that the cursor is currently at <paramref name="curpos"/>.
+        /// </summary>
+        /// <param name="positions">The list of cursor positions to generate into.</param>
+        /// <param name="curpos">The current cursor position just before spinning.</param>
+        /// <param name="spin">The time interval where we should spin the cursor.</param>
+        /// <returns>The final cursor position after spinning.</returns>
         private Vector2 addSpinPositions(SortedDictionary<double, Vector2> positions, Vector2 curpos, Interval spin)
         {
             Vector2 startPosition = CalcSpinnerStartPos(curpos);
@@ -475,6 +521,15 @@ namespace osu.Game.Rulesets.Osu.Replays
             return endPosition;
         }
 
+        /// <summary>
+        /// Create cursor positions that follow a certain slider, between the timestamps <paramref name="startTime"/> and <paramref name="endTime"/>.
+        /// We don't just follow the whole slider because in some 2B maps, we want to only follow part of a slider (between two slider ticks for example).
+        /// And so <paramref name="startTime"/> and <paramref name="endTime"/> are used to specify this interval.
+        /// </summary>
+        /// <param name="positions">The list of cursor positions to generate into.</param>
+        /// <param name="startTime">The timestamp where we start following the slider.</param>
+        /// <param name="endTime">The timestamp where we stop following the slider.</param>
+        /// <param name="s">The <see cref="Slider"/> which we are following.</param>
         private void addFollowSliderPositions(SortedDictionary<double, Vector2> positions, double startTime, double endTime, Slider s)
         {
             for (double t = startTime + FrameDelay; t < endTime; t += FrameDelay)
@@ -483,6 +538,14 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
+        /// <summary>
+        /// Create cursor positions that move between two positions, interpolating between them using <see cref="preferredEasing"/>.
+        /// </summary>
+        /// <param name="positions">The list of cursor positions to generate into.</param>
+        /// <param name="startTime">The timestamp where we start moving.</param>
+        /// <param name="endTime">The timestamp where we stop moving.</param>
+        /// <param name="startPosition">The initial position our cursor is at.</param>
+        /// <param name="endPosition">The position our cursor should move to.</param>
         private void addMovePositions(SortedDictionary<double, Vector2> positions, double startTime, double endTime, Vector2 startPosition, Vector2 endPosition)
         {
             if (!positions.ContainsKey(startTime))
@@ -500,6 +563,11 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region keyframe/hitpoint/zones Helpers
 
+        /// <summary>
+        /// Create a new <see cref="KeyFrame"/> in the <paramref name="keyFrames"/> list at the specified timestamp <paramref name="time"/>.
+        /// </summary>
+        /// <param name="keyFrames">The key frame list.</param>
+        /// <param name="time">The timestamp to generate the key frame at.</param>
         private void addKeyFrame(SortedDictionary<double, KeyFrame> keyFrames, double time)
         {
             if (!keyFrames.ContainsKey(time))
@@ -508,6 +576,14 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
+        /// <summary>
+        /// Adds a hitpoint to the key frame list, creating a new key frame if necessary.
+        /// </summary>
+        /// <param name="keyFrames">The key frame list.</param>
+        /// <param name="obj">The <see cref="OsuHitObject"> of this hitpoint.</param>
+        /// <param name="time">The timestamp of this hitpoint.</param>
+        /// <param name="click">Whether this hitpoint should be clicked or not (a circle or slider head).</param>
+        /// <param name="move">Whether the cursor should move to this hitpoint or not (a circle or slider, not a spinner).</param>
         private void addHitpoint(SortedDictionary<double, KeyFrame> keyFrames, OsuHitObject obj, double time, bool click, bool move)
         {
             Hitpoint newhitpoint = new Hitpoint
@@ -539,7 +615,10 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Helper classes and subroutines
 
-        // Basically a time and position, used to generate positions
+        /// <summary>
+        /// Basically a timestamp and a position, used to generate positions.
+        /// Keeps a reference to the corresponding <see cref="OsuHitObject"/> in so we can see whether we should follow sliders or not afterwards.
+        /// </summary>
         private class Hitpoint
         {
             public double Time;
@@ -573,7 +652,9 @@ namespace osu.Game.Rulesets.Osu.Replays
             End
         }
 
-        // Aggregates all the hitpoints/zones at a certain time into one data object
+        /// <summary>
+        /// Aggregates all the hitpoints/zones at a certain time into one data object.
+        /// </summary>
         private class KeyFrame
         {
             // The timestamp where all this is happening
@@ -611,6 +692,10 @@ namespace osu.Game.Rulesets.Osu.Replays
             Right = 2,
         }
 
+        /// <summary>
+        /// A slightly more informative version of <see cref="ReplayButtonState"/>.
+        /// Keeps track of which buttons are the primary or secondary buttons, to more easily determine how we should alternate buttons.
+        /// </summary>
         private class ButtonPlan
         {
             public Button Primary;
@@ -765,6 +850,9 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
+        /// <summary>
+        /// Stores an interal, usually an interval between two timestamps.
+        /// </summary>
         private class IntervalSet : List<Interval>
         {
 
