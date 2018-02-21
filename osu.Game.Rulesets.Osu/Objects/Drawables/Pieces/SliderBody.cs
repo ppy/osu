@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
                 accentColour = value;
 
-                if (LoadState == LoadState.Ready)
+                if (LoadState >= LoadState.Ready)
                     Schedule(reloadTexture);
             }
         }
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
                 borderColour = value;
 
-                if (LoadState == LoadState.Ready)
+                if (LoadState >= LoadState.Ready)
                     Schedule(reloadTexture);
             }
         }
