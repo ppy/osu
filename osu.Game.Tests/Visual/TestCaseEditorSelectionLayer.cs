@@ -19,7 +19,12 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseEditorSelectionLayer : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(SelectionLayer) };
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(SelectionBox),
+            typeof(SelectionLayer),
+            typeof(CaptureBox)
+        };
 
         [BackgroundDependencyLoader]
         private void load()
