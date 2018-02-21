@@ -315,11 +315,11 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                 for (double j = FrameDelay; j < s.Duration; j += FrameDelay)
                 {
-                    Vector2 pos = s.PositionAt(j / s.Duration);
+                    Vector2 pos = s.StackedPositionAt(j / s.Duration);
                     AddFrameToReplay(new ReplayFrame(h.StartTime + j, pos.X, pos.Y, button));
                 }
 
-                AddFrameToReplay(new ReplayFrame(s.EndTime, s.EndPosition.X, s.EndPosition.Y, button));
+                AddFrameToReplay(new ReplayFrame(s.EndTime, s.StackedEndPosition.X, s.StackedEndPosition.Y, button));
             }
 
             // We only want to let go of our button if we are at the end of the current replay. Otherwise something is still going on after us so we need to keep the button pressed!
