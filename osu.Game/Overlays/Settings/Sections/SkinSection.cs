@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public class SkinSection : SettingsSection
     {
-        private SettingsDropdown<SkinInfo> skinDropdown;
+        private SettingsDropdown<int> skinDropdown;
 
         public override string Header => "Skin";
 
@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections
             FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
-                skinDropdown = new SettingsDropdown<SkinInfo>(),
+                skinDropdown = new SettingsDropdown<int>(),
                 new SettingsSlider<double, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
@@ -47,13 +47,13 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
             };
 
-            void reloadSkins() => skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, SkinInfo>(s.Name, s));
+            void reloadSkins() => skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.Name, s.ID));
             skins.ItemAdded += _ => reloadSkins();
             skins.ItemRemoved += _ => reloadSkins();
 
             reloadSkins();
 
-            skinDropdown.Bindable = skins.CurrentSkinInfo;
+            skinDropdown.Bindable = config.GetBindable<int>(OsuSetting.Skin);
         }
 
         private class SizeSlider : OsuSliderBar<double>
