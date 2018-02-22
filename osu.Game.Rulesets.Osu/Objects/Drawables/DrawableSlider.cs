@@ -157,19 +157,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        /// <summary>
-        /// Finds the progress along the slider at the current time.
-        /// </summary>
-        /// <param name="span">The current span.</param>
-        /// <param name="progress">The current progress in the current span.</param>
-        public void GetCurrentProgress(out int span, out double progress)
-        {
-            double offset = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
-
-            span = slider.SpanAt(offset);
-            progress = slider.ProgressAt(offset);
-        }
-
         public Drawable ProxiedLayer => HeadCircle.ApproachCircle;
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Body.ReceiveMouseInputAt(screenSpacePos);
