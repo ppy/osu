@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -68,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 var drawableTick = new DrawableSliderTick(tick)
                 {
-                    Position = tick.Position
+                    Position = tick.StackedPosition
                 };
 
                 ticks.Add(drawableTick);
@@ -80,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
                 {
-                    Position = repeatPoint.Position
+                    Position = repeatPoint.StackedPosition
                 };
 
                 repeatPoints.Add(drawableRepeatPoint);
@@ -96,7 +95,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
         }
 
-        private int currentSpan;
         public bool Tracking;
 
         protected override void Update()
@@ -105,19 +103,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Tracking = Ball.Tracking;
 
-            double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
-
-            int span = slider.SpanAt(progress);
-            progress = slider.ProgressAt(progress);
-
-            if (span > currentSpan)
-                currentSpan = span;
+            double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (!HeadCircle.IsHit)
-                HeadCircle.Position = slider.Curve.PositionAt(progress);
+                HeadCircle.Position = slider.StackedPositionAt(completionProgress);
 
-            foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(progress, span);
+            foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
             foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
             foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
         }
