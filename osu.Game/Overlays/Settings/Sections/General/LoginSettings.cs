@@ -208,7 +208,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     username = new OsuTextBox
                     {
-                        PlaceholderText = "Username",
+                        PlaceholderText = "Email address",
                         RelativeSizeAxes = Axes.X,
                         Text = api?.Username ?? string.Empty,
                         TabbableContentContainer = this
@@ -222,12 +222,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     },
                     new SettingsCheckbox
                     {
-                        LabelText = "Remember username",
+                        LabelText = "Remember email address",
                         Bindable = config.GetBindable<bool>(OsuSetting.SaveUsername),
                     },
                     new SettingsCheckbox
                     {
-                        LabelText = "Stay logged in",
+                        LabelText = "Stay signed in",
                         Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
                     new SettingsButton
@@ -237,7 +237,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     },
                     new SettingsButton
                     {
-                        Text = "Register new account",
+                        Text = "Register",
                         //Action = registerLink
                     }
                 };
