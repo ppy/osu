@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Taiko.Audio
             {
                 mappings[s.Time] = new DrumSample
                 {
-                    Centre = s.GetSampleInfo().GetChannel(audio.Sample, "Taiko"),
-                    Rim = s.GetSampleInfo(SampleInfo.HIT_CLAP).GetChannel(audio.Sample, "Taiko")
+                    Centre = s.GetSampleInfo().GetChannel(audio.Sample.Get, "Taiko"),
+                    Rim = s.GetSampleInfo(SampleInfo.HIT_CLAP).GetChannel(audio.Sample.Get, "Taiko")
                 };
             }
         }
