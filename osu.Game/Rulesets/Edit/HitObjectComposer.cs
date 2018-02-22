@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -51,13 +50,16 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            ScalableContainer createLayerContainerWithContent(Drawable content)
+            ScalableContainer createLayerContainerWithContent(params Drawable[] content)
             {
                 var container = CreateLayerContainer();
-                container.Child = content;
+                container.Children = content;
                 layerContainers.Add(container);
                 return container;
             }
+
+            HitObjectOverlayLayer hitObjectOverlayLayer;
+            SelectionLayer selectionLayer;
 
             RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
@@ -93,7 +95,11 @@ namespace osu.Game.Rulesets.Edit
                                     Child = new Box { RelativeSizeAxes = Axes.Both, Alpha = 0, AlwaysPresent = true }
                                 }),
                                 rulesetContainer,
-                                createLayerContainerWithContent(new SelectionLayer(rulesetContainer.Playfield))
+                                createLayerContainerWithContent
+                                (
+                                    hitObjectOverlayLayer = CreateHitObjectOverlayLayer(),
+                                    selectionLayer = new SelectionLayer(rulesetContainer.Playfield)
+                                )
                             }
                         }
                     },
@@ -103,6 +109,9 @@ namespace osu.Game.Rulesets.Edit
                     new Dimension(GridSizeMode.Absolute, 200),
                 }
             };
+
+            selectionLayer.ObjectSelected += hitObjectOverlayLayer.AddOverlay;
+            selectionLayer.ObjectDeselected += hitObjectOverlayLayer.RemoveOverlay;
 
             toolboxCollection.Items =
                 new[] { new RadioButton("Select", () => setCompositionTool(null)) }
