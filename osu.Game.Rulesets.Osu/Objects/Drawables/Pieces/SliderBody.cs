@@ -48,8 +48,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
                 accentColour = value;
 
-                if (LoadState == LoadState.Ready)
-                    Schedule(reloadTexture);
+                if (LoadState >= LoadState.Ready)
+                    reloadTexture();
             }
         }
 
@@ -66,8 +66,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
                 borderColour = value;
 
-                if (LoadState == LoadState.Ready)
-                    Schedule(reloadTexture);
+                if (LoadState >= LoadState.Ready)
+                    reloadTexture();
             }
         }
 
@@ -181,8 +181,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return true;
         }
 
-        public void UpdateProgress(double progress, int span)
+        public void UpdateProgress(double completionProgress)
         {
+            var span = slider.SpanAt(completionProgress);
+            var spanProgress = slider.ProgressAt(completionProgress);
+
             double start = 0;
             double end = SnakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadein, 0, 1) : 1;
 
@@ -191,11 +194,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 if (Math.Min(span, slider.SpanCount() - 1) % 2 == 1)
                 {
                     start = 0;
-                    end = SnakingOut ? progress : 1;
+                    end = SnakingOut ? spanProgress : 1;
                 }
                 else
                 {
-                    start = SnakingOut ? progress : 0;
+                    start = SnakingOut ? spanProgress : 0;
                 }
             }
 
