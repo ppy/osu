@@ -58,8 +58,8 @@ namespace osu.Game.Rulesets.Edit
                 return container;
             }
 
-            HitObjectOverlayLayer hitObjectOverlayLayer;
-            SelectionLayer selectionLayer;
+            HitObjectOverlayLayer hitObjectOverlayLayer = CreateHitObjectOverlayLayer();
+            SelectionLayer selectionLayer = new SelectionLayer(rulesetContainer.Playfield);
 
             RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
@@ -97,8 +97,9 @@ namespace osu.Game.Rulesets.Edit
                                 rulesetContainer,
                                 createLayerContainerWithContent
                                 (
-                                    hitObjectOverlayLayer = CreateHitObjectOverlayLayer(),
-                                    selectionLayer = new SelectionLayer(rulesetContainer.Playfield)
+                                    selectionLayer, // Below object overlays for input
+                                    hitObjectOverlayLayer,
+                                    selectionLayer.CreateProxy() // Proxy above object overlays for selections
                                 )
                             }
                         }
