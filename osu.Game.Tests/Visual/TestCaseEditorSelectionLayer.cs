@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using OpenTK;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
