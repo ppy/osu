@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -27,12 +26,11 @@ namespace osu.Game.Rulesets.Edit
         protected ICompositionTool CurrentTool { get; private set; }
 
         private RulesetContainer rulesetContainer;
-        private readonly Container[] layerContainers = new Container[2];
+        private readonly List<Container> layerContainers = new List<Container>();
 
         protected HitObjectComposer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
-
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -42,6 +40,9 @@ namespace osu.Game.Rulesets.Edit
             try
             {
                 rulesetContainer = CreateRulesetContainer(ruleset, osuGame.Beatmap.Value);
+
+                // TODO: should probably be done at a RulesetContainer level to share logic with Player.
+                rulesetContainer.Clock = new InterpolatingFramedClock((IAdjustableClock)osuGame.Beatmap.Value.Track ?? new StopwatchClock());
             }
             catch (Exception e)
             {
@@ -49,19 +50,13 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            layerContainers[0] = CreateLayerContainer();
-            layerContainers[0].Child = new Container
+            ScalableContainer createLayerContainerWithContent(Drawable content)
             {
-                Name = "Border",
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                BorderColour = Color4.White,
-                BorderThickness = 2,
-                Child = new Box { RelativeSizeAxes = Axes.Both, Alpha = 0, AlwaysPresent = true }
-            };
-
-            layerContainers[1] = CreateLayerContainer();
-            layerContainers[1].Child = new SelectionLayer(rulesetContainer.Playfield);
+                var container = CreateLayerContainer();
+                container.Child = content;
+                layerContainers.Add(container);
+                return container;
+            }
 
             RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
@@ -87,9 +82,17 @@ namespace osu.Game.Rulesets.Edit
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                layerContainers[0],
+                                createLayerContainerWithContent(new Container
+                                {
+                                    Name = "Border",
+                                    RelativeSizeAxes = Axes.Both,
+                                    Masking = true,
+                                    BorderColour = Color4.White,
+                                    BorderThickness = 2,
+                                    Child = new Box { RelativeSizeAxes = Axes.Both, Alpha = 0, AlwaysPresent = true }
+                                }),
                                 rulesetContainer,
-                                layerContainers[1]
+                                createLayerContainerWithContent(new SelectionLayer(rulesetContainer.Playfield))
                             }
                         }
                     },
@@ -99,8 +102,6 @@ namespace osu.Game.Rulesets.Edit
                     new Dimension(GridSizeMode.Absolute, 200),
                 }
             };
-
-            rulesetContainer.Clock = new InterpolatingFramedClock((IAdjustableClock)osuGame.Beatmap.Value.Track ?? new StopwatchClock());
 
             toolboxCollection.Items =
                 new[] { new RadioButton("Select", () => setCompositionTool(null)) }
@@ -134,6 +135,6 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
         /// </summary>
-        protected virtual ScalableContainer CreateLayerContainer() => new ScalableContainer();
+        protected virtual ScalableContainer CreateLayerContainer() => new ScalableContainer { RelativeSizeAxes = Axes.Both };
     }
 }
