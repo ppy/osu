@@ -92,6 +92,7 @@
     <Compile Include="Objects\Drawables\IRequireTracking.cs" />
     <Compile Include="Objects\Drawables\ITrackSnaking.cs" />
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
+    <Compile Include="Objects\Drawables\Pieces\DefaultCirclePiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerBackground.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
     <Compile Include="Objects\Drawables\DrawableSlider.cs" />

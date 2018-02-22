@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -28,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                new CircularContainer
+                new SkinnableDrawable("Play/osu/number-glow", name => new CircularContainer
                 {
                     Masking = true,
                     Origin = Anchor.Centre,
@@ -38,11 +39,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                         Radius = 60,
                         Colour = Color4.White.Opacity(0.5f),
                     },
-                    Children = new[]
-                    {
-                        new Box()
-                    }
-                },
+                    Child = new Box()
+                }, false),
                 number = new OsuSpriteText
                 {
                     Text = @"1",
