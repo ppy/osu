@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Edit.Layers.Selection
 {
-    public class HitObjectOverlay : CompositeDrawable
+    public class HitObjectOverlay : OverlayContainer
     {
         // ReSharper disable once NotAccessedField.Local
         // This will be used later to handle drag movement, etc
@@ -15,6 +15,11 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         public HitObjectOverlay(DrawableHitObject hitObject)
         {
             this.hitObject = hitObject;
+
+            State = Visibility.Visible;
         }
+
+        protected override void PopIn() => Alpha = 1;
+        protected override void PopOut() => Alpha = 0;
     }
 }
