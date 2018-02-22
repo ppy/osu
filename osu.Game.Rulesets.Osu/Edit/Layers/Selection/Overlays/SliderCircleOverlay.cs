@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
     public class SliderCircleOverlay : HitObjectOverlay
     {
         public SliderCircleOverlay(DrawableHitCircle sliderHead, DrawableSlider slider)
-            : this(sliderHead, sliderHead.Position, slider)
+            : this(sliderHead, ((Slider)slider.HitObject).StackedPositionAt(0), slider)
         {
         }
 
