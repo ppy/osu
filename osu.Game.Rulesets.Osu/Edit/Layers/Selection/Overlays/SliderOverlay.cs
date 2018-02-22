@@ -16,13 +16,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
     {
         private readonly SliderBody body;
 
-        private readonly DrawableSlider hitObject;
-
         public SliderOverlay(DrawableSlider slider)
             : base(slider)
         {
-            hitObject = slider;
-
             var obj = (Slider)slider.HitObject;
 
             InternalChildren = new Drawable[]
@@ -48,8 +44,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
         {
             base.Update();
 
-            hitObject.GetCurrentProgress(out int span, out double progress);
-            body.UpdateProgress(progress, span);
+            // Need to cause one update
+            body.UpdateProgress(0);
         }
     }
 }
