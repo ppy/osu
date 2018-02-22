@@ -3,52 +3,37 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
 using osu.Framework.Allocation;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class Playfield : Container
+    public abstract class Playfield : ScalableContainer
     {
         /// <summary>
         /// The HitObjects contained in this Playfield.
         /// </summary>
         public HitObjectContainer HitObjects { get; private set; }
 
-        public Container<Drawable> ScaledContent;
-
-        protected override Container<Drawable> Content => content;
-        private readonly Container<Drawable> content;
-
-        private List<Playfield> nestedPlayfields;
-
         /// <summary>
         /// All the <see cref="Playfield"/>s nested inside this playfield.
         /// </summary>
         public IReadOnlyList<Playfield> NestedPlayfields => nestedPlayfields;
+        private List<Playfield> nestedPlayfields;
 
         /// <summary>
         /// A container for keeping track of DrawableHitObjects.
         /// </summary>
-        /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width.</param>
-        protected Playfield(float? customWidth = null)
+        /// <param name="customWidth">The width to scale the internal coordinate space to.
+        /// May be null if scaling based on <paramref name="customHeight"/> is desired. If <paramref name="customHeight"/> is also null, no scaling will occur.
+        /// </param>
+        /// <param name="customHeight">The height to scale the internal coordinate space to.
+        /// May be null if scaling based on <paramref name="customWidth"/> is desired. If <paramref name="customWidth"/> is also null, no scaling will occur.
+        /// </param>
+        protected Playfield(float? customWidth = null, float? customHeight = null)
+            : base(customWidth, customHeight)
         {
             RelativeSizeAxes = Axes.Both;
-
-            AddInternal(ScaledContent = new ScaledContainer
-            {
-                CustomWidth = customWidth,
-                RelativeSizeAxes = Axes.Both,
-                Children = new[]
-                {
-                    content = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    }
-                }
-            });
         }
 
         [BackgroundDependencyLoader]
@@ -94,22 +79,5 @@ namespace osu.Game.Rulesets.UI
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
-
-        private class ScaledContainer : Container
-        {
-            /// <summary>
-            /// A value (in game pixels that we should scale our content to match).
-            /// </summary>
-            public float? CustomWidth;
-
-            //dividing by the customwidth will effectively scale our content to the required container size.
-            protected override Vector2 DrawScale => CustomWidth.HasValue ? new Vector2(DrawSize.X / CustomWidth.Value) : base.DrawScale;
-
-            protected override void Update()
-            {
-                base.Update();
-                RelativeChildSize = new Vector2(DrawScale.X, RelativeChildSize.Y);
-            }
-        }
     }
 }
