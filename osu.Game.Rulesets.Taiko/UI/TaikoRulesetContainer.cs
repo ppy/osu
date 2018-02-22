@@ -88,6 +88,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             return new Vector2(1, default_relative_height * aspectAdjust);
         }
 
+        protected override Vector2 PlayfieldArea => Vector2.One;
+
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
         protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter(IsForCurrentRuleset);
