@@ -48,7 +48,7 @@ namespace osu.Game.Database
 
         protected readonly IDatabaseContextFactory ContextFactory;
 
-        protected readonly MutableDatabaseBackedStore<TModel> ModelStore;
+        public readonly MutableDatabaseBackedStore<TModel> ModelStore;
 
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
