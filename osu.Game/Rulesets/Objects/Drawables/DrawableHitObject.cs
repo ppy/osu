@@ -17,6 +17,7 @@ using osu.Framework.Configuration;
 using OpenTK;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -82,8 +83,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject = hitObject;
         }
 
+        private readonly Bindable<Skin> skin = new Bindable<Skin>();
+
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, SkinManager skins)
         {
             var samples = GetSamples();
             if (samples.Any())
@@ -91,23 +94,30 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 if (HitObject.SampleControlPoint == null)
                     throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
                                                                                           + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-
-                foreach (SampleInfo s in samples)
+                void loadSamples(Skin skin)
                 {
-                    SampleInfo localSampleInfo = new SampleInfo
+                    Samples.Clear();
+
+                    foreach (SampleInfo s in samples)
                     {
-                        Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
-                        Name = s.Name,
-                        Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
-                    };
+                        SampleInfo localSampleInfo = new SampleInfo
+                        {
+                            Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
+                            Name = s.Name,
+                            Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
+                        };
 
-                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample, SampleNamespace);
 
-                    if (channel == null)
-                        continue;
+                        SampleChannel channel = localSampleInfo.GetChannel(skin.GetSample, SampleNamespace) ?? localSampleInfo.GetChannel(audio.Sample.Get, SampleNamespace);
 
-                    Samples.Add(channel);
+                        if (channel == null) return;
+
+                        Samples.Add(channel);
+                    }
                 }
+
+                skin.ValueChanged += loadSamples;
+                skin.BindTo(skins.CurrentSkin);
             }
         }
 
