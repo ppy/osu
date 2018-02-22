@@ -30,6 +30,7 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Select;
 using OpenTK.Graphics;
 
 namespace osu.Game
@@ -495,15 +496,18 @@ namespace osu.Game
         private void screenAdded(Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
-
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
+
+            if (newScreen is PlaySongSelect)
+            {
+                newScreen.Exited += s => SelectedMods.UnbindAll();
+            }
         }
 
         private void screenRemoved(Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
-
             if (newScreen == null)
                 Exit();
         }
