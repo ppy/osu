@@ -5,6 +5,10 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public interface ISliderProgress
     {
-        void UpdateProgress(double progress, int span);
+        /// <summary>
+        /// Updates the progress of this <see cref="ISliderProgress"/> element along the slider.
+        /// </summary>
+        /// <param name="completionProgress">Amount of the slider completed.</param>
+        void UpdateProgress(double completionProgress);
     }
 }
