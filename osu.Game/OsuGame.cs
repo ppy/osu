@@ -134,7 +134,7 @@ namespace osu.Game
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
 
             SkinManager.CurrentSkinInfo.ValueChanged += s => configSkin.Value = s.ID;
-            configSkin.ValueChanged += id => SkinManager.CurrentSkinInfo.Value = SkinManager.ModelStore.ConsumableItems.FirstOrDefault(s => s.ID == id) ?? SkinInfo.Default;
+            configSkin.ValueChanged += id => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == id) ?? SkinInfo.Default;
             configSkin.TriggerChange();
 
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);

@@ -1,8 +1,11 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -35,5 +38,12 @@ namespace osu.Game.Skinning
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), importHost)
         {
         }
+
+        /// <summary>
+        /// Perform a lookup query on available <see cref="SkinInfo"/>s.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>The first result for the provided query, or null if no results were found.</returns>
+        public SkinInfo Query(Expression<Func<SkinInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
     }
 }
