@@ -41,9 +41,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
                 else if ((type & ConvertHitObjectType.Slider) > 0)
                 {
+                    var pos = new Vector2(int.Parse(split[0]), int.Parse(split[1]));
+
                     CurveType curveType = CurveType.Catmull;
                     double length = 0;
-                    var points = new List<Vector2> { new Vector2(int.Parse(split[0]), int.Parse(split[1])) };
+                    var points = new List<Vector2> { Vector2.Zero };
 
                     string[] pointsplit = split[5].Split('|');
                     foreach (string t in pointsplit)
@@ -69,7 +71,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         }
 
                         string[] temp = t.Split(':');
-                        points.Add(new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)));
+                        points.Add(new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)) - pos);
                     }
 
                     int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
@@ -134,7 +136,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     for (int i = 0; i < nodes; i++)
                         nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                    result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, nodeSamples);
+                    result = CreateSlider(pos, combo, points, length, curveType, repeatCount, nodeSamples);
                 }
                 else if ((type & ConvertHitObjectType.Spinner) > 0)
                 {
