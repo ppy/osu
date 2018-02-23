@@ -13,11 +13,10 @@ namespace osu.Game.Rulesets.Mods
         public override string ShortenedName => "DT";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_doubletime;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override string Description => "Zoooooooooom";
+        public override string Description => "Zoooooooooom.";
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModHalfTime) };
 
-        public override double ScoreMultiplier => 1.12;
 
         public virtual void ApplyToClock(IAdjustableClock clock)
         {

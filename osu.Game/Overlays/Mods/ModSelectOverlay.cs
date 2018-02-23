@@ -267,6 +267,7 @@ namespace osu.Game.Overlays.Mods
                             {
                                 new DifficultyReductionSection
                                 {
+                                    Text = "Difficulty Reduction",
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
@@ -274,6 +275,7 @@ namespace osu.Game.Overlays.Mods
                                 },
                                 new DifficultyIncreaseSection
                                 {
+                                    Text = "Difficulty Increase",
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
@@ -281,6 +283,7 @@ namespace osu.Game.Overlays.Mods
                                 },
                                 new AssistedSection
                                 {
+                                    Text = "Special",
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
