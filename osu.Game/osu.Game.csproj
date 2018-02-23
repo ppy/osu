@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
   <Import Project="..\osu.Game.props" />
   <PropertyGroup>
@@ -861,6 +861,8 @@
     <Compile Include="Skinning\SkinInfo.cs" />
     <Compile Include="Skinning\SkinManager.cs" />
     <Compile Include="Skinning\SkinnableDrawable.cs" />
+    <Compile Include="Skinning\SkinnableSound.cs" />
+    <Compile Include="Skinning\SkinReloadableDrawable.cs" />
     <Compile Include="Skinning\SkinStore.cs" />
     <Compile Include="Storyboards\CommandLoop.cs" />
     <Compile Include="Storyboards\CommandTimeline.cs" />
