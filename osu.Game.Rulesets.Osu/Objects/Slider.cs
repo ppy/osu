@@ -66,18 +66,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public double SpanDuration => Duration / this.SpanCount();
 
-        private int stackHeight;
-
-        public override int StackHeight
-        {
-            get { return stackHeight; }
-            set
-            {
-                stackHeight = value;
-                Curve.Offset = StackOffset;
-            }
-        }
-
         public double Velocity;
         public double TickDistance;
 

@@ -30,21 +30,19 @@ namespace osu.Game.Rulesets.Objects.Types
     public static class HasCurveExtensions
     {
         /// <summary>
-        /// Computes the position on the curve at a given progress, accounting for repeat logic.
-        /// <para>
-        /// Ranges from [0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.
-        /// </para>
+        /// Computes the position on the curve relative to how much of the <see cref="HitObject"/> has been completed.
         /// </summary>
         /// <param name="obj">The curve.</param>
-        /// <param name="progress">[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</param>
+        /// <param name="progress">[0, 1] where 0 is the start time of the <see cref="HitObject"/> and 1 is the end time of the <see cref="HitObject"/>.</param>
+        /// <returns>The position on the curve.</returns>
         public static Vector2 PositionAt(this IHasCurve obj, double progress)
             => obj.Curve.PositionAt(obj.ProgressAt(progress));
 
         /// <summary>
-        /// Finds the progress along the curve, accounting for repeat logic.
+        /// Computes the progress along the curve relative to how much of the <see cref="HitObject"/> has been completed.
         /// </summary>
         /// <param name="obj">The curve.</param>
-        /// <param name="progress">[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</param>
+        /// <param name="progress">[0, 1] where 0 is the start time of the <see cref="HitObject"/> and 1 is the end time of the <see cref="HitObject"/>.</param>
         /// <returns>[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</returns>
         public static double ProgressAt(this IHasCurve obj, double progress)
         {

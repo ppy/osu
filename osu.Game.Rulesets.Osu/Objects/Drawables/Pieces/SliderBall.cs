@@ -139,9 +139,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        public void UpdateProgress(double progress, int span)
+        public void UpdateProgress(double completionProgress)
         {
-            Position = slider.Curve.PositionAt(progress);
+            Position = slider.StackedPositionAt(completionProgress);
         }
     }
 }

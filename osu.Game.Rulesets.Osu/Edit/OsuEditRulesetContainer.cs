@@ -5,6 +5,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -16,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         protected override Playfield CreatePlayfield() => new OsuEditPlayfield();
+
+        protected override Vector2 PlayfieldArea => Vector2.One;
 
         protected override CursorContainer CreateCursor() => null;
     }
