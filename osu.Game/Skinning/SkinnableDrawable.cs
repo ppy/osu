@@ -2,10 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Skinning
 {
@@ -14,40 +11,29 @@ namespace osu.Game.Skinning
         public SkinnableDrawable(string name, Func<string, Drawable> defaultImplementation, bool fallback = true)
             : base(name, defaultImplementation, fallback)
         {
-            RelativeSizeAxes = Axes.Both;
         }
     }
 
-    public class SkinnableDrawable<T> : CompositeDrawable
+    public class SkinnableDrawable<T> : SkinReloadableDrawable
         where T : Drawable
     {
-        private Bindable<Skin> skin;
-        protected Func<string, T> CreateDefault;
+        private readonly Func<string, T> createDefault;
 
-        public readonly string ComponentName;
+        private readonly string componentName;
 
-        public readonly bool DefaultFallback;
-
-        public SkinnableDrawable(string name, Func<string, T> defaultImplementation, bool fallback = true)
+        public SkinnableDrawable(string name, Func<string, T> defaultImplementation, bool fallback = true) : base(fallback)
         {
-            DefaultFallback = fallback;
-            ComponentName = name;
-            CreateDefault = defaultImplementation;
+            componentName = name;
+            createDefault = defaultImplementation;
+
+            RelativeSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(SkinManager skinManager)
+        protected override void SkinChanged(Skin skin, bool allowFallback)
         {
-            skin = skinManager.CurrentSkin.GetBoundCopy();
-            skin.ValueChanged += updateComponent;
-            skin.TriggerChange();
-        }
-
-        private void updateComponent(Skin skin)
-        {
-            var drawable = skin.GetDrawableComponent(ComponentName);
-            if (drawable == null && (DefaultFallback || skin.SkinInfo == SkinInfo.Default))
-                drawable = CreateDefault(ComponentName);
+            var drawable = skin.GetDrawableComponent(componentName);
+            if (drawable == null && allowFallback)
+                drawable = createDefault(componentName);
 
             if (drawable != null)
                 InternalChild = drawable;

@@ -3,21 +3,19 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
-using osu.Game.Rulesets.Judgements;
-using Container = osu.Framework.Graphics.Containers.Container;
-using osu.Game.Rulesets.Objects.Types;
-using OpenTK.Graphics;
-using osu.Game.Audio;
 using System.Linq;
-using osu.Game.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using OpenTK;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Audio;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -33,8 +31,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
         protected virtual string SampleNamespace => null;
 
-        protected List<SampleChannel> Samples = new List<SampleChannel>();
-        protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
+        protected SkinnableSound Samples;
+
+        protected virtual IEnumerable<SampleInfo> GetSamples()
+        {
+            return HitObject.Samples;
+        }
 
         private List<DrawableHitObject> nestedHitObjects;
         public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
@@ -83,41 +85,23 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject = hitObject;
         }
 
-        private readonly Bindable<Skin> skin = new Bindable<Skin>();
-
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, SkinManager skins)
+        private void load()
         {
-            var samples = GetSamples();
+            var samples = GetSamples().ToArray();
+
             if (samples.Any())
             {
                 if (HitObject.SampleControlPoint == null)
                     throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
                                                                                           + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-                void loadSamples(Skin skin)
+                AddInternal(Samples = new SkinnableSound(samples.Select(s => new SampleInfo
                 {
-                    Samples.Clear();
-
-                    foreach (SampleInfo s in samples)
-                    {
-                        SampleInfo localSampleInfo = new SampleInfo
-                        {
-                            Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
-                            Name = s.Name,
-                            Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
-                        };
-
-
-                        SampleChannel channel = localSampleInfo.GetChannel(skin.GetSample, SampleNamespace) ?? localSampleInfo.GetChannel(audio.Sample.Get, SampleNamespace);
-
-                        if (channel == null) return;
-
-                        Samples.Add(channel);
-                    }
-                }
-
-                skin.ValueChanged += loadSamples;
-                skin.BindTo(skins.CurrentSkin);
+                    Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
+                    Name = s.Name,
+                    Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume,
+                    Namespace = SampleNamespace
+                }).ToArray()));
             }
         }
 
@@ -149,7 +133,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Plays all the hitsounds for this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public void PlaySamples() => Samples.ForEach(s => s?.Play());
+        public void PlaySamples() => Samples?.Play();
 
         protected override void Update()
         {
@@ -231,10 +215,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 return false;
 
             if (NestedHitObjects != null)
-            {
                 foreach (var d in NestedHitObjects)
                     judgementOccurred |= d.UpdateJudgement(userTriggered);
-            }
 
             if (!ProvidesJudgement || judgementFinalized || judgementOccurred)
                 return judgementOccurred;
