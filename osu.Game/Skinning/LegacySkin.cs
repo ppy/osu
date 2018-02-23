@@ -22,9 +22,7 @@ namespace osu.Game.Skinning
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : base(skin)
         {
-            var audioStore = new ResourceStore<byte[]>(storage);
-
-            samples = audioManager.GetSampleManager(audioStore);
+            samples = audioManager.GetSampleManager(storage);
             textures = new TextureStore(new RawTextureLoaderStore(storage));
         }
 
