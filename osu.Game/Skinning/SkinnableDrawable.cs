@@ -24,7 +24,7 @@ namespace osu.Game.Skinning
         private Bindable<Skin> skin;
         protected Func<string, T> CreateDefault;
 
-        public string ComponentName { get; set; }
+        public readonly string ComponentName;
 
         public readonly bool DefaultFallback;
 
