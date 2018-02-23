@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = "Please login to see online scores",
+                        Text = "Please sign in to see online scores",
                     };
                 }
 
