@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public void UpdateProgress(double completionProgress)
         {
-            Position = slider.PositionAt(completionProgress);
+            Position = slider.CurvePositionAt(completionProgress);
         }
     }
 }

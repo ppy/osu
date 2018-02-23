@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (!HeadCircle.IsHit)
-                HeadCircle.Position = slider.PositionAt(completionProgress);
+                HeadCircle.Position = slider.CurvePositionAt(completionProgress);
 
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
             foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
