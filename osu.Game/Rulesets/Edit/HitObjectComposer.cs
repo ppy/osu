@@ -4,14 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Edit.Layers;
 using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.UI;
@@ -50,16 +49,25 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            ScalableContainer createLayerContainerWithContent(params Drawable[] content)
-            {
-                var container = CreateLayerContainer();
-                container.Children = content;
-                layerContainers.Add(container);
-                return container;
-            }
-
             HitObjectOverlayLayer hitObjectOverlayLayer = CreateHitObjectOverlayLayer();
             SelectionLayer selectionLayer = new SelectionLayer(rulesetContainer.Playfield);
+
+            var layerBelowRuleset = new BorderLayer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = CreateLayerContainer()
+            };
+
+            var layerAboveRuleset = CreateLayerContainer();
+            layerAboveRuleset.Children = new Drawable[]
+            {
+                selectionLayer, // Below object overlays for input
+                hitObjectOverlayLayer,
+                selectionLayer.CreateProxy() // Proxy above object overlays for selections
+            };
+
+            layerContainers.Add(layerBelowRuleset);
+            layerContainers.Add(layerAboveRuleset);
 
             RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
@@ -85,22 +93,9 @@ namespace osu.Game.Rulesets.Edit
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                createLayerContainerWithContent(new Container
-                                {
-                                    Name = "Border",
-                                    RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
-                                    BorderColour = Color4.White,
-                                    BorderThickness = 2,
-                                    Child = new Box { RelativeSizeAxes = Axes.Both, Alpha = 0, AlwaysPresent = true }
-                                }),
+                                layerBelowRuleset,
                                 rulesetContainer,
-                                createLayerContainerWithContent
-                                (
-                                    selectionLayer, // Below object overlays for input
-                                    hitObjectOverlayLayer,
-                                    selectionLayer.CreateProxy() // Proxy above object overlays for selections
-                                )
+                                layerAboveRuleset
                             }
                         }
                     },
