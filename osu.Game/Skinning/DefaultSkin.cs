@@ -1,4 +1,7 @@
-﻿using osu.Framework.Audio.Sample;
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 
 namespace osu.Game.Skinning
@@ -10,8 +13,14 @@ namespace osu.Game.Skinning
         {
         }
 
-        public override Drawable GetDrawableComponent(string componentName) => null;
+        public override Drawable GetDrawableComponent(string componentName)
+        {
+            return null;
+        }
 
-        public override SampleChannel GetSample(string sampleName) => null;
+        public override SampleChannel GetSample(string sampleName)
+        {
+            return null;
+        }
     }
 }
