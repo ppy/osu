@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Framework.IO.Stores;
 
-namespace osu.Game.Beatmaps.IO
+namespace osu.Game.IO.Archives
 {
     public abstract class ArchiveReader : IDisposable, IResourceStore<byte[]>
     {
@@ -16,6 +16,16 @@ namespace osu.Game.Beatmaps.IO
         public abstract Stream GetStream(string name);
 
         public abstract void Dispose();
+
+        /// <summary>
+        /// The name of this archive (usually the containing filename).
+        /// </summary>
+        public readonly string Name;
+
+        protected ArchiveReader(string name)
+        {
+            Name = name;
+        }
 
         public abstract IEnumerable<string> Filenames { get; }
 

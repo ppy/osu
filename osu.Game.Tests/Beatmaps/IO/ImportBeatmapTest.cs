@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var temp = prepareTempCopy(osz_path);
                     Assert.IsTrue(File.Exists(temp));
 
-                    var importer = new BeatmapIPCChannel(client);
+                    var importer = new ArchiveImportIPCChannel(client);
                     if (!importer.ImportAsync(temp).Wait(10000))
                         Assert.Fail(@"IPC took too long to send");
 
@@ -209,7 +209,11 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Assert.IsTrue(File.Exists(temp));
 
-            var imported = osu.Dependencies.Get<BeatmapManager>().Import(temp);
+            var manager = osu.Dependencies.Get<BeatmapManager>();
+
+            manager.Import(temp);
+
+            var imported = manager.GetAllUsableBeatmapSets();
 
             ensureLoaded(osu);
 

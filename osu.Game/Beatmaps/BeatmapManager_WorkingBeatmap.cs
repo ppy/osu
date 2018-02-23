@@ -75,23 +75,32 @@ namespace osu.Game.Beatmaps
 
             protected override Storyboard GetStoryboard()
             {
+                Storyboard storyboard;
                 try
                 {
                     using (var beatmap = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                     {
                         Decoder decoder = Decoder.GetDecoder(beatmap);
 
-                        if (BeatmapSetInfo?.StoryboardFile == null)
-                            return decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap);
+                        // todo: support loading from both set-wide storyboard *and* beatmap specific.
 
-                        using (var storyboard = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
-                            return decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap, storyboard);
+                        if (BeatmapSetInfo?.StoryboardFile == null)
+                            storyboard = decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap);
+                        else
+                        {
+                            using (var reader = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
+                                storyboard = decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap, reader);
+                        }
                     }
                 }
                 catch
                 {
-                    return new Storyboard();
+                    storyboard = new Storyboard();
                 }
+
+                storyboard.BeatmapInfo = BeatmapInfo;
+
+                return storyboard;
             }
         }
     }
