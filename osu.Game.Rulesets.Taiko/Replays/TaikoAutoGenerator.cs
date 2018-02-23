@@ -63,16 +63,16 @@ namespace osu.Game.Rulesets.Taiko.Replays
                         {
                             default:
                             case 0:
-                                button = ReplayButtonState.Right1;
-                                break;
-                            case 1:
                                 button = ReplayButtonState.Left1;
                                 break;
+                            case 1:
+                                button = ReplayButtonState.Right1;
+                                break;
                             case 2:
-                                button = ReplayButtonState.Right2;
+                                button = ReplayButtonState.Left2;
                                 break;
                             case 3:
-                                button = ReplayButtonState.Left2;
+                                button = ReplayButtonState.Right2;
                                 break;
                         }
 
