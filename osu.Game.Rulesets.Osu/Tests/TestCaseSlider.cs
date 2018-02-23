@@ -88,9 +88,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Catmull Slider", () => testCatmull());
             AddStep("Catmull Slider 1 Repeat", () => testCatmull(1));
             AddStep("Catmull Slider 2 Repeats", () => testCatmull(2));
+
+            AddStep("Big Single, Large StackOffset", () => testSimpleBigLargeStackOffset());
+            AddStep("Big 1 Repeat, Large StackOffset", () => testSimpleBigLargeStackOffset(1));
         }
 
         private void testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
+
+        private void testSimpleBigLargeStackOffset(int repeats = 0) => createSlider(2, repeats: repeats, stackHeight: 10);
 
         private void testSimpleMedium(int repeats = 0) => createSlider(5, repeats: repeats);
 
@@ -104,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void testShortHighSpeed(int repeats = 0) => createSlider(distance: 100, repeats: repeats, speedMultiplier: 15);
 
-        private void createSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2)
+        private void createSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2, int stackHeight = 0)
         {
             var slider = new Slider
             {
@@ -118,7 +123,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
                 Distance = distance,
                 RepeatCount = repeats,
-                RepeatSamples = createEmptySamples(repeats)
+                RepeatSamples = createEmptySamples(repeats),
+                StackHeight = stackHeight
             };
 
             addSlider(slider, circleSize, speedMultiplier);
