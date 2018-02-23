@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -59,7 +59,7 @@ namespace osu.Game.Skinning
         {
             this.audio = audio;
 
-            CurrentSkinInfo.ValueChanged += info => { CurrentSkin.Value = GetSkin(info); };
+            CurrentSkinInfo.ValueChanged += info => CurrentSkin.Value = GetSkin(info);
             CurrentSkin.ValueChanged += skin =>
             {
                 if (skin.SkinInfo != CurrentSkinInfo.Value)
