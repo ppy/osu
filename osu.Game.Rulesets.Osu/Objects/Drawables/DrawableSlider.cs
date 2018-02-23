@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -53,8 +54,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableHitCircle(s.HeadCircle) { Position = s.HeadCircle.StackedPosition },
-                tail = new DrawableSliderTail(s.TailCircle) { Position = s.TailCircle.StackedPosition }
+                HeadCircle = new DrawableHitCircle(s.HeadCircle)　{　Position = s.HeadCircle.Position - s.Position　},
+                tail = new DrawableSliderTail(s.TailCircle) { Position = s.TailCircle.Position - s.Position }
             };
 
             components.Add(Body);
@@ -67,10 +68,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
-                var drawableTick = new DrawableSliderTick(tick)
-                {
-                    Position = tick.StackedPosition
-                };
+                var drawableTick = new DrawableSliderTick(tick) { Position = tick.Position - s.Position };
 
                 ticks.Add(drawableTick);
                 components.Add(drawableTick);
@@ -79,10 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
-                var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
-                {
-                    Position = repeatPoint.StackedPosition
-                };
+                var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this) { Position = repeatPoint.Position - s.Position };
 
                 repeatPoints.Add(drawableRepeatPoint);
                 components.Add(drawableRepeatPoint);
@@ -109,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (!HeadCircle.IsHit)
-                HeadCircle.Position = slider.StackedPositionAt(completionProgress);
+                HeadCircle.Position = slider.PositionAt(completionProgress);
 
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
             foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
