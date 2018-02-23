@@ -477,7 +477,7 @@ namespace osu.Game.Overlays
 
             if (!api.IsLoggedIn)
             {
-                target.AddNewMessages(new ErrorMessage("Please login to participate in chat!"));
+                target.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
                 return;
             }
 

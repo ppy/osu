@@ -30,6 +30,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game
 {
@@ -38,6 +39,8 @@ namespace osu.Game
         protected OsuConfigManager LocalConfig;
 
         protected BeatmapManager BeatmapManager;
+
+        protected SkinManager SkinManager;
 
         protected RulesetStore RulesetStore;
 
@@ -103,6 +106,8 @@ namespace osu.Game
 
             runMigrations();
 
+            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host));
+
             dependencies.Cache(API = new APIAccess
             {
                 Username = LocalConfig.Get<string>(OsuSetting.Username),
@@ -120,6 +125,7 @@ namespace osu.Game
 
             fileImporters.Add(BeatmapManager);
             fileImporters.Add(ScoreStore);
+            fileImporters.Add(SkinManager);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 });

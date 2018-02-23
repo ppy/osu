@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Configuration;
 using OpenTK;
 using OpenTK.Graphics.ES30;
 using OpenTK.Graphics;
@@ -30,6 +29,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             set { path.PathWidth = value; }
         }
 
+        public readonly Bindable<bool> SnakingIn = new Bindable<bool>();
+        public readonly Bindable<bool> SnakingOut = new Bindable<bool>();
+
         public double? SnakedStart { get; private set; }
         public double? SnakedEnd { get; private set; }
 
@@ -46,8 +48,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
                 accentColour = value;
 
-                if (LoadState == LoadState.Ready)
-                    Schedule(reloadTexture);
+                if (LoadState >= LoadState.Ready)
+                    reloadTexture();
+            }
+        }
+
+        private Color4 borderColour = Color4.White;
+        /// <summary>
+        /// Used to colour the path border.
+        /// </summary>
+        public new Color4 BorderColour
+        {
+            get { return borderColour; }
+            set
+            {
+                if (borderColour == value)
+                    return;
+                borderColour = value;
+
+                if (LoadState >= LoadState.Ready)
+                    reloadTexture();
             }
         }
 
@@ -97,15 +117,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        private Bindable<bool> snakingIn;
-        private Bindable<bool> snakingOut;
-
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
-            snakingIn = config.GetBindable<bool>(OsuSetting.SnakingInSliders);
-            snakingOut = config.GetBindable<bool>(OsuSetting.SnakingOutSliders);
-
             reloadTexture();
         }
 
@@ -130,10 +144,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 if (progress <= border_portion)
                 {
-                    bytes[i * 4] = 255;
-                    bytes[i * 4 + 1] = 255;
-                    bytes[i * 4 + 2] = 255;
-                    bytes[i * 4 + 3] = (byte)(Math.Min(progress / aa_portion, 1) * 255);
+                    bytes[i * 4] = (byte)(BorderColour.R * 255);
+                    bytes[i * 4 + 1] = (byte)(BorderColour.G * 255);
+                    bytes[i * 4 + 2] = (byte)(BorderColour.B * 255);
+                    bytes[i * 4 + 3] = (byte)(Math.Min(progress / aa_portion, 1) * (BorderColour.A * 255));
                 }
                 else
                 {
@@ -167,21 +181,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return true;
         }
 
-        public void UpdateProgress(double progress, int span)
+        public void UpdateProgress(double completionProgress)
         {
+            var span = slider.SpanAt(completionProgress);
+            var spanProgress = slider.ProgressAt(completionProgress);
+
             double start = 0;
-            double end = snakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadein, 0, 1) : 1;
+            double end = SnakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadein, 0, 1) : 1;
 
             if (span >= slider.SpanCount() - 1)
             {
                 if (Math.Min(span, slider.SpanCount() - 1) % 2 == 1)
                 {
                     start = 0;
-                    end = snakingOut ? progress : 1;
+                    end = SnakingOut ? spanProgress : 1;
                 }
                 else
                 {
-                    start = snakingOut ? progress : 0;
+                    start = SnakingOut ? spanProgress : 0;
                 }
             }
 
