@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             List<Vector2> curve = drawableSlider.Body.CurrentCurve;
 
             var positionOnCurve = isRepeatAtEnd ? end : start;
-            Position = positionOnCurve + drawableSlider.HitObject.StackOffset;
+            Position = positionOnCurve - curve[0] + drawableSlider.HitObject.StackOffset;
 
             if (curve.Count < 2)
                 return;
