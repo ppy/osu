@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             slider = s;
 
+            Position = s.StackedPosition;
+
             DrawableSliderTail tail;
             Container<DrawableSliderTick> ticks;
             Container<DrawableRepeatPoint> repeatPoints;
@@ -39,20 +41,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Body = new SliderBody(s)
                 {
                     AccentColour = AccentColour,
-                    Position = s.StackedPosition,
                     PathWidth = s.Scale * 64,
                 },
-                ticks = new Container<DrawableSliderTick>(),
-                repeatPoints = new Container<DrawableRepeatPoint>(),
+                ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
+                repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s)
                 {
+                    BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
                     AccentColour = AccentColour,
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableHitCircle(s.HeadCircle),
-                tail = new DrawableSliderTail(s.TailCircle)
+                HeadCircle = new DrawableHitCircle(s.HeadCircle) { Position = s.HeadCircle.StackedPosition },
+                tail = new DrawableSliderTail(s.TailCircle) { Position = s.TailCircle.StackedPosition }
             };
 
             components.Add(Body);
@@ -112,6 +114,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
             foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
             foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
+
+            Size = Body.Size;
+            OriginPosition = Body.PathOffset;
+
+            foreach (var obj in NestedHitObjects)
+                obj.RelativeAnchorPosition = Vector2.Divide(OriginPosition, Body.DrawSize);
+            Ball.RelativeAnchorPosition = Vector2.Divide(OriginPosition, Body.DrawSize);
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
