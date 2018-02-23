@@ -113,9 +113,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = Body.Size;
             OriginPosition = Body.PathOffset;
 
-            foreach (var obj in NestedHitObjects)
-                obj.RelativeAnchorPosition = Vector2.Divide(OriginPosition, Body.DrawSize);
-            Ball.RelativeAnchorPosition = Vector2.Divide(OriginPosition, Body.DrawSize);
+            if (DrawSize.X > 0 && DrawSize.Y > 0)
+            {
+                var childAnchorPosition = Vector2.Divide(OriginPosition, DrawSize);
+                foreach (var obj in NestedHitObjects)
+                    obj.RelativeAnchorPosition = childAnchorPosition;
+                Ball.RelativeAnchorPosition = childAnchorPosition;
+            }
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
