@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 }
             };
 
-            AddRangeInternal(sampleMappings.Drawables);
+            AddRangeInternal(sampleMappings.Sounds);
         }
 
         /// <summary>

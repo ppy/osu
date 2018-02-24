@@ -33,10 +33,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected SkinnableSound Samples;
 
-        protected virtual IEnumerable<SampleInfo> GetSamples()
-        {
-            return HitObject.Samples;
-        }
+        protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
 
         private List<DrawableHitObject> nestedHitObjects;
         public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
