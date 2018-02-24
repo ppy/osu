@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string ShortenedName => "FI";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hidden;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override string Description => "The notes appear out of nowhere!" //edit if bad
+        public override string Description => "The notes appear out of nowhere!"; //edit if bad
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight) };
