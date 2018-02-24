@@ -323,7 +323,7 @@
       <DependentUpon>20171209034410_AddRulesetInfoShortName.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\20180219060912_AddSkins.cs" />
-    <Compile Include="Migrations\20180219060912_AddSkins.designer.cs">
+    <Compile Include="Migrations\20180219060912_AddSkins.Designer.cs">
       <DependentUpon>20180219060912_AddSkins.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
