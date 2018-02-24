@@ -6,30 +6,24 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class ApproachCircle : Container
     {
-        private readonly Sprite approachCircle;
-
         public ApproachCircle()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            AutoSizeAxes = Axes.Both;
-
-            Children = new Drawable[]
-            {
-                approachCircle = new Sprite()
-            };
+            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            approachCircle.Texture = textures.Get(@"Play/osu/approachcircle");
+            Child = new SkinnableDrawable("Play/osu/approachcircle", name => new Sprite { Texture = textures.Get(name) });
         }
     }
 }

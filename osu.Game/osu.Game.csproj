@@ -854,9 +854,15 @@
     <Compile Include="Screens\Tournament\Teams\DrawingsTeam.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Skinning\DefaultSkin.cs" />
+    <Compile Include="Skinning\LegacySkin.cs" />
+    <Compile Include="Skinning\Skin.cs" />
     <Compile Include="Skinning\SkinFileInfo.cs" />
     <Compile Include="Skinning\SkinInfo.cs" />
     <Compile Include="Skinning\SkinManager.cs" />
+    <Compile Include="Skinning\SkinnableDrawable.cs" />
+    <Compile Include="Skinning\SkinnableSound.cs" />
+    <Compile Include="Skinning\SkinReloadableDrawable.cs" />
     <Compile Include="Skinning\SkinStore.cs" />
     <Compile Include="Storyboards\CommandLoop.cs" />
     <Compile Include="Storyboards\CommandTimeline.cs" />
