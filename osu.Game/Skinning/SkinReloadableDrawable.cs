@@ -20,7 +20,7 @@ namespace osu.Game.Skinning
         private readonly bool allowDefaultFallback;
 
         /// <summary>
-        /// Create a new
+        /// Create a new <see cref="SkinReloadableDrawable"/>
         /// </summary>
         /// <param name="fallback">Whether fallback to default skin should be allowed if the custom skin is missing this resource.</param>
         protected SkinReloadableDrawable(bool fallback = true)

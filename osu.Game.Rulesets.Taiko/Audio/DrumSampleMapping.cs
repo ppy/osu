@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Audio
         private readonly ControlPointInfo controlPoints;
         private readonly Dictionary<double, DrumSample> mappings = new Dictionary<double, DrumSample>();
 
-        public readonly List<SkinnableSound> Drawables = new List<SkinnableSound>();
+        public readonly List<SkinnableSound> Sounds = new List<SkinnableSound>();
 
         public DrumSampleMapping(ControlPointInfo controlPoints)
         {
@@ -37,16 +37,16 @@ namespace osu.Game.Rulesets.Taiko.Audio
 
                 mappings[s.Time] = new DrumSample
                 {
-                    Centre = addDrawableSound(centre),
-                    Rim = addDrawableSound(rim)
+                    Centre = addSound(centre),
+                    Rim = addSound(rim)
                 };
             }
         }
 
-        private SkinnableSound addDrawableSound(SampleInfo rim)
+        private SkinnableSound addSound(SampleInfo sampleInfo)
         {
-            var drawable = new SkinnableSound(rim);
-            Drawables.Add(drawable);
+            var drawable = new SkinnableSound(sampleInfo);
+            Sounds.Add(drawable);
             return drawable;
         }
 
