@@ -73,6 +73,11 @@ namespace osu.Game.Overlays
             FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
         }
 
+        public void ShowUser(long userId)
+        {
+            ShowUser(new User { Id = userId }, true);
+        }
+
         public void ShowUser(User user, bool fetchOnline = true)
         {
             userReq?.Cancel();
