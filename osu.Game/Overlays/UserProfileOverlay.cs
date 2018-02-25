@@ -75,6 +75,9 @@ namespace osu.Game.Overlays
 
         public void ShowUser(long userId)
         {
+            if (userId == Header.User.Id)
+                return;
+
             ShowUser(new User { Id = userId }, true);
         }
 

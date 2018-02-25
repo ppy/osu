@@ -34,8 +34,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             this.activity = activity;
             this.user = user;
 
-            userLinkTemplate = $"[{activity.User?.Username}]({urlToAbsolute(activity.User?.Url)})";
-            beatmapLinkTemplate = $"[{activity.Beatmap?.Title}]({urlToAbsolute(activity.Beatmap?.Url)})";
+            userLinkTemplate = $"[{urlToAbsolute(activity.User?.Url)} {activity.User?.Username}]";
+            beatmapLinkTemplate = $"[{urlToAbsolute(activity.Beatmap?.Url)} {activity.Beatmap?.Title}]";
         }
 
         [BackgroundDependencyLoader]
@@ -59,9 +59,9 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 Colour = OsuColour.Gray(0xAA),
             });
 
-            string text = activityToString();
+            var formatted = MessageFormatter.FormatText(activityToString());
 
-            content.AddLinks(text, MessageFormatter.GetLinks(text));
+            content.AddLinks(formatted.Text, formatted.Links);
         }
 
         protected override Drawable CreateLeftVisual()
