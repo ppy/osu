@@ -82,7 +82,7 @@ namespace osu.Game.Overlays
             sections = new ProfileSection[]
             {
                 //new AboutSection(),
-                //new RecentSection(),
+                new RecentSection(),
                 new RanksSection(),
                 //new MedalsSection(),
                 new HistoricalSection(),
