@@ -7,6 +7,14 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         public override string Title => "Recent";
 
-        public override string Identifier => "recent_activities";
+        public override string Identifier => "recent_activity";
+
+        public RecentSection()
+        {
+            Children = new[]
+            {
+                new PaginatedRecentActivityContainer(User, @"Recent", @"This user hasn't done anything notable recently!"),
+            };
+        }
     }
 }
