@@ -3,10 +3,6 @@ using osu.Game.Rulesets.Scoring;
 using Humanizer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {

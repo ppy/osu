@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using osu.Framework.Allocation;
+﻿using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -13,26 +8,22 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Screens.Select.Leaderboards;
-using osu.Game.Users;
-using static osu.Game.Online.API.Requests.RecentActivity;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class DrawableRecentActivity : DrawableProfileRow
     {
-        private RecentActivity activity;
-        private User user;
         private APIAccess api;
 
-        private string userLinkTemplate;
-        private string beatmapLinkTemplate;
+        private readonly RecentActivity activity;
+        private readonly string userLinkTemplate;
+        private readonly string beatmapLinkTemplate;
 
         private LinkFlowContainer content;
 
-        public DrawableRecentActivity(RecentActivity activity, User user)
+        public DrawableRecentActivity(RecentActivity activity)
         {
             this.activity = activity;
-            this.user = user;
 
             userLinkTemplate = $"[{urlToAbsolute(activity.User?.Url)} {activity.User?.Username}]";
             beatmapLinkTemplate = $"[{urlToAbsolute(activity.Beatmap?.Url)} {activity.Beatmap?.Title}]";

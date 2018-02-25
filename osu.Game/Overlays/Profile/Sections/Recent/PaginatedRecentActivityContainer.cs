@@ -1,17 +1,12 @@
 ﻿using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays.Profile.Sections.Recent;
 using osu.Game.Users;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace osu.Game.Overlays.Profile.Sections
+namespace osu.Game.Overlays.Profile.Sections.Recent
 {
-    class PaginatedRecentActivityContainer : PaginatedContainer
+    internal class PaginatedRecentActivityContainer : PaginatedContainer
     {
         public PaginatedRecentActivityContainer(Bindable<User> user, string header, string missing)
             : base(user, header, missing)
@@ -40,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
                 foreach (RecentActivity activity in activities)
                 {
-                    ItemsContainer.Add(new DrawableRecentActivity(activity, User));
+                    ItemsContainer.Add(new DrawableRecentActivity(activity));
                 }
             };
 
