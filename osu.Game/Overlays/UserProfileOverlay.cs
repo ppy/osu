@@ -78,7 +78,7 @@ namespace osu.Game.Overlays
             if (userId == Header.User.Id)
                 return;
 
-            ShowUser(new User { Id = userId }, true);
+            ShowUser(new User { Id = userId });
         }
 
         public void ShowUser(User user, bool fetchOnline = true)
