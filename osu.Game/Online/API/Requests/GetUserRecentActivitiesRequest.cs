@@ -7,12 +7,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using osu.Game.Rulesets;
-using osu.Game.Overlays.Profile.Sections.Recent;
 
 namespace osu.Game.Online.API.Requests
 {
     public class GetUserRecentActivitiesRequest : APIRequest<List<RecentActivity>>
     {
+        private readonly long userId;
+        private readonly int offset;
+
+        public GetUserRecentActivitiesRequest(long userId, int offset = 0)
+        {
+            this.userId = userId;
+            this.offset = offset;
+        }
+
+        protected override string Target => $"users/{userId}/recent_activity?offset={offset}";
     }
 
     public class RecentActivity
@@ -42,6 +51,9 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty("rank")]
         public int Rank;
 
+        [JsonProperty("count")]
+        public int Count;
+
         [JsonProperty("mode")]
         public string Mode;
 
@@ -50,6 +62,9 @@ namespace osu.Game.Online.API.Requests
 
         [JsonProperty("user")]
         public RecentActivityUser User;
+
+        [JsonProperty("achivementName")]
+        public string AchivementName;
 
         public class RecentActivityBeatmap
         {
@@ -67,6 +82,9 @@ namespace osu.Game.Online.API.Requests
 
             [JsonProperty("url")]
             public string Url;
+
+            [JsonProperty("previousUsername")]
+            public string PreviousUsername;
         }
     }
 
@@ -78,6 +96,7 @@ namespace osu.Game.Online.API.Requests
         BeatmapsetDelete,
         BeatmapsetRevive,
         BeatmapsetUpdate,
+        BeatmapsetUpload,
         Medal,
         Rank,
         RankLost,
