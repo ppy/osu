@@ -39,7 +39,7 @@ namespace osu.Game.Skinning
                 if (ch == null && allowFallback)
                     ch = loadChannel(s, audio.Sample.Get);
                 return ch;
-            }).ToArray();
+            }).Where(c => c != null).ToArray();
         }
 
         private SampleChannel loadChannel(SampleInfo info, Func<string, SampleChannel> getSampleFunction)
