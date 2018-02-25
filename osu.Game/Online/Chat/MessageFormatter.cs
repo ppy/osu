@@ -210,13 +210,13 @@ namespace osu.Game.Online.Chat
             return inputMessage;
         }
 
-        public static List<Link> GetLinks(string text)
+        public static MessageFormatterResult FormatText(string text)
         {
             var result = format(text);
 
             result.Links.Sort();
 
-            return result.Links;
+            return result;
         }
 
         public class MessageFormatterResult
