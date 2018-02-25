@@ -23,14 +23,16 @@ namespace osu.Game.Graphics.Containers
         public override bool HandleMouseInput => true;
 
         private OsuGame game;
+        private UserProfileOverlay userProfile;
 
         private Action showNotImplementedError;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications)
+        private void load(OsuGame game, NotificationOverlay notifications, UserProfileOverlay userProfile)
         {
             // will be null in tests
             this.game = game;
+            this.userProfile = userProfile;
 
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
@@ -89,6 +91,9 @@ namespace osu.Game.Graphics.Containers
                             break;
                         case LinkAction.External:
                             Process.Start(url);
+                            break;
+                        case LinkAction.OpenUserProfile:
+                            userProfile?.ShowUser(Convert.ToInt64(linkArgument));
                             break;
                         default:
                             throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");

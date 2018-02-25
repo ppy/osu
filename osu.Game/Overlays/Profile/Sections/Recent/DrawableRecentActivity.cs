@@ -7,10 +7,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.Chat;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
+using static osu.Game.Online.API.Requests.RecentActivity;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
@@ -18,19 +22,31 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
     {
         private RecentActivity activity;
         private User user;
+        private APIAccess api;
+
+        private string userLinkTemplate;
+        private string beatmapLinkTemplate;
+
+        private LinkFlowContainer content;
 
         public DrawableRecentActivity(RecentActivity activity, User user)
         {
             this.activity = activity;
             this.user = user;
+
+            userLinkTemplate = $"[{activity.User?.Username}]({urlToAbsolute(activity.User?.Url)})";
+            beatmapLinkTemplate = $"[{activity.Beatmap?.Title}]({urlToAbsolute(activity.Beatmap?.Url)})";
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(APIAccess api)
         {
-            LeftFlowContainer.Add(new OsuSpriteText
+            this.api = api;
+
+            LeftFlowContainer.Add(content = new LinkFlowContainer
             {
-                Text = activityToString(),
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
             });
 
             RightFlowContainer.Add(new OsuSpriteText
@@ -42,6 +58,10 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 TextSize = 12,
                 Colour = OsuColour.Gray(0xAA),
             });
+
+            string text = activityToString();
+
+            content.AddLinks(text, MessageFormatter.GetLinks(text));
         }
 
         protected override Drawable CreateLeftVisual()
@@ -66,48 +86,50 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             }
         }
 
+        private string urlToAbsolute(string url) => $"{api?.Endpoint ?? @"https://osu.ppy.sh"}{url}";
+
         private string activityToString()
         {
             switch (activity.Type)
             {
                 case RecentActivityType.Achievement:
-                    return $"{activity.User.Username} unlocked the {activity.AchivementName} achievement!";
+                    return $"{userLinkTemplate} unlocked the {activity.AchivementName} achievement!";
 
                 case RecentActivityType.BeatmapPlaycount:
-                    return $"{activity.Beatmap.Title} has been played {activity.Count} times!";
+                    return $"{beatmapLinkTemplate} has been played {activity.Count} times!";
 
                 case RecentActivityType.BeatmapsetDelete:
-                    return $"{activity.Beatmap.Title} has been deleted.";
+                    return $"{beatmapLinkTemplate} has been deleted.";
 
                 case RecentActivityType.BeatmapsetRevive:
-                    return $"{activity.Beatmap.Title} has been revived from eternal slumber by ${activity.User.Username}";
+                    return $"{beatmapLinkTemplate} has been revived from eternal slumber by ${userLinkTemplate}";
 
                 case RecentActivityType.BeatmapsetUpdate:
-                    return $"{activity.User.Username} has updated the beatmap ${activity.Beatmap.Title}";
+                    return $"{userLinkTemplate} has updated the beatmap ${beatmapLinkTemplate}";
 
                 case RecentActivityType.BeatmapsetUpload:
-                    return $"{activity.User.Username} has submitted a new beatmap ${activity.Beatmap.Title}";
+                    return $"{userLinkTemplate} has submitted a new beatmap ${beatmapLinkTemplate}";
 
                 case RecentActivityType.Medal:
-                    return $"{activity.User.Username} has unlocked the {activity.AchivementName} medal!";
+                    return $"{userLinkTemplate} has unlocked the {activity.AchivementName} medal!";
 
                 case RecentActivityType.Rank:
-                    return $"{activity.User.Username} achieved rank #{activity.Rank} on {activity.Beatmap?.Title}";
+                    return $"{userLinkTemplate} achieved rank #{activity.Rank} on {beatmapLinkTemplate}";
 
                 case RecentActivityType.RankLost:
-                    return $"{activity.User.Username} has lost first place on {activity.Beatmap.Title}!";
+                    return $"{userLinkTemplate} has lost first place on {beatmapLinkTemplate}!";
 
                 case RecentActivityType.UserSupportAgain:
-                    return $"{activity.User.Username} has once again chosen to support osu! - thanks for your generosity!";
+                    return $"{userLinkTemplate} has once again chosen to support osu! - thanks for your generosity!";
 
                 case RecentActivityType.UserSupportFirst:
-                    return $"{activity.User.Username} has become an osu! supporter - thanks for your generosity!";
+                    return $"{userLinkTemplate} has become an osu! supporter - thanks for your generosity!";
 
                 case RecentActivityType.UsernameChange:
-                    return $"{activity.User.PreviousUsername} has changed their username to {activity.User.Username}";
+                    return $"{activity.User.PreviousUsername} has changed their username to {userLinkTemplate}";
 
                 case RecentActivityType.UserSupportGift:
-                    return $"{activity.User.Username} has received the gift of osu! supporter!";
+                    return $"{userLinkTemplate} has received the gift of osu! supporter!";
 
                 default:
                     return string.Empty;
