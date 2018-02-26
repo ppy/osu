@@ -25,25 +25,37 @@ namespace osu.Game.Rulesets.Edit
 
         protected ICompositionTool CurrentTool { get; private set; }
 
+        private RulesetContainer rulesetContainer;
+        private readonly List<Container> layerContainers = new List<Container>();
+
         protected HitObjectComposer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
-
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {
-            RulesetContainer rulesetContainer;
             try
             {
                 rulesetContainer = CreateRulesetContainer(ruleset, osuGame.Beatmap.Value);
+
+                // TODO: should probably be done at a RulesetContainer level to share logic with Player.
+                rulesetContainer.Clock = new InterpolatingFramedClock((IAdjustableClock)osuGame.Beatmap.Value.Track ?? new StopwatchClock());
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Could not load beatmap sucessfully!");
                 return;
+            }
+
+            ScalableContainer createLayerContainerWithContent(Drawable content)
+            {
+                var container = CreateLayerContainer();
+                container.Child = content;
+                layerContainers.Add(container);
+                return container;
             }
 
             RadioButtonCollection toolboxCollection;
@@ -66,20 +78,21 @@ namespace osu.Game.Rulesets.Edit
                         },
                         new Container
                         {
+                            Name = "Content",
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            BorderColour = Color4.White,
-                            BorderThickness = 2,
                             Children = new Drawable[]
                             {
-                                new Box
+                                createLayerContainerWithContent(new Container
                                 {
+                                    Name = "Border",
                                     RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0,
-                                    AlwaysPresent = true,
-                                },
+                                    Masking = true,
+                                    BorderColour = Color4.White,
+                                    BorderThickness = 2,
+                                    Child = new Box { RelativeSizeAxes = Axes.Both, Alpha = 0, AlwaysPresent = true }
+                                }),
                                 rulesetContainer,
-                                new SelectionLayer(rulesetContainer.Playfield)
+                                createLayerContainerWithContent(new SelectionLayer(rulesetContainer.Playfield))
                             }
                         }
                     },
@@ -89,8 +102,6 @@ namespace osu.Game.Rulesets.Edit
                     new Dimension(GridSizeMode.Absolute, 200),
                 }
             };
-
-            rulesetContainer.Clock = new InterpolatingFramedClock((IAdjustableClock)osuGame.Beatmap.Value.Track ?? new StopwatchClock());
 
             toolboxCollection.Items =
                 new[] { new RadioButton("Select", () => setCompositionTool(null)) }
@@ -102,10 +113,28 @@ namespace osu.Game.Rulesets.Edit
             toolboxCollection.Items[0].Select();
         }
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            layerContainers.ForEach(l =>
+            {
+                l.Anchor = rulesetContainer.Playfield.Anchor;
+                l.Origin = rulesetContainer.Playfield.Origin;
+                l.Position = rulesetContainer.Playfield.Position;
+                l.Size = rulesetContainer.Playfield.Size;
+            });
+        }
+
         private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
 
         protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap, true);
 
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
+
+        /// <summary>
+        /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
+        /// </summary>
+        protected virtual ScalableContainer CreateLayerContainer() => new ScalableContainer { RelativeSizeAxes = Axes.Both };
     }
 }
