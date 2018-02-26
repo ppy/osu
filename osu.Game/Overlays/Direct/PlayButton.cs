@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Direct
         public Track Preview { get; private set; }
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
             get { return beatmapSet; }
@@ -199,8 +200,7 @@ namespace osu.Game.Overlays.Direct
                 // add back the user's music volume setting (since we are no longer in the global TrackManager's hierarchy).
                 config.BindWith(FrameworkSetting.VolumeMusic, trackManager.Volume);
 
-                if (!string.IsNullOrEmpty(preview))
-                    Preview = trackManager.Get(preview);
+                Preview = trackManager.Get(preview);
             }
 
             protected override void Dispose(bool isDisposing)
