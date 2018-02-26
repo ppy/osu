@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -141,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public void UpdateProgress(double completionProgress)
         {
-            Position = slider.StackedPositionAt(completionProgress);
+            Position = slider.CurvePositionAt(completionProgress);
         }
     }
 }

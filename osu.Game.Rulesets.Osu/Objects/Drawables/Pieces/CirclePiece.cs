@@ -2,20 +2,16 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
+using osu.Game.Skinning;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class CirclePiece : Container, IKeyBindingHandler<OsuAction>
     {
-        private readonly Sprite disc;
-
         public Func<bool> Hit;
 
         public CirclePiece()
@@ -27,26 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Children = new Drawable[]
-            {
-                disc = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                },
-                new TrianglesPiece
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingMode.Additive,
-                    Alpha = 0.5f,
-                }
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            disc.Texture = textures.Get(@"Play/osu/disc");
+            InternalChild = new SkinnableDrawable("Play/osu/hitcircle", _ => new DefaultCirclePiece());
         }
 
         public bool OnPressed(OsuAction action)
