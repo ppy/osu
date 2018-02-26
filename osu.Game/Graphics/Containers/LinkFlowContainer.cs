@@ -93,7 +93,8 @@ namespace osu.Game.Graphics.Containers
                             Process.Start(url);
                             break;
                         case LinkAction.OpenUserProfile:
-                            userProfile?.ShowUser(Convert.ToInt64(linkArgument));
+                            if (long.TryParse(linkArgument, out long userId))
+                                userProfile?.ShowUser(userId);
                             break;
                         default:
                             throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
