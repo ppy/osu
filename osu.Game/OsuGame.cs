@@ -30,6 +30,7 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Skinning;
 using OpenTK.Graphics;
 
 namespace osu.Game
@@ -79,6 +80,8 @@ namespace osu.Game
         private Bindable<int> configRuleset;
         public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
+        private Bindable<int> configSkin;
+
         private readonly string[] args;
 
         private SettingsOverlay settings;
@@ -122,9 +125,17 @@ namespace osu.Game
 
             dependencies.CacheAs(this);
 
+            // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
+
+            // bind config int to database SkinInfo
+            configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
+
+            SkinManager.CurrentSkinInfo.ValueChanged += s => configSkin.Value = s.ID;
+            configSkin.ValueChanged += id => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == id) ?? SkinInfo.Default;
+            configSkin.TriggerChange();
 
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
         }
@@ -187,7 +198,9 @@ namespace osu.Game
             CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
 
             // hook up notifications to components.
+            SkinManager.PostNotification = n => notifications?.Post(n);
             BeatmapManager.PostNotification = n => notifications?.Post(n);
+
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
 
             AddRange(new Drawable[]
