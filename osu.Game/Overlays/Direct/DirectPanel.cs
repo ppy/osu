@@ -32,16 +32,40 @@ namespace osu.Game.Overlays.Direct
 
         private Container content;
 
+        private ProgressBar progressBar;
         private BeatmapManager beatmaps;
         private BeatmapSetOverlay beatmapSetOverlay;
+
+        protected DownloadButton DownloadButton;
 
         public Track Preview => PlayButton.Preview;
         public Bindable<bool> PreviewPlaying => PlayButton.Playing;
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
 
-        protected ProgressBar ProgressBar;
-        protected DownloadButton DownloadButton;
+        private bool downloadIndicatorsVisible = true;
+        public bool DownloadIndicatorsVisible
+        {
+            get => downloadIndicatorsVisible;
+            set
+            {
+                if (value == downloadIndicatorsVisible)
+                    return;
+
+                downloadIndicatorsVisible = value;
+
+                if (!downloadIndicatorsVisible)
+                {
+                    DownloadButton?.FadeOut(200);
+                    progressBar?.FadeOut(200);
+                }
+                else
+                {
+                    DownloadButton?.FadeIn(200);
+                    progressBar?.FadeIn(200);
+                }
+            }
+        }
 
         protected override Container<Drawable> Content => content;
 
@@ -89,7 +113,7 @@ namespace osu.Game.Overlays.Direct
                         Colour = Color4.Black,
                     },
                     CreateBackground(),
-                    ProgressBar = new ProgressBar
+                    progressBar = new ProgressBar
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
@@ -108,6 +132,15 @@ namespace osu.Game.Overlays.Direct
                 attachDownload(downloadRequest);
 
             beatmaps.BeatmapDownloadBegan += attachDownload;
+        }
+
+        protected override void LoadAsyncComplete()
+        {
+            base.LoadAsyncComplete();
+
+            // value may have been set before the panel had fully finished loading
+            if (!downloadIndicatorsVisible)
+                DownloadButton.Alpha = 0;
         }
 
         public override bool DisposeOnDeathRemoval => true;
@@ -154,7 +187,7 @@ namespace osu.Game.Overlays.Direct
             return true;
         }
 
-        protected void ShowInformation(bool withDownloadButtons = true) => beatmapSetOverlay?.ShowBeatmapSet(SetInfo, withDownloadButtons);
+        protected void ShowInformation() => beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
 
         protected void StartDownload()
         {
@@ -177,23 +210,23 @@ namespace osu.Game.Overlays.Direct
             if (request.BeatmapSet.OnlineBeatmapSetID != SetInfo.OnlineBeatmapSetID)
                 return;
 
-            ProgressBar.FadeIn(400, Easing.OutQuint);
-            ProgressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
+            progressBar.FadeIn(400, Easing.OutQuint);
+            progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
 
-            ProgressBar.Current.Value = 0;
+            progressBar.Current.Value = 0;
 
             request.Failure += e =>
             {
-                ProgressBar.Current.Value = 0;
-                ProgressBar.FadeOut(500);
+                progressBar.Current.Value = 0;
+                progressBar.FadeOut(500);
             };
 
             request.DownloadProgressed += progress => Schedule(() => progressBar.Current.Value = progress);
 
             request.Success += data =>
             {
-                ProgressBar.Current.Value = 1;
-                ProgressBar.FillColour = colours.Yellow;
+                progressBar.Current.Value = 1;
+                progressBar.FillColour = colours.Yellow;
             };
         }
 

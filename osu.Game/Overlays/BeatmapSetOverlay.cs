@@ -32,6 +32,7 @@ namespace osu.Game.Overlays
         private APIAccess api;
         private RulesetStore rulesets;
         private GetScoresRequest getScoresRequest;
+        private BeatmapManager manager;
 
         private readonly ScrollContainer scroll;
 
@@ -114,10 +115,11 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, RulesetStore rulesets)
+        private void load(APIAccess api, RulesetStore rulesets, BeatmapManager manager)
         {
             this.api = api;
             this.rulesets = rulesets;
+            this.manager = manager;
         }
 
         protected override void PopIn()
@@ -147,10 +149,10 @@ namespace osu.Game.Overlays
             api.Queue(req);
         }
 
-        public void ShowBeatmapSet(BeatmapSetInfo set, bool withDownloadButtons = true)
+        public void ShowBeatmapSet(BeatmapSetInfo set)
         {
             header.BeatmapSet = info.BeatmapSet = set;
-            header.DownloadButtonsVisible = withDownloadButtons;
+            header.DownloadButtonsVisible = manager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID) == null;
             Show();
             scroll.ScrollTo(0);
         }
