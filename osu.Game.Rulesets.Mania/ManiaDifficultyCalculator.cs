@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania
 {
-    public class ManiaDifficultyCalculator : DifficultyCalculator<ManiaHitObject>
+    internal class ManiaDifficultyCalculator : DifficultyCalculator<ManiaHitObject>
     {
         private const double star_scaling_factor = 0.018;
 
@@ -18,12 +18,12 @@ namespace osu.Game.Rulesets.Mania
         /// This is to eliminate higher influence of stream over aim by simply having more HitObjects with high strain.
         /// The higher this value, the less strains there will be, indirectly giving long beatmaps an advantage.
         /// </summary>
-        protected const double strain_step = 400;
+        private const double strain_step = 400;
 
         /// <summary>
         /// The weighting of each strain value decays to this number * it's previous value
         /// </summary>
-        protected const double decay_weight = 0.9;
+        private const double decay_weight = 0.9;
 
         /// <summary>
         /// HitObjects are stored as a member variable.
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania
             // Fill our custom DifficultyHitObject class, that carries additional information
             difficultyHitObjects.Clear();
 
-            int columnCount = (Beatmap as ManiaBeatmap).TotalColumns;
+            int columnCount = (Beatmap as ManiaBeatmap)?.TotalColumns ?? 7;
 
             foreach (var hitObject in Beatmap.HitObjects)
                 difficultyHitObjects.Add(new ManiaHitObjectDifficulty(hitObject, columnCount));

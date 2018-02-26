@@ -6,7 +6,7 @@ using System;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
-    class ManiaHitObjectDifficulty
+    internal class ManiaHitObjectDifficulty
     {
         /// <summary>
         /// Factor by how much individual / overall strain decays per second.
@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         internal ManiaHitObject BaseHitObject;
 
-        private int beatmapColumnCount;
+        private readonly int beatmapColumnCount;
 
 
         private double endTime;
@@ -68,7 +68,6 @@ namespace osu.Game.Rulesets.Mania.Objects
         internal void CalculateStrains(ManiaHitObjectDifficulty previousHitObject, double timeRate)
         {
             // TODO: Factor in holds
-            double addition = 1.0;
             double timeElapsed = (BaseHitObject.StartTime - previousHitObject.BaseHitObject.StartTime) / timeRate;
             double individualDecay = Math.Pow(INDIVIDUAL_DECAY_BASE, timeElapsed / 1000);
             double overallDecay = Math.Pow(OVERALL_DECAY_BASE, timeElapsed / 1000);
@@ -106,9 +105,9 @@ namespace osu.Game.Rulesets.Mania.Objects
             heldUntil[BaseHitObject.Column] = endTime;
 
             // Increase individual strain in own column
-            IndividualStrain += (2.0/* + (double)SpeedMania.Column / 8.0*/) * holdFactor;
+            IndividualStrain += 2.0 * holdFactor;
 
-            OverallStrain = previousHitObject.OverallStrain * overallDecay + (addition + holdAddition) * holdFactor;
+            OverallStrain = previousHitObject.OverallStrain * overallDecay + (1.0 + holdAddition) * holdFactor;
         }
     }
 }
