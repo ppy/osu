@@ -68,8 +68,8 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty("user")]
         public RecentActivityUser User;
 
-        [JsonProperty("achievementName")]
-        public string AchivementName;
+        [JsonProperty("achievement")]
+        public RecentActivityAchievement Achievement;
 
         public class RecentActivityBeatmap
         {
@@ -91,6 +91,16 @@ namespace osu.Game.Online.API.Requests
             [JsonProperty("previousUsername")]
             public string PreviousUsername;
         }
+
+        public class RecentActivityAchievement
+        {
+            [JsonProperty("slug")]
+            public string Slug;
+
+            [JsonProperty("name")]
+            public string Name;
+        }
+
     }
 
     public enum RecentActivityType
