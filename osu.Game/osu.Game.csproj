@@ -301,6 +301,7 @@
     </Compile>
     <Compile Include="Migrations\20180131154205_AddMuteBinding.cs" />
     <Compile Include="Overlays\Profile\Sections\Recent\DrawableRecentActivity.cs" />
+    <Compile Include="Overlays\Profile\Sections\Recent\MedalIcon.cs" />
     <Compile Include="Overlays\Profile\Sections\Recent\PaginatedRecentActivityContainer.cs" />
     <Compile Include="Overlays\Profile\SupporterIcon.cs" />
     <Compile Include="Online\API\Requests\GetFriendsRequest.cs" />

@@ -72,8 +72,14 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                         FillMode = FillMode.Fit,
                     };
 
-                case RecentActivityType.Medal:
-                    // TODO: add medal visual
+                case RecentActivityType.Achievement:
+                    return new MedalIcon(activity.Achievement.Slug)
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 60,
+                        FillMode = FillMode.Fit,
+                    };
+
                 default:
                     return new Container
                     {
@@ -91,7 +97,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             switch (activity.Type)
             {
                 case RecentActivityType.Achievement:
-                    return $"{userLinkTemplate} unlocked the {activity.AchivementName} achievement!";
+                    return $"{userLinkTemplate} unlocked the {activity.Achievement.Name} medal!";
 
                 case RecentActivityType.BeatmapPlaycount:
                     return $"{beatmapLinkTemplate} has been played {activity.Count} times!";
@@ -112,7 +118,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     return $"{userLinkTemplate} has submitted a new beatmap {beatmapsetLinkTemplate}!";
 
                 case RecentActivityType.Medal:
-                    return $"{userLinkTemplate} has unlocked the {activity.AchivementName} medal!";
+                    // apparently this shouldn't exist look at achievement instead (https://github.com/ppy/osu-web/blob/master/resources/assets/coffee/react/profile-page/recent-activity.coffee#L111)
+                    return string.Empty;
 
                 case RecentActivityType.Rank:
                     return $"{userLinkTemplate} achieved rank #{activity.Rank} on {beatmapLinkTemplate} ({activity.Mode}!)";
