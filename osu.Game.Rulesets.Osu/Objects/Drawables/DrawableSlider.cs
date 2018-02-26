@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = Body.Size;
             OriginPosition = Body.PathOffset;
 
-            if (DrawSize.X > 0 && DrawSize.Y > 0)
+            if (DrawSize != Vector2.Zero)
             {
                 var childAnchorPosition = Vector2.Divide(OriginPosition, DrawSize);
                 foreach (var obj in NestedHitObjects)
