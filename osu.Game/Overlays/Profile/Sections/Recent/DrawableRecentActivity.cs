@@ -21,6 +21,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         private readonly RecentActivity activity;
         private readonly string userLinkTemplate;
         private readonly string beatmapLinkTemplate;
+        private readonly string beatmapsetLinkTemplate;
 
         private LinkFlowContainer content;
 
@@ -30,6 +31,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
             userLinkTemplate = $"[{urlToAbsolute(activity.User?.Url)} {activity.User?.Username}]";
             beatmapLinkTemplate = $"[{urlToAbsolute(activity.Beatmap?.Url)} {activity.Beatmap?.Title}]";
+            beatmapsetLinkTemplate = $"[{urlToAbsolute(activity.Beatmapset?.Url)} {activity.Beatmapset?.Title}]";
         }
 
         [BackgroundDependencyLoader]
@@ -70,6 +72,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                         FillMode = FillMode.Fit,
                     };
 
+                case RecentActivityType.Medal:
+                    // TODO: add medal visual
                 default:
                     return new Container
                     {
@@ -92,26 +96,29 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 case RecentActivityType.BeatmapPlaycount:
                     return $"{beatmapLinkTemplate} has been played {activity.Count} times!";
 
+                case RecentActivityType.BeatmapsetApprove:
+                    return $"{beatmapsetLinkTemplate} has been {activity.Approval.ToString().ToLowerInvariant()}!";
+
                 case RecentActivityType.BeatmapsetDelete:
-                    return $"{beatmapLinkTemplate} has been deleted.";
+                    return $"{beatmapsetLinkTemplate} has been deleted.";
 
                 case RecentActivityType.BeatmapsetRevive:
-                    return $"{beatmapLinkTemplate} has been revived from eternal slumber by ${userLinkTemplate}";
+                    return $"{beatmapsetLinkTemplate} has been revived from eternal slumber by {userLinkTemplate}.";
 
                 case RecentActivityType.BeatmapsetUpdate:
-                    return $"{userLinkTemplate} has updated the beatmap ${beatmapLinkTemplate}";
+                    return $"{userLinkTemplate} has updated the beatmap {beatmapsetLinkTemplate}!";
 
                 case RecentActivityType.BeatmapsetUpload:
-                    return $"{userLinkTemplate} has submitted a new beatmap ${beatmapLinkTemplate}";
+                    return $"{userLinkTemplate} has submitted a new beatmap {beatmapsetLinkTemplate}!";
 
                 case RecentActivityType.Medal:
                     return $"{userLinkTemplate} has unlocked the {activity.AchivementName} medal!";
 
                 case RecentActivityType.Rank:
-                    return $"{userLinkTemplate} achieved rank #{activity.Rank} on {beatmapLinkTemplate}";
+                    return $"{userLinkTemplate} achieved rank #{activity.Rank} on {beatmapLinkTemplate} ({activity.Mode}!)";
 
                 case RecentActivityType.RankLost:
-                    return $"{userLinkTemplate} has lost first place on {beatmapLinkTemplate}!";
+                    return $"{userLinkTemplate} has lost first place on {beatmapLinkTemplate} ({activity.Mode}!)";
 
                 case RecentActivityType.UserSupportAgain:
                     return $"{userLinkTemplate} has once again chosen to support osu! - thanks for your generosity!";
@@ -119,11 +126,11 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 case RecentActivityType.UserSupportFirst:
                     return $"{userLinkTemplate} has become an osu! supporter - thanks for your generosity!";
 
-                case RecentActivityType.UsernameChange:
-                    return $"{activity.User.PreviousUsername} has changed their username to {userLinkTemplate}";
-
                 case RecentActivityType.UserSupportGift:
                     return $"{userLinkTemplate} has received the gift of osu! supporter!";
+
+                case RecentActivityType.UsernameChange:
+                    return $"{activity.User.PreviousUsername} has changed their username to {userLinkTemplate}!";
 
                 default:
                     return string.Empty;

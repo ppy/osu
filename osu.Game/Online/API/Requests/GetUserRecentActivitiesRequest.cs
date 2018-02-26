@@ -28,7 +28,7 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty("id")]
         public int ID;
 
-        [JsonProperty("created_at")]
+        [JsonProperty("createdAt")]
         public DateTimeOffset CreatedAt;
 
         [JsonProperty]
@@ -50,6 +50,9 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty("rank")]
         public int Rank;
 
+        [JsonProperty("approval")]
+        public BeatmapApproval Approval;
+
         [JsonProperty("count")]
         public int Count;
 
@@ -59,10 +62,13 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty("beatmap")]
         public RecentActivityBeatmap Beatmap;
 
+        [JsonProperty("beatmapset")]
+        public RecentActivityBeatmap Beatmapset;
+
         [JsonProperty("user")]
         public RecentActivityUser User;
 
-        [JsonProperty("achivementName")]
+        [JsonProperty("achievementName")]
         public string AchivementName;
 
         public class RecentActivityBeatmap
@@ -103,5 +109,12 @@ namespace osu.Game.Online.API.Requests
         UserSupportFirst,
         UserSupportGift,
         UsernameChange,
+    }
+
+    public enum BeatmapApproval
+    {
+        Ranked,
+        Approved,
+        Qualified,
     }
 }
