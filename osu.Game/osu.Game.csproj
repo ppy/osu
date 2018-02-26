@@ -323,7 +323,7 @@
       <DependentUpon>20171209034410_AddRulesetInfoShortName.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\20180219060912_AddSkins.cs" />
-    <Compile Include="Migrations\20180219060912_AddSkins.designer.cs">
+    <Compile Include="Migrations\20180219060912_AddSkins.Designer.cs">
       <DependentUpon>20180219060912_AddSkins.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
@@ -854,9 +854,15 @@
     <Compile Include="Screens\Tournament\Teams\DrawingsTeam.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Skinning\DefaultSkin.cs" />
+    <Compile Include="Skinning\LegacySkin.cs" />
+    <Compile Include="Skinning\Skin.cs" />
     <Compile Include="Skinning\SkinFileInfo.cs" />
     <Compile Include="Skinning\SkinInfo.cs" />
     <Compile Include="Skinning\SkinManager.cs" />
+    <Compile Include="Skinning\SkinnableDrawable.cs" />
+    <Compile Include="Skinning\SkinnableSound.cs" />
+    <Compile Include="Skinning\SkinReloadableDrawable.cs" />
     <Compile Include="Skinning\SkinStore.cs" />
     <Compile Include="Storyboards\CommandLoop.cs" />
     <Compile Include="Storyboards\CommandTimeline.cs" />
