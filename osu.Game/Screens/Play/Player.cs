@@ -185,12 +185,13 @@ namespace osu.Game.Screens.Play
                             Clock = offsetClock,
                             Child = RulesetContainer,
                         },
-                        hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, decoupledClock, working, adjustableSourceClock)
                         new SkipButton(firstObjectTime)
                         {
                             SeekableClock = decoupledClock,
                             FramedClock = offsetClock,
                         },
+                        hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, decoupledClock, working)
+                        {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
