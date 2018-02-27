@@ -158,16 +158,8 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                storyboardContainer = new Container
+                pauseContainer = new PauseContainer(offsetClock, decoupledClock)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Clock = offsetClock,
-                    Alpha = 0,
-                },
-                pauseContainer = new PauseContainer
-                {
-                    AudioClock = decoupledClock,
-                    FramedClock = offsetClock,
                     OnRetry = Restart,
                     OnQuit = Exit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
@@ -183,7 +175,15 @@ namespace osu.Game.Screens.Play
                         {
                             RelativeSizeAxes = Axes.Both,
                             Clock = offsetClock,
-                            Child = RulesetContainer,
+                            Children = new[]
+                            {
+                                storyboardContainer = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
+                                },
+                                RulesetContainer,
+                            }
                         },
                         new SkipButton(firstObjectTime)
                         {
@@ -338,7 +338,9 @@ namespace osu.Game.Screens.Play
                     this.Delay(750).Schedule(() =>
                     {
                         if (!pauseContainer.IsPaused)
+                        {
                             decoupledClock.Start();
+                        }
                     });
                 });
             });
@@ -365,9 +367,7 @@ namespace osu.Game.Screens.Play
             }
 
             if (loadedSuccessfully)
-            {
                 pauseContainer?.Pause();
-            }
 
             return true;
         }
