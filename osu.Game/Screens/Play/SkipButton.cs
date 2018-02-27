@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
     {
         private readonly double startTime;
 
-        public IAdjustableClock SeekableClock;
+        public IAdjustableClock AdjustableClock;
         public IFrameBasedClock FramedClock;
 
         private Button button;
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Play
             using (BeginAbsoluteSequence(beginFadeTime))
                 this.FadeOut(fade_time);
 
-            button.Action = () => SeekableClock?.Seek(startTime - skip_required_cutoff - fade_time);
+            button.Action = () => AdjustableClock?.Seek(startTime - skip_required_cutoff - fade_time);
 
             displayTime = Time.Current;
 

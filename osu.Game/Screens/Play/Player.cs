@@ -61,7 +61,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private FramedOffsetClock offsetClock;
 
-        private DecoupleableInterpolatingFramedClock decoupledClock;
+        /// <summary>
+        /// The decoupled clock used for gameplay. Should be used for seeks and clock control.
+        /// </summary>
+        private DecoupleableInterpolatingFramedClock adjustableClock;
 
         private PauseContainer pauseContainer;
 
@@ -144,16 +147,16 @@ namespace osu.Game.Screens.Play
             }
 
             sourceClock = (IAdjustableClock)working.Track ?? new StopwatchClock();
-            decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
             var firstObjectTime = RulesetContainer.Objects.First().StartTime;
-            decoupledClock.Seek(AllowLeadIn
+            adjustableClock.Seek(AllowLeadIn
                 ? Math.Min(0, firstObjectTime - Math.Max(beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, beatmap.BeatmapInfo.AudioLeadIn))
                 : firstObjectTime);
 
-            decoupledClock.ProcessFrame();
+            adjustableClock.ProcessFrame();
 
-            offsetClock = new FramedOffsetClock(decoupledClock);
+            offsetClock = new FramedOffsetClock(adjustableClock);
 
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
@@ -163,7 +166,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                pauseContainer = new PauseContainer(offsetClock, decoupledClock)
+                pauseContainer = new PauseContainer(offsetClock, adjustableClock)
                 {
                     OnRetry = Restart,
                     OnQuit = Exit,
@@ -192,7 +195,7 @@ namespace osu.Game.Screens.Play
                         },
                         new SkipButton(firstObjectTime)
                         {
-                            SeekableClock = decoupledClock,
+                            AdjustableClock = adjustableClock,
                             FramedClock = offsetClock,
                         },
                         hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, decoupledClock, working)
@@ -304,7 +307,7 @@ namespace osu.Game.Screens.Play
             if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
-            decoupledClock.Stop();
+            adjustableClock.Stop();
 
             HasFailed = true;
             failOverlay.Retries = RestartCount;
@@ -337,14 +340,14 @@ namespace osu.Game.Screens.Play
 
                 Schedule(() =>
                 {
-                    decoupledClock.ChangeSource(sourceClock);
+                    adjustableClock.ChangeSource(sourceClock);
                     applyRateFromMods();
 
                     this.Delay(750).Schedule(() =>
                     {
                         if (!pauseContainer.IsPaused)
                         {
-                            decoupledClock.Start();
+                            adjustableClock.Start();
                         }
                     });
                 });
