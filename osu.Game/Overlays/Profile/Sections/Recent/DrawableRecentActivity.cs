@@ -19,25 +19,28 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         private APIAccess api;
 
         private readonly RecentActivity activity;
-        private readonly string userLinkTemplate;
-        private readonly string beatmapLinkTemplate;
-        private readonly string beatmapsetLinkTemplate;
+
+        private string userLinkTemplate;
+        private string beatmapLinkTemplate;
+        private string beatmapsetLinkTemplate;
 
         private LinkFlowContainer content;
 
         public DrawableRecentActivity(RecentActivity activity)
         {
             this.activity = activity;
-
-            userLinkTemplate = $"[{urlToAbsolute(activity.User?.Url)} {activity.User?.Username}]";
-            beatmapLinkTemplate = $"[{urlToAbsolute(activity.Beatmap?.Url)} {activity.Beatmap?.Title}]";
-            beatmapsetLinkTemplate = $"[{urlToAbsolute(activity.Beatmapset?.Url)} {activity.Beatmapset?.Title}]";
         }
 
         [BackgroundDependencyLoader]
         private void load(APIAccess api)
         {
             this.api = api;
+
+            userLinkTemplate = $"[{toAbsoluteUrl(activity.User?.Url)} {activity.User?.Username}]";
+            beatmapLinkTemplate = $"[{toAbsoluteUrl(activity.Beatmap?.Url)} {activity.Beatmap?.Title}]";
+            beatmapsetLinkTemplate = $"[{toAbsoluteUrl(activity.Beatmapset?.Url)} {activity.Beatmapset?.Title}]";
+
+            LeftFlowContainer.Padding = new MarginPadding { Left = 10, Right = 160 };
 
             LeftFlowContainer.Add(content = new LinkFlowContainer
             {
@@ -90,7 +93,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             }
         }
 
-        private string urlToAbsolute(string url) => $"{api?.Endpoint ?? @"https://osu.ppy.sh"}{url}";
+        private string toAbsoluteUrl(string url) => $"{api.Endpoint}{url}";
 
         private string activityToString()
         {
