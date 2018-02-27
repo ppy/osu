@@ -15,7 +15,7 @@ using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public class ScoreStore : DatabaseBackedStore
+    public class ScoreStore : DatabaseBackedStore, ICanAcceptFiles
     {
         private readonly Storage storage;
 
@@ -24,10 +24,12 @@ namespace osu.Game.Rulesets.Scoring
 
         private const string replay_folder = @"replays";
 
+        public event Action<Score> ScoreImported;
+
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
-        public ScoreStore(Storage storage, Func<OsuDbContext> factory, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(factory)
+        public ScoreStore(Storage storage, DatabaseContextFactory factory, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(factory)
         {
             this.storage = storage;
             this.beatmaps = beatmaps;
@@ -35,6 +37,18 @@ namespace osu.Game.Rulesets.Scoring
 
             if (importHost != null)
                 ipc = new ScoreIPCChannel(importHost, this);
+        }
+
+        public string[] HandledExtensions => new[] { ".osr" };
+
+        public void Import(params string[] paths)
+        {
+            foreach (var path in paths)
+            {
+                var score = ReadReplayFile(path);
+                if (score != null)
+                    ScoreImported?.Invoke(score);
+            }
         }
 
         public Score ReadReplayFile(string replayFilename)
@@ -160,5 +174,6 @@ namespace osu.Game.Rulesets.Scoring
 
             return new Replay { Frames = frames };
         }
+
     }
 }

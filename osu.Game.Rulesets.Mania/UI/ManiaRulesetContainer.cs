@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Mania.UI
             return null;
         }
 
-        protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(1, 0.8f);
+        protected override Vector2 PlayfieldArea => new Vector2(1, 0.8f);
 
         protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay, this);
 

@@ -29,10 +29,11 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
-            new KeyBinding(new[] { InputKey.Up }, GlobalAction.IncreaseVolume),
-            new KeyBinding(new[] { InputKey.MouseWheelUp }, GlobalAction.IncreaseVolume),
-            new KeyBinding(new[] { InputKey.Down }, GlobalAction.DecreaseVolume),
-            new KeyBinding(new[] { InputKey.MouseWheelDown }, GlobalAction.DecreaseVolume),
+            new KeyBinding(InputKey.Up, GlobalAction.IncreaseVolume),
+            new KeyBinding(InputKey.MouseWheelUp, GlobalAction.IncreaseVolume),
+            new KeyBinding(InputKey.Down, GlobalAction.DecreaseVolume),
+            new KeyBinding(InputKey.MouseWheelDown, GlobalAction.DecreaseVolume),
+            new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -63,6 +64,8 @@ namespace osu.Game.Input.Bindings
         IncreaseVolume,
         [Description("Decrease Volume")]
         DecreaseVolume,
+        [Description("Toggle mute")]
+        ToggleMute,
 
         // In-Game Keybindings
         [Description("Skip Cutscene")]

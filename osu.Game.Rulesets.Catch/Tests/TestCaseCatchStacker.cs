@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Catch.Objects;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    [Ignore("getting CI working")]
     public class TestCaseCatchStacker : Game.Tests.Visual.TestCasePlayer
     {
         public TestCaseCatchStacker()

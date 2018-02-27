@@ -14,6 +14,8 @@ namespace osu.Game.Configuration
         {
             // UI/selection defaults
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
+            Set(OsuSetting.Skin, 0, 0, int.MaxValue);
+
             Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
             Set(OsuSetting.ShowConvertedBeatmaps, true);
@@ -39,6 +41,8 @@ namespace osu.Game.Configuration
             };
 
             // Audio
+            Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
+
             Set(OsuSetting.MenuVoice, true);
             Set(OsuSetting.MenuMusic, true);
 
@@ -101,6 +105,7 @@ namespace osu.Game.Configuration
         MouseDisableButtons,
         MouseDisableWheel,
         AudioOffset,
+        VolumeInactive,
         MenuMusic,
         MenuVoice,
         CursorRotation,
@@ -119,6 +124,7 @@ namespace osu.Game.Configuration
         ChatDisplayHeight,
         Version,
         ShowConvertedBeatmaps,
-        SpeedChangeVisualisation
+        SpeedChangeVisualisation,
+        Skin
     }
 }

@@ -50,7 +50,11 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuReplayInputHandler(replay);
 
-        protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f);
+        protected override Vector2 GetAspectAdjustedSize()
+        {
+            var aspectSize = DrawSize.X * 0.75f < DrawSize.Y ? new Vector2(DrawSize.X, DrawSize.X * 0.75f) : new Vector2(DrawSize.Y * 4f / 3f, DrawSize.Y);
+            return new Vector2(aspectSize.X / DrawSize.X, aspectSize.Y / DrawSize.Y);
+        }
 
         protected override CursorContainer CreateCursor() => new GameplayCursor();
     }

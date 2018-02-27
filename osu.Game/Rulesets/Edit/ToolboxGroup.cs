@@ -2,11 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Game.Screens.Play.ReplaySettings;
+using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class ToolboxGroup : ReplayGroup
+    public class ToolboxGroup : PlayerSettingsGroup
     {
         protected override string Title => "toolbox";
 

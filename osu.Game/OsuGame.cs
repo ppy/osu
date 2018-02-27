@@ -19,6 +19,8 @@ using OpenTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Audio;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -29,6 +31,7 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Skinning;
 using OpenTK.Graphics;
 
 namespace osu.Game
@@ -78,6 +81,8 @@ namespace osu.Game
         private Bindable<int> configRuleset;
         public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
+        private Bindable<int> configSkin;
+
         private readonly string[] args;
 
         private SettingsOverlay settings;
@@ -104,6 +109,8 @@ namespace osu.Game
         {
             this.frameworkConfig = frameworkConfig;
 
+            ScoreStore.ScoreImported += score => Schedule(() => LoadScore(score));
+
             if (!Host.IsPrimaryInstance)
             {
                 Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
@@ -113,17 +120,40 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                Task.Run(() => BeatmapManager.Import(paths.ToArray()));
+
+                Task.Run(() => Import(paths.ToArray()));
             }
 
             dependencies.CacheAs(this);
 
+            // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
+
+            // bind config int to database SkinInfo
+            configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
+
+            SkinManager.CurrentSkinInfo.ValueChanged += s => configSkin.Value = s.ID;
+            configSkin.ValueChanged += id => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == id) ?? SkinInfo.Default;
+            configSkin.TriggerChange();
+
+            LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
         }
 
         private ScheduledDelegate scoreLoad;
+
+        /// <summary>
+        /// Open chat to a channel matching the provided name, if present.
+        /// </summary>
+        /// <param name="channelName">The name of the channel.</param>
+        public void OpenChannel(string channelName) => chat.OpenChannel(chat.AvailableChannels.Find(c => c.Name == channelName));
+
+        /// <summary>
+        /// Show a beatmap set as an overlay.
+        /// </summary>
+        /// <param name="setId">The set to display.</param>
+        public void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
 
         protected void LoadScore(Score s)
         {
@@ -169,7 +199,9 @@ namespace osu.Game
             CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
 
             // hook up notifications to components.
+            SkinManager.PostNotification = n => notifications?.Post(n);
             BeatmapManager.PostNotification = n => notifications?.Post(n);
+
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
 
             AddRange(new Drawable[]
@@ -383,6 +415,7 @@ namespace osu.Game
                     sensitivity.Disabled = true;
 
                     frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
+                    frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
                 case GlobalAction.ToggleToolbar:
                     Toolbar.ToggleVisibility();
@@ -396,6 +429,20 @@ namespace osu.Game
             }
 
             return false;
+        }
+
+        private readonly BindableDouble inactiveVolumeAdjust = new BindableDouble();
+
+        protected override void OnDeactivated()
+        {
+            base.OnDeactivated();
+            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+        }
+
+        protected override void OnActivated()
+        {
+            base.OnActivated();
+            Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
         }
 
         public bool OnReleased(GlobalAction action) => false;

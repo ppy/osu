@@ -8,7 +8,9 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -19,7 +21,6 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    [Ignore("getting CI working")]
     public class TestCaseManiaPlayfield : OsuTestCase
     {
         private const double start_time = 500;
@@ -92,10 +93,17 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
         }
 
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        private void load(RulesetStore rulesets, SettingsStore settings)
         {
             maniaRuleset = rulesets.GetRuleset(3);
+
+            dependencies.Cache(new ManiaConfigManager(settings, maniaRuleset, 4));
         }
 
         private ManiaPlayfield createPlayfield(int cols, bool inverted = false)

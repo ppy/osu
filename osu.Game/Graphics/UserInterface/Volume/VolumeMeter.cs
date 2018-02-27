@@ -70,11 +70,8 @@ namespace osu.Game.Graphics.UserInterface.Volume
 
         public double Volume
         {
-            get { return Bindable.Value; }
-            private set
-            {
-                Bindable.Value = value;
-            }
+            get => Bindable.Value;
+            private set => Bindable.Value = value;
         }
 
         public void Increase()

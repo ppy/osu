@@ -202,8 +202,8 @@ namespace osu.Game.Screens.Select
             if (osu != null)
                 Ruleset.BindTo(osu.Ruleset);
 
-            this.beatmaps.BeatmapSetAdded += onBeatmapSetAdded;
-            this.beatmaps.BeatmapSetRemoved += onBeatmapSetRemoved;
+            this.beatmaps.ItemAdded += onBeatmapSetAdded;
+            this.beatmaps.ItemRemoved += onBeatmapSetRemoved;
             this.beatmaps.BeatmapHidden += onBeatmapHidden;
             this.beatmaps.BeatmapRestored += onBeatmapRestored;
 
@@ -408,8 +408,8 @@ namespace osu.Game.Screens.Select
 
             if (beatmaps != null)
             {
-                beatmaps.BeatmapSetAdded -= onBeatmapSetAdded;
-                beatmaps.BeatmapSetRemoved -= onBeatmapSetRemoved;
+                beatmaps.ItemAdded -= onBeatmapSetAdded;
+                beatmaps.ItemRemoved -= onBeatmapSetRemoved;
                 beatmaps.BeatmapHidden -= onBeatmapHidden;
                 beatmaps.BeatmapRestored -= onBeatmapRestored;
             }
@@ -466,7 +466,7 @@ namespace osu.Game.Screens.Select
                 else if (beatmap.RulesetID > 0)
                     beatmap = Beatmap.Value.BeatmapSetInfo?.Beatmaps.FirstOrDefault(b => b.RulesetID == 0 || b.RulesetID == currentRulesetId);
 
-            if (beatmap != null && !Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
+            if (beatmap != null && !Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false)
             {
                 Carousel.SelectBeatmap(beatmap);
             }

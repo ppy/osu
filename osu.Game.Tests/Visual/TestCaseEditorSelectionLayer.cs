@@ -5,51 +5,51 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using OpenTK;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Layers.Selection;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
     public class TestCaseEditorSelectionLayer : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(SelectionLayer) };
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(SelectionBox),
+            typeof(SelectionLayer),
+            typeof(CaptureBox)
+        };
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuGameBase osuGame)
         {
-            var playfield = new OsuEditPlayfield();
-
-            Children = new Drawable[]
+            osuGame.Beatmap.Value = new TestWorkingBeatmap(new Beatmap
             {
-                new Container
+                HitObjects = new List<HitObject>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(new StopwatchClock()),
-                    Child = playfield
+                    new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f },
+                    new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f },
+                    new Slider
+                    {
+                        Position = new Vector2(128, 256),
+                        ControlPoints = new List<Vector2>
+                        {
+                            Vector2.Zero,
+                            new Vector2(216, 0),
+                        },
+                        Distance = 400,
+                        Velocity = 1,
+                        TickDistance = 100,
+                        Scale = 0.5f,
+                    }
                 },
-                new SelectionLayer(playfield)
-            };
+            });
 
-            playfield.Add(new DrawableHitCircle(new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f }));
-            playfield.Add(new DrawableHitCircle(new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f }));
-            playfield.Add(new DrawableSlider(new Slider
-            {
-                ControlPoints = new List<Vector2>
-                {
-                    new Vector2(128, 256),
-                    new Vector2(344, 256),
-                },
-                Distance = 400,
-                Position = new Vector2(128, 256),
-                Velocity = 1,
-                TickDistance = 100,
-                Scale = 0.5f
-            }));
+            Child = new OsuHitObjectComposer(new OsuRuleset());
         }
     }
 }

@@ -23,7 +23,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
-        public override Vector2 EndPosition => this.PositionAt(1);
+        public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
+        public override Vector2 EndPosition => Position + this.CurvePositionAt(1);
 
         public SliderCurve Curve { get; } = new SliderCurve();
 
@@ -65,20 +66,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public double SpanDuration => Duration / this.SpanCount();
 
-        private int stackHeight;
-
-        public override int StackHeight
-        {
-            get { return stackHeight; }
-            set
-            {
-                stackHeight = value;
-                Curve.Offset = StackOffset;
-            }
-        }
-
         public double Velocity;
         public double TickDistance;
+
+        public HitCircle HeadCircle;
+        public HitCircle TailCircle;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
@@ -97,8 +89,33 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.CreateNestedHitObjects();
 
+            createSliderEnds();
             createTicks();
             createRepeatPoints();
+        }
+
+        private void createSliderEnds()
+        {
+            HeadCircle = new HitCircle
+            {
+                StartTime = StartTime,
+                Position = Position,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboColour = ComboColour,
+                Samples = Samples,
+                SampleControlPoint = SampleControlPoint
+            };
+
+            TailCircle = new HitCircle
+            {
+                StartTime = EndTime,
+                Position = EndPosition,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboColour = ComboColour
+            };
+
+            AddNested(HeadCircle);
+            AddNested(TailCircle);
         }
 
         private void createTicks()
@@ -137,8 +154,9 @@ namespace osu.Game.Rulesets.Osu.Objects
                     AddNested(new SliderTick
                     {
                         SpanIndex = span,
+                        SpanStartTime = spanStartTime,
                         StartTime = spanStartTime + timeProgress * SpanDuration,
-                        Position = Curve.PositionAt(distanceProgress),
+                        Position = Position + Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
                         Scale = Scale,
                         ComboColour = ComboColour,
@@ -157,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     RepeatIndex = repeatIndex,
                     SpanDuration = SpanDuration,
                     StartTime = StartTime + repeat * SpanDuration,
-                    Position = Curve.PositionAt(repeat % 2),
+                    Position = Position + Curve.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
                     ComboColour = ComboColour,
