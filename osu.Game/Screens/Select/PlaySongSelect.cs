@@ -52,9 +52,9 @@ namespace osu.Game.Screens.Select
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay, OsuGame game)
+        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay, OsuGame osu)
         {
-            SelectedMods.BindTo(game.SelectedMods);
+            if (osu != null) SelectedMods.BindTo(osu.SelectedMods);
             modSelect.SelectedMods.BindTo(SelectedMods);
 
             sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
