@@ -24,7 +24,9 @@ namespace osu.Game.Screens.Play
     public class SkipButton : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
-        public IAdjustableClock AudioClock;
+
+        public IAdjustableClock SeekableClock;
+        public IFrameBasedClock FramedClock;
 
         private Button button;
         private Box remainingTimeBox;
@@ -60,8 +62,8 @@ namespace osu.Game.Screens.Play
         {
             var baseClock = Clock;
 
-            if (AudioClock != null)
-                Clock = new FramedClock(AudioClock) { ProcessSourceClockFrames = false };
+            if (FramedClock != null)
+                Clock = FramedClock;
 
             Children = new Drawable[]
             {
@@ -109,7 +111,7 @@ namespace osu.Game.Screens.Play
             using (BeginAbsoluteSequence(beginFadeTime))
                 this.FadeOut(fade_time);
 
-            button.Action = () => AudioClock?.Seek(startTime - skip_required_cutoff - fade_time);
+            button.Action = () => SeekableClock?.Seek(startTime - skip_required_cutoff - fade_time);
 
             displayTime = Time.Current;
 
