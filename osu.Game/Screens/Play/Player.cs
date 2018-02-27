@@ -54,8 +54,13 @@ namespace osu.Game.Screens.Play
         public CursorContainer Cursor => RulesetContainer.Cursor;
         public bool ProvidingUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded.Value;
 
-        private IAdjustableClock adjustableSourceClock;
+        private IAdjustableClock sourceClock;
+
+        /// <summary>
+        /// The final usable gameplay clock with user-set offsets applied.
+        /// </summary>
         private FramedOffsetClock offsetClock;
+
         private DecoupleableInterpolatingFramedClock decoupledClock;
 
         private PauseContainer pauseContainer;
@@ -138,7 +143,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            adjustableSourceClock = (IAdjustableClock)working.Track ?? new StopwatchClock();
+            sourceClock = (IAdjustableClock)working.Track ?? new StopwatchClock();
             decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
             var firstObjectTime = RulesetContainer.Objects.First().StartTime;
@@ -236,11 +241,11 @@ namespace osu.Game.Screens.Play
 
         private void applyRateFromMods()
         {
-            if (adjustableSourceClock == null) return;
+            if (sourceClock == null) return;
 
-            adjustableSourceClock.Rate = 1;
+            sourceClock.Rate = 1;
             foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
-                mod.ApplyToClock(adjustableSourceClock);
+                mod.ApplyToClock(sourceClock);
         }
 
         private void initializeStoryboard(bool asyncLoad)
@@ -328,11 +333,11 @@ namespace osu.Game.Screens.Play
 
             Task.Run(() =>
             {
-                adjustableSourceClock.Reset();
+                sourceClock.Reset();
 
                 Schedule(() =>
                 {
-                    decoupledClock.ChangeSource(adjustableSourceClock);
+                    decoupledClock.ChangeSource(sourceClock);
                     applyRateFromMods();
 
                     this.Delay(750).Schedule(() =>
