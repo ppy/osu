@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play
 
         private static bool hasShownNotificationOnce;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, DecoupleableInterpolatingFramedClock decoupledClock, WorkingBeatmap working, IAdjustableClock adjustableSourceClock)
+        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, IAdjustableClock seekableClock, WorkingBeatmap working)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -66,13 +66,13 @@ namespace osu.Game.Screens.Play
             BindRulesetContainer(rulesetContainer);
 
             Progress.Objects = rulesetContainer.Objects;
-            Progress.AudioClock = decoupledClock;
+            Progress.AudioClock = seekableClock;
             Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
-            Progress.OnSeek = pos => decoupledClock.Seek(pos);
+            Progress.OnSeek = pos => seekableClock.Seek(pos);
 
             ModDisplay.Current.BindTo(working.Mods);
 
-            PlayerSettingsOverlay.PlaybackSettings.AdjustableClock = adjustableSourceClock;
+            PlayerSettingsOverlay.PlaybackSettings.AdjustableClock = seekableClock;
         }
 
         [BackgroundDependencyLoader(true)]
