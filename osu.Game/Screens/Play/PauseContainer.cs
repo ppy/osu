@@ -44,13 +44,13 @@ namespace osu.Game.Screens.Play
         public Action OnResume;
         public Action OnPause;
 
-        public readonly IAdjustableClock SeekableClock;
+        public readonly IAdjustableClock AdjustableClock;
         public readonly FramedClock FramedClock;
 
-        public PauseContainer(FramedClock framedClock, IAdjustableClock seekableClock)
+        public PauseContainer(FramedClock framedClock, IAdjustableClock adjustableClock)
         {
             FramedClock = framedClock;
-            SeekableClock = seekableClock;
+            AdjustableClock = adjustableClock;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Play
             if (IsPaused) return;
 
             // stop the seekable clock (stops the audio eventually)
-            SeekableClock.Stop();
+            AdjustableClock.Stop();
             IsPaused = true;
 
             OnPause?.Invoke();
@@ -98,8 +98,8 @@ namespace osu.Game.Screens.Play
 
             // seek back to the time of the framed clock.
             // this accounts for the audio clock potentially taking time to enter a completely stopped state.
-            SeekableClock.Seek(FramedClock.CurrentTime);
-            SeekableClock.Start();
+            AdjustableClock.Seek(FramedClock.CurrentTime);
+            AdjustableClock.Start();
 
             OnResume?.Invoke();
             pauseOverlay.Hide();
