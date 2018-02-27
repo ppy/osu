@@ -63,7 +63,10 @@ namespace osu.Game.Screens.Play
             var baseClock = Clock;
 
             if (FramedClock != null)
+            {
                 Clock = FramedClock;
+                ShouldProcessClock = false;
+            }
 
             Children = new Drawable[]
             {
