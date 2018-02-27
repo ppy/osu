@@ -198,7 +198,7 @@ namespace osu.Game.Screens.Play
                             AdjustableClock = adjustableClock,
                             FramedClock = offsetClock,
                         },
-                        hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, decoupledClock, working)
+                        hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
