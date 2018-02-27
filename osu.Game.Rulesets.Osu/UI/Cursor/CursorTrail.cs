@@ -62,6 +62,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             // as we are currently very dependent on having a running clock, let's make our own clock for the time being.
             Clock = new FramedClock();
+            ShouldProcessClock = true;
 
             RelativeSizeAxes = Axes.Both;
 
