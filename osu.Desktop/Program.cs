@@ -55,11 +55,8 @@ namespace osu.Desktop
 
         private static void useMulticoreJit()
         {
-            var profilesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Profiles");
-            if (!Directory.Exists(profilesFolder))
-                Directory.CreateDirectory(profilesFolder);
-
-            ProfileOptimization.SetProfileRoot(profilesFolder);
+            var directory = Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Profiles"));
+            ProfileOptimization.SetProfileRoot(directory.FullName);
             ProfileOptimization.StartProfile("Startup.Profile");
         }
     }
