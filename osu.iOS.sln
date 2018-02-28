@@ -1,19 +1,20 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game", "osu.Game\osu.Game.csproj", "{858407F2-FBA9-4CB6-8E7D-8A059D0100FB}"
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2006
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game", "osu.Game\osu.Game.csproj", "{858407F2-FBA9-4CB6-8E7D-8A059D0100FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Framework", "osu-framework\osu.Framework\osu.Framework.csproj", "{C76BF5B3-985E-4D39-95FE-97C9C879B83A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Framework", "osu-framework\osu.Framework\osu.Framework.csproj", "{C76BF5B3-985E-4D39-95FE-97C9C879B83A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Taiko", "osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj", "{893A002B-9B6B-4170-9A51-B46EB3FB034E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Rulesets.Taiko", "osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj", "{893A002B-9B6B-4170-9A51-B46EB3FB034E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Osu", "osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj", "{B306C976-5A6E-40BF-849B-8396F795468D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Rulesets.Osu", "osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj", "{B306C976-5A6E-40BF-849B-8396F795468D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Mania", "osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj", "{1BC1EB48-1FAE-4009-9B1A-0CA22C407125}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Rulesets.Mania", "osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj", "{1BC1EB48-1FAE-4009-9B1A-0CA22C407125}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Catch", "osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj", "{63797424-4E5C-46D2-8059-F7ECAAEF9505}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Rulesets.Catch", "osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj", "{63797424-4E5C-46D2-8059-F7ECAAEF9505}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Resources", "osu-resources\osu.Game.Resources\osu.Game.Resources.csproj", "{E798E898-855F-4375-87D2-C53B5CB83323}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Resources", "osu-resources\osu.Game.Resources\osu.Game.Resources.csproj", "{D9A367C9-4C1A-489F-9B05-A0CEA2B53B58}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.iOS", "osu.iOS\osu.iOS.csproj", "{80B89BDA-D5C8-4987-A03D-037C483ABEF0}"
 EndProject
@@ -123,5 +124,8 @@ Global
 		{80B89BDA-D5C8-4987-A03D-037C483ABEF0}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{80B89BDA-D5C8-4987-A03D-037C483ABEF0}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{80B89BDA-D5C8-4987-A03D-037C483ABEF0}.Debug|iPhone.Build.0 = Debug|iPhone
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
