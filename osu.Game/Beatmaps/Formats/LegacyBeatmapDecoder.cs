@@ -42,6 +42,10 @@ namespace osu.Game.Beatmaps.Formats
 
             ParseContent(stream);
 
+            // objects may be out of order *only* if a user has manually edited an .osu file.
+            // unfortunately there are ranked maps in this state (example: https://osu.ppy.sh/s/594828).
+            this.beatmap.HitObjects.Sort((x, y) => x.StartTime.CompareTo(y.StartTime));
+
             foreach (var hitObject in this.beatmap.HitObjects)
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
         }
