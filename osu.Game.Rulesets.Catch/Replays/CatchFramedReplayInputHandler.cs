@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Input;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Catch.UI;
 
 namespace osu.Game.Rulesets.Catch.Replays
 {
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 new CatchReplayState
                 {
                     PressedActions = action,
-                    CatcherX = Position.Value.X
+                    CatcherX = Position.Value.X / CatchPlayfield.BASE_WIDTH
                 },
             };
         }
