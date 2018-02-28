@@ -11,7 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets
         /// <returns>A descriptive name of the variant.</returns>
         public virtual string GetVariantName(int variant) => string.Empty;
 
-        public virtual ReplayFrame CreateReplayFrame() => new ReplayFrame();
+        public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
 
         /// <summary>
         /// Create a ruleset info based on this ruleset.

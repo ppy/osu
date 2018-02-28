@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.IO;
 using osu.Game.Beatmaps;
 using osu.Game.IO.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Legacy;
-using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Users;
 using SharpCompress.Compressors.LZMA;
 
@@ -139,13 +139,12 @@ namespace osu.Game.Rulesets.Scoring.Legacy
 
         private ReplayFrame convertFrame(LegacyReplayFrame legacyFrame)
         {
-            var converted = currentRuleset.CreateReplayFrame();
-            converted.Time = legacyFrame.Time;
+            var convertible = currentRuleset.CreateConvertibleReplayFrame();
+            if (convertible == null)
+                throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
+            convertible.ConvertFrom(legacyFrame, currentScore, currentBeatmap);
 
-            if (converted is IConvertibleReplayFrame convertible)
-                convertible.ConvertFrom(legacyFrame, currentScore, currentBeatmap);
-
-            return converted;
+            return (ReplayFrame)convertible;
         }
     }
 }

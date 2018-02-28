@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Catch.Replays;
-using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Replays.Types;
 
 namespace osu.Game.Rulesets.Catch
 {
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override int LegacyID => 2;
 
-        public override ReplayFrame CreateReplayFrame() => new CatchReplayFrame();
+        public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
 
         public CatchRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
