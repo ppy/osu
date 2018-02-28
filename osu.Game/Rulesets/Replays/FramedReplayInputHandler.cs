@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Replays
 
         private const double sixty_frame_time = 1000.0 / 60;
 
-        protected double CurrentTime;
+        protected double CurrentTime { get; private set; }
         private int currentDirection;
 
         /// <summary>
