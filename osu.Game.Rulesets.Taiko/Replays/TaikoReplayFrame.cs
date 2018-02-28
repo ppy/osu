@@ -14,6 +14,10 @@ namespace osu.Game.Rulesets.Taiko.Replays
     {
         public List<TaikoAction> Actions = new List<TaikoAction>();
 
+        public TaikoReplayFrame()
+        {
+        }
+
         public TaikoReplayFrame(double time, params TaikoAction[] actions)
             : base(time)
         {

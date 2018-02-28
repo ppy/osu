@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Osu.Replays
         public List<OsuAction> Actions = new List<OsuAction>();
 
         public OsuReplayFrame()
-            : base(0)
         {
         }
 
