@@ -386,6 +386,8 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnExiting(Screen next)
         {
+            FinaliseSelection();
+
             beatmapInfoWedge.State = Visibility.Hidden;
 
             Content.FadeOut(100);
