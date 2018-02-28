@@ -365,7 +365,6 @@
     <Compile Include="Rulesets\Replays\Legacy\ReplayButtonState.cs" />
     <Compile Include="Rulesets\Replays\ReplayFrame.cs" />
     <Compile Include="Rulesets\Replays\Types\IConvertibleReplayFrame.cs" />
-    <Compile Include="Rulesets\Scoring\IScoreParser.cs" />
     <Compile Include="Rulesets\Scoring\Legacy\LegacyScoreParser.cs" />
     <Compile Include="Rulesets\UI\ScalableContainer.cs" />
     <Compile Include="Screens\Play\PlayerSettings\VisualSettings.cs" />

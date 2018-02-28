@@ -12,7 +12,7 @@ using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Rulesets.Scoring.Legacy
 {
-    public class LegacyScoreParser : IScoreParser
+    public class LegacyScoreParser
     {
         private readonly RulesetStore rulesets;
         private readonly BeatmapManager beatmaps;
