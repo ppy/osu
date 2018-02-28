@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play
         {
             var xFill = value * UsableWidth;
             fill.Width = xFill;
-            handleBase.MoveToX(xFill);
+            handleBase.X = xFill;
         }
 
         protected override void OnUserChange() => OnSeek?.Invoke(Current);
