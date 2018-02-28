@@ -207,6 +207,12 @@ namespace osu.Game.Tests.Visual
             checkVisibleItemCount(true, 0);
             AddAssert("Selection is null", () => currentSelection == null);
 
+            advanceSelection(true);
+            AddAssert("Selection is null", () => currentSelection == null);
+
+            advanceSelection(false);
+            AddAssert("Selection is null", () => currentSelection == null);
+
             AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
 
             AddAssert("Selection is non-null", () => currentSelection != null);
