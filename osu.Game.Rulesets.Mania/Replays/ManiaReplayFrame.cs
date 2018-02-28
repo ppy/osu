@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Legacy;
 using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Replays
 {
@@ -25,10 +24,10 @@ namespace osu.Game.Rulesets.Mania.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame legacyFrame, Score score, Beatmap beatmap)
+        public void ConvertFrom(LegacyReplayFrame legacyFrame, Beatmap beatmap)
         {
             // We don't need to fully convert, just create the converter
-            var converter = new ManiaBeatmapConverter(beatmap.BeatmapInfo.Ruleset.Equals(score.Ruleset), beatmap);
+            var converter = new ManiaBeatmapConverter(beatmap.BeatmapInfo.RulesetID == 3, beatmap);
 
             // NB: Via co-op mod, osu-stable can have two stages with floor(col/2) and ceil(col/2) columns. This will need special handling
             // elsewhere in the game if we do choose to support the old co-op mod anyway. For now, assume that there is only one stage.

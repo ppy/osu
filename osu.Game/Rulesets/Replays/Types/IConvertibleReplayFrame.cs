@@ -3,12 +3,20 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Replays.Legacy;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Replays.Types
 {
+    /// <summary>
+    /// A type of <see cref="ReplayFrame"/> which can be converted from a <see cref="LegacyReplayFrame"/>.
+    /// </summary>
     public interface IConvertibleReplayFrame
     {
-        void ConvertFrom(LegacyReplayFrame legacyFrame, Score score, Beatmap beatmap);
+        /// <summary>
+        /// Populates this <see cref="ReplayFrame"/> using values from a <see cref="LegacyReplayFrame"/>.
+        /// </summary>
+        /// <param name="legacyFrame">The <see cref="LegacyReplayFrame"/> to extract values from.</param>
+        /// <param name="score">The score.</param>
+        /// <param name="beatmap">The beatmap.</param>
+        void ConvertFrom(LegacyReplayFrame legacyFrame, Beatmap beatmap);
     }
 }

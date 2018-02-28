@@ -24,7 +24,6 @@ namespace osu.Game.Rulesets.Scoring.Legacy
         }
 
         private Beatmap currentBeatmap;
-        private Score currentScore;
         private Ruleset currentRuleset;
 
         public Score Parse(Stream stream)
@@ -33,7 +32,7 @@ namespace osu.Game.Rulesets.Scoring.Legacy
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
-                currentScore = score = new Score { Ruleset = rulesets.GetRuleset(sr.ReadByte()) };
+                score = new Score { Ruleset = rulesets.GetRuleset(sr.ReadByte()) };
                 currentRuleset = score.Ruleset.CreateInstance();
 
                 /* score.Pass = true;*/
@@ -142,7 +141,7 @@ namespace osu.Game.Rulesets.Scoring.Legacy
             var convertible = currentRuleset.CreateConvertibleReplayFrame();
             if (convertible == null)
                 throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
-            convertible.ConvertFrom(legacyFrame, currentScore, currentBeatmap);
+            convertible.ConvertFrom(legacyFrame, currentBeatmap);
 
             return (ReplayFrame)convertible;
         }
