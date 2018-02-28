@@ -10,7 +10,7 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Taiko.Replays;
 
 namespace osu.Game.Rulesets.Taiko
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public override int LegacyID => 1;
 
-        public override ReplayFrame CreateReplayFrame() => new TaikoReplayFrame();
+        public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
 
         public TaikoRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)

@@ -13,7 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Replays;
-using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Replays.Types;
 
 namespace osu.Game.Rulesets.Mania
 {
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override int LegacyID => 3;
 
-        public override ReplayFrame CreateReplayFrame() => new ManiaReplayFrame();
+        public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 
         public ManiaRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
