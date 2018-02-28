@@ -30,7 +30,6 @@ namespace osu.Game.Rulesets.Mania.Replays
             // We don't need to fully convert, just create the converter
             var converter = new ManiaBeatmapConverter(beatmap.BeatmapInfo.Ruleset.Equals(score.Ruleset), beatmap);
 
-            // Todo: Apply mods to converter
             // NB: Via co-op mod, osu-stable can have two stages with floor(col/2) and ceil(col/2) columns. This will need special handling
             // elsewhere in the game if we do choose to support the old co-op mod anyway. For now, assume that there is only one stage.
 
