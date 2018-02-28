@@ -19,13 +19,13 @@ namespace osu.Game.Rulesets.Taiko.Replays
             var actions = new List<TaikoAction>();
 
             if (CurrentFrame?.MouseRight1 == true)
-                actions.Add(TaikoAction.LeftCentre);
-            if (CurrentFrame?.MouseRight2 == true)
-                actions.Add(TaikoAction.RightCentre);
-            if (CurrentFrame?.MouseLeft1 == true)
                 actions.Add(TaikoAction.LeftRim);
-            if (CurrentFrame?.MouseLeft2 == true)
+            if (CurrentFrame?.MouseRight2 == true)
                 actions.Add(TaikoAction.RightRim);
+            if (CurrentFrame?.MouseLeft1 == true)
+                actions.Add(TaikoAction.LeftCentre);
+            if (CurrentFrame?.MouseLeft2 == true)
+                actions.Add(TaikoAction.RightCentre);
 
             return new List<InputState> { new ReplayState<TaikoAction> { PressedActions = actions } };
         }
