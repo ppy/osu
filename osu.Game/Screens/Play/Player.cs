@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Play
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
+        protected override float BackgroundParallaxAmount => 0.1f;
+
         public override bool ShowOverlaysOnEnter => false;
 
         public Action RestartRequested;
