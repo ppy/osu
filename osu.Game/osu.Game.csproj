@@ -330,6 +330,8 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\Sections\Gameplay\ScrollingSettings.cs" />
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
+    <Compile Include="Overlays\Volume\MuteButton.cs" />
+    <Compile Include="Overlays\Volume\VolumeMeter.cs" />
     <Compile Include="Rulesets\Configuration\IRulesetConfigManager.cs" />
     <Compile Include="Rulesets\Configuration\RulesetConfigManager.cs" />
     <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
