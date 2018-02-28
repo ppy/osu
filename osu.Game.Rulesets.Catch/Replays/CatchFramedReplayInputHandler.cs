@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Catch.Replays
         {
         }
 
+        protected override bool IsImportant(CatchReplayFrame frame) => frame.X > 0;
+
         protected float? Position
         {
             get
