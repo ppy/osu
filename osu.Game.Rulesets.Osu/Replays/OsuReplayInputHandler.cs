@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Replays;
@@ -15,6 +16,8 @@ namespace osu.Game.Rulesets.Osu.Replays
             : base(replay)
         {
         }
+
+        protected override bool IsImportant(OsuReplayFrame frame) => frame.Actions.Any();
 
         protected Vector2? Position
         {
