@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Replays
         {
         }
 
-        protected override bool IsImportant(CatchReplayFrame frame) => frame.X > 0;
+        protected override bool IsImportant(CatchReplayFrame frame) => frame.Position > 0;
 
         protected float? Position
         {
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 if (!HasFrames)
                     return null;
 
-                return Interpolation.ValueAt(CurrentTime, CurrentFrame.X, NextFrame.X, CurrentFrame.Time, NextFrame.Time);
+                return Interpolation.ValueAt(CurrentTime, CurrentFrame.Position, NextFrame.Position, CurrentFrame.Time, NextFrame.Time);
             }
         }
 
@@ -37,9 +37,9 @@ namespace osu.Game.Rulesets.Catch.Replays
             if (CurrentFrame.Dashing)
                 actions.Add(CatchAction.Dash);
 
-            if (Position.Value > CurrentFrame.X)
+            if (Position.Value > CurrentFrame.Position)
                 actions.Add(CatchAction.MoveRight);
-            else if (Position.Value < CurrentFrame.X)
+            else if (Position.Value < CurrentFrame.Position)
                 actions.Add(CatchAction.MoveLeft);
 
             return new List<InputState>

@@ -10,24 +10,24 @@ namespace osu.Game.Rulesets.Catch.Replays
 {
     public class CatchReplayFrame : ReplayFrame, IConvertibleReplayFrame
     {
-        public float X;
+        public float Position;
         public bool Dashing;
 
         public CatchReplayFrame()
         {
         }
 
-        public CatchReplayFrame(double time, float? x = null, bool dashing = false)
+        public CatchReplayFrame(double time, float? position = null, bool dashing = false)
             : base(time)
         {
-            X = x ?? -1;
+            Position = position ?? -1;
             Dashing = dashing;
         }
 
         public void ConvertFrom(LegacyReplayFrame legacyFrame, Beatmap beatmap)
         {
             // Todo: This needs to be re-scaled
-            X = legacyFrame.Position.X;
+            Position = legacyFrame.Position.X;
             Dashing = legacyFrame.ButtonState == ReplayButtonState.Left1;
         }
     }
