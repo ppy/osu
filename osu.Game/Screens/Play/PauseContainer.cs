@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play
             AddInternal(content = new Container
             {
                 Clock = this.framedClock,
-                ShouldProcessClock = false,
+                ProcessCustomClock = false,
                 RelativeSizeAxes = Axes.Both
             });
 

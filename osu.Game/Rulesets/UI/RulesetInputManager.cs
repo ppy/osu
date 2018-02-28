@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.UI
             //our clock will now be our parent's clock, but we want to replace this to allow manual control.
             parentClock = Clock;
 
-            ShouldProcessClock = false;
+            ProcessCustomClock = false;
             Clock = new FramedClock(clock = new ManualClock
             {
                 CurrentTime = parentClock.CurrentTime,
