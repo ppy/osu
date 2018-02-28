@@ -15,34 +15,10 @@ namespace osu.Game.Rulesets.Replays.Legacy
         public bool MouseLeft => MouseLeft1 || MouseLeft2;
         public bool MouseRight => MouseRight1 || MouseRight2;
 
-        public bool MouseLeft1
-        {
-            get { return (ButtonState & ReplayButtonState.Left1) > 0; }
-            set { setButtonState(ReplayButtonState.Left1, value); }
-        }
-        public bool MouseRight1
-        {
-            get { return (ButtonState & ReplayButtonState.Right1) > 0; }
-            set { setButtonState(ReplayButtonState.Right1, value); }
-        }
-        public bool MouseLeft2
-        {
-            get { return (ButtonState & ReplayButtonState.Left2) > 0; }
-            set { setButtonState(ReplayButtonState.Left2, value); }
-        }
-        public bool MouseRight2
-        {
-            get { return (ButtonState & ReplayButtonState.Right2) > 0; }
-            set { setButtonState(ReplayButtonState.Right2, value); }
-        }
-
-        private void setButtonState(ReplayButtonState singleButton, bool pressed)
-        {
-            if (pressed)
-                ButtonState |= singleButton;
-            else
-                ButtonState &= ~singleButton;
-        }
+        public bool MouseLeft1 => (ButtonState & ReplayButtonState.Left1) > 0;
+        public bool MouseRight1 => (ButtonState & ReplayButtonState.Right1) > 0;
+        public bool MouseLeft2 => (ButtonState & ReplayButtonState.Left2) > 0;
+        public bool MouseRight2 => (ButtonState & ReplayButtonState.Right2) > 0;
 
         public ReplayButtonState ButtonState;
 
