@@ -65,6 +65,14 @@ namespace osu.Game.Overlays.Mods
             Ruleset.TriggerChange();
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            Ruleset.UnbindAll();
+            SelectedMods.UnbindAll();
+        }
+
         private void selectedModsChanged(IEnumerable<Mod> obj)
         {
             foreach (ModSection section in ModSectionsContainer.Children)
