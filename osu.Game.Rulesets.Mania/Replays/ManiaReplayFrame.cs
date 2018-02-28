@@ -41,12 +41,15 @@ namespace osu.Game.Rulesets.Mania.Replays
             int counter = 0;
             while (activeColumns > 0)
             {
-                Actions.Add((activeColumns & 1) > 0 ? specialAction : normalAction);
+                var isSpecial = stage.IsSpecialColumn(counter);
 
-                if (stage.IsSpecialColumn(counter))
-                    normalAction++;
-                else
+                if ((activeColumns & 1) > 0)
+                    Actions.Add(isSpecial ? specialAction : normalAction);
+
+                if (isSpecial)
                     specialAction++;
+                else
+                    normalAction++;
 
                 counter++;
                 activeColumns >>= 1;
