@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <param name="obj">The curve.</param>
         /// <param name="progress">[0, 1] where 0 is the start time of the <see cref="HitObject"/> and 1 is the end time of the <see cref="HitObject"/>.</param>
         /// <returns>The position on the curve.</returns>
-        public static Vector2 PositionAt(this IHasCurve obj, double progress)
+        public static Vector2 CurvePositionAt(this IHasCurve obj, double progress)
             => obj.Curve.PositionAt(obj.ProgressAt(progress));
 
         /// <summary>
