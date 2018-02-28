@@ -192,7 +192,9 @@ namespace osu.Game.Screens.Select
         /// <param name="skipDifficulties">Whether to skip individual difficulties and only increment over full groups.</param>
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            if (!Items.Any())
+            var visibleItems = Items.Where(s => !s.Item.Filtered).ToList();
+
+            if (!visibleItems.Any())
                 return;
 
             DrawableCarouselItem drawable = null;
@@ -202,15 +204,15 @@ namespace osu.Game.Screens.Select
                 // we can fix this by changing this method to not reference drawables / Items in the first place.
                 return;
 
-            int originalIndex = Items.IndexOf(drawable);
+            int originalIndex = visibleItems.IndexOf(drawable);
             int currentIndex = originalIndex;
 
             // local function to increment the index in the required direction, wrapping over extremities.
-            int incrementIndex() => currentIndex = (currentIndex + direction + Items.Count) % Items.Count;
+            int incrementIndex() => currentIndex = (currentIndex + direction + visibleItems.Count) % visibleItems.Count;
 
             while (incrementIndex() != originalIndex)
             {
-                var item = Items[currentIndex].Item;
+                var item = visibleItems[currentIndex].Item;
 
                 if (item.Filtered || item.State == CarouselItemState.Selected) continue;
 
@@ -407,12 +409,14 @@ namespace osu.Game.Screens.Select
                     continue;
                 }
 
+                float depth = i + (item is DrawableCarouselBeatmapSet ? -Items.Count : 0);
+
                 // Only add if we're not already part of the content.
                 if (!scrollableContent.Contains(item))
                 {
                     // Makes sure headers are always _below_ items,
                     // and depth flows downward.
-                    item.Depth = i + (item is DrawableCarouselBeatmapSet ? -Items.Count : 0);
+                    item.Depth = depth;
 
                     switch (item.LoadState)
                     {
@@ -425,6 +429,10 @@ namespace osu.Game.Screens.Select
                             scrollableContent.Add(item);
                             break;
                     }
+                }
+                else
+                {
+                    scrollableContent.ChangeChildDepth(item, depth);
                 }
             }
 
