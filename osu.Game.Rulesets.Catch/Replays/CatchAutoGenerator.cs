@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 }
                 else if (h.HyperDash)
                 {
-                    Replay.Frames.Add(new CatchReplayFrame(h.StartTime - timeAvailable, lastPosition, true));
+                    Replay.Frames.Add(new CatchReplayFrame(h.StartTime - timeAvailable, lastPosition));
                     Replay.Frames.Add(new CatchReplayFrame(h.StartTime, h.X));
                 }
                 else if (dashRequired)
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 {
                     double timeBefore = positionChange / movement_speed;
 
-                    Replay.Frames.Add(new CatchReplayFrame(h.StartTime - timeBefore, lastPosition, true));
+                    Replay.Frames.Add(new CatchReplayFrame(h.StartTime - timeBefore, lastPosition));
                     Replay.Frames.Add(new CatchReplayFrame(h.StartTime, h.X));
                 }
 
