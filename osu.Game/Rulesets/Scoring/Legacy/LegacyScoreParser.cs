@@ -143,7 +143,10 @@ namespace osu.Game.Rulesets.Scoring.Legacy
                 throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
             convertible.ConvertFrom(legacyFrame, currentBeatmap);
 
-            return (ReplayFrame)convertible;
+            var frame = (ReplayFrame)convertible;
+            frame.Time = legacyFrame.Time;
+
+            return frame;
         }
     }
 }
