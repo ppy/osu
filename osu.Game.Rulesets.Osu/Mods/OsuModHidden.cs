@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -25,7 +26,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
                 d.ApplyCustomUpdateState += ApplyHiddenState;
+
                 d.HitObject.TimeFadein = d.HitObject.TimePreempt * fade_in_duration_multiplier;
+                foreach (var h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
+                    h.TimeFadein = h.TimePreempt * fade_in_duration_multiplier;
             }
         }
 
