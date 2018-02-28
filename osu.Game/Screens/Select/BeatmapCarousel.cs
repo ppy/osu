@@ -407,12 +407,14 @@ namespace osu.Game.Screens.Select
                     continue;
                 }
 
+                float depth = i + (item is DrawableCarouselBeatmapSet ? -Items.Count : 0);
+
                 // Only add if we're not already part of the content.
                 if (!scrollableContent.Contains(item))
                 {
                     // Makes sure headers are always _below_ items,
                     // and depth flows downward.
-                    item.Depth = i + (item is DrawableCarouselBeatmapSet ? -Items.Count : 0);
+                    item.Depth = depth;
 
                     switch (item.LoadState)
                     {
@@ -425,6 +427,10 @@ namespace osu.Game.Screens.Select
                             scrollableContent.Add(item);
                             break;
                     }
+                }
+                else
+                {
+                    scrollableContent.ChangeChildDepth(item, depth);
                 }
             }
 
