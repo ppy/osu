@@ -8,6 +8,7 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
+using OpenTK;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -319,7 +320,7 @@ namespace osu.Game.Beatmaps.Formats
                 beatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint
                 {
                     Time = time,
-                    BeatLength = beatLength,
+                    BeatLength = MathHelper.Clamp(beatLength, 100, 60000),
                     TimeSignature = timeSignature
                 });
             }
