@@ -183,7 +183,7 @@ namespace osu.Game.Screens.Play
                         {
                             RelativeSizeAxes = Axes.Both,
                             Clock = offsetClock,
-                            ShouldProcessClock = false,
+                            ProcessCustomClock = false,
                             Children = new[]
                             {
                                 storyboardContainer = new Container
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Clock = offsetClock,
-                            ShouldProcessClock = false,
+                            ProcessCustomClock = false,
                             Breaks = beatmap.Breaks
                         }
                     }
