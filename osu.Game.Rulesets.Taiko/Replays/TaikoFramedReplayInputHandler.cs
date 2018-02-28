@@ -7,27 +7,13 @@ using osu.Framework.Input;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
-    internal class TaikoFramedReplayInputHandler : FramedReplayInputHandler
+    internal class TaikoFramedReplayInputHandler : FramedReplayInputHandler<TaikoReplayFrame>
     {
         public TaikoFramedReplayInputHandler(Replay replay)
             : base(replay)
         {
         }
 
-        public override List<InputState> GetPendingStates()
-        {
-            var actions = new List<TaikoAction>();
-
-            if (CurrentFrame?.MouseRight1 == true)
-                actions.Add(TaikoAction.LeftRim);
-            if (CurrentFrame?.MouseRight2 == true)
-                actions.Add(TaikoAction.RightRim);
-            if (CurrentFrame?.MouseLeft1 == true)
-                actions.Add(TaikoAction.LeftCentre);
-            if (CurrentFrame?.MouseLeft2 == true)
-                actions.Add(TaikoAction.RightCentre);
-
-            return new List<InputState> { new ReplayState<TaikoAction> { PressedActions = actions } };
-        }
+        public override List<InputState> GetPendingStates() => new List<InputState> { new ReplayState<TaikoAction> { PressedActions = CurrentFrame.Actions } };
     }
 }

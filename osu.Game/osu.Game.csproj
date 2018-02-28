@@ -361,6 +361,12 @@
     <Compile Include="Overlays\Social\SocialPanel.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Rulesets\Objects\HitWindows.cs" />
+    <Compile Include="Rulesets\Replays\Legacy\LegacyReplayFrame.cs" />
+    <Compile Include="Rulesets\Replays\Legacy\ReplayButtonState.cs" />
+    <Compile Include="Rulesets\Replays\ReplayFrame.cs" />
+    <Compile Include="Rulesets\Replays\Types\IConvertibleReplayFrame.cs" />
+    <Compile Include="Rulesets\Scoring\IScoreParser.cs" />
+    <Compile Include="Rulesets\Scoring\Legacy\LegacyScoreParser.cs" />
     <Compile Include="Rulesets\UI\ScalableContainer.cs" />
     <Compile Include="Screens\Play\PlayerSettings\VisualSettings.cs" />
     <Compile Include="Rulesets\Objects\CatmullApproximator.cs" />
@@ -706,8 +712,6 @@
     <Compile Include="Rulesets\Replays\FramedReplayInputHandler.cs" />
     <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
     <Compile Include="Rulesets\Replays\Replay.cs" />
-    <Compile Include="Rulesets\Replays\ReplayButtonState.cs" />
-    <Compile Include="Rulesets\Replays\ReplayFrame.cs" />
     <Compile Include="Rulesets\Ruleset.cs" />
     <Compile Include="Rulesets\RulesetInfo.cs" />
     <Compile Include="Rulesets\RulesetStore.cs" />
