@@ -57,11 +57,6 @@ namespace osu.Game.Screens.Play
         private IAdjustableClock sourceClock;
 
         /// <summary>
-        /// The final usable gameplay clock with user-set offsets applied.
-        /// </summary>
-        private FramedOffsetClock offsetClock;
-
-        /// <summary>
         /// The decoupled clock used for gameplay. Should be used for seeks and clock control.
         /// </summary>
         private DecoupleableInterpolatingFramedClock adjustableClock;
@@ -156,7 +151,8 @@ namespace osu.Game.Screens.Play
 
             adjustableClock.ProcessFrame();
 
-            offsetClock = new FramedOffsetClock(adjustableClock);
+            // the final usable gameplay clock with user-set offsets applied.
+            var offsetClock = new FramedOffsetClock(adjustableClock);
 
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
@@ -179,28 +175,23 @@ namespace osu.Game.Screens.Play
                     OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
                     Children = new Drawable[]
                     {
-                        new Container
+                        storyboardContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Clock = offsetClock,
-                            ProcessCustomClock = false,
-                            Children = new[]
-                            {
-                                storyboardContainer = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0,
-                                },
-                                RulesetContainer,
-                            }
+                            Alpha = 0,
                         },
+                        RulesetContainer,
                         new SkipButton(firstObjectTime)
                         {
+                            Clock = Clock, // skip button doesn't want to use the audio clock directly
+                            ProcessCustomClock = false,
                             AdjustableClock = adjustableClock,
                             FramedClock = offsetClock,
                         },
                         hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
+                            Clock = Clock, // hud overlay doesn't want to use the audio clock directly
+                            ProcessCustomClock = false,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
@@ -208,7 +199,6 @@ namespace osu.Game.Screens.Play
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Clock = offsetClock,
                             ProcessCustomClock = false,
                             Breaks = beatmap.Breaks
                         }
