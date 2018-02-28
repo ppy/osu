@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
@@ -53,10 +54,14 @@ namespace osu.Game.Tests.Visual
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
             public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
+
+            public void SetRuleset(RulesetInfo ruleset) => Ruleset.Value = ruleset;
+
+            public int? RulesetID => Ruleset.Value.ID;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load(OsuGameBase game, OsuConfigManager config)
         {
             TestSongSelect songSelect = null;
 
@@ -113,6 +118,24 @@ namespace osu.Game.Tests.Visual
             AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });
             AddStep(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
             AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
+
+            AddWaitStep(5);
+
+            AddStep(@"Set unplayable WorkingBeatmap", () =>
+            {
+                var testMap = manager.GetAllUsableBeatmapSets().First().Beatmaps.First(b => b.RulesetID != 0);
+                songSelect.SetRuleset(rulesets.AvailableRulesets.First());
+                game.Beatmap.Value = manager.GetWorkingBeatmap(testMap);
+            });
+            AddAssert(@"WorkingBeatmap changed to playable ruleset", () => songSelect.RulesetID == 0 && game.Beatmap.Value.BeatmapInfo.RulesetID == 0);
+            AddStep(@"Disallow beatmap conversion", () =>
+            {
+                config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps).Value = false;
+                game.Beatmap.Value = manager.GetWorkingBeatmap(manager.GetAllUsableBeatmapSets().First().Beatmaps.First());
+            });
+            loadNewSongSelect();
+            AddWaitStep(3);
+            AddAssert(@"Ruleset matches beatmap", () => songSelect.RulesetID == game.Beatmap.Value.BeatmapInfo.RulesetID);
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)
@@ -134,7 +157,8 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1234 + i,
-                        Ruleset = rulesets.AvailableRulesets.First(),
+                        Ruleset = rulesets.AvailableRulesets.ElementAt(0),
+                        RulesetID = 0,
                         Path = "normal.osu",
                         Version = "Normal",
                         BaseDifficulty = new BeatmapDifficulty
@@ -145,8 +169,9 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1235 + i,
-                        Ruleset = rulesets.AvailableRulesets.First(),
-                        Path = "hard.osu",
+                        Ruleset = rulesets.AvailableRulesets.First(r => r.ID != 0),
+                        RulesetID = 1,
+                        Path = "hard.taiko",
                         Version = "Hard",
                         BaseDifficulty = new BeatmapDifficulty
                         {
@@ -156,8 +181,9 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1236 + i,
-                        Ruleset = rulesets.AvailableRulesets.First(),
-                        Path = "insane.osu",
+                        Ruleset = rulesets.AvailableRulesets.ElementAt(2),
+                        RulesetID = 2,
+                        Path = "insane.fruits",
                         Version = "Insane",
                         BaseDifficulty = new BeatmapDifficulty
                         {

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using System.Threading;
 using OpenTK;
 using OpenTK.Input;
@@ -9,12 +10,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -62,6 +65,8 @@ namespace osu.Game.Screens.Select
 
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
+
+        private Bindable<bool> rulesetConversionAllowed;
 
         private CancellationTokenSource initialAddSetsTask;
 
@@ -179,7 +184,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours, OsuConfigManager config)
         {
             dependencies.CacheAs(this);
 
@@ -193,6 +198,8 @@ namespace osu.Game.Screens.Select
 
             if (this.beatmaps == null)
                 this.beatmaps = beatmaps;
+
+            rulesetConversionAllowed = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
 
             if (osu != null)
                 Ruleset.BindTo(osu.Ruleset);
@@ -217,7 +224,10 @@ namespace osu.Game.Screens.Select
             Beatmap.ValueChanged += b =>
             {
                 if (IsCurrentScreen)
+                {
                     Carousel.SelectBeatmap(b?.BeatmapInfo);
+                    ensurePlayableRuleset();
+                }
             };
         }
 
@@ -316,6 +326,7 @@ namespace osu.Game.Screens.Select
         {
             base.OnEntering(last);
 
+            ensurePlayableRuleset();
             Content.FadeInFromZero(250);
             FilterControl.Activate();
         }
@@ -439,6 +450,34 @@ namespace osu.Game.Screens.Select
                 if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
                 track.Start();
             }
+        }
+
+        private void ensurePlayableRuleset()
+        {
+            if (Beatmap.IsDefault)
+                // DummyBeatmap won't be playable anyway
+                return;
+
+            bool conversionAllowed = rulesetConversionAllowed.Value;
+            int? currentRuleset = Ruleset.Value.ID;
+            int beatmapRuleset = Beatmap.Value.BeatmapInfo.RulesetID;
+
+            if (currentRuleset == beatmapRuleset || conversionAllowed && beatmapRuleset == 0)
+                // Current beatmap is playable, nothing more to do
+                return;
+
+            // Otherwise, first check if the current beatmapset has any playable beatmaps
+            BeatmapInfo beatmap = Beatmap.Value.BeatmapSetInfo.Beatmaps?.FirstOrDefault(b => b.RulesetID == currentRuleset || conversionAllowed && b.RulesetID == 0);
+
+            // If it does then update the WorkingBeatmap
+            if (beatmap != null)
+            {
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
+                return;
+            }
+
+            // If it doesn't, then update the current ruleset so that the current beatmap is playable
+            Ruleset.Value = Beatmap.Value.BeatmapInfo.Ruleset;
         }
 
         private void onBeatmapSetAdded(BeatmapSetInfo s) => Carousel.UpdateBeatmapSet(s);
