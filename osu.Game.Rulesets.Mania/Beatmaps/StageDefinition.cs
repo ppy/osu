@@ -16,11 +16,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public int Columns;
 
         /// <summary>
-        /// Whether this stage has a special column.
-        /// </summary>
-        public bool HasSpecialColumn => Columns % 2 == 1;
-
-        /// <summary>
         /// Whether the column index is a special column for this stage.
         /// </summary>
         /// <param name="column">The 0-based column index.</param>
