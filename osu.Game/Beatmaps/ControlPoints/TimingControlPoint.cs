@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public double BeatLength
         {
             get => beatLength;
-            set => beatLength = MathHelper.Clamp(value, 100, 60000);
+            set => beatLength = MathHelper.Clamp(value, 6, 60000);
         }
 
         private double beatLength = 1000;
