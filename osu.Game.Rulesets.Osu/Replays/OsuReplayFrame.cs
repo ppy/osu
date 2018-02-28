@@ -6,7 +6,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Legacy;
 using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.Scoring;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Replays
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame legacyFrame, Score score, Beatmap beatmap)
+        public void ConvertFrom(LegacyReplayFrame legacyFrame, Beatmap beatmap)
         {
             Position = legacyFrame.Position;
             if (legacyFrame.MouseLeft) Actions.Add(OsuAction.LeftButton);

@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Legacy;
 using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Replays
 {
@@ -25,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Replays
             Dashing = dashing;
         }
 
-        public void ConvertFrom(LegacyReplayFrame legacyFrame, Score score, Beatmap beatmap)
+        public void ConvertFrom(LegacyReplayFrame legacyFrame, Beatmap beatmap)
         {
             // Todo: This needs to be re-scaled
             X = legacyFrame.Position.X;
