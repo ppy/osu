@@ -883,6 +883,7 @@
     <Compile Include="Storyboards\StoryboardLayer.cs" />
     <Compile Include="Storyboards\StoryboardSample.cs" />
     <Compile Include="Storyboards\StoryboardSprite.cs" />
+    <Compile Include="Tests\Beatmaps\BeatmapConversionTest.cs" />
     <Compile Include="Tests\Beatmaps\TestWorkingBeatmap.cs" />
     <Compile Include="Tests\CleanRunHeadlessGameHost.cs" />
     <Compile Include="Tests\Platform\TestStorage.cs" />
