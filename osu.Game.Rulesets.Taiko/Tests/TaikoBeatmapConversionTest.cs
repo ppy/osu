@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             IsStrong = ((TaikoHitObject)hitObject).IsStrong
         };
 
-        protected override ITestableBeatmapConverter CreateConverter() => new TaikoBeatmapConverter(isForCurrentRuleset);
+        protected override ITestableBeatmapConverter CreateConverter(Beatmap beatmap) => new TaikoBeatmapConverter(isForCurrentRuleset);
     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
