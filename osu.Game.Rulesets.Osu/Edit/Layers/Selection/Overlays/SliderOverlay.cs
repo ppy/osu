@@ -15,10 +15,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
     public class SliderOverlay : HitObjectOverlay
     {
         private readonly SliderBody body;
+        private readonly DrawableSlider slider;
 
         public SliderOverlay(DrawableSlider slider)
             : base(slider)
         {
+            this.slider = slider;
+
             var obj = (Slider)slider.HitObject;
 
             InternalChildren = new Drawable[]
@@ -26,7 +29,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
                 body = new SliderBody(obj)
                 {
                     AccentColour = Color4.Transparent,
-                    Position = obj.StackedPosition,
                     PathWidth = obj.Scale * 64
                 },
                 new SliderCircleOverlay(slider.HeadCircle, slider),
@@ -43,6 +45,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
         protected override void Update()
         {
             base.Update();
+
+            Position = slider.Position;
+            Size = slider.Size;
+            OriginPosition = slider.OriginPosition;
 
             // Need to cause one update
             body.UpdateProgress(0);
