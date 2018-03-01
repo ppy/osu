@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -26,12 +27,15 @@ namespace osu.Game.Rulesets.Mania.Tests
             base.Test(beatmapId);
         }
 
-        protected override ConvertValue CreateConvertValue(HitObject hitObject) => new ConvertValue
+        protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
-            StartTime = hitObject.StartTime,
-            EndTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime,
-            Column = ((ManiaHitObject)hitObject).Column
-        };
+            yield return new ConvertValue
+            {
+                StartTime = hitObject.StartTime,
+                EndTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime,
+                Column = ((ManiaHitObject)hitObject).Column
+            };
+        }
 
         protected override ITestableBeatmapConverter CreateConverter(Beatmap beatmap) => new ManiaBeatmapConverter(isForCurrentRuleset, beatmap);
     }
