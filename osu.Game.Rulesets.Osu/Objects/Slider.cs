@@ -3,7 +3,6 @@
 
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
-using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
@@ -120,14 +119,16 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createTicks()
         {
-            if (TickDistance == 0) return;
-
             var length = Curve.Distance;
-            var tickDistance = Math.Min(TickDistance, length);
+            var tickDistance = MathHelper.Clamp(TickDistance, 0, length);
+
+            if (tickDistance == 0) return;
 
             var minDistanceFromEnd = Velocity * 0.01;
 
-            for (var span = 0; span < this.SpanCount(); span++)
+            var spanCount = this.SpanCount();
+
+            for (var span = 0; span < spanCount; span++)
             {
                 var spanStartTime = StartTime + span * SpanDuration;
                 var reversed = span % 2 == 1;
