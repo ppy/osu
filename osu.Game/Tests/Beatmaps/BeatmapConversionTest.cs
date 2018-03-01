@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Beatmaps
 
                 var mapping = new ConvertMapping { StartTime = orig.StartTime };
                 foreach (var obj in converted)
-                    mapping.Objects.Add(CreateConvertValue(obj));
+                    mapping.Objects.AddRange(CreateConvertValue(obj));
                 result.Mappings.Add(mapping);
             };
 
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Beatmaps
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 
-        protected abstract TConvertValue CreateConvertValue(HitObject hitObject);
+        protected abstract IEnumerable<TConvertValue> CreateConvertValue(HitObject hitObject);
         protected abstract ITestableBeatmapConverter CreateConverter(Beatmap beatmap);
 
         private class ConvertMapping

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -24,12 +25,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             base.Test(beatmapId);
         }
 
-        protected override ConvertValue CreateConvertValue(HitObject hitObject)
+        protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
             var startPosition = (hitObject as IHasPosition)?.Position ?? new Vector2(256, 192);
             var endPosition = (hitObject as Slider)?.EndPosition ?? startPosition;
 
-            return new ConvertValue
+            yield return new ConvertValue
             {
                 StartTime = hitObject.StartTime,
                 EndTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime,

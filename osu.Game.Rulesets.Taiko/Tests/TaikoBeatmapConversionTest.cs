@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -26,16 +27,19 @@ namespace osu.Game.Rulesets.Taiko.Tests
             base.Test(beatmapId);
         }
 
-        protected override ConvertValue CreateConvertValue(HitObject hitObject) => new ConvertValue
+        protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
-            StartTime = hitObject.StartTime,
-            EndTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime,
-            IsRim = hitObject is RimHit,
-            IsCentre = hitObject is CentreHit,
-            IsDrumRoll = hitObject is DrumRoll,
-            IsSwell = hitObject is Swell,
-            IsStrong = ((TaikoHitObject)hitObject).IsStrong
-        };
+            yield return new ConvertValue
+            {
+                StartTime = hitObject.StartTime,
+                EndTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime,
+                IsRim = hitObject is RimHit,
+                IsCentre = hitObject is CentreHit,
+                IsDrumRoll = hitObject is DrumRoll,
+                IsSwell = hitObject is Swell,
+                IsStrong = ((TaikoHitObject)hitObject).IsStrong
+            };
+        }
 
         protected override ITestableBeatmapConverter CreateConverter(Beatmap beatmap) => new TaikoBeatmapConverter(isForCurrentRuleset);
     }
