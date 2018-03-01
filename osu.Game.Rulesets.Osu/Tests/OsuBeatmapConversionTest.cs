@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -51,17 +50,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// </summary>
         private const double conversion_lenience = 2;
 
-        [JsonProperty]
         public double StartTime;
-        [JsonProperty]
         public double EndTime;
-        [JsonProperty]
         public float StartX;
-        [JsonProperty]
         public float StartY;
-        [JsonProperty]
         public float EndX;
-        [JsonProperty]
         public float EndY;
 
         public bool Equals(ConvertValue other)
