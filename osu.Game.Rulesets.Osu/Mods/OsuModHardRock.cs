@@ -22,8 +22,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (slider == null)
                 return;
 
+            slider.HeadCircle.Position = new Vector2(slider.HeadCircle.Position.X, OsuPlayfield.BASE_SIZE.Y - slider.HeadCircle.Position.Y);
+            slider.TailCircle.Position = new Vector2(slider.TailCircle.Position.X, OsuPlayfield.BASE_SIZE.Y - slider.TailCircle.Position.Y);
+
             var newControlPoints = new List<Vector2>();
-            slider.ControlPoints.ForEach(c => newControlPoints.Add(new Vector2(c.X, OsuPlayfield.BASE_SIZE.Y - c.Y)));
+            slider.ControlPoints.ForEach(c => newControlPoints.Add(new Vector2(c.X, -c.Y)));
 
             slider.ControlPoints = newControlPoints;
             slider.Curve?.Calculate(); // Recalculate the slider curve
