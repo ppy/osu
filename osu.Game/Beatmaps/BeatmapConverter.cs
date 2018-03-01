@@ -8,12 +8,36 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
+    public interface ITestableBeatmapConverter
+    {
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> has been converted.
+        /// The first argument contains the <see cref="HitObject"/> that was converted.
+        /// The second argument contains the <see cref="HitObject"/>s that were output from the conversion process.
+        /// </summary>
+        event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+
+        /// <summary>
+        /// Converts a Beatmap using this Beatmap Converter.
+        /// </summary>
+        /// <param name="original">The un-converted Beatmap.</param>
+        void Convert(Beatmap beatmap);
+    }
+
     /// <summary>
     /// Converts a Beatmap for another mode.
     /// </summary>
     /// <typeparam name="T">The type of HitObject stored in the Beatmap.</typeparam>
-    public abstract class BeatmapConverter<T> where T : HitObject
+    public abstract class BeatmapConverter<T> : ITestableBeatmapConverter
+        where T : HitObject
     {
+        private event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+        event Action<HitObject, IEnumerable<HitObject>> ITestableBeatmapConverter.ObjectConverted
+        {
+            add => ObjectConverted += value;
+            remove => ObjectConverted -= value;
+        }
+
         /// <summary>
         /// Checks if a Beatmap can be converted using this Beatmap Converter.
         /// </summary>
@@ -31,6 +55,8 @@ namespace osu.Game.Beatmaps
             // We always operate on a clone of the original beatmap, to not modify it game-wide
             return ConvertBeatmap(new Beatmap(original));
         }
+
+        void ITestableBeatmapConverter.Convert(Beatmap original) => Convert(original);
 
         /// <summary>
         /// Performs the conversion of a Beatmap using this Beatmap Converter.
@@ -63,8 +89,11 @@ namespace osu.Game.Beatmaps
                 yield break;
             }
 
+            var converted = ConvertHitObject(original, beatmap).ToList();
+            ObjectConverted?.Invoke(original, converted);
+
             // Convert the hit object
-            foreach (var obj in ConvertHitObject(original, beatmap))
+            foreach (var obj in converted)
             {
                 if (obj == null)
                     continue;
