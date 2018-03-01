@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly List<Drawable> components = new List<Drawable>();
 
         public readonly DrawableHitCircle HeadCircle;
+        public readonly DrawableSliderTail TailCircle;
+
         public readonly SliderBody Body;
         public readonly SliderBall Ball;
 
@@ -33,7 +35,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Position = s.StackedPosition;
 
-            DrawableSliderTail tail;
             Container<DrawableSliderTick> ticks;
             Container<DrawableRepeatPoint> repeatPoints;
 
@@ -54,8 +55,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableHitCircle(s.HeadCircle)　{　Position = s.HeadCircle.Position - s.Position　},
-                tail = new DrawableSliderTail(s.TailCircle) { Position = s.TailCircle.Position - s.Position }
+                HeadCircle = new DrawableHitCircle(s.HeadCircle) { Position = s.TailCircle.Position - s.Position },
+                TailCircle = new DrawableSliderTail(s.TailCircle) { Position = s.TailCircle.Position - s.Position }
             };
 
             components.Add(Body);
@@ -63,8 +64,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             AddNested(HeadCircle);
 
-            AddNested(tail);
-            components.Add(tail);
+            AddNested(TailCircle);
+            components.Add(TailCircle);
 
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
@@ -170,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Body.ReceiveMouseInputAt(screenSpacePos);
 
-        public override Vector2 SelectionPoint => ToScreenSpace(Body.Position);
+        public override Vector2 SelectionPoint => ToScreenSpace(OriginPosition);
         public override Quad SelectionQuad => Body.PathDrawQuad;
     }
 }
