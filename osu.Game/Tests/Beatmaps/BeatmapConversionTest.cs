@@ -36,9 +36,9 @@ namespace osu.Game.Tests.Beatmaps
                     if (mappingCounter >= ourResult.Mappings.Count && mappingCounter >= expectedResult.Mappings.Count)
                         break;
                     if (mappingCounter >= ourResult.Mappings.Count)
-                        Assert.Fail($"Missing conversion for object at time: {expectedResult.Mappings[mappingCounter].StartTime}");
+                        Assert.Fail($"A conversion did not generate any hitobjects, but should have, for hitobject at time: {expectedResult.Mappings[mappingCounter].StartTime}\n");
                     else if (mappingCounter >= expectedResult.Mappings.Count)
-                        Assert.Fail($"Extra conversion for object at time: {ourResult.Mappings[mappingCounter].StartTime}");
+                        Assert.Fail($"A conversion generated hitobjects, but should not have, for hitobject at time: {ourResult.Mappings[mappingCounter].StartTime}\n");
                     else
                     {
                         var counter = mappingCounter;
@@ -53,12 +53,14 @@ namespace osu.Game.Tests.Beatmaps
                                 if (objectCounter >= ourMapping.Objects.Count && objectCounter >= expectedMapping.Objects.Count)
                                     break;
                                 if (objectCounter >= ourMapping.Objects.Count)
-                                    Assert.Fail($"Expected conversion for object at time: {expectedMapping.StartTime}:\n{JsonConvert.SerializeObject(expectedMapping.Objects[objectCounter])}");
+                                    Assert.Fail($"The conversion did not generate a hitobject, but should have, for hitobject at time: {expectedMapping.StartTime}:\n"
+                                                + $"Expected: {JsonConvert.SerializeObject(expectedMapping.Objects[objectCounter])}\n");
                                 else if (objectCounter >= expectedMapping.Objects.Count)
-                                    Assert.Fail($"Unexpected conversion for object at time: {ourMapping.StartTime}:\n{JsonConvert.SerializeObject(ourMapping.Objects[objectCounter])}");
+                                    Assert.Fail($"The conversion generated a hitobject, but should not have, for hitobject at time: {ourMapping.StartTime}:\n"
+                                                + $"Received: {JsonConvert.SerializeObject(ourMapping.Objects[objectCounter])}\n");
                                 else if (!EqualityComparer<TConvertValue>.Default.Equals(expectedMapping.Objects[objectCounter], ourMapping.Objects[objectCounter]))
                                 {
-                                    Assert.Fail($"Converted hitobjects differ for object at time: {expectedMapping.StartTime}\n"
+                                    Assert.Fail($"The conversion generated differing hitobjects for object at time: {expectedMapping.StartTime}\n"
                                                 + $"Expected: {JsonConvert.SerializeObject(expectedMapping.Objects[objectCounter])}\n"
                                                 + $"Received: {JsonConvert.SerializeObject(ourMapping.Objects[objectCounter])}\n");
                                 }
