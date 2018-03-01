@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit.Layers.Selection;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
@@ -15,18 +14,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
     public class SliderCircleOverlay : HitObjectOverlay
     {
         public SliderCircleOverlay(DrawableHitCircle sliderHead, DrawableSlider slider)
-            : this(sliderHead, ((Slider)slider.HitObject).StackedPositionAt(0), slider)
+            : this(sliderHead, sliderHead.Position, slider)
         {
         }
 
         public SliderCircleOverlay(DrawableSliderTail sliderTail, DrawableSlider slider)
-            : this(sliderTail, ((Slider)slider.HitObject).Curve.PositionAt(1) + slider.HitObject.StackOffset, slider)
+            : this(sliderTail, sliderTail.Position, slider)
         {
         }
+
+        private readonly DrawableOsuHitObject hitObject;
 
         private SliderCircleOverlay(DrawableOsuHitObject hitObject, Vector2 position, DrawableSlider slider)
             : base(hitObject)
         {
+            this.hitObject = hitObject;
+
             Origin = Anchor.Centre;
 
             Position = position;
@@ -40,6 +43,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            RelativeAnchorPosition = hitObject.RelativeAnchorPosition;
         }
     }
 }
