@@ -352,7 +352,10 @@
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
     <Compile Include="Rulesets\Configuration\IRulesetConfigManager.cs" />
     <Compile Include="Rulesets\Configuration\RulesetConfigManager.cs" />
+    <Compile Include="Rulesets\Edit\Layers\BorderLayer.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\CaptureBox.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectOverlay.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectOverlayLayer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />
