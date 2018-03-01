@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Beatmaps
 
             var result = new ConvertResult();
 
-            var converter = CreateConverter();
+            var converter = CreateConverter(beatmap);
             converter.ObjectConverted += (orig, converted) =>
             {
                 converted.ForEach(h => h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty));
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         protected abstract TConvertValue CreateConvertValue(HitObject hitObject);
-        protected abstract ITestableBeatmapConverter CreateConverter();
+        protected abstract ITestableBeatmapConverter CreateConverter(Beatmap beatmap);
 
         private class ConvertMapping
         {
