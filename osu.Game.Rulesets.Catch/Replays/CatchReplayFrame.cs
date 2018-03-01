@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Legacy;
 using osu.Game.Rulesets.Replays.Types;
@@ -26,8 +27,7 @@ namespace osu.Game.Rulesets.Catch.Replays
 
         public void ConvertFrom(LegacyReplayFrame legacyFrame, Beatmap beatmap)
         {
-            // Todo: This needs to be re-scaled
-            Position = legacyFrame.Position.X;
+            Position = legacyFrame.Position.X / CatchPlayfield.BASE_WIDTH;
             Dashing = legacyFrame.ButtonState == ReplayButtonState.Left1;
         }
     }
