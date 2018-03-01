@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Body.ReceiveMouseInputAt(screenSpacePos);
 
-        public override Vector2 SelectionPoint => ToScreenSpace(Body.Position);
+        public override Vector2 SelectionPoint => ToScreenSpace(OriginPosition);
         public override Quad SelectionQuad => Body.PathDrawQuad;
     }
 }
