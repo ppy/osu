@@ -46,6 +46,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
     public struct ConvertValue : IEquatable<ConvertValue>
     {
+        /// <summary>
+        /// A sane value to account for osu!stable using ints everwhere.
+        /// </summary>
+        private const double conversion_lenience = 2;
+
         [JsonProperty]
         public double StartTime;
         [JsonProperty]
@@ -60,11 +65,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         public float EndY;
 
         public bool Equals(ConvertValue other)
-            => Precision.AlmostEquals(StartTime, other.StartTime, 1)
-               && Precision.AlmostEquals(EndTime, other.EndTime, 1)
-               && Precision.AlmostEquals(StartX, other.StartX, 1)
-               && Precision.AlmostEquals(StartY, other.StartY, 1)
-               && Precision.AlmostEquals(EndX, other.EndX, 1)
-               && Precision.AlmostEquals(EndY, other.EndY, 1);
+            => Precision.AlmostEquals(StartTime, other.StartTime)
+               && Precision.AlmostEquals(EndTime, other.EndTime, conversion_lenience)
+               && Precision.AlmostEquals(StartX, other.StartX)
+               && Precision.AlmostEquals(StartY, other.StartY, conversion_lenience)
+               && Precision.AlmostEquals(EndX, other.EndX, conversion_lenience)
+               && Precision.AlmostEquals(EndY, other.EndY, conversion_lenience);
     }
 }
