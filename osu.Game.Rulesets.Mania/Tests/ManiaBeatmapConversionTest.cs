@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         public int Column;
 
         public bool Equals(ConvertValue other)
-            => Precision.AlmostEquals(StartTime, other.StartTime)
+            => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
                && Precision.AlmostEquals(EndTime, other.EndTime, conversion_lenience)
                && Column == other.Column;
     }

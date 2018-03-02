@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         public bool IsStrong;
 
         public bool Equals(ConvertValue other)
-            => Precision.AlmostEquals(StartTime, other.StartTime)
+            => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
                && Precision.AlmostEquals(EndTime, other.EndTime, conversion_lenience)
                && IsRim == other.IsRim
                && IsCentre == other.IsCentre
