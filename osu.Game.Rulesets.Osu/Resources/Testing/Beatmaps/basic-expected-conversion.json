@@ -1,1 +1,124 @@
-{"Mappings":[{"StartTime":500.0,"Objects":[{"StartTime":500.0,"EndTime":2500.0,"StartX":96.0,"StartY":192.0,"EndX":96.0,"EndY":192.0}]},{"StartTime":3000.0,"Objects":[{"StartTime":3000.0,"EndTime":4000.0,"StartX":256.0,"StartY":192.0,"EndX":256.0,"EndY":192.0}]},{"StartTime":4500.0,"Objects":[{"StartTime":4500.0,"EndTime":5500.0,"StartX":256.0,"StartY":192.0,"EndX":256.0,"EndY":192.0}]},{"StartTime":6000.0,"Objects":[{"StartTime":6000.0,"EndTime":6500.0,"StartX":256.0,"StartY":192.0,"EndX":256.0,"EndY":192.0}]},{"StartTime":7000.0,"Objects":[{"StartTime":7000.0,"EndTime":8000.0,"StartX":256.0,"StartY":128.0,"EndX":256.0,"EndY":128.0}]},{"StartTime":8500.0,"Objects":[{"StartTime":8500.0,"EndTime":10999.0,"StartX":32.0,"StartY":192.0,"EndX":508.166229,"EndY":153.299271}]},{"StartTime":11500.0,"Objects":[{"StartTime":11500.0,"EndTime":12000.0,"StartX":256.0,"StartY":192.0,"EndX":256.0,"EndY":192.0}]},{"StartTime":12500.0,"Objects":[{"StartTime":12500.0,"EndTime":16500.0,"StartX":512.0,"StartY":320.0,"EndX":291.1977,"EndY":40.799427}]},{"StartTime":17000.0,"Objects":[{"StartTime":17000.0,"EndTime":18000.0,"StartX":256.0,"StartY":256.0,"EndX":256.0,"EndY":256.0}]},{"StartTime":18500.0,"Objects":[{"StartTime":18500.0,"EndTime":19450.0,"StartX":256.0,"StartY":192.0,"EndX":256.0,"EndY":192.0}]},{"StartTime":19875.0,"Objects":[{"StartTime":19875.0,"EndTime":23874.0,"StartX":216.0,"StartY":231.0,"EndX":408.720825,"EndY":339.810455}]}]}
+{
+    "Mappings": [{
+            "StartTime": 500,
+            "Objects": [{
+                "StartTime": 500,
+                "EndTime": 2500,
+                "StartX": 96,
+                "StartY": 192,
+                "EndX": 96,
+                "EndY": 192
+            }]
+        },
+        {
+            "StartTime": 3000,
+            "Objects": [{
+                "StartTime": 3000,
+                "EndTime": 4000,
+                "StartX": 256,
+                "StartY": 192,
+                "EndX": 256,
+                "EndY": 192
+            }]
+        },
+        {
+            "StartTime": 4500,
+            "Objects": [{
+                "StartTime": 4500,
+                "EndTime": 5500,
+                "StartX": 256,
+                "StartY": 192,
+                "EndX": 256,
+                "EndY": 192
+            }]
+        },
+        {
+            "StartTime": 6000,
+            "Objects": [{
+                "StartTime": 6000,
+                "EndTime": 6500,
+                "StartX": 256,
+                "StartY": 192,
+                "EndX": 256,
+                "EndY": 192
+            }]
+        },
+        {
+            "StartTime": 7000,
+            "Objects": [{
+                "StartTime": 7000,
+                "EndTime": 8000,
+                "StartX": 256,
+                "StartY": 128,
+                "EndX": 256,
+                "EndY": 128
+            }]
+        },
+        {
+            "StartTime": 8500,
+            "Objects": [{
+                "StartTime": 8500,
+                "EndTime": 10999,
+                "StartX": 32,
+                "StartY": 192,
+                "EndX": 508.166229,
+                "EndY": 153.299271
+            }]
+        },
+        {
+            "StartTime": 11500,
+            "Objects": [{
+                "StartTime": 11500,
+                "EndTime": 12000,
+                "StartX": 256,
+                "StartY": 192,
+                "EndX": 256,
+                "EndY": 192
+            }]
+        },
+        {
+            "StartTime": 12500,
+            "Objects": [{
+                "StartTime": 12500,
+                "EndTime": 16500,
+                "StartX": 512,
+                "StartY": 320,
+                "EndX": 291.1977,
+                "EndY": 40.799427
+            }]
+        },
+        {
+            "StartTime": 17000,
+            "Objects": [{
+                "StartTime": 17000,
+                "EndTime": 18000,
+                "StartX": 256,
+                "StartY": 256,
+                "EndX": 256,
+                "EndY": 256
+            }]
+        },
+        {
+            "StartTime": 18500,
+            "Objects": [{
+                "StartTime": 18500,
+                "EndTime": 19450,
+                "StartX": 256,
+                "StartY": 192,
+                "EndX": 256,
+                "EndY": 192
+            }]
+        },
+        {
+            "StartTime": 19875,
+            "Objects": [{
+                "StartTime": 19875,
+                "EndTime": 23874,
+                "StartX": 216,
+                "StartY": 231,
+                "EndX": 408.720825,
+                "EndY": 339.810455
+            }]
+        }
+    ]
+}
