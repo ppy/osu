@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             };
         }
 
-        protected override ITestableBeatmapConverter CreateConverter(Beatmap beatmap) => new TaikoBeatmapConverter(isForCurrentRuleset);
+        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new TaikoBeatmapConverter(isForCurrentRuleset);
     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
