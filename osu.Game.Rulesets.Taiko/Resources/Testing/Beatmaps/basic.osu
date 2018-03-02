@@ -1,34 +1,5 @@
 osu file format v14
 
-[General]
-AudioFilename: virtual
-AudioLeadIn: 0
-PreviewTime: -1
-Countdown: 1
-SampleSet: Soft
-StackLeniency: 0.7
-Mode: 0
-LetterboxInBreaks: 0
-WidescreenStoryboard: 1
-
-[Editor]
-DistanceSpacing: 1.5
-BeatDivisor: 4
-GridSize: 32
-TimelineZoom: 1
-
-[Metadata]
-Title:Basic
-TitleUnicode:Test Suite
-Artist:peppy
-ArtistUnicode:peppy
-Creator:peppy
-Version:[Basic]
-Source:
-Tags:
-BeatmapID:826308
-BeatmapSetID:-1
-
 [Difficulty]
 HPDrainRate:6
 CircleSize:4
@@ -37,20 +8,10 @@ ApproachRate:8.3
 SliderMultiplier:1.6
 SliderTickRate:1
 
-[Events]
-//Background and Video events
-//Break Periods
-//Storyboard Layer 0 (Background)
-//Storyboard Layer 1 (Fail)
-//Storyboard Layer 2 (Pass)
-//Storyboard Layer 3 (Foreground)
-//Storyboard Sound Samples
-
 [TimingPoints]
 500,500,4,2,1,50,1,0
 13426,-100,4,3,1,45,0,0
 14884,-100,4,2,1,50,0,0
-
 
 [HitObjects]
 96,192,500,6,0,L|416:192,2,320
