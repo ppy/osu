@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         public float Position;
 
         public bool Equals(ConvertValue other)
-            => Precision.AlmostEquals(StartTime, other.StartTime)
+            => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
                && Precision.AlmostEquals(Position, other.Position, conversion_lenience);
     }
 }
