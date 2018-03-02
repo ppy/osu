@@ -270,6 +270,7 @@
     <Compile Include="Beatmaps\Formats\JsonBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
+    <Compile Include="Beatmaps\IBeatmapConverter.cs" />
     <Compile Include="Configuration\DatabasedSetting.cs" />
     <Compile Include="Configuration\SettingsStore.cs" />
     <Compile Include="Configuration\DatabasedConfigManager.cs" />
@@ -883,6 +884,7 @@
     <Compile Include="Storyboards\StoryboardLayer.cs" />
     <Compile Include="Storyboards\StoryboardSample.cs" />
     <Compile Include="Storyboards\StoryboardSprite.cs" />
+    <Compile Include="Tests\Beatmaps\BeatmapConversionTest.cs" />
     <Compile Include="Tests\Beatmaps\TestWorkingBeatmap.cs" />
     <Compile Include="Tests\CleanRunHeadlessGameHost.cs" />
     <Compile Include="Tests\Platform\TestStorage.cs" />
