@@ -20,6 +20,10 @@ build:
   project: osu.sln
   parallel: true
   verbosity: minimal
+test:
+  assemblies:
+    only:
+      - 'osu.Desktop\**\*.dll'
 after_build:
   - cmd: inspectcode --o="inspectcodereport.xml" --projects:osu.Game* --caches-home="inspectcode" osu.sln > NUL
   - cmd: NVika parsereport "inspectcodereport.xml" --treatwarningsaserrors
