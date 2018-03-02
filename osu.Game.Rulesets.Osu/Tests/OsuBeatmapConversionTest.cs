@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
         }
 
-        protected override ITestableBeatmapConverter CreateConverter(BeaIBeatmapConvertereatmapConverter();
+        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new OsuBeatmapConverter();
     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
