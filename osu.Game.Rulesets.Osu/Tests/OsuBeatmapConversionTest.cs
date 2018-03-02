@@ -19,10 +19,10 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
-        [TestCase(875945), Ignore("See: https://github.com/ppy/osu/issues/2151")]
-        public new void Test(int beatmapId)
+        [TestCase("basic")]
+        public new void Test(string name)
         {
-            base.Test(beatmapId);
+            base.Test(name);
         }
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)

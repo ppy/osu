@@ -18,10 +18,10 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
 
-        [TestCase(875945), Ignore("See: https://github.com/ppy/osu/issues/2149")]
-        public new void Test(int beatmapId)
+        [TestCase("basic"), Ignore("See: https://github.com/ppy/osu/issues/2149")]
+        public new void Test(string name)
         {
-            base.Test(beatmapId);
+            base.Test(name);
         }
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)

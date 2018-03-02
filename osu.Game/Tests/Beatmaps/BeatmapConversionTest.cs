@@ -23,10 +23,10 @@ namespace osu.Game.Tests.Beatmaps
 
         protected abstract string ResourceAssembly { get; }
 
-        protected void Test(int beatmapId)
+        protected void Test(string name)
         {
-            var ourResult = convert(beatmapId);
-            var expectedResult = read(beatmapId);
+            var ourResult = convert(name);
+            var expectedResult = read(name);
 
             Assert.Multiple(() =>
             {
@@ -75,9 +75,9 @@ namespace osu.Game.Tests.Beatmaps
             });
         }
 
-        private ConvertResult convert(int beatmapId)
+        private ConvertResult convert(string name)
         {
-            var beatmap = getBeatmap(beatmapId);
+            var beatmap = getBeatmap(name);
 
             var result = new ConvertResult();
 
@@ -97,9 +97,9 @@ namespace osu.Game.Tests.Beatmaps
             return result;
         }
 
-        private ConvertResult read(int beatmapId)
+        private ConvertResult read(string name)
         {
-            using (var resStream = openResource($"{resource_namespace}.{beatmapId}{expected_conversion_suffix}.json"))
+            using (var resStream = openResource($"{resource_namespace}.{name}{expected_conversion_suffix}.json"))
             using (var reader = new StreamReader(resStream))
             {
                 var contents = reader.ReadToEnd();
@@ -107,10 +107,10 @@ namespace osu.Game.Tests.Beatmaps
             }
         }
 
-        private Beatmap getBeatmap(int beatmapId)
+        private Beatmap getBeatmap(string name)
         {
             var decoder = new LegacyBeatmapDecoder();
-            using (var resStream = openResource($"{resource_namespace}.{beatmapId}.osu"))
+            using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new StreamReader(resStream))
                 return decoder.DecodeBeatmap(stream);
         }
