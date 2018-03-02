@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using OpenTK;
 using osu.Game.Beatmaps;
@@ -18,6 +19,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseEditorSelectionLayer : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
