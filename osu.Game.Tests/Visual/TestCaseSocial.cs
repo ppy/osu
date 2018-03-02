@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseSocial : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
