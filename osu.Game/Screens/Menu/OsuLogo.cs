@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Menu
                                                     Alpha = 0.5f,
                                                     Size = new Vector2(0.96f)
                                                 },
-                                                new BufferedContainer
+                                                new Container
                                                 {
                                                     AutoSizeAxes = Axes.Both,
                                                     Children = new Drawable[]

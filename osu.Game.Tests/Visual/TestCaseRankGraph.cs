@@ -9,11 +9,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using System.Collections.Generic;
 using System;
+using NUnit.Framework;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseRankGraph : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

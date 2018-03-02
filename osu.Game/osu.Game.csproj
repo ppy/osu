@@ -270,17 +270,30 @@
     <Compile Include="Beatmaps\Formats\JsonBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
+    <Compile Include="Beatmaps\IBeatmapConverter.cs" />
     <Compile Include="Configuration\DatabasedSetting.cs" />
     <Compile Include="Configuration\SettingsStore.cs" />
     <Compile Include="Configuration\DatabasedConfigManager.cs" />
     <Compile Include="Configuration\SpeedChangeVisualisationMethod.cs" />
+    <Compile Include="Database\ArchiveModelManager.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Database\DatabaseWriteUsage.cs" />
+    <Compile Include="Database\ICanAcceptFiles.cs" />
     <Compile Include="Database\IDatabaseContextFactory.cs" />
+    <Compile Include="Database\IHasFiles.cs" />
     <Compile Include="Database\IHasPrimaryKey.cs" />
+    <Compile Include="Database\INamedFileInfo.cs" />
+    <Compile Include="Database\ISoftDelete.cs" />
+    <Compile Include="Database\MutableDatabaseBackedStore.cs" />
     <Compile Include="Database\SingletonContextFactory.cs" />
     <Compile Include="Graphics\Containers\LinkFlowContainer.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
+    <Compile Include="IO\Archives\ArchiveReader.cs" />
+    <Compile Include="IO\Archives\LegacyFilesystemReader.cs" />
+    <Compile Include="IO\Archives\ZipArchiveReader.cs" />
+    <Compile Include="Online\API\DummyAPIAccess.cs" />
+    <Compile Include="Online\API\IAPIProvider.cs" />
+    <Compile Include="Online\API\APIDownloadRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Migrations\20180125143340_Settings.cs" />
     <Compile Include="Migrations\20180125143340_Settings.Designer.cs">
@@ -310,6 +323,10 @@
     <Compile Include="Migrations\20171209034410_AddRulesetInfoShortName.Designer.cs">
       <DependentUpon>20171209034410_AddRulesetInfoShortName.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20180219060912_AddSkins.cs" />
+    <Compile Include="Migrations\20180219060912_AddSkins.Designer.cs">
+      <DependentUpon>20180219060912_AddSkins.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\Chat\DrawableLinkCompiler.cs" />
@@ -336,6 +353,10 @@
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
     <Compile Include="Rulesets\Configuration\IRulesetConfigManager.cs" />
     <Compile Include="Rulesets\Configuration\RulesetConfigManager.cs" />
+    <Compile Include="Rulesets\Edit\Layers\BorderLayer.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\CaptureBox.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectOverlay.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectOverlayLayer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />
@@ -344,6 +365,7 @@
     <Compile Include="Overlays\Social\SocialPanel.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Rulesets\Objects\HitWindows.cs" />
+    <Compile Include="Rulesets\UI\ScalableContainer.cs" />
     <Compile Include="Screens\Play\PlayerSettings\VisualSettings.cs" />
     <Compile Include="Rulesets\Objects\CatmullApproximator.cs" />
     <Compile Include="Rulesets\UI\HitObjectContainer.cs" />
@@ -356,11 +378,7 @@
     <Compile Include="Rulesets\UI\Scrolling\ScrollingRulesetContainer.cs" />
     <Compile Include="Screens\Select\ImportFromStablePopup.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\OriginHandle.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectSelectionBox.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\Handle.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\HandleContainer.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionInfo.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionBox.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\SelectionLayer.cs" />
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
     <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
@@ -371,8 +389,6 @@
     <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
     <Compile Include="Beatmaps\Formats\Decoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyBeatmapDecoder.cs" />
-    <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
-    <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
     <Compile Include="Online\API\Requests\GetUserScoresRequest.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\RadioButtons\DrawableRadioButton.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\RadioButtons\RadioButton.cs" />
@@ -387,7 +403,6 @@
     <Compile Include="Screens\Play\BreaksOverlay\InfoLine.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\LetterboxOverlay.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\RemainingTimeCounter.cs" />
-    <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
     <Compile Include="Beatmaps\RankStatus.cs" />
     <Compile Include="Beatmaps\Timing\BreakPeriod.cs" />
@@ -470,7 +485,7 @@
     <Compile Include="IO\Serialization\Converters\TypedListConverter.cs" />
     <Compile Include="IO\Serialization\Converters\Vector2Converter.cs" />
     <Compile Include="IO\Serialization\IJsonSerializable.cs" />
-    <Compile Include="IPC\BeatmapIPCChannel.cs" />
+    <Compile Include="IPC\ArchiveImportIPCChannel.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />
@@ -843,6 +858,16 @@
     <Compile Include="Screens\Tournament\Teams\DrawingsTeam.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Skinning\DefaultSkin.cs" />
+    <Compile Include="Skinning\LegacySkin.cs" />
+    <Compile Include="Skinning\Skin.cs" />
+    <Compile Include="Skinning\SkinFileInfo.cs" />
+    <Compile Include="Skinning\SkinInfo.cs" />
+    <Compile Include="Skinning\SkinManager.cs" />
+    <Compile Include="Skinning\SkinnableDrawable.cs" />
+    <Compile Include="Skinning\SkinnableSound.cs" />
+    <Compile Include="Skinning\SkinReloadableDrawable.cs" />
+    <Compile Include="Skinning\SkinStore.cs" />
     <Compile Include="Storyboards\CommandLoop.cs" />
     <Compile Include="Storyboards\CommandTimeline.cs" />
     <Compile Include="Storyboards\CommandTimelineGroup.cs" />
@@ -859,9 +884,11 @@
     <Compile Include="Storyboards\StoryboardLayer.cs" />
     <Compile Include="Storyboards\StoryboardSample.cs" />
     <Compile Include="Storyboards\StoryboardSprite.cs" />
+    <Compile Include="Tests\Beatmaps\BeatmapConversionTest.cs" />
     <Compile Include="Tests\Beatmaps\TestWorkingBeatmap.cs" />
     <Compile Include="Tests\CleanRunHeadlessGameHost.cs" />
     <Compile Include="Tests\Platform\TestStorage.cs" />
+    <Compile Include="Tests\TestTestCase.cs" />
     <Compile Include="Tests\Visual\OsuTestCase.cs" />
     <Compile Include="Tests\Visual\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\Visual\ScreenTestCase.cs" />

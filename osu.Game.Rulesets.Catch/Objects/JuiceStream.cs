@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                     {
                         StartTime = lastTickTime,
                         ComboColour = ComboColour,
-                        X = Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
+                        X = X + Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
                         Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                         {
                             Bank = s.Bank,
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                     {
                         StartTime = spanStartTime + t,
                         ComboColour = ComboColour,
-                        X = Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
+                        X = X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
                         Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                         {
                             Bank = s.Bank,
@@ -120,14 +120,14 @@ namespace osu.Game.Rulesets.Catch.Objects
                     Samples = Samples,
                     ComboColour = ComboColour,
                     StartTime = spanStartTime + spanDuration,
-                    X = Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
+                    X = X + Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
                 });
             }
         }
 
         public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
 
-        public float EndX => Curve.PositionAt(this.ProgressAt(1)).X / CatchPlayfield.BASE_WIDTH;
+        public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
 
         public double Duration => EndTime - StartTime;
 
