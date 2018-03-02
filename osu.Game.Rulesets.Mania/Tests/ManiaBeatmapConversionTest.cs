@@ -21,11 +21,11 @@ namespace osu.Game.Rulesets.Mania.Tests
         private bool isForCurrentRuleset;
 
         [NonParallelizable]
-        [TestCase(875945, false), Ignore("See: https://github.com/ppy/osu/issues/2150")]
-        public void Test(int beatmapId, bool isForCurrentRuleset)
+        [TestCase("basic", false), Ignore("See: https://github.com/ppy/osu/issues/2150")]
+        public void Test(string name, bool isForCurrentRuleset)
         {
             this.isForCurrentRuleset = isForCurrentRuleset;
-            base.Test(beatmapId);
+            base.Test(name);
         }
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
