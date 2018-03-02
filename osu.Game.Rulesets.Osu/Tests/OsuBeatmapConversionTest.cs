@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
         [TestCase("basic")]
+        [TestCase("colinear-perfect-curve")]
         public new void Test(string name)
         {
             base.Test(name);
