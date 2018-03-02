@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
@@ -15,6 +16,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
+    [TestFixture]
     public class TestCaseFruitObjects : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

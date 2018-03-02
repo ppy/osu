@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -17,6 +18,7 @@ using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseBeatmapCarousel : OsuTestCase
     {
         private TestBeatmapCarousel carousel;
