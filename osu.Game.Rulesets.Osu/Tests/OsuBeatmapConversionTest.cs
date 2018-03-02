@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
-        [TestCase(875945)]
+        [TestCase(875945), Ignore("See: https://github.com/ppy/osu/issues/2151")]
         public new void Test(int beatmapId)
         {
             base.Test(beatmapId);
