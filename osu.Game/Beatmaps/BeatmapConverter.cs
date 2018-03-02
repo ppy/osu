@@ -8,31 +8,15 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
-    public interface ITestableBeatmapConverter
-    {
-        /// <summary>
-        /// Invoked when a <see cref="HitObject"/> has been converted.
-        /// The first argument contains the <see cref="HitObject"/> that was converted.
-        /// The second argument contains the <see cref="HitObject"/>s that were output from the conversion process.
-        /// </summary>
-        event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
-
-        /// <summary>
-        /// Converts a Beatmap using this Beatmap Converter.
-        /// </summary>
-        /// <param name="original">The un-converted Beatmap.</param>
-        void Convert(Beatmap beatmap);
-    }
-
     /// <summary>
     /// Converts a Beatmap for another mode.
     /// </summary>
     /// <typeparam name="T">The type of HitObject stored in the Beatmap.</typeparam>
-    public abstract class BeatmapConverter<T> : ITestableBeatmapConverter
+    public abstract class BeatmapConverter<T> : IBeatmapConverter
         where T : HitObject
     {
         private event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
-        event Action<HitObject, IEnumerable<HitObject>> ITestableBeatmapConverter.ObjectConverted
+        event Action<HitObject, IEnumerable<HitObject>> IBeatmapConverter.ObjectConverted
         {
             add => ObjectConverted += value;
             remove => ObjectConverted -= value;
@@ -56,7 +40,7 @@ namespace osu.Game.Beatmaps
             return ConvertBeatmap(new Beatmap(original));
         }
 
-        void ITestableBeatmapConverter.Convert(Beatmap original) => Convert(original);
+        void IBeatmapConverter.Convert(Beatmap original) => Convert(original);
 
         /// <summary>
         /// Performs the conversion of a Beatmap using this Beatmap Converter.
