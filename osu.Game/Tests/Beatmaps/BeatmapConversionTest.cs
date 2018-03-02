@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         protected abstract IEnumerable<TConvertValue> CreateConvertValue(HitObject hitObject);
-        protected abstract ITestableBeatmapConverter CreateConverter(Beatmap beatmap);
+        protected abstract IBeatmapConverter CreateConverter(Beatmap beatmap);
 
         private class ConvertMapping
         {
