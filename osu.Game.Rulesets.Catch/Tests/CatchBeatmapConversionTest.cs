@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
 
-        [TestCase(875945)]
+        [TestCase(875945), Ignore("See: https://github.com/ppy/osu/issues/2149")]
         public new void Test(int beatmapId)
         {
             base.Test(beatmapId);

@@ -20,7 +20,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private bool isForCurrentRuleset;
 
-        [TestCase(875945, false), NonParallelizable]
+        [NonParallelizable]
+        [TestCase(875945, false), Ignore("See: https://github.com/ppy/osu/issues/2152")]
         public void Test(int beatmapId, bool isForCurrentRuleset)
         {
             this.isForCurrentRuleset = isForCurrentRuleset;
