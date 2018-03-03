@@ -128,9 +128,9 @@ namespace osu.Game.Overlays.Volume
             });
 
             Bindable.ValueChanged += newVolume => this.TransformTo("circleBindable", newVolume * 0.75, 250, Easing.OutQuint);
-            volumeCircle.Current.ValueChanged += newVolume =>
+            volumeCircle.Current.ValueChanged += newVolume =>  //by using this event we sync the meter with the text. newValue has to be divided by 0.75 to give the actual percentage
             {
-                if (newVolume > 0.745)
+                if (Precision.DefinitelyBigger(newVolume, 0.74))
                 {
                     text.Alpha = 0;
                     maxGlow.Alpha = 1; //show "MAX"
