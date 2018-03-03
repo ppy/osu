@@ -870,6 +870,7 @@
     <Compile Include="Skinning\SkinnableDrawable.cs" />
     <Compile Include="Skinning\SkinnableSound.cs" />
     <Compile Include="Skinning\SkinReloadableDrawable.cs" />
+    <Compile Include="Skinning\SkinResourceStore.cs" />
     <Compile Include="Skinning\SkinStore.cs" />
     <Compile Include="Storyboards\CommandLoop.cs" />
     <Compile Include="Storyboards\CommandTimeline.cs" />
