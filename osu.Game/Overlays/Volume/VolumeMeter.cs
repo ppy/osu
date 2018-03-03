@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Globalization;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -65,7 +67,7 @@ namespace osu.Game.Overlays.Volume
             });
 
 
-            OsuSpriteText text, maxText;
+            OsuSpriteText text;
             CircularProgress bgProgress;
             BufferedContainer maxGlow;
 
@@ -104,26 +106,17 @@ namespace osu.Game.Overlays.Volume
                         Colour = meterColour,
                         Strength = 2
                     }),
-                    maxGlow = new OsuSpriteText
+                    maxGlow = (text = new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Font = "Venera",
-                        Text = "MAX",
                         TextSize = 0.16f * circleSize
-                    }.WithEffect(new GlowEffect
+                    }).WithEffect(new GlowEffect
                     {
-                        Colour = meterColour,
+                        Colour = Color4.Transparent,
                         PadExtent = true,
-                        Strength = 2,
-                    }),
-                    text = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = "Venera",
-                        TextSize = 0.16f * circleSize
-                    }
+                    })
                 }
             });
 
@@ -132,14 +125,14 @@ namespace osu.Game.Overlays.Volume
             {
                 if (Precision.DefinitelyBigger(newVolume, 0.74))
                 {
-                    text.Alpha = 0;
-                    maxGlow.Alpha = 1; //show "MAX"
+                    text.Text = "MAX";
+                    maxGlow.EffectColour = meterColour.Opacity(2f);
                 }
                 else
                 {
+                    if (text.Text == "MAX")
+                        maxGlow.EffectColour = Color4.Transparent;
                     text.Text = Math.Round(newVolume / 0.0075).ToString(CultureInfo.CurrentCulture);
-                    text.Alpha = 1;
-                    maxGlow.Alpha = 0;
                 }
             };
 
@@ -149,6 +142,7 @@ namespace osu.Game.Overlays.Volume
         /// <summary>
         /// This is needed because <see cref="TransformCustom{TValue,T}"/> doesn't support <see cref="Bindable{T}"/>
         /// </summary>
+        [UsedImplicitly]
         private double circleBindable
         {
             get => volumeCircle.Current;

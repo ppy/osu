@@ -31,7 +31,8 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
-            RelativeSizeAxes = Axes.Both;
+            AutoSizeAxes = Axes.X;
+            RelativeSizeAxes = Axes.Y;
 
             AddRange(new Drawable[]
             {
