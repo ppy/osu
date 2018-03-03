@@ -16,10 +16,12 @@ using System.Collections.Generic;
 using System;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using NUnit.Framework;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
+    [TestFixture]
     public class TestCaseHitCircle : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
