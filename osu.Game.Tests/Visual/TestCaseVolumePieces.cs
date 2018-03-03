@@ -7,8 +7,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Volume;
+using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -17,10 +17,10 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(VolumeMeter), typeof(MuteButton) };
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(AudioManager audio)
         {
             VolumeMeter meter;
-            Add(meter = new VolumeMeter("MASTER", 125, colours.PinkDarker));
+            Add(meter = new VolumeMeter("MASTER", 125, Color4.Blue));
             Add(new MuteButton
             {
                 Margin = new MarginPadding { Top = 200 }
