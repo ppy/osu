@@ -16,14 +16,17 @@ namespace osu.Game.Input
     {
         public event Action KeyBindingChanged;
 
-        public KeyBindingStore(Func<OsuDbContext> createContext, RulesetStore rulesets, Storage storage = null)
-            : base(createContext, storage)
+        public KeyBindingStore(DatabaseContextFactory contextFactory, RulesetStore rulesets, Storage storage = null)
+            : base(contextFactory, storage)
         {
-            foreach (var info in rulesets.AvailableRulesets)
+            using (ContextFactory.GetForWrite())
             {
-                var ruleset = info.CreateInstance();
-                foreach (var variant in ruleset.AvailableVariants)
-                    insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
+                foreach (var info in rulesets.AvailableRulesets)
+                {
+                    var ruleset = info.CreateInstance();
+                    foreach (var variant in ruleset.AvailableVariants)
+                        insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
+                }
             }
         }
 
@@ -31,9 +34,7 @@ namespace osu.Game.Input
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
-            var context = GetContext();
-
-            using (var transaction = context.BeginTransaction())
+            using (var usage = ContextFactory.GetForWrite())
             {
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
@@ -46,7 +47,7 @@ namespace osu.Game.Input
 
                     foreach (var insertable in group.Skip(count).Take(aimCount - count))
                         // insert any defaults which are missing.
-                        context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
+                        usage.Context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
                         {
                             KeyCombination = insertable.KeyCombination,
                             Action = insertable.Action,
@@ -54,8 +55,6 @@ namespace osu.Game.Input
                             Variant = variant
                         });
                 }
-
-                context.SaveChanges(transaction);
             }
         }
 
@@ -66,19 +65,20 @@ namespace osu.Game.Input
         /// <param name="variant">An optional variant.</param>
         /// <returns></returns>
         public List<DatabasedKeyBinding> Query(int? rulesetId = null, int? variant = null) =>
-            GetContext().DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
+            ContextFactory.Get().DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
 
         public void Update(KeyBinding keyBinding)
         {
-            var dbKeyBinding = (DatabasedKeyBinding)keyBinding;
+            using (ContextFactory.GetForWrite())
+            {
+                var dbKeyBinding = (DatabasedKeyBinding)keyBinding;
+                Refresh(ref dbKeyBinding);
 
-            var context = GetContext();
+                if (dbKeyBinding.KeyCombination.Equals(keyBinding.KeyCombination))
+                    return;
 
-            Refresh(ref dbKeyBinding);
-
-            dbKeyBinding.KeyCombination = keyBinding.KeyCombination;
-
-            context.SaveChanges();
+                dbKeyBinding.KeyCombination = keyBinding.KeyCombination;
+            }
 
             KeyBindingChanged?.Invoke();
         }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -17,6 +18,7 @@ using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseBeatmapCarousel : OsuTestCase
     {
         private TestBeatmapCarousel carousel;
@@ -60,7 +62,9 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Load Beatmaps", () => { carousel.BeatmapSets = beatmapSets; });
 
-            AddUntilStep(() => carousel.BeatmapSets.Any(), "Wait for load");
+            bool changed = false;
+            carousel.BeatmapSetsChanged = () => changed = true;
+            AddUntilStep(() => changed, "Wait for load");
 
             testTraversal();
             testFiltering();
@@ -203,6 +207,12 @@ namespace osu.Game.Tests.Visual
 
             checkVisibleItemCount(false, 0);
             checkVisibleItemCount(true, 0);
+            AddAssert("Selection is null", () => currentSelection == null);
+
+            advanceSelection(true);
+            AddAssert("Selection is null", () => currentSelection == null);
+
+            advanceSelection(false);
             AddAssert("Selection is null", () => currentSelection == null);
 
             AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));

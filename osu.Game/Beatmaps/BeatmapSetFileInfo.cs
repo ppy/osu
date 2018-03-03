@@ -3,11 +3,12 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using osu.Game.Database;
 using osu.Game.IO;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapSetFileInfo
+    public class BeatmapSetFileInfo : INamedFileInfo
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
