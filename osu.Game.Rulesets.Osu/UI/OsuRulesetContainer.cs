@@ -5,6 +5,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using OpenTK;
 using osu.Game.Beatmaps;
+using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
@@ -48,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.UI
             return null;
         }
 
-        protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuReplayInputHandler(replay);
+        protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuReplayInputHandler(replay);
 
         protected override Vector2 GetAspectAdjustedSize()
         {
