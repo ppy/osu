@@ -9,7 +9,7 @@ using osu.Game.Overlays.Volume;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseVolumeControl : TestCase
+    public class TestCaseVolumePieces : TestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(VolumeMeter), typeof(MuteButton) };
 
@@ -24,6 +24,7 @@ namespace osu.Game.Tests.Visual
             });
 
             meter.Bindable.BindTo(audio.Volume);
+
         }
     }
 }
