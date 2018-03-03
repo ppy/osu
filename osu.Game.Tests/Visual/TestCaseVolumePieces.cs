@@ -27,7 +27,6 @@ namespace osu.Game.Tests.Visual
             });
 
             meter.Bindable.BindTo(audio.Volume);
-
         }
     }
 }
