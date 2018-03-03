@@ -38,7 +38,6 @@ namespace osu.Game.Overlays.Volume
             hoveredColour = colours.YellowDark;
             BorderColour = unhoveredColour = colours.Gray1.Opacity(0.9f);
 
-
             SpriteIcon icon;
             AddRange(new Drawable[]
             {
