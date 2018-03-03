@@ -42,8 +42,8 @@ namespace osu.Game.Overlays
                     Width = 300,
                     Colour = new ColourInfo
                     {
-                        TopLeft = Color4.Black.Opacity(0.5f),
-                        BottomLeft = Color4.Black.Opacity(0.5f),
+                        TopLeft = Color4.Black.Opacity(0.75f),
+                        BottomLeft = Color4.Black.Opacity(0.75f),
                         TopRight = Color4.Black.Opacity(0),
                         BottomRight = Color4.Black.Opacity(0),
                     }
@@ -58,12 +58,12 @@ namespace osu.Game.Overlays
                     Margin = new MarginPadding { Left = offset },
                     Children = new Drawable[]
                     {
-                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.Blue)
+                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker)
                         {
                             Margin = new MarginPadding { Top = 100 + MuteButton.HEIGHT } //to counter the mute button and re-center the volume meters
                         },
-                        volumeMeterMaster = new VolumeMeter("MASTER", 150, colours.Pink),
-                        volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.Blue),
+                        volumeMeterMaster = new VolumeMeter("MASTER", 150, colours.PinkDarker),
+                        volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
                         muteButton = new MuteButton
                         {
                             Margin = new MarginPadding { Top = 100 }
