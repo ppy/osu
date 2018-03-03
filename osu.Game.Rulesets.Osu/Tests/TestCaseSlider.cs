@@ -15,6 +15,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using NUnit.Framework;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -23,6 +24,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
+    [TestFixture]
     public class TestCaseSlider : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

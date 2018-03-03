@@ -4,14 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Edit.Layers;
 using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.UI;
@@ -50,13 +49,25 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            ScalableContainer createLayerContainerWithContent(Drawable content)
+            HitObjectOverlayLayer hitObjectOverlayLayer = CreateHitObjectOverlayLayer();
+            SelectionLayer selectionLayer = new SelectionLayer(rulesetContainer.Playfield);
+
+            var layerBelowRuleset = new BorderLayer
             {
-                var container = CreateLayerContainer();
-                container.Child = content;
-                layerContainers.Add(container);
-                return container;
-            }
+                RelativeSizeAxes = Axes.Both,
+                Child = CreateLayerContainer()
+            };
+
+            var layerAboveRuleset = CreateLayerContainer();
+            layerAboveRuleset.Children = new Drawable[]
+            {
+                selectionLayer, // Below object overlays for input
+                hitObjectOverlayLayer,
+                selectionLayer.CreateProxy() // Proxy above object overlays for selections
+            };
+
+            layerContainers.Add(layerBelowRuleset);
+            layerContainers.Add(layerAboveRuleset);
 
             RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
@@ -82,17 +93,9 @@ namespace osu.Game.Rulesets.Edit
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                createLayerContainerWithContent(new Container
-                                {
-                                    Name = "Border",
-                                    RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
-                                    BorderColour = Color4.White,
-                                    BorderThickness = 2,
-                                    Child = new Box { RelativeSizeAxes = Axes.Both, Alpha = 0, AlwaysPresent = true }
-                                }),
+                                layerBelowRuleset,
                                 rulesetContainer,
-                                createLayerContainerWithContent(new SelectionLayer(rulesetContainer.Playfield))
+                                layerAboveRuleset
                             }
                         }
                     },
@@ -102,6 +105,9 @@ namespace osu.Game.Rulesets.Edit
                     new Dimension(GridSizeMode.Absolute, 200),
                 }
             };
+
+            selectionLayer.ObjectSelected += hitObjectOverlayLayer.AddOverlay;
+            selectionLayer.ObjectDeselected += hitObjectOverlayLayer.RemoveOverlay;
 
             toolboxCollection.Items =
                 new[] { new RadioButton("Select", () => setCompositionTool(null)) }
@@ -136,5 +142,10 @@ namespace osu.Game.Rulesets.Edit
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
         /// </summary>
         protected virtual ScalableContainer CreateLayerContainer() => new ScalableContainer { RelativeSizeAxes = Axes.Both };
+
+        /// <summary>
+        /// Creates the <see cref="HitObjectOverlayLayer"/> which overlays selected <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        protected virtual HitObjectOverlayLayer CreateHitObjectOverlayLayer() => new HitObjectOverlayLayer();
     }
 }
