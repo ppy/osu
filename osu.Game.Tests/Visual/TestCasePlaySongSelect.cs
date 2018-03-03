@@ -60,6 +60,14 @@ namespace osu.Game.Tests.Visual
             public void SetRuleset(RulesetInfo ruleset) => Ruleset.Value = ruleset;
 
             public int? RulesetID => Ruleset.Value.ID;
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                // Necessary while running tests because gc is moody and uncollected object interferes with OnEntering test
+                Beatmap.ValueChanged -= WorkingBeatmapChanged;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -82,6 +90,7 @@ namespace osu.Game.Tests.Visual
             {
                 if (deleteMaps)
                 {
+                    // TODO: check why this alone doesn't allow import test to run twice in the same session, probably because the delete op is not saved?
                     manager.Delete(manager.GetAllUsableBeatmapSets());
                     game.Beatmap.SetDefault();
                 }
@@ -93,6 +102,8 @@ namespace osu.Game.Tests.Visual
                 }
 
                 Add(songSelect = new TestSongSelect());
+
+                songSelect?.SetRuleset(rulesets.AvailableRulesets.First());
             });
 
             loadNewSongSelect(true);
@@ -107,6 +118,36 @@ namespace osu.Game.Tests.Visual
             {
                 for (int i = 0; i < 100; i += 10)
                     manager.Import(createTestBeatmapSet(i));
+
+                // also import a set which has a single non - osu ruleset beatmap
+                manager.Import(new BeatmapSetInfo
+                {
+                    OnlineBeatmapSetID = 1993,
+                    Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
+                    Metadata = new BeatmapMetadata
+                    {
+                        OnlineBeatmapSetID = 1993,
+                        // Create random metadata, then we can check if sorting works based on these
+                        Artist = "MONACA " + RNG.Next(0, 9),
+                        Title = "Black Song " + RNG.Next(0, 9),
+                        AuthorString = "Some Guy " + RNG.Next(0, 9),
+                    },
+                    Beatmaps = new List<BeatmapInfo>
+                    {
+                        new BeatmapInfo
+                        {
+                            OnlineBeatmapID = 1994,
+                            Ruleset = rulesets.AvailableRulesets.ElementAt(3),
+                            RulesetID = 3,
+                            Path = "normal.fruits",
+                            Version = "Normal",
+                            BaseDifficulty = new BeatmapDifficulty
+                            {
+                                OverallDifficulty = 3.5f,
+                            }
+                        },
+                    }
+                });
             });
 
             AddWaitStep(3);
@@ -121,23 +162,44 @@ namespace osu.Game.Tests.Visual
             AddStep(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
             AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
 
-            AddWaitStep(5);
+            // Test that song select sets a playable beatmap while entering
+            AddStep(@"Remove song select", () =>
+            {
+                Remove(songSelect);
+                songSelect.Dispose();
+                songSelect = null;
+            });
+            AddStep(@"Set non-osu beatmap", () => game.Beatmap.Value = manager.GetWorkingBeatmap(manager.GetAllUsableBeatmapSets().First().Beatmaps.First(b => b.RulesetID != 0)));
+            AddAssert(@"Non-osu beatmap set", () => game.Beatmap.Value.BeatmapInfo.RulesetID != 0);
+            loadNewSongSelect();
+            AddWaitStep(3);
+            AddAssert(@"osu beatmap set", () => game.Beatmap.Value.BeatmapInfo.RulesetID == 0);
 
-            AddStep(@"Set unplayable WorkingBeatmap", () =>
+            // Test that song select changes WorkingBeatmap to be playable in current ruleset when updated externally
+            AddStep(@"Try set non-osu beatmap", () =>
             {
                 var testMap = manager.GetAllUsableBeatmapSets().First().Beatmaps.First(b => b.RulesetID != 0);
                 songSelect.SetRuleset(rulesets.AvailableRulesets.First());
                 game.Beatmap.Value = manager.GetWorkingBeatmap(testMap);
             });
-            AddAssert(@"WorkingBeatmap changed to playable ruleset", () => songSelect.RulesetID == 0 && game.Beatmap.Value.BeatmapInfo.RulesetID == 0);
-            AddStep(@"Disallow beatmap conversion", () =>
+            AddAssert(@"Beatmap changed to osu", () => songSelect.RulesetID == 0 && game.Beatmap.Value.BeatmapInfo.RulesetID == 0);
+
+            // Test that song select updates WorkingBeatmap when ruleset conversion is disabled
+            AddStep(@"Disable beatmap conversion", () => config.Set(OsuSetting.ShowConvertedBeatmaps, false));
+            AddStep(@"Set osu beatmap taiko rs", () =>
             {
-                config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps).Value = false;
-                game.Beatmap.Value = manager.GetWorkingBeatmap(manager.GetAllUsableBeatmapSets().First().Beatmaps.First());
+                game.Beatmap.Value = manager.GetWorkingBeatmap(manager.GetAllUsableBeatmapSets().First().Beatmaps.First(b => b.RulesetID == 0));
+                songSelect.SetRuleset(rulesets.AvailableRulesets.First(r => r.ID == 1));
             });
-            loadNewSongSelect();
-            AddWaitStep(3);
-            AddAssert(@"Ruleset matches beatmap", () => songSelect.RulesetID == game.Beatmap.Value.BeatmapInfo.RulesetID);
+            AddAssert(@"taiko beatmap set", () => songSelect.RulesetID == 1);
+
+            // Test that song select changes the active ruleset when externally set beatmapset has no playable beatmaps
+            AddStep(@"Set fruits only beatmapset", () =>
+            {
+                songSelect.SetRuleset(rulesets.AvailableRulesets.First());
+                game.Beatmap.Value = manager.GetWorkingBeatmap(manager.QueryBeatmapSet(b => b.OnlineBeatmapSetID == 1993).Beatmaps.First());
+            });
+            AddAssert(@"Ruleset changed to fruits", () => songSelect.RulesetID == game.Beatmap.Value.BeatmapInfo.RulesetID);
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int i)

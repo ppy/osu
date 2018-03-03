@@ -221,14 +221,7 @@ namespace osu.Game.Screens.Select
             Beatmap.DisabledChanged += disabled => Carousel.AllowSelection = !disabled;
             Beatmap.TriggerChange();
 
-            Beatmap.ValueChanged += b =>
-            {
-                if (IsCurrentScreen)
-                {
-                    Carousel.SelectBeatmap(b?.BeatmapInfo);
-                    ensurePlayableRuleset();
-                }
-            };
+            Beatmap.ValueChanged += WorkingBeatmapChanged;
         }
 
         public void Edit(BeatmapInfo beatmap)
@@ -270,6 +263,15 @@ namespace osu.Game.Screens.Select
 
         // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
         private BeatmapInfo beatmapNoDebounce;
+
+        protected void WorkingBeatmapChanged(WorkingBeatmap beatmap)
+        {
+            if (IsCurrentScreen)
+            {
+                Carousel.SelectBeatmap(beatmap?.BeatmapInfo);
+                ensurePlayableRuleset();
+            }
+        }
 
         /// <summary>
         /// selection has been changed as the result of interaction with the carousel.
