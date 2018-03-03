@@ -9,6 +9,7 @@ using System.Globalization;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -41,9 +42,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
                 else if ((type & ConvertHitObjectType.Slider) > 0)
                 {
+                    var pos = new Vector2(int.Parse(split[0]), int.Parse(split[1]));
+
                     CurveType curveType = CurveType.Catmull;
                     double length = 0;
-                    var points = new List<Vector2> { new Vector2(int.Parse(split[0]), int.Parse(split[1])) };
+                    var points = new List<Vector2> { Vector2.Zero };
 
                     string[] pointsplit = split[5].Split('|');
                     foreach (string t in pointsplit)
@@ -69,8 +72,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         }
 
                         string[] temp = t.Split(':');
-                        points.Add(new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)));
+                        points.Add(new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)) - pos);
                     }
+
+                    // osu-stable special-cased colinear perfect curves to a CurveType.Linear
+                    bool isLinear(List<Vector2> p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+                    if (points.Count == 3 && curveType == CurveType.PerfectCurve && isLinear(points))
+                        curveType = CurveType.Linear;
 
                     int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
 
@@ -134,7 +142,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     for (int i = 0; i < nodes; i++)
                         nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                    result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, nodeSamples);
+                    result = CreateSlider(pos, combo, points, length, curveType, repeatCount, nodeSamples);
                 }
                 else if ((type & ConvertHitObjectType.Spinner) > 0)
                 {

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,6 +13,7 @@ using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseEditorComposeTimeline : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ScrollableTimeline), typeof(ScrollingTimelineContainer), typeof(BeatmapWaveformGraph), typeof(TimelineButton) };
