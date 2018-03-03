@@ -197,8 +197,8 @@ namespace osu.Game.Screens.Select
             if (osu != null)
                 Ruleset.BindTo(osu.Ruleset);
 
-            this.beatmaps.BeatmapSetAdded += onBeatmapSetAdded;
-            this.beatmaps.BeatmapSetRemoved += onBeatmapSetRemoved;
+            this.beatmaps.ItemAdded += onBeatmapSetAdded;
+            this.beatmaps.ItemRemoved += onBeatmapSetRemoved;
             this.beatmaps.BeatmapHidden += onBeatmapHidden;
             this.beatmaps.BeatmapRestored += onBeatmapRestored;
 
@@ -386,6 +386,8 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnExiting(Screen next)
         {
+            FinaliseSelection();
+
             beatmapInfoWedge.State = Visibility.Hidden;
 
             Content.FadeOut(100);
@@ -401,8 +403,8 @@ namespace osu.Game.Screens.Select
 
             if (beatmaps != null)
             {
-                beatmaps.BeatmapSetAdded -= onBeatmapSetAdded;
-                beatmaps.BeatmapSetRemoved -= onBeatmapSetRemoved;
+                beatmaps.ItemAdded -= onBeatmapSetAdded;
+                beatmaps.ItemRemoved -= onBeatmapSetRemoved;
                 beatmaps.BeatmapHidden -= onBeatmapHidden;
                 beatmaps.BeatmapRestored -= onBeatmapRestored;
             }
@@ -448,7 +450,7 @@ namespace osu.Game.Screens.Select
 
         private void carouselBeatmapsLoaded()
         {
-            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false)
+            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false)
             {
                 Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo);
             }

@@ -16,7 +16,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    [Ignore("getting CI working")]
+    [TestFixture]
     public class TestCaseFruitObjects : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

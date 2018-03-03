@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -38,30 +37,27 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             if (!userTriggered)
             {
-                if (timeOffset > HitObject.HitWindowGood)
+                if (!HitObject.HitWindows.CanBeHit(timeOffset))
                     AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
                 return;
             }
 
-            double hitOffset = Math.Abs(timeOffset);
-
-            if (hitOffset > HitObject.HitWindowMiss)
+            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            if (result == HitResult.None)
                 return;
 
-            if (!validKeyPressed)
+            if (!validKeyPressed || result == HitResult.Miss)
                 AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
-            else if (hitOffset < HitObject.HitWindowGood)
+            else
             {
                 AddJudgement(new TaikoJudgement
                 {
-                    Result = hitOffset < HitObject.HitWindowGreat ? HitResult.Great : HitResult.Good,
+                    Result = result,
                     Final = !HitObject.IsStrong
                 });
 
                 SecondHitAllowed = true;
             }
-            else
-                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
         }
 
         public override bool OnPressed(TaikoAction action)
@@ -90,7 +86,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 switch (State.Value)
                 {
                     case ArmedState.Idle:
-                        this.Delay(HitObject.HitWindowMiss).Expire();
+                        this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
                         break;
                     case ArmedState.Miss:
                         this.FadeOut(100)

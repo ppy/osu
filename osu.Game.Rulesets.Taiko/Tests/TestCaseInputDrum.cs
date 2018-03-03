@@ -15,7 +15,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    [Ignore("getting CI working")]
+    [TestFixture]
     public class TestCaseInputDrum : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

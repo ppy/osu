@@ -12,8 +12,8 @@ namespace osu.Game.Configuration
     {
         public event Action SettingChanged;
 
-        public SettingsStore(Func<OsuDbContext> createContext)
-            : base(createContext)
+        public SettingsStore(DatabaseContextFactory contextFactory)
+            : base(contextFactory)
         {
         }
 
@@ -24,19 +24,16 @@ namespace osu.Game.Configuration
         /// <param name="variant">An optional variant.</param>
         /// <returns></returns>
         public List<DatabasedSetting> Query(int? rulesetId = null, int? variant = null) =>
-            GetContext().DatabasedSetting.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
+            ContextFactory.Get().DatabasedSetting.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
 
         public void Update(DatabasedSetting setting)
         {
-            var context = GetContext();
-
-            var newValue = setting.Value;
-
-            Refresh(ref setting);
-
-            setting.Value = newValue;
-
-            context.SaveChanges();
+            using (ContextFactory.GetForWrite())
+            {
+                var newValue = setting.Value;
+                Refresh(ref setting);
+                setting.Value = newValue;
+            }
 
             SettingChanged?.Invoke();
         }

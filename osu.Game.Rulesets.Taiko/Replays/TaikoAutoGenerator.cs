@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 {
                     foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
                     {
-                        Frames.Add(new TaikoReplayFrame(tick.StartTime, hitButton ? ReplayButtonState.Right1 : ReplayButtonState.Right2));
+                        Frames.Add(new TaikoReplayFrame(tick.StartTime, hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2));
                         hitButton = !hitButton;
                     }
                 }
@@ -95,16 +95,16 @@ namespace osu.Game.Rulesets.Taiko.Replays
                     if (hit is CentreHit)
                     {
                         if (h.IsStrong)
-                            button = ReplayButtonState.Right1 | ReplayButtonState.Right2;
+                            button = ReplayButtonState.Left1 | ReplayButtonState.Left2;
                         else
-                            button = hitButton ? ReplayButtonState.Right1 : ReplayButtonState.Right2;
+                            button = hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2;
                     }
                     else
                     {
                         if (h.IsStrong)
-                            button = ReplayButtonState.Left1 | ReplayButtonState.Left2;
+                            button = ReplayButtonState.Right1 | ReplayButtonState.Right2;
                         else
-                            button = hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2;
+                            button = hitButton ? ReplayButtonState.Right1 : ReplayButtonState.Right2;
                     }
 
                     Frames.Add(new TaikoReplayFrame(h.StartTime, button));

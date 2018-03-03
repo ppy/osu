@@ -89,20 +89,20 @@ namespace osu.Game.Rulesets.Osu.Replays
             double endTime = (prev as IHasEndTime)?.EndTime ?? prev.StartTime;
 
             // Make the cursor stay at a hitObject as long as possible (mainly for autopilot).
-            if (h.StartTime - h.HitWindowFor(HitResult.Miss) > endTime + h.HitWindowFor(HitResult.Meh) + 50)
+            if (h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Miss) > endTime + h.HitWindows.HalfWindowFor(HitResult.Meh) + 50)
             {
-                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindowFor(HitResult.Meh), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
-                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindowFor(HitResult.Miss), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
+                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
+                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
             }
-            else if (h.StartTime - h.HitWindowFor(HitResult.Meh) > endTime + h.HitWindowFor(HitResult.Meh) + 50)
+            else if (h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh) > endTime + h.HitWindows.HalfWindowFor(HitResult.Meh) + 50)
             {
-                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindowFor(HitResult.Meh), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
-                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindowFor(HitResult.Meh), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
+                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
+                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
             }
-            else if (h.StartTime - h.HitWindowFor(HitResult.Good) > endTime + h.HitWindowFor(HitResult.Good) + 50)
+            else if (h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh) > endTime + h.HitWindows.HalfWindowFor(HitResult.Meh) + 50)
             {
-                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindowFor(HitResult.Good), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
-                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindowFor(HitResult.Good), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
+                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
+                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
             }
         }
 
@@ -315,11 +315,11 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                 for (double j = FrameDelay; j < s.Duration; j += FrameDelay)
                 {
-                    Vector2 pos = s.PositionAt(j / s.Duration);
+                    Vector2 pos = s.StackedPositionAt(j / s.Duration);
                     AddFrameToReplay(new ReplayFrame(h.StartTime + j, pos.X, pos.Y, button));
                 }
 
-                AddFrameToReplay(new ReplayFrame(s.EndTime, s.EndPosition.X, s.EndPosition.Y, button));
+                AddFrameToReplay(new ReplayFrame(s.EndTime, s.StackedEndPosition.X, s.StackedEndPosition.Y, button));
             }
 
             // We only want to let go of our button if we are at the end of the current replay. Otherwise something is still going on after us so we need to keep the button pressed!

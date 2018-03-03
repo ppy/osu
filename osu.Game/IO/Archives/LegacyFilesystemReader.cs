@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.IO.File;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using osu.Framework.IO.File;
 
-namespace osu.Game.Beatmaps.IO
+namespace osu.Game.IO.Archives
 {
     /// <summary>
     /// Reads an extracted legacy beatmap from disk.
@@ -15,7 +15,7 @@ namespace osu.Game.Beatmaps.IO
     {
         private readonly string path;
 
-        public LegacyFilesystemReader(string path)
+        public LegacyFilesystemReader(string path) : base(Path.GetFileName(path))
         {
             this.path = path;
         }

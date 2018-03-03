@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime;
 using osu.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
@@ -15,6 +16,9 @@ namespace osu.Desktop
         [STAThread]
         public static int Main(string[] args)
         {
+            if (!RuntimeInfo.IsMono)
+                useMulticoreJit();
+
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
 
@@ -22,7 +26,7 @@ namespace osu.Desktop
             {
                 if (!host.IsPrimaryInstance)
                 {
-                    var importer = new BeatmapIPCChannel(host);
+                    var importer = new ArchiveImportIPCChannel(host);
                     // Restore the cwd so relative paths given at the command line work correctly
                     Directory.SetCurrentDirectory(cwd);
                     foreach (var file in args)
@@ -44,8 +48,16 @@ namespace osu.Desktop
                             break;
                     }
                 }
+
                 return 0;
             }
+        }
+
+        private static void useMulticoreJit()
+        {
+            var directory = Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Profiles"));
+            ProfileOptimization.SetProfileRoot(directory.FullName);
+            ProfileOptimization.StartProfile("Startup.Profile");
         }
     }
 }

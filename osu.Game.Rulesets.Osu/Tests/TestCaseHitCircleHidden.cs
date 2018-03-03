@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    [Ignore("getting CI working")]
+    [TestFixture]
     public class TestCaseHitCircleHidden : TestCaseHitCircle
     {
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[] { typeof(OsuModHidden) }).ToList();

@@ -3,63 +3,66 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using OpenTK;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Layers.Selection;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
+using osu.Game.Rulesets.Osu.Edit.Layers.Selection;
+using osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseEditorSelectionLayer : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(SelectionLayer) };
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(SelectionBox),
+            typeof(SelectionLayer),
+            typeof(CaptureBox),
+            typeof(HitObjectComposer),
+            typeof(OsuHitObjectComposer),
+            typeof(HitObjectOverlayLayer),
+            typeof(OsuHitObjectOverlayLayer),
+            typeof(HitObjectOverlay),
+            typeof(HitCircleOverlay),
+            typeof(SliderOverlay),
+            typeof(SliderCircleOverlay)
+        };
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuGameBase osuGame)
         {
-            var playfield = new OsuEditPlayfield();
-
-            Children = new Drawable[]
+            osuGame.Beatmap.Value = new TestWorkingBeatmap(new Beatmap
             {
-                new Container
+                HitObjects = new List<HitObject>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(new StopwatchClock()),
-                    Child = playfield
+                    new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f },
+                    new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f },
+                    new Slider
+                    {
+                        Position = new Vector2(128, 256),
+                        ControlPoints = new List<Vector2>
+                        {
+                            Vector2.Zero,
+                            new Vector2(216, 0),
+                        },
+                        Distance = 400,
+                        Velocity = 1,
+                        TickDistance = 100,
+                        Scale = 0.5f,
+                    }
                 },
-                new SelectionLayer(playfield)
-            };
+            });
 
-            var hitCircle1 = new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f };
-            var hitCircle2 = new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f };
-            var slider = new Slider
-            {
-                ControlPoints = new List<Vector2>
-                {
-                    new Vector2(128, 256),
-                    new Vector2(344, 256),
-                },
-                Distance = 400,
-                Position = new Vector2(128, 256),
-                Velocity = 1,
-                TickDistance = 100,
-                Scale = 0.5f,
-            };
-
-            hitCircle1.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-            hitCircle2.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-            slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-
-            playfield.Add(new DrawableHitCircle(hitCircle1));
-            playfield.Add(new DrawableHitCircle(hitCircle2));
-            playfield.Add(new DrawableSlider(slider));
+            Child = new OsuHitObjectComposer(new OsuRuleset());
         }
     }
 }

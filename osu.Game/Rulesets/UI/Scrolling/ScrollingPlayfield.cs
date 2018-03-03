@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected virtual bool UserScrollSpeedAdjustment => true;
 
         /// <summary>
-        /// The container that contains the <see cref="SpeedAdjustmentContainer"/>s and <see cref="DrawableHitObject"/>s.
+        /// The container that contains the <see cref="DrawableHitObject"/>s.
         /// </summary>
         public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
 
@@ -61,10 +61,15 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// Creates a new <see cref="ScrollingPlayfield"/>.
         /// </summary>
-        /// <param name="scrollingAxes">The axes on which <see cref="DrawableHitObject"/>s in this container should scroll.</param>
-        /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width</param>
-        protected ScrollingPlayfield(ScrollingDirection direction, float? customWidth = null)
-            : base(customWidth)
+        /// <param name="direction">The direction in which <see cref="DrawableHitObject"/>s in this container should scroll.</param>
+        /// <param name="customWidth">The width to scale the internal coordinate space to.
+        /// May be null if scaling based on <paramref name="customHeight"/> is desired. If <paramref name="customHeight"/> is also null, no scaling will occur.
+        /// </param>
+        /// <param name="customHeight">The height to scale the internal coordinate space to.
+        /// May be null if scaling based on <paramref name="customWidth"/> is desired. If <paramref name="customWidth"/> is also null, no scaling will occur.
+        /// </param>
+        protected ScrollingPlayfield(ScrollingDirection direction, float? customWidth = null, float? customHeight = null)
+            : base(customWidth, customHeight)
         {
             this.direction = direction;
         }

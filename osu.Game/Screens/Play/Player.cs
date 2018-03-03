@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Play
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
+        protected override float BackgroundParallaxAmount => 0.1f;
+
         public override bool ShowOverlaysOnEnter => false;
 
         public Action RestartRequested;
@@ -351,7 +353,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(Screen next)
         {
-            if (!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused != false || RulesetContainer?.HasReplayLoaded != false)
+            if ((!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused != false || RulesetContainer?.HasReplayLoaded != false) && (!pauseContainer?.IsResuming ?? true))
             {
                 // In the case of replays, we may have changed the playback rate.
                 applyRateFromMods();
@@ -362,7 +364,7 @@ namespace osu.Game.Screens.Play
 
             if (loadedSuccessfully)
             {
-                pauseContainer.Pause();
+                pauseContainer?.Pause();
             }
 
             return true;
@@ -387,7 +389,7 @@ namespace osu.Game.Screens.Play
                 .FadeTo(storyboardVisible && opacity > 0 ? 1 : 0, duration, Easing.OutQuint);
 
             (Background as BackgroundScreenBeatmap)?.BlurTo(new Vector2((float)blurLevel.Value * 25), duration, Easing.OutQuint);
-            Background?.FadeTo(!storyboardVisible || beatmap.Background == null ? opacity : 0, duration, Easing.OutQuint);
+            Background?.FadeTo(beatmap.Background != null && (!storyboardVisible || !beatmap.Storyboard.ReplacesBackground) ? opacity : 0, duration, Easing.OutQuint);
         }
 
         private void fadeOut()
