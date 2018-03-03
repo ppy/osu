@@ -270,6 +270,7 @@
     <Compile Include="Beatmaps\Formats\JsonBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
+    <Compile Include="Beatmaps\IBeatmapConverter.cs" />
     <Compile Include="Configuration\DatabasedSetting.cs" />
     <Compile Include="Configuration\SettingsStore.cs" />
     <Compile Include="Configuration\DatabasedConfigManager.cs" />
@@ -352,7 +353,10 @@
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
     <Compile Include="Rulesets\Configuration\IRulesetConfigManager.cs" />
     <Compile Include="Rulesets\Configuration\RulesetConfigManager.cs" />
+    <Compile Include="Rulesets\Edit\Layers\BorderLayer.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\CaptureBox.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectOverlay.cs" />
+    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectOverlayLayer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />
@@ -883,9 +887,11 @@
     <Compile Include="Storyboards\StoryboardLayer.cs" />
     <Compile Include="Storyboards\StoryboardSample.cs" />
     <Compile Include="Storyboards\StoryboardSprite.cs" />
+    <Compile Include="Tests\Beatmaps\BeatmapConversionTest.cs" />
     <Compile Include="Tests\Beatmaps\TestWorkingBeatmap.cs" />
     <Compile Include="Tests\CleanRunHeadlessGameHost.cs" />
     <Compile Include="Tests\Platform\TestStorage.cs" />
+    <Compile Include="Tests\TestTestCase.cs" />
     <Compile Include="Tests\Visual\OsuTestCase.cs" />
     <Compile Include="Tests\Visual\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\Visual\ScreenTestCase.cs" />

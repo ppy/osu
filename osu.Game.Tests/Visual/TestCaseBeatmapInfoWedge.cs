@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -18,6 +19,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseBeatmapInfoWedge : OsuTestCase
     {
         private RulesetStore rulesets;

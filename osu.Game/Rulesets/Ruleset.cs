@@ -90,6 +90,11 @@ namespace osu.Game.Rulesets
         /// <returns>A descriptive name of the variant.</returns>
         public virtual string GetVariantName(int variant) => string.Empty;
 
+        /// <summary>
+        /// For rulesets which support legacy (osu-stable) replay conversion, this method will create an empty replay frame
+        /// for conversion use.
+        /// </summary>
+        /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
         public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
 
         /// <summary>
