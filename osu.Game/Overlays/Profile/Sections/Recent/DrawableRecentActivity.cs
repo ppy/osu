@@ -20,10 +20,6 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
         private readonly RecentActivity activity;
 
-        private string userLinkTemplate;
-        private string beatmapLinkTemplate;
-        private string beatmapsetLinkTemplate;
-
         private LinkFlowContainer content;
 
         public DrawableRecentActivity(RecentActivity activity)
@@ -35,10 +31,6 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         private void load(APIAccess api)
         {
             this.api = api;
-
-            userLinkTemplate = $"[{toAbsoluteUrl(activity.User?.Url)} {activity.User?.Username}]";
-            beatmapLinkTemplate = $"[{toAbsoluteUrl(activity.Beatmap?.Url)} {activity.Beatmap?.Title}]";
-            beatmapsetLinkTemplate = $"[{toAbsoluteUrl(activity.Beatmapset?.Url)} {activity.Beatmapset?.Title}]";
 
             LeftFlowContainer.Padding = new MarginPadding { Left = 10, Right = 160 };
 
@@ -58,7 +50,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 Colour = OsuColour.Gray(0xAA),
             });
 
-            var formatted = MessageFormatter.FormatText(activityToString());
+            var formatted = createMessage();
 
             content.AddLinks(formatted.Text, formatted.Links);
         }
@@ -95,56 +87,79 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
         private string toAbsoluteUrl(string url) => $"{api.Endpoint}{url}";
 
-        private string activityToString()
+        private MessageFormatter.MessageFormatterResult createMessage()
         {
+            string userLinkTemplate() => $"[{toAbsoluteUrl(activity.User?.Url)} {activity.User?.Username}]";
+            string beatmapLinkTemplate() => $"[{toAbsoluteUrl(activity.Beatmap?.Url)} {activity.Beatmap?.Title}]";
+            string beatmapsetLinkTemplate() => $"[{toAbsoluteUrl(activity.Beatmapset?.Url)} {activity.Beatmapset?.Title}]";
+
+            string message;
+
             switch (activity.Type)
             {
                 case RecentActivityType.Achievement:
-                    return $"{userLinkTemplate} unlocked the {activity.Achievement.Name} medal!";
+                    message = $"{userLinkTemplate()} unlocked the {activity.Achievement.Name} medal!";
+                    break;
 
                 case RecentActivityType.BeatmapPlaycount:
-                    return $"{beatmapLinkTemplate} has been played {activity.Count} times!";
+                    message = $"{beatmapLinkTemplate()} has been played {activity.Count} times!";
+                    break;
 
                 case RecentActivityType.BeatmapsetApprove:
-                    return $"{beatmapsetLinkTemplate} has been {activity.Approval.ToString().ToLowerInvariant()}!";
+                    message = $"{beatmapsetLinkTemplate()} has been {activity.Approval.ToString().ToLowerInvariant()}!";
+                    break;
 
                 case RecentActivityType.BeatmapsetDelete:
-                    return $"{beatmapsetLinkTemplate} has been deleted.";
+                    message = $"{beatmapsetLinkTemplate()} has been deleted.";
+                    break;
 
                 case RecentActivityType.BeatmapsetRevive:
-                    return $"{beatmapsetLinkTemplate} has been revived from eternal slumber by {userLinkTemplate}.";
+                    message = $"{beatmapsetLinkTemplate()} has been revived from eternal slumber by {userLinkTemplate()}.";
+                    break;
 
                 case RecentActivityType.BeatmapsetUpdate:
-                    return $"{userLinkTemplate} has updated the beatmap {beatmapsetLinkTemplate}!";
+                    message = $"{userLinkTemplate()} has updated the beatmap {beatmapsetLinkTemplate()}!";
+                    break;
 
                 case RecentActivityType.BeatmapsetUpload:
-                    return $"{userLinkTemplate} has submitted a new beatmap {beatmapsetLinkTemplate}!";
+                    message = $"{userLinkTemplate()} has submitted a new beatmap {beatmapsetLinkTemplate()}!";
+                    break;
 
                 case RecentActivityType.Medal:
                     // apparently this shouldn't exist look at achievement instead (https://github.com/ppy/osu-web/blob/master/resources/assets/coffee/react/profile-page/recent-activity.coffee#L111)
-                    return string.Empty;
+                    message = string.Empty;
+                    break;
 
                 case RecentActivityType.Rank:
-                    return $"{userLinkTemplate} achieved rank #{activity.Rank} on {beatmapLinkTemplate} ({activity.Mode}!)";
+                    message = $"{userLinkTemplate()} achieved rank #{activity.Rank} on {beatmapLinkTemplate()} ({activity.Mode}!)";
+                    break;
 
                 case RecentActivityType.RankLost:
-                    return $"{userLinkTemplate} has lost first place on {beatmapLinkTemplate} ({activity.Mode}!)";
+                    message = $"{userLinkTemplate()} has lost first place on {beatmapLinkTemplate()} ({activity.Mode}!)";
+                    break;
 
                 case RecentActivityType.UserSupportAgain:
-                    return $"{userLinkTemplate} has once again chosen to support osu! - thanks for your generosity!";
+                    message = $"{userLinkTemplate()} has once again chosen to support osu! - thanks for your generosity!";
+                    break;
 
                 case RecentActivityType.UserSupportFirst:
-                    return $"{userLinkTemplate} has become an osu! supporter - thanks for your generosity!";
+                    message = $"{userLinkTemplate()} has become an osu! supporter - thanks for your generosity!";
+                    break;
 
                 case RecentActivityType.UserSupportGift:
-                    return $"{userLinkTemplate} has received the gift of osu! supporter!";
+                    message = $"{userLinkTemplate()} has received the gift of osu! supporter!";
+                    break;
 
                 case RecentActivityType.UsernameChange:
-                    return $"{activity.User.PreviousUsername} has changed their username to {userLinkTemplate}!";
+                    message = $"{activity.User?.PreviousUsername} has changed their username to {userLinkTemplate()}!";
+                    break;
 
                 default:
-                    return string.Empty;
+                    message = string.Empty;
+                    break;
             }
+
+            return MessageFormatter.FormatText(message);
         }
     }
 }
