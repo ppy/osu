@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -22,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly List<Drawable> components = new List<Drawable>();
 
         public readonly DrawableHitCircle HeadCircle;
+        public readonly DrawableSliderTail TailCircle;
+
         public readonly SliderBody Body;
         public readonly SliderBall Ball;
 
@@ -30,7 +33,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             slider = s;
 
-            DrawableSliderTail tail;
+            Position = s.StackedPosition;
+
             Container<DrawableSliderTick> ticks;
             Container<DrawableRepeatPoint> repeatPoints;
 
@@ -39,20 +43,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Body = new SliderBody(s)
                 {
                     AccentColour = AccentColour,
-                    Position = s.StackedPosition,
                     PathWidth = s.Scale * 64,
                 },
-                ticks = new Container<DrawableSliderTick>(),
-                repeatPoints = new Container<DrawableRepeatPoint>(),
+                ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
+                repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s)
                 {
+                    BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
                     AccentColour = AccentColour,
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableHitCircle(s.HeadCircle),
-                tail = new DrawableSliderTail(s.TailCircle)
+                HeadCircle = new DrawableHitCircle(s.HeadCircle) { Position = s.TailCircle.Position - s.Position },
+                TailCircle = new DrawableSliderTail(s.TailCircle) { Position = s.TailCircle.Position - s.Position }
             };
 
             components.Add(Body);
@@ -60,15 +64,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             AddNested(HeadCircle);
 
-            AddNested(tail);
-            components.Add(tail);
+            AddNested(TailCircle);
+            components.Add(TailCircle);
 
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
-                var drawableTick = new DrawableSliderTick(tick)
-                {
-                    Position = tick.StackedPosition
-                };
+                var drawableTick = new DrawableSliderTick(tick) { Position = tick.Position - s.Position };
 
                 ticks.Add(drawableTick);
                 components.Add(drawableTick);
@@ -77,10 +78,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
-                var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
-                {
-                    Position = repeatPoint.StackedPosition
-                };
+                var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this) { Position = repeatPoint.Position - s.Position };
 
                 repeatPoints.Add(drawableRepeatPoint);
                 components.Add(drawableRepeatPoint);
@@ -107,11 +105,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (!HeadCircle.IsHit)
-                HeadCircle.Position = slider.StackedPositionAt(completionProgress);
+                HeadCircle.Position = slider.CurvePositionAt(completionProgress);
 
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
             foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
             foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
+
+            Size = Body.Size;
+            OriginPosition = Body.PathOffset;
+
+            if (DrawSize != Vector2.Zero)
+            {
+                var childAnchorPosition = Vector2.Divide(OriginPosition, DrawSize);
+                foreach (var obj in NestedHitObjects)
+                    obj.RelativeAnchorPosition = childAnchorPosition;
+                Ball.RelativeAnchorPosition = childAnchorPosition;
+            }
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
@@ -162,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Body.ReceiveMouseInputAt(screenSpacePos);
 
-        public override Vector2 SelectionPoint => ToScreenSpace(Body.Position);
+        public override Vector2 SelectionPoint => ToScreenSpace(OriginPosition);
         public override Quad SelectionQuad => Body.PathDrawQuad;
     }
 }
