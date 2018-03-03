@@ -2,12 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseEditorCompose : OsuTestCase
     {
         private readonly Random random;

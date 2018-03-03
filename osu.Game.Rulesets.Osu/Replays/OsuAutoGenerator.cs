@@ -6,7 +6,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
-using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
@@ -64,9 +64,9 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             buttonIndex = 0;
 
-            AddFrameToReplay(new ReplayFrame(-100000, 256, 500, ReplayButtonState.None));
-            AddFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, 256, 500, ReplayButtonState.None));
-            AddFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1000, 256, 192, ReplayButtonState.None));
+            AddFrameToReplay(new OsuReplayFrame(-100000, new Vector2(256, 500)));
+            AddFrameToReplay(new OsuReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, new Vector2(256, 500)));
+            AddFrameToReplay(new OsuReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, new Vector2(256, 500)));
 
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
@@ -91,18 +91,18 @@ namespace osu.Game.Rulesets.Osu.Replays
             // Make the cursor stay at a hitObject as long as possible (mainly for autopilot).
             if (h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Miss) > endTime + h.HitWindows.HalfWindowFor(HitResult.Meh) + 50)
             {
-                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
-                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
+                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new OsuReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(prev.StackedEndPosition.X, prev.StackedEndPosition.Y)));
+                if (!(h is Spinner)) AddFrameToReplay(new OsuReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
             }
             else if (h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh) > endTime + h.HitWindows.HalfWindowFor(HitResult.Meh) + 50)
             {
-                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
-                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
+                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new OsuReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(prev.StackedEndPosition.X, prev.StackedEndPosition.Y)));
+                if (!(h is Spinner)) AddFrameToReplay(new OsuReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
             }
             else if (h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh) > endTime + h.HitWindows.HalfWindowFor(HitResult.Meh) + 50)
             {
-                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
-                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
+                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new OsuReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(prev.StackedEndPosition.X, prev.StackedEndPosition.Y)));
+                if (!(h is Spinner)) AddFrameToReplay(new OsuReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
             }
         }
 
@@ -118,9 +118,9 @@ namespace osu.Game.Rulesets.Osu.Replays
             // TODO: Shouldn't the spinner always spin in the same direction?
             if (h is Spinner)
             {
-                calcSpinnerStartPosAndDirection(Frames[Frames.Count - 1].Position, out startPosition, out spinnerDirection);
+                calcSpinnerStartPosAndDirection(((OsuReplayFrame)Frames[Frames.Count - 1]).Position, out startPosition, out spinnerDirection);
 
-                Vector2 spinCentreOffset = SPINNER_CENTRE - Frames[Frames.Count - 1].Position;
+                Vector2 spinCentreOffset = SPINNER_CENTRE - ((OsuReplayFrame)Frames[Frames.Count - 1]).Position;
 
                 if (spinCentreOffset.Length > SPIN_RADIUS)
                 {
@@ -192,13 +192,13 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private void moveToHitObject(OsuHitObject h, Vector2 targetPos, Easing easing)
         {
-            ReplayFrame lastFrame = Frames[Frames.Count - 1];
+            OsuReplayFrame lastFrame = (OsuReplayFrame)Frames[Frames.Count - 1];
 
             // Wait until Auto could "see and react" to the next note.
             double waitTime = h.StartTime - Math.Max(0.0, h.TimePreempt - reactionTime);
             if (waitTime > lastFrame.Time)
             {
-                lastFrame = new ReplayFrame(waitTime, lastFrame.MouseX, lastFrame.MouseY, lastFrame.ButtonState);
+                lastFrame = new OsuReplayFrame(waitTime, lastFrame.Position) { Actions = lastFrame.Actions };
                 AddFrameToReplay(lastFrame);
             }
 
@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                 for (double time = lastFrame.Time + FrameDelay; time < h.StartTime; time += FrameDelay)
                 {
                     Vector2 currentPosition = Interpolation.ValueAt(time, lastPosition, targetPos, lastFrame.Time, h.StartTime, easing);
-                    AddFrameToReplay(new ReplayFrame((int)time, currentPosition.X, currentPosition.Y, lastFrame.ButtonState));
+                    AddFrameToReplay(new OsuReplayFrame((int)time, new Vector2(currentPosition.X, currentPosition.Y)) { Actions = lastFrame.Actions });
                 }
 
                 buttonIndex = 0;
@@ -231,14 +231,14 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             // Time to insert the first frame which clicks the object
             // Here we mainly need to determine which button to use
-            ReplayButtonState button = buttonIndex % 2 == 0 ? ReplayButtonState.Left1 : ReplayButtonState.Right1;
+            var action = buttonIndex % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton;
 
-            ReplayFrame startFrame = new ReplayFrame(h.StartTime, startPosition.X, startPosition.Y, button);
+            var startFrame = new OsuReplayFrame(h.StartTime, new Vector2(startPosition.X, startPosition.Y), action);
 
             // TODO: Why do we delay 1 ms if the object is a spinner? There already is KEY_UP_DELAY from hEndTime.
             double hEndTime = ((h as IHasEndTime)?.EndTime ?? h.StartTime) + KEY_UP_DELAY;
             int endDelay = h is Spinner ? 1 : 0;
-            ReplayFrame endFrame = new ReplayFrame(hEndTime + endDelay, h.StackedEndPosition.X, h.StackedEndPosition.Y, ReplayButtonState.None);
+            var endFrame = new OsuReplayFrame(hEndTime + endDelay, new Vector2(h.StackedEndPosition.X, h.StackedEndPosition.Y));
 
             // Decrement because we want the previous frame, not the next one
             int index = FindInsertionIndex(startFrame) - 1;
@@ -248,19 +248,18 @@ namespace osu.Game.Rulesets.Osu.Replays
             // Do we have a previous frame? No need to check for < replay.Count since we decremented!
             if (index >= 0)
             {
-                ReplayFrame previousFrame = Frames[index];
-                var previousButton = previousFrame.ButtonState;
+                var previousFrame = (OsuReplayFrame)Frames[index];
+                var previousActions = previousFrame.Actions;
 
                 // If a button is already held, then we simply alternate
-                if (previousButton != ReplayButtonState.None)
+                if (previousActions.Any())
                 {
-                    Debug.Assert(previousButton != (ReplayButtonState.Left1 | ReplayButtonState.Right1), "Previous button state was not Left1 nor Right1 despite only using those two states.");
-
                     // Force alternation if we have the same button. Otherwise we can just keep the naturally to us assigned button.
-                    if (previousButton == button)
+                    if (previousActions.Contains(action))
                     {
-                        button = (ReplayButtonState.Left1 | ReplayButtonState.Right1) & ~button;
-                        startFrame.ButtonState = button;
+                        action = action == OsuAction.LeftButton ? OsuAction.RightButton : OsuAction.LeftButton;
+                        startFrame.Actions.Clear();
+                        startFrame.Actions.Add(action);
                     }
 
                     // We always follow the most recent slider / spinner, so remove any other frames that occur while it exists.
@@ -272,9 +271,14 @@ namespace osu.Game.Rulesets.Osu.Replays
                     // After alternating we need to keep holding the other button in the future rather than the previous one.
                     for (int j = index + 1; j < Frames.Count; ++j)
                     {
+                        var frame = (OsuReplayFrame)Frames[j];
+
                         // Don't affect frames which stop pressing a button!
-                        if (j < Frames.Count - 1 || Frames[j].ButtonState == previousButton)
-                            Frames[j].ButtonState = button;
+                        if (j < Frames.Count - 1 || frame.Actions.SequenceEqual(previousActions))
+                        {
+                            frame.Actions.Clear();
+                            frame.Actions.Add(action);
+                        }
                     }
                 }
             }
@@ -298,16 +302,15 @@ namespace osu.Game.Rulesets.Osu.Replays
                     t = ApplyModsToTime(j - h.StartTime) * spinnerDirection;
 
                     Vector2 pos = SPINNER_CENTRE + CirclePosition(t / 20 + angle, SPIN_RADIUS);
-                    AddFrameToReplay(new ReplayFrame((int)j, pos.X, pos.Y, button));
+                    AddFrameToReplay(new OsuReplayFrame((int)j, new Vector2(pos.X, pos.Y), action));
                 }
 
                 t = ApplyModsToTime(s.EndTime - h.StartTime) * spinnerDirection;
                 Vector2 endPosition = SPINNER_CENTRE + CirclePosition(t / 20 + angle, SPIN_RADIUS);
 
-                AddFrameToReplay(new ReplayFrame(s.EndTime, endPosition.X, endPosition.Y, button));
+                AddFrameToReplay(new OsuReplayFrame(s.EndTime, new Vector2(endPosition.X, endPosition.Y), action));
 
-                endFrame.MouseX = endPosition.X;
-                endFrame.MouseY = endPosition.Y;
+                endFrame.Position = endPosition;
             }
             else if (h is Slider)
             {
@@ -316,10 +319,10 @@ namespace osu.Game.Rulesets.Osu.Replays
                 for (double j = FrameDelay; j < s.Duration; j += FrameDelay)
                 {
                     Vector2 pos = s.StackedPositionAt(j / s.Duration);
-                    AddFrameToReplay(new ReplayFrame(h.StartTime + j, pos.X, pos.Y, button));
+                    AddFrameToReplay(new OsuReplayFrame(h.StartTime + j, new Vector2(pos.X, pos.Y), action));
                 }
 
-                AddFrameToReplay(new ReplayFrame(s.EndTime, s.StackedEndPosition.X, s.StackedEndPosition.Y, button));
+                AddFrameToReplay(new OsuReplayFrame(s.EndTime, new Vector2(s.StackedEndPosition.X, s.StackedEndPosition.Y), action));
             }
 
             // We only want to let go of our button if we are at the end of the current replay. Otherwise something is still going on after us so we need to keep the button pressed!

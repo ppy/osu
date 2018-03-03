@@ -2,32 +2,42 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Replays;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
-    public class OsuReplayInputHandler : FramedReplayInputHandler
+    public class OsuReplayInputHandler : FramedReplayInputHandler<OsuReplayFrame>
     {
         public OsuReplayInputHandler(Replay replay)
             : base(replay)
         {
         }
 
+        protected override bool IsImportant(OsuReplayFrame frame) => frame.Actions.Any();
+
+        protected Vector2? Position
+        {
+            get
+            {
+                if (!HasFrames)
+                    return null;
+
+                return Interpolation.ValueAt(CurrentTime, CurrentFrame.Position, NextFrame.Position, CurrentFrame.Time, NextFrame.Time);
+            }
+        }
+
         public override List<InputState> GetPendingStates()
         {
-            List<OsuAction> actions = new List<OsuAction>();
-
-            if (CurrentFrame?.MouseLeft ?? false) actions.Add(OsuAction.LeftButton);
-            if (CurrentFrame?.MouseRight ?? false) actions.Add(OsuAction.RightButton);
-
             return new List<InputState>
             {
                 new ReplayState<OsuAction>
                 {
                     Mouse = new ReplayMouseState(ToScreenSpace(Position ?? Vector2.Zero)),
-                    PressedActions = actions
+                    PressedActions = CurrentFrame.Actions
                 }
             };
         }
