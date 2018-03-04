@@ -22,7 +22,18 @@ namespace osu.Game.Beatmaps.Formats
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
 
-        private readonly int timeOffset;
+        /// <summary>
+        /// lazer's audio timings in general doesn't match stable. this is the result of user testing, albeit limited.
+        /// This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
+        /// </summary>
+        public static int UniversalOffset => RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? -22 : 0;
+
+        /// <summary>
+        /// Whether or not beatmap or runtime offsets should be applied. Defaults on; only disable for testing purposes.
+        /// </summary>
+        public bool ApplyOffsets = true;
+
+        private readonly int offset = UniversalOffset;
 
         public LegacyBeatmapDecoder()
         {
@@ -33,12 +44,7 @@ namespace osu.Game.Beatmaps.Formats
             BeatmapVersion = int.Parse(header.Substring(17));
 
             // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
-            timeOffset += BeatmapVersion < 5 ? 24 : 0;
-
-            // lazer in general doesn't match stable. this is the result of user testing, albeit limited.
-            // only seems to be required on windows.
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
-                timeOffset += -22;
+            offset += BeatmapVersion < 5 ? 24 : 0;
         }
 
         protected override void ParseBeatmap(StreamReader stream, Beatmap beatmap)
@@ -413,8 +419,8 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private int getOffsetTime(int time) => time + timeOffset;
+        private int getOffsetTime(int time) => time + (ApplyOffsets ? offset : 0);
 
-        private double getOffsetTime(double time) => time + timeOffset;
+        private double getOffsetTime(double time) => time + (ApplyOffsets ? offset : 0);
     }
 }
