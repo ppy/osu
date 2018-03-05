@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (timeOffset < 0)
                 return;
 
-            int countHit = NestedHitObjects.Count(o => o.IsHit);
+            int countHit = NestedHitObjects?.Count(o => o.IsHit) ?? 0;
             if (countHit >= HitObject.RequiredGoodHits)
             {
                 AddJudgement(new TaikoJudgement { Result = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good });
