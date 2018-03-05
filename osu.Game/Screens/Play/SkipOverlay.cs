@@ -35,8 +35,7 @@ namespace osu.Game.Screens.Play
         private double displayTime;
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
-
-        protected override bool BlockPassThroughMouse => fadeContainer.IsHovered;
+        protected override bool BlockPassThroughMouse => false;
 
         public SkipOverlay(double startTime)
         {
@@ -276,7 +275,7 @@ namespace osu.Game.Screens.Play
                 flow.TransformSpacingTo(new Vector2(5), 500, Easing.OutQuint);
                 box.FadeColour(colourHover, 500, Easing.OutQuint);
                 background.FadeTo(0.4f, 500, Easing.OutQuint);
-                return base.OnHover(state);
+                return true;
             }
 
             protected override void OnHoverLost(InputState state)
