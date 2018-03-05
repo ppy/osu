@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mods;
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             return new Score
             {
                 User = new User { Username = "osu!topus!" },
-                Replay = new ManiaAutoGenerator(beatmap).Generate(),
+                Replay = new ManiaAutoGenerator((ManiaBeatmap)beatmap).Generate(),
             };
         }
     }

@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.UI
             });
         }
 
-        public class ScaledContainer : Container
+        private class ScaledContainer : Container
         {
             /// <summary>
             /// The value to scale the width of the content to match.

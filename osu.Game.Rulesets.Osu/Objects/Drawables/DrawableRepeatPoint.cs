@@ -78,8 +78,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             bool isRepeatAtEnd = repeatPoint.RepeatIndex % 2 == 0;
             List<Vector2> curve = drawableSlider.Body.CurrentCurve;
 
-            var positionOnCurve = isRepeatAtEnd ? end : start;
-            Position = positionOnCurve + drawableSlider.HitObject.StackOffset;
+            Position = isRepeatAtEnd ? end : start;
 
             if (curve.Count < 2)
                 return;
@@ -90,10 +89,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // find the next vector2 in the curve which is not equal to our current position to infer a rotation.
             for (int i = searchStart; i >= 0 && i < curve.Count; i += direction)
             {
-                if (curve[i] == positionOnCurve)
+                if (curve[i] == Position)
                     continue;
 
-                Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(curve[i].Y - positionOnCurve.Y, curve[i].X - positionOnCurve.X));
+                Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(curve[i].Y - Position.Y, curve[i].X - Position.X));
                 break;
             }
         }
