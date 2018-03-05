@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private float time;
 
+        public override bool IsPresent => true;
+
         private readonly TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
         private const int max_sprites = 2048;
 
