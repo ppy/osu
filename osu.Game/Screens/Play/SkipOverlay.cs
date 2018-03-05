@@ -52,12 +52,6 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.Centre;
         }
 
-        protected override bool OnMouseMove(InputState state)
-        {
-            fadeContainer.State = Visibility.Visible;
-            return base.OnMouseMove(state);
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -122,20 +116,21 @@ namespace osu.Game.Screens.Play
             Expire();
         }
 
-        protected override void PopIn()
-        {
-            this.FadeIn();
-        }
+        protected override void PopIn() => this.FadeIn();
 
-        protected override void PopOut()
-        {
-            this.FadeOut();
-        }
+        protected override void PopOut() => this.FadeOut();
 
         protected override void Update()
         {
             base.Update();
             remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, Easing.OutQuint);
+        }
+
+        protected override bool OnMouseMove(InputState state)
+        {
+            if (!state.Mouse.HasAnyButtonPressed)
+                fadeContainer.State = Visibility.Visible;
+            return base.OnMouseMove(state);
         }
 
         public bool OnPressed(GlobalAction action)
@@ -177,7 +172,7 @@ namespace osu.Game.Screens.Play
                             if (stateChanged)
                                 this.FadeIn(500, Easing.OutExpo);
 
-                            if (!IsHovered)
+                            if (!IsHovered && !IsDragged)
                                 using (BeginDelayedSequence(1000))
                                     scheduledHide = Schedule(() => State = Visibility.Hidden);
                             break;
@@ -194,6 +189,18 @@ namespace osu.Game.Screens.Play
             {
                 base.LoadComplete();
                 State = Visibility.Visible;
+            }
+
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            {
+                scheduledHide?.Cancel();
+                return base.OnMouseDown(state, args);
+            }
+
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            {
+                State = Visibility.Visible;
+                return base.OnMouseUp(state, args);
             }
         }
 
