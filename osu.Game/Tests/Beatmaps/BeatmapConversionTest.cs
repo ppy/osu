@@ -109,10 +109,9 @@ namespace osu.Game.Tests.Beatmaps
 
         private Beatmap getBeatmap(string name)
         {
-            var decoder = new LegacyBeatmapDecoder();
             using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new StreamReader(resStream))
-                return decoder.DecodeBeatmap(stream);
+                return Decoder.GetDecoder(stream).DecodeBeatmap(stream);
         }
 
         private Stream openResource(string name)
