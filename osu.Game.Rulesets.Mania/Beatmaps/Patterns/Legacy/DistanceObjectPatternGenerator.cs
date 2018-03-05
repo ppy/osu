@@ -396,6 +396,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             // Create the hold note
             addToPattern(pattern, holdColumn, startTime, endTime);
 
+            int nextColumn = Random.Next(RandomStart, TotalColumns);
             int noteCount;
             if (ConversionDifficulty > 6.5)
                 noteCount = GetRandomNoteCount(0.63, 0);
@@ -408,7 +409,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             noteCount = Math.Min(TotalColumns - 1, noteCount);
 
             bool ignoreHead = !sampleInfoListAt(startTime).Any(s => s.Name == SampleInfo.HIT_WHISTLE || s.Name == SampleInfo.HIT_FINISH || s.Name == SampleInfo.HIT_CLAP);
-            int nextColumn = Random.Next(RandomStart, TotalColumns);
 
             var rowPattern = new Pattern();
             for (int i = 0; i <= spanCount; i++)
