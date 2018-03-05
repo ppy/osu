@@ -159,7 +159,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var sr = new StreamReader(stream))
             {
 
-                var legacyDecoded = new LegacyBeatmapDecoder().DecodeBeatmap(sr);
+                var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.DecodeBeatmap(sr);
                 using (var ms = new MemoryStream())
                 using (var sw = new StreamWriter(ms))
                 using (var sr2 = new StreamReader(ms))
