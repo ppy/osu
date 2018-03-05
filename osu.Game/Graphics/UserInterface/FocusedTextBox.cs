@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public Action Exit;
 
-        public override bool HandleLeftRightArrows => false;
+        public override bool HandleLeftRightArrows => true;
 
         private bool focus;
         public bool HoldFocus
