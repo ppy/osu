@@ -249,10 +249,10 @@ namespace osu.Game.Beatmaps.Formats
                     difficulty.ApproachRate = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"SliderMultiplier":
-                    difficulty.SliderMultiplier = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    difficulty.SliderMultiplier = double.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"SliderTickRate":
-                    difficulty.SliderTickRate = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    difficulty.SliderTickRate = double.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
                     break;
             }
         }
