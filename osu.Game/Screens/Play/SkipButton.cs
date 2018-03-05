@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Play
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
+        protected override bool BlockPassThroughMouse => fadeContainer.IsHovered;
+
         public SkipButton(double startTime)
         {
             this.startTime = startTime;
