@@ -21,7 +21,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipButton : OverlayContainer, IKeyBindingHandler<GlobalAction>
+    public class SkipOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool BlockPassThroughMouse => fadeContainer.IsHovered;
 
-        public SkipButton(double startTime)
+        public SkipOverlay(double startTime)
         {
             this.startTime = startTime;
 
