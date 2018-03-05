@@ -801,7 +801,7 @@
     <Compile Include="Screens\Play\PlayerSettings\PlayerCheckbox.cs" />
     <Compile Include="Screens\Play\PlayerSettings\PlayerSettingsGroup.cs" />
     <Compile Include="Screens\Play\PlayerSettings\PlayerSliderBar.cs" />
-    <Compile Include="Screens\Play\SkipButton.cs" />
+    <Compile Include="Screens\Play\SkipOverlay.cs" />
     <Compile Include="Screens\Play\SongProgress.cs" />
     <Compile Include="Screens\Play\SongProgressBar.cs" />
     <Compile Include="Screens\Play\SongProgressGraph.cs" />
