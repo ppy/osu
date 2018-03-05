@@ -9,7 +9,6 @@ namespace osu.Game.Rulesets.Replays
     public class Replay
     {
         public User User;
-
         public List<ReplayFrame> Frames = new List<ReplayFrame>();
     }
 }
