@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual
             // We create a dummy RulesetContainer just to get the replay - we don't want to use mods here
             // to simulate setting a replay rather than having the replay already set for us
             beatmap.Mods.Value = beatmap.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
-            var dummyRulesetContainer = ruleset.CreateRulesetContainerWith(beatmap, false);
+            var dummyRulesetContainer = ruleset.CreateRulesetContainerWith(beatmap, beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo));
 
             // We have the replay
             var replay = dummyRulesetContainer.Replay;
