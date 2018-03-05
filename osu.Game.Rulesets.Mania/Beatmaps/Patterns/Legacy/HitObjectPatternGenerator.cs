@@ -356,7 +356,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     break;
                 case 3:
                     centreProbability = Math.Max(centreProbability, 0.03);
-                    p2 = Math.Max(p2, 0.1);
+                    p2 = 0;
                     p3 = 0;
                     break;
                 case 4:
