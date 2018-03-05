@@ -48,13 +48,11 @@ namespace osu.Game.Rulesets.Mania.UI
         private Color4 specialColumnColour;
 
         private readonly int firstColumnIndex;
-        private readonly StageDefinition definition;
 
         public ManiaStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
             : base(ScrollingDirection.Up)
         {
             this.firstColumnIndex = firstColumnIndex;
-            this.definition = definition;
 
             Name = "Stage";
 
@@ -131,7 +129,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < definition.Columns; i++)
             {
-                var isSpecial = isSpecialColumn(i);
+                var isSpecial = definition.IsSpecialColumn(i);
                 var column = new Column
                 {
                     IsSpecial = isSpecial,
@@ -159,13 +157,6 @@ namespace osu.Game.Rulesets.Mania.UI
             columnFlow.Add(c);
             AddNested(c);
         }
-
-        /// <summary>
-        /// Whether the column index is a special column for this playfield.
-        /// </summary>
-        /// <param name="column">The 0-based column index.</param>
-        /// <returns>Whether the column is a special column.</returns>
-        private bool isSpecialColumn(int column) => definition.Columns % 2 == 1 && column == definition.Columns / 2;
 
         public override void Add(DrawableHitObject h)
         {
