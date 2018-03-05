@@ -19,7 +19,7 @@ using OpenTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    internal class CursorTrail : Drawable
+    internal class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
     {
         private int currentIndex;
 
