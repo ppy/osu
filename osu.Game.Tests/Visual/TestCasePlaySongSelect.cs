@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.MathUtils;
@@ -19,6 +20,7 @@ using osu.Game.Tests.Platform;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCasePlaySongSelect : OsuTestCase
     {
         private BeatmapManager manager;
@@ -75,7 +77,7 @@ namespace osu.Game.Tests.Visual
             {
                 if (deleteMaps)
                 {
-                    manager.DeleteAll();
+                    manager.Delete(manager.GetAllUsableBeatmapSets());
                     game.Beatmap.SetDefault();
                 }
 

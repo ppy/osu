@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics;
@@ -14,6 +15,7 @@ using osu.Framework.Configuration;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseEditorSummaryTimeline : OsuTestCase
     {
         private const int length = 60000;
