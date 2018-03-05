@@ -82,8 +82,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
 
             int countHit = NestedHitObjects.Count(o => o.IsHit);
-
-            if (countHit > HitObject.RequiredGoodHits)
+            if (countHit >= HitObject.RequiredGoodHits)
             {
                 AddJudgement(new TaikoJudgement { Result = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good });
                 if (HitObject.IsStrong)

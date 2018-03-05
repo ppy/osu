@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapGeneral()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapEvents()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapTimingPoints()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
@@ -187,7 +187,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapHitObjects()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
