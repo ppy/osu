@@ -152,10 +152,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 return null;
 
             Pattern newPattern = conversion.Generate();
-            lastPattern = newPattern;
 
-            var stairPatternGenerator = conversion as HitObjectPatternGenerator;
-            lastStair = stairPatternGenerator?.StairType ?? lastStair;
+            lastPattern = conversion is EndTimeObjectPatternGenerator ? lastPattern : newPattern;
+            lastStair = (conversion as HitObjectPatternGenerator)?.StairType ?? lastStair;
 
             return newPattern.HitObjects;
         }
