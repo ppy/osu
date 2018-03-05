@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
                     }
                 }
 
-                if (obj.NestedHitObjects != null)
+                if (obj.HasNestedHitObjects)
                 {
                     ComputeInitialStates(obj.NestedHitObjects, direction, timeRange, length);
                     ComputePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);

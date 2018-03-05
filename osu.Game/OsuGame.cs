@@ -20,6 +20,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -414,6 +415,7 @@ namespace osu.Game
                     sensitivity.Disabled = true;
 
                     frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
+                    frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
                 case GlobalAction.ToggleToolbar:
                     Toolbar.ToggleVisibility();

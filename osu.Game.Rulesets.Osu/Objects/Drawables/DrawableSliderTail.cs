@@ -19,8 +19,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSliderTail(HitCircle hitCircle)
             : base(hitCircle)
         {
-            AlwaysPresent = true;
+            Origin = Anchor.Centre;
+
             RelativeSizeAxes = Axes.Both;
+            FillMode = FillMode.Fit;
+
+            AlwaysPresent = true;
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
