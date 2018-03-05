@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
         {
             convertType = PatternType.None;
-            if (Beatmap.ControlPointInfo.EffectPointAt(hitObject.StartTime).KiaiMode)
+            if (!Beatmap.ControlPointInfo.EffectPointAt(hitObject.StartTime).KiaiMode)
                 convertType = PatternType.LowProbability;
 
             var distanceData = hitObject as IHasDistance;
