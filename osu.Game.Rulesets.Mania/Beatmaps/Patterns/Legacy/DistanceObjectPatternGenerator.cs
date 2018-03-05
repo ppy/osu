@@ -305,19 +305,19 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     p4 = 0;
                     break;
                 case 3:
-                    p2 = Math.Max(p2, 0.1);
+                    p2 = Math.Min(p2, 0.1);
                     p3 = 0;
                     p4 = 0;
                     break;
                 case 4:
-                    p2 = Math.Max(p2, 0.3);
-                    p3 = Math.Max(p3, 0.04);
+                    p2 = Math.Min(p2, 0.3);
+                    p3 = Math.Min(p3, 0.04);
                     p4 = 0;
                     break;
                 case 5:
-                    p2 = Math.Max(p2, 0.34);
-                    p3 = Math.Max(p3, 0.1);
-                    p4 = Math.Max(p4, 0.03);
+                    p2 = Math.Min(p2, 0.34);
+                    p3 = Math.Min(p3, 0.1);
+                    p4 = Math.Min(p4, 0.03);
                     break;
             }
 
