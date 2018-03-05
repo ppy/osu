@@ -207,7 +207,7 @@ namespace osu.Game.Screens.Menu
                                 Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                             );
 
-                            Texture.DrawQuad(
+                            Texture.DrawQuad<TexturedVertex2D>(
                                 rectangle,
                                 colourInfo,
                                 null,

@@ -238,7 +238,7 @@ namespace osu.Game.Graphics.Backgrounds
                     ColourInfo colourInfo = DrawInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
 
-                    Texture.DrawTriangle(
+                    Texture.DrawTriangle<TexturedVertex2D>(
                         triangle,
                         colourInfo,
                         null,
