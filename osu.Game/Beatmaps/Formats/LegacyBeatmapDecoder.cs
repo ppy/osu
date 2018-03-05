@@ -8,6 +8,7 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Framework;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -21,6 +22,19 @@ namespace osu.Game.Beatmaps.Formats
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
 
+        /// <summary>
+        /// lazer's audio timings in general doesn't match stable. this is the result of user testing, albeit limited.
+        /// This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
+        /// </summary>
+        public static int UniversalOffset => RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? -22 : 0;
+
+        /// <summary>
+        /// Whether or not beatmap or runtime offsets should be applied. Defaults on; only disable for testing purposes.
+        /// </summary>
+        public bool ApplyOffsets = true;
+
+        private readonly int offset = UniversalOffset;
+
         public LegacyBeatmapDecoder()
         {
         }
@@ -28,6 +42,9 @@ namespace osu.Game.Beatmaps.Formats
         public LegacyBeatmapDecoder(string header)
         {
             BeatmapVersion = int.Parse(header.Substring(17));
+
+            // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
+            offset += BeatmapVersion < 5 ? 24 : 0;
         }
 
         protected override void ParseBeatmap(StreamReader stream, Beatmap beatmap)
@@ -102,7 +119,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.AudioLeadIn = int.Parse(pair.Value);
                     break;
                 case @"PreviewTime":
-                    metadata.PreviewTime = int.Parse(pair.Value);
+                    metadata.PreviewTime = getOffsetTime(int.Parse(pair.Value));
                     break;
                 case @"Countdown":
                     beatmap.BeatmapInfo.Countdown = int.Parse(pair.Value) == 1;
@@ -257,8 +274,8 @@ namespace osu.Game.Beatmaps.Formats
                 case EventType.Break:
                     var breakEvent = new BreakPeriod
                     {
-                        StartTime = double.Parse(split[1], NumberFormatInfo.InvariantInfo),
-                        EndTime = double.Parse(split[2], NumberFormatInfo.InvariantInfo)
+                        StartTime = getOffsetTime(double.Parse(split[1], NumberFormatInfo.InvariantInfo)),
+                        EndTime = getOffsetTime(double.Parse(split[2], NumberFormatInfo.InvariantInfo))
                     };
 
                     if (!breakEvent.HasEffect)
@@ -273,7 +290,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             string[] split = line.Split(',');
 
-            double time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo);
+            double time = getOffsetTime(double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo));
             double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
             double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
@@ -396,7 +413,14 @@ namespace osu.Game.Beatmaps.Formats
             var obj = parser.Parse(line);
 
             if (obj != null)
+            {
+                obj.StartTime = getOffsetTime(obj.StartTime);
                 beatmap.HitObjects.Add(obj);
+            }
         }
+
+        private int getOffsetTime(int time) => time + (ApplyOffsets ? offset : 0);
+
+        private double getOffsetTime(double time) => time + (ApplyOffsets ? offset : 0);
     }
 }
