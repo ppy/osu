@@ -31,8 +31,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             BorderThickness = 2;
             BorderColour = Color4.White;
 
-            Alpha = 0;
-
             Children = new Drawable[]
             {
                 new Box
