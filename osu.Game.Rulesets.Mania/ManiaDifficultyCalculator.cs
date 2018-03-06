@@ -4,6 +4,7 @@
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 
@@ -31,8 +32,11 @@ namespace osu.Game.Rulesets.Mania
         private readonly List<ManiaHitObjectDifficulty> difficultyHitObjects = new List<ManiaHitObjectDifficulty>();
 
         public ManiaDifficultyCalculator(Beatmap beatmap)
-            : base(beatmap)
-        {
+            : base(beatmap) {
+        }
+
+        public ManiaDifficultyCalculator(Beatmap beatmap, Mod[] mods)
+            : base(beatmap, mods) {
         }
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
@@ -53,11 +57,8 @@ namespace osu.Game.Rulesets.Mania
 
             double starRating = calculateDifficulty() * star_scaling_factor;
 
-            if (categoryDifficulty != null)
-            {
-                categoryDifficulty.Add("Strain", starRating);
-                // categoryDifficulty.Add("Hit window 300", 35 /*HitObjectManager.HitWindow300*/ / TimeRate);
-            }
+            categoryDifficulty?.Add("Strain", starRating);
+            // categoryDifficulty.Add("Hit window 300", 35 /*HitObjectManager.HitWindow300*/ / TimeRate);
 
             return starRating;
         }
