@@ -12,6 +12,6 @@ namespace osu.Game.Graphics.Containers
     {
         protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
 
-        protected override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
+        public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
     }
 }
