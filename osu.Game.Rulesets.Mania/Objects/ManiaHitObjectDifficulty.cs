@@ -22,13 +22,13 @@ namespace osu.Game.Rulesets.Mania.Objects
         private readonly int beatmapColumnCount;
 
 
-        private double endTime;
-        private double[] heldUntil;
+        private readonly double endTime;
+        private readonly double[] heldUntil;
 
         /// <summary>
         ///  Measures jacks or more generally: repeated presses of the same button
         /// </summary>
-        private double[] individualStrains;
+        private readonly double[] individualStrains;
 
         internal double IndividualStrain
         {
