@@ -43,13 +43,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = 300,
-                    Colour = new ColourInfo
-                    {
-                        TopLeft = Color4.Black.Opacity(0.75f),
-                        BottomLeft = Color4.Black.Opacity(0.75f),
-                        TopRight = Color4.Black.Opacity(0),
-                        BottomRight = Color4.Black.Opacity(0),
-                    }
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.75f), Color4.Black.Opacity(0))
                 },
                 new FillFlowContainer
                 {
