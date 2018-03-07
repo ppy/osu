@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
-    internal class MedalIcon : Container
+    public class MedalIcon : Container
     {
         private readonly string slug;
         private readonly Sprite sprite;

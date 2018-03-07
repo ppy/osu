@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
-    internal class PaginatedRecentActivityContainer : PaginatedContainer
+    public class PaginatedRecentActivityContainer : PaginatedContainer
     {
         public PaginatedRecentActivityContainer(Bindable<User> user, string header, string missing)
             : base(user, header, missing)
