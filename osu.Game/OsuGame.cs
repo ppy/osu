@@ -232,7 +232,7 @@ namespace osu.Game
                 },
             }, overlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeOverlay(), Add);
+            loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
             //overlay elements
