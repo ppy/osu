@@ -122,8 +122,13 @@ namespace osu.Game.Overlays.Volume
             });
 
             Bindable.ValueChanged += newVolume => { this.TransformTo("DisplayVolume", newVolume, 400, Easing.OutQuint); };
-
             bgProgress.Current.Value = 0.75f;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Bindable.TriggerChange();
         }
 
         private double displayVolume;
