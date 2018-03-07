@@ -133,9 +133,6 @@ namespace osu.Game.Overlays.Volume
 
         private double displayVolume;
 
-        /// <summary>
-        /// This is needed because <see cref="TransformCustom{TValue,T}"/> doesn't support <see cref="Bindable{T}"/>
-        /// </summary>
         protected double DisplayVolume
         {
             get => displayVolume;
