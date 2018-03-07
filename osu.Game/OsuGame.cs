@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Framework.Logging;
-using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
@@ -33,6 +32,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
+using osu.Game.Overlays.Volume;
 
 namespace osu.Game
 {
@@ -75,7 +75,7 @@ namespace osu.Game
 
         private OsuScreen screenStack;
 
-        private VolumeControl volume;
+        private VolumeOverlay volume;
         private OnScreenDisplay onscreenDisplay;
 
         private Bindable<int> configRuleset;
@@ -232,7 +232,7 @@ namespace osu.Game
                 },
             }, overlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeControl(), Add);
+            loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
             //overlay elements
