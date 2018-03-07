@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
@@ -161,15 +160,9 @@ namespace osu.Game.Overlays.Volume
             private set => Bindable.Value = value;
         }
 
-        public void Increase()
-        {
-            Volume += 0.05f;
-        }
+        public void Increase() => Volume += 0.05f;
 
-        public void Decrease()
-        {
-            Volume -= 0.05f;
-        }
+        public void Decrease() => Volume -= 0.05f;
 
         public bool OnPressed(GlobalAction action)
         {
