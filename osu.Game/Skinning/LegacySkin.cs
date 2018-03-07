@@ -32,12 +32,7 @@ namespace osu.Game.Skinning
             var texture = textures.Get(componentName);
             if (texture == null) return null;
 
-            return new Sprite
-            {
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit,
-                Texture = texture,
-            };
+            return new Sprite { Texture = texture };
         }
 
         public override SampleChannel GetSample(string sampleName) => samples.Get(sampleName);
@@ -48,7 +43,8 @@ namespace osu.Game.Skinning
             private readonly IResourceStore<byte[]> underlyingStore;
 
             private string getPathForFile(string filename) =>
-                skin.Files.FirstOrDefault(f => string.Equals(Path.GetFileNameWithoutExtension(f.Filename), filename.Split('/').Last(), StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+                skin.Files.FirstOrDefault(f => string.Equals(Path.GetFileNameWithoutExtension(f.Filename), filename.Split('/').Last(), StringComparison.InvariantCultureIgnoreCase))?.FileInfo
+                    .StoragePath;
 
             public LegacySkinResourceStore(SkinInfo skin, IResourceStore<byte[]> underlyingStore)
             {
