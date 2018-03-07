@@ -15,7 +15,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
         private readonly PlayerCheckbox showStoryboardToggle;
-        private readonly PlayerCheckbox mouseWheelDisabledToggle;
 
         public VisualSettings()
         {
@@ -35,8 +34,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 {
                     Text = "Toggles:"
                 },
-                showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboards" },
-                mouseWheelDisabledToggle = new PlayerCheckbox { LabelText = "Disable mouse wheel" }
+                showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboards" }
             };
         }
 
@@ -46,7 +44,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
             dimSliderBar.Bindable = config.GetBindable<double>(OsuSetting.DimLevel);
             blurSliderBar.Bindable = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboardToggle.Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-            mouseWheelDisabledToggle.Bindable = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
         }
     }
 }
