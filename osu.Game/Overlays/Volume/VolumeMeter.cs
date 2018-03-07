@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Volume
     public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
     {
         private CircularProgress volumeCircle;
-        public BindableDouble Bindable { get; } = new BindableDouble();
+        public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1 };
         private readonly float circleSize;
         private readonly Color4 meterColour;
         private readonly string name;
