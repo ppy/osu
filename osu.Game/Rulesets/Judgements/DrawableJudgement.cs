@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Judgements
 {
@@ -18,9 +20,11 @@ namespace osu.Game.Rulesets.Judgements
     /// </summary>
     public class DrawableJudgement : Container
     {
+        private const float judgement_size = 80;
+
         protected readonly Judgement Judgement;
 
-        protected readonly SpriteText JudgementText;
+        protected SpriteText JudgementText;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
@@ -30,31 +34,37 @@ namespace osu.Game.Rulesets.Judgements
         {
             Judgement = judgement;
 
-            AutoSizeAxes = Axes.Both;
-
-            Children = new[]
-            {
-                JudgementText = new OsuSpriteText
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Text = judgement.Result.GetDescription().ToUpper(),
-                    Font = @"Venera",
-                    Scale = new Vector2(0.85f, 1),
-                    TextSize = 12
-                }
-            };
+            Size = new Vector2(judgement_size);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            string legacyName = string.Empty;
             switch (Judgement.Result)
             {
                 case HitResult.Miss:
-                    Colour = colours.Red;
+                    legacyName = "hit0";
+                    break;
+                case HitResult.Meh:
+                    legacyName = "hit50";
+                    break;
+                case HitResult.Good:
+                    legacyName = "hit100";
+                    break;
+                case HitResult.Great:
+                    legacyName = "hit300";
                     break;
             }
+
+            Child = new SkinnableDrawable($"Play/osu/{legacyName}", _ => JudgementText = new OsuSpriteText
+            {
+                Text = Judgement.Result.GetDescription().ToUpper(),
+                Font = @"Venera",
+                Colour = Judgement.Result == HitResult.Miss ? colours.Red : Color4.White,
+                Scale = new Vector2(0.85f, 1),
+                TextSize = 12
+            }, restrictSize: false);
         }
 
         protected override void LoadComplete()
