@@ -3,7 +3,6 @@
 
 using System;
 using System.Globalization;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -14,7 +13,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
@@ -30,6 +28,9 @@ namespace osu.Game.Overlays.Volume
         private readonly float circleSize;
         private readonly Color4 meterColour;
         private readonly string name;
+
+        private OsuSpriteText text;
+        private BufferedContainer maxGlow;
 
         public VolumeMeter(string name, float circleSize, Color4 meterColour)
         {
@@ -69,9 +70,7 @@ namespace osu.Game.Overlays.Volume
                 }
             });
 
-            OsuSpriteText text;
             CircularProgress bgProgress;
-            BufferedContainer maxGlow;
 
             Add(new CircularContainer
             {
@@ -122,33 +121,36 @@ namespace osu.Game.Overlays.Volume
                 }
             });
 
-            Bindable.ValueChanged += newVolume => this.TransformTo("circleBindable", newVolume * 0.75, 250, Easing.OutQuint);
-            volumeCircle.Current.ValueChanged += newVolume =>  //by using this event we sync the meter with the text. newValue has to be divided by 0.75 to give the actual percentage
+            Bindable.ValueChanged += newVolume => { this.TransformTo("DisplayVolume", newVolume, 400, Easing.OutQuint); };
+
+            bgProgress.Current.Value = 0.75f;
+        }
+
+        private double displayVolume;
+
+        /// <summary>
+        /// This is needed because <see cref="TransformCustom{TValue,T}"/> doesn't support <see cref="Bindable{T}"/>
+        /// </summary>
+        protected double DisplayVolume
+        {
+            get => displayVolume;
+            set
             {
-                if (Precision.DefinitelyBigger(newVolume, 0.74))
+                displayVolume = value;
+
+                if (displayVolume > 0.99f)
                 {
                     text.Text = "MAX";
                     maxGlow.EffectColour = meterColour.Opacity(2f);
                 }
                 else
                 {
-                    if (text.Text == "MAX")
-                        maxGlow.EffectColour = Color4.Transparent;
-                    text.Text = Math.Round(newVolume / 0.0075).ToString(CultureInfo.CurrentCulture);
+                    maxGlow.EffectColour = Color4.Transparent;
+                    text.Text = Math.Round(displayVolume * 100).ToString(CultureInfo.CurrentCulture);
                 }
-            };
 
-            bgProgress.Current.Value = 0.75f;
-        }
-
-        /// <summary>
-        /// This is needed because <see cref="TransformCustom{TValue,T}"/> doesn't support <see cref="Bindable{T}"/>
-        /// </summary>
-        [UsedImplicitly]
-        private double circleBindable
-        {
-            get => volumeCircle.Current;
-            set => volumeCircle.Current.Value = value;
+                volumeCircle.Current.Value = displayVolume * 0.75f;
+            }
         }
 
         public double Volume
