@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         [NonParallelizable]
         [TestCase("basic", false), Ignore("See: https://github.com/ppy/osu/issues/2152")]
+        [TestCase("slider-generating-drumroll", false)]
         public void Test(string name, bool isForCurrentRuleset)
         {
             this.isForCurrentRuleset = isForCurrentRuleset;

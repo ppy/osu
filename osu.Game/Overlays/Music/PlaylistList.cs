@@ -101,11 +101,10 @@ namespace osu.Game.Overlays.Music
 
             public void AddBeatmapSet(BeatmapSetInfo beatmapSet)
             {
-                items.Add(new PlaylistItem(beatmapSet)
-                {
-                    OnSelect = set => OnSelect?.Invoke(set),
-                    Depth = items.Count
-                });
+                var newItem = new PlaylistItem(beatmapSet) { OnSelect = set => OnSelect?.Invoke(set) };
+
+                items.Add(newItem);
+                items.SetLayoutPosition(newItem, items.Count);
             }
 
             public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -197,7 +196,7 @@ namespace osu.Game.Overlays.Music
             {
                 var itemsPos = items.ToLocalSpace(nativeDragPosition);
 
-                int srcIndex = (int)draggedItem.Depth;
+                int srcIndex = (int)items.GetLayoutPosition(draggedItem);
 
                 // Find the last item with position < mouse position. Note we can't directly use
                 // the item positions as they are being transformed
@@ -219,15 +218,15 @@ namespace osu.Game.Overlays.Music
                 if (srcIndex < dstIndex)
                 {
                     for (int i = srcIndex + 1; i <= dstIndex; i++)
-                        items.ChangeChildDepth(items[i], i - 1);
+                        items.SetLayoutPosition(items[i], i - 1);
                 }
                 else
                 {
                     for (int i = dstIndex; i < srcIndex; i++)
-                        items.ChangeChildDepth(items[i], i + 1);
+                        items.SetLayoutPosition(items[i], i + 1);
                 }
 
-                items.ChangeChildDepth(draggedItem, dstIndex);
+                items.SetLayoutPosition(draggedItem, dstIndex);
             }
 
             private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
@@ -242,9 +241,6 @@ namespace osu.Game.Overlays.Music
                             InvalidateLayout();
                     }
                 }
-
-                // Compare with reversed ChildID and Depth
-                protected override int Compare(Drawable x, Drawable y) => base.Compare(y, x);
 
                 public IEnumerable<IFilterable> FilterableChildren => Children;
 

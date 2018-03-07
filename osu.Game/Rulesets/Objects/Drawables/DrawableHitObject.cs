@@ -35,8 +35,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
 
-        private List<DrawableHitObject> nestedHitObjects;
-        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+        private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
+        public bool HasNestedHitObjects => nestedHitObjects.IsValueCreated;
+        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects.Value;
 
         public event Action<DrawableHitObject, Judgement> OnJudgement;
         public event Action<DrawableHitObject, Judgement> OnJudgementRemoved;
@@ -52,12 +53,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been hit.
         /// </summary>
-        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && (NestedHitObjects?.All(n => n.IsHit) ?? true);
+        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && (!HasNestedHitObjects || NestedHitObjects.All(n => n.IsHit));
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
+        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (!HasNestedHitObjects || NestedHitObjects.All(h => h.AllJudged));
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> can be judged.
@@ -160,14 +161,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected virtual void AddNested(DrawableHitObject h)
         {
-            if (nestedHitObjects == null)
-                nestedHitObjects = new List<DrawableHitObject>();
-
             h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
             h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
             h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
 
-            nestedHitObjects.Add(h);
+            nestedHitObjects.Value.Add(h);
         }
 
         /// <summary>
@@ -211,7 +209,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (AllJudged)
                 return false;
 
-            if (NestedHitObjects != null)
+            if (HasNestedHitObjects)
                 foreach (var d in NestedHitObjects)
                     judgementOccurred |= d.UpdateJudgement(userTriggered);
 
