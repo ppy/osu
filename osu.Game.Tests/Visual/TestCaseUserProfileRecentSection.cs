@@ -28,26 +28,25 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseUserProfileRecentSection()
         {
-            var flow = new FillFlowContainer<DrawableRecentActivity>
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(0.2f)
+                },
+                new ScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new FillFlowContainer<DrawableRecentActivity>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        ChildrenEnumerable = createDummyActivities().Select(a => new DrawableRecentActivity(a))
+                    },
+                }
             };
-
-            flow.AddRange(createDummyActivities().Select(a => new DrawableRecentActivity(a)));
-
-            Add(new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(0.2f)
-            });
-
-            Add(new ScrollContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = flow,
-            });
         }
 
         private IEnumerable<RecentActivity> createDummyActivities()
