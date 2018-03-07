@@ -22,16 +22,11 @@ namespace osu.Game.Overlays.Notifications
 
         private ClearAllButton clearButton;
 
-        private FlowContainer<Notification> notifications;
+        private FlowContainer<Drawable> notifications;
+        protected override Container<Drawable> Content => notifications;
 
-        public int DisplayedCount => notifications.Count(n => !n.WasClosed);
-        public int UnreadCount => notifications.Count(n => !n.WasClosed && !n.Read);
-
-        public void Add(Notification notification, float position)
-        {
-            notifications.Add(notification);
-            notifications.SetLayoutPosition(notification, position);
-        }
+        public int DisplayedCount => notifications.OfType<Notification>().Count(n => !n.WasClosed);
+        public int UnreadCount => notifications.OfType<Notification>().Count(n => !n.WasClosed && !n.Read);
 
         public IEnumerable<Type> AcceptTypes;
 
@@ -114,7 +109,7 @@ namespace osu.Game.Overlays.Notifications
                         },
                     },
                 },
-                notifications = new AlwaysUpdateFillFlowContainer<Notification>
+                notifications = new AlwaysUpdateFillFlowContainer<Drawable>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
@@ -127,7 +122,7 @@ namespace osu.Game.Overlays.Notifications
 
         private void clearAll()
         {
-            notifications.Children.ForEach(c => c.Close());
+            notifications.Children.OfType<Notification>().ForEach(c => c.Close());
         }
 
         protected override void Update()
@@ -160,7 +155,7 @@ namespace osu.Game.Overlays.Notifications
 
         public void MarkAllRead()
         {
-            notifications?.Children.ForEach(n => n.Read = true);
+            notifications?.Children.OfType<Notification>().ForEach(n => n.Read = true);
         }
     }
 

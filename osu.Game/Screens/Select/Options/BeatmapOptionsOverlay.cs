@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Select.Options
         /// </param>
         public void AddButton(string firstLine, string secondLine, FontAwesome icon, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
         {
-            var button = new BeatmapOptionsButton
+            buttonsContainer.Add(new BeatmapOptionsButton
             {
                 FirstLineText = firstLine,
                 SecondLineText = secondLine,
@@ -108,10 +108,7 @@ namespace osu.Game.Screens.Select.Options
                     action?.Invoke();
                 },
                 HotKey = hotkey
-            };
-
-            buttonsContainer.Add(button);
-            buttonsContainer.SetLayoutPosition(button, depth);
+            }, depth);
         }
     }
 }

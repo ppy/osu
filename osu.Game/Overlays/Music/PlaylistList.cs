@@ -101,10 +101,10 @@ namespace osu.Game.Overlays.Music
 
             public void AddBeatmapSet(BeatmapSetInfo beatmapSet)
             {
-                var newItem = new PlaylistItem(beatmapSet) { OnSelect = set => OnSelect?.Invoke(set) };
-
-                items.Add(newItem);
-                items.SetLayoutPosition(newItem, items.Count);
+                items.Add(new PlaylistItem(beatmapSet)
+                {
+                    OnSelect = set => OnSelect?.Invoke(set)
+                }, items.Count);
             }
 
             public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)

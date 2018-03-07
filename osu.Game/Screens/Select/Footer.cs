@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Select
         /// </param>
         public void AddButton(string text, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
         {
-            var button = new FooterButton
+            buttons.Add(new FooterButton
             {
                 Text = text,
                 Height = play_song_select_button_height,
@@ -55,10 +55,7 @@ namespace osu.Game.Screens.Select
                 Hovered = updateModeLight,
                 HoverLost = updateModeLight,
                 Action = action,
-            };
-
-            buttons.Add(button);
-            buttons.SetLayoutPosition(button, -depth);
+            }, -depth);
         }
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
