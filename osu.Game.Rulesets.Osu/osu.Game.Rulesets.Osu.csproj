@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Game.props" />
   <Import Project="..\OpenTK.props" />
-  <Import Project="..\iOS.props" />
 
   <PropertyGroup Label="Project">
     <OutputType>Library</OutputType>
@@ -23,4 +22,5 @@
     <PackageReference Include="NUnit" Version="3.8.1" />
   </ItemGroup>
 
+  <Import Project="..\iOS.props" />
 </Project>
