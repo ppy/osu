@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -55,6 +56,14 @@ namespace osu.Game.Graphics.UserInterface
                     i.AccentColour = value;
             }
         }
+
+        protected override TabFillFlowContainer CreateTabFlow() => new OsuTabFillFlowContainer
+        {
+            Direction = FillDirection.Full,
+            RelativeSizeAxes = Axes.Both,
+            Depth = -1,
+            Masking = true
+        };
 
         public class OsuTabItem : TabItem<T>, IHasAccentColour
         {
@@ -238,6 +247,11 @@ namespace osu.Game.Graphics.UserInterface
                     base.OnHoverLost(state);
                 }
             }
+        }
+
+        private class OsuTabFillFlowContainer : TabFillFlowContainer
+        {
+            protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
         }
     }
 }
