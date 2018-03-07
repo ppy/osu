@@ -129,7 +129,6 @@ namespace osu.Game.Overlays
         public void Post(Notification notification) => postScheduler.Add(() =>
         {
             ++runningDepth;
-            notification.Depth = notification.DisplayOnTop ? runningDepth : -runningDepth;
 
             notification.Closed += notificationClosed;
 
@@ -138,7 +137,9 @@ namespace osu.Game.Overlays
                 hasCompletionTarget.CompletionTarget = Post;
 
             var ourType = notification.GetType();
-            sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
+
+            var section = sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)));
+            section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
 
             updateCounts();
         });

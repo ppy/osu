@@ -22,16 +22,14 @@ namespace osu.Game.Skinning
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : base(skin)
         {
+            storage = new LegacySkinResourceStore(skin, storage);
             samples = audioManager.GetSampleManager(storage);
             textures = new TextureStore(new RawTextureLoaderStore(storage));
         }
 
-        private string getPathForFile(string filename) =>
-            SkinInfo.Files.FirstOrDefault(f => string.Equals(Path.GetFileNameWithoutExtension(f.Filename), filename, StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
-
         public override Drawable GetDrawableComponent(string componentName)
         {
-            var texture = textures.Get(getPathForFile(componentName.Split('/').Last()));
+            var texture = textures.Get(componentName);
             if (texture == null) return null;
 
             return new Sprite
@@ -42,6 +40,25 @@ namespace osu.Game.Skinning
             };
         }
 
-        public override SampleChannel GetSample(string sampleName) => samples.Get(getPathForFile(sampleName.Split('/').Last()));
+        public override SampleChannel GetSample(string sampleName) => samples.Get(sampleName);
+
+        private class LegacySkinResourceStore : IResourceStore<byte[]>
+        {
+            private readonly SkinInfo skin;
+            private readonly IResourceStore<byte[]> underlyingStore;
+
+            private string getPathForFile(string filename) =>
+                skin.Files.FirstOrDefault(f => string.Equals(Path.GetFileNameWithoutExtension(f.Filename), filename.Split('/').Last(), StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+
+            public LegacySkinResourceStore(SkinInfo skin, IResourceStore<byte[]> underlyingStore)
+            {
+                this.skin = skin;
+                this.underlyingStore = underlyingStore;
+            }
+
+            public Stream GetStream(string name) => underlyingStore.GetStream(getPathForFile(name));
+
+            byte[] IResourceStore<byte[]>.Get(string name) => underlyingStore.Get(getPathForFile(name));
+        }
     }
 }
