@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -22,7 +23,6 @@ namespace osu.Game.Screens.Play
         private Player player;
 
         private BeatmapMetadataDisplay info;
-        private VisualSettings visualSettings;
 
         private bool showOverlays = true;
         public override bool ShowOverlaysOnEnter => showOverlays;
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
-            Add(visualSettings = new VisualSettings
+            Add(new VisualSettings
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -116,9 +116,22 @@ namespace osu.Game.Screens.Play
             logo.Delay(resuming ? 0 : 500).MoveToOffset(new Vector2(0, -0.24f), 500, Easing.InOutExpo);
         }
 
+        private bool weHandledMouseDown;
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            weHandledMouseDown = true;
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            weHandledMouseDown = false;
+            return base.OnMouseUp(state, args);
+        }
+
         private void pushWhenLoaded()
         {
-            if (player.LoadState != LoadState.Ready || visualSettings.IsHovered)
+            if (player.LoadState != LoadState.Ready || !IsHovered || GetContainingInputManager().CurrentState.Mouse.HasAnyButtonPressed && !weHandledMouseDown)
             {
                 Schedule(pushWhenLoaded);
                 return;
