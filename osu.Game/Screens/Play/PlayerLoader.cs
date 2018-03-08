@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 
@@ -51,6 +52,7 @@ namespace osu.Game.Screens.Play
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
+
             Add(new VisualSettings
             {
                 Anchor = Anchor.TopRight,
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.Play
             contentIn();
 
             info.Delay(750).FadeIn(500);
-            this.Delay(2150).Schedule(pushWhenLoaded);
+            this.Delay(1800).Schedule(pushWhenLoaded);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -129,29 +131,39 @@ namespace osu.Game.Screens.Play
             return base.OnMouseUp(state, args);
         }
 
+        private ScheduledDelegate pushDebounce;
+
+        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && (!GetContainingInputManager().CurrentState.Mouse.HasAnyButtonPressed || weHandledMouseDown);
+
         private void pushWhenLoaded()
         {
-            if (player.LoadState != LoadState.Ready || !IsHovered || GetContainingInputManager().CurrentState.Mouse.HasAnyButtonPressed && !weHandledMouseDown)
+            Schedule(pushWhenLoaded);
+
+            if (!readyForPush)
             {
-                Schedule(pushWhenLoaded);
+                pushDebounce?.Cancel();
+                pushDebounce = null;
                 return;
             }
 
-            contentOut();
-
-            this.Delay(250).Schedule(() =>
+            if (pushDebounce == null) pushDebounce = Scheduler.AddDelayed(() =>
             {
-                if (!IsCurrentScreen) return;
+                contentOut();
 
-                if (!Push(player))
-                    Exit();
-                else
+                this.Delay(250).Schedule(() =>
                 {
-                    //By default, we want to load the player and never be returned to.
-                    //Note that this may change if the player we load requested a re-run.
-                    ValidForResume = false;
-                }
-            });
+                    if (!IsCurrentScreen) return;
+
+                    if (!Push(player))
+                        Exit();
+                    else
+                    {
+                        //By default, we want to load the player and never be returned to.
+                        //Note that this may change if the player we load requested a re-run.
+                        ValidForResume = false;
+                    }
+                });
+            }, 500);
         }
 
         protected override bool OnExiting(Screen next)
