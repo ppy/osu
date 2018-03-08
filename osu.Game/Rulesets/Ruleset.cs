@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Do not override this unless you are a legacy mode.
         /// </summary>
-        public virtual int LegacyID => -1;
+        public virtual int? LegacyID => null;
 
         /// <summary>
         /// A unique short name to reference this ruleset in online requests.

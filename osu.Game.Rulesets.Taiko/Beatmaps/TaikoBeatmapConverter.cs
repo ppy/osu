@@ -101,15 +101,15 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 // The duration of the taiko hit object
                 double taikoDuration = distance / taikoVelocity;
 
-                // For some reason, old osu! always uses speedAdjustment to determine the taiko velocity, but
-                // only uses it to determine osu! velocity if beatmap version < 8. Let's account for that here.
-                if (beatmap.BeatmapInfo.BeatmapVersion >= 8)
-                    speedAdjustedBeatLength *= speedAdjustment;
-
                 // The velocity of the osu! hit object - calculated as the velocity of a slider
                 double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * legacy_velocity_multiplier / speedAdjustedBeatLength;
                 // The duration of the osu! hit object
                 double osuDuration = distance / osuVelocity;
+
+                // osu-stable always uses the speed-adjusted beatlength to determine the velocities, but
+                // only uses it for tick rate if beatmap version < 8
+                if (beatmap.BeatmapInfo.BeatmapVersion >= 8)
+                    speedAdjustedBeatLength *= speedAdjustment;
 
                 // If the drum roll is to be split into hit circles, assume the ticks are 1/8 spaced within the duration of one beat
                 double tickSpacing = Math.Min(speedAdjustedBeatLength / beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate, taikoDuration / spans);
