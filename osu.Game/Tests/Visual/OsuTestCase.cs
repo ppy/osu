@@ -4,10 +4,12 @@
 using System;
 using System.IO;
 using System.Reflection;
+using NUnit.Framework;
 using osu.Framework.Testing;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture, Timeout(30000)]
     public abstract class OsuTestCase : TestCase
     {
         public override void RunTest()

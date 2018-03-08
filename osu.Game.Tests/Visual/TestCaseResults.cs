@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
@@ -30,6 +31,8 @@ namespace osu.Game.Tests.Visual
         private void load(BeatmapManager beatmaps)
         {
             this.beatmaps = beatmaps;
+
+            Thread.Sleep(300000);
         }
 
         private WorkingBeatmap beatmap;
