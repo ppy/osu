@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
@@ -42,8 +43,9 @@ namespace osu.Game.Screens.Play
             UserAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
         }
 
-        protected void ConfigureBackgroundUpdate()
+        protected override void OnEntering(Screen last)
         {
+            base.OnEntering(last);
             DimLevel.ValueChanged += _ => UpdateBackgroundElements();
             BlurLevel.ValueChanged += _ => UpdateBackgroundElements();
             ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();

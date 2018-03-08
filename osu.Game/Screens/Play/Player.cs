@@ -277,8 +277,6 @@ namespace osu.Game.Screens.Play
             if (!loadedSuccessfully)
                 return;
 
-            ConfigureBackgroundUpdate();
-
             Content.Alpha = 0;
             Content
                 .ScaleTo(0.7f)
