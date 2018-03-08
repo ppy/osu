@@ -68,6 +68,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
             score.Statistics[HitResult.Miss] = scoreResultCounts.GetOrDefault(HitResult.Miss);
         }
 
+        private const double harshness = 0.01;
+
         protected override void OnNewJudgement(Judgement judgement)
         {
             base.OnNewJudgement(judgement);
@@ -83,15 +85,15 @@ namespace osu.Game.Rulesets.Osu.Scoring
             switch (judgement.Result)
             {
                 case HitResult.Great:
-                    Health.Value += (10.2 - hpDrainRate) * 0.02;
+                    Health.Value += (10.2 - hpDrainRate) * harshness;
                     break;
 
                 case HitResult.Good:
-                    Health.Value += (8 - hpDrainRate) * 0.02;
+                    Health.Value += (8 - hpDrainRate) * harshness;
                     break;
 
                 case HitResult.Meh:
-                    Health.Value += (4 - hpDrainRate) * 0.02;
+                    Health.Value += (4 - hpDrainRate) * harshness;
                     break;
 
                 /*case HitResult.SliderTick:
@@ -99,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     break;*/
 
                 case HitResult.Miss:
-                    Health.Value -= hpDrainRate * 0.04;
+                    Health.Value -= hpDrainRate * (harshness * 2);
                     break;
             }
         }
