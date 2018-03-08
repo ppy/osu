@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapGeneral()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(4, difficulty.CircleSize);
                 Assert.AreEqual(8, difficulty.OverallDifficulty);
                 Assert.AreEqual(9, difficulty.ApproachRate);
-                Assert.AreEqual(1.8f, difficulty.SliderMultiplier);
+                Assert.AreEqual(1.8, difficulty.SliderMultiplier);
                 Assert.AreEqual(2, difficulty.SliderTickRate);
             }
         }
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapEvents()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapTimingPoints()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
@@ -187,7 +187,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapHitObjects()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
