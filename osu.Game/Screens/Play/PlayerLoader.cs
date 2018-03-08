@@ -88,8 +88,6 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            ConfigureBackgroundUpdate();
-
             Content.ScaleTo(0.7f);
 
             contentIn();
