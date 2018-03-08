@@ -149,6 +149,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Testing\Beatmaps\basic-expected-conversion.json" />
     <EmbeddedResource Include="Resources\Testing\Beatmaps\basic.osu" />
+    <EmbeddedResource Include="Resources\Testing\Beatmaps\slider-generating-drumroll-expected-conversion.json" />
+    <EmbeddedResource Include="Resources\Testing\Beatmaps\slider-generating-drumroll.osu" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets" Condition="Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" />
