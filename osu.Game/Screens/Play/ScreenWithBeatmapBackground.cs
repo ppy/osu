@@ -26,8 +26,6 @@ namespace osu.Game.Screens.Play
         protected Bindable<double> DimLevel;
         protected Bindable<double> BlurLevel;
         protected Bindable<bool> ShowStoryboard;
-        protected Bindable<bool> MouseWheelDisabled;
-        protected Bindable<double> UserAudioOffset;
 
         #endregion
 
@@ -37,10 +35,6 @@ namespace osu.Game.Screens.Play
             DimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             BlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-
-            MouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
-
-            UserAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
         }
 
         protected override void OnEntering(Screen last)
