@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -16,6 +17,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
@@ -42,6 +44,9 @@ namespace osu.Game.Screens.Play
         public bool AllowPause { get; set; } = true;
         public bool AllowLeadIn { get; set; } = true;
         public bool AllowResults { get; set; } = true;
+
+        private Bindable<bool> mouseWheelDisabled;
+        private Bindable<double> userAudioOffset;
 
         public int RestartCount;
 
@@ -75,10 +80,13 @@ namespace osu.Game.Screens.Play
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, APIAccess api)
+        private void load(AudioManager audio, APIAccess api, OsuConfigManager config)
         {
             this.api = api;
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
+
+            mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+            userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
 
             WorkingBeatmap working = Beatmap.Value;
             Beatmap beatmap;
@@ -131,8 +139,8 @@ namespace osu.Game.Screens.Play
             // the final usable gameplay clock with user-set offsets applied.
             var offsetClock = new FramedOffsetClock(adjustableClock);
 
-            UserAudioOffset.ValueChanged += v => offsetClock.Offset = v;
-            UserAudioOffset.TriggerChange();
+            userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
+            userAudioOffset.TriggerChange();
 
             scoreProcessor = RulesetContainer.CreateScoreProcessor();
 
@@ -342,7 +350,7 @@ namespace osu.Game.Screens.Play
             Background?.FadeTo(1f, fade_out_duration);
         }
 
-        protected override bool OnWheel(InputState state) => MouseWheelDisabled.Value && !pauseContainer.IsPaused;
+        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
 
         private void initializeStoryboard(bool asyncLoad)
         {
