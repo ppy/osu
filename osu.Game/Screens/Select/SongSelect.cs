@@ -259,8 +259,13 @@ namespace osu.Game.Screens.Select
 
         protected void WorkingBeatmapChanged(WorkingBeatmap beatmap)
         {
-            if (IsCurrentScreen)
-                Carousel.SelectBeatmap(beatmap?.BeatmapInfo);
+            if (IsCurrentScreen && !Carousel.SelectBeatmap(beatmap?.BeatmapInfo, false))
+                // If selecting new beatmap without bypassing filters failed, there's possibly a ruleset mismatch
+                if (beatmap?.BeatmapInfo?.Ruleset != null && beatmap.BeatmapInfo.Ruleset != Ruleset.Value)
+                {
+                    Ruleset.Value = beatmap.BeatmapInfo.Ruleset;
+                    Carousel.SelectBeatmap(beatmap.BeatmapInfo);
+                }
         }
 
         /// <summary>
@@ -452,7 +457,7 @@ namespace osu.Game.Screens.Select
 
         private void carouselBeatmapsLoaded()
         {
-            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, true))
+            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
                 return;
 
             if (Carousel.SelectedBeatmapSet == null && !Carousel.SelectNextRandom())
