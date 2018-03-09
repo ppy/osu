@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual
         {
             typeof(SelectionBox),
             typeof(SelectionLayer),
-            typeof(CaptureBox),
+            typeof(SelectionOverlay),
             typeof(HitObjectComposer),
             typeof(OsuHitObjectComposer),
             typeof(HitObjectOverlayLayer),

@@ -1,14 +1,15 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Edit.Types;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 
@@ -17,20 +18,13 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
     /// <summary>
     /// A box which encloses <see cref="DrawableHitObject"/>s.
     /// </summary>
-    public class CaptureBox : VisibilityContainer
+    public class SelectionOverlay : VisibilityContainer
     {
-        /// <summary>
-        /// Invoked when the captured <see cref="DrawableHitObject"/>s should be moved.
-        /// </summary>
-        public event Action<InputState> MovementRequested;
+        private readonly IReadOnlyList<HitObjectOverlay> overlays;
 
-        private readonly IDrawable captureArea;
-        private readonly IReadOnlyList<DrawableHitObject> capturedObjects;
-
-        public CaptureBox(IDrawable captureArea, IReadOnlyList<DrawableHitObject> capturedObjects)
+        public SelectionOverlay(IReadOnlyList<HitObjectOverlay> overlays)
         {
-            this.captureArea = captureArea;
-            this.capturedObjects = capturedObjects;
+            this.overlays = overlays;
 
             Masking = true;
             BorderThickness = SelectionBox.BORDER_RADIUS;
@@ -61,10 +55,10 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             var topLeft = new Vector2(float.MaxValue, float.MaxValue);
             var bottomRight = new Vector2(float.MinValue, float.MinValue);
 
-            foreach (var obj in capturedObjects)
+            foreach (var obj in overlays)
             {
-                topLeft = Vector2.ComponentMin(topLeft, captureArea.ToLocalSpace(obj.SelectionQuad.TopLeft));
-                bottomRight = Vector2.ComponentMax(bottomRight, captureArea.ToLocalSpace(obj.SelectionQuad.BottomRight));
+                topLeft = Vector2.ComponentMin(topLeft, Parent.ToLocalSpace(obj.HitObject.SelectionQuad.TopLeft));
+                bottomRight = Vector2.ComponentMax(bottomRight, Parent.ToLocalSpace(obj.HitObject.SelectionQuad.BottomRight));
             }
 
             topLeft -= new Vector2(5);
@@ -80,7 +74,16 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
         protected override bool OnDrag(InputState state)
         {
-            MovementRequested?.Invoke(state);
+            // Todo: Various forms of snapping
+            foreach (var hitObject in overlays.Select(o => o.HitObject.HitObject))
+            {
+                switch (hitObject)
+                {
+                    case IHasEditablePosition editablePosition:
+                        editablePosition.OffsetPosition(state.Mouse.Delta);
+                        break;
+                }
+            }
             return true;
         }
 
