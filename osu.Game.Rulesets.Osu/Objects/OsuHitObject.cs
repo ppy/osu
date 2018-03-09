@@ -67,6 +67,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }
 
-        public virtual void SetPosition(Vector2 offset) => Position += offset;
+        public virtual void OffsetPosition(Vector2 offset) => Position += offset;
     }
 }

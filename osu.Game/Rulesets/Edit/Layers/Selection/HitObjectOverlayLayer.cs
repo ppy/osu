@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
                 switch (hitObject)
                 {
                     case IHasEditablePosition editablePosition:
-                        editablePosition.SetPosition(offset);
+                        editablePosition.OffsetPosition(state.Mouse.Delta);
                         break;
                 }
             }

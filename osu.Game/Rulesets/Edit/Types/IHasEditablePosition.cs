@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Edit.Types
 {
     public interface IHasEditablePosition
     {
-        void SetPosition(Vector2 offset);
+        void OffsetPosition(Vector2 offset);
     }
 }

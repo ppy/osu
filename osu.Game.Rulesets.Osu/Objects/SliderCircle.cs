@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             this.slider = slider;
         }
 
-        public override void SetPosition(Vector2 offset) => slider.SetPosition(offset);
+        public override void OffsetPosition(Vector2 offset) => slider.OffsetPosition(offset);
     }
 }
