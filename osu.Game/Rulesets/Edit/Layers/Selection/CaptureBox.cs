@@ -42,6 +42,13 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         private void load(OsuColour colours)
         {
             BorderColour = colours.Yellow;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Todo: We might need to optimise this
 
             // Move the rectangle to cover the hitobjects
             var topLeft = new Vector2(float.MaxValue, float.MaxValue);
