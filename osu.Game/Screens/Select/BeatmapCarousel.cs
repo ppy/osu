@@ -169,20 +169,29 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public void SelectBeatmap(BeatmapInfo beatmap)
+        /// <summary>
+        /// Selects a given beatmap on the carousel.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to select.</param>
+        /// <param name="skipFiltered">Whether to skip selecting filtered beatmaps.</param>
+        /// <returns>True if a selection was made, false if it was skipped.</returns>
+        public bool SelectBeatmap(BeatmapInfo beatmap, bool skipFiltered = false)
         {
             if (beatmap?.Hidden != false)
-                return;
+                return false;
 
-            foreach (CarouselBeatmapSet group in beatmapSets)
-            {
-                var item = group.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
-                if (item != null)
-                {
-                    select(item);
-                    return;
-                }
-            }
+            var group = beatmapSets.FirstOrDefault(s => s.BeatmapSet.OnlineBeatmapSetID == beatmap.BeatmapSet.OnlineBeatmapSetID);
+
+            if (group == null || !skipFiltered && group.Filtered)
+                return false;
+
+            var item = group.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
+
+            if (item == null || !skipFiltered && item.Filtered)
+                return false;
+
+            select(item);
+            return true;
         }
 
         /// <summary>

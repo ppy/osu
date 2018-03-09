@@ -267,10 +267,7 @@ namespace osu.Game.Screens.Select
         protected void WorkingBeatmapChanged(WorkingBeatmap beatmap)
         {
             if (IsCurrentScreen)
-            {
                 Carousel.SelectBeatmap(beatmap?.BeatmapInfo);
-                ensurePlayableRuleset();
-            }
         }
 
         /// <summary>
@@ -328,7 +325,6 @@ namespace osu.Game.Screens.Select
         {
             base.OnEntering(last);
 
-            ensurePlayableRuleset();
             Content.FadeInFromZero(250);
             FilterControl.Activate();
         }
@@ -454,34 +450,6 @@ namespace osu.Game.Screens.Select
                 if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
                 track.Start();
             }
-        }
-
-        private void ensurePlayableRuleset()
-        {
-            if (Beatmap.IsDefault)
-                // DummyBeatmap won't be playable anyway
-                return;
-
-            bool conversionAllowed = rulesetConversionAllowed.Value;
-            int? currentRuleset = Ruleset.Value.ID;
-            int beatmapRuleset = Beatmap.Value.BeatmapInfo.RulesetID;
-
-            if (currentRuleset == beatmapRuleset || conversionAllowed && beatmapRuleset == 0)
-                // Current beatmap is playable, nothing more to do
-                return;
-
-            // Otherwise, first check if the current beatmapset has any playable beatmaps
-            BeatmapInfo beatmap = Beatmap.Value.BeatmapSetInfo.Beatmaps?.FirstOrDefault(b => b.RulesetID == currentRuleset || conversionAllowed && b.RulesetID == 0);
-
-            // If it does then update the WorkingBeatmap
-            if (beatmap != null)
-            {
-                Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
-                return;
-            }
-
-            // If it doesn't, then update the current ruleset so that the current beatmap is playable
-            Ruleset.Value = Beatmap.Value.BeatmapInfo.Ruleset;
         }
 
         private void onBeatmapSetAdded(BeatmapSetInfo s) => Carousel.UpdateBeatmapSet(s);
