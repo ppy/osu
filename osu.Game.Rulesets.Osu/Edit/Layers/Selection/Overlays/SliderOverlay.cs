@@ -22,18 +22,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
         {
             this.slider = slider;
 
-            var obj = (Slider)slider.HitObject;
+            Position = slider.Position;
+
+            var sliderObject = (Slider)slider.HitObject;
 
             InternalChildren = new Drawable[]
             {
-                body = new SliderBody(obj)
+                body = new SliderBody(sliderObject)
                 {
                     AccentColour = Color4.Transparent,
-                    PathWidth = obj.Scale * 64
+                    PathWidth = sliderObject.Scale * 64
                 },
                 new SliderCircleOverlay(slider.HeadCircle, slider),
                 new SliderCircleOverlay(slider.TailCircle, slider),
             };
+
+            sliderObject.PositionChanged += _ => Position = slider.Position;
         }
 
         [BackgroundDependencyLoader]
@@ -46,7 +50,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
         {
             base.Update();
 
-            Position = slider.Position;
             Size = slider.Size;
             OriginPosition = slider.OriginPosition;
 

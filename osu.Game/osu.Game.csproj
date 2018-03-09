@@ -365,6 +365,7 @@
     <Compile Include="Rulesets\Edit\Layers\Selection\CaptureBox.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectOverlay.cs" />
     <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectOverlayLayer.cs" />
+    <Compile Include="Rulesets\Edit\Types\IHasEditablePosition.cs" />
     <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />

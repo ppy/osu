@@ -55,8 +55,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableHitCircle(s.HeadCircle) { Position = s.TailCircle.Position - s.Position },
-                TailCircle = new DrawableSliderTail(s.TailCircle) { Position = s.TailCircle.Position - s.Position }
+                HeadCircle = new DrawableSliderHead(s, s.HeadCircle),
+                TailCircle = new DrawableSliderTail(s, s.TailCircle)
             };
 
             components.Add(Body);
@@ -84,6 +84,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 components.Add(drawableRepeatPoint);
                 AddNested(drawableRepeatPoint);
             }
+
+            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
         }
 
         [BackgroundDependencyLoader]

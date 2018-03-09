@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
             Scale = hitCircle.Scale;
 
             AddInternal(new RingPiece());
+
+            hitCircle.HitObject.PositionChanged += _ => Position = hitCircle.Position;
         }
 
         [BackgroundDependencyLoader]
