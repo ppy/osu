@@ -18,11 +18,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeStoryboardEvents()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacyStoryboardDecoder();
             using (var resStream = Resource.OpenResource("Himeringo - Yotsuya-san ni Yoroshiku (RLC) [Winber1's Extreme].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var storyboard = decoder.GetStoryboardDecoder().DecodeStoryboard(stream);
+                var storyboard = decoder.Decode(stream);
 
                 Assert.IsTrue(storyboard.HasDrawable);
                 Assert.AreEqual(4, storyboard.Layers.Count());
