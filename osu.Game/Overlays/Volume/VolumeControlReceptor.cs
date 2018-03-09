@@ -7,7 +7,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Game.Input.Bindings;
 
-namespace osu.Game.Graphics.UserInterface.Volume
+namespace osu.Game.Overlays.Volume
 {
     public class VolumeControlReceptor : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalInput
     {

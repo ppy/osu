@@ -50,10 +50,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdatePreemptState()
         {
-            this.Animate(
-                d => d.FadeIn(ANIM_DURATION),
-                d => d.ScaleTo(0.5f).ScaleTo(1f, ANIM_DURATION * 4, Easing.OutElasticHalf)
-            );
+            this.FadeOut().FadeIn(ANIM_DURATION);
+            this.ScaleTo(0.5f).ScaleTo(1f, ANIM_DURATION * 4, Easing.OutElasticHalf);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -64,12 +62,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     this.Delay(HitObject.TimePreempt).FadeOut();
                     break;
                 case ArmedState.Miss:
-                    this.FadeOut(ANIM_DURATION)
-                        .FadeColour(Color4.Red, ANIM_DURATION / 2);
+                    this.FadeOut(ANIM_DURATION);
+                    this.FadeColour(Color4.Red, ANIM_DURATION / 2);
                     break;
                 case ArmedState.Hit:
-                    this.FadeOut(ANIM_DURATION, Easing.OutQuint)
-                        .ScaleTo(Scale * 1.5f, ANIM_DURATION, Easing.Out);
+                    this.FadeOut(ANIM_DURATION, Easing.OutQuint);
+                    this.ScaleTo(Scale * 1.5f, ANIM_DURATION, Easing.Out);
                     break;
             }
         }
