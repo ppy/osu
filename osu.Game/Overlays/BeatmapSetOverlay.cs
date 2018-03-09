@@ -17,6 +17,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Overlays.BeatmapSet.Scores;
+using System.Linq;
 
 namespace osu.Game.Overlays
 {
@@ -137,6 +138,23 @@ namespace osu.Game.Overlays
         {
             State = Visibility.Hidden;
             return true;
+        }
+
+        public void ShowBeatmap(int beatmapId)
+        {
+            var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
+            req.Success += res =>
+            {
+                ShowBeatmapSet(res.ToBeatmapSet(rulesets));
+                header.Picker.Beatmap.Value = header.BeatmapSet.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+            };
+            api.Queue(req);
+        }
+
+        public void ShowBeatmap(BeatmapInfo beatmap)
+        {
+            ShowBeatmapSet(beatmap.BeatmapSet);
+            header.Picker.Beatmap.Value = beatmap;
         }
 
         public void ShowBeatmapSet(int beatmapSetId)
