@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new ManiaDifficultyCalculator(beatmap);
 
-        public override int LegacyID => 3;
+        public override int? LegacyID => 3;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 

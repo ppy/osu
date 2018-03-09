@@ -294,12 +294,16 @@
     <Compile Include="Online\API\DummyAPIAccess.cs" />
     <Compile Include="Online\API\IAPIProvider.cs" />
     <Compile Include="Online\API\APIDownloadRequest.cs" />
+    <Compile Include="Online\API\Requests\GetUserRecentActivitiesRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Migrations\20180125143340_Settings.cs" />
     <Compile Include="Migrations\20180125143340_Settings.Designer.cs">
       <DependentUpon>20180125143340_Settings.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\20180131154205_AddMuteBinding.cs" />
+    <Compile Include="Overlays\Profile\Sections\Recent\DrawableRecentActivity.cs" />
+    <Compile Include="Overlays\Profile\Sections\Recent\MedalIcon.cs" />
+    <Compile Include="Overlays\Profile\Sections\Recent\PaginatedRecentActivityContainer.cs" />
     <Compile Include="Overlays\Profile\SupporterIcon.cs" />
     <Compile Include="Online\API\Requests\GetFriendsRequest.cs" />
     <Compile Include="Overlays\Settings\DangerousSettingsButton.cs" />
@@ -351,6 +355,10 @@
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreModsContainer.cs" />
     <Compile Include="Overlays\Settings\Sections\Gameplay\ScrollingSettings.cs" />
     <Compile Include="Overlays\Settings\Sections\Maintenance\DeleteAllBeatmapsDialog.cs" />
+    <Compile Include="Overlays\VolumeOverlay.cs" />
+    <Compile Include="Overlays\Volume\MuteButton.cs" />
+    <Compile Include="Overlays\Volume\VolumeControlReceptor.cs" />
+    <Compile Include="Overlays\Volume\VolumeMeter.cs" />
     <Compile Include="Rulesets\Configuration\IRulesetConfigManager.cs" />
     <Compile Include="Rulesets\Configuration\RulesetConfigManager.cs" />
     <Compile Include="Rulesets\Edit\Layers\BorderLayer.cs" />
@@ -370,10 +378,11 @@
     <Compile Include="Rulesets\Replays\ReplayFrame.cs" />
     <Compile Include="Rulesets\Replays\Types\IConvertibleReplayFrame.cs" />
     <Compile Include="Rulesets\Scoring\Legacy\LegacyScoreParser.cs" />
-    <Compile Include="Rulesets\UI\ScalableContainer.cs" />
+    <Compile Include="Screens\Play\ScreenWithBeatmapBackground.cs" />
     <Compile Include="Screens\Play\PlayerSettings\VisualSettings.cs" />
     <Compile Include="Rulesets\Objects\CatmullApproximator.cs" />
     <Compile Include="Rulesets\UI\HitObjectContainer.cs" />
+    <Compile Include="Rulesets\UI\ScalableContainer.cs" />
     <Compile Include="Rulesets\UI\Scrolling\Visualisers\SequentialSpeedChangeVisualiser.cs" />
     <Compile Include="Rulesets\UI\Scrolling\Visualisers\ISpeedChangeVisualiser.cs" />
     <Compile Include="Rulesets\UI\Scrolling\Visualisers\OverlappingSpeedChangeVisualiser.cs" />
@@ -474,9 +483,6 @@
     <Compile Include="Graphics\UserInterface\SimpleComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\StarCounter.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
-    <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
-    <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
-    <Compile Include="Graphics\UserInterface\Volume\VolumeMeter.cs" />
     <Compile Include="Input\Bindings\DatabasedKeyBinding.cs" />
     <Compile Include="Input\Bindings\DatabasedKeyBindingContainer.cs" />
     <Compile Include="Input\Bindings\GlobalActionContainer.cs" />
