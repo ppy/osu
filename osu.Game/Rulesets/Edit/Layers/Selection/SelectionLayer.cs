@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         /// <summary>
         /// Invoked when the selected <see cref="DrawableHitObject"/>s should be moved.
         /// </summary>
-        public event Action<Vector2> SelectionMovementRequested;
+        public event Action<InputState> SelectionMovementRequested;
 
         private readonly Playfield playfield;
 
