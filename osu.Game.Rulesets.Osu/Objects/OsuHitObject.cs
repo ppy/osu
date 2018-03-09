@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 if (position == value)
                     return;
                 position = value;
-                
+
                 PositionChanged?.Invoke(value);
             }
         }
