@@ -171,27 +171,41 @@ namespace osu.Game.Screens.Select
 
         /// <summary>
         /// Selects a given beatmap on the carousel.
+        ///
+        /// If skipFiltered is true, we will try to select another unfiltered beatmap in the same set. If the
+        /// entire set is filtered, no selection is made.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
         /// <param name="skipFiltered">Whether to skip selecting filtered beatmaps.</param>
-        /// <returns>True if a selection was made, false if it was skipped.</returns>
+        /// <returns>True if a selection was made, False if it wasn't.</returns>
         public bool SelectBeatmap(BeatmapInfo beatmap, bool skipFiltered = false)
         {
             if (beatmap?.Hidden != false)
                 return false;
 
-            var group = beatmapSets.FirstOrDefault(s => s.BeatmapSet.OnlineBeatmapSetID == beatmap.BeatmapSet.OnlineBeatmapSetID);
+            foreach (CarouselBeatmapSet set in beatmapSets)
+            {
+                if (skipFiltered && set.Filtered)
+                    continue;
 
-            if (group == null || !skipFiltered && group.Filtered)
-                return false;
+                var item = set.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
 
-            var item = group.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
+                if (item == null)
+                    // The beatmap that needs to be selected doesn't exist in this set
+                    continue;
 
-            if (item == null || !skipFiltered && item.Filtered)
-                return false;
+                if (skipFiltered && item.Filtered)
+                    // The beatmap exists in this set but is filtered, so look for the first unfiltered map in the set
+                    item = set.Beatmaps.FirstOrDefault(b => !b.Filtered);
 
-            select(item);
-            return true;
+                if (item != null)
+                {
+                    select(item);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
