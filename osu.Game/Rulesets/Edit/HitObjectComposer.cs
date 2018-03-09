@@ -108,6 +108,7 @@ namespace osu.Game.Rulesets.Edit
 
             selectionLayer.ObjectSelected += hitObjectOverlayLayer.AddOverlay;
             selectionLayer.ObjectDeselected += hitObjectOverlayLayer.RemoveOverlay;
+            selectionLayer.SelectionMovementRequested += hitObjectOverlayLayer.MoveObjects;
 
             toolboxCollection.Items =
                 new[] { new RadioButton("Select", () => setCompositionTool(null)) }

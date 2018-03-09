@@ -27,6 +27,11 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         /// </summary>
         public event Action<DrawableHitObject> ObjectDeselected;
 
+        /// <summary>
+        /// Invoked when the selected <see cref="DrawableHitObject"/>s should be moved.
+        /// </summary>
+        public event Action<Vector2> SelectionMovementRequested;
+
         private readonly Playfield playfield;
 
         public SelectionLayer(Playfield playfield)
@@ -192,6 +197,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
                 return;
 
             AddInternal(captureBox = new CaptureBox(this, selectedHitObjects.ToList()));
+            captureBox.MovementRequested += v => SelectionMovementRequested?.Invoke(v);
         }
     }
 }
