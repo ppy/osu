@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Rulesets.Edit.Types;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Edit.Layers.Selection
 {
@@ -49,7 +48,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             existing.Expire();
         }
 
-        public void MoveObjects(Vector2 offset)
+        public void MoveObjects(InputState state)
         {
             // Todo: Various forms of snapping
             foreach (var hitObject in overlayContainer.Select(o => o.HitObject.HitObject))

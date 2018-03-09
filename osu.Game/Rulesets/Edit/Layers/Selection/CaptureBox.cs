@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         /// <summary>
         /// Invoked when the captured <see cref="DrawableHitObject"/>s should be moved.
         /// </summary>
-        public event Action<Vector2> MovementRequested;
+        public event Action<InputState> MovementRequested;
 
         private readonly IDrawable captureArea;
         private readonly IReadOnlyList<DrawableHitObject> capturedObjects;
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
         protected override bool OnDrag(InputState state)
         {
-            MovementRequested?.Invoke(state.Mouse.Delta);
+            MovementRequested?.Invoke(state);
             return true;
         }
 
