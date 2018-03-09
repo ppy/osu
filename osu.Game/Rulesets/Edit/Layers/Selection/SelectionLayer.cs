@@ -28,9 +28,14 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         public event Action<DrawableHitObject> ObjectDeselected;
 
         /// <summary>
-        /// Invoked when the selected <see cref="DrawableHitObject"/>s should be moved.
+        /// Invoked when the selection has been cleared.
         /// </summary>
-        public event Action<InputState> SelectionMovementRequested;
+        public event Action SelectionCleared;
+
+        /// <summary>
+        /// Invoked when the user has finished selecting all <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        public event Action SelectionFinished;
 
         private readonly Playfield playfield;
 
@@ -42,7 +47,6 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         }
 
         private SelectionBox selectionBox;
-        private CaptureBox captureBox;
 
         private readonly HashSet<DrawableHitObject> selectedHitObjects = new HashSet<DrawableHitObject>();
 
@@ -100,7 +104,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             if (!select(hitObject))
                 return;
 
-            clearCapture();
+            clearSelection();
             finishSelection();
         }
 
@@ -127,7 +131,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             if (!deselect(hitObject))
                 return;
 
-            clearCapture();
+            clearSelection();
             finishSelection();
         }
 
@@ -153,7 +157,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             selectedHitObjects.ForEach(h => ObjectDeselected?.Invoke(h));
             selectedHitObjects.Clear();
 
-            clearCapture();
+            clearSelection();
         }
 
         /// <summary>
@@ -185,19 +189,13 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             select(target);
         }
 
-        private void clearCapture()
-        {
-            captureBox?.Hide();
-            captureBox?.Expire();
-        }
+        private void clearSelection() => SelectionCleared?.Invoke();
 
         private void finishSelection()
         {
             if (selectedHitObjects.Count == 0)
                 return;
-
-            AddInternal(captureBox = new CaptureBox(this, selectedHitObjects.ToList()));
-            captureBox.MovementRequested += v => SelectionMovementRequested?.Invoke(v);
+            SelectionFinished?.Invoke();
         }
     }
 }
