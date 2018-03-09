@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using System.Threading;
 using OpenTK;
 using OpenTK.Input;
@@ -10,14 +9,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -65,8 +62,6 @@ namespace osu.Game.Screens.Select
 
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
-
-        private Bindable<bool> rulesetConversionAllowed;
 
         private CancellationTokenSource initialAddSetsTask;
 
@@ -184,7 +179,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours, OsuConfigManager config)
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
         {
             dependencies.CacheAs(this);
 
@@ -198,8 +193,6 @@ namespace osu.Game.Screens.Select
 
             if (this.beatmaps == null)
                 this.beatmaps = beatmaps;
-
-            rulesetConversionAllowed = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
 
             if (osu != null)
                 Ruleset.BindTo(osu.Ruleset);
@@ -459,16 +452,14 @@ namespace osu.Game.Screens.Select
 
         private void carouselBeatmapsLoaded()
         {
-            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false)
+            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, true))
+                return;
+
+            if (Carousel.SelectedBeatmapSet == null && !Carousel.SelectNextRandom())
             {
-                Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo);
-            }
-            else if (Carousel.SelectedBeatmapSet == null)
-            {
-                if (!Carousel.SelectNextRandom())
-                    // in the case random selection failed, we want to trigger selectionChanged
-                    // to show the dummy beatmap (we have nothing else to display).
-                    carouselSelectionChanged(null);
+                // in the case random selection failed, we want to trigger selectionChanged
+                // to show the dummy beatmap (we have nothing else to display).
+                carouselSelectionChanged(null);
             }
         }
 
