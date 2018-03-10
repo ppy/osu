@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.IO;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -83,6 +85,8 @@ namespace osu.Game
 
         private Bindable<int> configSkin;
 
+        private Bindable<ScreenshotFormat> screenshotFormat;
+
         private readonly string[] args;
 
         private SettingsOverlay settings;
@@ -133,6 +137,8 @@ namespace osu.Game
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
+
+            screenshotFormat = LocalConfig.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
 
             SkinManager.CurrentSkinInfo.ValueChanged += s => configSkin.Value = s.ID;
             configSkin.ValueChanged += id => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == id) ?? SkinInfo.Default;
@@ -432,9 +438,45 @@ namespace osu.Game
                 case GlobalAction.ToggleDirect:
                     direct.ToggleVisibility();
                     return true;
+                case GlobalAction.TakeScreenshot:
+                    if (Window.ScreenshotTakenAction == null)
+                        Window.ScreenshotTakenAction = (screenshotBitmap) =>
+                        {
+                            var fileName = getScreenshotFileName(screenshotFormat);
+
+                            switch (screenshotFormat.Value)
+                            {
+                                case ScreenshotFormat.Bmp:
+                                    screenshotBitmap.Save(fileName, ImageFormat.Bmp);
+                                    break;
+                                case ScreenshotFormat.Png:
+                                    screenshotBitmap.Save(fileName, ImageFormat.Png);
+                                    break;
+                                case ScreenshotFormat.Jpg:
+                                    screenshotBitmap.Save(fileName, ImageFormat.Jpeg);
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException(nameof(screenshotFormat));
+                            }
+                        };
+
+                    RequestScreenshot();
+                    return true;
             }
 
             return false;
+        }
+
+        private string getScreenshotFileName(ScreenshotFormat screenshotFormat)
+        {
+            // TODO Change screenshots location
+            var baseDirectory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            var screenshotsDirectory = baseDirectory.CreateSubdirectory("Screenshots");
+
+            var screenshotExtension = screenshotFormat.ToString().ToLower();
+            var screenshots = screenshotsDirectory.GetFiles($"*.{screenshotExtension}");
+
+            return Path.Combine(screenshotsDirectory.FullName, $"screenshot{screenshots.Length + 1}.{screenshotExtension}");
         }
 
         private readonly BindableDouble inactiveVolumeAdjust = new BindableDouble();

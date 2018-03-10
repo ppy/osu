@@ -26,6 +26,8 @@ namespace osu.Game.Input.Bindings
         {
             new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
             new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
+            new KeyBinding(InputKey.F12,GlobalAction.TakeScreenshot),
+
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
@@ -66,6 +68,8 @@ namespace osu.Game.Input.Bindings
         DecreaseVolume,
         [Description("Toggle mute")]
         ToggleMute,
+        [Description("Take screenshot")]
+        TakeScreenshot,
 
         // In-Game Keybindings
         [Description("Skip Cutscene")]
