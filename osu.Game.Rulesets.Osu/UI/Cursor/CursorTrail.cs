@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             const int fade_clock_reset_threshold = 1000000;
 
-            time = (float)(Time.Current - timeOffset) / 500f;
+            time = (float)(Time.Current - timeOffset) / 300f;
             if (time > fade_clock_reset_threshold)
                 resetTime();
         }
