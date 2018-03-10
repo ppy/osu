@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.BeatmapSet
             Beatmap.TriggerChange();
         }
 
-        private void showBeatmap(BeatmapInfo beatmap) => version.Text = beatmap.Version;
+        private void showBeatmap(BeatmapInfo beatmap) => version.Text = beatmap?.Version;
 
         private void updateDifficultyButtons()
         {
