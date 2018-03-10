@@ -48,6 +48,9 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
+                if (beatmapSet == null)
+                    return;
+
                 Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = BeatmapSet;
                 title.Text = BeatmapSet.Metadata.Title;
                 artist.Text = BeatmapSet.Metadata.Artist;

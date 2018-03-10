@@ -18,23 +18,53 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using System.Linq;
+using osu.Framework.Configuration;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
     public class BeatmapSetOverlay : WaveOverlayContainer
     {
+        private const int fade_duration = 300;
+
         public const float X_PADDING = 40;
         public const float RIGHT_WIDTH = 275;
 
         private readonly Header header;
         private readonly Info info;
         private readonly ScoresContainer scores;
+        private readonly LoadingAnimation loading;
 
         private APIAccess api;
         private RulesetStore rulesets;
         private GetScoresRequest getScoresRequest;
 
         private readonly ScrollContainer scroll;
+
+        private BeatmapSetInfo beatmapSet;
+
+        public BeatmapSetInfo BeatmapSet
+        {
+            get => beatmapSet;
+            set
+            {
+                if (value == beatmapSet)
+                    return;
+
+                beatmapSet = value;
+
+                if (beatmapSet == null)
+                {
+                    scroll.FadeOut(fade_duration);
+                    loading.FadeIn(fade_duration);
+                    return;
+                }
+
+                header.BeatmapSet = info.BeatmapSet = beatmapSet;
+                loading.FadeOut(fade_duration);
+                scroll.FadeIn(fade_duration);
+            }
+        }
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
@@ -67,10 +97,17 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
+                loading = new LoadingAnimation
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Alpha = 1,
+                },
                 scroll = new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
+                    Alpha = 0,
                     Child = new ReverseChildIDFillFlowContainer<Drawable>
                     {
                         RelativeSizeAxes = Axes.X,
@@ -89,7 +126,9 @@ namespace osu.Game.Overlays
             header.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b;
-                updateScores(b);
+
+                if (b != null)
+                    updateScores(b);
             };
         }
 
@@ -132,6 +171,7 @@ namespace osu.Game.Overlays
             base.PopOut();
             header.Details.StopPreview();
             FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
+            BeatmapSet = null;
         }
 
         protected override bool OnClick(InputState state)
@@ -142,6 +182,7 @@ namespace osu.Game.Overlays
 
         public void ShowBeatmap(int beatmapId)
         {
+            BeatmapSet = null;
             var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
             req.Success += res =>
             {
@@ -149,25 +190,21 @@ namespace osu.Game.Overlays
                 header.Picker.Beatmap.Value = header.BeatmapSet.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
             api.Queue(req);
-        }
-
-        public void ShowBeatmap(BeatmapInfo beatmap)
-        {
-            ShowBeatmapSet(beatmap.BeatmapSet);
-            header.Picker.Beatmap.Value = beatmap;
+            Show();
         }
 
         public void ShowBeatmapSet(int beatmapSetId)
         {
-            // todo: display the overlay while we are loading here. we need to support setting BeatmapSet to null for this to work.
+            BeatmapSet = null;
             var req = new GetBeatmapSetRequest(beatmapSetId);
             req.Success += res => ShowBeatmapSet(res.ToBeatmapSet(rulesets));
             api.Queue(req);
+            Show();
         }
 
         public void ShowBeatmapSet(BeatmapSetInfo set)
         {
-            header.BeatmapSet = info.BeatmapSet = set;
+            BeatmapSet = set;
             Show();
             scroll.ScrollTo(0);
         }
