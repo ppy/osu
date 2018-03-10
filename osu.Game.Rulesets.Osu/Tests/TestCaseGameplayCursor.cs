@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(cursor = new GameplayCursor() { RelativeSizeAxes = Axes.Both });
+            Add(cursor = new GameplayCursor { RelativeSizeAxes = Axes.Both });
         }
     }
 }
