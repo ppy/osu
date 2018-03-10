@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaMirrorMod : Mod, IApplicableToRulesetContainer<ManiaHitObject>
+    public class ManiaModMirror : Mod, IApplicableToRulesetContainer<ManiaHitObject>
     {
         public override string Name => "Mirror";
         public override string ShortenedName => "MR";
