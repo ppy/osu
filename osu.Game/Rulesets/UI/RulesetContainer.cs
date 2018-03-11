@@ -67,7 +67,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly CursorContainer Cursor;
 
-
         protected readonly Ruleset Ruleset;
 
         private IRulesetConfigManager rulesetConfig;
@@ -102,7 +101,6 @@ namespace osu.Game.Rulesets.UI
                 dependencies.Cache(rulesetConfig);
                 onScreenDisplay?.BeginTracking(this, rulesetConfig);
             }
-
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -169,7 +167,6 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetContainer<TObject> : RulesetContainer
         where TObject : HitObject
     {
-
         public event Action<Judgement> OnJudgement;
         public event Action<Judgement> OnJudgementRemoved;
 
@@ -198,7 +195,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly bool IsForCurrentRuleset;
 
-
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
         protected override Container<Drawable> Content => content;
@@ -208,7 +204,6 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-
             KeyBindingInputManager.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -224,7 +219,6 @@ namespace osu.Game.Rulesets.UI
 
             // Apply mods
             applyMods(Mods, config);
-
         }
 
         /// <summary>
@@ -275,9 +269,8 @@ namespace osu.Game.Rulesets.UI
 
             // Add mods, should always be the last thing applied to give full control to mods
             // Mods are now added in the load() method because we need the OsuConfigManager
-            // for the IReadFromConfig implementations. Rhis method is still executed after the constructor,
+            // for the IReadFromConfig implementations. This method is still executed after the constructor,
             // so the mods are still added in last
-
         }
 
 
@@ -288,6 +281,8 @@ namespace osu.Game.Rulesets.UI
         /// <param name="mods"></param>
         private void applyMods(IEnumerable<Mod> mods, OsuConfigManager config)
         {
+            if (mods == null)
+                return;
 
             foreach (var mod in mods.OfType<IApplicableToHitObject<TObject>>())
                 foreach (var obj in Beatmap.HitObjects)
@@ -297,8 +292,7 @@ namespace osu.Game.Rulesets.UI
                 mod.ApplyToRulesetContainer(this);
 
             foreach (var mod in mods.OfType<IReadFromConfig>())
-                mod.ApplyToConfig(config);
-
+                mod.ReadFromConfig(config);
         }
 
         public override void SetReplay(Replay replay)
