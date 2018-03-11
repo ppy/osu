@@ -93,6 +93,8 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
         {
+            this.onScreenDisplay = onScreenDisplay;
+
             rulesetConfig = CreateConfig(Ruleset, settings);
 
             if (rulesetConfig != null)
@@ -272,8 +274,9 @@ namespace osu.Game.Rulesets.UI
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
 
             // Add mods, should always be the last thing applied to give full control to mods
-            // Mods are now added in the load() method, this method is still executed after the constructor
-            // so they are still added in last
+            // Mods are now added in the load() method because we need the OsuConfigManager
+            // for the IReadFromConfig implementations. Rhis method is still executed after the constructor,
+            // so the mods are still added in last
 
         }
 
