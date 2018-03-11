@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets
                 context.SaveChanges();
 
                 //add any other modes
-                foreach (var r in instances.Where(r => r.LegacyID < 0))
+                foreach (var r in instances.Where(r => r.LegacyID == null || r.LegacyID < 0))
                     if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
 
