@@ -21,12 +21,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
-        private bool IncreaseFirstObjectVisibility = true;
+        private bool increaseFirstObjectVisibility = true;
         private IEnumerable<DrawableHitObject> drawables;
 
         private void applyMod()
         {
-            if (IncreaseFirstObjectVisibility)
+            if (increaseFirstObjectVisibility)
             {
                 foreach (var d in drawables.OfType<DrawableOsuHitObject>())
                 {
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToConfig(OsuConfigManager config)
         {
-            IncreaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
+            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
             //This starts the process of applying the mod effects. We start it here since this is the last void called.
             applyMod();
         }
