@@ -38,6 +38,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Increase the first object's visibility in \"Hidden\" mod",
+                    Bindable = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility)
+                },
             };
         }
     }

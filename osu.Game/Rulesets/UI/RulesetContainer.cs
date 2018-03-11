@@ -67,6 +67,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly CursorContainer Cursor;
 
+
         protected readonly Ruleset Ruleset;
 
         private IRulesetConfigManager rulesetConfig;
@@ -89,11 +90,9 @@ namespace osu.Game.Rulesets.UI
             Cursor = CreateCursor();
         }
 
-        [BackgroundDependencyLoader(true)]
+        [BackgroundDependencyLoader]
         private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
         {
-            this.onScreenDisplay = onScreenDisplay;
-
             rulesetConfig = CreateConfig(Ruleset, settings);
 
             if (rulesetConfig != null)
@@ -101,6 +100,7 @@ namespace osu.Game.Rulesets.UI
                 dependencies.Cache(rulesetConfig);
                 onScreenDisplay?.BeginTracking(this, rulesetConfig);
             }
+
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -167,6 +167,7 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetContainer<TObject> : RulesetContainer
         where TObject : HitObject
     {
+
         public event Action<Judgement> OnJudgement;
         public event Action<Judgement> OnJudgementRemoved;
 
@@ -195,10 +196,34 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly bool IsForCurrentRuleset;
 
+
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
         protected override Container<Drawable> Content => content;
         private Container content;
+        private IEnumerable<Mod> mods;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+
+            KeyBindingInputManager.Add(content = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
+
+            AddInternal(KeyBindingInputManager);
+            KeyBindingInputManager.Add(Playfield);
+
+            if (Cursor != null)
+                KeyBindingInputManager.Add(Cursor);
+
+            loadObjects();
+
+            // Apply mods
+            applyMods(Mods, config);
+
+        }
 
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
@@ -247,34 +272,19 @@ namespace osu.Game.Rulesets.UI
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
 
             // Add mods, should always be the last thing applied to give full control to mods
-            applyMods(Mods);
+            // Mods are now added in the load() method, this method is still executed after the constructor
+            // so they are still added in last
+
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            KeyBindingInputManager.Add(content = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-            });
 
-            AddInternal(KeyBindingInputManager);
-            KeyBindingInputManager.Add(Playfield);
-
-            if (Cursor != null)
-                KeyBindingInputManager.Add(Cursor);
-
-            loadObjects();
-        }
 
         /// <summary>
         /// Applies the active mods to this RulesetContainer.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyMods(IEnumerable<Mod> mods)
+        private void applyMods(IEnumerable<Mod> mods, OsuConfigManager config)
         {
-            if (mods == null)
-                return;
 
             foreach (var mod in mods.OfType<IApplicableToHitObject<TObject>>())
                 foreach (var obj in Beatmap.HitObjects)
@@ -282,6 +292,10 @@ namespace osu.Game.Rulesets.UI
 
             foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);
+
+            foreach (var mod in mods.OfType<IReadFromConfig>())
+                mod.ApplyToConfig(config);
+
         }
 
         public override void SetReplay(Replay replay)
