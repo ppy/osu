@@ -78,6 +78,8 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.SpeedChangeVisualisation, SpeedChangeVisualisationMethod.Sequential);
 
+            Set(OsuSetting.IncreaseFirstObjectVisibility, true);
+
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
@@ -125,6 +127,7 @@ namespace osu.Game.Configuration
         Version,
         ShowConvertedBeatmaps,
         SpeedChangeVisualisation,
-        Skin
+        Skin,
+        IncreaseFirstObjectVisibility
     }
 }
