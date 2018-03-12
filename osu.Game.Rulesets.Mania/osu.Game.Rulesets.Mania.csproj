@@ -115,6 +115,7 @@
     <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\LaneGlowPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\NotePiece.cs" />
+    <Compile Include="Objects\ManiaHitObjectDifficulty.cs" />
     <Compile Include="Objects\Types\IHasColumn.cs" />
     <Compile Include="Replays\ManiaAutoGenerator.cs" />
     <Compile Include="Replays\ManiaFramedReplayInputHandler.cs" />
