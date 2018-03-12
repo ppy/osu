@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Components;
@@ -9,6 +10,7 @@ using OpenTK;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCasePlaybackControl : OsuTestCase
     {
         public TestCasePlaybackControl()

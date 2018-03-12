@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
@@ -10,6 +11,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseSongProgress : OsuTestCase
     {
         private readonly SongProgress progress;

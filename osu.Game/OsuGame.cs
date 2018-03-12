@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Framework.Logging;
-using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
@@ -20,6 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -32,6 +32,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
+using osu.Game.Overlays.Volume;
 
 namespace osu.Game
 {
@@ -74,7 +75,7 @@ namespace osu.Game
 
         private OsuScreen screenStack;
 
-        private VolumeControl volume;
+        private VolumeOverlay volume;
         private OnScreenDisplay onscreenDisplay;
 
         private Bindable<int> configRuleset;
@@ -154,6 +155,12 @@ namespace osu.Game
         /// <param name="setId">The set to display.</param>
         public void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
 
+        /// <summary>
+        /// Show a user's profile as an overlay.
+        /// </summary>
+        /// <param name="userId">The user to display.</param>
+        public void ShowUser(long userId) => userProfile.ShowUser(userId);
+
         protected void LoadScore(Score s)
         {
             scoreLoad?.Cancel();
@@ -231,7 +238,7 @@ namespace osu.Game
                 },
             }, overlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeControl(), Add);
+            loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
             //overlay elements
@@ -414,6 +421,7 @@ namespace osu.Game
                     sensitivity.Disabled = true;
 
                     frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
+                    frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
                 case GlobalAction.ToggleToolbar:
                     Toolbar.ToggleVisibility();
