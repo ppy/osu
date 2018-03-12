@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             var availableColumns = ((ManiaRulesetContainer)rulesetContainer).Beatmap.TotalColumns;
 
-            rulesetContainer.Objects.OfType<ManiaHitObject>().ForEach(h => h.Column = -h.Column + availableColumns - 1);
+            rulesetContainer.Objects.OfType<ManiaHitObject>().ForEach(h => h.Column = availableColumns - 1 - h.Column);
         }
     }
 }
