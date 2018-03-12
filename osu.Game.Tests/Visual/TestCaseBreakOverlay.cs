@@ -3,9 +3,9 @@
 
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Screens.Play.BreaksOverlay;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
