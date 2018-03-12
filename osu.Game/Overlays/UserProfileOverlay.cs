@@ -169,15 +169,18 @@ namespace osu.Game.Overlays
         {
             Header.User = user;
 
-            foreach (string id in user.ProfileOrder)
+            if (user.ProfileOrder != null)
             {
-                var sec = sections.FirstOrDefault(s => s.Identifier == id);
-                if (sec != null)
+                foreach (string id in user.ProfileOrder)
                 {
-                    sec.User.Value = user;
+                    var sec = sections.FirstOrDefault(s => s.Identifier == id);
+                    if (sec != null)
+                    {
+                        sec.User.Value = user;
 
-                    sectionsContainer.Add(sec);
-                    tabs.AddItem(sec);
+                        sectionsContainer.Add(sec);
+                        tabs.AddItem(sec);
+                    }
                 }
             }
         }
