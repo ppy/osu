@@ -3,13 +3,14 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     internal class DrawableManiaJudgement : DrawableJudgement
     {
-        public DrawableManiaJudgement(Judgement judgement)
-            : base(judgement)
+        public DrawableManiaJudgement(Judgement judgement, DrawableHitObject judgedObject)
+            : base(judgement, judgedObject)
         {
             JudgementText.TextSize = 25;
         }
