@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -63,7 +64,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Do not override this unless you are a legacy mode.
         /// </summary>
-        public virtual int LegacyID => -1;
+        public virtual int? LegacyID => null;
 
         /// <summary>
         /// A unique short name to reference this ruleset in online requests.
@@ -88,6 +89,13 @@ namespace osu.Game.Rulesets
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
         public virtual string GetVariantName(int variant) => string.Empty;
+
+        /// <summary>
+        /// For rulesets which support legacy (osu-stable) replay conversion, this method will create an empty replay frame
+        /// for conversion use.
+        /// </summary>
+        /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
+        public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
 
         /// <summary>
         /// Create a ruleset info based on this ruleset.

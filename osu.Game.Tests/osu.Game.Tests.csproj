@@ -173,7 +173,9 @@
     <Compile Include="Visual\TestCaseTwoLayerButton.cs" />
     <Compile Include="Visual\TestCaseUserPanel.cs" />
     <Compile Include="Visual\TestCaseUserProfile.cs" />
+    <Compile Include="Visual\TestCaseUserProfileRecentSection.cs" />
     <Compile Include="Visual\TestCaseUserRanks.cs" />
+    <Compile Include="Visual\TestCaseVolumePieces.cs" />
     <Compile Include="Visual\TestCaseWaveform.cs" />
   </ItemGroup>
   <ItemGroup>

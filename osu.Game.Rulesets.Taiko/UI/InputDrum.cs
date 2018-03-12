@@ -4,7 +4,6 @@
 using System;
 using OpenTK;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -34,9 +33,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
-            var sampleMappings = new DrumSampleMapping(controlPoints, audio);
+            var sampleMappings = new DrumSampleMapping(controlPoints);
 
             Children = new Drawable[]
             {
@@ -63,6 +62,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     CentreAction = TaikoAction.RightCentre
                 }
             };
+
+            AddRangeInternal(sampleMappings.Sounds);
         }
 
         /// <summary>

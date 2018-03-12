@@ -130,11 +130,7 @@ namespace osu.Game.Overlays.Profile
                         }
                     }
                 },
-                infoTextLeft = new OsuTextFlowContainer(t =>
-                {
-                    t.TextSize = 14;
-                    t.Alpha = 0.8f;
-                })
+                infoTextLeft = new OsuTextFlowContainer(t => t.TextSize = 14)
                 {
                     X = UserProfileOverlay.CONTENT_X_MARGIN,
                     Y = cover_height + 20,
@@ -318,11 +314,23 @@ namespace osu.Game.Overlays.Profile
                 colourBar.Show();
             }
 
-            void boldItalic(SpriteText t)
+            void boldItalic(SpriteText t) => t.Font = @"Exo2.0-BoldItalic";
+            void lightText(SpriteText t) => t.Alpha = 0.8f;
+
+            OsuSpriteText createScoreText(string text) => new OsuSpriteText
             {
-                t.Font = @"Exo2.0-BoldItalic";
-                t.Alpha = 1;
-            }
+                TextSize = 14,
+                Text = text
+            };
+
+            OsuSpriteText createScoreNumberText(string text) => new OsuSpriteText
+            {
+                TextSize = 14,
+                Font = @"Exo2.0-Bold",
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                Text = text
+            };
 
             if (user.Age != null)
             {
@@ -331,7 +339,7 @@ namespace osu.Game.Overlays.Profile
 
             if (user.Country != null)
             {
-                infoTextLeft.AddText("from ");
+                infoTextLeft.AddText("from ", lightText);
                 infoTextLeft.AddText(user.Country.FullName, boldItalic);
                 countryFlag.Country = user.Country;
             }
@@ -344,18 +352,18 @@ namespace osu.Game.Overlays.Profile
             }
             else
             {
-                infoTextLeft.AddText("Joined ");
-                infoTextLeft.AddText(user.JoinDate.LocalDateTime.ToShortDateString(), boldItalic);
+                infoTextLeft.AddText("Joined ", lightText);
+                infoTextLeft.AddText(new DrawableDate(user.JoinDate), boldItalic);
             }
 
             infoTextLeft.NewLine();
-            infoTextLeft.AddText("Last seen ");
-            infoTextLeft.AddText(user.LastVisit.LocalDateTime.ToShortDateString(), boldItalic);
+            infoTextLeft.AddText("Last seen ", lightText);
+            infoTextLeft.AddText(new DrawableDate(user.LastVisit), boldItalic);
             infoTextLeft.NewParagraph();
 
             if (user.PlayStyle?.Length > 0)
             {
-                infoTextLeft.AddText("Plays with ");
+                infoTextLeft.AddText("Plays with ", lightText);
                 infoTextLeft.AddText(string.Join(", ", user.PlayStyle), boldItalic);
             }
 
@@ -411,23 +419,6 @@ namespace osu.Game.Overlays.Profile
             }
         }
 
-        // These could be local functions when C# 7 enabled
-
-        private OsuSpriteText createScoreText(string text) => new OsuSpriteText
-        {
-            TextSize = 14,
-            Text = text
-        };
-
-        private OsuSpriteText createScoreNumberText(string text) => new OsuSpriteText
-        {
-            TextSize = 14,
-            Font = @"Exo2.0-Bold",
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight,
-            Text = text
-        };
-
         private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
         {
             if (string.IsNullOrEmpty(str)) return;
@@ -436,10 +427,12 @@ namespace osu.Game.Overlays.Profile
             if (url != null)
             {
                 infoTextRight.AddLink(" " + str, url);
-            } else
+            }
+            else
             {
                 infoTextRight.AddText(" " + str);
             }
+
             infoTextRight.NewLine();
         }
 
