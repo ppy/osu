@@ -68,6 +68,8 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             Position = topLeft;
         }
 
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => overlays.Any(o => o.ReceiveMouseInputAt(screenSpacePos));
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
         protected override bool OnDragStart(InputState state) => true;

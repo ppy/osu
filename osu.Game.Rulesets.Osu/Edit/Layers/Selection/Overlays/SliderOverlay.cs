@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
@@ -56,5 +57,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
             // Need to cause one update
             body.UpdateProgress(0);
         }
+
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => body.ReceiveMouseInputAt(screenSpacePos);
     }
 }
