@@ -73,6 +73,14 @@ namespace osu.Game.Overlays
             FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
         }
 
+        public void ShowUser(long userId)
+        {
+            if (userId == Header.User.Id)
+                return;
+
+            ShowUser(new User { Id = userId });
+        }
+
         public void ShowUser(User user, bool fetchOnline = true)
         {
             userReq?.Cancel();
@@ -82,7 +90,7 @@ namespace osu.Game.Overlays
             sections = new ProfileSection[]
             {
                 //new AboutSection(),
-                //new RecentSection(),
+                new RecentSection(),
                 new RanksSection(),
                 //new MedalsSection(),
                 new HistoricalSection(),

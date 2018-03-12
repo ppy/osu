@@ -118,6 +118,8 @@ namespace osu.Game.Online.Chat
                             case "beatmapsets":
                             case "d":
                                 return new LinkDetails(LinkAction.OpenBeatmapSet, args[3]);
+                            case "u":
+                                return new LinkDetails(LinkAction.OpenUserProfile, args[3]);
                         }
                     }
 
@@ -145,6 +147,9 @@ namespace osu.Game.Online.Chat
                             break;
                         case "spectate":
                             linkType = LinkAction.Spectate;
+                            break;
+                        case "u":
+                            linkType = LinkAction.OpenUserProfile;
                             break;
                         default:
                             linkType = LinkAction.External;
@@ -205,6 +210,15 @@ namespace osu.Game.Online.Chat
             return inputMessage;
         }
 
+        public static MessageFormatterResult FormatText(string text)
+        {
+            var result = format(text);
+
+            result.Links.Sort();
+
+            return result;
+        }
+
         public class MessageFormatterResult
         {
             public List<Link> Links = new List<Link>();
@@ -239,6 +253,7 @@ namespace osu.Game.Online.Chat
         OpenEditorTimestamp,
         JoinMultiplayerMatch,
         Spectate,
+        OpenUserProfile,
     }
 
     public class Link : IComparable<Link>

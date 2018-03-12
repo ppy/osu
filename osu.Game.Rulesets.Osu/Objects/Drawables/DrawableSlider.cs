@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -55,8 +54,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableHitCircle(s.HeadCircle) { Position = s.TailCircle.Position - s.Position },
-                TailCircle = new DrawableSliderTail(s.TailCircle) { Position = s.TailCircle.Position - s.Position }
+                HeadCircle = new DrawableSliderHead(s, s.HeadCircle),
+                TailCircle = new DrawableSliderTail(s, s.TailCircle)
             };
 
             components.Add(Body);
@@ -102,10 +101,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Tracking = Ball.Tracking;
 
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
-
-            //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (!HeadCircle.IsHit)
-                HeadCircle.Position = slider.CurvePositionAt(completionProgress);
 
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
             foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));

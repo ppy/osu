@@ -155,6 +155,12 @@ namespace osu.Game
         /// <param name="setId">The set to display.</param>
         public void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
 
+        /// <summary>
+        /// Show a user's profile as an overlay.
+        /// </summary>
+        /// <param name="userId">The user to display.</param>
+        public void ShowUser(long userId) => userProfile.ShowUser(userId);
+
         protected void LoadScore(Score s)
         {
             scoreLoad?.Cancel();
