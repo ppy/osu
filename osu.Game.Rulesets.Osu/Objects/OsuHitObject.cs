@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Edit.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasCombo, IHasPosition, IHasEditablePosition
+    public abstract class OsuHitObject : HitObject, IHasCombo, IHasEditablePosition
     {
         public const double OBJECT_RADIUS = 64;
 
