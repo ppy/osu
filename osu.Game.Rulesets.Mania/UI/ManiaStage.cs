@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK;
 using OpenTK.Graphics;
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container<Drawable> content;
 
         public Container<DrawableManiaJudgement> Judgements => judgements;
-        private readonly Container<DrawableManiaJudgement> judgements;
+        private readonly JudgementContainer<DrawableManiaJudgement> judgements;
 
         private readonly Container topLevelContainer;
 
@@ -114,7 +115,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 Padding = new MarginPadding { Top = HIT_TARGET_POSITION }
                             }
                         },
-                        judgements = new Container<DrawableManiaJudgement>
+                        judgements = new JudgementContainer<DrawableManiaJudgement>
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.Centre,
@@ -171,7 +172,7 @@ namespace osu.Game.Rulesets.Mania.UI
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             judgements.Clear();
-            judgements.Add(new DrawableManiaJudgement(judgement)
+            judgements.Add(new DrawableManiaJudgement(judgement, judgedObject)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
