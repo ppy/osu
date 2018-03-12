@@ -1,18 +1,15 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
-using OpenTK;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using osu.Game.Beatmaps.Timing;
+using OpenTK;
 
-namespace osu.Game.Screens.Play.BreaksOverlay
+namespace osu.Game.Screens.Play.Break
 {
-    public class ArrowsOverlay : VisibilityContainer
+    public class BreakArrows : CompositeDrawable
     {
-        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
-
         private const int glow_icon_size = 60;
         private const int glow_icon_blur_sigma = 10;
         private const float glow_icon_final_offset = 0.22f;
@@ -29,10 +26,10 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         private readonly BlurredIcon leftBlurredIcon;
         private readonly BlurredIcon rightBlurredIcon;
 
-        public ArrowsOverlay()
+        public BreakArrows()
         {
             RelativeSizeAxes = Axes.Both;
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 leftGlowIcon = new GlowIcon
                 {
@@ -82,22 +79,22 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             };
         }
 
-        protected override void PopIn()
+        public void Show(double duration)
         {
-            leftGlowIcon.MoveToX(-glow_icon_final_offset, fade_duration, Easing.OutQuint);
-            rightGlowIcon.MoveToX(glow_icon_final_offset, fade_duration, Easing.OutQuint);
+            leftGlowIcon.MoveToX(-glow_icon_final_offset, duration, Easing.OutQuint);
+            rightGlowIcon.MoveToX(glow_icon_final_offset, duration, Easing.OutQuint);
 
-            leftBlurredIcon.MoveToX(-blurred_icon_final_offset, fade_duration, Easing.OutQuint);
-            rightBlurredIcon.MoveToX(blurred_icon_final_offset, fade_duration, Easing.OutQuint);
+            leftBlurredIcon.MoveToX(-blurred_icon_final_offset, duration, Easing.OutQuint);
+            rightBlurredIcon.MoveToX(blurred_icon_final_offset, duration, Easing.OutQuint);
         }
 
-        protected override void PopOut()
+        public void Hide(double duration)
         {
-            leftGlowIcon.MoveToX(-glow_icon_offscreen_offset, fade_duration, Easing.OutQuint);
-            rightGlowIcon.MoveToX(glow_icon_offscreen_offset, fade_duration, Easing.OutQuint);
+            leftGlowIcon.MoveToX(-glow_icon_offscreen_offset, duration, Easing.OutQuint);
+            rightGlowIcon.MoveToX(glow_icon_offscreen_offset, duration, Easing.OutQuint);
 
-            leftBlurredIcon.MoveToX(-blurred_icon_offscreen_offset, fade_duration, Easing.OutQuint);
-            rightBlurredIcon.MoveToX(blurred_icon_offscreen_offset, fade_duration, Easing.OutQuint);
+            leftBlurredIcon.MoveToX(-blurred_icon_offscreen_offset, duration, Easing.OutQuint);
+            rightBlurredIcon.MoveToX(blurred_icon_offscreen_offset, duration, Easing.OutQuint);
         }
     }
 }
