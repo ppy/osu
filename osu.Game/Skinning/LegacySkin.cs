@@ -58,9 +58,14 @@ namespace osu.Game.Skinning
             private readonly SkinInfo skin;
             private readonly IResourceStore<byte[]> underlyingStore;
 
-            private string getPathForFile(string filename) =>
-                skin.Files.FirstOrDefault(f => string.Equals(Path.GetFileNameWithoutExtension(f.Filename), filename.Split('/').Last(), StringComparison.InvariantCultureIgnoreCase))?.FileInfo
-                    .StoragePath;
+            private string getPathForFile(string filename)
+            {
+                string lastPiece = filename.Split('/').Last();
+
+                var file = skin.Files.FirstOrDefault(f =>
+                    string.Equals(Path.GetFileNameWithoutExtension(f.Filename), lastPiece, StringComparison.InvariantCultureIgnoreCase));
+                return file?.FileInfo.StoragePath;
+            }
 
             public LegacySkinResourceStore(SkinInfo skin, IResourceStore<byte[]> underlyingStore)
             {
