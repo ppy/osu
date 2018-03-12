@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
@@ -40,14 +39,12 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 RelativeSizeAxes = Axes.X,
             });
 
-            RightFlowContainer.Add(new OsuSpriteText
+            RightFlowContainer.Add(new DrawableDate(activity.CreatedAt)
             {
-                Text = activity.CreatedAt.LocalDateTime.ToShortDateString(),
+                TextSize =  13,
+                Colour = OsuColour.Gray(0xAA),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                Font = "Exo2.0-RegularItalic",
-                TextSize = 12,
-                Colour = OsuColour.Gray(0xAA),
             });
 
             var formatted = createMessage();
