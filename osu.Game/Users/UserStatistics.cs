@@ -73,10 +73,10 @@ namespace osu.Game.Users
         public struct UserRanks
         {
             [JsonProperty(@"global")]
-            public int Global;
+            public int? Global;
 
             [JsonProperty(@"country")]
-            public int Country;
+            public int? Country;
         }
 
     }
