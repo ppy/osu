@@ -4,11 +4,17 @@
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Beatmaps
 {
     public class TestWorkingBeatmap : WorkingBeatmap
     {
+        public TestWorkingBeatmap(RulesetInfo ruleset)
+            : this(new TestBeatmap(ruleset))
+        {
+        }
+
         public TestWorkingBeatmap(Beatmap beatmap)
             : base(beatmap.BeatmapInfo)
         {
@@ -16,7 +22,6 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         private readonly Beatmap beatmap;
-
         protected override Beatmap GetBeatmap() => beatmap;
         protected override Texture GetBackground() => null;
         protected override Track GetTrack() => new TrackVirtual();
