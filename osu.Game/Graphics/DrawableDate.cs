@@ -58,6 +58,8 @@ namespace osu.Game.Graphics
             Scheduler.AddDelayed(updateTimeWithReschedule, timeUntilNextUpdate);
         }
 
+        public override bool HandleMouseInput => true;
+
         private void updateTime() => Text = date.Humanize();
         public string TooltipText => date.ToString();
     }
