@@ -29,6 +29,22 @@ namespace osu.Game.Skinning
 
         public override Drawable GetDrawableComponent(string componentName)
         {
+            switch (componentName)
+            {
+                case "Play/Miss":
+                    componentName = "hit0";
+                    break;
+                case "Play/Meh":
+                    componentName = "hit50";
+                    break;
+                case "Play/Good":
+                    componentName = "hit100";
+                    break;
+                case "Play/Great":
+                    componentName = "hit300";
+                    break;
+            }
+
             var texture = textures.Get(componentName);
             if (texture == null) return null;
 

@@ -40,24 +40,7 @@ namespace osu.Game.Rulesets.Judgements
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            string legacyName = string.Empty;
-            switch (Judgement.Result)
-            {
-                case HitResult.Miss:
-                    legacyName = "hit0";
-                    break;
-                case HitResult.Meh:
-                    legacyName = "hit50";
-                    break;
-                case HitResult.Good:
-                    legacyName = "hit100";
-                    break;
-                case HitResult.Great:
-                    legacyName = "hit300";
-                    break;
-            }
-
-            Child = new SkinnableDrawable($"Play/osu/{legacyName}", _ => JudgementText = new OsuSpriteText
+            Child = new SkinnableDrawable($"Play/{Judgement.Result}", _ => JudgementText = new OsuSpriteText
             {
                 Text = Judgement.Result.GetDescription().ToUpper(),
                 Font = @"Venera",
