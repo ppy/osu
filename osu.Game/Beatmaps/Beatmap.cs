@@ -22,6 +22,7 @@ namespace osu.Game.Beatmaps
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
         public ControlPointInfo ControlPointInfo = new ControlPointInfo();
         public List<BreakPeriod> Breaks = new List<BreakPeriod>();
+
         public List<Color4> ComboColors = new List<Color4>
         {
             new Color4(17, 136, 170, 255),
@@ -85,8 +86,12 @@ namespace osu.Game.Beatmaps
         /// Constructs a new beatmap.
         /// </summary>
         /// <param name="original">The original beatmap to use the parameters of.</param>
-        public Beatmap(Beatmap original = null)
+        public Beatmap(Beatmap original)
             : base(original)
+        {
+        }
+
+        public Beatmap()
         {
         }
     }
