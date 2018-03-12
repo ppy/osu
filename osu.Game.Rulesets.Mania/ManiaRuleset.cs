@@ -91,6 +91,7 @@ namespace osu.Game.Rulesets.Mania
                         },
                         new ManiaModRandom(),
                         new ManiaModDualStages(),
+                        new ManiaModMirror(),
                         new MultiMod
                         {
                             Mods = new Mod[]
