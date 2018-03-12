@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
@@ -24,15 +25,18 @@ namespace osu.Game.Rulesets.Judgements
 
         protected readonly Judgement Judgement;
 
+        public readonly DrawableHitObject JudgedObject;
+
         protected SpriteText JudgementText;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
         /// <param name="judgement">The judgement to visualise.</param>
-        public DrawableJudgement(Judgement judgement)
+        public DrawableJudgement(Judgement judgement, DrawableHitObject judgedObject)
         {
             Judgement = judgement;
+            JudgedObject = judgedObject;
 
             Size = new Vector2(judgement_size);
         }
