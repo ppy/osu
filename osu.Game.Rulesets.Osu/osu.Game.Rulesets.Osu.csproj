@@ -87,6 +87,7 @@
     <Compile Include="Mods\OsuModSpunOut.cs" />
     <Compile Include="Mods\OsuModSuddenDeath.cs" />
     <Compile Include="Mods\OsuModTarget.cs" />
+    <Compile Include="Objects\Drawables\DrawableSliderHead.cs" />
     <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
     <Compile Include="Objects\Drawables\Connections\ConnectionRenderer.cs" />
     <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
