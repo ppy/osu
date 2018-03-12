@@ -52,6 +52,8 @@ namespace osu.Game.Beatmaps.Formats
         protected override void ParseStreamInto(StreamReader stream, Beatmap beatmap)
         {
             this.beatmap = beatmap;
+            this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
+
             base.ParseStreamInto(stream, beatmap);
 
             // objects may be out of order *only* if a user has manually edited an .osu file.
