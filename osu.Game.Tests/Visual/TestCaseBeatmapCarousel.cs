@@ -12,6 +12,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
@@ -22,6 +23,7 @@ namespace osu.Game.Tests.Visual
     public class TestCaseBeatmapCarousel : OsuTestCase
     {
         private TestBeatmapCarousel carousel;
+        private RulesetStore rulesets;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -46,8 +48,10 @@ namespace osu.Game.Tests.Visual
         private const int set_count = 5;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(RulesetStore rulesets)
         {
+            this.rulesets = rulesets;
+
             Add(carousel = new TestBeatmapCarousel
             {
                 RelativeSizeAxes = Axes.Both,
@@ -75,6 +79,7 @@ namespace osu.Game.Tests.Visual
             testRemoveAll();
             testEmptyTraversal();
             testHiding();
+            testSelectingFilteredRuleset();
         }
 
         private void ensureRandomFetchSuccess() =>
@@ -361,6 +366,41 @@ namespace osu.Game.Tests.Visual
                     carousel.UpdateBeatmapSet(hidingSet);
                 });
             }
+        }
+
+        private void testSelectingFilteredRuleset()
+        {
+            var testMixed = createTestBeatmapSet(set_count + 1);
+            AddStep("add mixed ruleset beatmapset", () =>
+            {
+                for (int i = 0; i <= 2; i++)
+                {
+                    testMixed.Beatmaps[i].Ruleset = rulesets.AvailableRulesets.ElementAt(i);
+                    testMixed.Beatmaps[i].RulesetID = i;
+                }
+
+                carousel.UpdateBeatmapSet(testMixed);
+            });
+            AddStep("filter to ruleset 0", () =>
+                carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
+            AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
+            AddAssert("unfiltered beatmap selected", () => carousel.SelectedBeatmap.Equals(testMixed.Beatmaps[0]));
+
+            AddStep("remove mixed set", () =>
+            {
+                carousel.RemoveBeatmapSet(testMixed);
+                testMixed = null;
+            });
+            var testSingle = createTestBeatmapSet(set_count + 2);
+            testSingle.Beatmaps.ForEach(b =>
+            {
+                b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
+                b.RulesetID = b.Ruleset.ID ?? 1;
+            });
+            AddStep("add single ruleset beatmapset", () => carousel.UpdateBeatmapSet(testSingle));
+            AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testSingle.Beatmaps[0], false));
+            checkNoSelection();
+            AddStep("remove single ruleset set", () => carousel.RemoveBeatmapSet(testSingle));
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int id)
