@@ -379,7 +379,6 @@
     <Compile Include="Rulesets\Replays\Types\IConvertibleReplayFrame.cs" />
     <Compile Include="Rulesets\Scoring\Legacy\LegacyScoreParser.cs" />
     <Compile Include="Rulesets\UI\JudgementContainer.cs" />
-    <Compile Include="Rulesets\UI\ScalableContainer.cs" />
     <Compile Include="Screens\Play\ScreenWithBeatmapBackground.cs" />
     <Compile Include="Screens\Play\PlayerSettings\VisualSettings.cs" />
     <Compile Include="Rulesets\Objects\CatmullApproximator.cs" />
