@@ -142,26 +142,68 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnWheel(InputState state)
         {
-            var timingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(adjustableClock.CurrentTime);
-
-            const int beat_snap_divisor = 4; // Todo: This should not be a constant
-            double seekAmount = timingPoint.BeatLength / beat_snap_divisor;
-            int direction = state.Mouse.WheelDelta > 0 ? -1 : 1;
-
-            // The direction is added to prevent rounding issues by enforcing that abs(unsnappedTime - currentTime) > beatLength
-            double unsnappedTime = adjustableClock.CurrentTime + seekAmount * direction + direction;
-
-            // Unsnapped time may be between two beats, so we need to snap it to the closest beat
-            int closestBeat;
-            if (direction > 0)
-                closestBeat = (int)Math.Floor(unsnappedTime / seekAmount);
+            if (state.Mouse.WheelDelta > 0)
+                SeekBackward(true);
             else
-                closestBeat = (int)Math.Ceiling(unsnappedTime / seekAmount);
-
-            double snappedTime = closestBeat * seekAmount;
-
-            adjustableClock.Seek(snappedTime);
+                SeekForward(true);
             return true;
+        }
+
+        /// <summary>
+        /// Seeks the current time one beat-snapped beat-length backwards.
+        /// </summary>
+        /// <param name="snapped">Whether to snap to the closest beat.</param>
+        public void SeekBackward(bool snapped) => seek(-1, snapped);
+
+        /// <summary>
+        /// Seeks the current time one beat-snapped beat-length forwards.
+        /// </summary>
+        /// <param name="snapped">Whether to snap to the closest beat.</param>
+        public void SeekForward(bool snapped) => seek(1, snapped);
+
+        private void seek(int direction, bool snapped)
+        {
+            // Todo: This should not be a constant, but feels good for now
+            const int beat_snap_divisor = 4;
+
+            var currentTimingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(adjustableClock.CurrentTime);
+            double seekAmount = currentTimingPoint.BeatLength / beat_snap_divisor;
+
+            double seekTime = adjustableClock.CurrentTime + seekAmount * direction;
+
+            if (!snapped)
+            {
+                adjustableClock.Seek(seekTime);
+                return;
+            }
+
+            var nextTimingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > currentTimingPoint.Time);
+            var firstTimingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.First();
+
+            if (currentTimingPoint != firstTimingPoint && seekTime < currentTimingPoint.Time)
+                seekTime = currentTimingPoint.Time - 1; // -1 to be in the prior timing point's boundary
+            else if (nextTimingPoint != null && seekTime >= nextTimingPoint.Time)
+                seekTime = nextTimingPoint.Time + 1; // +1 to be in the next timing point's boundary
+            else
+            {
+                // We will be snapping to beats within the current timing point
+                seekTime -= currentTimingPoint.Time;
+
+                // When rounding below, we need to ensure that abs(seekTime - currentTime) > seekAmount
+                // This is done by adding direction - a small offset, to seekTime
+                seekTime += direction;
+
+                // Determine the index from the current timing point of the closest beat to seekTime, accounting for scrolling direction
+                int closestBeat;
+                if (direction > 0)
+                    closestBeat = (int)Math.Floor(seekTime / seekAmount);
+                else
+                    closestBeat = (int)Math.Ceiling(seekTime / seekAmount);
+
+                seekTime = currentTimingPoint.Time + closestBeat * seekAmount;
+            }
+
+            adjustableClock.Seek(seekTime);
         }
 
         private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
