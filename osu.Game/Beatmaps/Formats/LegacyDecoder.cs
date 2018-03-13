@@ -65,6 +65,7 @@ namespace osu.Game.Beatmaps.Formats
             Colours,
             HitObjects,
             Variables,
+            Fonts
         }
 
         internal enum LegacySampleBank
