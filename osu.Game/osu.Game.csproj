@@ -902,7 +902,7 @@
     <Compile Include="Tests\Platform\TestStorage.cs" />
     <Compile Include="Tests\TestTestCase.cs" />
     <Compile Include="Tests\Visual\OsuTestCase.cs" />
-    <Compile Include="Tests\Visual\TestCaseEditor.cs" />
+    <Compile Include="Tests\Visual\EditorTestCase.cs" />
     <Compile Include="Tests\Visual\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\Visual\ScreenTestCase.cs" />
     <Compile Include="Tests\Visual\TestCasePlayer.cs" />

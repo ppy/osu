@@ -11,13 +11,13 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class TestCaseEditor : OsuTestCase
+    public abstract class EditorTestCase : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Editor), typeof(EditorScreen) };
 
         private readonly Ruleset ruleset;
 
-        protected TestCaseEditor(Ruleset ruleset)
+        protected EditorTestCase(Ruleset ruleset)
         {
             this.ruleset = ruleset;
         }
