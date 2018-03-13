@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -27,6 +29,9 @@ namespace osu.Game.Rulesets.Edit
         private RulesetContainer rulesetContainer;
         private readonly List<Container> layerContainers = new List<Container>();
 
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private IAdjustableClock adjustableClock;
+
         protected HitObjectComposer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
@@ -36,12 +41,15 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {
+            beatmap.BindTo(osuGame.Beatmap);
+
             try
             {
-                rulesetContainer = CreateRulesetContainer(ruleset, osuGame.Beatmap.Value);
+                rulesetContainer = CreateRulesetContainer(ruleset, beatmap.Value);
 
                 // TODO: should probably be done at a RulesetContainer level to share logic with Player.
-                rulesetContainer.Clock = new InterpolatingFramedClock((IAdjustableClock)osuGame.Beatmap.Value.Track ?? new StopwatchClock());
+                adjustableClock = (IAdjustableClock)beatmap.Value.Track ?? new StopwatchClock();
+                rulesetContainer.Clock = new InterpolatingFramedClock(adjustableClock);
             }
             catch (Exception e)
             {
@@ -130,6 +138,24 @@ namespace osu.Game.Rulesets.Edit
                 l.Position = rulesetContainer.Playfield.Position;
                 l.Size = rulesetContainer.Playfield.Size;
             });
+        }
+
+        protected override bool OnWheel(InputState state)
+        {
+            var timingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(adjustableClock.CurrentTime);
+
+            const int beat_snap_divisor = 4; // Todo: This should not be a constant
+            double beatLength = timingPoint.BeatLength / beat_snap_divisor;
+            int direction = state.Mouse.WheelDelta > 0 ? 1 : -1;
+
+            double unsnappedTime = adjustableClock.CurrentTime + beatLength * direction;
+
+            // Unsnapped time may be between two beats, so we need to snap it to the closest beat
+            int closestBeat = (int)Math.Round(unsnappedTime / beatLength);
+            double snappedTime = closestBeat * beatLength;
+
+            adjustableClock.Seek(snappedTime);
+            return true;
         }
 
         private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
