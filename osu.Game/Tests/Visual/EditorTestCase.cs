@@ -11,7 +11,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class EditorTestCase : OsuTestCase
+    public abstract class EditorTestCase : ScreenTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Editor), typeof(EditorScreen) };
 
@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual
         {
             osuGame.Beatmap.Value = new TestWorkingBeatmap(ruleset.RulesetInfo);
 
-            Child = new Editor();
+            LoadComponentAsync(new Editor(), LoadScreen);
         }
     }
 }
