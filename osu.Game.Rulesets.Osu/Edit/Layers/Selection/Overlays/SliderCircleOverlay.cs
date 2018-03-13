@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit.Layers.Selection;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
@@ -14,12 +15,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
     public class SliderCircleOverlay : HitObjectOverlay
     {
         public SliderCircleOverlay(DrawableHitCircle sliderHead, DrawableSlider slider)
-            : this(sliderHead, sliderHead.Position, slider)
+            : this(sliderHead, Vector2.Zero, slider)
         {
         }
 
         public SliderCircleOverlay(DrawableSliderTail sliderTail, DrawableSlider slider)
-            : this(sliderTail, sliderTail.Position, slider)
+            : this(sliderTail, ((Slider)slider.HitObject).Curve.PositionAt(1), slider)
         {
         }
 
