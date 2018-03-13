@@ -29,15 +29,26 @@ namespace osu.Game.Skinning
 
         public override Drawable GetDrawableComponent(string componentName)
         {
+            switch (componentName)
+            {
+                case "Play/Miss":
+                    componentName = "hit0";
+                    break;
+                case "Play/Meh":
+                    componentName = "hit50";
+                    break;
+                case "Play/Good":
+                    componentName = "hit100";
+                    break;
+                case "Play/Great":
+                    componentName = "hit300";
+                    break;
+            }
+
             var texture = textures.Get(componentName);
             if (texture == null) return null;
 
-            return new Sprite
-            {
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit,
-                Texture = texture,
-            };
+            return new Sprite { Texture = texture };
         }
 
         public override SampleChannel GetSample(string sampleName) => samples.Get(sampleName);
@@ -47,8 +58,14 @@ namespace osu.Game.Skinning
             private readonly SkinInfo skin;
             private readonly IResourceStore<byte[]> underlyingStore;
 
-            private string getPathForFile(string filename) =>
-                skin.Files.FirstOrDefault(f => string.Equals(Path.GetFileNameWithoutExtension(f.Filename), filename.Split('/').Last(), StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+            private string getPathForFile(string filename)
+            {
+                string lastPiece = filename.Split('/').Last();
+
+                var file = skin.Files.FirstOrDefault(f =>
+                    string.Equals(Path.GetFileNameWithoutExtension(f.Filename), lastPiece, StringComparison.InvariantCultureIgnoreCase));
+                return file?.FileInfo.StoragePath;
+            }
 
             public LegacySkinResourceStore(SkinInfo skin, IResourceStore<byte[]> underlyingStore)
             {

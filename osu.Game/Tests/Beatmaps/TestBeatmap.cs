@@ -17,15 +17,11 @@ namespace osu.Game.Tests.Beatmaps
             BeatmapInfo.Ruleset = ruleset;
         }
 
-        private static Beatmap testBeatmapCache;
         private static Beatmap createTestBeatmap()
         {
-            if (testBeatmapCache != null)
-                return testBeatmapCache;
-
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(test_beatmap_data)))
             using (var reader = new StreamReader(stream))
-                return testBeatmapCache = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
+                return Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
         }
 
         private const string test_beatmap_data =
@@ -341,9 +337,8 @@ SliderTickRate:2
 226701,-100,4,2,0,10,0,0
 227170,-100,4,2,0,5,0,0
 
-
 [Colours]
-        Combo1 : 17,254,176
+Combo1 : 17,254,176
 Combo2 : 173,255,95
 Combo3 : 255,88,100
 Combo4 : 255,94,55
