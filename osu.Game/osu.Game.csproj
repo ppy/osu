@@ -288,6 +288,7 @@
     <Compile Include="Database\MutableDatabaseBackedStore.cs" />
     <Compile Include="Database\SingletonContextFactory.cs" />
     <Compile Include="Graphics\Containers\LinkFlowContainer.cs" />
+    <Compile Include="Graphics\ScreenshotManager.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
     <Compile Include="IO\Archives\ArchiveReader.cs" />
     <Compile Include="IO\Archives\LegacyFilesystemReader.cs" />
