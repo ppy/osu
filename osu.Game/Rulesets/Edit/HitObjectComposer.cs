@@ -148,10 +148,16 @@ namespace osu.Game.Rulesets.Edit
             double beatLength = timingPoint.BeatLength / beat_snap_divisor;
             int direction = state.Mouse.WheelDelta > 0 ? 1 : -1;
 
-            double unsnappedTime = adjustableClock.CurrentTime + beatLength * direction;
+            // The direction is added to prevent rounding issues by enforcing that abs(unsnappedTime - currentTime) > beatLength
+            double unsnappedTime = adjustableClock.CurrentTime + beatLength * direction + direction;
 
             // Unsnapped time may be between two beats, so we need to snap it to the closest beat
-            int closestBeat = (int)Math.Round(unsnappedTime / beatLength);
+            int closestBeat;
+            if (direction > 0)
+                closestBeat = (int)Math.Floor(unsnappedTime / beatLength);
+            else
+                closestBeat = (int)Math.Ceiling(unsnappedTime / beatLength);
+
             double snappedTime = closestBeat * beatLength;
 
             adjustableClock.Seek(snappedTime);
