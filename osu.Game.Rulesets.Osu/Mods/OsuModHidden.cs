@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Configuration;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -18,26 +19,29 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
         public override double ScoreMultiplier => 1.06;
-
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
-        private bool increaseFirstObjectVisibility = true;
-        private IEnumerable<DrawableHitObject> drawables;
+        private Bindable<bool> increaseFirstObjectVisibility;
 
-        private void applyMod()
+        public void ReadFromConfig(OsuConfigManager config)
         {
-                foreach (var d in drawables.OfType<DrawableOsuHitObject>())
-                {
-                    //Don't hide the first object
-                    if (d.ChildID == 1 && increaseFirstObjectVisibility) continue;
-                    d.ApplyCustomUpdateState += ApplyHiddenState;
-
-                    d.HitObject.TimeFadein = d.HitObject.TimePreempt * fade_in_duration_multiplier;
-                    foreach (var h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
-                        h.TimeFadein = h.TimePreempt * fade_in_duration_multiplier;
-
-                }
+            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
         }
+
+        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        {
+            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
+            {
+                //Don't hide the first object ("drawables" are in a reverse order -> Last() )
+                if (d == drawables.Last() && increaseFirstObjectVisibility) continue;
+                d.ApplyCustomUpdateState += ApplyHiddenState;
+
+                d.HitObject.TimeFadein = d.HitObject.TimePreempt * fade_in_duration_multiplier;
+                foreach (var h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
+                    h.TimeFadein = h.TimePreempt * fade_in_duration_multiplier;
+            }
+        }
+
         protected void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
         {
             if (!(drawable is DrawableOsuHitObject d))
@@ -88,18 +92,5 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
             }
         }
-
-        public void ReadFromConfig(OsuConfigManager config)
-        {
-            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
-            //This starts the process of applying the mod effects. We start it here since this is the last void called.
-            applyMod();
-        }
-
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
-        {
-            this.drawables = drawables;
-        }
-
     }
 }
