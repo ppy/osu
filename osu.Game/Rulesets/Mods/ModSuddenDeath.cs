@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "Miss a note and fail.";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoPilot), typeof(ModAutoplay) };
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {

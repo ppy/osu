@@ -6,6 +6,9 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModKey3 : ManiaKeyMod
     {
         public override int KeyCount => 3;
-        public override string Name => "3K";
+        public override string Name => "Three Keys";
+        public override string ShortenedName => "3K";
+        public override FontAwesome Icon => FontAwesome.fa_question;
+        public override string Description => "Play with three keys.";
     }
 }

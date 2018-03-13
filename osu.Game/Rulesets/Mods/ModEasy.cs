@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
         public override string ShortenedName => "EZ";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_easy;
         public override ModType Type => ModType.DifficultyReduction;
-        public override string Description => "Reduces overall difficulty - larger circles, more forgiving HP drain, less accuracy required.";
+        public override string Description => "Larger circles, more forgiving HP drain, and less accuracy required.";
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
