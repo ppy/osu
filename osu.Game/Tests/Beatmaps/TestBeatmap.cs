@@ -17,15 +17,11 @@ namespace osu.Game.Tests.Beatmaps
             BeatmapInfo.Ruleset = ruleset;
         }
 
-        private static Beatmap testBeatmapCache;
         private static Beatmap createTestBeatmap()
         {
-            if (testBeatmapCache != null)
-                return testBeatmapCache;
-
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(test_beatmap_data)))
             using (var reader = new StreamReader(stream))
-                return testBeatmapCache = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
+                return Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
         }
 
         private const string test_beatmap_data =
