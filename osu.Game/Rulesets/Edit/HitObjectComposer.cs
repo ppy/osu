@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Edit
 
             const int beat_snap_divisor = 4; // Todo: This should not be a constant
             double seekAmount = timingPoint.BeatLength / beat_snap_divisor;
-            int direction = state.Mouse.WheelDelta > 0 ? 1 : -1;
+            int direction = state.Mouse.WheelDelta > 0 ? -1 : 1;
 
             // The direction is added to prevent rounding issues by enforcing that abs(unsnappedTime - currentTime) > beatLength
             double unsnappedTime = adjustableClock.CurrentTime + seekAmount * direction + direction;
