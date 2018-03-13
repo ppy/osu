@@ -145,20 +145,20 @@ namespace osu.Game.Rulesets.Edit
             var timingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(adjustableClock.CurrentTime);
 
             const int beat_snap_divisor = 4; // Todo: This should not be a constant
-            double beatLength = timingPoint.BeatLength / beat_snap_divisor;
+            double seekAmount = timingPoint.BeatLength / beat_snap_divisor;
             int direction = state.Mouse.WheelDelta > 0 ? 1 : -1;
 
             // The direction is added to prevent rounding issues by enforcing that abs(unsnappedTime - currentTime) > beatLength
-            double unsnappedTime = adjustableClock.CurrentTime + beatLength * direction + direction;
+            double unsnappedTime = adjustableClock.CurrentTime + seekAmount * direction + direction;
 
             // Unsnapped time may be between two beats, so we need to snap it to the closest beat
             int closestBeat;
             if (direction > 0)
-                closestBeat = (int)Math.Floor(unsnappedTime / beatLength);
+                closestBeat = (int)Math.Floor(unsnappedTime / seekAmount);
             else
-                closestBeat = (int)Math.Ceiling(unsnappedTime / beatLength);
+                closestBeat = (int)Math.Ceiling(unsnappedTime / seekAmount);
 
-            double snappedTime = closestBeat * beatLength;
+            double snappedTime = closestBeat * seekAmount;
 
             adjustableClock.Seek(snappedTime);
             return true;
