@@ -1,18 +1,16 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps.Timing;
+using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Play.BreaksOverlay
+namespace osu.Game.Screens.Play.Break
 {
-    public class LetterboxOverlay : VisibilityContainer
+    public class LetterboxOverlay : CompositeDrawable
     {
-        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
         private const int height = 350;
 
         private static readonly Color4 transparent_black = new Color4(0, 0, 0, 0);
@@ -20,7 +18,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         public LetterboxOverlay()
         {
             RelativeSizeAxes = Axes.Both;
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Container
                 {
@@ -48,8 +46,5 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 }
             };
         }
-
-        protected override void PopIn() => this.FadeIn(fade_duration);
-        protected override void PopOut() => this.FadeOut(fade_duration);
     }
 }

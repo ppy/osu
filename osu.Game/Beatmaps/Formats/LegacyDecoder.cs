@@ -4,47 +4,20 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Game.Beatmaps.Legacy;
-using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps.Formats
 {
-    public abstract class LegacyDecoder : Decoder
+    public abstract class LegacyDecoder<T> : Decoder<T>
+        where T : new()
     {
-        public static void Register()
+        protected readonly int FormatVersion;
+
+        protected LegacyDecoder(int version)
         {
-            AddDecoder(@"osu file format v14", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v13", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v12", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v11", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v10", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v9", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v8", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v7", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v6", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v5", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v4", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v3", m => new LegacyBeatmapDecoder(m));
-            // TODO: differences between versions
+            FormatVersion = version;
         }
 
-        protected int BeatmapVersion;
-
-        public override Decoder GetStoryboardDecoder() => new LegacyStoryboardDecoder(BeatmapVersion);
-
-        public override Beatmap DecodeBeatmap(StreamReader stream) => new LegacyBeatmap(base.DecodeBeatmap(stream));
-
-        protected override void ParseBeatmap(StreamReader stream, Beatmap beatmap)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void ParseStoryboard(StreamReader stream, Storyboard storyboard)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected void ParseContent(StreamReader stream)
+        protected override void ParseStreamInto(StreamReader stream, T beatmap)
         {
             Section section = Section.None;
 
@@ -54,13 +27,6 @@ namespace osu.Game.Beatmaps.Formats
                 if (ShouldSkipLine(line))
                     continue;
 
-                // It's already set in ParseBeatmap... why do it again?
-                //if (line.StartsWith(@"osu file format v"))
-                //{
-                //    Beatmap.BeatmapInfo.BeatmapVersion = int.Parse(line.Substring(17));
-                //    continue;
-                //}
-
                 if (line.StartsWith(@"[") && line.EndsWith(@"]"))
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
@@ -68,18 +34,13 @@ namespace osu.Game.Beatmaps.Formats
                     continue;
                 }
 
-                ProcessSection(section, line);
+                ParseLine(beatmap, section, line);
             }
         }
 
-        protected virtual bool ShouldSkipLine(string line)
-        {
-            if (string.IsNullOrWhiteSpace(line) || line.StartsWith("//"))
-                return true;
-            return false;
-        }
+        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//");
 
-        protected abstract void ProcessSection(Section section, string line);
+        protected abstract void ParseLine(T output, Section section, string line);
 
         protected KeyValuePair<string, string> SplitKeyVal(string line, char separator)
         {
