@@ -202,8 +202,11 @@ namespace osu.Game.Rulesets.UI
         private IEnumerable<Mod> mods;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager osuConfig)
         {
+            // Apply mods
+            applyMods(Mods, osuConfig);
+
             KeyBindingInputManager.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -216,9 +219,6 @@ namespace osu.Game.Rulesets.UI
                 KeyBindingInputManager.Add(Cursor);
 
             loadObjects();
-
-            // Apply mods
-            applyMods(Mods, config);
         }
 
         /// <summary>
@@ -284,15 +284,15 @@ namespace osu.Game.Rulesets.UI
             if (mods == null)
                 return;
 
+            foreach (var mod in mods.OfType<IReadFromConfig>())
+                mod.ReadFromConfig(config);
+
             foreach (var mod in mods.OfType<IApplicableToHitObject<TObject>>())
                 foreach (var obj in Beatmap.HitObjects)
                     mod.ApplyToHitObject(obj);
 
             foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);
-
-            foreach (var mod in mods.OfType<IReadFromConfig>())
-                mod.ReadFromConfig(config);
         }
 
         public override void SetReplay(Replay replay)
