@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.UI
     public class OsuPlayfield : Playfield
     {
         private readonly Container approachCircles;
-        private readonly Container judgementLayer;
+        private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
         // Todo: This should not be a thing, but is currently required for the editor
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     RelativeSizeAxes = Axes.Both,
                     Depth = 2,
                 },
-                judgementLayer = new Container
+                judgementLayer = new JudgementContainer<DrawableOsuJudgement>
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = 1,
@@ -75,16 +75,13 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            var osuJudgement = (OsuJudgement)judgement;
-            var osuObject = (OsuHitObject)judgedObject.HitObject;
-
             if (!judgedObject.DisplayJudgement)
                 return;
 
-            DrawableOsuJudgement explosion = new DrawableOsuJudgement(osuJudgement)
+            DrawableOsuJudgement explosion = new DrawableOsuJudgement(judgement, judgedObject)
             {
                 Origin = Anchor.Centre,
-                Position = osuObject.StackedEndPosition + osuJudgement.PositionOffset
+                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition + ((OsuJudgement)judgement).PositionOffset
             };
 
             judgementLayer.Add(explosion);

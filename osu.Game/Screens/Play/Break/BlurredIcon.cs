@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
+using OpenTK;
 
-namespace osu.Game.Screens.Play.BreaksOverlay
+namespace osu.Game.Screens.Play.Break
 {
     public class BlurredIcon : BufferedContainer
     {

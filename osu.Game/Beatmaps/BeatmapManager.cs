@@ -301,7 +301,7 @@ namespace osu.Game.Beatmaps
 
             BeatmapMetadata metadata;
             using (var stream = new StreamReader(reader.GetStream(mapName)))
-                metadata = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
+                metadata = Decoder.GetDecoder<Beatmap>(stream).Decode(stream).Metadata;
 
             return new BeatmapSetInfo
             {
@@ -328,8 +328,8 @@ namespace osu.Game.Beatmaps
                     raw.CopyTo(ms);
                     ms.Position = 0;
 
-                    var decoder = Decoder.GetDecoder(sr);
-                    Beatmap beatmap = decoder.DecodeBeatmap(sr);
+                    var decoder = Decoder.GetDecoder<Beatmap>(sr);
+                    Beatmap beatmap = decoder.Decode(sr);
 
                     beatmap.BeatmapInfo.Path = name;
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
