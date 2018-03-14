@@ -32,9 +32,6 @@ namespace osu.Game.Graphics
 
                 switch (screenshotFormat.Value)
                 {
-                    case ScreenshotFormat.Bmp:
-                        screenshotBitmap.Save(stream, ImageFormat.Bmp);
-                        break;
                     case ScreenshotFormat.Png:
                         screenshotBitmap.Save(stream, ImageFormat.Png);
                         break;
