@@ -2,7 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Scoring
@@ -23,8 +25,14 @@ namespace osu.Game.Rulesets.Scoring
 
         protected PerformanceCalculator(Ruleset ruleset, Beatmap beatmap, Score score)
         {
-            Beatmap = CreateBeatmapConverter().Convert(beatmap);
             Score = score;
+
+            var converter = CreateBeatmapConverter();
+
+            foreach (var mod in score.Mods.OfType<IApplicableToBeatmapConverter<TObject>>())
+                mod.ApplyToBeatmapConverter(converter);
+
+            Beatmap = converter.Convert(beatmap);
 
             var diffCalc = ruleset.CreateDifficultyCalculator(beatmap, score.Mods);
             diffCalc.Calculate(attributes);

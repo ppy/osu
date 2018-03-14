@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using OpenTK;
-using osu.Framework.Allocation;
 
-namespace osu.Game.Screens.Play.BreaksOverlay
+namespace osu.Game.Screens.Play.Break
 {
     public class GlowIcon : Container
     {
@@ -16,24 +16,24 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 
         public override Vector2 Size
         {
+            get { return base.Size; }
             set
             {
                 blurredIcon.Size = spriteIcon.Size = value;
                 blurredIcon.ForceRedraw();
             }
-            get { return base.Size; }
         }
 
         public Vector2 BlurSigma
         {
-            set { blurredIcon.BlurSigma = value; }
             get { return blurredIcon.BlurSigma; }
+            set { blurredIcon.BlurSigma = value; }
         }
 
         public FontAwesome Icon
         {
-            set { spriteIcon.Icon = blurredIcon.Icon = value; }
             get { return spriteIcon.Icon; }
+            set { spriteIcon.Icon = blurredIcon.Icon = value; }
         }
 
         public GlowIcon()
