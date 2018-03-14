@@ -60,10 +60,12 @@ namespace osu.Game.Skinning
 
             private string getPathForFile(string filename)
             {
+                bool hasExtension = filename.Contains('.');
+
                 string lastPiece = filename.Split('/').Last();
 
                 var file = skin.Files.FirstOrDefault(f =>
-                    string.Equals(Path.GetFileNameWithoutExtension(f.Filename), lastPiece, StringComparison.InvariantCultureIgnoreCase));
+                    string.Equals(hasExtension ? f.Filename : Path.GetFileNameWithoutExtension(f.Filename), lastPiece, StringComparison.InvariantCultureIgnoreCase));
                 return file?.FileInfo.StoragePath;
             }
 
@@ -73,9 +75,17 @@ namespace osu.Game.Skinning
                 this.underlyingStore = underlyingStore;
             }
 
-            public Stream GetStream(string name) => underlyingStore.GetStream(getPathForFile(name));
+            public Stream GetStream(string name)
+            {
+                string path = getPathForFile(name);
+                return path == null ? null : underlyingStore.GetStream(path);
+            }
 
-            byte[] IResourceStore<byte[]>.Get(string name) => underlyingStore.Get(getPathForFile(name));
+            byte[] IResourceStore<byte[]>.Get(string name)
+            {
+                string path = getPathForFile(name);
+                return path == null ? null : underlyingStore.Get(path);
+            }
         }
     }
 }
