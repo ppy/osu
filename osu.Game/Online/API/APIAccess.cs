@@ -8,15 +8,15 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class APIAccess : IAPIProvider, IDisposable
+    public class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
         private readonly OAuth authentication;
@@ -26,8 +26,6 @@ namespace osu.Game.Online.API
         private const string client_secret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
 
         private ConcurrentQueue<APIRequest> queue = new ConcurrentQueue<APIRequest>();
-
-        public readonly Scheduler Scheduler = new Scheduler();
 
         /// <summary>
         /// The username/email provided by the user when initiating a login.
@@ -306,26 +304,12 @@ namespace osu.Game.Online.API
             Id = 1,
         };
 
-        public void Update()
+        protected override void Dispose(bool isDisposing)
         {
-            Scheduler.Update();
-        }
+            base.Dispose(isDisposing);
 
-        private void dispose()
-        {
             config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? Token : string.Empty);
             config.Save();
-        }
-
-        public void Dispose()
-        {
-            dispose();
-            GC.SuppressFinalize(this);
-        }
-
-        ~APIAccess()
-        {
-            dispose();
         }
     }
 

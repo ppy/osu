@@ -56,8 +56,6 @@ namespace osu.Game
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
-        public APIAccess API;
-
         private Container content;
 
         protected override Container<Drawable> Content => content;
@@ -108,12 +106,14 @@ namespace osu.Game
 
             dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
 
-            dependencies.Cache(API = new APIAccess(LocalConfig));
-            dependencies.CacheAs<IAPIProvider>(API);
+            var api = new APIAccess(LocalConfig);
+
+            dependencies.Cache(api);
+            dependencies.CacheAs<IAPIProvider>(api);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Host));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, api, Host));
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
@@ -180,6 +180,8 @@ namespace osu.Game
             };
 
             FileStore.Cleanup();
+
+            AddInternal(api);
         }
 
         private void runMigrations()
@@ -235,18 +237,6 @@ namespace osu.Game
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(host.Storage);
             base.SetHost(host);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            API.Update();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            API.Dispose();
         }
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
