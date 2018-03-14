@@ -112,6 +112,7 @@ namespace osu.Game.Screens.Play
         }
 
         private bool weHandledMouseDown;
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             weHandledMouseDown = true;
@@ -139,24 +140,25 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            if (pushDebounce == null) pushDebounce = Scheduler.AddDelayed(() =>
-            {
-                contentOut();
-
-                this.Delay(250).Schedule(() =>
+            if (pushDebounce == null)
+                pushDebounce = Scheduler.AddDelayed(() =>
                 {
-                    if (!IsCurrentScreen) return;
+                    contentOut();
 
-                    if (!Push(player))
-                        Exit();
-                    else
+                    this.Delay(250).Schedule(() =>
                     {
-                        //By default, we want to load the player and never be returned to.
-                        //Note that this may change if the player we load requested a re-run.
-                        ValidForResume = false;
-                    }
-                });
-            }, 500);
+                        if (!IsCurrentScreen) return;
+
+                        if (!Push(player))
+                            Exit();
+                        else
+                        {
+                            //By default, we want to load the player and never be returned to.
+                            //Note that this may change if the player we load requested a re-run.
+                            ValidForResume = false;
+                        }
+                    });
+                }, 500);
         }
 
         protected override bool OnExiting(Screen next)
