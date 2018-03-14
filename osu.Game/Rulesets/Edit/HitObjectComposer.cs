@@ -10,10 +10,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Edit.Layers;
-using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
 
 namespace osu.Game.Rulesets.Edit
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            HitObjectOverlayLayer hitObjectOverlayLayer = CreateHitObjectOverlayLayer();
+            HitObjectMaskLayer hitObjectMaskLayer = new HitObjectMaskLayer(this);
             SelectionLayer selectionLayer = new SelectionLayer(rulesetContainer.Playfield);
 
             var layerBelowRuleset = new BorderLayer
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Edit
             layerAboveRuleset.Children = new Drawable[]
             {
                 selectionLayer, // Below object overlays for input
-                hitObjectOverlayLayer,
+                hitObjectMaskLayer,
                 selectionLayer.CreateProxy() // Proxy above object overlays for selections
             };
 
@@ -106,8 +106,10 @@ namespace osu.Game.Rulesets.Edit
                 }
             };
 
-            selectionLayer.ObjectSelected += hitObjectOverlayLayer.AddOverlay;
-            selectionLayer.ObjectDeselected += hitObjectOverlayLayer.RemoveOverlay;
+            selectionLayer.ObjectSelected += hitObjectMaskLayer.AddOverlay;
+            selectionLayer.ObjectDeselected += hitObjectMaskLayer.RemoveOverlay;
+            selectionLayer.SelectionCleared += hitObjectMaskLayer.RemoveSelectionOverlay;
+            selectionLayer.SelectionFinished += hitObjectMaskLayer.AddSelectionOverlay;
 
             toolboxCollection.Items =
                 new[] { new RadioButton("Select", () => setCompositionTool(null)) }
@@ -139,13 +141,21 @@ namespace osu.Game.Rulesets.Edit
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
 
         /// <summary>
+        /// Creates a <see cref="HitObjectMask"/> for a specific <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
+        public virtual HitObjectMask CreateMaskFor(DrawableHitObject hitObject) => null;
+
+        /// <summary>
+        /// Creates a <see cref="SelectionBox"/> which outlines <see cref="DrawableHitObject"/>s
+        /// and handles all hitobject movement/pattern adjustments.
+        /// </summary>
+        /// <param name="overlays">The <see cref="DrawableHitObject"/> overlays.</param>
+        public virtual SelectionBox CreateSelectionOverlay(IReadOnlyList<HitObjectMask> overlays) => new SelectionBox(overlays);
+
+        /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
         /// </summary>
         protected virtual ScalableContainer CreateLayerContainer() => new ScalableContainer { RelativeSizeAxes = Axes.Both };
-
-        /// <summary>
-        /// Creates the <see cref="HitObjectOverlayLayer"/> which overlays selected <see cref="DrawableHitObject"/>s.
-        /// </summary>
-        protected virtual HitObjectOverlayLayer CreateHitObjectOverlayLayer() => new HitObjectOverlayLayer();
     }
 }

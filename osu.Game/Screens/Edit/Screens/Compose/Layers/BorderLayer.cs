@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using OpenTK.Graphics;
 
-namespace osu.Game.Rulesets.Edit.Layers
+namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     public class BorderLayer : Container
     {
