@@ -3,13 +3,14 @@
 
 using System;
 using osu.Framework.Graphics;
+using OpenTK;
 
 namespace osu.Game.Skinning
 {
     public class SkinnableDrawable : SkinnableDrawable<Drawable>
     {
-        public SkinnableDrawable(string name, Func<string, Drawable> defaultImplementation, bool fallback = true)
-            : base(name, defaultImplementation, fallback)
+        public SkinnableDrawable(string name, Func<string, Drawable> defaultImplementation, bool fallback = true, bool restrictSize = true)
+            : base(name, defaultImplementation, fallback, restrictSize)
         {
         }
     }
@@ -21,10 +22,20 @@ namespace osu.Game.Skinning
 
         private readonly string componentName;
 
-        public SkinnableDrawable(string name, Func<string, T> defaultImplementation, bool fallback = true) : base(fallback)
+        private readonly bool restrictSize;
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="name">The namespace-complete resource name for this skinnable element.</param>
+        /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
+        /// <param name="fallback">Whther to fallback to the default implementation when a custom skin is specified but not implementation is present.</param>
+        /// <param name="restrictSize">Whether a user-skin drawable should be limited to the size of our parent.</param>
+        public SkinnableDrawable(string name, Func<string, T> defaultImplementation, bool fallback = true, bool restrictSize = true) : base(fallback)
         {
             componentName = name;
             createDefault = defaultImplementation;
+            this.restrictSize = restrictSize;
 
             RelativeSizeAxes = Axes.Both;
         }
@@ -32,11 +43,25 @@ namespace osu.Game.Skinning
         protected override void SkinChanged(Skin skin, bool allowFallback)
         {
             var drawable = skin.GetDrawableComponent(componentName);
-            if (drawable == null && allowFallback)
+            if (drawable != null)
+            {
+                if (restrictSize)
+                {
+                    drawable.RelativeSizeAxes = Axes.Both;
+                    drawable.Size = Vector2.One;
+                    drawable.FillMode = FillMode.Fit;
+                }
+            }
+            else if (allowFallback)
                 drawable = createDefault(componentName);
 
             if (drawable != null)
+            {
+                drawable.Origin = Anchor.Centre;
+                drawable.Anchor = Anchor.Centre;
+
                 InternalChild = drawable;
+            }
             else
                 ClearInternal();
         }
