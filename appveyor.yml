@@ -9,6 +9,8 @@ cache:
   - packages -> **\packages.config
 artifacts:
   - path: '**\*.dmp'
+on_failure:
+  - appveyor PushArtifact osu.Desktop\bin\Debug\osu!.exe
 install:
   - cmd: git submodule update --init --recursive --depth=5
 before_build:
