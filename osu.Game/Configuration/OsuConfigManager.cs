@@ -83,7 +83,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.Version, string.Empty);
 
-            Set(OsuSetting.ScreenshotFormat, ScreenshotFormat.Png);
+            Set(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
         }
 
         public OsuConfigManager(Storage storage) : base(storage)
