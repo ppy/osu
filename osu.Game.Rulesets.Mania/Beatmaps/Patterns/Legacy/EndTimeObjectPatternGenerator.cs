@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using System.Linq;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
@@ -15,8 +16,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
     {
         private readonly double endTime;
 
-        public EndTimeObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap)
-            : base(random, hitObject, beatmap, new Pattern())
+        public EndTimeObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Beatmap originalBeatmap)
+            : base(random, hitObject, beatmap, new Pattern(), originalBeatmap)
         {
             var endtimeData = HitObject as IHasEndTime;
 
