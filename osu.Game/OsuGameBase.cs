@@ -245,14 +245,8 @@ namespace osu.Game
 
         protected override void Dispose(bool isDisposing)
         {
-            //refresh token may have changed.
-            if (LocalConfig != null && API != null)
-            {
-                LocalConfig.Set(OsuSetting.Token, LocalConfig.Get<bool>(OsuSetting.SavePassword) ? API.Token : string.Empty);
-                LocalConfig.Save();
-            }
-
             base.Dispose(isDisposing);
+            API.Dispose();
         }
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
