@@ -9,25 +9,28 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Types;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 
-namespace osu.Game.Rulesets.Edit.Layers.Selection
+namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     /// <summary>
-    /// A box which encloses <see cref="DrawableHitObject"/>s.
+    /// A box which surrounds <see cref="DrawableHitObject"/>s and provides interactive handles, context menus etc.
     /// </summary>
-    public class SelectionOverlay : VisibilityContainer
+    public class SelectionBox : VisibilityContainer
     {
-        private readonly IReadOnlyList<HitObjectOverlay> overlays;
+        private readonly IReadOnlyList<HitObjectMask> overlays;
 
-        public SelectionOverlay(IReadOnlyList<HitObjectOverlay> overlays)
+        public const float BORDER_RADIUS = 2;
+
+        public SelectionBox(IReadOnlyList<HitObjectMask> overlays)
         {
             this.overlays = overlays;
 
             Masking = true;
-            BorderThickness = SelectionBox.BORDER_RADIUS;
+            BorderThickness = BORDER_RADIUS;
 
             InternalChild = new Box
             {
