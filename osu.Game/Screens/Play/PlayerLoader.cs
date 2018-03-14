@@ -131,16 +131,22 @@ namespace osu.Game.Screens.Play
 
         private void pushWhenLoaded()
         {
-            Schedule(pushWhenLoaded);
+            if (!IsCurrentScreen) return;
 
-            if (!readyForPush)
+            try
             {
-                pushDebounce?.Cancel();
-                pushDebounce = null;
-                return;
-            }
+                if (!readyForPush)
+                {
+                    // as the pushDebounce below has a delay, we need to keep checking and cancel a future debounce
+                    // if we become unready for push during the delay.
+                    pushDebounce?.Cancel();
+                    pushDebounce = null;
+                    return;
+                }
 
-            if (pushDebounce == null)
+                if (pushDebounce != null)
+                    return;
+
                 pushDebounce = Scheduler.AddDelayed(() =>
                 {
                     contentOut();
@@ -159,6 +165,11 @@ namespace osu.Game.Screens.Play
                         }
                     });
                 }, 500);
+            }
+            finally
+            {
+                Schedule(pushWhenLoaded);
+            }
         }
 
         protected override bool OnExiting(Screen next)
