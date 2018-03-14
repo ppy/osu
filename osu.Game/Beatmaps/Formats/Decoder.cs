@@ -4,38 +4,64 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Game.Storyboards;
+using System.Linq;
 
 namespace osu.Game.Beatmaps.Formats
 {
+    public abstract class Decoder<TOutput> : Decoder
+        where TOutput : new()
+    {
+        protected virtual TOutput CreateTemplateObject() => new TOutput();
+
+        public TOutput Decode(StreamReader primaryStream, params StreamReader[] otherStreams)
+        {
+            var output = CreateTemplateObject();
+            foreach (StreamReader stream in new[] { primaryStream }.Concat(otherStreams))
+                ParseStreamInto(stream, output);
+            return output;
+        }
+
+        protected abstract void ParseStreamInto(StreamReader stream, TOutput beatmap);
+    }
+
     public abstract class Decoder
     {
-        private static readonly Dictionary<string, Func<string, Decoder>> decoders = new Dictionary<string, Func<string, Decoder>>();
+        private static readonly Dictionary<Type, Dictionary<string, Func<string, Decoder>>> decoders = new Dictionary<Type, Dictionary<string, Func<string, Decoder>>>();
 
         static Decoder()
         {
-            LegacyDecoder.Register();
+            LegacyBeatmapDecoder.Register();
             JsonBeatmapDecoder.Register();
+            LegacyStoryboardDecoder.Register();
         }
 
         /// <summary>
         /// Retrieves a <see cref="Decoder"/> to parse a <see cref="Beatmap"/>.
         /// </summary>
         /// <param name="stream">A stream pointing to the <see cref="Beatmap"/>.</param>
-        public static Decoder GetDecoder(StreamReader stream)
+        public static Decoder<T> GetDecoder<T>(StreamReader stream)
+            where T : new()
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
 
+            if (!decoders.TryGetValue(typeof(T), out var typedDecoders))
+                throw new IOException(@"Unknown decoder type");
+
             string line;
             do
-            { line = stream.ReadLine()?.Trim(); }
-            while (line != null && line.Length == 0);
+            {
+                line = stream.ReadLine()?.Trim();
+            } while (line != null && line.Length == 0);
 
-            if (line == null || !decoders.ContainsKey(line))
+            if (line == null)
                 throw new IOException(@"Unknown file format");
 
-            return decoders[line](line);
+            var decoder = typedDecoders.Select(d => line.StartsWith(d.Key) ? d.Value : null).FirstOrDefault();
+            if (decoder == null)
+                throw new IOException(@"Unknown file format");
+
+            return (Decoder<T>)decoder.Invoke(line);
         }
 
         /// <summary>
@@ -43,41 +69,12 @@ namespace osu.Game.Beatmaps.Formats
         /// </summary>
         /// <param name="magic">A string in the file which triggers this decoder to be used.</param>
         /// <param name="constructor">A function which constructs the <see cref="Decoder"/> given <paramref name="magic"/>.</param>
-        protected static void AddDecoder(string magic, Func<string, Decoder> constructor)
+        protected static void AddDecoder<T>(string magic, Func<string, Decoder> constructor)
         {
-            decoders[magic] = constructor;
+            if (!decoders.TryGetValue(typeof(T), out var typedDecoders))
+                decoders.Add(typeof(T), typedDecoders = new Dictionary<string, Func<string, Decoder>>());
+
+            typedDecoders[magic] = constructor;
         }
-
-        /// <summary>
-        /// Retrieves a <see cref="Decoder"/> to parse a <see cref="Storyboard"/>
-        /// </summary>
-        public abstract Decoder GetStoryboardDecoder();
-
-        public virtual Beatmap DecodeBeatmap(StreamReader stream)
-        {
-            var beatmap = new Beatmap
-            {
-                BeatmapInfo = new BeatmapInfo
-                {
-                    Metadata = new BeatmapMetadata(),
-                    BaseDifficulty = new BeatmapDifficulty(),
-                },
-            };
-
-            ParseBeatmap(stream, beatmap);
-            return beatmap;
-        }
-
-        protected abstract void ParseBeatmap(StreamReader stream, Beatmap beatmap);
-
-        public virtual Storyboard DecodeStoryboard(params StreamReader[] streams)
-        {
-            var storyboard = new Storyboard();
-            foreach (StreamReader stream in streams)
-                ParseStoryboard(stream, storyboard);
-            return storyboard;
-        }
-
-        protected abstract void ParseStoryboard(StreamReader stream, Storyboard storyboard);
     }
 }

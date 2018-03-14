@@ -130,6 +130,7 @@
     <Compile Include="Replays\OsuReplayFrame.cs" />
     <Compile Include="Replays\OsuReplayInputHandler.cs" />
     <Compile Include="Tests\OsuBeatmapConversionTest.cs" />
+    <Compile Include="Tests\TestCaseEditor.cs" />
     <Compile Include="Tests\TestCaseHitCircle.cs" />
     <Compile Include="Tests\TestCaseHitCircleHidden.cs" />
     <Compile Include="Tests\TestCasePerformancePoints.cs" />

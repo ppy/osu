@@ -9,7 +9,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Judgements
 {
@@ -18,43 +21,37 @@ namespace osu.Game.Rulesets.Judgements
     /// </summary>
     public class DrawableJudgement : Container
     {
+        private const float judgement_size = 80;
+
         protected readonly Judgement Judgement;
 
-        protected readonly SpriteText JudgementText;
+        public readonly DrawableHitObject JudgedObject;
+
+        protected SpriteText JudgementText;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
         /// <param name="judgement">The judgement to visualise.</param>
-        public DrawableJudgement(Judgement judgement)
+        public DrawableJudgement(Judgement judgement, DrawableHitObject judgedObject)
         {
             Judgement = judgement;
+            JudgedObject = judgedObject;
 
-            AutoSizeAxes = Axes.Both;
-
-            Children = new[]
-            {
-                JudgementText = new OsuSpriteText
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Text = judgement.Result.GetDescription().ToUpper(),
-                    Font = @"Venera",
-                    Scale = new Vector2(0.85f, 1),
-                    TextSize = 12
-                }
-            };
+            Size = new Vector2(judgement_size);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            switch (Judgement.Result)
+            Child = new SkinnableDrawable($"Play/{Judgement.Result}", _ => JudgementText = new OsuSpriteText
             {
-                case HitResult.Miss:
-                    Colour = colours.Red;
-                    break;
-            }
+                Text = Judgement.Result.GetDescription().ToUpper(),
+                Font = @"Venera",
+                Colour = Judgement.Result == HitResult.Miss ? colours.Red : Color4.White,
+                Scale = new Vector2(0.85f, 1),
+                TextSize = 12
+            }, restrictSize: false);
         }
 
         protected override void LoadComplete()

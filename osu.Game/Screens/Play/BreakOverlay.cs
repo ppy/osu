@@ -1,15 +1,16 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Scoring;
-using System.Collections.Generic;
-using osu.Framework.Graphics.UserInterface;
+using osu.Game.Screens.Play.Break;
 
-namespace osu.Game.Screens.Play.BreaksOverlay
+namespace osu.Game.Screens.Play
 {
     public class BreakOverlay : Container
     {
@@ -18,28 +19,26 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         private const int vertical_margin = 25;
 
         private List<BreakPeriod> breaks;
+
+        private readonly Container fadeContainer;
+
         public List<BreakPeriod> Breaks
         {
+            get => breaks;
             set
             {
                 breaks = value;
                 initializeBreaks();
             }
-            get
-            {
-                return breaks;
-            }
         }
 
         public override bool RemoveCompletedTransforms => false;
 
-        private readonly bool letterboxing;
-        private readonly LetterboxOverlay letterboxOverlay;
         private readonly Container remainingTimeAdjustmentBox;
         private readonly Container remainingTimeBox;
         private readonly RemainingTimeCounter remainingTimeCounter;
-        private readonly InfoContainer info;
-        private readonly ArrowsOverlay arrowsOverlay;
+        private readonly BreakInfo info;
+        private readonly BreakArrows breakArrows;
 
         public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
             : this(letterboxing)
@@ -49,61 +48,72 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 
         public BreakOverlay(bool letterboxing)
         {
-            this.letterboxing = letterboxing;
-
             RelativeSizeAxes = Axes.Both;
-            Children = new Drawable[]
+            Child = fadeContainer = new Container
             {
-                letterboxOverlay = new LetterboxOverlay
+                Alpha = 0,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
-                remainingTimeAdjustmentBox = new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                    Width = 0,
-                    Child = remainingTimeBox = new Container
+                    new LetterboxOverlay
+                    {
+                        Alpha = letterboxing ? 1 : 0,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    remainingTimeAdjustmentBox = new Container
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
-                        Height = 8,
-                        CornerRadius = 4,
-                        Masking = true,
-                        Child = new Box { RelativeSizeAxes = Axes.Both }
+                        Width = 0,
+                        Child = remainingTimeBox = new Container
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 8,
+                            CornerRadius = 4,
+                            Masking = true,
+                            Child = new Box { RelativeSizeAxes = Axes.Both }
+                        }
+                    },
+                    remainingTimeCounter = new RemainingTimeCounter
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.BottomCentre,
+                        Margin = new MarginPadding { Bottom = vertical_margin },
+                    },
+                    info = new BreakInfo
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.TopCentre,
+                        Margin = new MarginPadding { Top = vertical_margin },
+                    },
+                    breakArrows = new BreakArrows
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                     }
-                },
-                remainingTimeCounter = new RemainingTimeCounter
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.BottomCentre,
-                    Margin = new MarginPadding { Bottom = vertical_margin },
-                },
-                info = new InfoContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
-                    Margin = new MarginPadding { Top = vertical_margin },
-                },
-                arrowsOverlay = new ArrowsOverlay
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                 }
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            initializeBreaks();
+        }
+
         private void initializeBreaks()
         {
+            if (!IsLoaded) return; // we need a clock.
+
             FinishTransforms(true);
             Scheduler.CancelDelayedTasks();
 
-            if (breaks == null)
-                return;
+            if (breaks == null) return; //we need breaks.
 
             foreach (var b in breaks)
             {
@@ -112,6 +122,9 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 
                 using (BeginAbsoluteSequence(b.StartTime, true))
                 {
+                    fadeContainer.FadeIn(fade_duration);
+                    breakArrows.Show(fade_duration);
+
                     remainingTimeAdjustmentBox
                         .ResizeWidthTo(remaining_time_container_max_size, fade_duration, Easing.OutQuint)
                         .Delay(b.Duration - fade_duration)
@@ -123,35 +136,14 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                         .ResizeWidthTo(1);
 
                     remainingTimeCounter.CountTo(b.Duration).CountTo(0, b.Duration);
-                }
 
-                using (BeginAbsoluteSequence(b.StartTime))
-                {
-                    Schedule(showBreak);
-                    using (BeginDelayedSequence(b.Duration - fade_duration))
-                        Schedule(hideBreak);
+                    using (BeginDelayedSequence(b.Duration - fade_duration, true))
+                    {
+                        fadeContainer.FadeOut(fade_duration);
+                        breakArrows.Hide(fade_duration);
+                    }
                 }
             }
-        }
-
-        private void showBreak()
-        {
-            if (letterboxing)
-                letterboxOverlay.Show();
-
-            remainingTimeCounter.Show();
-            info.Show();
-            arrowsOverlay.Show();
-        }
-
-        private void hideBreak()
-        {
-            if (letterboxing)
-                letterboxOverlay.Hide();
-
-            remainingTimeCounter.Hide();
-            info.Hide();
-            arrowsOverlay.Hide();
         }
 
         private void bindProcessor(ScoreProcessor processor)
