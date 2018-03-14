@@ -34,7 +34,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game
 {
-    public class OsuGameBase : Framework.Game, IOnlineComponent, ICanAcceptFiles
+    public class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
         protected OsuConfigManager LocalConfig;
 
@@ -108,11 +108,7 @@ namespace osu.Game
 
             dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
 
-            dependencies.Cache(API = new APIAccess
-            {
-                Username = LocalConfig.Get<string>(OsuSetting.Username),
-                Token = LocalConfig.Get<string>(OsuSetting.Token)
-            });
+            dependencies.Cache(API = new APIAccess(LocalConfig));
             dependencies.CacheAs<IAPIProvider>(API);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
@@ -183,8 +179,6 @@ namespace osu.Game
                 lastBeatmap = b;
             };
 
-            API.Register(this);
-
             FileStore.Cleanup();
         }
 
@@ -210,16 +204,6 @@ namespace osu.Game
         }
 
         private WorkingBeatmap lastBeatmap;
-
-        public void APIStateChanged(APIAccess api, APIState state)
-        {
-            switch (state)
-            {
-                case APIState.Online:
-                    LocalConfig.Set(OsuSetting.Username, LocalConfig.Get<bool>(OsuSetting.SaveUsername) ? API.Username : string.Empty);
-                    break;
-            }
-        }
 
         protected override void LoadComplete()
         {
