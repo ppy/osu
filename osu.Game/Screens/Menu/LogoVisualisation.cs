@@ -210,8 +210,8 @@ namespace osu.Game.Screens.Menu
                             Texture.DrawQuad<TexturedVertex2D>(
                                 rectangle,
                                 colourInfo,
-                                null,
                                 Shared.VertexBatch.Add,
+                                null,
                                 //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                 Vector2.Divide(inflation, barSize.Yx));
                         }

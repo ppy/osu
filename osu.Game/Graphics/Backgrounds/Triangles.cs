@@ -241,8 +241,8 @@ namespace osu.Game.Graphics.Backgrounds
                     Texture.DrawTriangle<TexturedVertex2D>(
                         triangle,
                         colourInfo,
-                        null,
                         Shared.VertexBatch.Add,
+                        null,
                         Vector2.Divide(localInflationAmount, size));
                 }
 

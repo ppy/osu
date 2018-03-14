@@ -214,7 +214,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         Texture.DrawQuad<TexturedVertex2D>(
                             new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
                             colour,
-                            null,
                             v => Shared.VertexBuffer.Vertices[end++] = v);
 
                         Parts[i].WasUpdated = false;
