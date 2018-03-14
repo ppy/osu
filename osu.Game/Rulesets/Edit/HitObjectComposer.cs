@@ -153,13 +153,43 @@ namespace osu.Game.Rulesets.Edit
         /// Seeks the current time one beat-snapped beat-length backwards.
         /// </summary>
         /// <param name="snapped">Whether to snap to the closest beat.</param>
-        public void SeekBackward(bool snapped) => seek(-1, snapped);
+        public void SeekBackward(bool snapped = false) => seek(-1, snapped);
 
         /// <summary>
         /// Seeks the current time one beat-snapped beat-length forwards.
         /// </summary>
         /// <param name="snapped">Whether to snap to the closest beat.</param>
-        public void SeekForward(bool snapped) => seek(1, snapped);
+        public void SeekForward(bool snapped = false) => seek(1, snapped);
+
+        public void SeekTo(double seekTime, bool snapped = false)
+        {
+            // Todo: This should not be a constant, but feels good for now
+            const int beat_snap_divisor = 4;
+
+            if (!snapped)
+            {
+                adjustableClock.Seek(seekTime);
+                return;
+            }
+
+            var timingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(seekTime);
+            double beatSnapLength = timingPoint.BeatLength / beat_snap_divisor;
+
+            // We will be snapping to beats within the timing point
+            seekTime -= timingPoint.Time;
+
+            // Determine the index from the current timing point of the closest beat to seekTime
+            int closestBeat = (int)Math.Round(seekTime / beatSnapLength);
+            seekTime = timingPoint.Time + closestBeat * beatSnapLength;
+
+            // Depending on beatSnapLength, we may snap to a beat that is beyond timingPoint's end time, but we want to instead snap to
+            // the next timing point's start time
+            var nextTimingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
+            if (seekTime > nextTimingPoint?.Time)
+                seekTime = nextTimingPoint.Time;
+
+            adjustableClock.Seek(seekTime);
+        }
 
         private void seek(int direction, bool snapped)
         {
@@ -181,17 +211,13 @@ namespace osu.Game.Rulesets.Edit
             var firstTimingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.First();
 
             if (currentTimingPoint != firstTimingPoint && seekTime < currentTimingPoint.Time)
-                seekTime = currentTimingPoint.Time - 1; // -1 to be in the prior timing point's boundary
-            else if (nextTimingPoint != null && seekTime >= nextTimingPoint.Time)
-                seekTime = nextTimingPoint.Time + 1; // +1 to be in the next timing point's boundary
+                adjustableClock.Seek(currentTimingPoint.Time - 1); // -1 to be in the prior timing point's boundary
+            else if (seekTime >= nextTimingPoint?.Time)
+                adjustableClock.Seek(nextTimingPoint.Time); // +1 to be in the next timing point's boundary
             else
             {
-                // We will be snapping to beats within the current timing point
+                // We will be snapping to beats within the timing point
                 seekTime -= currentTimingPoint.Time;
-
-                // When rounding below, we need to ensure that abs(seekTime - currentTime) > seekAmount
-                // This is done by adding direction - a small offset, to seekTime
-                seekTime += direction;
 
                 // Determine the index from the current timing point of the closest beat to seekTime, accounting for scrolling direction
                 int closestBeat;
@@ -201,9 +227,9 @@ namespace osu.Game.Rulesets.Edit
                     closestBeat = (int)Math.Ceiling(seekTime / seekAmount);
 
                 seekTime = currentTimingPoint.Time + closestBeat * seekAmount;
-            }
 
-            adjustableClock.Seek(seekTime);
+                adjustableClock.Seek(seekTime);
+            }
         }
 
         private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
