@@ -211,9 +211,6 @@ namespace osu.Game
 
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
 
-            screenshotManager = new ScreenshotManager();
-            Add(screenshotManager);
-
             AddRange(new Drawable[]
             {
                 new VolumeControlReceptor
@@ -223,6 +220,7 @@ namespace osu.Game
                 },
                 mainContent = new Container { RelativeSizeAxes = Axes.Both },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
+                screenshotManager = new ScreenshotManager()
             });
 
             loadComponentSingleFile(screenStack = new Loader(), d =>
@@ -435,9 +433,6 @@ namespace osu.Game
                     return true;
                 case GlobalAction.ToggleDirect:
                     direct.ToggleVisibility();
-                    return true;
-                case GlobalAction.TakeScreenshot:
-                    screenshotManager.TakeScreenshot();
                     return true;
             }
 

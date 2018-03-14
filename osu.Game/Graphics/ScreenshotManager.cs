@@ -3,13 +3,16 @@ using System.Drawing.Imaging;
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics
 {
-    public class ScreenshotManager : Drawable
+    public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalInput
     {
         private Bindable<ScreenshotFormat> screenshotFormat;
         private GameHost host;
@@ -23,6 +26,20 @@ namespace osu.Game.Graphics
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
         }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.TakeScreenshot:
+                    TakeScreenshot();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => false;
 
         public void TakeScreenshot()
         {
