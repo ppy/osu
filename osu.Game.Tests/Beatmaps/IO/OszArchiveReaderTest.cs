@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 BeatmapMetadata meta;
                 using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
-                    meta = Decoder.GetDecoder(stream).DecodeBeatmap(stream).Metadata;
+                    meta = Decoder.GetDecoder<Beatmap>(stream).Decode(stream).Metadata;
 
                 Assert.AreEqual(241526, meta.OnlineBeatmapSetID);
                 Assert.AreEqual("Soleily", meta.Artist);

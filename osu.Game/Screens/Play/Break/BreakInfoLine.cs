@@ -8,9 +8,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
-namespace osu.Game.Screens.Play.BreaksOverlay
+namespace osu.Game.Screens.Play.Break
 {
-    public class InfoLine<T> : Container
+    public class BreakInfoLine<T> : Container
         where T : struct
     {
         private const int margin = 2;
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 
         private readonly string prefix;
 
-        public InfoLine(string name, string prefix = @"")
+        public BreakInfoLine(string name, string prefix = @"")
         {
             this.prefix = prefix;
 
@@ -71,9 +71,9 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         }
     }
 
-    public class PercentageInfoLine : InfoLine<double>
+    public class PercentageBreakInfoLine : BreakInfoLine<double>
     {
-        public PercentageInfoLine(string name, string prefix = "") : base(name, prefix)
+        public PercentageBreakInfoLine(string name, string prefix = "") : base(name, prefix)
         {
         }
 

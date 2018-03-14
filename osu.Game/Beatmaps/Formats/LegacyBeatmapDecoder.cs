@@ -4,6 +4,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
@@ -12,8 +13,10 @@ using osu.Framework;
 
 namespace osu.Game.Beatmaps.Formats
 {
-    public class LegacyBeatmapDecoder : LegacyDecoder
+    public class LegacyBeatmapDecoder : LegacyDecoder<Beatmap>
     {
+        public const int LATEST_VERSION = 14;
+
         private Beatmap beatmap;
 
         private bool hasCustomColours;
@@ -21,6 +24,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
+
+        public static void Register()
+        {
+            AddDecoder<Beatmap>(@"osu file format v", m => new LegacyBeatmapDecoder(int.Parse(m.Split('v').Last())));
+        }
 
         /// <summary>
         /// lazer's audio timings in general doesn't match stable. this is the result of user testing, albeit limited.
@@ -35,29 +43,18 @@ namespace osu.Game.Beatmaps.Formats
 
         private readonly int offset = UniversalOffset;
 
-        public LegacyBeatmapDecoder()
+        public LegacyBeatmapDecoder(int version = LATEST_VERSION) : base(version)
         {
-        }
-
-        public LegacyBeatmapDecoder(string header)
-        {
-            BeatmapVersion = int.Parse(header.Substring(17));
-
             // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
-            offset += BeatmapVersion < 5 ? 24 : 0;
+            offset += FormatVersion < 5 ? 24 : 0;
         }
 
-        protected override void ParseBeatmap(StreamReader stream, Beatmap beatmap)
+        protected override void ParseStreamInto(StreamReader stream, Beatmap beatmap)
         {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-            if (beatmap == null)
-                throw new ArgumentNullException(nameof(beatmap));
-
             this.beatmap = beatmap;
-            this.beatmap.BeatmapInfo.BeatmapVersion = BeatmapVersion;
+            this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
 
-            ParseContent(stream);
+            base.ParseStreamInto(stream, beatmap);
 
             // objects may be out of order *only* if a user has manually edited an .osu file.
             // unfortunately there are ranked maps in this state (example: https://osu.ppy.sh/s/594828).
@@ -67,14 +64,9 @@ namespace osu.Game.Beatmaps.Formats
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
         }
 
-        protected override bool ShouldSkipLine(string line)
-        {
-            if (base.ShouldSkipLine(line) || line.StartsWith(" ") || line.StartsWith("_"))
-                return true;
-            return false;
-        }
+        protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(" ") || line.StartsWith("_");
 
-        protected override void ProcessSection(Section section, string line)
+        protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
             switch (section)
             {

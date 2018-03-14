@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -14,22 +15,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             Size = new Vector2(128);
 
-            Masking = true;
-            CornerRadius = Size.X / 2;
-
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             Blending = BlendingMode.Additive;
             Alpha = 0;
 
-            Children = new Drawable[]
+            Child = new SkinnableDrawable("Play/osu/hitcircle-flash", name => new CircularContainer
             {
-                new Box
+                Masking = true,
+                RelativeSizeAxes = Axes.Both,
+                Child = new Box
                 {
                     RelativeSizeAxes = Axes.Both
                 }
-            };
+            }, false);
         }
     }
 }
