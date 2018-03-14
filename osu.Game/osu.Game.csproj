@@ -896,11 +896,13 @@
     <Compile Include="Storyboards\StoryboardSample.cs" />
     <Compile Include="Storyboards\StoryboardSprite.cs" />
     <Compile Include="Tests\Beatmaps\BeatmapConversionTest.cs" />
+    <Compile Include="Tests\Beatmaps\TestBeatmap.cs" />
     <Compile Include="Tests\Beatmaps\TestWorkingBeatmap.cs" />
     <Compile Include="Tests\CleanRunHeadlessGameHost.cs" />
     <Compile Include="Tests\Platform\TestStorage.cs" />
     <Compile Include="Tests\TestTestCase.cs" />
     <Compile Include="Tests\Visual\OsuTestCase.cs" />
+    <Compile Include="Tests\Visual\EditorTestCase.cs" />
     <Compile Include="Tests\Visual\TestCasePerformancePoints.cs" />
     <Compile Include="Tests\Visual\ScreenTestCase.cs" />
     <Compile Include="Tests\Visual\TestCasePlayer.cs" />
