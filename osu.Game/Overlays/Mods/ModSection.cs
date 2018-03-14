@@ -114,19 +114,19 @@ namespace osu.Game.Overlays.Mods
         }
 
         /// <summary>
-        /// Select one or more mods in this section.
+        /// Select one or more mods in this section and deselects all other ones.
         /// </summary>
-        /// <param name="mods">The types of <see cref="Mod"/>s which should be deselected.</param>
-        public void SelectTypes(IEnumerable<Mod> mods)
+        /// <param name="modTypes">The types of <see cref="Mod"/>s which should be selected.</param>
+        public void SelectTypes(IEnumerable<Type> modTypes)
         {
             foreach (var button in buttons)
             {
-                for (int i = 0; i < button.Mods.Length; i++)
-                {
-                    foreach (var mod in mods)
-                        if (mod.GetType().IsInstanceOfType(button.Mods[i]))
-                            button.SelectAt(i);
-                }
+                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t.IsInstanceOfType(m)));
+
+                if (i >= 0)
+                    button.SelectAt(i);
+                else
+                    button.Deselect();
             }
         }
 
