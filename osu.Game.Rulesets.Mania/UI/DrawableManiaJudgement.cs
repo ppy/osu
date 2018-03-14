@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -12,7 +13,13 @@ namespace osu.Game.Rulesets.Mania.UI
         public DrawableManiaJudgement(Judgement judgement, DrawableHitObject judgedObject)
             : base(judgement, judgedObject)
         {
-            JudgementText.TextSize = 25;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (JudgementText != null)
+                JudgementText.TextSize = 25;
         }
 
         protected override void LoadComplete()
