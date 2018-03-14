@@ -8,6 +8,8 @@ cache:
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
   - inspectcode -> appveyor.yml
   - packages -> **\packages.config
+artifacts:
+  - path: '**\*.dmp'
 install:
   - cmd: git submodule update --init --recursive --depth=5
   - cmd: choco install resharper-clt -y

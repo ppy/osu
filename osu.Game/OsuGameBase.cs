@@ -7,6 +7,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Threading;
+using Microsoft.Win32.SafeHandles;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Configuration;
@@ -85,6 +88,8 @@ namespace osu.Game
         public OsuGameBase()
         {
             Name = @"osu!lazer";
+
+            Dumper.Start();
         }
 
         private DependencyContainer dependencies;
@@ -282,5 +287,62 @@ namespace osu.Game
         }
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
+    }
+
+    public static class Dumper
+    {
+        public static void Start()
+        {
+            new Thread(collect)　{　IsBackground = true　}.Start();
+        }
+
+        private static void collect()
+        {
+            // 15 mins
+            Thread.Sleep(1000 * 60 * 15);
+
+            var process = Process.GetCurrentProcess();
+
+            try
+            {
+                using (var dumpStream = File.Create("fail.dmp"))
+                    MiniDumpWriteDump(process.Handle, (uint)process.Id, dumpStream.SafeFileHandle, DumpType.Normal | DumpType.WithProcessThreadData | DumpType.WithThreadInfo | DumpType.WithCodeSegs,
+                        IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+            }
+            catch
+            {
+            }
+        }
+
+        [DllImport("dbghelp.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool MiniDumpWriteDump([In] IntPtr hProcess, uint processId, SafeFileHandle hFile, DumpType dumpType, [In] IntPtr exceptionParam, [In] IntPtr userStreamParam, [In] IntPtr callbackParam);
+
+        [Flags]
+        private enum DumpType
+        {
+            Normal = 0,
+            WithDataSegs = 1 << 0,
+            WithFullMemory = 1 << 1,
+            WithHandleData = 1 << 2,
+            FilterMemory = 1 << 3,
+            ScanMemory = 1 << 4,
+            WithUnloadedModules = 1 << 5,
+            WithIndirectlyReferencedMemory = 1 << 6,
+            FilterModulePaths = 1 << 7,
+            WithProcessThreadData = 1 << 8,
+            WithPrivateReadWriteMemory = 1 << 9,
+            WithoutOptionalData = 1 << 10,
+            WithFullMemoryInfo = 1 << 11,
+            WithThreadInfo = 1 << 12,
+            WithCodeSegs = 1 << 13,
+            WithoutAuxiliaryState = 1 << 14,
+            WithFullAuxiliaryState = 1 << 15,
+            WithPrivateWriteCopyMemory = 1 << 16,
+            IgnoreInaccessibleMemory = 1 << 17,
+            WithTokenInformation = 1 << 18,
+            WithModuleHeaders = 1 << 19,
+            FilterTriage = 1 << 20
+        }
     }
 }
