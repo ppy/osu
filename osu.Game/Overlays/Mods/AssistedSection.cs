@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Mods
 
         public AssistedSection()
         {
-            Header = @"Assisted";
+            Header = @"Special";
         }
     }
 }

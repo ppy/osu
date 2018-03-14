@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -14,6 +15,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Name => "Mirror";
         public override string ShortenedName => "MR";
+        public override FontAwesome Icon => FontAwesome.fa_question;
         public override ModType Type => ModType.Special;
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
