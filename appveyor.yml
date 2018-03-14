@@ -8,7 +8,8 @@ cache:
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
   - packages -> **\packages.config
 on_finish:
-  - ps: Get-ChildItem .\*.dmp -Recurse | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+  - ps: 7z a debug.zip osu.Desktop\bin\Debug\*
+  - ps: appveyor PushArtifact debug.zip
 install:
   - cmd: git submodule update --init --recursive --depth=5
 before_build:
