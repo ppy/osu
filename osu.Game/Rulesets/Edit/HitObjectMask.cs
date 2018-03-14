@@ -4,13 +4,16 @@
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Edit.Layers.Selection
+namespace osu.Game.Rulesets.Edit
 {
-    public class HitObjectOverlay : Container
+    /// <summary>
+    /// A mask placed above a <see cref="DrawableHitObject"/> adding editing functionality.
+    /// </summary>
+    public class HitObjectMask : Container
     {
         public readonly DrawableHitObject HitObject;
 
-        public HitObjectOverlay(DrawableHitObject hitObject)
+        public HitObjectMask(DrawableHitObject hitObject)
         {
             HitObject = hitObject;
         }
