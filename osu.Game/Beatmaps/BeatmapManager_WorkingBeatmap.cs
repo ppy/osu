@@ -10,6 +10,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Graphics.Textures;
+using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
@@ -99,6 +100,23 @@ namespace osu.Game.Beatmaps
                 storyboard.BeatmapInfo = BeatmapInfo;
 
                 return storyboard;
+            }
+
+            protected override Skin GetSkin()
+            {
+                Skin skin;
+                try
+                {
+                    // todo: this needs an AudioManager
+                    skin = new BeatmapSkin(BeatmapInfo, store);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Skin failed to load");
+                    skin = new DefaultSkin();
+                }
+
+                return skin;
             }
         }
     }
