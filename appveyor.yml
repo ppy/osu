@@ -7,10 +7,8 @@ cache:
   - C:\ProgramData\chocolatey\bin -> appveyor.yml
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
   - packages -> **\packages.config
-artifacts:
-  - path: '**\*.dmp'
 on_failure:
-  - appveyor PushArtifact osu.Desktop\bin\Debug\osu!.exe
+  - ps: Get-ChildItem .\*.dmp -Recurse | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 install:
   - cmd: git submodule update --init --recursive --depth=5
 before_build:
