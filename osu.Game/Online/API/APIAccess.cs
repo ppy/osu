@@ -16,7 +16,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class APIAccess : IAPIProvider
+    public class APIAccess : IAPIProvider, IDisposable
     {
         private readonly OsuConfigManager config;
         private readonly OAuth authentication;
@@ -27,7 +27,7 @@ namespace osu.Game.Online.API
 
         private ConcurrentQueue<APIRequest> queue = new ConcurrentQueue<APIRequest>();
 
-        public Scheduler Scheduler = new Scheduler();
+        public readonly Scheduler Scheduler = new Scheduler();
 
         /// <summary>
         /// The username/email provided by the user when initiating a login.
@@ -309,6 +309,23 @@ namespace osu.Game.Online.API
         public void Update()
         {
             Scheduler.Update();
+        }
+
+        private void dispose()
+        {
+            config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? Token : string.Empty);
+            config.Save();
+        }
+
+        public void Dispose()
+        {
+            dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        ~APIAccess()
+        {
+            dispose();
         }
     }
 
