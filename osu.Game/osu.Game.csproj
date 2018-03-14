@@ -553,7 +553,7 @@
     <Compile Include="Overlays\MainSettings.cs" />
     <Compile Include="Overlays\MedalOverlay.cs" />
     <Compile Include="Overlays\MedalSplash\DrawableMedal.cs" />
-    <Compile Include="Overlays\Mods\AssistedSection.cs" />
+    <Compile Include="Overlays\Mods\SpecialSection.cs" />
     <Compile Include="Overlays\Mods\DifficultyIncreaseSection.cs" />
     <Compile Include="Overlays\Mods\DifficultyReductionSection.cs" />
     <Compile Include="Overlays\Mods\ModButton.cs" />
