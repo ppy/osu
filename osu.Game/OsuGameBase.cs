@@ -308,6 +308,8 @@ namespace osu.Game
                 using (var dumpStream = File.Create("fail.dmp"))
                     MiniDumpWriteDump(process.Handle, (uint)process.Id, dumpStream.SafeFileHandle, DumpType.Normal | DumpType.WithProcessThreadData | DumpType.WithThreadInfo | DumpType.WithCodeSegs,
                         IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+
+                process.Kill();
             }
             catch
             {
