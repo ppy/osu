@@ -96,7 +96,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleGeneral(string line)
         {
-            var pair = SplitKeyVal(line, ':');
+            var pair = SplitKeyVal(line);
 
             var metadata = beatmap.BeatmapInfo.Metadata;
             switch (pair.Key)
@@ -155,7 +155,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEditor(string line)
         {
-            var pair = SplitKeyVal(line, ':');
+            var pair = SplitKeyVal(line);
 
             switch (pair.Key)
             {
@@ -179,7 +179,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleMetadata(string line)
         {
-            var pair = SplitKeyVal(line, ':');
+            var pair = SplitKeyVal(line);
 
             var metadata = beatmap.BeatmapInfo.Metadata;
             switch (pair.Key)
@@ -220,7 +220,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleDifficulty(string line)
         {
-            var pair = SplitKeyVal(line, ':');
+            var pair = SplitKeyVal(line);
 
             var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
             switch (pair.Key)
