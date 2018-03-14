@@ -51,7 +51,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private bool hasCustomColours;
+        private bool hasComboColours;
 
         private void handleColours(T output, string line)
         {
@@ -73,11 +73,11 @@ namespace osu.Game.Beatmaps.Formats
             {
                 if (!(output is IHasComboColours tHasComboColours)) return;
 
-                if (!hasCustomColours)
+                if (!hasComboColours)
                 {
                     // remove default colours.
                     tHasComboColours.ComboColours.Clear();
-                    hasCustomColours = true;
+                    hasComboColours = true;
                 }
 
                 tHasComboColours.ComboColours.Add(colour);
