@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         private bool isForCurrentRuleset;
 
         [NonParallelizable]
-        [TestCase("basic", false), Ignore("See: https://github.com/ppy/osu/issues/2150")]
+        [TestCase("basic", false)]
         public void Test(string name, bool isForCurrentRuleset)
         {
             this.isForCurrentRuleset = isForCurrentRuleset;
