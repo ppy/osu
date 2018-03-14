@@ -54,12 +54,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             RightFlowContainer.SetLayoutPosition(text, 1);
 
             LeftFlowContainer.Add(new BeatmapMetadataContainer(Score.Beatmap));
-            LeftFlowContainer.Add(new OsuSpriteText
-            {
-                Text = Score.Date.LocalDateTime.ToShortDateString(),
-                TextSize = 11,
-                Colour = OsuColour.Gray(0xAA),
-            });
+            LeftFlowContainer.Add(new DrawableDate(Score.Date));
 
             foreach (Mod mod in Score.Mods)
                 modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.5f) });
