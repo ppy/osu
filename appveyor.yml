@@ -7,7 +7,7 @@ cache:
   - C:\ProgramData\chocolatey\bin -> appveyor.yml
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
   - packages -> **\packages.config
-on_failure:
+on_finish:
   - ps: Get-ChildItem .\*.dmp -Recurse | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 install:
   - cmd: git submodule update --init --recursive --depth=5
