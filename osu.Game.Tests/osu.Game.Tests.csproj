@@ -126,7 +126,6 @@
     <Compile Include="Visual\TestCaseDirect.cs" />
     <Compile Include="Visual\TestCaseDrawableRoom.cs" />
     <Compile Include="Visual\TestCaseDrawings.cs" />
-    <Compile Include="Visual\TestCaseEditor.cs" />
     <Compile Include="Visual\TestCaseEditorCompose.cs" />
     <Compile Include="Visual\TestCaseEditorComposeRadioButtons.cs" />
     <Compile Include="Visual\TestCaseEditorComposeTimeline.cs" />
