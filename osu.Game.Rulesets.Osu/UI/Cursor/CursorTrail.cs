@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         colour.BottomLeft.Linear.A = Parts[i].Time + colour.BottomLeft.Linear.A;
                         colour.BottomRight.Linear.A = Parts[i].Time + colour.BottomRight.Linear.A;
 
-                        Texture.DrawQuad(
+                        Texture.DrawQuad<TexturedVertex2D>(
                             new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
                             colour,
                             null,
