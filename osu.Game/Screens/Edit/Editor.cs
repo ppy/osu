@@ -26,12 +26,13 @@ namespace osu.Game.Screens.Edit
 
         public override bool ShowOverlaysOnEnter => false;
 
-        private readonly Box bottomBackground;
-        private readonly Container screenContainer;
+        private Box bottomBackground;
+        private Container screenContainer;
 
         private EditorScreen currentScreen;
 
-        public Editor()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
             EditorMenuBar menuBar;
             TimeInfoContainer timeInfo;
@@ -130,12 +131,9 @@ namespace osu.Game.Screens.Edit
             timeline.Beatmap.BindTo(Beatmap);
             playback.Beatmap.BindTo(Beatmap);
             menuBar.Mode.ValueChanged += onModeChanged;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
             bottomBackground.Colour = colours.Gray2;
+
         }
 
         private void exportBeatmap()
