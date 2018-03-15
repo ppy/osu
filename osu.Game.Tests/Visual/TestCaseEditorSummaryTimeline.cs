@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using OpenTK;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Configuration;
+using osu.Framework.Timing;
 
 namespace osu.Game.Tests.Visual
 {
@@ -29,8 +30,10 @@ namespace osu.Game.Tests.Visual
         {
             random = new Random(1337);
 
+            var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+
             SummaryTimeline summaryTimeline;
-            Add(summaryTimeline = new SummaryTimeline
+            Add(summaryTimeline = new SummaryTimeline(clock)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

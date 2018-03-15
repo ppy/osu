@@ -4,6 +4,7 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Screens.Compose;
 
@@ -19,7 +20,9 @@ namespace osu.Game.Tests.Visual
         {
             random = new Random(1337);
 
-            Add(compose = new Compose());
+            var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+
+            Add(compose = new Compose(clock, clock));
             AddStep("Next beatmap", nextBeatmap);
         }
 
