@@ -173,6 +173,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             texture.SetData(upload);
             path.Texture = texture;
+
+            container.ForceRedraw();
         }
 
         private void computeSize()

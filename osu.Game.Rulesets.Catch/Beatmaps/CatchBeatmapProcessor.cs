@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 }
 
                 obj.IndexInBeatmap = index++;
-                obj.ComboColour = beatmap.ComboColours[colourIndex];
+                obj.AccentColour = beatmap.ComboColours[colourIndex];
 
                 lastObj = obj;
             }
