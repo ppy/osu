@@ -1,20 +1,25 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Edit.Layers.Selection
+namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
-    public class HitObjectOverlayLayer : CompositeDrawable
+    public class HitObjectMaskLayer : CompositeDrawable
     {
-        private readonly Dictionary<DrawableHitObject, HitObjectOverlay> existingOverlays = new Dictionary<DrawableHitObject, HitObjectOverlay>();
+        private readonly HitObjectComposer composer;
+        private readonly Container<HitObjectMask> overlayContainer;
 
-        public HitObjectOverlayLayer()
+        public HitObjectMaskLayer(HitObjectComposer composer)
         {
+            this.composer = composer;
             RelativeSizeAxes = Axes.Both;
+
+            InternalChild = overlayContainer = new Container<HitObjectMask> { RelativeSizeAxes = Axes.Both };
         }
 
         /// <summary>
@@ -23,12 +28,11 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create an overlay for.</param>
         public void AddOverlay(DrawableHitObject hitObject)
         {
-            var overlay = CreateOverlayFor(hitObject);
+            var overlay = composer.CreateMaskFor(hitObject);
             if (overlay == null)
                 return;
 
-            existingOverlays[hitObject] = overlay;
-            AddInternal(overlay);
+            overlayContainer.Add(overlay);
         }
 
         /// <summary>
@@ -37,17 +41,22 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to remove the overlay for.</param>
         public void RemoveOverlay(DrawableHitObject hitObject)
         {
-            if (!existingOverlays.TryGetValue(hitObject, out var existing))
+            var existing = overlayContainer.FirstOrDefault(h => h.HitObject == hitObject);
+            if (existing == null)
                 return;
 
             existing.Hide();
             existing.Expire();
         }
 
-        /// <summary>
-        /// Creates a <see cref="HitObjectOverlay"/> for a specific <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
-        protected virtual HitObjectOverlay CreateOverlayFor(DrawableHitObject hitObject) => null;
+        private SelectionBox currentSelectionBox;
+
+        public void AddSelectionOverlay() => AddInternal(currentSelectionBox = composer.CreateSelectionOverlay(overlayContainer));
+
+        public void RemoveSelectionOverlay()
+        {
+            currentSelectionBox?.Hide();
+            currentSelectionBox?.Expire();
+        }
     }
 }
