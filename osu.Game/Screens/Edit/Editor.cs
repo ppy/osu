@@ -115,9 +115,9 @@ namespace osu.Game.Screens.Edit
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding { Right = 10 },
-                                            Child = timeInfo = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
+                                            Child = timeInfo = new TimeInfoContainer(adjustableClock) { RelativeSizeAxes = Axes.Both },
                                         },
-                                        timeline = new SummaryTimeline
+                                        timeline = new SummaryTimeline(adjustableClock)
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Edit
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding { Left = 10 },
-                                            Child = playback = new PlaybackControl { RelativeSizeAxes = Axes.Both },
+                                            Child = playback = new PlaybackControl(adjustableClock) { RelativeSizeAxes = Axes.Both },
                                         }
                                     },
                                 }

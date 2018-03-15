@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 
@@ -18,13 +19,13 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
     {
         private readonly Drawable timelineBar;
 
-        public SummaryTimeline()
+        public SummaryTimeline(IAdjustableClock adjustableClock)
         {
             TimelinePart markerPart, controlPointPart, bookmarkPart, breakPart;
 
             Children = new[]
             {
-                markerPart = new MarkerPart { RelativeSizeAxes = Axes.Both },
+                markerPart = new MarkerPart(adjustableClock) { RelativeSizeAxes = Axes.Both },
                 controlPointPart = new ControlPointPart
                 {
                     Anchor = Anchor.Centre,
