@@ -362,10 +362,8 @@
     <Compile Include="Overlays\Volume\VolumeMeter.cs" />
     <Compile Include="Rulesets\Configuration\IRulesetConfigManager.cs" />
     <Compile Include="Rulesets\Configuration\RulesetConfigManager.cs" />
-    <Compile Include="Rulesets\Edit\Layers\BorderLayer.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\CaptureBox.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectOverlay.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\HitObjectOverlayLayer.cs" />
+    <Compile Include="Rulesets\Edit\HitObjectMask.cs" />
+    <Compile Include="Rulesets\Edit\Types\IHasEditablePosition.cs" />
     <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />
@@ -380,6 +378,10 @@
     <Compile Include="Rulesets\Replays\Types\IConvertibleReplayFrame.cs" />
     <Compile Include="Rulesets\Scoring\Legacy\LegacyScoreParser.cs" />
     <Compile Include="Rulesets\UI\JudgementContainer.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Layers\BorderLayer.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Layers\HitObjectMaskLayer.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Layers\SelectionBox.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Layers\SelectionLayer.cs" />
     <Compile Include="Screens\Play\ScreenWithBeatmapBackground.cs" />
     <Compile Include="Screens\Play\PlayerSettings\VisualSettings.cs" />
     <Compile Include="Rulesets\Objects\CatmullApproximator.cs" />
@@ -394,8 +396,6 @@
     <Compile Include="Rulesets\UI\Scrolling\ScrollingRulesetContainer.cs" />
     <Compile Include="Screens\Select\ImportFromStablePopup.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionBox.cs" />
-    <Compile Include="Rulesets\Edit\Layers\Selection\SelectionLayer.cs" />
     <Compile Include="Screens\Edit\Components\BottomBarContainer.cs" />
     <Compile Include="Screens\Edit\Components\PlaybackControl.cs" />
     <Compile Include="Screens\Edit\Components\TimeInfoContainer.cs" />
