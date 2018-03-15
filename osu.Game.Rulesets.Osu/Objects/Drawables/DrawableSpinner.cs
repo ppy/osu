@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Spinner = s;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 circleContainer = new Container
                 {

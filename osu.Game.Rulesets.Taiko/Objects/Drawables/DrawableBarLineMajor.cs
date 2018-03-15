@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableBarLineMajor(BarLine barLine)
             : base(barLine)
         {
-            Add(triangleContainer = new Container
+            InternalChild = triangleContainer = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         EdgeSmoothness = new Vector2(1),
                     }
                 }
-            });
+            };
 
             Tracker.Alpha = 1f;
         }

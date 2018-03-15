@@ -19,7 +19,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
-    public abstract class DrawableHitObject : Container, IHasAccentColour
+    public abstract class DrawableHitObject : CompositeDrawable, IHasAccentColour
     {
         public readonly HitObject HitObject;
 

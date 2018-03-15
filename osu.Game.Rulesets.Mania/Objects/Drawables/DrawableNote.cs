@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 laneGlowPiece = new LaneGlowPiece
                 {
