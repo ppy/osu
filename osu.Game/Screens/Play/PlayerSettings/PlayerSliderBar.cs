@@ -23,9 +23,18 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private class Sliderbar : OsuSliderBar<T>
         {
+            private OsuColour colours;
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
+                this.colours = colours;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
                 AccentColour = colours.Yellow;
                 Nub.AccentColour = colours.Yellow;
                 Nub.GlowingAccentColour = colours.YellowLighter;
