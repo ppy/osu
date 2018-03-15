@@ -126,7 +126,6 @@
     <Compile Include="Visual\TestCaseDirect.cs" />
     <Compile Include="Visual\TestCaseDrawableRoom.cs" />
     <Compile Include="Visual\TestCaseDrawings.cs" />
-    <Compile Include="Visual\TestCaseEditor.cs" />
     <Compile Include="Visual\TestCaseEditorCompose.cs" />
     <Compile Include="Visual\TestCaseEditorComposeRadioButtons.cs" />
     <Compile Include="Visual\TestCaseEditorComposeTimeline.cs" />
@@ -173,7 +172,9 @@
     <Compile Include="Visual\TestCaseTwoLayerButton.cs" />
     <Compile Include="Visual\TestCaseUserPanel.cs" />
     <Compile Include="Visual\TestCaseUserProfile.cs" />
+    <Compile Include="Visual\TestCaseUserProfileRecentSection.cs" />
     <Compile Include="Visual\TestCaseUserRanks.cs" />
+    <Compile Include="Visual\TestCaseVolumePieces.cs" />
     <Compile Include="Visual\TestCaseWaveform.cs" />
   </ItemGroup>
   <ItemGroup>

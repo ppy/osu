@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createSliderEnds()
         {
-            HeadCircle = new HitCircle
+            HeadCircle = new SliderCircle(this)
             {
                 StartTime = StartTime,
                 Position = Position,
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 SampleControlPoint = SampleControlPoint
             };
 
-            TailCircle = new HitCircle
+            TailCircle = new SliderCircle(this)
             {
                 StartTime = EndTime,
                 Position = EndPosition,

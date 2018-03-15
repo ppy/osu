@@ -125,7 +125,6 @@ namespace osu.Game.Online.API
                         userReq.Success += u =>
                         {
                             LocalUser.Value = u;
-                            Username = LocalUser.Value.Username;
                             failureCount = 0;
 
                             //we're connected!
@@ -199,7 +198,7 @@ namespace osu.Game.Online.API
             }
             catch (WebException we)
             {
-                HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode ?? HttpStatusCode.RequestTimeout;
+                HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
 
                 switch (statusCode)
                 {

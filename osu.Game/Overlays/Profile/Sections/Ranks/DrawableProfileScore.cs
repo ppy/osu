@@ -40,24 +40,21 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colour)
         {
-            RightFlowContainer.Add(new OsuSpriteText
+            var text = new OsuSpriteText
             {
                 Text = $"accuracy: {Score.Accuracy:P2}",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Colour = colour.GrayA,
                 TextSize = 11,
-                Font = "Exo2.0-RegularItalic",
-                Depth = -1,
-            });
+                Font = "Exo2.0-RegularItalic"
+            };
+
+            RightFlowContainer.Add(text);
+            RightFlowContainer.SetLayoutPosition(text, 1);
 
             LeftFlowContainer.Add(new BeatmapMetadataContainer(Score.Beatmap));
-            LeftFlowContainer.Add(new OsuSpriteText
-            {
-                Text = Score.Date.LocalDateTime.ToShortDateString(),
-                TextSize = 11,
-                Colour = OsuColour.Gray(0xAA),
-            });
+            LeftFlowContainer.Add(new DrawableDate(Score.Date));
 
             foreach (Mod mod in Score.Mods)
                 modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.5f) });
