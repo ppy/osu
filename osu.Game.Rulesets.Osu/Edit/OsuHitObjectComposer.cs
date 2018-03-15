@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Layers.Selection;
@@ -16,8 +17,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuHitObjectComposer : HitObjectComposer
     {
-        public OsuHitObjectComposer(Ruleset ruleset)
-            : base(ruleset)
+        public OsuHitObjectComposer(Ruleset ruleset, IAdjustableClock adjustableClock, IFrameBasedClock framedClock)
+            : base(ruleset, adjustableClock, framedClock)
         {
         }
 
