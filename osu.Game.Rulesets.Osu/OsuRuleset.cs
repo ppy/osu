@@ -13,6 +13,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Timing;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Edit;
@@ -137,7 +138,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override PerformanceCalculator CreatePerformanceCalculator(Beatmap beatmap, Score score) => new OsuPerformanceCalculator(this, beatmap, score);
 
-        public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
+        public override HitObjectComposer CreateHitObjectComposer(IAdjustableClock adjustableClock, IFrameBasedClock framedClock) => new OsuHitObjectComposer(this, adjustableClock, framedClock);
 
         public override string Description => "osu!";
 

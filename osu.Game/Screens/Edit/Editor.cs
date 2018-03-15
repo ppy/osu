@@ -12,6 +12,7 @@ using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Screens.Compose;
@@ -31,9 +32,16 @@ namespace osu.Game.Screens.Edit
 
         private EditorScreen currentScreen;
 
+        private DecoupleableInterpolatingFramedClock adjustableClock;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            // TODO: should probably be done at a RulesetContainer level to share logic with Player.
+            var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
+            adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            adjustableClock.ChangeSource(sourceClock);
+
             EditorMenuBar menuBar;
             TimeInfoContainer timeInfo;
             SummaryTimeline timeline;
@@ -148,7 +156,7 @@ namespace osu.Game.Screens.Edit
             switch (mode)
             {
                 case EditorScreenMode.Compose:
-                    currentScreen = new Compose();
+                    currentScreen = new Compose(adjustableClock, adjustableClock);
                     break;
                 case EditorScreenMode.Design:
                     currentScreen = new Design();
