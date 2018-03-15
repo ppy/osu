@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Edit
                 seekTime = timingPoint.Time + closestBeat * seekAmount;
             }
 
-            if (seekTime < timingPoint.Time)
+            if (seekTime < timingPoint.Time && timingPoint != cpi.TimingPoints.First())
                 seekTime = timingPoint.Time;
 
             var nextTimingPoint = cpi.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
