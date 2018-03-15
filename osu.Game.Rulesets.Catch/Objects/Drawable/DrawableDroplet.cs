@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new Pulp
+            InternalChild = new Pulp
             {
                 AccentColour = AccentColour,
                 Size = Size
