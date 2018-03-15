@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.IO;
+using osu.Framework.Audio;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
@@ -10,13 +11,12 @@ namespace osu.Game.Skinning
 {
     public class BeatmapSkin : LegacySkin
     {
-        public BeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage)
+        public BeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, AudioManager audioManager)
             : base(new SkinInfo { Name = beatmap.ToString(), Creator =  beatmap.Metadata.Author.ToString() })
         {
             storage = new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage);
 
-            // todo: sample support
-            // samples = audioManager.GetSampleManager(storage);
+            Samples = audioManager.GetSampleManager(storage);
 
             Textures = new TextureStore(new RawTextureLoaderStore(storage));
 

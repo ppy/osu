@@ -18,13 +18,13 @@ namespace osu.Game.Skinning
     {
         protected TextureStore Textures;
 
-        private readonly SampleManager samples;
+        protected SampleManager Samples;
 
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin)
         {
             storage = new LegacySkinResourceStore<SkinFileInfo>(skin, storage);
-            samples = audioManager.GetSampleManager(storage);
+            Samples = audioManager.GetSampleManager(storage);
             Textures = new TextureStore(new RawTextureLoaderStore(storage));
 
             Stream stream = storage.GetStream("skin.ini");
@@ -63,7 +63,7 @@ namespace osu.Game.Skinning
             return new Sprite { Texture = texture };
         }
 
-        public override SampleChannel GetSample(string sampleName) => samples.Get(sampleName);
+        public override SampleChannel GetSample(string sampleName) => Samples.Get(sampleName);
 
         protected class LegacySkinResourceStore<T> : IResourceStore<byte[]>
             where T : INamedFileInfo
