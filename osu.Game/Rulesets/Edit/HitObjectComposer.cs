@@ -31,7 +31,9 @@ namespace osu.Game.Rulesets.Edit
         private readonly List<Container> layerContainers = new List<Container>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-        private IAdjustableClock adjustableClock;
+
+        private IAdjustableClock sourceClock;
+        private DecoupleableInterpolatingFramedClock adjustableClock;
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -49,8 +51,12 @@ namespace osu.Game.Rulesets.Edit
                 rulesetContainer = CreateRulesetContainer(ruleset, beatmap.Value);
 
                 // TODO: should probably be done at a RulesetContainer level to share logic with Player.
-                adjustableClock = (IAdjustableClock)beatmap.Value.Track ?? new StopwatchClock();
-                rulesetContainer.Clock = new InterpolatingFramedClock(adjustableClock);
+                sourceClock = (IAdjustableClock)beatmap.Value.Track ?? new StopwatchClock();
+                adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+                adjustableClock.ChangeSource(sourceClock);
+
+                rulesetContainer.Clock = adjustableClock;
+
             }
             catch (Exception e)
             {
@@ -229,14 +235,11 @@ namespace osu.Game.Rulesets.Edit
 
             seekTime = timingPoint.Time + closestBeat * seekAmount;
 
-            // Due to the rounding above, we may end up on the same beat. This will effectively cause 0 seeking to happen
-            // so we can just seek to the next beat in the direction if this is the case
-            if (Math.Abs(adjustableClock.CurrentTime - seekTime) == 0)
+            // Due to the rounding above, we may end up on the current beat. This will effectively cause 0 seeking to happen, but we don't want this.
+            // Instead, we'll go to the next beat in the direction when this is the case
+            if (Precision.AlmostEquals(adjustableClock.CurrentTime, seekTime))
             {
-                if (direction > 0)
-                    closestBeat++;
-                else
-                    closestBeat--;
+                closestBeat += direction > 0 ? 1 : -1;
                 seekTime = timingPoint.Time + closestBeat * seekAmount;
             }
 
@@ -244,7 +247,7 @@ namespace osu.Game.Rulesets.Edit
                 seekTime = timingPoint.Time;
 
             var nextTimingPoint = cpi.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
-            if (seekTime >= nextTimingPoint?.Time)
+            if (seekTime > nextTimingPoint?.Time)
                 seekTime = nextTimingPoint.Time;
 
             adjustableClock.Seek(seekTime);
