@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Timing;
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
@@ -62,7 +63,9 @@ namespace osu.Game.Tests.Visual
                 },
             });
 
-            Child = new OsuHitObjectComposer(new OsuRuleset());
+            var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+
+            Child = new OsuHitObjectComposer(new OsuRuleset(), clock, clock);
         }
     }
 }

@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Tests.Beatmaps;
@@ -15,7 +16,9 @@ namespace osu.Game.Tests.Visual
     {
         public TestCasePlaybackControl()
         {
-            var playback = new PlaybackControl
+            var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+
+            var playback = new PlaybackControl(clock)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
