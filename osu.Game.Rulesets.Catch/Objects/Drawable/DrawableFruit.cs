@@ -24,7 +24,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Origin = Anchor.Centre;
 
             Size = new Vector2((float)CatchHitObject.OBJECT_RADIUS);
-            AccentColour = HitObject.ComboColour;
             Masking = false;
 
             Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
@@ -33,6 +32,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load()
         {
+            // todo: this should come from the skin.
+            AccentColour = colourForRrepesentation(HitObject.VisualRepresentation);
+
             InternalChildren = new[]
             {
                 createPulp(HitObject.VisualRepresentation),
@@ -272,6 +274,32 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             base.Update();
 
             border.Alpha = (float)MathHelper.Clamp((HitObject.StartTime - Time.Current) / 500, 0, 1);
+        }
+
+        private Color4 colourForRrepesentation(FruitVisualRepresentation representation)
+        {
+            switch (representation)
+            {
+                default:
+                case FruitVisualRepresentation.Pear:
+                    return new Color4(17, 136, 170, 255);
+                case FruitVisualRepresentation.Grape:
+                    return new Color4(204, 102, 0, 255);
+                case FruitVisualRepresentation.Raspberry:
+                    return new Color4(121, 9, 13, 255);
+                case FruitVisualRepresentation.Pineapple:
+                    return new Color4(102, 136, 0, 255);
+                case FruitVisualRepresentation.Banana:
+                    switch (RNG.Next(0, 3))
+                    {
+                        default:
+                            return new Color4(255, 240, 0, 255);
+                        case 1:
+                            return new Color4(255, 192, 0, 255);
+                        case 2:
+                            return new Color4(214, 221, 28, 255);
+                    }
+            }
         }
     }
 }
