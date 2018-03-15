@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
-using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
@@ -87,14 +86,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             };
 
             timeline.Beatmap.BindTo(Beatmap);
-            Beatmap.ValueChanged += beatmapChanged;
-        }
 
-        private void beatmapChanged(WorkingBeatmap newBeatmap)
-        {
-            composerContainer.Clear();
-
-            var ruleset = newBeatmap.BeatmapInfo.Ruleset?.CreateInstance();
+            var ruleset = Beatmap.Value.BeatmapInfo.Ruleset?.CreateInstance();
             if (ruleset == null)
             {
                 Logger.Log("Beatmap doesn't have a ruleset assigned.");

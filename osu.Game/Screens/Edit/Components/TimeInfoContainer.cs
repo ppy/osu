@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
+using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Edit.Components
 {
@@ -13,8 +14,12 @@ namespace osu.Game.Screens.Edit.Components
 
         private readonly OsuSpriteText trackTimer;
 
-        public TimeInfoContainer()
+        private readonly IAdjustableClock adjustableClock;
+
+        public TimeInfoContainer(IAdjustableClock adjustableClock)
         {
+            this.adjustableClock = adjustableClock;
+
             Children = new Drawable[]
             {
                 trackTimer = new OsuSpriteText
@@ -32,7 +37,7 @@ namespace osu.Game.Screens.Edit.Components
         {
             base.Update();
 
-            trackTimer.Text = TimeSpan.FromMilliseconds(Track.CurrentTime).ToString(@"mm\:ss\:fff");
+            trackTimer.Text = TimeSpan.FromMilliseconds(adjustableClock.CurrentTime).ToString(@"mm\:ss\:fff");
         }
     }
 }
