@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Logging;
+using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Layers;
@@ -196,40 +197,57 @@ namespace osu.Game.Rulesets.Edit
             // Todo: This should not be a constant, but feels good for now
             const int beat_snap_divisor = 4;
 
-            var currentTimingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(adjustableClock.CurrentTime);
-            double seekAmount = currentTimingPoint.BeatLength / beat_snap_divisor;
+            var cpi = beatmap.Value.Beatmap.ControlPointInfo;
 
+            var timingPoint = cpi.TimingPointAt(adjustableClock.CurrentTime);
+            if (direction < 0 && timingPoint.Time == adjustableClock.CurrentTime)
+            {
+                // When going backwards, we care about the timing point that was _previously_ active at the current time
+                int activeIndex = cpi.TimingPoints.IndexOf(timingPoint);
+                while (activeIndex > 0 && adjustableClock.CurrentTime == timingPoint.Time)
+                    timingPoint = cpi.TimingPoints[--activeIndex];
+            }
+
+            double seekAmount = timingPoint.BeatLength / beat_snap_divisor;
             double seekTime = adjustableClock.CurrentTime + seekAmount * direction;
 
-            if (!snapped)
+            if (!snapped || cpi.TimingPoints.Count == 0)
             {
                 adjustableClock.Seek(seekTime);
                 return;
             }
 
-            var nextTimingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > currentTimingPoint.Time);
-            var firstTimingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.First();
+            // We will be snapping to beats within timingPoint
+            seekTime -= timingPoint.Time;
 
-            if (currentTimingPoint != firstTimingPoint && seekTime < currentTimingPoint.Time)
-                adjustableClock.Seek(currentTimingPoint.Time - 1); // -1 to be in the prior timing point's boundary
-            else if (seekTime >= nextTimingPoint?.Time)
-                adjustableClock.Seek(nextTimingPoint.Time); // +1 to be in the next timing point's boundary
+            // Determine the index from timingPoint of the closest beat to seekTime, accounting for scrolling direction
+            int closestBeat;
+            if (direction > 0)
+                closestBeat = (int)Math.Floor(seekTime / seekAmount);
             else
+                closestBeat = (int)Math.Ceiling(seekTime / seekAmount);
+
+            seekTime = timingPoint.Time + closestBeat * seekAmount;
+
+            // Due to the rounding above, we may end up on the same beat. This will effectively cause 0 seeking to happen
+            // so we can just seek to the next beat in the direction if this is the case
+            if (Math.Abs(adjustableClock.CurrentTime - seekTime) == 0)
             {
-                // We will be snapping to beats within the timing point
-                seekTime -= currentTimingPoint.Time;
-
-                // Determine the index from the current timing point of the closest beat to seekTime, accounting for scrolling direction
-                int closestBeat;
                 if (direction > 0)
-                    closestBeat = (int)Math.Floor(seekTime / seekAmount);
+                    closestBeat++;
                 else
-                    closestBeat = (int)Math.Ceiling(seekTime / seekAmount);
-
-                seekTime = currentTimingPoint.Time + closestBeat * seekAmount;
-
-                adjustableClock.Seek(seekTime);
+                    closestBeat--;
+                seekTime = timingPoint.Time + closestBeat * seekAmount;
             }
+
+            if (seekTime < timingPoint.Time)
+                seekTime = timingPoint.Time;
+
+            var nextTimingPoint = cpi.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
+            if (seekTime >= nextTimingPoint?.Time)
+                seekTime = nextTimingPoint.Time;
+
+            adjustableClock.Seek(seekTime);
         }
 
         private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
