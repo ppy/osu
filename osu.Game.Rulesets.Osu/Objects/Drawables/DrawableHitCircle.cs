@@ -66,6 +66,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             //may not be so correct
             Size = circle.DrawSize;
+
+            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
