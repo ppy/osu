@@ -8,6 +8,9 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Edit.Screens
 {
+    /// <summary>
+    /// TODO: eventually make this inherit Screen and add a local scren stack inside the Editor.
+    /// </summary>
     public class EditorScreen : Container
     {
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();

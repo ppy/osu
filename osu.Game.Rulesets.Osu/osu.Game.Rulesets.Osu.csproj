@@ -64,10 +64,9 @@
   <ItemGroup>
     <Compile Include="Beatmaps\OsuBeatmapConverter.cs" />
     <Compile Include="Beatmaps\OsuBeatmapProcessor.cs" />
-    <Compile Include="Edit\Layers\Selection\OsuHitObjectOverlayLayer.cs" />
-    <Compile Include="Edit\Layers\Selection\Overlays\HitCircleOverlay.cs" />
-    <Compile Include="Edit\Layers\Selection\Overlays\SliderCircleOverlay.cs" />
-    <Compile Include="Edit\Layers\Selection\Overlays\SliderOverlay.cs" />
+    <Compile Include="Edit\Layers\Selection\Overlays\HitCircleMask.cs" />
+    <Compile Include="Edit\Layers\Selection\Overlays\SliderCircleMask.cs" />
+    <Compile Include="Edit\Layers\Selection\Overlays\SliderMask.cs" />
     <Compile Include="Edit\OsuEditPlayfield.cs" />
     <Compile Include="Edit\OsuEditRulesetContainer.cs" />
     <Compile Include="Edit\OsuHitObjectComposer.cs" />
@@ -118,6 +117,7 @@
     <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
     <Compile Include="Objects\ISliderProgress.cs" />
     <Compile Include="Objects\RepeatPoint.cs" />
+    <Compile Include="Objects\SliderCircle.cs" />
     <Compile Include="Objects\SliderTick.cs" />
     <Compile Include="OsuDifficulty\OsuDifficultyCalculator.cs" />
     <Compile Include="OsuDifficulty\Preprocessing\OsuDifficultyBeatmap.cs" />

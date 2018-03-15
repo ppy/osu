@@ -4,15 +4,15 @@
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Edit.Layers.Selection;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
 {
-    public class HitCircleOverlay : HitObjectOverlay
+    public class HitCircleMask : HitObjectMask
     {
-        public HitCircleOverlay(DrawableHitCircle hitCircle)
+        public HitCircleMask(DrawableHitCircle hitCircle)
             : base(hitCircle)
         {
             Origin = Anchor.Centre;
@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
             Scale = hitCircle.Scale;
 
             AddInternal(new RingPiece());
+
+            hitCircle.HitObject.PositionChanged += _ => Position = hitCircle.Position;
         }
 
         [BackgroundDependencyLoader]
