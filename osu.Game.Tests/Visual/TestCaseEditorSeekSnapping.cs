@@ -43,7 +43,8 @@ namespace osu.Game.Tests.Visual
                         new TimingControlPoint { Time = 100, BeatLength = 400 },
                         new TimingControlPoint { Time = 175, BeatLength = 800 },
                         new TimingControlPoint { Time = 350, BeatLength = 200 },
-                        new TimingControlPoint { Time = 450, BeatLength = 100 }
+                        new TimingControlPoint { Time = 450, BeatLength = 100 },
+                        new TimingControlPoint { Time = 500, BeatLength = 307.69230769230802 }
                     }
                 },
                 HitObjects =
@@ -71,12 +72,15 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-//            testSeekNoSnapping();
-//            testSeekSnappingOnBeat();
-//            testSeekSnappingInBetweenBeat();
-//            testSeekForwardNoSnapping();
-//            testSeekForwardSnappingOnBeat();
+            testSeekNoSnapping();
+            testSeekSnappingOnBeat();
+            testSeekSnappingInBetweenBeat();
+            testSeekForwardNoSnapping();
+            testSeekForwardSnappingOnBeat();
             testSeekForwardSnappingFromInBetweenBeat();
+            testSeekBackwardSnappingOnBeat();
+            testSeekBackwardSnappingFromInBetweenBeat();
+            testSeekingWithFloatingPointBeatLength();
         }
 
         /// <summary>
@@ -149,7 +153,7 @@ namespace osu.Game.Tests.Visual
         }
 
         /// <summary>
-        /// Tests that when seeking forward with no beat snapping, beats are never snapped to, nor the next timing point (if we've skipped it).
+        /// Tests that when seeking forward with no beat snapping, beats are never explicitly snapped to, nor the next timing point (if we've skipped it).
         /// </summary>
         private void testSeekForwardNoSnapping()
         {
@@ -174,17 +178,17 @@ namespace osu.Game.Tests.Visual
         {
             reset();
 
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 50", () => track.CurrentTime == 50);
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 100", () => track.CurrentTime == 100);
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 175", () => track.CurrentTime == 175);
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 350", () => track.CurrentTime == 350);
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 400", () => track.CurrentTime == 400);
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 450", () => track.CurrentTime == 450);
         }
 
@@ -197,29 +201,129 @@ namespace osu.Game.Tests.Visual
             reset();
 
             AddStep("Seek(49)", () => composer.SeekTo(49));
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 50", () => track.CurrentTime == 50);
             AddStep("Seek(49.999)", () => composer.SeekTo(49.999));
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 50", () => track.CurrentTime == 50);
             AddStep("Seek(99)", () => composer.SeekTo(99));
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 100", () => track.CurrentTime == 100);
             AddStep("Seek(99.999)", () => composer.SeekTo(99.999));
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 100", () => track.CurrentTime == 100);
             AddStep("Seek(174)", () => composer.SeekTo(174));
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 175", () => track.CurrentTime == 175);
             AddStep("Seek(349)", () => composer.SeekTo(349));
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 350", () => track.CurrentTime == 350);
             AddStep("Seek(399)", () => composer.SeekTo(399));
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 400", () => track.CurrentTime == 400);
             AddStep("Seek(449)", () => composer.SeekTo(449));
-            AddStep("SeekForward", () => composer.SeekForward(true));
+            AddStep("SeekForward, Snap", () => composer.SeekForward(true));
             AddAssert("Time = 450", () => track.CurrentTime == 450);
+        }
+
+        /// <summary>
+        /// Tests that when seeking backward with no beat snapping, beats are never explicitly snapped to, nor the next timing point (if we've skipped it).
+        /// </summary>
+        private void testSeekBackwardNoSnapping()
+        {
+            reset();
+
+            AddStep("Seek(450)", () => composer.SeekTo(450));
+            AddStep("SeekBackward", () => composer.SeekBackward());
+            AddAssert("Time = 425", () => track.CurrentTime == 425);
+            AddStep("SeekBackward", () => composer.SeekBackward());
+            AddAssert("Time = 375", () => track.CurrentTime == 375);
+            AddStep("SeekBackward", () => composer.SeekBackward());
+            AddAssert("Time = 325", () => track.CurrentTime == 325);
+            AddStep("SeekBackward", () => composer.SeekBackward());
+            AddAssert("Time = 125", () => track.CurrentTime == 125);
+            AddStep("SeekBackward", () => composer.SeekBackward());
+            AddAssert("Time = 25", () => track.CurrentTime == 25);
+            AddStep("SeekBackward", () => composer.SeekBackward());
+            AddAssert("Time = 0", () => track.CurrentTime == 0);
+        }
+
+        /// <summary>
+        /// Tests that when seeking backward with beat snapping, all beats are snapped to and timing points are never skipped.
+        /// </summary>
+        private void testSeekBackwardSnappingOnBeat()
+        {
+            reset();
+
+            AddStep("Seek(450)", () => composer.SeekTo(450));
+            AddStep("SeekBackward, Snap", () => composer.SeekBackward(true));
+            AddAssert("Time = 400", () => track.CurrentTime == 400);
+            AddStep("SeekBackward, Snap", () => composer.SeekBackward(true));
+            AddAssert("Time = 350", () => track.CurrentTime == 350);
+            AddStep("SeekBackward, Snap", () => composer.SeekBackward(true));
+            AddAssert("Time = 175", () => track.CurrentTime == 175);
+            AddStep("SeekBackward, Snap", () => composer.SeekBackward(true));
+            AddAssert("Time = 100", () => track.CurrentTime == 100);
+            AddStep("SeekBackward, Snap", () => composer.SeekBackward(true));
+            AddAssert("Time = 50", () => track.CurrentTime == 50);
+            AddStep("SeekBackward, Snap", () => composer.SeekBackward(true));
+            AddAssert("Time = 0", () => track.CurrentTime == 0);
+        }
+
+        /// <summary>
+        /// Tests that when seeking backward from in-between two beats, the previous beat or timing point is snapped to, and no beats are skipped.
+        /// This will also test being extremely close to the previous beat/timing point, to ensure rounding is not an issue.
+        /// </summary>
+        private void testSeekBackwardSnappingFromInBetweenBeat()
+        {
+            reset();
+
+            AddStep("Seek(451)", () => composer.SeekTo(451));
+            AddStep("SeekBackward, Snap", () => composer.SeekBackward(true));
+            AddAssert("Time = 450", () => track.CurrentTime == 450);
+            AddStep("Seek(450.999)", () => composer.SeekTo(450.999));
+            AddStep("SeekBackward, Snap", () => composer.SeekBackward(true));
+            AddAssert("Time = 450", () => track.CurrentTime == 450);
+            AddStep("Seek(401)", () => composer.SeekTo(401));
+            AddStep("SeekBackward, Snap", () => composer.SeekBackward(true));
+            AddAssert("Time = 400", () => track.CurrentTime == 400);
+            AddStep("Seek(401.999)", () => composer.SeekTo(401.999));
+            AddStep("SeekBackward, Snap", () => composer.SeekBackward(true));
+            AddAssert("Time = 400", () => track.CurrentTime == 400);
+        }
+
+        /// <summary>
+        /// Tests that there are no rounding issues when snapping to beats within a timing point with a floating-point beatlength.
+        /// </summary>
+        private void testSeekingWithFloatingPointBeatLength()
+        {
+            reset();
+
+            double lastTime = 0;
+
+            AddStep("Seek(0)", () => composer.SeekTo(0));
+
+            for (int i = 0; i < 20; i++)
+            {
+                AddStep("SeekForward, Snap", () =>
+                {
+                    lastTime = track.CurrentTime;
+                    composer.SeekForward(true);
+                });
+                AddAssert("Time > lastTime", () => track.CurrentTime > lastTime);
+            }
+
+            for (int i = 0; i < 20; i++)
+            {
+                AddStep("SeekBackward, Snap", () =>
+                {
+                    lastTime = track.CurrentTime;
+                    composer.SeekBackward(true);
+                });
+                AddAssert("Time < lastTime", () => track.CurrentTime < lastTime);
+            }
+
+            AddAssert("Time = 0", () => track.CurrentTime == 0);
         }
 
         private void reset()
