@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -20,11 +21,13 @@ namespace osu.Game.Beatmaps
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
             private readonly IResourceStore<byte[]> store;
+            private readonly AudioManager audioManager;
 
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo)
+            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo, AudioManager audioManager)
                 : base(beatmapInfo)
             {
                 this.store = store;
+                this.audioManager = audioManager;
             }
 
             protected override Beatmap GetBeatmap()
@@ -107,8 +110,7 @@ namespace osu.Game.Beatmaps
                 Skin skin;
                 try
                 {
-                    // todo: this needs an AudioManager
-                    skin = new BeatmapSkin(BeatmapInfo, store);
+                    skin = new BeatmapSkin(BeatmapInfo, store, audioManager);
                 }
                 catch (Exception e)
                 {
