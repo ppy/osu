@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Play
                 OnResume = () =>
                 {
                     IsResuming = true;
-                    this.Delay(resumeOverlay == null ? 400 : 0).Schedule(Resume); ;
+                    this.Delay(resumeOverlay == null ? 400 : 0).Schedule(Resume);
                 },
                 OnRetry = () => OnRetry(),
                 OnQuit = () => OnQuit(),
@@ -124,9 +124,6 @@ namespace osu.Game.Screens.Play
 
         private void resumeInternal()
         {
-            pauseOverlay.Hide();
-            resumeOverlay?.Hide();
-
             IsPaused = false;
             lastPauseActionTime = Time.Current;
 
@@ -137,6 +134,8 @@ namespace osu.Game.Screens.Play
 
             OnResume?.Invoke();
             IsResuming = false;
+            resumeOverlay?.Hide();
+            pauseOverlay.Hide();
         }
 
         private OsuGameBase game;

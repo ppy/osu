@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Osu.UI.Overlays
     public class OsuResumeOverlay : PauseContainer.ResumeOverlay
     {
         private GameplayCursor.OsuClickToResumeCursor clickToResumeCursor;
+        private bool needToMoveCursor = true;
 
         public OsuResumeOverlay(PassThroughInputManager rulesetInputManager, CursorContainer cursor, Action resumeAction, Action escAction)
             : base(rulesetInputManager, cursor, resumeAction, escAction)
@@ -22,7 +23,11 @@ namespace osu.Game.Rulesets.Osu.UI.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            RulesetInputManager.Add(clickToResumeCursor = new GameplayCursor.OsuClickToResumeCursor(ResumeAction));
+            RulesetInputManager.Add(clickToResumeCursor = new GameplayCursor.OsuClickToResumeCursor(() =>
+            {
+                needToMoveCursor = true;
+                ResumeAction?.Invoke();
+            }));
             Add(RulesetInputManager);
         }
 
@@ -31,8 +36,12 @@ namespace osu.Game.Rulesets.Osu.UI.Overlays
 
         public override void Show()
         {
-            if (Cursor != null)
+            if (Cursor != null && needToMoveCursor)
+            {
                 clickToResumeCursor.MoveTo(Cursor.ActiveCursor.Position);
+                needToMoveCursor = false;
+            }
+
             base.Show();
         }
     }
