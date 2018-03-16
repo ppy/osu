@@ -9,6 +9,7 @@ using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO.Serialization;
 using Newtonsoft.Json;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
@@ -16,14 +17,14 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// A Beatmap containing converted HitObjects.
     /// </summary>
-    public class Beatmap<T> : IJsonSerializable
+    public class Beatmap<T> : IJsonSerializable, IHasComboColours
         where T : HitObject
     {
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
         public ControlPointInfo ControlPointInfo = new ControlPointInfo();
         public List<BreakPeriod> Breaks = new List<BreakPeriod>();
 
-        public List<Color4> ComboColors = new List<Color4>
+        public List<Color4> ComboColours { get; set; } = new List<Color4>
         {
             new Color4(17, 136, 170, 255),
             new Color4(102, 136, 0, 255),
@@ -55,7 +56,7 @@ namespace osu.Game.Beatmaps
             BeatmapInfo = original?.BeatmapInfo.DeepClone() ?? BeatmapInfo;
             ControlPointInfo = original?.ControlPointInfo ?? ControlPointInfo;
             Breaks = original?.Breaks ?? Breaks;
-            ComboColors = original?.ComboColors ?? ComboColors;
+            ComboColours = original?.ComboColours ?? ComboColours;
             HitObjects = original?.HitObjects ?? HitObjects;
 
             if (original == null && Metadata == null)

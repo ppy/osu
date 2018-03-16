@@ -46,11 +46,13 @@ namespace osu.Game.Beatmaps.Formats
             {
                 case Section.Events:
                     handleEvents(line);
-                    break;
+                    return;
                 case Section.Variables:
                     handleVariables(line);
-                    break;
+                    return;
             }
+
+            base.ParseLine(storyboard, section, line);
         }
 
         private void handleEvents(string line)
