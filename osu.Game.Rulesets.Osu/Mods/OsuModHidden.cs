@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHidden : ModHidden, IApplicableToDrawableHitObjects
     {
-        public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
+        public override string Description => @"Play with no approach circles and fading circles/sliders.";
         public override double ScoreMultiplier => 1.06;
 
         private const double fade_in_duration_multiplier = 0.4;

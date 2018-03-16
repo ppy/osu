@@ -4,36 +4,41 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Edit.Layers.Selection;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
 {
-    public class SliderOverlay : HitObjectOverlay
+    public class SliderMask : HitObjectMask
     {
         private readonly SliderBody body;
         private readonly DrawableSlider slider;
 
-        public SliderOverlay(DrawableSlider slider)
+        public SliderMask(DrawableSlider slider)
             : base(slider)
         {
             this.slider = slider;
 
-            var obj = (Slider)slider.HitObject;
+            Position = slider.Position;
+
+            var sliderObject = (Slider)slider.HitObject;
 
             InternalChildren = new Drawable[]
             {
-                body = new SliderBody(obj)
+                body = new SliderBody(sliderObject)
                 {
                     AccentColour = Color4.Transparent,
-                    PathWidth = obj.Scale * 64
+                    PathWidth = sliderObject.Scale * 64
                 },
-                new SliderCircleOverlay(slider.HeadCircle, slider),
-                new SliderCircleOverlay(slider.TailCircle, slider),
+                new SliderCircleMask(slider.HeadCircle, slider),
+                new SliderCircleMask(slider.TailCircle, slider),
             };
+
+            sliderObject.PositionChanged += _ => Position = slider.Position;
         }
 
         [BackgroundDependencyLoader]
@@ -46,12 +51,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
         {
             base.Update();
 
-            Position = slider.Position;
             Size = slider.Size;
             OriginPosition = slider.OriginPosition;
 
             // Need to cause one update
             body.UpdateProgress(0);
         }
+
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => body.ReceiveMouseInputAt(screenSpacePos);
     }
 }
