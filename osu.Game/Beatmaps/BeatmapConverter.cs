@@ -50,9 +50,14 @@ namespace osu.Game.Beatmaps
         protected virtual Beatmap<T> ConvertBeatmap(Beatmap original)
         {
             var beatmap = CreateBeatmap();
+
+            // todo: this *must* share logic (or directly use) Beatmap<T>'s constructor.
+            // right now this isn't easily possible due to generic entanglement.
             beatmap.BeatmapInfo = original.BeatmapInfo;
             beatmap.ControlPointInfo = original.ControlPointInfo;
             beatmap.HitObjects = original.HitObjects.SelectMany(h => convert(h, original)).ToList();
+            beatmap.Breaks = original.Breaks;
+            beatmap.ComboColours = original.ComboColours;
 
             return beatmap;
         }

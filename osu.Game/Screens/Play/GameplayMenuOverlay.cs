@@ -18,7 +18,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class GameplayMenuOverlay : OverlayContainer, IRequireHighFrequencyMousePosition
+    public abstract class GameplayMenuOverlay : OverlayContainer
     {
         private const int transition_duration = 200;
         private const int button_height = 70;

@@ -140,12 +140,12 @@ namespace osu.Game.Tests.Visual
             {
                 Origin = Anchor.Centre;
 
-                Add(new Box
+                InternalChild = new Box
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both
-                });
+                };
 
                 switch (direction)
                 {
@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.Centre;
                 AutoSizeAxes = Axes.Both;
 
-                Add(new Box { Size = new Vector2(75) });
+                InternalChild = new Box { Size = new Vector2(75) };
             }
 
             protected override void UpdateState(ArmedState state)
