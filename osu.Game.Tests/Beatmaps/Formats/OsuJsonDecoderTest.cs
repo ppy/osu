@@ -102,9 +102,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new Color4(255, 187, 255, 255),
                 new Color4(255, 177, 140, 255),
             };
-            Assert.AreEqual(expected.Length, beatmap.ComboColors.Count);
+            Assert.AreEqual(expected.Length, beatmap.ComboColours.Count);
             for (int i = 0; i < expected.Length; i++)
-                Assert.AreEqual(expected[i], beatmap.ComboColors[i]);
+                Assert.AreEqual(expected[i], beatmap.ComboColours[i]);
         }
 
         [Test]
