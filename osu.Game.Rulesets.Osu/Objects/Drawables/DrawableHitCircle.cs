@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Position = HitObject.StackedPosition;
             Scale = new Vector2(h.Scale);
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 glow = new GlowPiece
                 {
