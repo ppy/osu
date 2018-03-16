@@ -81,8 +81,6 @@ namespace osu.Game
         private Bindable<int> configRuleset;
         public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
-        private ScreenshotManager screenshotManager;
-
         private Bindable<int> configSkin;
 
         private readonly string[] args;
@@ -220,7 +218,7 @@ namespace osu.Game
                 },
                 mainContent = new Container { RelativeSizeAxes = Axes.Both },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
-                screenshotManager = new ScreenshotManager()
+                new ScreenshotManager()
             });
 
             loadComponentSingleFile(screenStack = new Loader(), d =>
