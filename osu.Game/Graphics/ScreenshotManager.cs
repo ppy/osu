@@ -9,6 +9,8 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Graphics
 {
@@ -17,12 +19,14 @@ namespace osu.Game.Graphics
         private Bindable<ScreenshotFormat> screenshotFormat;
         private GameHost host;
         private Storage storage;
+        private NotificationOverlay notificationOverlay;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, OsuConfigManager config, Storage storage)
+        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay)
         {
             this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
+            this.notificationOverlay = notificationOverlay;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
         }
@@ -45,7 +49,8 @@ namespace osu.Game.Graphics
         {
             host.TakeScreenshot(screenshotBitmap =>
             {
-                var stream = getFileStream();
+                var fileName = getFileName();
+                var stream = storage.GetStream(fileName, FileAccess.Write);
 
                 switch (screenshotFormat.Value)
                 {
@@ -58,25 +63,27 @@ namespace osu.Game.Graphics
                     default:
                         throw new ArgumentOutOfRangeException(nameof(screenshotFormat));
                 }
+
+                notificationOverlay.Post(new SimpleNotification { Text = $"{fileName} saved" });
             });
         }
 
-        private Stream getFileStream()
+        private string getFileName()
         {
             var fileExt = screenshotFormat.ToString().ToLower();
 
             var withoutIndex = $"Screenshot.{fileExt}";
             if (!storage.Exists(withoutIndex))
-                return storage.GetStream(withoutIndex, FileAccess.Write);
+                return withoutIndex;
 
             for (ulong i = 1; i < ulong.MaxValue; i++)
             {
                 var indexedName = $"Screenshot-{i}.{fileExt}";
                 if (!storage.Exists(indexedName))
-                    return storage.GetStream(indexedName, FileAccess.Write);
+                    return indexedName;
             }
 
-            throw new Exception($"Failed to get stream for saving {fileExt} file");
+            throw new Exception($"Failed to find suitable file name for saving {fileExt} image");
         }
     }
 }
