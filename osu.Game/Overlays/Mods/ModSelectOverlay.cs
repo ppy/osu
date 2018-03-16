@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Mods
         private void selectedModsChanged(IEnumerable<Mod> obj)
         {
             foreach (ModSection section in ModSectionsContainer.Children)
-                section.SelectTypes(obj);
+                section.SelectTypes(obj.Select(m => m.GetType()).ToList());
 
             updateMods();
         }
