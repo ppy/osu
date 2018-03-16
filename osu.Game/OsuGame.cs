@@ -218,7 +218,6 @@ namespace osu.Game
                 },
                 mainContent = new Container { RelativeSizeAxes = Axes.Both },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
-                new ScreenshotManager()
             });
 
             loadComponentSingleFile(screenStack = new Loader(), d =>
@@ -285,6 +284,8 @@ namespace osu.Game
             dependencies.Cache(beatmapSetOverlay);
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
+
+            Add(new ScreenshotManager());
 
             // ensure only one of these overlays are open at once.
             var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
