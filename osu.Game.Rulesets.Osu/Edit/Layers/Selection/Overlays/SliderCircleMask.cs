@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Edit.Layers.Selection;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
@@ -12,21 +12,21 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
 {
-    public class SliderCircleOverlay : HitObjectOverlay
+    public class SliderCircleMask : HitObjectMask
     {
-        public SliderCircleOverlay(DrawableHitCircle sliderHead, DrawableSlider slider)
+        public SliderCircleMask(DrawableHitCircle sliderHead, DrawableSlider slider)
             : this(sliderHead, Vector2.Zero, slider)
         {
         }
 
-        public SliderCircleOverlay(DrawableSliderTail sliderTail, DrawableSlider slider)
+        public SliderCircleMask(DrawableSliderTail sliderTail, DrawableSlider slider)
             : this(sliderTail, ((Slider)slider.HitObject).Curve.PositionAt(1), slider)
         {
         }
 
         private readonly DrawableOsuHitObject hitObject;
 
-        private SliderCircleOverlay(DrawableOsuHitObject hitObject, Vector2 position, DrawableSlider slider)
+        private SliderCircleMask(DrawableOsuHitObject hitObject, Vector2 position, DrawableSlider slider)
             : base(hitObject)
         {
             this.hitObject = hitObject;
