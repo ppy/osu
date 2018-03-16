@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RelativeSizeAxes = Axes.Y;
             Width = tracker_width;
 
-            Children = new[]
+            InternalChildren = new[]
             {
                 Tracker = new Box
                 {
