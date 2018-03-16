@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 Texture = textures.Get(name),
                 Blending = BlendingMode.Additive,
                 Alpha = 0.5f
-            }, false);
+            }, s => s.GetTexture("Play/osu/hitcircle") == null);
         }
     }
 }
