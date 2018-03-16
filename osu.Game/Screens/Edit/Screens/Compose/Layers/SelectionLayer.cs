@@ -8,12 +8,14 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Rulesets.Edit.Layers.Selection
+namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     public class SelectionLayer : CompositeDrawable
     {
@@ -27,6 +29,16 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
         /// </summary>
         public event Action<DrawableHitObject> ObjectDeselected;
 
+        /// <summary>
+        /// Invoked when the selection has been cleared.
+        /// </summary>
+        public event Action SelectionCleared;
+
+        /// <summary>
+        /// Invoked when the user has finished selecting all <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        public event Action SelectionFinished;
+
         private readonly Playfield playfield;
 
         public SelectionLayer(Playfield playfield)
@@ -36,8 +48,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             RelativeSizeAxes = Axes.Both;
         }
 
-        private SelectionBox selectionBox;
-        private CaptureBox captureBox;
+        private DragBox dragBox;
 
         private readonly HashSet<DrawableHitObject> selectedHitObjects = new HashSet<DrawableHitObject>();
 
@@ -49,20 +60,20 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
         protected override bool OnDragStart(InputState state)
         {
-            AddInternal(selectionBox = new SelectionBox());
+            AddInternal(dragBox = new DragBox());
             return true;
         }
 
         protected override bool OnDrag(InputState state)
         {
-            selectionBox.Show();
+            dragBox.Show();
 
             var dragPosition = state.Mouse.NativeState.Position;
             var dragStartPosition = state.Mouse.NativeState.PositionMouseDown ?? dragPosition;
 
             var screenSpaceDragQuad = new Quad(dragStartPosition.X, dragStartPosition.Y, dragPosition.X - dragStartPosition.X, dragPosition.Y - dragStartPosition.Y);
 
-            selectionBox.SetDragRectangle(screenSpaceDragQuad.AABBFloat);
+            dragBox.SetDragRectangle(screenSpaceDragQuad.AABBFloat);
             selectQuad(screenSpaceDragQuad);
 
             return true;
@@ -70,8 +81,8 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
 
         protected override bool OnDragEnd(InputState state)
         {
-            selectionBox.Hide();
-            selectionBox.Expire();
+            dragBox.Hide();
+            dragBox.Expire();
 
             finishSelection();
 
@@ -95,7 +106,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             if (!select(hitObject))
                 return;
 
-            clearCapture();
+            clearSelection();
             finishSelection();
         }
 
@@ -122,7 +133,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             if (!deselect(hitObject))
                 return;
 
-            clearCapture();
+            clearSelection();
             finishSelection();
         }
 
@@ -148,7 +159,7 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             selectedHitObjects.ForEach(h => ObjectDeselected?.Invoke(h));
             selectedHitObjects.Clear();
 
-            clearCapture();
+            clearSelection();
         }
 
         /// <summary>
@@ -180,18 +191,49 @@ namespace osu.Game.Rulesets.Edit.Layers.Selection
             select(target);
         }
 
-        private void clearCapture()
-        {
-            captureBox?.Hide();
-            captureBox?.Expire();
-        }
+        private void clearSelection() => SelectionCleared?.Invoke();
 
         private void finishSelection()
         {
             if (selectedHitObjects.Count == 0)
                 return;
+            SelectionFinished?.Invoke();
+        }
 
-            AddInternal(captureBox = new CaptureBox(this, selectedHitObjects.ToList()));
+        /// <summary>
+        /// A box that represents a drag selection.
+        /// </summary>
+        private class DragBox : VisibilityContainer
+        {
+            /// <summary>
+            /// Creates a new <see cref="DragBox"/>.
+            /// </summary>
+            public DragBox()
+            {
+                Masking = true;
+                BorderColour = Color4.White;
+                BorderThickness = SelectionBox.BORDER_RADIUS;
+
+                Child = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.1f
+                };
+            }
+
+            public void SetDragRectangle(RectangleF rectangle)
+            {
+                var topLeft = Parent.ToLocalSpace(rectangle.TopLeft);
+                var bottomRight = Parent.ToLocalSpace(rectangle.BottomRight);
+
+                Position = topLeft;
+                Size = bottomRight - topLeft;
+            }
+
+            public override bool DisposeOnDeathRemoval => true;
+
+            protected override void PopIn() => this.FadeIn(250, Easing.OutQuint);
+            protected override void PopOut() => this.FadeOut(250, Easing.OutQuint);
         }
     }
 }
