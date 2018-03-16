@@ -45,7 +45,7 @@ namespace osu.Game.Graphics
         {
             host.TakeScreenshot(screenshotBitmap =>
             {
-                var stream = storage.GetStream($"{DateTime.Now:yyyyMMddTHHmmss}.{screenshotFormat.ToString().ToLower()}", FileAccess.Write);
+                var stream = getFileStream();
 
                 switch (screenshotFormat.Value)
                 {
@@ -59,6 +59,24 @@ namespace osu.Game.Graphics
                         throw new ArgumentOutOfRangeException(nameof(screenshotFormat));
                 }
             });
+        }
+
+        private Stream getFileStream()
+        {
+            var fileExt = screenshotFormat.ToString().ToLower();
+
+            var withoutIndex = $"Screenshot.{fileExt}";
+            if (!storage.Exists(withoutIndex))
+                return storage.GetStream(withoutIndex, FileAccess.Write);
+
+            for (ulong i = 1; i < ulong.MaxValue; i++)
+            {
+                var indexedName = $"Screenshot-{i}.{fileExt}";
+                if (!storage.Exists(indexedName))
+                    return storage.GetStream(indexedName, FileAccess.Write);
+            }
+
+            throw new Exception($"Failed to get stream for saving {fileExt} file");
         }
     }
 }
