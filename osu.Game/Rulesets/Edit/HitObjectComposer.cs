@@ -180,7 +180,7 @@ namespace osu.Game.Rulesets.Edit
             var timingPoint = cpi.TimingPointAt(adjustableClock.CurrentTime);
             if (direction < 0 && timingPoint.Time == adjustableClock.CurrentTime)
             {
-                // When going backwards, we care about the timing point that was _previously_ active at the current time
+                // When going backwards and we're at the boundary of two timing points, we compute the seek distance with the timing point which we are seeking into
                 int activeIndex = cpi.TimingPoints.IndexOf(timingPoint);
                 while (activeIndex > 0 && adjustableClock.CurrentTime == timingPoint.Time)
                     timingPoint = cpi.TimingPoints[--activeIndex];
