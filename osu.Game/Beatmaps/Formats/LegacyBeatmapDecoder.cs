@@ -5,7 +5,6 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
@@ -19,7 +18,6 @@ namespace osu.Game.Beatmaps.Formats
 
         private Beatmap beatmap;
 
-        private bool hasCustomColours;
         private ConvertHitObjectParser parser;
 
         private LegacySampleBank defaultSampleBank;
@@ -72,29 +70,28 @@ namespace osu.Game.Beatmaps.Formats
             {
                 case Section.General:
                     handleGeneral(line);
-                    break;
+                    return;
                 case Section.Editor:
                     handleEditor(line);
-                    break;
+                    return;
                 case Section.Metadata:
                     handleMetadata(line);
-                    break;
+                    return;
                 case Section.Difficulty:
                     handleDifficulty(line);
-                    break;
+                    return;
                 case Section.Events:
                     handleEvents(line);
-                    break;
+                    return;
                 case Section.TimingPoints:
                     handleTimingPoints(line);
-                    break;
-                case Section.Colours:
-                    handleColours(line);
-                    break;
+                    return;
                 case Section.HitObjects:
                     handleHitObjects(line);
-                    break;
+                    return;
             }
+
+            base.ParseLine(beatmap, section, line);
         }
 
         private void handleGeneral(string line)
@@ -360,38 +357,6 @@ namespace osu.Game.Beatmaps.Formats
                     Time = time,
                     KiaiMode = kiaiMode,
                     OmitFirstBarLine = omitFirstBarSignature
-                });
-            }
-        }
-
-        private void handleColours(string line)
-        {
-            var pair = SplitKeyVal(line, ':');
-
-            string[] split = pair.Value.Split(',');
-
-            if (split.Length != 3)
-                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {pair.Value}");
-
-            byte r, g, b;
-            if (!byte.TryParse(split[0], out r) || !byte.TryParse(split[1], out g) || !byte.TryParse(split[2], out b))
-                throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
-
-            if (!hasCustomColours)
-            {
-                beatmap.ComboColors.Clear();
-                hasCustomColours = true;
-            }
-
-            // Note: the combo index specified in the beatmap is discarded
-            if (pair.Key.StartsWith(@"Combo"))
-            {
-                beatmap.ComboColors.Add(new Color4
-                {
-                    R = r / 255f,
-                    G = g / 255f,
-                    B = b / 255f,
-                    A = 1f,
                 });
             }
         }

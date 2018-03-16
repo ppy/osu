@@ -5,12 +5,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 
@@ -21,7 +23,6 @@ namespace osu.Game.Screens.Play
         private Player player;
 
         private BeatmapMetadataDisplay info;
-        private VisualSettings visualSettings;
 
         private bool showOverlays = true;
         public override bool ShowOverlaysOnEnter => showOverlays;
@@ -46,7 +47,8 @@ namespace osu.Game.Screens.Play
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
-            Add(visualSettings = new VisualSettings
+
+            Add(new VisualSettings
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -93,7 +95,7 @@ namespace osu.Game.Screens.Play
             contentIn();
 
             info.Delay(750).FadeIn(500);
-            this.Delay(2150).Schedule(pushWhenLoaded);
+            this.Delay(1800).Schedule(pushWhenLoaded);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -109,29 +111,65 @@ namespace osu.Game.Screens.Play
             logo.Delay(resuming ? 0 : 500).MoveToOffset(new Vector2(0, -0.24f), 500, Easing.InOutExpo);
         }
 
+        private bool weHandledMouseDown;
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            weHandledMouseDown = true;
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            weHandledMouseDown = false;
+            return base.OnMouseUp(state, args);
+        }
+
+        private ScheduledDelegate pushDebounce;
+
+        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && (!GetContainingInputManager().CurrentState.Mouse.HasAnyButtonPressed || weHandledMouseDown);
+
         private void pushWhenLoaded()
         {
-            if (player.LoadState != LoadState.Ready || visualSettings.IsHovered)
+            if (!IsCurrentScreen) return;
+
+            try
+            {
+                if (!readyForPush)
+                {
+                    // as the pushDebounce below has a delay, we need to keep checking and cancel a future debounce
+                    // if we become unready for push during the delay.
+                    pushDebounce?.Cancel();
+                    pushDebounce = null;
+                    return;
+                }
+
+                if (pushDebounce != null)
+                    return;
+
+                pushDebounce = Scheduler.AddDelayed(() =>
+                {
+                    contentOut();
+
+                    this.Delay(250).Schedule(() =>
+                    {
+                        if (!IsCurrentScreen) return;
+
+                        if (!Push(player))
+                            Exit();
+                        else
+                        {
+                            //By default, we want to load the player and never be returned to.
+                            //Note that this may change if the player we load requested a re-run.
+                            ValidForResume = false;
+                        }
+                    });
+                }, 500);
+            }
+            finally
             {
                 Schedule(pushWhenLoaded);
-                return;
             }
-
-            contentOut();
-
-            this.Delay(250).Schedule(() =>
-            {
-                if (!IsCurrentScreen) return;
-
-                if (!Push(player))
-                    Exit();
-                else
-                {
-                    //By default, we want to load the player and never be returned to.
-                    //Note that this may change if the player we load requested a re-run.
-                    ValidForResume = false;
-                }
-            });
         }
 
         protected override bool OnExiting(Screen next)
