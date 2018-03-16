@@ -186,7 +186,7 @@ namespace osu.Game.Overlays.Direct
                 progressBar.FadeOut(500);
             };
 
-            request.DownloadProgressed += progress => progressBar.Current.Value = progress;
+            request.DownloadProgressed += progress => Schedule(() => progressBar.Current.Value = progress);
 
             request.Success += data =>
             {

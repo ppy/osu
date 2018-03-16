@@ -20,12 +20,65 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
+        protected override Container<Drawable> Content => fadeContainer;
+
+        private readonly Container<Drawable> fadeContainer;
+
         public GameplayCursor()
         {
-            Add(new CursorTrail { Depth = 1 });
+            InternalChild = fadeContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new CursorTrail { Depth = 1 }
+                }
+            };
         }
 
         private int downCount;
+
+        public bool OnPressed(OsuAction action)
+        {
+            switch (action)
+            {
+                case OsuAction.LeftButton:
+                case OsuAction.RightButton:
+                    downCount++;
+                    ActiveCursor.ScaleTo(1).ScaleTo(1.2f, 100, Easing.OutQuad);
+                    break;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(OsuAction action)
+        {
+            switch (action)
+            {
+                case OsuAction.LeftButton:
+                case OsuAction.RightButton:
+                    if (--downCount == 0)
+                        ActiveCursor.ScaleTo(1, 200, Easing.OutQuad);
+                    break;
+            }
+
+            return false;
+        }
+
+        public override bool HandleMouseInput => true; // OverlayContainer will set this false when we go hidden, but we always want to receive input.
+
+        protected override void PopIn()
+        {
+            fadeContainer.FadeTo(1, 300, Easing.OutQuint);
+            ActiveCursor.ScaleTo(1, 400, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            fadeContainer.FadeTo(0.05f, 450, Easing.OutQuint);
+            ActiveCursor.ScaleTo(0.8f, 450, Easing.OutQuint);
+        }
 
         public class OsuCursor : Container
         {
@@ -130,46 +183,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 cursorContainer.Scale = new Vector2(scale);
             }
-        }
-
-        public bool OnPressed(OsuAction action)
-        {
-            switch (action)
-            {
-                case OsuAction.LeftButton:
-                case OsuAction.RightButton:
-                    downCount++;
-                    ActiveCursor.ScaleTo(1).ScaleTo(1.2f, 100, Easing.OutQuad);
-                    break;
-            }
-
-            return false;
-        }
-
-        public bool OnReleased(OsuAction action)
-        {
-            switch (action)
-            {
-                case OsuAction.LeftButton:
-                case OsuAction.RightButton:
-                    if (--downCount == 0)
-                        ActiveCursor.ScaleTo(1, 200, Easing.OutQuad);
-                    break;
-            }
-
-            return false;
-        }
-
-        protected override void PopIn()
-        {
-            ActiveCursor.FadeTo(1, 250, Easing.OutQuint);
-            ActiveCursor.ScaleTo(1, 400, Easing.OutQuint);
-        }
-
-        protected override void PopOut()
-        {
-            ActiveCursor.FadeTo(0, 250, Easing.OutQuint);
-            ActiveCursor.ScaleTo(0.6f, 250, Easing.In);
         }
     }
 }

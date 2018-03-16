@@ -267,6 +267,8 @@
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
+    <Compile Include="Beatmaps\Formats\IHasComboColours.cs" />
+    <Compile Include="Beatmaps\Formats\IHasCustomColours.cs" />
     <Compile Include="Beatmaps\Formats\JsonBeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyDecoder.cs" />
     <Compile Include="Beatmaps\Formats\LegacyStoryboardDecoder.cs" />
@@ -553,7 +555,7 @@
     <Compile Include="Overlays\MainSettings.cs" />
     <Compile Include="Overlays\MedalOverlay.cs" />
     <Compile Include="Overlays\MedalSplash\DrawableMedal.cs" />
-    <Compile Include="Overlays\Mods\AssistedSection.cs" />
+    <Compile Include="Overlays\Mods\SpecialSection.cs" />
     <Compile Include="Overlays\Mods\DifficultyIncreaseSection.cs" />
     <Compile Include="Overlays\Mods\DifficultyReductionSection.cs" />
     <Compile Include="Overlays\Mods\ModButton.cs" />
@@ -809,7 +811,7 @@
     <Compile Include="Screens\Play\PlayerSettings\PlayerCheckbox.cs" />
     <Compile Include="Screens\Play\PlayerSettings\PlayerSettingsGroup.cs" />
     <Compile Include="Screens\Play\PlayerSettings\PlayerSliderBar.cs" />
-    <Compile Include="Screens\Play\SkipButton.cs" />
+    <Compile Include="Screens\Play\SkipOverlay.cs" />
     <Compile Include="Screens\Play\SongProgress.cs" />
     <Compile Include="Screens\Play\SongProgressBar.cs" />
     <Compile Include="Screens\Play\SongProgressGraph.cs" />

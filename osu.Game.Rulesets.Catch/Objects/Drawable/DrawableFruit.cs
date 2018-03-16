@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new[]
+            InternalChildren = new[]
             {
                 createPulp(HitObject.VisualRepresentation),
                 border = new Circle
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             if (HitObject.HyperDash)
             {
-                Add(new Pulp
+                AddInternal(new Pulp
                 {
                     RelativePositionAxes = Axes.Both,
                     Anchor = Anchor.Centre,

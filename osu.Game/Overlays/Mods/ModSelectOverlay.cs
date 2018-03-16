@@ -287,7 +287,7 @@ namespace osu.Game.Overlays.Mods
                                     Anchor = Anchor.TopCentre,
                                     Action = modButtonPressed,
                                 },
-                                new AssistedSection
+                                new SpecialSection
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
