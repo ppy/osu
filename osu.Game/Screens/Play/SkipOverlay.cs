@@ -21,7 +21,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipButton : OverlayContainer, IKeyBindingHandler<GlobalAction>
+    public class SkipOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
 
@@ -35,8 +35,9 @@ namespace osu.Game.Screens.Play
         private double displayTime;
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+        protected override bool BlockPassThroughMouse => false;
 
-        public SkipButton(double startTime)
+        public SkipOverlay(double startTime)
         {
             this.startTime = startTime;
 
@@ -49,12 +50,6 @@ namespace osu.Game.Screens.Play
             Size = new Vector2(1, 0.14f);
 
             Origin = Anchor.Centre;
-        }
-
-        protected override bool OnMouseMove(InputState state)
-        {
-            fadeContainer.State = Visibility.Visible;
-            return base.OnMouseMove(state);
         }
 
         [BackgroundDependencyLoader]
@@ -121,20 +116,21 @@ namespace osu.Game.Screens.Play
             Expire();
         }
 
-        protected override void PopIn()
-        {
-            this.FadeIn();
-        }
+        protected override void PopIn() => this.FadeIn();
 
-        protected override void PopOut()
-        {
-            this.FadeOut();
-        }
+        protected override void PopOut() => this.FadeOut();
 
         protected override void Update()
         {
             base.Update();
             remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, Easing.OutQuint);
+        }
+
+        protected override bool OnMouseMove(InputState state)
+        {
+            if (!state.Mouse.HasAnyButtonPressed)
+                fadeContainer.State = Visibility.Visible;
+            return base.OnMouseMove(state);
         }
 
         public bool OnPressed(GlobalAction action)
@@ -176,7 +172,7 @@ namespace osu.Game.Screens.Play
                             if (stateChanged)
                                 this.FadeIn(500, Easing.OutExpo);
 
-                            if (!IsHovered)
+                            if (!IsHovered && !IsDragged)
                                 using (BeginDelayedSequence(1000))
                                     scheduledHide = Schedule(() => State = Visibility.Hidden);
                             break;
@@ -193,6 +189,18 @@ namespace osu.Game.Screens.Play
             {
                 base.LoadComplete();
                 State = Visibility.Visible;
+            }
+
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            {
+                scheduledHide?.Cancel();
+                return base.OnMouseDown(state, args);
+            }
+
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            {
+                State = Visibility.Visible;
+                return base.OnMouseUp(state, args);
             }
         }
 
@@ -274,7 +282,7 @@ namespace osu.Game.Screens.Play
                 flow.TransformSpacingTo(new Vector2(5), 500, Easing.OutQuint);
                 box.FadeColour(colourHover, 500, Easing.OutQuint);
                 background.FadeTo(0.4f, 500, Easing.OutQuint);
-                return base.OnHover(state);
+                return true;
             }
 
             protected override void OnHoverLost(InputState state)
