@@ -1,5 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
@@ -25,7 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Rotate cursor when dragging",
                     Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
-                new SettingsEnumDropdown<ScreenshotFormat>()
+                new SettingsEnumDropdown<ScreenshotFormat>
                 {
                     LabelText = "Screenshot format",
                     Bindable = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)

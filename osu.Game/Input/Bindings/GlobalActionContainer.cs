@@ -68,13 +68,14 @@ namespace osu.Game.Input.Bindings
         DecreaseVolume,
         [Description("Toggle mute")]
         ToggleMute,
-        [Description("Take screenshot")]
-        TakeScreenshot,
 
         // In-Game Keybindings
         [Description("Skip Cutscene")]
         SkipCutscene,
         [Description("Quick Retry (Hold)")]
         QuickRetry,
+
+        [Description("Take screenshot")]
+        TakeScreenshot
     }
 }
