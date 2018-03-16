@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using OpenTK;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Objects;
@@ -19,8 +20,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private readonly PatternType convertType;
 
-        public HitObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density, PatternType lastStair)
-            : base(random, hitObject, beatmap, previousPattern)
+        public HitObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density, PatternType lastStair, Beatmap originalBeatmap)
+            : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
         {
             if (previousTime > hitObject.StartTime) throw new ArgumentOutOfRangeException(nameof(previousTime));
             if (density < 0) throw new ArgumentOutOfRangeException(nameof(density));
@@ -308,20 +309,20 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     p5 = 0;
                     break;
                 case 3:
-                    p2 = Math.Max(p2, 0.1);
+                    p2 = Math.Min(p2, 0.1);
                     p3 = 0;
                     p4 = 0;
                     p5 = 0;
                     break;
                 case 4:
-                    p2 = Math.Max(p2, 0.23);
-                    p3 = Math.Max(p3, 0.04);
+                    p2 = Math.Min(p2, 0.23);
+                    p3 = Math.Min(p3, 0.04);
                     p4 = 0;
                     p5 = 0;
                     break;
                 case 5:
-                    p3 = Math.Max(p3, 0.15);
-                    p4 = Math.Max(p4, 0.03);
+                    p3 = Math.Min(p3, 0.15);
+                    p4 = Math.Min(p4, 0.03);
                     p5 = 0;
                     break;
             }
@@ -355,23 +356,23 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     p3 = 0;
                     break;
                 case 3:
-                    centreProbability = Math.Max(centreProbability, 0.03);
-                    p2 = Math.Max(p2, 0.1);
+                    centreProbability = Math.Min(centreProbability, 0.03);
+                    p2 = 0;
                     p3 = 0;
                     break;
                 case 4:
                     centreProbability = 0;
-                    p2 = Math.Max(p2 * 2, 0.2);
+                    p2 = Math.Min(p2 * 2, 0.2);
                     p3 = 0;
                     break;
                 case 5:
-                    centreProbability = Math.Max(centreProbability, 0.03);
+                    centreProbability = Math.Min(centreProbability, 0.03);
                     p3 = 0;
                     break;
                 case 6:
                     centreProbability = 0;
-                    p2 = Math.Max(p2 * 2, 0.5);
-                    p3 = Math.Max(p3 * 2, 0.15);
+                    p2 = Math.Min(p2 * 2, 0.5);
+                    p3 = Math.Min(p3 * 2, 0.15);
                     break;
             }
 
