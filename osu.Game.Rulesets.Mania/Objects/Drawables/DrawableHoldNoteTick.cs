@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1);
 
-            Children = new[]
+            InternalChildren = new[]
             {
                 glowContainer = new CircularContainer
                 {
