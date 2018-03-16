@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var comboColors = decoder.Decode(stream).ComboColors;
+                var comboColors = decoder.Decode(stream).ComboColours;
 
                 Color4[] expectedColors =
                 {
