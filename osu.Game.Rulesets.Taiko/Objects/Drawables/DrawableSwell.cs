@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             FillMode = FillMode.Fit;
 
-            InternalChild = bodyContainer = new Container
+            AddInternal(bodyContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = 1,
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         }
                     }
                 }
-            };
+            });
 
             MainPiece.Add(symbol = new SwellSymbolPiece());
         }
