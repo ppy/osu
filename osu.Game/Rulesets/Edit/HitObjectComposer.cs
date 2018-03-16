@@ -13,10 +13,10 @@ using osu.Framework.Logging;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Edit.Layers;
-using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
 
 namespace osu.Game.Rulesets.Edit
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            HitObjectOverlayLayer hitObjectOverlayLayer = CreateHitObjectOverlayLayer();
+            HitObjectMaskLayer hitObjectMaskLayer = new HitObjectMaskLayer(this);
             SelectionLayer selectionLayer = new SelectionLayer(rulesetContainer.Playfield);
 
             var layerBelowRuleset = new BorderLayer
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Edit
             layerAboveRuleset.Children = new Drawable[]
             {
                 selectionLayer, // Below object overlays for input
-                hitObjectOverlayLayer,
+                hitObjectMaskLayer,
                 selectionLayer.CreateProxy() // Proxy above object overlays for selections
             };
 
@@ -117,8 +117,10 @@ namespace osu.Game.Rulesets.Edit
                 }
             };
 
-            selectionLayer.ObjectSelected += hitObjectOverlayLayer.AddOverlay;
-            selectionLayer.ObjectDeselected += hitObjectOverlayLayer.RemoveOverlay;
+            selectionLayer.ObjectSelected += hitObjectMaskLayer.AddOverlay;
+            selectionLayer.ObjectDeselected += hitObjectMaskLayer.RemoveOverlay;
+            selectionLayer.SelectionCleared += hitObjectMaskLayer.RemoveSelectionOverlay;
+            selectionLayer.SelectionFinished += hitObjectMaskLayer.AddSelectionOverlay;
 
             toolboxCollection.Items =
                 new[] { new RadioButton("Select", () => setCompositionTool(null)) }
@@ -164,36 +166,6 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="snapped">Whether to snap to the closest beat.</param>
         public void SeekForward(bool snapped = false) => seek(1, snapped);
 
-        public void SeekTo(double seekTime, bool snapped = false)
-        {
-            // Todo: This should not be a constant, but feels good for now
-            const int beat_snap_divisor = 4;
-
-            if (!snapped)
-            {
-                adjustableClock.Seek(seekTime);
-                return;
-            }
-
-            var timingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(seekTime);
-            double beatSnapLength = timingPoint.BeatLength / beat_snap_divisor;
-
-            // We will be snapping to beats within the timing point
-            seekTime -= timingPoint.Time;
-
-            // Determine the index from the current timing point of the closest beat to seekTime
-            int closestBeat = (int)Math.Round(seekTime / beatSnapLength);
-            seekTime = timingPoint.Time + closestBeat * beatSnapLength;
-
-            // Depending on beatSnapLength, we may snap to a beat that is beyond timingPoint's end time, but we want to instead snap to
-            // the next timing point's start time
-            var nextTimingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
-            if (seekTime > nextTimingPoint?.Time)
-                seekTime = nextTimingPoint.Time;
-
-            adjustableClock.Seek(seekTime);
-        }
-
         private void seek(int direction, bool snapped)
         {
             // Todo: This should not be a constant, but feels good for now
@@ -204,7 +176,7 @@ namespace osu.Game.Rulesets.Edit
             var timingPoint = cpi.TimingPointAt(adjustableClock.CurrentTime);
             if (direction < 0 && timingPoint.Time == adjustableClock.CurrentTime)
             {
-                // When going backwards, we care about the timing point that was _previously_ active at the current time
+                // When going backwards and we're at the boundary of two timing points, we compute the seek distance with the timing point which we are seeking into
                 int activeIndex = cpi.TimingPoints.IndexOf(timingPoint);
                 while (activeIndex > 0 && adjustableClock.CurrentTime == timingPoint.Time)
                     timingPoint = cpi.TimingPoints[--activeIndex];
@@ -239,10 +211,40 @@ namespace osu.Game.Rulesets.Edit
                 seekTime = timingPoint.Time + closestBeat * seekAmount;
             }
 
-            if (seekTime < timingPoint.Time)
+            if (seekTime < timingPoint.Time && timingPoint != cpi.TimingPoints.First())
                 seekTime = timingPoint.Time;
 
             var nextTimingPoint = cpi.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
+            if (seekTime > nextTimingPoint?.Time)
+                seekTime = nextTimingPoint.Time;
+
+            adjustableClock.Seek(seekTime);
+        }
+
+        public void SeekTo(double seekTime, bool snapped = false)
+        {
+            // Todo: This should not be a constant, but feels good for now
+            const int beat_snap_divisor = 4;
+
+            if (!snapped)
+            {
+                adjustableClock.Seek(seekTime);
+                return;
+            }
+
+            var timingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(seekTime);
+            double beatSnapLength = timingPoint.BeatLength / beat_snap_divisor;
+
+            // We will be snapping to beats within the timing point
+            seekTime -= timingPoint.Time;
+
+            // Determine the index from the current timing point of the closest beat to seekTime
+            int closestBeat = (int)Math.Round(seekTime / beatSnapLength);
+            seekTime = timingPoint.Time + closestBeat * beatSnapLength;
+
+            // Depending on beatSnapLength, we may snap to a beat that is beyond timingPoint's end time, but we want to instead snap to
+            // the next timing point's start time
+            var nextTimingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
             if (seekTime > nextTimingPoint?.Time)
                 seekTime = nextTimingPoint.Time;
 
@@ -256,13 +258,21 @@ namespace osu.Game.Rulesets.Edit
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
 
         /// <summary>
+        /// Creates a <see cref="HitObjectMask"/> for a specific <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
+        public virtual HitObjectMask CreateMaskFor(DrawableHitObject hitObject) => null;
+
+        /// <summary>
+        /// Creates a <see cref="SelectionBox"/> which outlines <see cref="DrawableHitObject"/>s
+        /// and handles all hitobject movement/pattern adjustments.
+        /// </summary>
+        /// <param name="overlays">The <see cref="DrawableHitObject"/> overlays.</param>
+        public virtual SelectionBox CreateSelectionOverlay(IReadOnlyList<HitObjectMask> overlays) => new SelectionBox(overlays);
+
+        /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
         /// </summary>
         protected virtual ScalableContainer CreateLayerContainer() => new ScalableContainer { RelativeSizeAxes = Axes.Both };
-
-        /// <summary>
-        /// Creates the <see cref="HitObjectOverlayLayer"/> which overlays selected <see cref="DrawableHitObject"/>s.
-        /// </summary>
-        protected virtual HitObjectOverlayLayer CreateHitObjectOverlayLayer() => new HitObjectOverlayLayer();
     }
 }

@@ -1,23 +1,41 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Edit.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasCombo, IHasPosition
+    public abstract class OsuHitObject : HitObject, IHasCombo, IHasEditablePosition
     {
         public const double OBJECT_RADIUS = 64;
+
+        public event Action<Vector2> PositionChanged;
 
         public double TimePreempt = 600;
         public double TimeFadein = 400;
 
-        public Vector2 Position { get; set; }
+        private Vector2 position;
+
+        public Vector2 Position
+        {
+            get => position;
+            set
+            {
+                if (position == value)
+                    return;
+                position = value;
+
+                PositionChanged?.Invoke(value);
+            }
+        }
+
         public float X => Position.X;
         public float Y => Position.Y;
 
@@ -48,5 +66,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }
+
+        public virtual void OffsetPosition(Vector2 offset) => Position += offset;
     }
 }
