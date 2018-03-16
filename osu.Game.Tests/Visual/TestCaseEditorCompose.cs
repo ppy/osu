@@ -1,51 +1,28 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
-using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit.Screens.Compose;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
     public class TestCaseEditorCompose : OsuTestCase
     {
-        private readonly Random random;
-        private readonly Compose compose;
-
-        public TestCaseEditorCompose()
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase osuGame)
         {
-            random = new Random(1337);
+            osuGame.Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-
-            Add(compose = new Compose(clock, clock));
-            AddStep("Next beatmap", nextBeatmap);
-        }
-
-        private OsuGameBase osuGame;
-        private BeatmapManager beatmaps;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, BeatmapManager beatmaps)
-        {
-            this.osuGame = osuGame;
-            this.beatmaps = beatmaps;
-
+            var compose = new Compose(clock, clock);
             compose.Beatmap.BindTo(osuGame.Beatmap);
-        }
 
-        private void nextBeatmap()
-        {
-            var sets = beatmaps.GetAllUsableBeatmapSets();
-            if (sets.Count == 0)
-                return;
-
-            var b = sets[random.Next(0, sets.Count)].Beatmaps[0];
-            osuGame.Beatmap.Value = beatmaps.GetWorkingBeatmap(b);
+            Child = compose;
         }
     }
 }
