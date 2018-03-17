@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1.06;
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
-        private Bindable<bool> increaseFirstObjectVisibility;
+        private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>(false);
 
         public void ReadFromConfig(OsuConfigManager config)
         {
