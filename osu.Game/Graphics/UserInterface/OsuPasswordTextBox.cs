@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Key == Key.CapsLock)
+            if (args.Key == Key.CapsLock && HasFocus)
                 updateCapsWarning(host.CapsLockEnabled);
             return base.OnKeyDown(state, args);
         }
