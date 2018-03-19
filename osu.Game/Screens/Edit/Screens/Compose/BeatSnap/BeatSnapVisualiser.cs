@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Size = new Vector2(100, 110);
             Masking = true;
             CornerRadius = 5;
 
