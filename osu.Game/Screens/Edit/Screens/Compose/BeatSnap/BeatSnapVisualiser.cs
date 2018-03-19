@@ -163,6 +163,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
 
+                // Small offset to look a bit better centered along with the divisor text
+                Y = 1;
+
                 ButtonSize = new Vector2(20);
                 IconScale = new Vector2(0.7f);
             }
