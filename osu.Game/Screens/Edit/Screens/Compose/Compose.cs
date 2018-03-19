@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Edit.Screens.Compose.BeatSnap;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
@@ -47,15 +48,28 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                         Name = "Timeline content",
                                         RelativeSizeAxes = Axes.Both,
                                         Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
-                                        Children = new Drawable[]
+                                        Child = new GridContainer
                                         {
-                                            new Container
+                                            RelativeSizeAxes = Axes.Both,
+                                            Content = new[]
                                             {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Right = 115 },
-                                                Child = timeline = new ScrollableTimeline { RelativeSizeAxes = Axes.Both }
+                                                new Drawable[]
+                                                {
+                                                    new Container
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Padding = new MarginPadding { Right = 5 },
+                                                        Child = timeline = new ScrollableTimeline { RelativeSizeAxes = Axes.Both }
+                                                    },
+                                                    new BeatSnapVisualiser { RelativeSizeAxes = Axes.Both }
+                                                },
+                                            },
+                                            ColumnDimensions = new[]
+                                            {
+                                                new Dimension(),
+                                                new Dimension(GridSizeMode.Absolute, 90),
                                             }
-                                        }
+                                        },
                                     }
                                 }
                             }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Edit.Screens.Compose.BeatSnap;
+using OpenTK;
 
 namespace osu.Game.Tests.Visual
 {
@@ -24,7 +25,8 @@ namespace osu.Game.Tests.Visual
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Y = -200
+                Y = -200,
+                Size = new Vector2(100, 110)
             };
         }
     }
