@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
@@ -18,6 +19,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
         public readonly Bindable<int> Divisor = new Bindable<int>(1);
 
         private TickContainer tickContainer;
+        private DivisorText text;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -74,7 +76,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
                                                     {
                                                         Icon = FontAwesome.fa_chevron_left,
                                                     },
-                                                    null,
+                                                    text = new DivisorText(),
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.fa_chevron_right,
@@ -111,6 +113,28 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
             };
 
             tickContainer.Divisor.BindTo(Divisor);
+            text.Divisor.BindTo(Divisor);
+        }
+
+        private class DivisorText : SpriteText
+        {
+            public readonly Bindable<int> Divisor = new Bindable<int>();
+
+            public DivisorText()
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Divisor.ValueChanged += v => updateText();
+                updateText();
+            }
+
+            private void updateText() => Text = $"1/{Divisor.Value}";
         }
 
         private class DivisorButton : IconButton
