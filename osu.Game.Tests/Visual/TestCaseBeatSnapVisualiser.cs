@@ -17,9 +17,16 @@ namespace osu.Game.Tests.Visual
             typeof(BeatSnapVisualiser)
         };
 
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
+
         [BackgroundDependencyLoader]
         private void load()
         {
+            dependencies.Cache(new BindableBeatDivisor());
+
             Child = new BeatSnapVisualiser
             {
                 Anchor = Anchor.Centre,

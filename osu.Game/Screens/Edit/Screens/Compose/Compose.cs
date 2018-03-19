@@ -17,11 +17,20 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
 
+        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
+
         private Container composerContainer;
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            dependencies.Cache(beatDivisor);
+
             ScrollableTimeline timeline;
             Children = new Drawable[]
             {
