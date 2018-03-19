@@ -13,7 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
+namespace osu.Game.Screens.Edit.Screens.Compose
 {
     public class BeatSnapVisualiser : CompositeDrawable
     {
