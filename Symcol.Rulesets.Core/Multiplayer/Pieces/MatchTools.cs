@@ -62,12 +62,12 @@ namespace Symcol.Rulesets.Core.Multiplayer.Pieces
                 },
                 TabControl = new OsuTabControl<MatchScreenMode>
                 {
-                    Position = new Vector2(36, 0),
+                    Position = new Vector2(72, 0),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.08f,
-                    Width = 0.6f
+                    Width = 0.8f
                 },
                 SelectedContent = new Container
                 {
