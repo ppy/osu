@@ -14,7 +14,6 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(BeatSnapVisualiser),
-            typeof(Tick),
             typeof(TickContainer)
         };
 

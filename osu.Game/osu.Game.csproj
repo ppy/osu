@@ -381,7 +381,6 @@
     <Compile Include="Rulesets\Scoring\Legacy\LegacyScoreParser.cs" />
     <Compile Include="Rulesets\UI\JudgementContainer.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\BeatSnap\BeatSnapVisualiser.cs" />
-    <Compile Include="Screens\Edit\Screens\Compose\BeatSnap\Tick.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\BeatSnap\TickContainer.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Layers\BorderLayer.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Layers\HitObjectMaskLayer.cs" />
