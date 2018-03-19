@@ -30,6 +30,9 @@ using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using OpenTK.Input;
 using Symcol.Rulesets.Core.Multiplayer.Networking;
+using Symcol.Rulesets.Core.Multiplayer.Pieces;
+using System.Collections.Generic;
+using Symcol.Core.Networking;
 
 namespace Symcol.Rulesets.Core.Multiplayer.Screens
 {
@@ -85,13 +88,18 @@ namespace Symcol.Rulesets.Core.Multiplayer.Screens
 
         private HUDOverlay hudOverlay;
 
+        private MultiplayerScoreboard scoreboard;
+
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
-        public MultiPlayer(RulesetNetworkingClientHandler rulesetNetworkingClientHandler)//, WorkingBeatmap beatmap = null)
+        private readonly List<ClientInfo> playerList;
+
+        public MultiPlayer(RulesetNetworkingClientHandler rulesetNetworkingClientHandler, List<ClientInfo> playerList)//, WorkingBeatmap beatmap = null)
         {
             RulesetNetworkingClientHandler = rulesetNetworkingClientHandler;
             RulesetNetworkingClientHandler.OnAbort = () => Exit();
             RulesetNetworkingClientHandler.StartGame = () => start();
+            this.playerList = playerList;
         }
 
         [BackgroundDependencyLoader]
@@ -191,7 +199,8 @@ namespace Symcol.Rulesets.Core.Multiplayer.Screens
                             Origin = Anchor.Centre,
                             ProcessCustomClock = false,
                             Breaks = beatmap.Breaks
-                        }
+                        },
+                        scoreboard = new MultiplayerScoreboard(RulesetNetworkingClientHandler, playerList, scoreProcessor)
                     }
                 }
             };

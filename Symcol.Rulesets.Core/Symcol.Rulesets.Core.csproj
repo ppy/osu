@@ -44,6 +44,7 @@
     <Compile Include="Containers\LinkText.cs" />
     <Compile Include="Containers\ProfileLink.cs" />
     <Compile Include="HitObjects\DrawableSymcolHitObject.cs" />
+    <Compile Include="Multiplayer\Networking\ScorePacket.cs" />
     <Compile Include="Multiplayer\Pieces\Chat.cs" />
     <Compile Include="Multiplayer\Pieces\ChatMessage.cs" />
     <Compile Include="Multiplayer\Networking\ChatPacket.cs" />
@@ -54,6 +55,8 @@
     <Compile Include="Multiplayer\Options\MultiplayerDropdownEnumOption.cs" />
     <Compile Include="Multiplayer\Options\MultiplayerOption.cs" />
     <Compile Include="Multiplayer\Options\MultiplayerToggleOption.cs" />
+    <Compile Include="Multiplayer\Pieces\MultiplayerScoreboard.cs" />
+    <Compile Include="Multiplayer\Pieces\MultiplayerScoreboardItem.cs" />
     <Compile Include="Multiplayer\Screens\MatchSongSelect.cs" />
     <Compile Include="Multiplayer\Screens\MultiPlayer.cs" />
     <Compile Include="Multiplayer\Screens\RulesetLobbyScreen.cs" />
