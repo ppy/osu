@@ -19,15 +19,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose
     {
         private static readonly int[] available_divisors = { 1, 2, 3, 4, 6, 8, 12, 16 };
 
-        public readonly Bindable<int> Divisor = new Bindable<int>(1);
+        private readonly Bindable<int> beatDivisor = new Bindable<int>(1);
         private int currentDivisorIndex;
 
-        private TickContainer tickContainer;
-        private DivisorText text;
-
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, BindableBeatDivisor beatDivisor)
         {
+            this.beatDivisor.BindTo(beatDivisor);
+
             Masking = true;
             CornerRadius = 5;
 
@@ -46,7 +45,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     {
                         new Drawable[]
                         {
-                            tickContainer = new TickContainer(1, 2, 3, 4, 6, 8, 12, 16)
+                            new TickContainer(1, 2, 3, 4, 6, 8, 12, 16)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Horizontal = 5 }
@@ -80,7 +79,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                                         Icon = FontAwesome.fa_chevron_left,
                                                         Action = selectPrevious
                                                     },
-                                                    text = new DivisorText(),
+                                                    new DivisorText(),
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.fa_chevron_right,
@@ -116,28 +115,25 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     }
                 }
             };
-
-            tickContainer.Divisor.BindTo(Divisor);
-            text.Divisor.BindTo(Divisor);
         }
 
         private void selectPrevious()
         {
             if (currentDivisorIndex == 0)
                 return;
-            Divisor.Value = available_divisors[--currentDivisorIndex];
+            beatDivisor.Value = available_divisors[--currentDivisorIndex];
         }
 
         private void selectNext()
         {
             if (currentDivisorIndex == available_divisors.Length - 1)
                 return;
-            Divisor.Value = available_divisors[++currentDivisorIndex];
+            beatDivisor.Value = available_divisors[++currentDivisorIndex];
         }
 
         private class DivisorText : SpriteText
         {
-            public readonly Bindable<int> Divisor = new Bindable<int>();
+            private readonly Bindable<int> beatDivisor = new Bindable<int>();
 
             public DivisorText()
             {
@@ -146,8 +142,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, BindableBeatDivisor beatDivisor)
             {
+                this.beatDivisor.BindTo(beatDivisor);
+
                 Colour = colours.BlueLighter;
             }
 
@@ -155,11 +153,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             {
                 base.LoadComplete();
 
-                Divisor.ValueChanged += v => updateText();
+                beatDivisor.ValueChanged += v => updateText();
                 updateText();
             }
 
-            private void updateText() => Text = $"1/{Divisor.Value}";
+            private void updateText() => Text = $"1/{beatDivisor.Value}";
         }
 
         private class DivisorButton : IconButton
@@ -187,7 +185,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 
         private class TickContainer : CompositeDrawable
         {
-            public readonly BindableInt Divisor = new BindableInt();
+            private readonly Bindable<int> beatDivisor = new Bindable<int>();
 
             public new MarginPadding Padding
             {
@@ -206,8 +204,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, BindableBeatDivisor beatDivisor)
             {
+                this.beatDivisor.BindTo(beatDivisor);
+
                 InternalChild = marker = new EquilateralTriangle
                 {
                     Anchor = Anchor.BottomLeft,
@@ -234,11 +234,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             {
                 base.LoadComplete();
 
-                Divisor.ValueChanged += v => updatePosition();
+                beatDivisor.ValueChanged += v => updatePosition();
                 updatePosition();
             }
 
-            private void updatePosition() => marker.MoveToX(getTickPosition(Array.IndexOf(availableDivisors, Divisor.Value)), 100, Easing.OutQuint);
+            private void updatePosition() => marker.MoveToX(getTickPosition(Array.IndexOf(availableDivisors, beatDivisor.Value)), 100, Easing.OutQuint);
 
             private float getTickPosition(int index) => (index + 1) * tickSpacing;
 
