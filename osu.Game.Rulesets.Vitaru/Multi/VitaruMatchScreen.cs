@@ -70,8 +70,7 @@ namespace osu.Game.Rulesets.Vitaru.Multi
 
         protected override void Load(List<ClientInfo> playerList)
         {
-            base.Load(playerList);
-
+            MakeCurrent();
             foreach (ClientInfo client in playerList)
                 if (client is VitaruClientInfo vitaruClientInfo)
                     VitaruPlayfield.LoadPlayerList.Add(vitaruClientInfo);

@@ -237,6 +237,10 @@
       <Project>{c92a607b-1fdd-4954-9f92-03ff547d9080}</Project>
       <Name>osu.Game.Rulesets.Osu</Name>
     </ProjectReference>
+    <ProjectReference Include="..\osu.Game.Rulesets.Shape\osu.Game.Rulesets.Shape.csproj">
+      <Project>{baf6d7b6-5e48-4278-ab81-f079af640e31}</Project>
+      <Name>osu.Game.Rulesets.Shape</Name>
+    </ProjectReference>
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
       <Project>{f167e17a-7de6-4af5-b920-a5112296c695}</Project>
       <Name>osu.Game.Rulesets.Taiko</Name>

@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BAF6D7B6-5E48-4278-AB81-F079AF640E31}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>osu.Game.Rulesets.Shape</RootNamespace>
+    <AssemblyName>osu.Game.Rulesets.Shape</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\osu.Game\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\osu.Game\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0\lib\net45\OpenTK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Beatmaps\ShapeBeatmapConverter.cs" />
+    <Compile Include="Beatmaps\ShapeBeatmapProcessor.cs" />
+    <Compile Include="Judgements\ShapeJudgement.cs" />
+    <Compile Include="Multi\ShapeLobbyItem.cs" />
+    <Compile Include="Multi\ShapeLobbyScreen.cs" />
+    <Compile Include="Multi\ShapeMatchScreen.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Arrow.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Circle.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Square.cs" />
+    <Compile Include="Objects\Drawables\Pieces\Triangle.cs" />
+    <Compile Include="Objects\Drawables\Pieces\X.cs" />
+    <Compile Include="Objects\BaseShape.cs" />
+    <Compile Include="Objects\Drawables\DrawableBaseShape.cs" />
+    <Compile Include="Objects\Drawables\DrawableShapeJudgement.cs" />
+    <Compile Include="Mods\ShapeMod.cs" />
+    <Compile Include="Objects\Drawables\DrawableShapeHitObject.cs" />
+    <Compile Include="Objects\Drawables\Pieces\BaseDial.cs" />
+    <Compile Include="Objects\HitObjectType.cs" />
+    <Compile Include="Objects\ShapeHitObjectDifficulty.cs" />
+    <Compile Include="Objects\ShapeHitObject.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\ShapeConfigManager.cs" />
+    <Compile Include="Settings\ShapeSettings.cs" />
+    <Compile Include="ShapeDifficultyCalculator.cs" />
+    <Compile Include="UI\ShapeRulsesetContainer.cs" />
+    <Compile Include="Scoring\ShapeScoreProcessor.cs" />
+    <Compile Include="UI\ShapePlayfield.cs" />
+    <Compile Include="ShapeRuleset.cs" />
+    <Compile Include="ShapeInputManager.cs" />
+    <Compile Include="Wiki\Sections\Gamemodes.cs" />
+    <Compile Include="Wiki\ShapeWikiHeader.cs" />
+    <Compile Include="Wiki\ShapeWikiOverlay.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
+      <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
+      <Name>osu.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
+      <Project>{d9a367c9-4c1a-489f-9b05-a0cea2b53b58}</Project>
+      <Name>osu.Game.Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
+      <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>
+      <Name>osu.Game</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Symcol.Rulesets.Core\Symcol.Rulesets.Core.csproj">
+      <Project>{552b5940-c647-4060-aa4d-61baac415c72}</Project>
+      <Name>Symcol.Rulesets.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\Audio\" />
+    <Folder Include="Assets\Font\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\icon.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

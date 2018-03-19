@@ -137,6 +137,7 @@ namespace Symcol.Rulesets.Core.Multiplayer.Screens
         protected virtual void Load(List<ClientInfo> playerList)
         {
             MakeCurrent();
+            Push(new MultiPlayer(RulesetNetworkingClientHandler, playerList));
         }
 
         private void openSongSelect()
