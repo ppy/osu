@@ -1,4 +1,8 @@
-﻿using osu.Framework.Allocation;
+﻿//osu.Game.Screens.Symcol.SymcolMenu
+//Symcol.Rulesets.Core.Multiplayer.Screens.RulesetMultiplayerSelection
+//#define SymcolMods
+
+using osu.Framework.Allocation;
 using osu.Game;
 using osu.Game.Overlays.Settings;
 using Symcol.Rulesets.Core.Wiki;
@@ -15,7 +19,9 @@ namespace Symcol.Rulesets.Core
 
         public virtual RulesetLobbyItem RulesetLobbyItem => null;
 
+#if SymcolMods
         public static RulesetMultiplayerSelection RulesetMultiplayerSelection;
+#endif
 
         public static SymcolConfigManager SymcolConfigManager;
 
@@ -23,8 +29,8 @@ namespace Symcol.Rulesets.Core
 
         public SymcolSettingsSubsection()
         {
-            try
-            {
+
+#if SymcolMods
                 if (RulesetLobbyItem != null)
                     RulesetMultiplayerSelection.LobbyItems.Add(RulesetLobbyItem);
 
@@ -32,11 +38,11 @@ namespace Symcol.Rulesets.Core
                     RulesetMultiplayerSelection = new RulesetMultiplayerSelection();
 
                 SymcolMenu.RulesetMultiplayerScreen = RulesetMultiplayerSelection;
-            }
-            catch
-            {
-                Logger.Log("osu.Game mods not installed! Online Multiplayer will not be avalible without them. . .", LoggingTarget.Information, LogLevel.Important);
-            }
+#endif
+#if !SymcolMods
+            Logger.Log("osu.Game mods not installed! Online Multiplayer will not be avalible without them. . .", LoggingTarget.Information, LogLevel.Important);
+#endif
+
         }
 
         [BackgroundDependencyLoader]

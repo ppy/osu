@@ -1,4 +1,8 @@
-﻿using OpenTK;
+﻿//osu.Game.Screens.Symcol.SymcolMenu
+//Symcol.Rulesets.Core.SymcolSettingsSubsection
+//#define SymcolMods
+
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -39,12 +43,13 @@ namespace Symcol.Rulesets.Core.Multiplayer.Screens
         protected override bool OnExiting(Screen next)
         {
             Remove(LobbyItems);
+
+#if SymcolMods
             SymcolSettingsSubsection.RulesetMultiplayerSelection = new RulesetMultiplayerSelection();
-            try
-            {
-                SymcolMenu.RulesetMultiplayerScreen = SymcolSettingsSubsection.RulesetMultiplayerSelection;
-            }
-            catch { }
+
+            SymcolMenu.RulesetMultiplayerScreen = SymcolSettingsSubsection.RulesetMultiplayerSelection;
+#endif
+
             return base.OnExiting(next);
         }
     }

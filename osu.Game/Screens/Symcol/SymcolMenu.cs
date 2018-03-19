@@ -1,4 +1,8 @@
-﻿using OpenTK;
+﻿//Symcol.Rulesets.Core.Multiplayer.Screens.RulesetMultiplayerSelection
+//Symcol.Rulesets.Core.SymcolSettingsSubsection
+//#define SymcolMods
+
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -137,7 +141,9 @@ namespace osu.Game.Screens.Symcol
                             ButtonColorTop = Color4.Blue,
                             ButtonColorBottom = Color4.Red,
                             ButtonSize = 120,
+#if SymcolMods
                             Action = delegate { Push(RulesetMultiplayerScreen); },
+#endif
                             ButtonPosition = new Vector2(180 , -100),
                         },
                         /*
