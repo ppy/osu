@@ -488,7 +488,7 @@ namespace osu.Game.Screens.Pokeosu
                     startButton.Text = "Start your journey";
                     break;
                 case APIState.Online:
-                    startButton.Text = "Start your journey, " + api.Username;
+                    startButton.Text = "Start your journey, " + api.LocalUser.Value.Username;
                     break;
             }
         }

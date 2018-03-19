@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Containers\LinkText.cs" />
     <Compile Include="Containers\ProfileLink.cs" />
+    <Compile Include="HitObjects\DrawableSymcolHitObject.cs" />
     <Compile Include="Multiplayer\Pieces\Chat.cs" />
     <Compile Include="Multiplayer\Pieces\ChatMessage.cs" />
     <Compile Include="Multiplayer\Networking\ChatPacket.cs" />

@@ -241,6 +241,10 @@
       <Project>{f167e17a-7de6-4af5-b920-a5112296c695}</Project>
       <Name>osu.Game.Rulesets.Taiko</Name>
     </ProjectReference>
+    <ProjectReference Include="..\osu.Game.Rulesets.Vitaru\osu.Game.Rulesets.Vitaru.csproj">
+      <Project>{9a615027-b2ab-435e-b865-0c7209933457}</Project>
+      <Name>osu.Game.Rulesets.Vitaru</Name>
+    </ProjectReference>
     <ProjectReference Include="..\osu.Game.Tests\osu.Game.Tests.csproj">
       <Project>{54377672-20b1-40af-8087-5cf73bf3953a}</Project>
       <Name>osu.Game.Tests</Name>
@@ -248,6 +252,14 @@
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
       <Name>osu.Game</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Symcol.Core\Symcol.Core.csproj">
+      <Project>{f34ac16c-e590-4d70-a069-a748326852bf}</Project>
+      <Name>Symcol.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Symcol.Rulesets.Core\Symcol.Rulesets.Core.csproj">
+      <Project>{552b5940-c647-4060-aa4d-61baac415c72}</Project>
+      <Name>Symcol.Rulesets.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

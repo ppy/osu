@@ -29,7 +29,6 @@ using OpenTK;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using OpenTK.Input;
-using osu.Game.Screens.Play.BreaksOverlay;
 using Symcol.Rulesets.Core.Multiplayer.Networking;
 
 namespace Symcol.Rulesets.Core.Multiplayer.Screens

@@ -1,14 +1,15 @@
 ﻿using osu.Framework.Graphics;
-using osu.Game.Rulesets.Vitaru.Judgements;
 using OpenTK;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
 {
     public class DrawableVitaruJudgement : DrawableJudgement
     {
-        public DrawableVitaruJudgement(VitaruJudgement judgement) : base(judgement)
+        public DrawableVitaruJudgement(Judgement judgement, DrawableHitObject judgedObject)
+            : base(judgement, judgedObject)
         {
         }
 

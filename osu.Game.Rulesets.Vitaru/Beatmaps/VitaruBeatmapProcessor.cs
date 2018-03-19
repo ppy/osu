@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Vitaru.Beatmaps
     {
         public override void PostProcess(Beatmap<VitaruHitObject> beatmap)
         {
-            if (beatmap.ComboColors.Count == 0)
+            if (beatmap.ComboColours.Count == 0)
                 return;
 
             int comboIndex = 0;
@@ -18,11 +18,11 @@ namespace osu.Game.Rulesets.Vitaru.Beatmaps
                 if (obj.NewCombo)
                 {
                     comboIndex = 0;
-                    colourIndex = (colourIndex + 1) % beatmap.ComboColors.Count;
+                    colourIndex = (colourIndex + 1) % beatmap.ComboColours.Count;
                 }
 
                 obj.ComboIndex = comboIndex++;
-                obj.ComboColour = beatmap.ComboColors[colourIndex];
+                obj.ComboColour = beatmap.ComboColours[colourIndex];
             }
         }
     }

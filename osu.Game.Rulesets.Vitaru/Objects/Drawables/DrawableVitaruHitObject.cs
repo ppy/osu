@@ -1,9 +1,10 @@
 ﻿using osu.Game.Rulesets.Objects.Drawables;
+using Symcol.Rulesets.Core.HitObjects;
 using System.ComponentModel;
 
 namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
 {
-    public class DrawableVitaruHitObject : DrawableHitObject<VitaruHitObject>
+    public class DrawableVitaruHitObject : DrawableSymcolHitObject<VitaruHitObject>
     {
         public static float TIME_PREEMPT = 600;
         public static float TIME_FADEIN = 300;

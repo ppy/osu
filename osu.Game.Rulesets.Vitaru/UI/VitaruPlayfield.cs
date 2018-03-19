@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Vitaru.UI
 
             if (VitaruPlayer != null)
             {
-                DrawableVitaruJudgement explosion = new DrawableVitaruJudgement(vitaruJudgement)
+                DrawableVitaruJudgement explosion = new DrawableVitaruJudgement(judgement, judgedObject)
                 {
                     Alpha = 0.5f,
                     Origin = Anchor.Centre,

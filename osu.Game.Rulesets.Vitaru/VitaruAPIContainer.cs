@@ -11,7 +11,6 @@ namespace osu.Game.Rulesets.Vitaru
         public static bool Shawdooow;
         public static bool Arrcival;
         public static bool Jorolf;
-        public static bool Noob;
 
         [BackgroundDependencyLoader]
         private void load(APIAccess api)
@@ -29,10 +28,9 @@ namespace osu.Game.Rulesets.Vitaru
                     break;
                 case APIState.Online:
                     PlayerID = (int)api.LocalUser.Value.Id;
-                    Shawdooow = api.Username == "Shawdooow";
-                    Arrcival = api.Username == "Arrcival";
-                    Jorolf = api.Username == "Jorolf";
-                    Noob = api.Password == "P4s5w0rd";
+                    Shawdooow = api.LocalUser.Value.Username == "Shawdooow";
+                    Arrcival = api.LocalUser.Value.Username == "Arrcival";
+                    Jorolf = api.LocalUser.Value.Username == "Jorolf";
                     break;
             }
         }
