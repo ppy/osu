@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
@@ -54,7 +53,7 @@ namespace osu.Game.Rulesets
 
         public virtual PerformanceCalculator CreatePerformanceCalculator(Beatmap beatmap, Score score) => null;
 
-        public virtual HitObjectComposer CreateHitObjectComposer(IAdjustableClock adjustableClock, IFrameBasedClock framedClock) => null;
+        public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_question_circle };
 

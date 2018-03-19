@@ -18,11 +18,12 @@ namespace osu.Game.Screens.Edit.Components
 {
     public class PlaybackControl : BottomBarContainer
     {
-        private readonly IconButton playButton;
+        private IconButton playButton;
 
-        private readonly IAdjustableClock adjustableClock;
+        private IAdjustableClock adjustableClock;
 
-        public PlaybackControl(IAdjustableClock adjustableClock)
+        [BackgroundDependencyLoader]
+        private void load(IAdjustableClock adjustableClock)
         {
             this.adjustableClock = adjustableClock;
 

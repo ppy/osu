@@ -17,13 +17,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
     /// </summary>
     public class SummaryTimeline : BottomBarContainer
     {
-        private readonly Drawable timelineBar;
-
-        public SummaryTimeline(IAdjustableClock adjustableClock)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, IAdjustableClock adjustableClock)
         {
             TimelinePart markerPart, controlPointPart, bookmarkPart, breakPart;
 
-            Children = new[]
+            Children = new Drawable[]
             {
                 markerPart = new MarkerPart(adjustableClock) { RelativeSizeAxes = Axes.Both },
                 controlPointPart = new ControlPointPart
@@ -40,9 +39,10 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.35f
                 },
-                timelineBar = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = colours.Gray5,
                     Children = new Drawable[]
                     {
                         new Circle
@@ -80,12 +80,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
             controlPointPart.Beatmap.BindTo(Beatmap);
             bookmarkPart.Beatmap.BindTo(Beatmap);
             breakPart.Beatmap.BindTo(Beatmap);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            timelineBar.Colour = colours.Gray5;
         }
     }
 }

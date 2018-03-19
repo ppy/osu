@@ -33,10 +33,17 @@ namespace osu.Game.Tests.Visual
 
         private DecoupleableInterpolatingFramedClock clock;
 
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
+
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {
             clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            dependencies.CacheAs<IAdjustableClock>(clock);
+            dependencies.CacheAs<IFrameBasedClock>(clock);
 
             var testBeatmap = new Beatmap
             {
@@ -67,7 +74,7 @@ namespace osu.Game.Tests.Visual
                 RelativeSizeAxes = Axes.Both,
                 Content = new[]
                 {
-                    new Drawable[] { composer = new TestHitObjectComposer(new OsuRuleset(), clock, clock) },
+                    new Drawable[] { composer = new TestHitObjectComposer(new OsuRuleset()) },
                     new Drawable[] { new TimingPointVisualiser(testBeatmap, track) { Clock = clock } },
                 },
                 RowDimensions = new[]
@@ -338,8 +345,8 @@ namespace osu.Game.Tests.Visual
 
         private class TestHitObjectComposer : HitObjectComposer
         {
-            public TestHitObjectComposer(Ruleset ruleset, IAdjustableClock adjustableClock, IFrameBasedClock framedClock)
-                : base(ruleset, adjustableClock, framedClock)
+            public TestHitObjectComposer(Ruleset ruleset)
+                : base(ruleset)
             {
             }
 

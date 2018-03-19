@@ -13,13 +13,21 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseEditorCompose : OsuTestCase
     {
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
+
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {
             osuGame.Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-            var compose = new Compose(clock, clock);
+            dependencies.CacheAs<IAdjustableClock>(clock);
+            dependencies.CacheAs<IFrameBasedClock>(clock);
+
+            var compose = new Compose();
             compose.Beatmap.BindTo(osuGame.Beatmap);
 
             Child = compose;
