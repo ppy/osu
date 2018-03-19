@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9A615027-B2AB-435E-B865-0C7209933457}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>osu.Game.Rulesets.Vitaru</RootNamespace>
+    <AssemblyName>osu.Game.Rulesets.Vitaru</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\OpenTK.3.0.0-git00009\lib\net20\OpenTK.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Multi\VitaruPlayerInformation.cs" />
+    <Compile Include="Multi\VitaruClientInfo.cs" />
+    <Compile Include="Multi\VitaruInMatchPacket.cs" />
+    <Compile Include="Multi\VitaruLobbyScreen.cs" />
+    <Compile Include="Multi\VitaruLobbyItem.cs" />
+    <Compile Include="Multi\VitaruMatchScreen.cs" />
+    <Compile Include="Multi\VitaruNetworkingClientHandler.cs" />
+    <Compile Include="Multi\VitaruPacket.cs" />
+    <Compile Include="Objects\Characters\Pieces\Rift.cs" />
+    <Compile Include="Objects\Drawables\DrawableSeekingBullet.cs" />
+    <Compile Include="Objects\Characters\Pieces\Mask.cs" />
+    <Compile Include="Objects\Characters\Pieces\Metranome.cs" />
+    <Compile Include="Objects\Drawables\Pieces\SeekingBulletPiece.cs" />
+    <Compile Include="Objects\Characters\Pieces\UFO.cs" />
+    <Compile Include="Objects\SeekingBullet.cs" />
+    <Compile Include="UI\VitaruSkinElement.cs" />
+    <Compile Include="VitaruAPIContainer.cs" />
+    <Compile Include="Edit\Pieces\PatternEditor.cs" />
+    <Compile Include="Edit\VitaruEditPlayfield.cs" />
+    <Compile Include="Edit\VitaruEditRulesetContainer.cs" />
+    <Compile Include="Edit\VitaruHitObjectComposer.cs" />
+    <Compile Include="Objects\Characters\Pieces\Crystal.cs" />
+    <Compile Include="Objects\Laser.cs" />
+    <Compile Include="Objects\Bullet.cs" />
+    <Compile Include="Objects\Characters\VitaruCharacter.cs" />
+    <Compile Include="Objects\Characters\Enemy.cs" />
+    <Compile Include="Objects\Drawables\DrawableLaser.cs" />
+    <Compile Include="Objects\Drawables\Pieces\BulletPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\LaserPiece.cs" />
+    <Compile Include="Objects\Pattern.cs" />
+    <Compile Include="Beatmaps\VitaruBeatmapConverter.cs" />
+    <Compile Include="Beatmaps\VitaruBeatmapProcessor.cs" />
+    <Compile Include="Judgements\VitaruJudgement.cs" />
+    <Compile Include="Objects\Drawables\DrawableBullet.cs" />
+    <Compile Include="Objects\Drawables\DrawableVitaruJudgement.cs" />
+    <Compile Include="Objects\Characters\Pieces\Totem.cs" />
+    <Compile Include="Replays\VitaruAutoGenerator.cs" />
+    <Compile Include="Replays\VitaruReplayInputHandler.cs" />
+    <Compile Include="Scoring\VitaruPerformanceCalculator.cs" />
+    <Compile Include="Settings\VitaruConfigManager.cs" />
+    <Compile Include="Tests\TestCaseVitaruPlayer.cs" />
+    <Compile Include="UI\ComboFire.cs" />
+    <Compile Include="UI\Cursor\GameplayCursor.cs" />
+    <Compile Include="UI\DebugValueUI.cs" />
+    <Compile Include="Settings\VitaruSettings.cs" />
+    <Compile Include="Mods\VitaruMod.cs" />
+    <Compile Include="Objects\Drawables\DrawableVitaruHitObject.cs" />
+    <Compile Include="Objects\Characters\VitaruPlayer.cs" />
+    <Compile Include="Objects\HitObjectType.cs" />
+    <Compile Include="Objects\VitaruHitObjectDifficulty.cs" />
+    <Compile Include="Objects\Drawables\DrawablePatterns.cs" />
+    <Compile Include="Objects\VitaruHitObject.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\MirrorField.cs" />
+    <Compile Include="Beatmaps\VitaruDifficultyCalculator.cs" />
+    <Compile Include="UI\VitaruRulesetContainer.cs" />
+    <Compile Include="Scoring\VitaruScoreProcessor.cs" />
+    <Compile Include="UI\VitaruPlayfield.cs" />
+    <Compile Include="VitaruInputManager.cs" />
+    <Compile Include="VitaruRuleset.cs" />
+    <Compile Include="Wiki\Sections\CodeSection.cs" />
+    <Compile Include="Wiki\Sections\CreditsSection.cs" />
+    <Compile Include="Wiki\Sections\GameplaySection.cs" />
+    <Compile Include="Wiki\Sections\EditorSection.cs" />
+    <Compile Include="Wiki\Sections\MultiplayerSection.cs" />
+    <Compile Include="Wiki\Sections\Pieces\Anatomy.cs" />
+    <Compile Include="Wiki\Sections\RankingSection.cs" />
+    <Compile Include="Wiki\VitaruWikiHeader.cs" />
+    <Compile Include="Wiki\VitaruWikiOverlay.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Font\vitaruFont.fnt" />
+    <None Include="app.config" />
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\Audio\Tracks\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Font\vitaruFont_0.png" />
+    <EmbeddedResource Include="Assets\Textures\player.png" />
+    <EmbeddedResource Include="Assets\Textures\playerKiai.png" />
+    <EmbeddedResource Include="Assets\Audio\Samples\deathSound.mp3" />
+    <EmbeddedResource Include="Assets\Audio\Samples\shootSound.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\enemy.png" />
+    <EmbeddedResource Include="Assets\Textures\enemyKiai.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\bulletKiai.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\playerKiaiRight.png" />
+    <EmbeddedResource Include="Assets\Textures\playerRight.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Audio\Samples\gasterFire.mp3" />
+    <EmbeddedResource Include="Assets\Audio\Samples\gasterReady.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
+      <Project>{c76bf5b3-985e-4d39-95fe-97c9c879b83a}</Project>
+      <Name>osu.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
+      <Project>{0d3fbf8a-7464-4cf7-8c90-3e7886df2d4d}</Project>
+      <Name>osu.Game</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Symcol.Core\Symcol.Core.csproj">
+      <Project>{f34ac16c-e590-4d70-a069-a748326852bf}</Project>
+      <Name>Symcol.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Symcol.Rulesets.Core\Symcol.Rulesets.Core.csproj">
+      <Project>{552b5940-c647-4060-aa4d-61baac415c72}</Project>
+      <Name>Symcol.Rulesets.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\chen.png" />
+    <EmbeddedResource Include="Assets\Textures\chenKiai.png" />
+    <EmbeddedResource Include="Assets\Textures\chenKiaiRight.png" />
+    <EmbeddedResource Include="Assets\Textures\chenRight.png" />
+    <EmbeddedResource Include="Assets\Textures\kaguya.png" />
+    <EmbeddedResource Include="Assets\Textures\kaguyaKiai.png" />
+    <EmbeddedResource Include="Assets\Textures\kaguyaKiaiRight.png" />
+    <EmbeddedResource Include="Assets\Textures\kaguyaRight.png" />
+    <EmbeddedResource Include="Assets\Textures\marisa.png" />
+    <EmbeddedResource Include="Assets\Textures\marisaKiai.png" />
+    <EmbeddedResource Include="Assets\Textures\marisaKiaiRight.png" />
+    <EmbeddedResource Include="Assets\Textures\marisaRight.png" />
+    <EmbeddedResource Include="Assets\Textures\nue.png" />
+    <EmbeddedResource Include="Assets\Textures\nueKiai.png" />
+    <EmbeddedResource Include="Assets\Textures\nueKiaiRight.png" />
+    <EmbeddedResource Include="Assets\Textures\nueRight.png" />
+    <EmbeddedResource Include="Assets\Textures\reimu.png" />
+    <EmbeddedResource Include="Assets\Textures\reimuKiai.png" />
+    <EmbeddedResource Include="Assets\Textures\reimuKiaiRight.png" />
+    <EmbeddedResource Include="Assets\Textures\reimuRight.png" />
+    <EmbeddedResource Include="Assets\Textures\sakuya.png" />
+    <EmbeddedResource Include="Assets\Textures\sakuyaKiai.png" />
+    <EmbeddedResource Include="Assets\Textures\sakuyaKiaiRight.png" />
+    <EmbeddedResource Include="Assets\Textures\sakuyaRight.png" />
+    <EmbeddedResource Include="Assets\Textures\sign.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\crystal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\Vitaru%402x.png" />
+    <EmbeddedResource Include="Assets\Textures\VitaruTouhosuModeTrue2560x1440.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\ring.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\vortex.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
