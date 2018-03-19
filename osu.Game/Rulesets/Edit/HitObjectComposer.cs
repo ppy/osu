@@ -32,21 +32,20 @@ namespace osu.Game.Rulesets.Edit
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
-        private readonly IAdjustableClock adjustableClock;
-        private readonly IFrameBasedClock framedClock;
+        private IAdjustableClock adjustableClock;
 
-        protected HitObjectComposer(Ruleset ruleset, IAdjustableClock adjustableClock, IFrameBasedClock framedClock)
+        protected HitObjectComposer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
-            this.adjustableClock = adjustableClock;
-            this.framedClock = framedClock;
 
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        private void load(OsuGameBase osuGame, IAdjustableClock adjustableClock, IFrameBasedClock framedClock)
         {
+            this.adjustableClock = adjustableClock;
+
             beatmap.BindTo(osuGame.Beatmap);
 
             try

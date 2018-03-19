@@ -35,6 +35,11 @@ namespace osu.Game.Tests.Visual
             typeof(SliderCircleMask)
         };
 
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
+
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {
@@ -61,8 +66,10 @@ namespace osu.Game.Tests.Visual
             });
 
             var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            dependencies.CacheAs<IAdjustableClock>(clock);
+            dependencies.CacheAs<IFrameBasedClock>(clock);
 
-            Child = new OsuHitObjectComposer(new OsuRuleset(), clock, clock);
+            Child = new OsuHitObjectComposer(new OsuRuleset());
         }
     }
 }

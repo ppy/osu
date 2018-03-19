@@ -32,15 +32,21 @@ namespace osu.Game.Screens.Edit
 
         private EditorScreen currentScreen;
 
-        private DecoupleableInterpolatingFramedClock adjustableClock;
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             // TODO: should probably be done at a RulesetContainer level to share logic with Player.
             var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
-            adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            var adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
             adjustableClock.ChangeSource(sourceClock);
+
+            dependencies.CacheAs<IAdjustableClock>(adjustableClock);
+            dependencies.CacheAs<IFrameBasedClock>(adjustableClock);
 
             EditorMenuBar menuBar;
             TimeInfoContainer timeInfo;
@@ -115,9 +121,9 @@ namespace osu.Game.Screens.Edit
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding { Right = 10 },
-                                            Child = timeInfo = new TimeInfoContainer(adjustableClock) { RelativeSizeAxes = Axes.Both },
+                                            Child = timeInfo = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
                                         },
-                                        timeline = new SummaryTimeline(adjustableClock)
+                                        timeline = new SummaryTimeline
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
@@ -125,7 +131,7 @@ namespace osu.Game.Screens.Edit
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding { Left = 10 },
-                                            Child = playback = new PlaybackControl(adjustableClock) { RelativeSizeAxes = Axes.Both },
+                                            Child = playback = new PlaybackControl { RelativeSizeAxes = Axes.Both },
                                         }
                                     },
                                 }
@@ -156,7 +162,7 @@ namespace osu.Game.Screens.Edit
             switch (mode)
             {
                 case EditorScreenMode.Compose:
-                    currentScreen = new Compose(adjustableClock, adjustableClock);
+                    currentScreen = new Compose();
                     break;
                 case EditorScreenMode.Design:
                     currentScreen = new Design();

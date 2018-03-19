@@ -4,21 +4,19 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Edit.Components
 {
     public class TimeInfoContainer : BottomBarContainer
     {
-        private const int count_duration = 150;
-
         private readonly OsuSpriteText trackTimer;
 
-        private readonly IAdjustableClock adjustableClock;
+        private IAdjustableClock adjustableClock;
 
-        public TimeInfoContainer(IAdjustableClock adjustableClock)
+        public TimeInfoContainer()
         {
-            this.adjustableClock = adjustableClock;
 
             Children = new Drawable[]
             {
@@ -31,6 +29,12 @@ namespace osu.Game.Screens.Edit.Components
                     Y = 0.5f,
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IAdjustableClock adjustableClock)
+        {
+            this.adjustableClock = adjustableClock;
         }
 
         protected override void Update()
