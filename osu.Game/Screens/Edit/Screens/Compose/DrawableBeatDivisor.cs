@@ -15,7 +15,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
 {
-    public class BeatSnapVisualiser : CompositeDrawable
+    public class DrawableBeatDivisor : CompositeDrawable
     {
         private static readonly int[] available_divisors = { 1, 2, 3, 4, 6, 8, 12, 16 };
 

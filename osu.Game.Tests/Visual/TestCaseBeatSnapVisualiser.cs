@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(BeatSnapVisualiser)
+            typeof(DrawableBeatDivisor)
         };
 
         private DependencyContainer dependencies;
@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual
         {
             dependencies.Cache(new BindableBeatDivisor());
 
-            Child = new BeatSnapVisualiser
+            Child = new DrawableBeatDivisor
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
