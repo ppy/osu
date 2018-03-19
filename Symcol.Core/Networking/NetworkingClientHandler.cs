@@ -559,7 +559,7 @@ namespace Symcol.Core.Networking
         public void ShareWithOtherPeers(Packet packet)
         {
             if (SendClient == null)
-                foreach (ClientInfo clientInfo in InGameClients)
+                foreach (ClientInfo clientInfo in ConncetedClients)
                     if (packet.ClientInfo.IP != clientInfo.IP)
                     {
                         NetworkingClient client = new NetworkingClient(true, clientInfo.IP, clientInfo.Port);

@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="GameObjects\SymcolHitbox.cs" />
     <Compile Include="Graphics\Containers\SymcolClickableContainer.cs" />
+    <Compile Include="Graphics\Containers\SymcolDialContainer.cs" />
     <Compile Include="Graphics\Containers\SymcolDragContainer.cs" />
     <Compile Include="Graphics\Containers\SymcolContainer.cs" />
     <Compile Include="Graphics\UserInterface\SpriteButton.cs" />
