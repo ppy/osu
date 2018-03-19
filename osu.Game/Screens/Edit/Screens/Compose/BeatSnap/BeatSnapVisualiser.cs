@@ -16,7 +16,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
 {
     public class BeatSnapVisualiser : CompositeDrawable
     {
+        private static readonly int[] available_divisors = { 1, 2, 3, 4, 6, 8, 12, 16 };
+
         public readonly Bindable<int> Divisor = new Bindable<int>(1);
+        private int currentDivisorIndex = 0;
 
         private TickContainer tickContainer;
         private DivisorText text;
@@ -75,11 +78,13 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.fa_chevron_left,
+                                                        Action = selectPrevious
                                                     },
                                                     text = new DivisorText(),
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.fa_chevron_right,
+                                                        Action = selectNext
                                                     }
                                                 },
                                                 new Drawable[]
@@ -114,6 +119,20 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
 
             tickContainer.Divisor.BindTo(Divisor);
             text.Divisor.BindTo(Divisor);
+        }
+
+        private void selectPrevious()
+        {
+            if (currentDivisorIndex == 0)
+                return;
+            Divisor.Value = available_divisors[--currentDivisorIndex];
+        }
+
+        private void selectNext()
+        {
+            if (currentDivisorIndex == available_divisors.Length - 1)
+                return;
+            Divisor.Value = available_divisors[++currentDivisorIndex];
         }
 
         private class DivisorText : SpriteText
