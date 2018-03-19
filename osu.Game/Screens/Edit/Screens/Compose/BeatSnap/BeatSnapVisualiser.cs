@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
         private static readonly int[] available_divisors = { 1, 2, 3, 4, 6, 8, 12, 16 };
 
         public readonly Bindable<int> Divisor = new Bindable<int>(1);
-        private int currentDivisorIndex = 0;
+        private int currentDivisorIndex;
 
         private TickContainer tickContainer;
         private DivisorText text;
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
                                                 new Drawable[]
                                                 {
                                                     null,
-                                                    new TextFlowContainer(s => s.TextSize = 12)
+                                                    new TextFlowContainer(s => s.TextSize = 10)
                                                     {
                                                         Text = "beat snap divisor",
                                                         RelativeSizeAxes = Axes.X,
@@ -145,6 +145,12 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
                 Origin = Anchor.Centre;
             }
 
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Colour = colours.BlueLighter;
+            }
+
             protected override void LoadComplete()
             {
                 base.LoadComplete();
@@ -167,7 +173,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
                 Y = 1;
 
                 ButtonSize = new Vector2(20);
-                IconScale = new Vector2(0.7f);
+                IconScale = new Vector2(0.6f);
             }
 
             [BackgroundDependencyLoader]
