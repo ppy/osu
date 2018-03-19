@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Game.Beatmaps;
+using osu.Framework.Timing;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit.Screens.Compose;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
@@ -14,38 +16,24 @@ namespace osu.Game.Tests.Visual
     public class TestCaseEditorCompose : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Compose) };
+        private DependencyContainer dependencies;
 
-        private readonly Random random;
-        private readonly Compose compose;
-
-        public TestCaseEditorCompose()
-        {
-            random = new Random(1337);
-
-            Add(compose = new Compose());
-            AddStep("Next beatmap", nextBeatmap);
-        }
-
-        private OsuGameBase osuGame;
-        private BeatmapManager beatmaps;
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, BeatmapManager beatmaps)
+        private void load(OsuGameBase osuGame)
         {
-            this.osuGame = osuGame;
-            this.beatmaps = beatmaps;
+            osuGame.Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
+            var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            dependencies.CacheAs<IAdjustableClock>(clock);
+            dependencies.CacheAs<IFrameBasedClock>(clock);
+
+            var compose = new Compose();
             compose.Beatmap.BindTo(osuGame.Beatmap);
-        }
 
-        private void nextBeatmap()
-        {
-            var sets = beatmaps.GetAllUsableBeatmapSets();
-            if (sets.Count == 0)
-                return;
-
-            var b = sets[random.Next(0, sets.Count)].Beatmaps[0];
-            osuGame.Beatmap.Value = beatmaps.GetWorkingBeatmap(b);
+            Child = compose;
         }
     }
 }
