@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
             updatePosition();
         }
 
-        private void updatePosition() => marker.X = getTickPosition(Array.IndexOf(availableDivisors, Divisor.Value));
+        private void updatePosition() => marker.MoveToX(getTickPosition(Array.IndexOf(availableDivisors, Divisor.Value)), 100, Easing.OutQuint);
 
         private float getTickPosition(int index) => (index + 1) * tickSpacing;
 
