@@ -1,13 +1,13 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
-using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
@@ -17,9 +17,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
 
-        private readonly Container composerContainer;
+        private Container composerContainer;
 
-        public Compose()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             ScrollableTimeline timeline;
             Children = new Drawable[]
@@ -75,14 +76,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             };
 
             timeline.Beatmap.BindTo(Beatmap);
-            Beatmap.ValueChanged += beatmapChanged;
-        }
 
-        private void beatmapChanged(WorkingBeatmap newBeatmap)
-        {
-            composerContainer.Clear();
-
-            var ruleset = newBeatmap.BeatmapInfo.Ruleset?.CreateInstance();
+            var ruleset = Beatmap.Value.BeatmapInfo.Ruleset?.CreateInstance();
             if (ruleset == null)
             {
                 Logger.Log("Beatmap doesn't have a ruleset assigned.");
