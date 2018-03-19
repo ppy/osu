@@ -20,7 +20,8 @@ namespace osu.Game.Tests.Visual
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(parent);
 
-        public TestCasePlaybackControl()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
             dependencies.CacheAs<IAdjustableClock>(clock);
@@ -35,7 +36,7 @@ namespace osu.Game.Tests.Visual
 
             playback.Beatmap.Value = new TestWorkingBeatmap(new Beatmap());
 
-            Add(playback);
+            Child = playback;
         }
     }
 }
