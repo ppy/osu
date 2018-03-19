@@ -32,31 +32,26 @@ namespace osu.Game.Rulesets.Edit
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
-        private IAdjustableClock sourceClock;
-        private DecoupleableInterpolatingFramedClock adjustableClock;
+        private IAdjustableClock adjustableClock;
 
         protected HitObjectComposer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
+
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        private void load(OsuGameBase osuGame, IAdjustableClock adjustableClock, IFrameBasedClock framedClock)
         {
+            this.adjustableClock = adjustableClock;
+
             beatmap.BindTo(osuGame.Beatmap);
 
             try
             {
                 rulesetContainer = CreateRulesetContainer(ruleset, beatmap.Value);
-
-                // TODO: should probably be done at a RulesetContainer level to share logic with Player.
-                sourceClock = (IAdjustableClock)beatmap.Value.Track ?? new StopwatchClock();
-                adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-                adjustableClock.ChangeSource(sourceClock);
-
-                rulesetContainer.Clock = adjustableClock;
-
+                rulesetContainer.Clock = framedClock;
             }
             catch (Exception e)
             {
