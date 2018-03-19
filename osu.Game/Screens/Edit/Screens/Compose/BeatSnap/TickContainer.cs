@@ -65,5 +65,28 @@ namespace osu.Game.Screens.Edit.Screens.Compose.BeatSnap
         private void updatePosition() => marker.X = getTickPosition(Array.IndexOf(availableDivisors, Divisor.Value));
 
         private float getTickPosition(int index) => (index + 1) * tickSpacing;
+
+        private class Tick : Box
+        {
+            private readonly int divisor;
+
+            public Tick(int divisor)
+            {
+                this.divisor = divisor;
+
+                Size = new Vector2(2, 10);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                if (divisor >= 16)
+                    Colour = colours.Red;
+                else if (divisor >= 8)
+                    Colour = colours.Yellow;
+                else
+                    Colour = colours.Gray4;
+            }
+        }
     }
 }
