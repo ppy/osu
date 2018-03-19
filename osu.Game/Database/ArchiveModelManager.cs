@@ -88,7 +88,8 @@ namespace osu.Game.Database
 
             List<TModel> imported = new List<TModel>();
 
-            int i = 0;
+            int success = 0;
+            int errors = 0;
             foreach (string path in paths)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)
@@ -97,11 +98,11 @@ namespace osu.Game.Database
 
                 try
                 {
-                    notification.Text = $"Importing ({i} of {paths.Length})\n{Path.GetFileName(path)}";
+                    notification.Text = $"Importing ({success} of {paths.Length})\n{Path.GetFileName(path)}";
                     using (ArchiveReader reader = getReaderFrom(path))
                         imported.Add(Import(reader));
 
-                    notification.Progress = (float)++i / paths.Length;
+                    notification.Progress = (float)++success / paths.Length;
 
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with items from default storage.
@@ -121,10 +122,11 @@ namespace osu.Game.Database
                 {
                     e = e.InnerException ?? e;
                     Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
+                    errors++;
                 }
             }
 
-            notification.State = ProgressNotificationState.Completed;
+            notification.State = errors == 0 ? ProgressNotificationState.Completed : ProgressNotificationState.Cancelled;
         }
 
         /// <summary>
