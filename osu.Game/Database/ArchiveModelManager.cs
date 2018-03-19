@@ -79,7 +79,6 @@ namespace osu.Game.Database
             var notification = new ProgressNotification
             {
                 Text = "Import is initialising...",
-                CompletionText = "Import successful!",
                 Progress = 0,
                 State = ProgressNotificationState.Active,
             };
@@ -88,7 +87,7 @@ namespace osu.Game.Database
 
             List<TModel> imported = new List<TModel>();
 
-            int success = 0;
+            int current = 0;
             int errors = 0;
             foreach (string path in paths)
             {
@@ -98,11 +97,11 @@ namespace osu.Game.Database
 
                 try
                 {
-                    notification.Text = $"Importing ({success} of {paths.Length})\n{Path.GetFileName(path)}";
+                    notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
                     using (ArchiveReader reader = getReaderFrom(path))
                         imported.Add(Import(reader));
 
-                    notification.Progress = (float)++success / paths.Length;
+                    notification.Progress = (float)(current - 1) / paths.Length;
 
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with items from default storage.
@@ -126,7 +125,8 @@ namespace osu.Game.Database
                 }
             }
 
-            notification.State = errors == 0 ? ProgressNotificationState.Completed : ProgressNotificationState.Cancelled;
+            notification.Text = errors > 0 ? $"Import complete with {errors} errors" : "Import successful!";
+            notification.State = ProgressNotificationState.Completed;
         }
 
         /// <summary>
@@ -333,7 +333,7 @@ namespace osu.Game.Database
         {
             if (ZipFile.IsZipFile(path))
                 return new ZipArchiveReader(Files.Storage.GetStream(path), Path.GetFileName(path));
-            return new LegacyFilesystemReader(path);
+                return new LegacyFilesystemReader(path);
         }
     }
 }
