@@ -26,10 +26,13 @@ namespace osu.Game.Skinning
             samples = audioManager.GetSampleManager(storage);
             textures = new TextureStore(new RawTextureLoaderStore(storage));
 
-            var decoder = new LegacySkinDecoder();
+            Stream stream = storage.GetStream("skin.ini");
 
-            using (StreamReader reader = new StreamReader(storage.GetStream("skin.ini")))
-                Configuration = decoder.Decode(reader);
+            if (stream != null)
+                using (StreamReader reader = new StreamReader(stream))
+                    Configuration = new LegacySkinDecoder().Decode(reader);
+            else
+                Configuration = new SkinConfiguration();
         }
 
         public override Drawable GetDrawableComponent(string componentName)
