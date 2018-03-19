@@ -51,7 +51,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         private SelectionBox currentSelectionBox;
 
-        public void AddSelectionOverlay() => AddInternal(currentSelectionBox = composer.CreateSelectionOverlay(overlayContainer));
+        public void AddSelectionOverlay()
+        {
+            if (overlayContainer.Count > 0)
+                AddInternal(currentSelectionBox = composer.CreateSelectionOverlay(overlayContainer));
+        }
 
         public void RemoveSelectionOverlay()
         {
