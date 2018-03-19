@@ -7,8 +7,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 {
     public class BindableBeatDivisor : Bindable<int>
     {
-        public BindableBeatDivisor()
-            : base(1)
+        public BindableBeatDivisor(int value = 1)
+            : base(value)
         {
         }
     }
