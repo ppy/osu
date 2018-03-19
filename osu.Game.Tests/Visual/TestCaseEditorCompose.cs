@@ -16,6 +16,7 @@ namespace osu.Game.Tests.Visual
     public class TestCaseEditorCompose : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Compose) };
+
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
