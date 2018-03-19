@@ -24,7 +24,8 @@ namespace osu.Game.Tests.Visual
             Child = new BeatSnapVisualiser
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
+                Y = -200
             };
         }
     }
