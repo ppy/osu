@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Screens.Edit.Screens.Compose.BeatSnap;
+using osu.Game.Screens.Edit.Screens.Compose;
 using OpenTK;
 
 namespace osu.Game.Tests.Visual
@@ -14,8 +14,7 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(BeatSnapVisualiser),
-            typeof(TickContainer)
+            typeof(BeatSnapVisualiser)
         };
 
         [BackgroundDependencyLoader]
