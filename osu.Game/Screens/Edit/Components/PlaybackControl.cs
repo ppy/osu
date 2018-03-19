@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -17,10 +18,15 @@ namespace osu.Game.Screens.Edit.Components
 {
     public class PlaybackControl : BottomBarContainer
     {
-        private readonly IconButton playButton;
+        private IconButton playButton;
 
-        public PlaybackControl()
+        private IAdjustableClock adjustableClock;
+
+        [BackgroundDependencyLoader]
+        private void load(IAdjustableClock adjustableClock)
         {
+            this.adjustableClock = adjustableClock;
+
             PlaybackTabControl tabs;
 
             Children = new Drawable[]
@@ -54,22 +60,22 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            tabs.Current.ValueChanged += newValue => Track.Tempo.Value = newValue;
+            tabs.Current.ValueChanged += newValue => Beatmap.Value.Track.Tempo.Value = newValue;
         }
 
         private void togglePause()
         {
-            if (Track.IsRunning)
-                Track.Stop();
+            if (adjustableClock.IsRunning)
+                adjustableClock.Stop();
             else
-                Track.Start();
+                adjustableClock.Start();
         }
 
         protected override void Update()
         {
             base.Update();
 
-            playButton.Icon = Track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
+            playButton.Icon = adjustableClock.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
         }
 
         private class PlaybackTabControl : OsuTabControl<double>
