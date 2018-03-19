@@ -40,7 +40,11 @@ namespace Symcol.Rulesets.Core.Multiplayer.Screens
         {
             Remove(LobbyItems);
             SymcolSettingsSubsection.RulesetMultiplayerSelection = new RulesetMultiplayerSelection();
-            SymcolMenu.RulesetMultiplayerScreen = SymcolSettingsSubsection.RulesetMultiplayerSelection;
+            try
+            {
+                SymcolMenu.RulesetMultiplayerScreen = SymcolSettingsSubsection.RulesetMultiplayerSelection;
+            }
+            catch { }
             return base.OnExiting(next);
         }
     }
