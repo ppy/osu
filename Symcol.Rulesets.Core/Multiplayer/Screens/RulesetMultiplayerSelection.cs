@@ -1,6 +1,6 @@
 ﻿//osu.Game.Screens.Symcol.SymcolMenu
 //Symcol.Rulesets.Core.SymcolSettingsSubsection
-//#define SymcolMods
+#define SymcolMods
 
 using OpenTK;
 using OpenTK.Graphics;
