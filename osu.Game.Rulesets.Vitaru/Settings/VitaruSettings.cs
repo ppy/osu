@@ -15,7 +15,6 @@ using Symcol.Rulesets.Core.Wiki;
 using osu.Game.Rulesets.Vitaru.Wiki;
 using osu.Game.Rulesets.Vitaru.Scoring;
 using osu.Game.Rulesets.Vitaru.Edit;
-using osu.Game.Screens.Symcol.Screens;
 using Symcol.Rulesets.Core.Multiplayer.Screens;
 
 namespace osu.Game.Rulesets.Vitaru.Settings
