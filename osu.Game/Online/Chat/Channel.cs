@@ -32,7 +32,7 @@ namespace osu.Game.Online.Chat
 
         public bool ReadOnly => false;
 
-        public const int MAX_HISTORY = 300;
+        public const int MAX_HISTORY = 600;
 
         [JsonConstructor]
         public Channel()

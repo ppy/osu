@@ -25,6 +25,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Overlays
 {
@@ -56,6 +57,7 @@ namespace osu.Game.Overlays
         private readonly Container chatContainer;
         private readonly Container tabsArea;
         private readonly Box chatBackground;
+        private readonly Triangles chatBackgroundTriangles;
         private readonly Box tabBackground;
 
         public Bindable<double> ChatHeight { get; set; }
@@ -109,6 +111,21 @@ namespace osu.Game.Overlays
                                 chatBackground = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Masking = true,
+                                    Children = new Drawable[]
+                                    {
+                                        chatBackgroundTriangles = new Triangles
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            ColourDark = OsuColour.FromHex(@"132226"),
+                                            ColourLight = OsuColour.FromHex(@"1f3b42"),
+                                            TriangleScale = 3,
+                                        }
+                                    }
                                 },
                                 currentChannelContainer = new Container<DrawableChannel>
                                 {

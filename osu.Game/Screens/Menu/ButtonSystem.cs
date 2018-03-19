@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Menu
         public Action OnSettings;
         public Action OnMulti;
         public Action OnChart;
+        public Action OnSymcol;
         public Action OnTest;
 
         private readonly FlowContainerWithOrigin buttonFlow;
@@ -120,6 +121,7 @@ namespace osu.Game.Screens.Menu
             buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
             buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.fa_users, new Color4(94, 63, 186, 255), () => OnMulti?.Invoke(), 0, Key.M));
             buttonsPlay.Add(new Button(@"chart", @"button-generic-select", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
+            buttonsPlay.Add(new Button(@"symcol", @"select-5", FontAwesome.fa_osu_gear, new Color4(70, 48, 146, 255), () => OnSymcol?.Invoke()));
 
             buttonsTopLevel.Add(new Button(@"play", @"button-play-select", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), onPlay, WEDGE_WIDTH, Key.P));
             buttonsTopLevel.Add(new Button(@"osu!editor", @"button-generic-select", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
