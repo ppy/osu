@@ -36,7 +36,7 @@ namespace osu.Game.Graphics
             switch (action)
             {
                 case GlobalAction.TakeScreenshot:
-                    TakeScreenshot();
+                    TakeScreenshotAsync();
                     return true;
             }
 
@@ -45,9 +45,9 @@ namespace osu.Game.Graphics
 
         public bool OnReleased(GlobalAction action) => false;
 
-        public void TakeScreenshot()
+        public async void TakeScreenshotAsync()
         {
-            host.TakeScreenshot(screenshotBitmap =>
+            using (var bitmap = await host.TakeScreenshotAsync())
             {
                 var fileName = getFileName();
                 var stream = storage.GetStream(fileName, FileAccess.Write);
@@ -55,17 +55,17 @@ namespace osu.Game.Graphics
                 switch (screenshotFormat.Value)
                 {
                     case ScreenshotFormat.Png:
-                        screenshotBitmap.Save(stream, ImageFormat.Png);
+                        bitmap.Save(stream, ImageFormat.Png);
                         break;
                     case ScreenshotFormat.Jpg:
-                        screenshotBitmap.Save(stream, ImageFormat.Jpeg);
+                        bitmap.Save(stream, ImageFormat.Jpeg);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(screenshotFormat));
                 }
 
                 notificationOverlay.Post(new SimpleNotification { Text = $"{fileName} saved" });
-            });
+            }
         }
 
         private string getFileName()
