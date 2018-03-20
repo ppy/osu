@@ -569,7 +569,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         }
 
         #region Spell Stuff
-
         private void spell(bool keyUp = false, VitaruAction action = VitaruAction.Spell)
         {
             if (Energy >= energyRequired && currentGameMode == VitaruGamemode.Touhosu && !keyUp || currentCharacter == Characters.AliceMuyart && currentGameMode == VitaruGamemode.Touhosu && !keyUp)
