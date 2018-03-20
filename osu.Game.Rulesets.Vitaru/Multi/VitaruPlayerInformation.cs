@@ -24,5 +24,7 @@ namespace osu.Game.Rulesets.Vitaru.Multi
         public Dictionary<VitaruAction, bool> Actions;
 
         public VitaruAction PressedAction;
+
+        public VitaruAction ReleasedAction;
     }
 }

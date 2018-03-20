@@ -561,7 +561,7 @@ namespace Symcol.Core.Networking
         }
 
         /// <summary>
-        /// Send tto all but the one that sent it
+        /// Send to all but the one that sent it
         /// </summary>
         /// <param name="packet"></param>
         /// <param name="playerID"></param>

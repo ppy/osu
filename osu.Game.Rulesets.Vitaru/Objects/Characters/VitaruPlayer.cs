@@ -1263,7 +1263,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                         DrawableBullet bullet = draw as DrawableBullet;
                         if (bullet.Bullet.Team != Team)
                         {
-                            Vector2 pos = bullet.ToSpaceOfOtherDrawable(Vector2.Zero, this) + new Vector2(6);
+                            Vector2 pos = bullet.ToSpaceOfOtherDrawable(Vector2.Zero, this) + new Vector2(bullet.Width / 2 + Hitbox.Width / 2);
                             float distance = (float)Math.Sqrt(Math.Pow(pos.X, 2) + Math.Pow(pos.Y, 2));
                             float edgeDistance = distance - (bullet.Width / 2 + Hitbox.Width / 2);
                             float angleToBullet = MathHelper.RadiansToDegrees((float)Math.Atan2((bullet.Position.Y - Position.Y), (bullet.Position.X - Position.X))) + 90 + Rotation;
@@ -1410,9 +1410,9 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 if (currentCharacter == Characters.AliceMuyart)
                 {
                     if (action == VitaruAction.Increase)
-                        SetRate = Math.Min((float)Math.Round(SetRate + 0.1f, 1), 1.5f);
+                        SetRate = Math.Min((float)Math.Round(SetRate + 0.1f, 1), 2f);
                     if (action == VitaruAction.Decrease)
-                        SetRate = Math.Max((float)Math.Round(SetRate - 0.1f, 1), -1f);
+                        SetRate = Math.Max((float)Math.Round(SetRate - 0.1f, 1), -2f);
                 }
                 else if (currentCharacter == Characters.SakuyaIzayoi)
                 {
@@ -1452,7 +1452,9 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     Actions[VitaruAction.Shoot] = true;
 
                 spell(false, action);
-                sendPacket();
+
+                if (!Puppet)
+                    sendPacket(action);
 
                 return true;
             }
@@ -1486,7 +1488,9 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 if (action == VitaruAction.Shoot)
                     Actions[VitaruAction.Shoot] = false;
                 spell(true, action);
-                sendPacket();
+
+                if (!Puppet)
+                    sendPacket(VitaruAction.None, action);
 
                 return true;
             }
@@ -1495,17 +1499,21 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         #endregion
 
         #region Networking
-        private void sendPacket()
+        private void sendPacket(VitaruAction pressedAction = VitaruAction.None, VitaruAction releasedAction = VitaruAction.None)
         {
             if (VitaruNetworkingClientHandler != null && !Puppet)
             {
                 VitaruPlayerInformation playerInformation = new VitaruPlayerInformation
                 {
                     Character = currentCharacter,
+                    MouseX = cursor.Position.X,
+                    MouseY = cursor.Position.Y,
                     PlayerX = Position.X,
                     PlayerY = Position.Y,
                     PlayerID = PlayerID,
                     Actions = Actions,
+                    PressedAction = pressedAction,
+                    ReleasedAction = releasedAction,
                     ClockSpeed = currentRate
                 };
 
@@ -1531,8 +1539,15 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
                 if (packet.PlayerInformation.PlayerID == PlayerID && Puppet)
                 {
-                    Actions = packet.PlayerInformation.Actions;
                     Position = new Vector2(packet.PlayerInformation.PlayerX, packet.PlayerInformation.PlayerY);
+                    cursor.Position = new Vector2(packet.PlayerInformation.MouseX, packet.PlayerInformation.MouseY);
+
+                    if (packet.PlayerInformation.PressedAction != VitaruAction.None)
+                        OnPressed(packet.PlayerInformation.PressedAction);
+                    if (packet.PlayerInformation.ReleasedAction != VitaruAction.None)
+                        OnPressed(packet.PlayerInformation.ReleasedAction);
+
+                    Actions = packet.PlayerInformation.Actions;
                 }
 
                 VitaruNetworkingClientHandler.ShareWithOtherPeers(packet);
