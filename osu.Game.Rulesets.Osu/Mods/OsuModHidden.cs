@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1.06;
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
-        private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>(false);
+        private Bindable<bool> increaseFirstObjectVisibility;
 
         public void ReadFromConfig(OsuConfigManager config)
         {
@@ -30,10 +30,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
+            //In the Tests for hidden the ReadFromConfig() void isn't called -> the following bindable is null
+            //It's too much work to get the Dependency Injection on the Tests to get the config for just this mod, so I just make sure
+            //the bindable isn't null
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
                 //Don't hide the first object ("drawables" are in a reverse order -> Last() )
-                if (d == drawables.Last() && increaseFirstObjectVisibility) continue;
+                if (d == drawables.Last() && (increaseFirstObjectVisibility == null || increaseFirstObjectVisibility)) continue;
                 d.ApplyCustomUpdateState += ApplyHiddenState;
 
                 d.HitObject.TimeFadein = d.HitObject.TimePreempt * fade_in_duration_multiplier;
