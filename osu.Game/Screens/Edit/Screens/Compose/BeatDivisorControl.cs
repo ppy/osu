@@ -5,10 +5,12 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
@@ -181,7 +183,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 set => base.Padding = value;
             }
 
-            private Drawable marker;
+            private Marker marker;
 
             private readonly int[] availableDivisors;
 
@@ -193,8 +195,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = marker = new Marker();
-
                 foreach (var t in availableDivisors)
                 {
                     AddInternal(new Tick(t)
@@ -206,23 +206,69 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     });
                 }
 
-                CurrentNumber.ValueChanged += v => marker.MoveToX(getTickPosition(v), 100, Easing.OutQuint);
+                AddInternal(marker = new Marker());
+
+                CurrentNumber.ValueChanged += v =>
+                {
+                    marker.MoveToX(getTickPosition(v), 100, Easing.OutQuint);
+                    marker.Flash();
+                };
             }
 
             protected override void UpdateValue(float value)
             {
             }
 
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            {
+                marker.Active = true;
+                return base.OnMouseDown(state, args);
+            }
+
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            {
+                marker.Active = false;
+                return base.OnMouseUp(state, args);
+            }
+
+            protected override bool OnClick(InputState state)
+            {
+                handleMouseInput(state);
+                return true;
+            }
+
+            protected override bool OnDrag(InputState state)
+            {
+                handleMouseInput(state);
+                return true;
+            }
+
+            private void handleMouseInput(InputState state)
+            {
+                // copied from SliderBar so we can do custom spacing logic.
+                var xPosition = ToLocalSpace(state?.Mouse.NativeState.Position ?? Vector2.Zero).X - RangePadding;
+
+                if (!CurrentNumber.Disabled)
+                    CurrentNumber.SetProportional(xPosition / UsableWidth, state != null && state.Keyboard.ShiftPressed ? KeyboardStep : 0);
+
+                OnUserChange();
+            }
+
             private float getTickPosition(float divisor) => (divisor - 1) / availableDivisors.Last();
 
-            private class Tick : Box
+            private class Tick : CompositeDrawable
             {
                 private readonly int divisor;
 
                 public Tick(int divisor)
                 {
                     this.divisor = divisor;
-                    Size = new Vector2(2, 10);
+                    Size = new Vector2(2.5f, 10);
+
+                    InternalChild = new Box { RelativeSizeAxes = Axes.Both };
+
+                    CornerRadius = 0.5f;
+                    Masking = true;
                 }
 
                 [BackgroundDependencyLoader]
@@ -233,18 +279,20 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     else if (divisor >= 8)
                         Colour = colours.Yellow;
                     else
-                        Colour = colours.Gray4;
+                        Colour = OsuColour.Gray(2f / divisor);
                 }
             }
 
             private class Marker : CompositeDrawable
             {
+                private Color4 defaultColour;
+
                 private const float size = 7;
 
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
-                    Colour = colours.Gray4;
+                    Colour = defaultColour = colours.Gray4;
                     Anchor = Anchor.TopLeft;
                     Origin = Anchor.TopCentre;
 
@@ -252,16 +300,16 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     RelativeSizeAxes = Axes.Y;
                     RelativePositionAxes = Axes.X;
 
-
                     InternalChildren = new Drawable[]
                     {
                         new Box
                         {
-                            Width = 1,
+                            Width = 2,
                             RelativeSizeAxes = Axes.Y,
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.BottomCentre,
-                            Colour = Color4.White,
+                            Colour = ColourInfo.GradientVertical(Color4.Transparent, Color4.White),
+                            Blending = BlendingMode.Additive,
                         },
                         new EquilateralTriangle
                         {
@@ -272,6 +320,30 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                             Colour = Color4.White,
                         }
                     };
+                }
+
+                private bool active;
+
+                public bool Active
+                {
+                    get => active;
+                    set
+                    {
+                        this.FadeColour(value ? Color4.White : defaultColour, 500, Easing.OutQuint);
+                        active = value;
+                    }
+                }
+
+                public void Flash()
+                {
+                    bool wasActive = active;
+
+                    Active = true;
+
+                    if (wasActive) return;
+
+                    using (BeginDelayedSequence(50))
+                        Active = false;
                 }
             }
         }
