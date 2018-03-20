@@ -25,26 +25,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             get { return base.Value; }
             set
             {
-                int snapped = 1;
+                if (!VALID_DIVISORS.Contains(value))
+                    throw new ArgumentOutOfRangeException($"Provided divisor is not in {nameof(VALID_DIVISORS)}");
 
-                for (int i = 1; i < VALID_DIVISORS.Length; i++)
-                {
-                    var curr = VALID_DIVISORS[i];
-                    var prev = VALID_DIVISORS[i - 1];
-                    if (value < prev + (curr - prev) / 2f)
-                    {
-                        snapped = prev;
-                        break;
-                    }
-
-                    snapped = curr;
-                }
-
-                if (snapped == Value)
-                    // it may be that we are already at the snapped value, but we want bound components to still be made aware that we possibly modified an incoming ValueChanged.
-                    TriggerValueChange();
-                else
-                    base.Value = snapped;
+                base.Value = value;
             }
         }
 

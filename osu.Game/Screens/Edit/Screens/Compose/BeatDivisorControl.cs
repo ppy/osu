@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
 {
@@ -24,8 +25,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
     {
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
         private int currentDivisorIndex;
-        private TickSliderBar slider;
-
         public BeatDivisorControl(BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor.BindTo(beatDivisor);
@@ -52,10 +51,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     {
                         new Drawable[]
                         {
-                            slider = new TickSliderBar(beatDivisor, 1, 2, 3, 4, 6, 8, 12, 16)
+                            new TickSliderBar(beatDivisor, 1, 2, 3, 4, 6, 8, 12, 16)
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Horizontal = 5 }
                             }
                         },
                         new Drawable[]
@@ -122,8 +120,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     }
                 }
             };
-
-            slider.Current.BindTo(beatDivisor);
         }
 
         private class DivisorText : SpriteText
@@ -180,18 +176,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 
         private class TickSliderBar : SliderBar<int>
         {
-            public new MarginPadding Padding
-            {
-                set => base.Padding = value;
-            }
-
             private Marker marker;
 
+            private readonly BindableBeatDivisor beatDivisor;
             private readonly int[] availableDivisors;
 
-            public TickSliderBar(params int[] divisors)
+            public TickSliderBar(BindableBeatDivisor beatDivisor, params int[] divisors)
             {
+                CurrentNumber.BindTo(this.beatDivisor = beatDivisor);
                 availableDivisors = divisors;
+
+                Padding = new MarginPadding { Horizontal = 5 };
             }
 
             [BackgroundDependencyLoader]
@@ -204,7 +199,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
-                        X = getTickPosition(t)
+                        X = getMappedPosition(t)
                     });
                 }
 
@@ -212,16 +207,33 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 
                 CurrentNumber.ValueChanged += v =>
                 {
-                    marker.MoveToX(getTickPosition(v), 100, Easing.OutQuint);
+                    marker.MoveToX(getMappedPosition(v), 100, Easing.OutQuint);
                     marker.Flash();
-
-                    KeyboardStep = v / 3f;
                 };
             }
 
             protected override void UpdateValue(float value)
             {
+            }
 
+            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+            {
+                if (!IsHovered || CurrentNumber.Disabled)
+                    return false;
+
+                switch (args.Key)
+                {
+                    case Key.Right:
+                        beatDivisor.Next();
+                        OnUserChange();
+                        return true;
+                    case Key.Left:
+                        beatDivisor.Previous();
+                        OnUserChange();
+                        return true;
+                    default:
+                        return false;
+                }
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -251,16 +263,13 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             private void handleMouseInput(InputState state)
             {
                 // copied from SliderBar so we can do custom spacing logic.
-                var xPosition = ToLocalSpace(state?.Mouse.NativeState.Position ?? Vector2.Zero).X - RangePadding;
+                var xPosition = (ToLocalSpace(state?.Mouse.NativeState.Position ?? Vector2.Zero).X - RangePadding) / UsableWidth;
 
-                if (!CurrentNumber.Disabled)
-                    CurrentNumber.SetProportional(xPosition / UsableWidth, state != null && state.Keyboard.ShiftPressed ? KeyboardStep : 0);
-
+                CurrentNumber.Value = availableDivisors.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
                 OnUserChange();
             }
 
-            private float getTickPosition(float divisor) => (float)Math.Pow((divisor - 1) / availableDivisors.Last(), 0.90f);
-
+            private float getMappedPosition(float divisor) => (float)Math.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
 
             private class Tick : CompositeDrawable
             {
@@ -291,7 +300,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     else
                         colour = Color4.White;
 
-s                    Colour = colour.Opacity((float)Math.Pow(0.98f, divisor * 1.2f));
+                    Colour = colour.Opacity((float)Math.Pow(0.98f, divisor * 1.2f));
                 }
             }
 
