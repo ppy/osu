@@ -1,9 +1,11 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -219,6 +221,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 
             protected override void UpdateValue(float value)
             {
+
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -256,7 +259,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 OnUserChange();
             }
 
-            private float getTickPosition(float divisor) => (divisor - 1) / availableDivisors.Last();
+            private float getTickPosition(float divisor) => (float)Math.Pow((divisor - 1) / availableDivisors.Last(), 0.90f);
+
 
             private class Tick : CompositeDrawable
             {
@@ -276,12 +280,18 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
+                    Color4 colour;
+
                     if (divisor >= 16)
-                        Colour = colours.Red;
-                    else if (divisor >= 8)
-                        Colour = colours.Yellow;
+                        colour = colours.Red;
+                    else if (divisor >= 12)
+                        colour = colours.YellowDarker;
+                    else if (divisor % 3 == 0)
+                        colour = colours.Yellow;
                     else
-                        Colour = OsuColour.Gray(2f / divisor);
+                        colour = Color4.White;
+
+s                    Colour = colour.Opacity((float)Math.Pow(0.98f, divisor * 1.2f));
                 }
             }
 
