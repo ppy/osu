@@ -10,14 +10,14 @@ using OpenTK;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseDrawableBeatDivisor : OsuTestCase
+    public class TestCaseBeatDivisorControl : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(BindableBeatDivisor) };
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new DrawableBeatDivisor(new BindableBeatDivisor())
+            Child = new BeatDivisorControl(new BindableBeatDivisor())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
