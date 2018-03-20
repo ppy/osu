@@ -10,17 +10,10 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseDrawableBeatDivisor : OsuTestCase
     {
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(parent);
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            dependencies.Cache(new BindableBeatDivisor());
-
-            Child = new DrawableBeatDivisor
+            Child = new DrawableBeatDivisor(new BindableBeatDivisor())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
