@@ -965,10 +965,15 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     if (currentRate > originalRate)
                         currentRate = originalRate;
                     applyToClock(workingBeatmap.Value.Track, currentRate);
-                    if (timeFreezeEndTime - 500 <= Time.Current)
+                    if (currentRate > 0 && timeFreezeEndTime - 500 <= Time.Current)
                     {
                         currentRate = originalRate;
                         applyToClock(workingBeatmap.Value.Track, currentRate);
+                    }
+                    else if (currentRate < 0 && timeFreezeEndTime + 500 >= Time.Current)
+                    {
+                            currentRate = originalRate;
+                            applyToClock(workingBeatmap.Value.Track, currentRate);
                     }
                 }
                 else
@@ -980,7 +985,12 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                         energyDrainMultiplier = currentRate - 1;
 
                     Energy -= (float)Clock.ElapsedFrameTime / 1000 * (1 / currentRate) * energyRequiredPerSecond * energyDrainMultiplier;
-                    timeFreezeEndTime = Time.Current + 2000;
+
+                    if (currentRate > 0)
+                        timeFreezeEndTime = Time.Current + 2000;
+                    else
+                        timeFreezeEndTime = Time.Current - 2000;
+
                     currentRate = originalRate * SetRate;
                     applyToClock(workingBeatmap.Value.Track, currentRate);
                 }
@@ -1083,8 +1093,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
         private void applyToClock(IAdjustableClock clock, float speed)
         {
-            var pitchAdjust = clock as IHasPitchAdjust;
-            if (pitchAdjust != null)
+            if (clock is IHasPitchAdjust pitchAdjust)
                 pitchAdjust.PitchAdjust = speed;
             SpeedMultiplier = 1 / speed;
             foreach (Drawable draw in Parent)
@@ -1378,16 +1387,16 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 if (currentCharacter == Characters.AliceMuyart)
                 {
                     if (action == VitaruAction.Increase)
-                        SetRate = Math.Min(SetRate + 0.1f, 1.5f);
+                        SetRate = Math.Min((float)Math.Round(SetRate + 0.1f, 1), 1.5f);
                     if (action == VitaruAction.Decrease)
-                        SetRate = Math.Max(SetRate - 0.1f, 0.1f);
+                        SetRate = Math.Max((float)Math.Round(SetRate - 0.1f, 1), -1f);
                 }
                 else if (currentCharacter == Characters.SakuyaIzayoi)
                 {
                     if (action == VitaruAction.Increase)
-                        SetRate = Math.Min(SetRate + 0.2f, 0.8f);
+                        SetRate = Math.Min((float)Math.Round(SetRate + 0.2f, 1), 0.8f);
                     if (action == VitaruAction.Decrease)
-                        SetRate = Math.Max(SetRate - 0.2f, 0.2f);
+                        SetRate = Math.Max((float)Math.Round(SetRate - 0.2f, 1), 0.2f);
                 }
 
                 if (action == VitaruAction.Up)
