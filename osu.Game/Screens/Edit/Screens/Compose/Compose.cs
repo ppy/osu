@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                                         Padding = new MarginPadding { Right = 5 },
                                                         Child = timeline = new ScrollableTimeline { RelativeSizeAxes = Axes.Both }
                                                     },
-                                                    new DrawableBeatDivisor { RelativeSizeAxes = Axes.Both }
+                                                    new DrawableBeatDivisor(beatDivisor) { RelativeSizeAxes = Axes.Both }
                                                 },
                                             },
                                             ColumnDimensions = new[]
