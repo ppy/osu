@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Tests.Beatmaps;
 
@@ -69,7 +68,6 @@ namespace osu.Game.Tests.Visual
             var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
             dependencies.CacheAs<IAdjustableClock>(clock);
             dependencies.CacheAs<IFrameBasedClock>(clock);
-            dependencies.Cache(new BindableBeatDivisor());
 
             Child = new OsuHitObjectComposer(new OsuRuleset());
         }
