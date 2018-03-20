@@ -333,7 +333,7 @@ namespace osu.Game.Database
         {
             if (ZipFile.IsZipFile(path))
                 return new ZipArchiveReader(Files.Storage.GetStream(path), Path.GetFileName(path));
-                return new LegacyFilesystemReader(path);
+            return new LegacyFilesystemReader(path);
         }
     }
 }
