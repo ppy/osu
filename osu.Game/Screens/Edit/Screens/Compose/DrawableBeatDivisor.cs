@@ -1,13 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
@@ -17,10 +18,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 {
     public class DrawableBeatDivisor : CompositeDrawable
     {
-        private static readonly int[] available_divisors = { 1, 2, 3, 4, 6, 8, 12, 16 };
-
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
         private int currentDivisorIndex;
+        private TickSliderBar slider;
 
         public DrawableBeatDivisor(BindableBeatDivisor beatDivisor)
         {
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     {
                         new Drawable[]
                         {
-                            new TickContainer(beatDivisor, 1, 2, 3, 4, 6, 8, 12, 16)
+                            slider = new TickSliderBar(beatDivisor, 1, 2, 3, 4, 6, 8, 12, 16)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Horizontal = 5 }
@@ -80,13 +80,13 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.fa_chevron_left,
-                                                        Action = selectPrevious
+                                                        Action = beatDivisor.Previous
                                                     },
                                                     new DivisorText(beatDivisor),
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.fa_chevron_right,
-                                                        Action = selectNext
+                                                        Action = beatDivisor.Next
                                                     }
                                                 },
                                                 new Drawable[]
@@ -118,20 +118,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     }
                 }
             };
-        }
 
-        private void selectPrevious()
-        {
-            if (currentDivisorIndex == 0)
-                return;
-            beatDivisor.Value = available_divisors[--currentDivisorIndex];
-        }
-
-        private void selectNext()
-        {
-            if (currentDivisorIndex == available_divisors.Length - 1)
-                return;
-            beatDivisor.Value = available_divisors[++currentDivisorIndex];
+            slider.Current.BindTo(beatDivisor);
         }
 
         private class DivisorText : SpriteText
@@ -186,61 +174,46 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             }
         }
 
-        private class TickContainer : CompositeDrawable
+        private class TickSliderBar : SliderBar<int>
         {
-            private readonly Bindable<int> beatDivisor = new Bindable<int>();
+            public new MarginPadding Padding
+            {
+                set => base.Padding = value;
+            }
 
-            public new MarginPadding Padding { set => base.Padding = value; }
-
-            private EquilateralTriangle marker;
+            private Drawable marker;
 
             private readonly int[] availableDivisors;
-            private readonly float tickSpacing;
 
-            public TickContainer(BindableBeatDivisor beatDivisor, params int[] divisors)
+            public TickSliderBar(params int[] divisors)
             {
-                this.beatDivisor.BindTo(beatDivisor);
-
                 availableDivisors = divisors;
-                tickSpacing = 1f / (availableDivisors.Length + 1);
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
-                InternalChild = marker = new EquilateralTriangle
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomCentre,
-                    RelativePositionAxes = Axes.X,
-                    Height = 7,
-                    EdgeSmoothness = new Vector2(1),
-                    Colour = colours.Gray4,
-                };
+                InternalChild = marker = new Marker();
 
-                for (int i = 0; i < availableDivisors.Length; i++)
+                foreach (var t in availableDivisors)
                 {
-                    AddInternal(new Tick(availableDivisors[i])
+                    AddInternal(new Tick(t)
                     {
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
-                        X = getTickPosition(i)
+                        X = getTickPosition(t)
                     });
                 }
+
+                CurrentNumber.ValueChanged += v => marker.MoveToX(getTickPosition(v), 100, Easing.OutQuint);
             }
 
-            protected override void LoadComplete()
+            protected override void UpdateValue(float value)
             {
-                base.LoadComplete();
-
-                beatDivisor.ValueChanged += v => updatePosition();
-                updatePosition();
             }
 
-            private void updatePosition() => marker.MoveToX(getTickPosition(Array.IndexOf(availableDivisors, beatDivisor.Value)), 100, Easing.OutQuint);
-
-            private float getTickPosition(int index) => (index + 1) * tickSpacing;
+            private float getTickPosition(float divisor) => (divisor - 1) / availableDivisors.Last();
 
             private class Tick : Box
             {
@@ -249,7 +222,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 public Tick(int divisor)
                 {
                     this.divisor = divisor;
-
                     Size = new Vector2(2, 10);
                 }
 
@@ -262,6 +234,44 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                         Colour = colours.Yellow;
                     else
                         Colour = colours.Gray4;
+                }
+            }
+
+            private class Marker : CompositeDrawable
+            {
+                private const float size = 7;
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    Colour = colours.Gray4;
+                    Anchor = Anchor.TopLeft;
+                    Origin = Anchor.TopCentre;
+
+                    Width = size;
+                    RelativeSizeAxes = Axes.Y;
+                    RelativePositionAxes = Axes.X;
+
+
+                    InternalChildren = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Width = 1,
+                            RelativeSizeAxes = Axes.Y,
+                            Origin = Anchor.BottomCentre,
+                            Anchor = Anchor.BottomCentre,
+                            Colour = Color4.White,
+                        },
+                        new EquilateralTriangle
+                        {
+                            Origin = Anchor.BottomCentre,
+                            Anchor = Anchor.BottomCentre,
+                            Height = size,
+                            EdgeSmoothness = new Vector2(1),
+                            Colour = Color4.White,
+                        }
+                    };
                 }
             }
         }
