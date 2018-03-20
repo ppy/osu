@@ -110,6 +110,7 @@ namespace osu.Game.Rulesets.Vitaru.Settings
         Awoken,
         Sacred,
         Resurrected,
+        Bonded,
         Revenge,
 
         HostIP,

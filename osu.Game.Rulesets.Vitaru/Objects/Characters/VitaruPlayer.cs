@@ -65,6 +65,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
         private readonly Container cursor;
 
+        //List of all players loaded
         private readonly static List<VitaruPlayer> playerList = new List<VitaruPlayer>();
 
         private readonly Bindable<WorkingBeatmap> workingBeatmap = new Bindable<WorkingBeatmap>();
@@ -81,7 +82,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         private UFO ufoHealth;
         private UFO ufoEnergy;
         private UFO ufoDamage;
-        private readonly float originalMaxHealth;
+        private float originalMaxHealth;
 
         private bool riftActive;
         private Rift riftStart;
@@ -301,6 +302,12 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 221777 && currentCharacter == Characters.HongMeiling)
+            {
+                MaxHealth = 120;
+                originalMaxHealth = MaxHealth;
+            }
 
             if (VitaruNetworkingClientHandler != null)
                 VitaruNetworkingClientHandler.OnPacketReceive += (p) => packetReceived(p);
@@ -1577,6 +1584,9 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         private readonly Bindable<bool> resurrected = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Resurrected);
         private int resurrection;
 
+        private readonly Bindable<bool> bonded = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Bonded);
+        private int bond;
+
         public void Speak(string text)
         {
             textContainer.FadeTo(0.5f, 200);
@@ -1597,7 +1607,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             if (Time.Current > startSpeaking + lengthOfSpeaking)
                 textContainer.FadeOut(200);
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 1371893 && currentCharacter == Characters.ReimuHakurei && !familiar)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 1371893 && currentCharacter == Characters.ReimuHakurei && !familiar && playerList.Count == 1)
             {
                 if (Time.Current >= 5200 && familiarity == 0)
                 {
@@ -1652,7 +1662,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
 
-            if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 1548917 && currentCharacter == Characters.KokoroHatano && !lastDance)
+            if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 1548917 && currentCharacter == Characters.KokoroHatano && !lastDance && playerList.Count == 1)
             {
                 if (Time.Current >= 1430 && dance == 0)
                 {
@@ -1672,7 +1682,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && insane)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && insane && playerList.Count == 1)
             {
                 if (Time.Current >= 760 && insanity == 0)
                 {
@@ -1692,7 +1702,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && !insane)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && !insane && playerList.Count == 1)
             {
                 if (Time.Current >= 760 && insanity == 0)
                 {
@@ -1701,7 +1711,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
             /*
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.RemiliaScarlet && !insane)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.RemiliaScarlet && !insane && playerList.Count == 2)
             {
                 if (Time.Current >= 760 && awakening == 0)
                 {
@@ -1751,37 +1761,56 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             }
             */
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 148000 && currentCharacter == Characters.Kaguya)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 148000 && playerList.Count == 2)
             {
-                if (Time.Current >= 1280 && tresspassing == 0)
+                if (currentCharacter == Characters.Kaguya)
                 {
-                    Speak("What a lovely night it is for a walk.");
-                    tresspassing++;
+                    if (Time.Current >= 1280 && tresspassing == 0)
+                    {
+                        Speak("What a lovely night it is for a walk.");
+                        tresspassing++;
+                    }
+                    if (Time.Current >= 20860 && tresspassing == 1)
+                    {
+                        Speak("Oh?");
+                        tresspassing++;
+                    }
+                    if (Time.Current >= 22120 && tresspassing == 2)
+                    {
+                        Speak("Someone has been here already. . .");
+                        tresspassing++;
+                    }
+                    if (Time.Current >= 37280 && tresspassing == 3)
+                    {
+                        Speak("Thats them over there.");
+                        tresspassing++;
+                    }
+                    if (Time.Current >= 41060 && tresspassing == 4)
+                    {
+                        Speak("Whaaa-");
+                        tresspassing++;
+                    }
+                    if (Time.Current >= 82740 && tresspassing == 5)
+                    {
+                        Speak("Why are we fighting? What did I do to you?");
+                        tresspassing++;
+                    }
                 }
-                if (Time.Current >= 20860 && tresspassing == 1)
+            }
+
+            if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 221777 && playerList.Count == 2)
+            {
+                if (currentCharacter == Characters.HongMeiling)
                 {
-                    Speak("Oh?");
-                    tresspassing++;
+                    if (Time.Current >= 0 && bond == 0)
+                    {
+                        Speak("");
+                        bond++;
+                    }
                 }
-                if (Time.Current >= 22120 && tresspassing == 2)
+                else if (currentCharacter == Characters.SakuyaIzayoi)
                 {
-                    Speak("Someone has been here already. . .");
-                    tresspassing++;
-                }
-                if (Time.Current >= 37280 && tresspassing == 3)
-                {
-                    Speak("Thats them over there.");
-                    tresspassing++;
-                }
-                if (Time.Current >= 41060 && tresspassing == 4)
-                {
-                    Speak("Whaaa-");
-                    tresspassing++;
-                }
-                if (Time.Current >= 82740 && tresspassing == 5)
-                {
-                    Speak("Why are we fighting? What did I do to you?");
-                    tresspassing++;
+
                 }
             }
         }
