@@ -184,8 +184,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                 "(however I am sure that some parts of Touhosu slip into them at this stage in the ruleset's development). " +
                 "In Touhosu however, this will change a number of stats listed below. " +
                 "I also listed their " +
-                "difficulty to play (Easy, Normal, Hard, Insane, Another, Extra), " +
-                "tier rating (F [In need of a buff], D, C, B, A, S, SS, Silver S, Silver SS) " +
+                "difficulty to play (Easy, Normal, Hard, Insane, Another, Extra) " +
                 "and their Role in a multiplayer setting (Offense, Defense, Support). " +
                 "Most of it is subjective but ¯\\_(ツ)_/¯"));
             Content.Add(characterDescription = new WikiOptionEnumExplanation<Characters>(selectedCharacter));
@@ -205,7 +204,6 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 40" +
                         "\nRole: Defense + Support" +
                         "\nDifficulty: Easy" +
-                        "\nTier: C" +
                         "\nSpell (40 energy): Refresh\n\n" +
                         "";
                         break;
@@ -215,8 +213,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 30" +
                         "\nRole: Offense" +
                         "\nDifficulty: Easy" +
-                        "\nTier: B" +
-                        "\nSpell (10 energy): Totem-Seal (Not Implemented)\n\n" +
+                        "\nSpell (10 energy): Rune-Seal (Not Implemented)\n\n" +
                         "Reimu used to be a complete air head. " +
                         "But time and hardship has shaped her into the strong cunning magician she is today. " +
                         "Usually you would be hard-pressed to not only get the jump on her but even find her before she finds you. " +
@@ -230,7 +227,6 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 30" +
                         "\nRole: Offense" +
                         "\nDifficulty: Easy" +
-                        "\nTier: B" +
                         "\nSpell (10 energy): Mini-Hakkero (WIP)\n\n" +
                         "Marisa Kirisame, the magical witch of the forest who could do no wrong, or so they said. " +
                         "One thing that is certain is her lust for control, she never lets the situation get out of hand. " +
@@ -241,7 +237,6 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 36" +
                         "\nRole: Defense" +
                         "\nDifficulty: Normal" +
-                        "\nTier: A" +
                         "\nSpell (6 energy, 3 per second): Time-Warden\n\n" +
                         "Young Sakuya used to be kind and caring for all, like the ones who raised her. " +
                         "But even the purest of hearts can be broken given the right circumstances, corrupted by the dark things that lurk in the night. " +
@@ -253,7 +248,6 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 36" +
                         "\nRole: Defense" +
                         "\nDifficulty: Time Freeze" +
-                        "\nTier: A" +
                         "\nAbility (passive): Leader (WIP)\n\n" +
                         "Hong was your typical war hero. She fought valiantly, saved allies, showed no mercy against the enemy. " +
                         "She didn't really care for all the medals or attention though, now that the war was over she just wanted to retire to her mansion.\n\n" +
@@ -295,7 +289,6 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 80" +
                         "\nRole: Offense" +
                         "\nDifficulty: Easy" +
-                        "\nTier: D" +
                         "\nSpell (40 energy): Taboo\n\n" +
                         "Flandre used to be one of the most feared fairies around, and thats no small feat. " +
                         "Fairies are have a tendency to be stupid, but Flandre wasn't always a Fairy now was she?\n\n" +
@@ -307,7 +300,6 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 60" +
                         "\nRole: Offense" +
                         "\nDifficulty: Normal" +
-                        "\nTier: C" +
                         "\nAbility (passive / 0.5 health per hit): Vampuric\n\n" +
                         "Remilia wasn't always a vampire, she didn't always have a thirst for blood. " +
                         "But things change, something happened one day and she was 'ascended' she keeps telling herself with her sister. " +
@@ -323,15 +315,21 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 40" +
                         "\nRole: Defense" +
                         "\nDifficulty: Easy" +
-                        "\nTier: F?" +
                         "\nAbility (40 energy): Shatter";
+                        break;
+                    case Characters.YuyukoSaigyouji:
+                        characterDescription.Description.Text = "\nMax Health: 100" +
+                        "\nMax Energy: 20" +
+                        "\nRole: Defense" +
+                        "\nDifficulty: Hard" +
+                        "\nSpell (4 energy, 2 per second): Ghastly Dream"; /*\n\n" +
+                        "";*/
                         break;
                     case Characters.YukariYakumo:
                         characterDescription.Description.Text = "\nMax Health: 80" +
                         "\nMax Energy: 24" +
                         "\nRole: Support" +
                         "\nDifficulty: Another" +
-                        "\nTier: B" +
                         "\nAbility (4 energy, 4 per second): Rift (Buggy?)"; /*\n\n" +
                         "There are many stories about Yukari, some say she was born of the stone people to the far west and some say she predates the known universe itself. " +
                         "While that would explain her unatural abilities in combat they would not explain her affection toward others. " +
@@ -342,17 +340,15 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 36" +
                         "\nRole: Offense + Defense" +
                         "\nDifficulty: Extra" +
-                        "\nTier: Silver SS" +
                         "\nAbility (passive): Last Dance (Buggy?)\n\n" +
                         "";
                         break;
                     case Characters.Kaguya:
-                        characterDescription.Description.Text = "\nMax Health: 100" +
-                        "\nMax Energy: 20" +
-                        "\nRole: Defense" +
+                        characterDescription.Description.Text = "\nMax Health: 80" +
+                        "\nMax Energy: 36" +
+                        "\nRole: Support" +
                         "\nDifficulty: Hard" +
-                        "\nTier: S" +
-                        "\nSpell (4 energy, 2 per second): Ghost\n\n" +
+                        "\nSpell (4 energy): Lunar Shift (Not Implemented)\n\n" +
                         "";
                         break;
                     case Characters.IbarakiKasen:
@@ -360,8 +356,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 8" +
                         "\nRole: Offense" +
                         "\nDifficulty: Insane" +
-                        "\nTier: SS" +
-                        "\nSpell (2 energy): Blink\n\n" +
+                        "\nSpell (2 energy): Blink (Pending New Spell)\n\n" +
                         "";
                         break;
                     case Characters.NueHoujuu:
@@ -369,7 +364,6 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 24" +
                         "\nRole: Support" +
                         "\nDifficulty: Another" +
-                        "\nTier: S" +
                         "\nSpell (Ratio [energy:damage/energy/health] - 1:4/2/1): Invasion (WIP)";
                         break;
                     case Characters.AliceMuyart:
@@ -383,7 +377,6 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 200 (x2 Gain)" +
                         "\nRole: Offense" +
                         "\nDifficulty: Hard" +
-                        "\nTier: Silver SS" +
                         "\nSpell: UnNatural\n\n" +
                         "\"The cold hand of death will find you all.\"";
                         break;
@@ -398,7 +391,6 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 80" +
                         "\nRole: Defense" +
                         "\nDifficulty: ???" +
-                        "\nTier: Silver SS" +
                         "\nSpell: Seasonal Shift\n\n" +
                         "\"Don't tamper with natural law they said. . .\"";
                         break;

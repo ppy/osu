@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         private float currentRate = 1;
         private bool timeFreezeActive;
         private bool tabooActive;
-        private bool ghostActive;
+        private bool ghastlytActive;
         private bool shattered;
         private readonly float energyRequired = 50;
         private readonly float energyRequiredPerSecond;
@@ -215,6 +215,9 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     break;
                 case Characters.YuyukoSaigyouji:
                     CharacterColor = Color4.LightBlue;
+                    maxEnergy = 24;
+                    energyRequired = 2;
+                    energyRequiredPerSecond = 2;
                     break;
                 case Characters.YukariYakumo:
                     CharacterColor = Color4.DarkViolet;
@@ -234,9 +237,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 case Characters.Kaguya:
                     CharacterColor = Color4.DarkRed;
                     CharacterName = "kaguya";
-                    maxEnergy = 24;
-                    energyRequired = 2;
-                    energyRequiredPerSecond = 2;
                     break;
                 case Characters.IbarakiKasen:
                     CharacterColor = Color4.YellowGreen;
@@ -507,7 +507,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             float distance = (float)Math.Sqrt(Math.Pow(object2Pos.X, 2) + Math.Pow(object2Pos.Y, 2));
             float edgeDistance = distance - (bullet.Width / 2 + Hitbox.Width / 2);
 
-            if (currentCharacter == Characters.Kaguya && ghostActive)
+            if (currentCharacter == Characters.YuyukoSaigyouji && ghastlytActive)
             {
                 Hitbox.HitDetection = true;
                 if (Hitbox.HitDetect(Hitbox, bullet.Hitbox) && bullet.Bullet.Ghost)
@@ -592,14 +592,14 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 {
 
                 }
+                else if (currentCharacter == Characters.YuyukoSaigyouji && !Clone && !ghastlytActive && action == VitaruAction.Spell)
+                    yuyukoSpell();
                 else if (currentCharacter == Characters.YukariYakumo && action == VitaruAction.Spell)
                     yukariSpell();
                 else if (currentCharacter == Characters.Chen && action == VitaruAction.Spell)
                 {
 
                 }
-                else if (currentCharacter == Characters.Kaguya && !Clone && !ghostActive && action == VitaruAction.Spell)
-                    kaguyaSpell();
                 else if (currentCharacter == Characters.IbarakiKasen && action == VitaruAction.Spell)
                     ibarakiSpell();
                 else if (currentCharacter == Characters.NueHoujuu && action == VitaruAction.Spell | action == VitaruAction.Spell2 | action == VitaruAction.Spell3 | action == VitaruAction.Spell4)
@@ -615,8 +615,8 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                         case VitaruAction.Spell3 when SetRate != 1 && Energystored > 6:
                             sakuyaSpell(6);
                             break;
-                        case VitaruAction.Spell2 when !ghostActive && Energystored > 8:
-                            kaguyaSpell(8);
+                        case VitaruAction.Spell2 when !ghastlytActive && Energystored > 8:
+                            yuyukoSpell(8);
                             break;
                     }
                 }
@@ -631,14 +631,14 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     case Characters.YukariYakumo when action == VitaruAction.Spell:
                         riftActive = false;
                         break;
-                    case Characters.Kaguya when action == VitaruAction.Spell:
-                        ghostActive = false;
+                    case Characters.YuyukoSaigyouji when action == VitaruAction.Spell:
+                        ghastlytActive = false;
                         break;
                     case Characters.AliceMuyart:
                         if (action == VitaruAction.Spell3)
                             timeFreezeActive = false;
                         else if (action == VitaruAction.Spell2)
-                            ghostActive = false;
+                            ghastlytActive = false;
                         break;
                 }
             }
@@ -752,14 +752,14 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             }
         }
 
-        private void kaguyaSpell(float energyOverride = -1)
+        private void yuyukoSpell(float energyOverride = -1)
         {
             if (energyOverride == -1)
                 Energy -= energyRequired;
             else
                 Energy -= energyOverride;
 
-            ghostActive = true;
+            ghastlytActive = true;
             this.FadeTo(0.5f, beatLength / 2);
             Hitbox.HitDetection = false;
 
@@ -929,7 +929,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
             CharacterSign.Alpha = Energy / (maxEnergy * 2);
 
-            if (ghostActive)
+            if (ghastlytActive)
                 Energy -= (float)Clock.ElapsedFrameTime / 1000 * energyRequiredPerSecond;
 
             if (riftActive)
@@ -938,7 +938,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             if (Energy <= 0)
             {
                 Energy = 0;
-                ghostActive = false;
+                ghastlytActive = false;
                 timeFreezeActive = false;
                 riftActive = false;
             }
@@ -1034,7 +1034,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 riftStart.FadeOut(beatLength / 4);
             }
 
-            if (!ghostActive && Alpha == 0.5f)
+            if (!ghastlytActive && Alpha == 0.5f)
             {
                 Hitbox.HitDetection = true;
                 foreach (VitaruPlayer clone in cloneList)
@@ -1117,7 +1117,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 BulletDiameter = 16,
                 BulletDamage = 20 * damageMultiplier,
                 Team = Team,
-                Ghost = currentCharacter == Characters.Kaguya | currentCharacter == Characters.AliceMuyart
+                Ghost = currentCharacter == Characters.YuyukoSaigyouji | currentCharacter == Characters.AliceMuyart
             }));
             if (vampuric)
                 drawableBullet.OnHit = () => Heal(0.5f);

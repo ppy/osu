@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables.Pieces
                     Colour = drawableBullet.Bullet.ComboColour.Opacity(0.2f)
                 };
 
-            if (drawableBullet.Bullet.Ghost && currentCharacter == Characters.Characters.Kaguya | currentCharacter == Characters.Characters.AliceMuyart)
+            if (drawableBullet.Bullet.Ghost && currentCharacter == Characters.Characters.YuyukoSaigyouji | currentCharacter == Characters.Characters.AliceMuyart)
                 box.Colour = Color4.Cyan;
         }
     }
