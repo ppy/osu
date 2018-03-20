@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 
@@ -16,6 +17,8 @@ namespace osu.Game.Skinning
         public event Action SourceChanged;
 
         public Drawable GetDrawableComponent(string componentName) => source.GetDrawableComponent(componentName) ?? fallbackSource?.GetDrawableComponent(componentName);
+
+        public Texture GetTexture(string componentName) => source.GetTexture(componentName) ?? fallbackSource.GetTexture(componentName);
 
         public SampleChannel GetSample(string sampleName) => source.GetSample(sampleName) ?? fallbackSource?.GetSample(sampleName);
 

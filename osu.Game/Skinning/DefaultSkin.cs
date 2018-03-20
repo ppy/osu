@@ -3,6 +3,7 @@
 
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
 using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -25,6 +26,8 @@ namespace osu.Game.Skinning
         }
 
         public override Drawable GetDrawableComponent(string componentName) => null;
+
+        public override Texture GetTexture(string componentName) => null;
 
         public override SampleChannel GetSample(string sampleName) => null;
     }

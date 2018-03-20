@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 
@@ -17,6 +18,8 @@ namespace osu.Game.Skinning
         event Action SourceChanged;
 
         Drawable GetDrawableComponent(string componentName);
+
+        Texture GetTexture(string componentName);
 
         SampleChannel GetSample(string sampleName);
 

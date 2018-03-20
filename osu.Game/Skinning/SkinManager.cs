@@ -10,6 +10,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
@@ -118,6 +119,8 @@ namespace osu.Game.Skinning
         public event Action SourceChanged;
 
         public Drawable GetDrawableComponent(string componentName) => CurrentSkin.Value.GetDrawableComponent(componentName);
+
+        public Texture GetTexture(string componentName)=> CurrentSkin.Value.GetTexture(componentName);
 
         public SampleChannel GetSample(string sampleName) => CurrentSkin.Value.GetSample(sampleName);
 
