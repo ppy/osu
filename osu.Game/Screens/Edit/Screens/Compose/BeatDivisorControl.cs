@@ -212,6 +212,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 {
                     marker.MoveToX(getTickPosition(v), 100, Easing.OutQuint);
                     marker.Flash();
+
+                    KeyboardStep = v / 3f;
                 };
             }
 
