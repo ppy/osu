@@ -25,10 +25,10 @@ namespace osu.Game.Rulesets.Vitaru
 
     public enum VitaruAction
     {
-        None,
+        None = -1,
 
         //Movement
-        Left,
+        Left = 0,
         Right,
         Up,
         Down,
