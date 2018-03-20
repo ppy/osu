@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
-                //Don't hide the first object ("drawables" are in a reverse order -> Last() )
+                //Don't hide the first object if the increaseFirstObjectVisibility is true ("drawables" are in a reverse order -> Last() )
                 //If increaseFirstObjectVisibility is null then we're exectuing one of the tests for the hidden mod. Since it's too much
                 //work for just this interface to work on this tests (DI of the config..), I just make sure to not throw a null exception
                 if (d == drawables.Last() && (increaseFirstObjectVisibility == null || increaseFirstObjectVisibility)) continue;
