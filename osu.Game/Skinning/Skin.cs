@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 
@@ -20,6 +21,8 @@ namespace osu.Game.Skinning
         public abstract Drawable GetDrawableComponent(string componentName);
 
         public abstract SampleChannel GetSample(string sampleName);
+
+        public abstract Texture GetTexture(string componentName);
 
         public virtual Color4? GetComboColour(IHasComboIndex comboObject) =>
             Configuration.ComboColours.Count == 0 ? (Color4?)null : Configuration.ComboColours[comboObject.ComboIndex % Configuration.ComboColours.Count];

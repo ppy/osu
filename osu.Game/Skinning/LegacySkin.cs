@@ -57,11 +57,13 @@ namespace osu.Game.Skinning
                     break;
             }
 
-            var texture = Textures.Get(componentName);
+            var texture = GetTexture(componentName);
             if (texture == null) return null;
 
             return new Sprite { Texture = texture };
         }
+
+        public override Texture GetTexture(string componentName) => Textures.Get(componentName);
 
         public override SampleChannel GetSample(string sampleName) => Samples.Get(sampleName);
 
