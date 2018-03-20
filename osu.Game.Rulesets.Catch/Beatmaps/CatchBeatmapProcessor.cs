@@ -16,23 +16,13 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
     {
         public override void PostProcess(Beatmap<CatchHitObject> beatmap)
         {
-            int index = 0;
-
-            CatchHitObject lastObj = null;
-
             initialiseHyperDash(beatmap.HitObjects);
 
+            base.PostProcess(beatmap);
+
+            int index = 0;
             foreach (var obj in beatmap.HitObjects)
-            {
-                if (obj.NewCombo)
-                {
-                    if (lastObj != null) lastObj.LastInCombo = true;
-                }
-
                 obj.IndexInBeatmap = index++;
-
-                lastObj = obj;
-            }
         }
 
         private void initialiseHyperDash(List<CatchHitObject> objects)
