@@ -343,7 +343,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     Position = new Vector2(0, 48),
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
-                    Width = 100,
                     AutoSizeAxes = Axes.Both,
                     Text = ""
                 });
@@ -1662,26 +1661,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
 
-            if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 1548917 && currentCharacter == Characters.KokoroHatano && !lastDance && playerList.Count == 1)
-            {
-                if (Time.Current >= 1430 && dance == 0)
-                {
-                    Speak("This is it,");
-                    dance++;
-                }
-                if (Time.Current >= 23760 && dance == 1)
-                {
-                    Speak("My final act,");
-                    dance++;
-                }
-                if (Time.Current >= 43300 && dance == 2)
-                {
-                    Speak("My Last Dance.");
-                    dance++;
-                    lastDance.Value = true;
-                }
-            }
-
             if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && insane && playerList.Count == 1)
             {
                 if (Time.Current >= 760 && insanity == 0)
@@ -1710,58 +1689,62 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     insanity++;
                 }
             }
-            /*
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.RemiliaScarlet && !insane && playerList.Count == 2)
+            if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && !insane && playerList.Count == 2)
             {
-                if (Time.Current >= 760 && awakening == 0)
+                if (currentCharacter == Characters.RemiliaScarlet)
                 {
-                    Speak("Flandre, what happened to you?");
-                    awakening++;
+                    if (Time.Current >= 760 && awakening == 0)
+                    {
+                        Speak("Flandre, what happened to you?");
+                        awakening++;
+                    }
+                    if (Time.Current >= 12340 && awakening == 1)
+                    {
+                        Speak("Flan, are you there?");
+                        awakening++;
+                    }
+                    if (Time.Current >= 28600 && awakening == 2)
+                    {
+                        Speak("Its me, your sister Remilia,");
+                        awakening++;
+                    }
+                    if (Time.Current >= 0 && awakening == 3)
+                    {
+                        Speak("Flan? I know you can hear me.");
+                        awakening++;
+                    }
+                    if (Time.Current >= 0 && awakening == 4)
+                    {
+                        Speak("Please? I need to talk.");
+                        awakening++;
+                    }
+                    if (Time.Current >= 0 && awakening == 5)
+                    {
+                        Speak("I know you're upset,");
+                        awakening++;
+                    }
+                    if (Time.Current >= 0 && awakening == 6)
+                    {
+                        Speak("But I need my sister back.");
+                        awakening++;
+                    }
+                    if (Time.Current >= 0 && awakening == 7)
+                    {
+                        Speak("What would Hong say if she knew you were this lazy?");
+                        awakening++;
+                    }
                 }
-                if (Time.Current >= 12340 && awakening == 1)
+                else if (currentCharacter == Characters.FlandreScarlet)
                 {
-                    Speak("Flan, are you there?");
-                    awakening++;
-                }
-                if (Time.Current >= 28600 && awakening == 2)
-                {
-                    Speak("Its me, your sister Remilia,");
-                    awakening++;
-                }
-                if (Time.Current >= 0 && awakening == 3)
-                {
-                    Speak("Flan? I know you can hear me.");
-                    awakening++;
-                }
-                if (Time.Current >= 0 && awakening == 4)
-                {
-                    Speak("Please? I need to talk.");
-                    awakening++;
-                }
-                if (Time.Current >= 0 && awakening == 5)
-                {
-                    Speak("I know you're upset,");
-                    awakening++;
-                }
-                if (Time.Current >= 0 && awakening == 6)
-                {
-                    Speak("But I need my sister back.");
-                    awakening++;
-                }
-                if (Time.Current >= 0 && awakening == 7)
-                {
-                    Speak("What would Hong say if she knew you were this lazy?");
-                    awakening++;
-                }
-                if (Time.Current >= 0 && awakening == 8)
-                {
-                    //Flandre.Speak("\"Get off your ass\"?");
-                    awakening++;
+                    if (Time.Current >= 0 && awakening == 0)
+                    {
+                        //Speak("\"Get off your ass\"?");
+                        awakening++;
+                    }
                 }
             }
-            */
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 148000 && playerList.Count == 2)
+            if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 148000 && playerList.Count == 2)
             {
                 if (currentCharacter == Characters.Kaguya)
                 {
@@ -1777,12 +1760,12 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     }
                     if (Time.Current >= 22120 && tresspassing == 2)
                     {
-                        Speak("Someone has been here already. . .");
+                        Speak("It seems I am not alone. . .");
                         tresspassing++;
                     }
                     if (Time.Current >= 37280 && tresspassing == 3)
                     {
-                        Speak("Thats them over there.");
+                        Speak("Someone is over there,");
                         tresspassing++;
                     }
                     if (Time.Current >= 41060 && tresspassing == 4)
@@ -1793,6 +1776,14 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     if (Time.Current >= 82740 && tresspassing == 5)
                     {
                         Speak("Why are we fighting? What did I do to you?");
+                        tresspassing++;
+                    }
+                }
+                else if (currentCharacter == Characters.MarisaKirisame)
+                {
+                    if (Time.Current >= 88740 && tresspassing == 0)
+                    {
+                        Speak("Its what you'll do soon, I can't allow it.");
                         tresspassing++;
                     }
                 }
@@ -1811,6 +1802,26 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 else if (currentCharacter == Characters.SakuyaIzayoi)
                 {
 
+                }
+            }
+
+            if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 1548917 && currentCharacter == Characters.KokoroHatano && !lastDance && playerList.Count == 1)
+            {
+                if (Time.Current >= 1430 && dance == 0)
+                {
+                    Speak("This is it,");
+                    dance++;
+                }
+                if (Time.Current >= 23760 && dance == 1)
+                {
+                    Speak("My final act,");
+                    dance++;
+                }
+                if (Time.Current >= 43300 && dance == 2)
+                {
+                    Speak("My Last Dance.");
+                    dance++;
+                    lastDance.Value = true;
                 }
             }
         }
@@ -1866,8 +1877,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         IbarakiKasen,
         [System.ComponentModel.Description("Nue Houjuu")]
         NueHoujuu,
-        //[System.ComponentModel.Description("Taikonator")]
-        //Taikonator,
         [System.ComponentModel.Description("Jorolf")]
         Rock,
         [System.ComponentModel.Description("Alice Muyart")]
