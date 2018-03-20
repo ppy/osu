@@ -16,13 +16,13 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
 {
-    public class DrawableBeatDivisor : CompositeDrawable
+    public class BeatDivisorControl : CompositeDrawable
     {
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
         private int currentDivisorIndex;
         private TickSliderBar slider;
 
-        public DrawableBeatDivisor(BindableBeatDivisor beatDivisor)
+        public BeatDivisorControl(BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor.BindTo(beatDivisor);
         }
