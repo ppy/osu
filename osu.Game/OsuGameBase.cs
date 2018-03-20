@@ -105,6 +105,7 @@ namespace osu.Game
             runMigrations();
 
             dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
+            dependencies.CacheAs<ISkinSource>(SkinManager);
 
             var api = new APIAccess(LocalConfig);
 

@@ -4,18 +4,25 @@
 using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Objects.Types;
+using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public abstract class Skin : IDisposable
+    public abstract class Skin : IDisposable, ISkinSource
     {
         public readonly SkinInfo SkinInfo;
 
         public virtual SkinConfiguration Configuration { get; protected set; }
 
+        public event Action SourceChanged;
+
         public abstract Drawable GetDrawableComponent(string componentName);
 
         public abstract SampleChannel GetSample(string sampleName);
+
+        public virtual Color4? GetComboColour(IHasComboIndex comboObject) =>
+            Configuration.ComboColours.Count == 0 ? (Color4?)null : Configuration.ComboColours[comboObject.ComboIndex % Configuration.ComboColours.Count];
 
         protected Skin(SkinInfo skin)
         {

@@ -3,6 +3,7 @@
 
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -11,17 +12,20 @@ namespace osu.Game.Skinning
         public DefaultSkin()
             : base(SkinInfo.Default)
         {
-            Configuration = new SkinConfiguration();
+            Configuration = new SkinConfiguration
+            {
+                ComboColours =
+                {
+                    new Color4(17, 136, 170, 255),
+                    new Color4(102, 136, 0, 255),
+                    new Color4(204, 102, 0, 255),
+                    new Color4(121, 9, 13, 255)
+                }
+            };
         }
 
-        public override Drawable GetDrawableComponent(string componentName)
-        {
-            return null;
-        }
+        public override Drawable GetDrawableComponent(string componentName) => null;
 
-        public override SampleChannel GetSample(string sampleName)
-        {
-            return null;
-        }
+        public override SampleChannel GetSample(string sampleName) => null;
     }
 }

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -19,7 +18,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
-    public abstract class DrawableHitObject : CompositeDrawable, IHasAccentColour
+    public abstract class DrawableHitObject : SkinReloadableDrawable, IHasAccentColour
     {
         public readonly HitObject HitObject;
 
@@ -101,6 +100,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     Namespace = SampleNamespace
                 }).ToArray()));
             }
+        }
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+
+            if (HitObject is IHasComboIndex combo)
+                AccentColour = skin.GetComboColour(combo) ?? Color4.White;
         }
 
         protected override void LoadComplete()
