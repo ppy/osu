@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Skinning
@@ -12,7 +11,7 @@ namespace osu.Game.Skinning
     /// </summary>
     public abstract class SkinReloadableDrawable : CompositeDrawable
     {
-        private Bindable<Skin> skin;
+        private ISkinSource skin;
 
         /// <summary>
         /// Whether fallback to default skin should be allowed if the custom skin is missing this resource.
@@ -29,16 +28,18 @@ namespace osu.Game.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(SkinManager skinManager)
+        private void load(ISkinSource source)
         {
-            skin = skinManager.CurrentSkin.GetBoundCopy();
-            skin.ValueChanged += skin => SkinChanged(skin, allowDefaultFallback || skin.SkinInfo == SkinInfo.Default);
+            skin = source;
+            skin.SourceChanged += onChange;
         }
+
+        private void onChange() => SkinChanged(skin, allowDefaultFallback);
 
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
-            skin.TriggerChange();
+            onChange();
         }
 
         /// <summary>
@@ -46,7 +47,7 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="skin">The new skin.</param>
         /// <param name="allowFallback">Whether fallback to default skin should be allowed if the custom skin is missing this resource.</param>
-        protected virtual void SkinChanged(Skin skin, bool allowFallback)
+        protected virtual void SkinChanged(ISkinSource skin, bool allowFallback)
         {
         }
     }
