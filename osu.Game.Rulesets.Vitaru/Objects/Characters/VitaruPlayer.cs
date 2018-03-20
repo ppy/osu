@@ -23,7 +23,8 @@ using osu.Framework.Platform;
 using osu.Game.Rulesets.Vitaru.Objects.Characters.Pieces;
 using osu.Game.Rulesets.Vitaru.Multi;
 using Symcol.Core.Networking;
-using System.ComponentModel;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 {
@@ -48,6 +49,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
         private const float player_speed = 0.25f;
 
+        //Upsidedown?
         public bool Invert { get; set; }
 
         //Is not Human
@@ -61,6 +63,8 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         /// </summary>
         public bool Puppet { get; set; }
 
+        private readonly Container cursor;
+
         private readonly static List<VitaruPlayer> playerList = new List<VitaruPlayer>();
 
         private readonly Bindable<WorkingBeatmap> workingBeatmap = new Bindable<WorkingBeatmap>();
@@ -72,7 +76,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         private OsuTextFlowContainer textContainer;
 
         private List<UFO> ufoList = new List<UFO>();
-        private Framework.Graphics.Containers.Container ufoContainer;
+        private Container ufoContainer;
         private UFO ufoMark;
         private UFO ufoHealth;
         private UFO ufoEnergy;
@@ -127,7 +131,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         #endregion
 
         #region Loading Stuff
-        public VitaruPlayer(Framework.Graphics.Containers.Container parent, Characters characterOverride, VitaruPlayer parentPlayer = null) : base(parent)
+        public VitaruPlayer(Container parent, Characters characterOverride, VitaruPlayer parentPlayer = null) : base(parent)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -135,6 +139,21 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             playerList.Add(this);
 
             currentCharacter = characterOverride;
+
+            parent.Add(cursor = new Container
+            {
+                Anchor = Anchor.TopLeft,
+                Origin = Anchor.Centre,
+                Size = new Vector2(4),
+                CornerRadius = 2,
+                Alpha = 0.2f,
+                Masking = true,
+
+                Child = new Box
+                {
+                    RelativeSizeAxes = Axes.Both
+                }
+            });
 
             if (parentPlayer != null)
                 this.parentPlayer = parentPlayer;
@@ -157,14 +176,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 default:
                     CharacterColor = Color4.White;
                     break;
-                /*
-            case Characters.Alex:
-                energyRequired = 20;
-                maxEnergy = 40;
-                CharacterColor = Color4.Gold;
-                //CharacterName = "arysa";
-                break;
-                */
                 case Characters.ReimuHakurei:
                     CharacterColor = Color4.Red;
                     CharacterName = "reimu";
@@ -215,6 +226,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     break;
                 case Characters.YuyukoSaigyouji:
                     CharacterColor = Color4.LightBlue;
+                    MaxHealth = 80;
                     maxEnergy = 24;
                     energyRequired = 2;
                     energyRequiredPerSecond = 2;
@@ -230,6 +242,12 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     CharacterColor = Color4.Green;
                     CharacterName = "chen";
                     break;
+                case Characters.SikieikiYamaxanadu:
+                    MaxHealth = 80;
+                    maxEnergy = 40;
+                    energyRequiredPerSecond = 4;
+                    energyRequired = 2;
+                    break;
                 case Characters.KokoroHatano:
                     CharacterColor = Color4.Cyan;
                     maxEnergy = 36;
@@ -237,6 +255,8 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 case Characters.Kaguya:
                     CharacterColor = Color4.DarkRed;
                     CharacterName = "kaguya";
+                    maxEnergy = 36;
+                    MaxHealth = 80;
                     break;
                 case Characters.IbarakiKasen:
                     CharacterColor = Color4.YellowGreen;
@@ -349,7 +369,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     Remove(CharacterSign);
                 }
 
-                Add(ufoContainer = new Framework.Graphics.Containers.Container
+                Add(ufoContainer = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
@@ -472,6 +492,9 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         protected override void Update()
         {
             base.Update();
+
+            if (!Bot && !Puppet && !Auto)
+                cursor.Position = VitaruCursor.CenterCircle.ToSpaceOfOtherDrawable(Vector2.Zero, Parent) + new Vector2(6);
 
             if (currentGameMode == VitaruGamemode.Touhosu)
             {
@@ -725,10 +748,10 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         private void yukariSpell()
         {
             riftActive = true;
-            riftStart.FadeInFromZero(beatLength / 2);
+            riftStart.FadeTo(0.5f, beatLength / 2);
             riftStart.Position = new Vector2(Position.X, Position.Y - 64);
-            riftEnd.FadeInFromZero(beatLength / 2);
-            riftEnd.Position = VitaruCursor.CenterCircle.ToSpaceOfOtherDrawable(Vector2.Zero, Parent);
+            riftEnd.FadeTo(0.5f, beatLength / 2);
+            riftEnd.Position = cursor.Position;
         }
 
         private void kokoroSpell()
@@ -784,7 +807,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             else
                 Energy -= energyOverride;
 
-            Position = VitaruCursor.CenterCircle.ToSpaceOfOtherDrawable(Vector2.Zero, Hitbox);
+            Position = cursor.Position;
         }
 
         private void nueSpell(VitaruAction action)
@@ -796,7 +819,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
             foreach (VitaruPlayer player in playerList)
             {
-                Vector2 playerPos = VitaruCursor.CenterCircle.ToSpaceOfOtherDrawable(Vector2.Zero, player) + new Vector2(6);
+                Vector2 playerPos = cursor.ToSpaceOfOtherDrawable(Vector2.Zero, player);
                 float distance = (float)Math.Sqrt(Math.Pow(playerPos.X, 2) + Math.Pow(playerPos.Y, 2));
 
                 if (closestPlayerDistance >= distance)
@@ -944,16 +967,16 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
             CharacterSign.Alpha = Energy / (maxEnergy * 2);
 
-            foreach (Drawable child in Parent.Children)
-                if (child is Rift rift)
+            foreach (Drawable drawable in Parent.Children)
+                if (drawable is Rift rift && warpTime <= Time.Current && rift.Alpha > 0)
                 {
-                    Vector2 riftPos = rift.ToSpaceOfOtherDrawable(Vector2.Zero, Hitbox);
-                    float distance = (float)Math.Sqrt(Math.Pow(riftPos.X + 20, 2) + Math.Pow(riftPos.Y + 20, 2));
+                    Vector2 riftPos = rift.ToSpaceOfOtherDrawable(Vector2.Zero, Hitbox) + new Vector2(20);
+                    float distance = (float)Math.Sqrt(Math.Pow(riftPos.X, 2) + Math.Pow(riftPos.Y, 2));
 
-                    if (distance <= 32 && warpTime <= Time.Current && rift.Alpha > 0)
+                    if (distance <= 32)
                     {
-                        warpTime = Time.Current + beatLength;
-                        Position = rift.LinkedRift.ToSpaceOfOtherDrawable(Vector2.Zero, Parent);
+                        warpTime = Time.Current + 500;
+                        Position = rift.LinkedRift.Position;
                     }
                 }
 
@@ -1037,7 +1060,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 Hitbox.HitDetection = true;
             }
 
-            if (!riftActive && riftStart != null && riftStart.Alpha == 1)
+            if (!riftActive && riftStart != null && riftStart.Alpha == 0.5f)
             {
                 riftEnd.FadeOut(beatLength / 4);
                 riftStart.FadeOut(beatLength / 4);
@@ -1753,57 +1776,59 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
     public enum Characters
     {
         //Alex,
-        [Description("Reimu Hakurei")]
+        [System.ComponentModel.Description("Reimu Hakurei")]
         ReimuHakurei = 1,
-        [Description("Marisa Kirisame")]
+        [System.ComponentModel.Description("Marisa Kirisame")]
         MarisaKirisame,
-        [Description("Sakuya Izayoi")]
+        [System.ComponentModel.Description("Sakuya Izayoi")]
         SakuyaIzayoi,
-        [Description("Hong Meiling")]
+        [System.ComponentModel.Description("Hong Meiling")]
         HongMeiling,
-        [Description("Flandre Scarlet")]
+        [System.ComponentModel.Description("Flandre Scarlet")]
         FlandreScarlet,
-        [Description("Remilia Scarlet")]
+        [System.ComponentModel.Description("Remilia Scarlet")]
         RemiliaScarlet,
-        [Description("Cirno")]
+        [System.ComponentModel.Description("Cirno")]
         Cirno,
-        [Description("Tenshi Hinanai")]
+        [System.ComponentModel.Description("Tenshi Hinanai")]
         TenshiHinanai,
-        [Description("Yuyuko Saigyouji")]
+        [System.ComponentModel.Description("Yuyuko Saigyouji")]
         YuyukoSaigyouji,
-        [Description("Yukari Yakumo")]
+        [System.ComponentModel.Description("Yukari Yakumo")]
         YukariYakumo,
-        [Description("Ran Yakumo")]
+        [System.ComponentModel.Description("Ran Yakumo")]
         RanYakumo,
-        [Description("Chen")]
+        [System.ComponentModel.Description("Chen")]
         Chen,
-        [Description("Alice Margatroid")]
+        [System.ComponentModel.Description("Alice Margatroid")]
         AliceMargatroid,
-        [Description("Komachi Onozuka")]
+        [System.ComponentModel.Description("Komachi Onozuka")]
         KomachiOnozuka,
-        [Description("Byakuren Hijiri")]
+        [System.ComponentModel.Description("Byakuren Hijiri")]
         ByakurenHijiri,
-        [Description("Rumia")]
+        [System.ComponentModel.Description("Rumia")]
         Rumia,
-        [Description("Sikieiki Yamaxanadu")]
+        [System.ComponentModel.Description("Sikieiki Yamaxanadu")]
         SikieikiYamaxanadu,
-        [Description("Suwako Moriya")]
+        [System.ComponentModel.Description("Suwako Moriya")]
         SuwakoMoriya,
-        [Description("Youmu Konpaku")]
+        [System.ComponentModel.Description("Youmu Konpaku")]
         YoumuKonpaku,
-        [Description("Kokoro Hatano")]
+        [System.ComponentModel.Description("Kokoro Hatano")]
         KokoroHatano,
-        [Description("Kaguya")]
+        [System.ComponentModel.Description("Kaguya")]
         Kaguya,
-        [Description("Ibaraki Kasen")]
+        [System.ComponentModel.Description("Ibaraki Kasen")]
         IbarakiKasen,
-        [Description("Nue Houjuu")]
+        [System.ComponentModel.Description("Nue Houjuu")]
         NueHoujuu,
-        //[Description("Meme")]
+        //[System.ComponentModel.Description("Taikonator")]
         //Taikonator,
-        [Description("Alice Muyart")]
+        [System.ComponentModel.Description("Jorolf")]
+        Rock,
+        [System.ComponentModel.Description("Alice Muyart")]
         AliceMuyart,
-        [Description("Arysa Muyart")]
+        [System.ComponentModel.Description("Arysa Muyart")]
         ArysaMuyart
     }
 }

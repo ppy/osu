@@ -321,7 +321,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         characterDescription.Description.Text = "\nMax Health: 100" +
                         "\nMax Energy: 20" +
                         "\nRole: Defense" +
-                        "\nDifficulty: Hard" +
+                        "\nDifficulty: Normal" +
                         "\nSpell (4 energy, 2 per second): Ghastly Dream"; /*\n\n" +
                         "";*/
                         break;
@@ -330,10 +330,18 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nMax Energy: 24" +
                         "\nRole: Support" +
                         "\nDifficulty: Another" +
-                        "\nAbility (4 energy, 4 per second): Rift (Buggy?)"; /*\n\n" +
-                        "There are many stories about Yukari, some say she was born of the stone people to the far west and some say she predates the known universe itself. " +
-                        "While that would explain her unatural abilities in combat they would not explain her affection toward others. " +
-                        "The only other individual to supposedly be even relativly this old is cold and heartless (perhaps litterally).";*/
+                        "\nAbility (4 energy, 4 per second): Rift\n\n" +
+                        "There are many stories about Yukari, some say she was born of some rich folk to the far west and some say she predates the known universe itself. " +
+                        "While that would explain her unatural abilities in combat they would not explain her uncanny abitlity to empithize with her \"creations\". " +
+                        "The only other individual to supposedly be even relativly this old is cold and heartless (perhaps litterally).";
+                        break;
+                    case Characters.SikieikiYamaxanadu:
+                        characterDescription.Description.Text = "\nMax Health: 80" +
+                        "\nMax Energy: 40" +
+                        "\nRole: Offense + Defense" +
+                        "\nDifficulty: ???" +
+                        "\nAbility (2 stab, 4 per second of block, 6 swipe, 10 wipe): Judgement (Not Implemented)\n\n" +
+                        "";
                         break;
                     case Characters.KokoroHatano:
                         characterDescription.Description.Text = "\nMax Health: 100" +
@@ -365,6 +373,13 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nRole: Support" +
                         "\nDifficulty: Another" +
                         "\nSpell (Ratio [energy:damage/energy/health] - 1:4/2/1): Invasion (WIP)";
+                        break;
+                    case Characters.Rock:
+                        characterDescription.Description.Text = "\nMax Health: 20" +
+                        "\nMax Energy: 0" +
+                        "\nRole: *Silence*" +
+                        "\nDifficulty: *More Silence*" +
+                        "\nSpell (0 energy): Death by Stoning";
                         break;
                     case Characters.AliceMuyart:
                         if (!VitaruAPIContainer.Shawdooow)
