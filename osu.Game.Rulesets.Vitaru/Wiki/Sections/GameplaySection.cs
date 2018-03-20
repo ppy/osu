@@ -220,7 +220,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
 
                         if (selectedGamemode.Value == VitaruGamemode.Touhosu)
                         {
-                            stats = stats + "Reimu used to be a complete air head. " +
+                            stats = stats + "\n\nReimu used to be a complete air head. " +
                         "But time and hardship has shaped her into the strong cunning magician she is today. " +
                         "Usually you would be hard-pressed to not only get the jump on her but even find her before she finds you. " +
                         "However don't let this fool you, she is by no means a rutheless killer like some of her friends, infact she is quite sweet. " +
@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nSpell (6 energy, 3 per second): Time-Warden";
 
                         if (selectedGamemode.Value == VitaruGamemode.Touhosu)
-                            stats = stats + "Young Sakuya used to be kind and caring for all, like the ones who raised her. " +
+                            stats = stats + "\n\nYoung Sakuya used to be kind and caring for all, like the ones who raised her. " +
                         "But even the purest of hearts can be broken given the right circumstances, corrupted by the dark things that lurk in the night. " +
                         "Physical wounds may heal, but the emotional stabbing she was subjected to can never be mended. " +
                         "Now she spends every ounce of willpower to keep to her schedule, everything must be timed perfectly.";
@@ -265,7 +265,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nAbility (passive): Leader (WIP)";
 
                         if (false)//selectedGamemode.Value == VitaruGamemode.Touhosu)
-                            stats = stats + "Hong was your typical war hero. She fought valiantly, saved allies, showed no mercy against the enemy. " +
+                            stats = stats + "\n\nHong was your typical war hero. She fought valiantly, saved allies, showed no mercy against the enemy. " +
                         "She didn't really care for all the medals or attention though, now that the war was over she just wanted to retire to her mansion.\n\n" +
                         "Upon returning home she met with the Scarlet sisters she had entrusted the house with, ony to find they are different. " +
                         "They had wings, they grew wings? They were fairies now? " +
@@ -308,7 +308,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nSpell (40 energy): Taboo";
 
                         if (selectedGamemode.Value == VitaruGamemode.Touhosu && familiar)
-                            stats = stats + "Flandre used to be one of the most feared fairies around, and thats no small feat. " +
+                            stats = stats + "\n\nFlandre used to be one of the most feared fairies around, and thats no small feat. " +
                         "Fairies are have a tendency to be stupid, but Flandre wasn't always a Fairy now was she?\n\n" +
                         "Now days all she does is mindless games in the basement, broken but not lost. " +
                         "One day she could return, and you wouldn't want to be on the recieving end of her wrath.";
@@ -321,7 +321,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nAbility (passive / 0.5 health per hit): Vampuric";
 
                         if (selectedGamemode.Value == VitaruGamemode.Touhosu && familiar)
-                            stats = stats + "Remilia wasn't always a vampire, she didn't always have a thirst for blood. " +
+                            stats = stats + "\n\nRemilia wasn't always a vampire, she didn't always have a thirst for blood. " +
                         "But things change, something happened one day and she was 'ascended' she keeps telling herself with her sister. " +
                         "Certainly this was a change for the better though, after all biological imortality is hard to come by.\n\n" +
                         "She also loves her sister Flandre dearly, but for a long time now she has been broken. " +
@@ -352,7 +352,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nAbility (4 energy, 4 per second): Rift (Buggy?)";
 
                         if (false)//selectedGamemode.Value == VitaruGamemode.Touhosu)
-                            stats = stats + "There are many stories about Yukari, some say she was born of some rich folk to the far west and some say she predates the known universe itself. " +
+                            stats = stats + "\n\nThere are many stories about Yukari, some say she was born of some rich folk to the far west and some say she predates the known universe itself. " +
                         "While that would explain her unatural abilities in combat they would not explain her uncanny abitlity to empithize with her \"creations\". " +
                         "The only other individual to supposedly be even relativly this old is cold and heartless (perhaps litterally).";
                         break;
