@@ -1672,7 +1672,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
 
-            if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && insane)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && insane)
             {
                 if (Time.Current >= 760 && insanity == 0)
                 {
@@ -1692,7 +1692,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
 
-            if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && !insane)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && !insane)
             {
                 if (Time.Current >= 760 && insanity == 0)
                 {
@@ -1751,7 +1751,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             }
             */
 
-            if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 148000 && currentCharacter == Characters.Kaguya)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 148000 && currentCharacter == Characters.Kaguya)
             {
                 if (Time.Current >= 1280 && tresspassing == 0)
                 {

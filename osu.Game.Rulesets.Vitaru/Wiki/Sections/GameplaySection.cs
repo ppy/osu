@@ -21,9 +21,16 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
 
         private Bindable<VitaruGamemode> selectedGamemode;
         private Bindable<ScoringMetric> selectedScoring;
+        private Bindable<Characters> selectedCharacter;
+
+        private Bindable<bool> familiar;
+        private Bindable<bool> lastDance;
+        private Bindable<bool> insane;
+        private Bindable<bool> awoken;
+        private Bindable<bool> sacred;
+        private Bindable<bool> resurrected;
 
         private WikiOptionEnumExplanation<Characters> characterDescription;
-        private Bindable<Characters> selectedCharacter;
 
         private const string spell_default = "Spell is not implemented yet";
 
@@ -39,6 +46,13 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
             selectedGamemode = VitaruSettings.VitaruConfigManager.GetBindable<VitaruGamemode>(VitaruSetting.GameMode);
             selectedScoring = VitaruSettings.VitaruConfigManager.GetBindable<ScoringMetric>(VitaruSetting.ScoringMetric);
             selectedCharacter = VitaruSettings.VitaruConfigManager.GetBindable<Characters>(VitaruSetting.Characters);
+
+            familiar = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Familiar);
+            lastDance = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.LastDance);
+            insane = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Insane);
+            awoken = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Awoken);
+            sacred = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Sacred);
+            resurrected = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Resurrected);
 
             Content.Add(new WikiParagraph("Your objective in vitaru is simple, don't get hit by the bullets flying at you, although this is easier said than done."));
 
@@ -192,64 +206,66 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
             //basically just an ingame wiki for the characters
             selectedCharacter.ValueChanged += character =>
             {
+                string stats = "\nMax Health: " + 100 + "\nMax Energy: " + 100 + "\n" + spell_default;
+
                 restart:
-
-                characterDescription.Description.Text = "\nMax Health: " + 100 + "\nMax Energy: " + 100 + "\n" + spell_default;
-
                 switch (character)
                 {
-                    /*
-                    case Characters.Alex:
-                        characterDescription.Description.Text = "\nMax Health: 100" +
-                        "\nMax Energy: 40" +
-                        "\nRole: Defense + Support" +
-                        "\nDifficulty: Easy" +
-                        "\nSpell (40 energy): Refresh\n\n" +
-                        "";
-                        break;
-                        */
                     case Characters.ReimuHakurei:
-                        characterDescription.Description.Text = "\nMax Health: 100" +
+                        stats = "\nMax Health: 100" +
                         "\nMax Energy: 30" +
                         "\nRole: Offense" +
                         "\nDifficulty: Easy" +
-                        "\nSpell (10 energy): Rune-Seal (Not Implemented)\n\n" +
-                        "Reimu used to be a complete air head. " +
+                        "\nSpell (10 energy): Rune-Seal (Not Implemented)";
+
+                        if (selectedGamemode.Value == VitaruGamemode.Touhosu)
+                        {
+                            stats = stats + "Reimu used to be a complete air head. " +
                         "But time and hardship has shaped her into the strong cunning magician she is today. " +
                         "Usually you would be hard-pressed to not only get the jump on her but even find her before she finds you. " +
                         "However don't let this fool you, she is by no means a rutheless killer like some of her friends, infact she is quite sweet. " +
-                        "Just try not to get on her bad side. " +
-                        "She seems to be spacing out again lately though, almost like she is off in her own world. . .\n\n" +
-                        "And indeed she is, dreaming of a night long gone.";
+                        "Just try not to get on her bad side. ";
+
+                            if (!familiar)
+                                stats = stats +
+                            "She seems to be spacing out again lately though, almost like she is off in her own world. . .\n\n" +
+                            "And indeed she is, dreaming of a night long gone.";
+                        }
                         break;
                     case Characters.MarisaKirisame:
-                        characterDescription.Description.Text = "\nMax Health: 100" +
+                        stats = "\nMax Health: 100" +
                         "\nMax Energy: 30" +
                         "\nRole: Offense" +
                         "\nDifficulty: Easy" +
-                        "\nSpell (10 energy): Mini-Hakkero (WIP)\n\n" +
-                        "Marisa Kirisame, the magical witch of the forest who could do no wrong, or so they said. " +
+                        "\nSpell (10 energy): Mini-Hakkero (WIP)";
+
+                        if (selectedGamemode.Value == VitaruGamemode.Touhosu && familiar)
+                            stats = stats + "\n\nMarisa Kirisame, the magical witch of the forest who could do no wrong, or so they said. " +
                         "One thing that is certain is her lust for control, she never lets the situation get out of hand. " +
                         "Last time she did it cost her greatly, and created wounds that won't heal as easily as she would lead you to believe.";
                         break;
                     case Characters.SakuyaIzayoi:
-                        characterDescription.Description.Text = "\nMax Health: 100" +
+                        stats = "\nMax Health: 100" +
                         "\nMax Energy: 36" +
                         "\nRole: Defense" +
                         "\nDifficulty: Normal" +
-                        "\nSpell (6 energy, 3 per second): Time-Warden\n\n" +
-                        "Young Sakuya used to be kind and caring for all, like the ones who raised her. " +
+                        "\nSpell (6 energy, 3 per second): Time-Warden";
+
+                        if (selectedGamemode.Value == VitaruGamemode.Touhosu)
+                            stats = stats + "Young Sakuya used to be kind and caring for all, like the ones who raised her. " +
                         "But even the purest of hearts can be broken given the right circumstances, corrupted by the dark things that lurk in the night. " +
                         "Physical wounds may heal, but the emotional stabbing she was subjected to can never be mended. " +
                         "Now she spends every ounce of willpower to keep to her schedule, everything must be timed perfectly.";
                         break;
                     case Characters.HongMeiling:
-                        characterDescription.Description.Text = "\nMax Health: 0 (when resurrected 20)" +
+                        stats = "\nMax Health: 0 (when resurrected 20)" +
                         "\nMax Energy: 36" +
                         "\nRole: Defense" +
                         "\nDifficulty: Time Freeze" +
-                        "\nAbility (passive): Leader (WIP)\n\n" +
-                        "Hong was your typical war hero. She fought valiantly, saved allies, showed no mercy against the enemy. " +
+                        "\nAbility (passive): Leader (WIP)";
+
+                        if (false)//selectedGamemode.Value == VitaruGamemode.Touhosu)
+                            stats = stats + "Hong was your typical war hero. She fought valiantly, saved allies, showed no mercy against the enemy. " +
                         "She didn't really care for all the medals or attention though, now that the war was over she just wanted to retire to her mansion.\n\n" +
                         "Upon returning home she met with the Scarlet sisters she had entrusted the house with, ony to find they are different. " +
                         "They had wings, they grew wings? They were fairies now? " +
@@ -285,23 +301,27 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\"Let me show you a few tricks to the jobs back here I bet the Scarlet sisters don't know.\"";
                         break;
                     case Characters.FlandreScarlet:
-                        characterDescription.Description.Text = "\nMax Health: 100" +
+                        stats = "\nMax Health: 100" +
                         "\nMax Energy: 80" +
                         "\nRole: Offense" +
                         "\nDifficulty: Easy" +
-                        "\nSpell (40 energy): Taboo\n\n" +
-                        "Flandre used to be one of the most feared fairies around, and thats no small feat. " +
+                        "\nSpell (40 energy): Taboo";
+
+                        if (selectedGamemode.Value == VitaruGamemode.Touhosu && familiar)
+                            stats = stats + "Flandre used to be one of the most feared fairies around, and thats no small feat. " +
                         "Fairies are have a tendency to be stupid, but Flandre wasn't always a Fairy now was she?\n\n" +
                         "Now days all she does is mindless games in the basement, broken but not lost. " +
                         "One day she could return, and you wouldn't want to be on the recieving end of her wrath.";
                         break;
                     case Characters.RemiliaScarlet:
-                        characterDescription.Description.Text = "\nMax Health: 60" +
+                        stats = "\nMax Health: 60" +
                         "\nMax Energy: 60" +
                         "\nRole: Offense" +
                         "\nDifficulty: Normal" +
-                        "\nAbility (passive / 0.5 health per hit): Vampuric\n\n" +
-                        "Remilia wasn't always a vampire, she didn't always have a thirst for blood. " +
+                        "\nAbility (passive / 0.5 health per hit): Vampuric";
+
+                        if (selectedGamemode.Value == VitaruGamemode.Touhosu && familiar)
+                            stats = stats + "Remilia wasn't always a vampire, she didn't always have a thirst for blood. " +
                         "But things change, something happened one day and she was 'ascended' she keeps telling herself with her sister. " +
                         "Certainly this was a change for the better though, after all biological imortality is hard to come by.\n\n" +
                         "She also loves her sister Flandre dearly, but for a long time now she has been broken. " +
@@ -311,71 +331,68 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "For now this family shall remain shattered by un-imaginable pain, but the worst has yet to come.";
                         break;
                     case Characters.Cirno:
-                        characterDescription.Description.Text = "\nMax Health: 80" +
+                        stats = "\nMax Health: 80" +
                         "\nMax Energy: 40" +
                         "\nRole: Defense" +
                         "\nDifficulty: Easy" +
                         "\nAbility (40 energy): Shatter";
                         break;
                     case Characters.YuyukoSaigyouji:
-                        characterDescription.Description.Text = "\nMax Health: 100" +
+                        stats = "\nMax Health: 100" +
                         "\nMax Energy: 20" +
                         "\nRole: Defense" +
                         "\nDifficulty: Normal" +
-                        "\nSpell (4 energy, 2 per second): Ghastly Dream"; /*\n\n" +
-                        "";*/
+                        "\nSpell (4 energy, 2 per second): Ghastly Dream";
                         break;
                     case Characters.YukariYakumo:
-                        characterDescription.Description.Text = "\nMax Health: 80" +
+                        stats = "\nMax Health: 80" +
                         "\nMax Energy: 24" +
                         "\nRole: Support" +
                         "\nDifficulty: Another" +
-                        "\nAbility (4 energy, 4 per second): Rift\n\n" +
-                        "There are many stories about Yukari, some say she was born of some rich folk to the far west and some say she predates the known universe itself. " +
+                        "\nAbility (4 energy, 4 per second): Rift (Buggy?)";
+
+                        if (false)//selectedGamemode.Value == VitaruGamemode.Touhosu)
+                            stats = stats + "There are many stories about Yukari, some say she was born of some rich folk to the far west and some say she predates the known universe itself. " +
                         "While that would explain her unatural abilities in combat they would not explain her uncanny abitlity to empithize with her \"creations\". " +
                         "The only other individual to supposedly be even relativly this old is cold and heartless (perhaps litterally).";
                         break;
                     case Characters.SikieikiYamaxanadu:
-                        characterDescription.Description.Text = "\nMax Health: 80" +
+                        stats = "\nMax Health: 80" +
                         "\nMax Energy: 40" +
                         "\nRole: Offense + Defense" +
                         "\nDifficulty: ???" +
-                        "\nAbility (2 stab, 4 per second of block, 6 swipe, 10 wipe): Judgement (Not Implemented)\n\n" +
-                        "";
+                        "\nAbility (2 stab, 4 per second of block, 6 swipe, 10 wipe): Judgement (Not Implemented)";
                         break;
                     case Characters.KokoroHatano:
-                        characterDescription.Description.Text = "\nMax Health: 100" +
+                        stats = "\nMax Health: 100" +
                         "\nMax Energy: 36" +
                         "\nRole: Offense + Defense" +
                         "\nDifficulty: Extra" +
-                        "\nAbility (passive): Last Dance (Buggy?)\n\n" +
-                        "";
+                        "\nAbility (passive): Last Dance (Buggy?)";
                         break;
                     case Characters.Kaguya:
-                        characterDescription.Description.Text = "\nMax Health: 80" +
+                        stats = "\nMax Health: 80" +
                         "\nMax Energy: 36" +
                         "\nRole: Support" +
                         "\nDifficulty: Hard" +
-                        "\nSpell (4 energy): Lunar Shift (Not Implemented)\n\n" +
-                        "";
+                        "\nSpell (4 energy): Lunar Shift (Not Implemented)";
                         break;
                     case Characters.IbarakiKasen:
-                        characterDescription.Description.Text = "\nMax Health: 40" +
+                        stats = "\nMax Health: 40" +
                         "\nMax Energy: 8" +
                         "\nRole: Offense" +
                         "\nDifficulty: Insane" +
-                        "\nSpell (2 energy): Blink (Pending New Spell)\n\n" +
-                        "";
+                        "\nSpell (2 energy): Blink (Pending New Spell)";
                         break;
                     case Characters.NueHoujuu:
-                        characterDescription.Description.Text = "\nMax Health: 80" +
+                        stats = "\nMax Health: 80" +
                         "\nMax Energy: 24" +
                         "\nRole: Support" +
                         "\nDifficulty: Another" +
-                        "\nSpell (Ratio [energy:damage/energy/health] - 1:4/2/1): Invasion (WIP)";
+                        "\nSpell (Ratio [energy:damage/energy/health/weaken] - 1:4/2/1/2): Invasion (WIP)";
                         break;
                     case Characters.Rock:
-                        characterDescription.Description.Text = "\nMax Health: 20" +
+                        stats = "\nMax Health: 20" +
                         "\nMax Energy: 0" +
                         "\nRole: *Silence*" +
                         "\nDifficulty: *More Silence*" +
@@ -388,12 +405,11 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                             character = Characters.ReimuHakurei;
                             goto restart;
                         }
-                        characterDescription.Description.Text = "\nMax Health: 200 (x2 Healing)" +
+                        stats = "\nMax Health: 200 (x2 Healing)" +
                         "\nMax Energy: 200 (x2 Gain)" +
                         "\nRole: Offense" +
                         "\nDifficulty: Hard" +
-                        "\nSpell: UnNatural\n\n" +
-                        "\"The cold hand of death will find you all.\"";
+                        "\nSpell: UnNatural";
                         break;
                     case Characters.ArysaMuyart:
                         if (!VitaruAPIContainer.Shawdooow)
@@ -402,14 +418,15 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                             character = Characters.ReimuHakurei;
                             goto restart;
                         }
-                        characterDescription.Description.Text = "\nMax Health: 60" +
+                        stats = "\nMax Health: 60" +
                         "\nMax Energy: 80" +
                         "\nRole: Defense" +
                         "\nDifficulty: ???" +
-                        "\nSpell: Seasonal Shift\n\n" +
-                        "\"Don't tamper with natural law they said. . .\"";
+                        "\nSpell: Seasonal Shift";
                         break;
                 }
+
+                characterDescription.Description.Text = stats;
             };
             selectedCharacter.TriggerChange();
 
@@ -427,9 +444,11 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         break;
                     case VitaruGamemode.Touhosu:
                         gamemodeDescription.Description.Text = "The \"amplified\" gamemode. Touhosu mode is everything Vitaru is and so much more. " +
-                        "Selecting different characters no longer just changes your skin but also your stats and allows you to use spells!";
+                        "Selecting different characters no longer just changes your skin but also your stats and allows you to use spells!\n\n" +
+                        "Also allows you to start story mode.";
                         break;
                 }
+                selectedCharacter.TriggerChange();
             };
             selectedGamemode.TriggerChange();
 
