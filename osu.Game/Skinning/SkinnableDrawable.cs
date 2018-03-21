@@ -49,6 +49,7 @@ namespace osu.Game.Skinning
                 {
                     drawable.RelativeSizeAxes = Axes.Both;
                     drawable.Size = Vector2.One;
+                    drawable.Scale = Vector2.One;
                     drawable.FillMode = FillMode.Fit;
                 }
             }
