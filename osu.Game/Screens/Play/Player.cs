@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
                             Alpha = 0,
                         },
                         RulesetContainer,
-                        new SkipButton(firstObjectTime)
+                        new SkipOverlay(firstObjectTime)
                         {
                             Clock = Clock, // skip button doesn't want to use the audio clock directly
                             ProcessCustomClock = false,

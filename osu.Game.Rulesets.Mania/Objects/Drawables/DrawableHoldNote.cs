@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             RelativeSizeAxes = Axes.X;
 
-            AddRange(new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 // The hit object itself cannot be used for various elements because the tail overshoots it
                 // So a specialized container that is updated to contain the tail height is used
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 }
-            });
+            };
 
             foreach (var tick in HitObject.NestedHitObjects.OfType<HoldNoteTick>())
             {

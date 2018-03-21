@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -40,7 +41,53 @@ namespace osu.Game.Beatmaps.Formats
 
         protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//");
 
-        protected abstract void ParseLine(T output, Section section, string line);
+        protected virtual void ParseLine(T output, Section section, string line)
+        {
+            switch (section)
+            {
+                case Section.Colours:
+                    handleColours(output, line);
+                    return;
+            }
+        }
+
+        private bool hasComboColours;
+
+        private void handleColours(T output, string line)
+        {
+            var pair = SplitKeyVal(line, ':');
+
+            bool isCombo = pair.Key.StartsWith(@"Combo");
+
+            string[] split = pair.Value.Split(',');
+
+            if (split.Length != 3)
+                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {pair.Value}");
+
+            if (!byte.TryParse(split[0], out var r) || !byte.TryParse(split[1], out var g) || !byte.TryParse(split[2], out var b))
+                throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
+
+            Color4 colour = new Color4(r, g, b, 255);
+
+            if (isCombo)
+            {
+                if (!(output is IHasComboColours tHasComboColours)) return;
+
+                if (!hasComboColours)
+                {
+                    // remove default colours.
+                    tHasComboColours.ComboColours.Clear();
+                    hasComboColours = true;
+                }
+
+                tHasComboColours.ComboColours.Add(colour);
+            }
+            else
+            {
+                if (!(output is IHasCustomColours tHasCustomColours)) return;
+                tHasCustomColours.CustomColours[pair.Key] = colour;
+            }
+        }
 
         protected KeyValuePair<string, string> SplitKeyVal(string line, char separator)
         {
@@ -65,6 +112,7 @@ namespace osu.Game.Beatmaps.Formats
             Colours,
             HitObjects,
             Variables,
+            Fonts
         }
 
         internal enum LegacySampleBank

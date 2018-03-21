@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableBarLineMajor(BarLine barLine)
             : base(barLine)
         {
-            Add(triangleContainer = new Container
+            AddInternal(triangleContainer = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

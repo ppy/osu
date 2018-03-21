@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModHalfTime : ModHalfTime
     {
-        public override double ScoreMultiplier => 0.5;
+        public override double ScoreMultiplier => 0.3;
     }
 }
