@@ -302,18 +302,30 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
-                    Color4 colour;
+                    Colour = getColourForDivisor(divisor, colours);
+                }
 
-                    if (divisor >= 16)
-                        colour = colours.Red;
-                    else if (divisor >= 12)
-                        colour = colours.YellowDarker;
-                    else if (divisor % 3 == 0)
-                        colour = colours.Yellow;
-                    else
-                        colour = Color4.White;
-
-                    Colour = colour.Opacity((float)Math.Pow(0.98f, divisor * 1.2f));
+                private ColourInfo getColourForDivisor(int divisor, OsuColour colours)
+                {
+                    switch (divisor)
+                    {
+                        case 2:
+                            return colours.BlueLight;
+                        case 4:
+                            return colours.Blue;
+                        case 8:
+                            return colours.BlueDarker;
+                        case 16:
+                            return colours.PurpleDark;
+                        case 3:
+                            return colours.YellowLight;
+                        case 6:
+                            return colours.Yellow;
+                        case 12:
+                            return colours.YellowDarker;
+                        default:
+                            return Color4.White;
+                    }
                 }
             }
 
@@ -342,7 +354,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                             RelativeSizeAxes = Axes.Y,
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.BottomCentre,
-                            Colour = ColourInfo.GradientVertical(Color4.Transparent, Color4.White),
+                            Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.2f), Color4.White),
                             Blending = BlendingMode.Additive,
                         },
                         new EquilateralTriangle
