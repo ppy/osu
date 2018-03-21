@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
     {
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
         private int currentDivisorIndex;
+
         public BeatDivisorControl(BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor.BindTo(beatDivisor);
@@ -40,9 +41,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             {
                 new Box
                 {
-                    Name = "Background",
+                    Name = "Gray Background",
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black
+                    Colour = colours.Gray4
                 },
                 new GridContainer
                 {
@@ -51,9 +52,22 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     {
                         new Drawable[]
                         {
-                            new TickSliderBar(beatDivisor, BindableBeatDivisor.VALID_DIVISORS)
+                            new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        Name = "Black Background",
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.Black
+                                    },
+                                    new TickSliderBar(beatDivisor, BindableBeatDivisor.VALID_DIVISORS)
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                    }
+                                }
                             }
                         },
                         new Drawable[]
@@ -91,16 +105,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                                         Action = beatDivisor.Next
                                                     }
                                                 },
-                                                new Drawable[]
-                                                {
-                                                    null,
-                                                    new TextFlowContainer(s => s.TextSize = 10)
-                                                    {
-                                                        Text = "beat snap divisor",
-                                                        RelativeSizeAxes = Axes.X,
-                                                        TextAnchor = Anchor.TopCentre
-                                                    },
-                                                },
                                             },
                                             ColumnDimensions = new[]
                                             {
@@ -113,6 +117,16 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                 }
                             }
                         },
+                        new Drawable[]
+                        {
+                            new TextFlowContainer(s => s.TextSize = 14)
+                            {
+                                Padding = new MarginPadding { Horizontal = 15 },
+                                Text = "beat snap divisor",
+                                RelativeSizeAxes = Axes.X,
+                                TextAnchor = Anchor.TopCentre
+                            },
+                        }
                     },
                     RowDimensions = new[]
                     {
