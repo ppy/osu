@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     {
                         new Drawable[]
                         {
-                            new TickSliderBar(beatDivisor, 1, 2, 3, 4, 6, 8, 12, 16)
+                            new TickSliderBar(beatDivisor, BindableBeatDivisor.VALID_DIVISORS)
                             {
                                 RelativeSizeAxes = Axes.Both,
                             }
@@ -216,11 +216,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             {
             }
 
+            public override bool HandleKeyboardInput => IsHovered && !CurrentNumber.Disabled;
+
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
             {
-                if (!IsHovered || CurrentNumber.Disabled)
-                    return false;
-
                 switch (args.Key)
                 {
                     case Key.Right:
