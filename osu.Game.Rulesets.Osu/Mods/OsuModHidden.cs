@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
                 //Don't hide the first object if the increaseFirstObjectVisibility is true ("drawables" are in a reverse order -> Last() )
-                if (d == drawables.Last() && (increaseFirstObjectVisibility == null || increaseFirstObjectVisibility)) continue;
+                if (d == drawables.Last() && increaseFirstObjectVisibility) continue;
                 d.ApplyCustomUpdateState += ApplyHiddenState;
 
                 d.HitObject.TimeFadein = d.HitObject.TimePreempt * fade_in_duration_multiplier;
