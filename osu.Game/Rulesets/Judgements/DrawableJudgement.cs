@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
 using System.Reflection;
-using System;
 
 namespace osu.Game.Rulesets.Judgements
 {
@@ -44,13 +43,13 @@ namespace osu.Game.Rulesets.Judgements
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Child = new SkinnableDrawable($"Play/{Judgement.Result}", _ => JudgementText = new OsuSpriteText
             {
                 Text = Judgement.Result.GetDescription().ToUpper(),
                 Font = @"Venera",
-                Colour = JudgementColours(Judgement.Result),
+                Colour = judgementColours(Judgement.Result),
                 Scale = new Vector2(0.85f, 1),
                 TextSize = 12
             }, restrictSize: false);
@@ -86,8 +85,8 @@ namespace osu.Game.Rulesets.Judgements
             Expire(true);
         }
 
-        private Color4 JudgementColours(HitResult judgement) =>
+        private Color4 judgementColours(HitResult judgement) =>
             judgement.GetType().GetField(judgement.ToString())
-            .GetCustomAttribute<JudgementColour>().colour;
+            .GetCustomAttribute<JudgementColour>().Colour;
     }
 }
