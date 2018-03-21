@@ -130,6 +130,7 @@
     <Compile Include="Visual\TestCaseEditorComposeRadioButtons.cs" />
     <Compile Include="Visual\TestCaseEditorComposeTimeline.cs" />
     <Compile Include="Visual\TestCaseEditorMenuBar.cs" />
+    <Compile Include="Visual\TestCaseEditorSeekSnapping.cs" />
     <Compile Include="Visual\TestCaseEditorSummaryTimeline.cs" />
     <Compile Include="Visual\TestCaseEditorSelectionLayer.cs" />
     <Compile Include="Visual\TestCaseGamefield.cs" />

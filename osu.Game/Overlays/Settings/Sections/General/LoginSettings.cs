@@ -210,7 +210,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         PlaceholderText = "Email address",
                         RelativeSizeAxes = Axes.X,
-                        Text = api?.Username ?? string.Empty,
+                        Text = api?.ProvidedUsername ?? string.Empty,
                         TabbableContentContainer = this
                     },
                     password = new OsuPasswordTextBox
