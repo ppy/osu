@@ -149,6 +149,7 @@ namespace osu.Game.Screens.Play
 
                 pushDebounce = Scheduler.AddDelayed(() =>
                 {
+                    pushDebounce = null;
                     contentOut();
 
                     this.Delay(250).Schedule(() =>
