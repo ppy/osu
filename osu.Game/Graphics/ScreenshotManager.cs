@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using System.Drawing.Imaging;
 using System.IO;
 using osu.Framework.Allocation;
@@ -43,7 +46,10 @@ namespace osu.Game.Graphics
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public bool OnReleased(GlobalAction action)
+        {
+            return false;
+        }
 
         public async void TakeScreenshotAsync()
         {
