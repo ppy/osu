@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Judgements
             {
                 Text = Judgement.Result.GetDescription().ToUpper(),
                 Font = @"Venera",
-                Colour = JudgementColours(Judgement.Result, colours),
+                Colour = judgementColours(Judgement.Result, colours),
                 Scale = new Vector2(0.85f, 1),
                 TextSize = 12
             }, restrictSize: false);
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Judgements
             Expire(true);
         }
 
-        private Color4 JudgementColours(HitResult judgement, OsuColour colours)
+        private Color4 judgementColours(HitResult judgement, OsuColour colours)
         {
             switch (judgement)
             {
