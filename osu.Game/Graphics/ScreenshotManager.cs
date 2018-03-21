@@ -76,15 +76,16 @@ namespace osu.Game.Graphics
 
         private string getFileName()
         {
+            var dt = DateTime.Now;
             var fileExt = screenshotFormat.ToString().ToLower();
 
-            var withoutIndex = $"Screenshot.{fileExt}";
+            var withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
             if (!storage.Exists(withoutIndex))
                 return withoutIndex;
 
             for (ulong i = 1; i < ulong.MaxValue; i++)
             {
-                var indexedName = $"Screenshot-{i}.{fileExt}";
+                var indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
                 if (!storage.Exists(indexedName))
                     return indexedName;
             }
