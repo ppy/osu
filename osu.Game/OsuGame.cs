@@ -239,6 +239,7 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
+            loadComponentSingleFile(new ScreenshotManager(), Add);
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
@@ -284,8 +285,6 @@ namespace osu.Game
             dependencies.Cache(beatmapSetOverlay);
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
-
-            Add(new ScreenshotManager());
 
             // ensure only one of these overlays are open at once.
             var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
