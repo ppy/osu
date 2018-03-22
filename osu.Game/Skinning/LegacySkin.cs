@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Database;
+using OpenTK;
 
 namespace osu.Game.Skinning
 {
@@ -56,10 +57,22 @@ namespace osu.Game.Skinning
                     break;
             }
 
-            var texture = GetTexture(componentName);
+            float ratio = 0.72f; // brings sizing roughly in-line with stable
+
+            var texture = GetTexture($"{componentName}@2x");
+            if (texture == null)
+            {
+                ratio *= 2;
+                GetTexture(componentName);
+            }
+
             if (texture == null) return null;
 
-            return new Sprite { Texture = texture };
+            return new Sprite
+            {
+                Texture = texture,
+                Scale = new Vector2(ratio),
+            };
         }
 
         public override Texture GetTexture(string componentName) => Textures.Get(componentName);
