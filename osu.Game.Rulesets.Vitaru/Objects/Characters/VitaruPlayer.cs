@@ -1462,7 +1462,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     Actions[VitaruAction.Left] = true;
                 if (action == VitaruAction.Right)
                     Actions[VitaruAction.Right] = true;
-                if (action == VitaruAction.Fast && CurrentCharacter != Characters.IbarakiKasen)
+                if (action == VitaruAction.Fast && currentGameMode == VitaruGamemode.Vitaru)
                     Actions[VitaruAction.Fast] = true;
                 if (action == VitaruAction.Slow)
                 {

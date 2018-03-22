@@ -70,7 +70,6 @@ namespace osu.Game.Rulesets.Vitaru
                         new KeyBinding(InputKey.A, VitaruAction.Left),
                         new KeyBinding(InputKey.D, VitaruAction.Right),
                         new KeyBinding(InputKey.Shift, VitaruAction.Slow),
-                        new KeyBinding(InputKey.Space, VitaruAction.Fast),
                     };
                 case ControlScheme.Touhosu:
                     return new KeyBinding[]
@@ -82,7 +81,6 @@ namespace osu.Game.Rulesets.Vitaru
                         new KeyBinding(InputKey.MouseLeft, VitaruAction.Shoot),
                         new KeyBinding(InputKey.MouseRight, VitaruAction.Spell),
                         new KeyBinding(InputKey.Shift, VitaruAction.Slow),
-                        new KeyBinding(InputKey.Space, VitaruAction.Fast),
                     };
                 case ControlScheme.Sakuya:
                     return new KeyBinding[]
@@ -96,7 +94,6 @@ namespace osu.Game.Rulesets.Vitaru
                         new KeyBinding(InputKey.E, VitaruAction.Increase),
                         new KeyBinding(InputKey.Q, VitaruAction.Decrease),
                         new KeyBinding(InputKey.Shift, VitaruAction.Slow),
-                        new KeyBinding(InputKey.Space, VitaruAction.Fast),
                     };
                 case ControlScheme.Kokoro:
                     return new KeyBinding[]
@@ -110,7 +107,6 @@ namespace osu.Game.Rulesets.Vitaru
                         new KeyBinding(InputKey.E, VitaruAction.RightShoot),
                         new KeyBinding(InputKey.Q, VitaruAction.LeftShoot),
                         new KeyBinding(InputKey.Shift, VitaruAction.Slow),
-                        new KeyBinding(InputKey.Space, VitaruAction.Fast),
                     };
                 case ControlScheme.NueHoujuu:
                     return new KeyBinding[]
@@ -125,7 +121,6 @@ namespace osu.Game.Rulesets.Vitaru
                         new KeyBinding(InputKey.E, VitaruAction.Spell3),
                         new KeyBinding(InputKey.Q, VitaruAction.Spell4),
                         new KeyBinding(InputKey.Shift, VitaruAction.Slow),
-                        new KeyBinding(InputKey.Space, VitaruAction.Fast),
                     };
                 case ControlScheme.AliceMuyart:
                     return new KeyBinding[]
@@ -141,7 +136,6 @@ namespace osu.Game.Rulesets.Vitaru
                         new KeyBinding(InputKey.E, VitaruAction.Increase),
                         new KeyBinding(InputKey.Q, VitaruAction.Decrease),
                         new KeyBinding(InputKey.Shift, VitaruAction.Slow),
-                        new KeyBinding(InputKey.Space, VitaruAction.Fast),
                     };
             }
 
