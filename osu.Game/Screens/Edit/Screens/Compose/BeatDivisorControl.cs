@@ -131,6 +131,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 35),
+                        new Dimension(GridSizeMode.Absolute, 25),
                     }
                 }
             };
