@@ -7,9 +7,9 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Skinning
 {
-    public class BeatmapSkin : LegacySkin
+    public class LegacyBeatmapSkin : LegacySkin
     {
-        public BeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, AudioManager audioManager)
+        public LegacyBeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, AudioManager audioManager)
             : base(createSkinInfo(beatmap), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage), audioManager, beatmap.Path)
         {
         }
