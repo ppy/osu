@@ -366,7 +366,6 @@
     <Compile Include="Rulesets\Configuration\RulesetConfigManager.cs" />
     <Compile Include="Rulesets\Edit\HitObjectMask.cs" />
     <Compile Include="Rulesets\Edit\Types\IHasEditablePosition.cs" />
-    <Compile Include="Rulesets\Judgements\JudgementColour.cs" />
     <Compile Include="Rulesets\Mods\IApplicableFailOverride.cs" />
     <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToBeatmapConverter.cs" />

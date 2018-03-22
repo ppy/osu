@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 {
                     RelativeSizeAxes = Axes.Both
                 }
-            }, false);
+            }, s => s.GetTexture("Play/osu/hitcircle") == null);
         }
     }
 }
