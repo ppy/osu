@@ -23,9 +23,9 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmap">The Beatmap to process.</param>
         public virtual void PostProcess(Beatmap<TObject> beatmap)
         {
-            IHasComboIndex lastObj = null;
+            IHasComboInformation lastObj = null;
 
-            foreach (var obj in beatmap.HitObjects.OfType<IHasComboIndex>())
+            foreach (var obj in beatmap.HitObjects.OfType<IHasComboInformation>())
             {
                 if (obj.NewCombo)
                 {
