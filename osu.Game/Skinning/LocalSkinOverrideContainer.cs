@@ -7,7 +7,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -22,7 +21,7 @@ namespace osu.Game.Skinning
 
         public SampleChannel GetSample(string sampleName) => source.GetSample(sampleName) ?? fallbackSource?.GetSample(sampleName);
 
-        public Color4? GetComboColour(IHasComboInformation comboObject) => source.GetComboColour(comboObject) ?? fallbackSource?.GetComboColour(comboObject);
+        public Color4? GetColour(string colourName) => source.GetColour(colourName) ?? fallbackSource?.GetColour(colourName);
 
         private readonly ISkinSource source;
         private ISkinSource fallbackSource;
