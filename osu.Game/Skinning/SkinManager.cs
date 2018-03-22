@@ -39,6 +39,31 @@ namespace osu.Game.Skinning
             Name = archive.Name
         };
 
+        protected override void Populate(SkinInfo model, ArchiveReader archive)
+        {
+            base.Populate(model, archive);
+            populate(model);
+        }
+
+        /// <summary>
+        /// Populate a <see cref="SkinInfo"/> from its <see cref="SkinConfiguration"/> (if possible).
+        /// </summary>
+        /// <param name="model"></param>
+        private void populate(SkinInfo model)
+        {
+            Skin reference = GetSkin(model);
+            if (!string.IsNullOrEmpty(reference.Configuration.SkinInfo.Name))
+            {
+                model.Name = reference.Configuration.SkinInfo.Name;
+                model.Creator = reference.Configuration.SkinInfo.Creator;
+            }
+            else
+            {
+                model.Name = model.Name.Replace(".osk", "");
+                model.Creator = "Unknown";
+            }
+        }
+
         /// <summary>
         /// Retrieve a <see cref="Skin"/> instance for the provided <see cref="SkinInfo"/>
         /// </summary>
@@ -65,6 +90,16 @@ namespace osu.Game.Skinning
                 if (skin.SkinInfo != CurrentSkinInfo.Value)
                     throw new InvalidOperationException($"Setting {nameof(CurrentSkin)}'s value directly is not supported. Use {nameof(CurrentSkinInfo)} instead.");
             };
+
+            // migrate older imports which didn't have access to skin.ini
+            using (ContextFactory.GetForWrite())
+            {
+                foreach (var skinInfo in ModelStore.ConsumableItems.Where(s => s.Name.EndsWith(".osk")))
+                {
+                    populate(skinInfo);
+                    Update(skinInfo);
+                }
+            }
         }
 
         /// <summary>
