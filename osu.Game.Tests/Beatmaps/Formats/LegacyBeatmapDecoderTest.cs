@@ -11,6 +11,7 @@ using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -163,7 +164,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapColors()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacySkinDecoder();
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {

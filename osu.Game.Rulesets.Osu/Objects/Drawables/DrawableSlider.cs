@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -41,7 +42,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 Body = new SliderBody(s)
                 {
-                    AccentColour = AccentColour,
                     PathWidth = s.Scale * 64,
                 },
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
@@ -50,7 +50,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
-                    AccentColour = AccentColour,
                     AlwaysPresent = true,
                     Alpha = 0
                 },
@@ -85,6 +84,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+        }
+
+        public override Color4 AccentColour
+        {
+            get { return base.AccentColour; }
+            set
+            {
+                base.AccentColour = value;
+                Body.AccentColour = AccentColour;
+                Ball.AccentColour = AccentColour;
+            }
         }
 
         [BackgroundDependencyLoader]

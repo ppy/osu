@@ -139,8 +139,7 @@ namespace osu.Game.Screens.Play
                 {
                     // as the pushDebounce below has a delay, we need to keep checking and cancel a future debounce
                     // if we become unready for push during the delay.
-                    pushDebounce?.Cancel();
-                    pushDebounce = null;
+                    cancelLoad();
                     return;
                 }
 
@@ -172,10 +171,23 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        private void cancelLoad()
+        {
+            pushDebounce?.Cancel();
+            pushDebounce = null;
+        }
+
+        protected override void OnSuspending(Screen next)
+        {
+            base.OnSuspending(next);
+            cancelLoad();
+        }
+
         protected override bool OnExiting(Screen next)
         {
             Content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
+            cancelLoad();
 
             return base.OnExiting(next);
         }

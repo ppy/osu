@@ -5,28 +5,39 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableDroplet : PalpableCatchHitObject<Droplet>
     {
+        private Pulp pulp;
+
         public DrawableDroplet(Droplet h)
             : base(h)
         {
             Origin = Anchor.Centre;
             Size = new Vector2((float)CatchHitObject.OBJECT_RADIUS) / 4;
-            AccentColour = h.ComboColour;
             Masking = false;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new Pulp
+            InternalChild = pulp = new Pulp
             {
-                AccentColour = AccentColour,
                 Size = Size
             };
+        }
+
+        public override Color4 AccentColour
+        {
+            get { return base.AccentColour; }
+            set
+            {
+                base.AccentColour = value;
+                pulp.AccentColour = AccentColour;
+            }
         }
     }
 }

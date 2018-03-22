@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
             };
 
-            void reloadSkins() => skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.Name, s.ID));
+            void reloadSkins() => skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.ToString(), s.ID));
             skins.ItemAdded += _ => reloadSkins();
             skins.ItemRemoved += _ => reloadSkins();
 

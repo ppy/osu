@@ -6,13 +6,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Edit.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasCombo, IHasEditablePosition
+    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
     {
         public const double OBJECT_RADIUS = 64;
 
@@ -53,9 +51,13 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public float Scale { get; set; } = 1;
 
-        public Color4 ComboColour { get; set; } = Color4.Gray;
         public virtual bool NewCombo { get; set; }
+
         public int IndexInCurrentCombo { get; set; }
+
+        public int ComboIndex { get; set; }
+
+        public bool LastInCombo { get; set; }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
