@@ -7,14 +7,17 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 
 namespace osu.Game.Skinning
 {
-    public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>
+    public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource
     {
         private readonly AudioManager audio;
 
@@ -89,6 +92,8 @@ namespace osu.Game.Skinning
             {
                 if (skin.SkinInfo != CurrentSkinInfo.Value)
                     throw new InvalidOperationException($"Setting {nameof(CurrentSkin)}'s value directly is not supported. Use {nameof(CurrentSkinInfo)} instead.");
+
+                SourceChanged?.Invoke();
             };
 
             // migrate older imports which didn't have access to skin.ini
@@ -108,5 +113,17 @@ namespace osu.Game.Skinning
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public SkinInfo Query(Expression<Func<SkinInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
+
+        public event Action SourceChanged;
+
+        public Drawable GetDrawableComponent(string componentName) => CurrentSkin.Value.GetDrawableComponent(componentName);
+
+        public Texture GetTexture(string componentName) => CurrentSkin.Value.GetTexture(componentName);
+
+        public SampleChannel GetSample(string sampleName) => CurrentSkin.Value.GetSample(sampleName);
+
+        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class => CurrentSkin.Value.GetValue(query);
+
+        public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct => CurrentSkin.Value.GetValue(query);
     }
 }
