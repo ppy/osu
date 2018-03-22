@@ -23,5 +23,9 @@ namespace osu.Game.Skinning
         SampleChannel GetSample(string sampleName);
 
         Color4? GetColour(string colourName);
+
+        TValue GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class;
+
+        TValue? GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct;
     }
 }

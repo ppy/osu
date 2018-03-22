@@ -119,10 +119,14 @@ namespace osu.Game.Skinning
 
         public Drawable GetDrawableComponent(string componentName) => CurrentSkin.Value.GetDrawableComponent(componentName);
 
-        public Texture GetTexture(string componentName)=> CurrentSkin.Value.GetTexture(componentName);
+        public Texture GetTexture(string componentName) => CurrentSkin.Value.GetTexture(componentName);
 
         public SampleChannel GetSample(string sampleName) => CurrentSkin.Value.GetSample(sampleName);
 
         public Color4? GetColour(string colourName) => CurrentSkin.Value.GetColour(colourName);
+
+        public TValue GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class => CurrentSkin.Value.GetConfiguration(query);
+
+        public TValue? GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct => CurrentSkin.Value.GetConfiguration(query);
     }
 }
