@@ -1132,19 +1132,19 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 if (speed > 1)
                 {
                     VitaruInputManager.Shade.Colour = Color4.Cyan;
-                    VitaruInputManager.Shade.Alpha = (speed - 1) * 0.1f;
+                    VitaruInputManager.Shade.Alpha = (speed - 1) * 0.05f;
                 }
                 else if (speed == 1)
                     VitaruInputManager.Shade.Alpha = 0;
                 else if (speed < 1 && speed > 0)
                 {
                     VitaruInputManager.Shade.Colour = Color4.Orange;
-                    VitaruInputManager.Shade.Alpha = (1 - speed) * 0.1f;
+                    VitaruInputManager.Shade.Alpha = (1 - speed) * 0.05f;
                 }
                 else if (speed < 0)
                 {
                     VitaruInputManager.Shade.Colour = Color4.Purple;
-                    VitaruInputManager.Shade.Alpha = -speed * 0.2f;
+                    VitaruInputManager.Shade.Alpha = -speed * 0.1f;
                 }
             }
 
