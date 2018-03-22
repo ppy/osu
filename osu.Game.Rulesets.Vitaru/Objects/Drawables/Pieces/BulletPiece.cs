@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables.Pieces
                     Alpha = 0,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Colour = drawableBullet.Bullet.ComboColour,
+                    Colour = drawableBullet.AccentColour,
                     Texture = VitaruRuleset.VitaruTextures.Get("bulletKiai"),
                 };
 
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables.Pieces
                 Origin = Anchor.Centre,
                 Alpha = 1,
                 RelativeSizeAxes = Axes.Both,
-                BorderColour = drawableBullet.Bullet.ComboColour,
+                BorderColour = drawableBullet.AccentColour,
                 BorderThickness = 6,
                 Masking = true,
 
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables.Pieces
                 {
                     Radius = drawableBullet.Bullet.BulletDiameter,
                     Type = EdgeEffectType.Shadow,
-                    Colour = drawableBullet.Bullet.ComboColour.Opacity(0.2f)
+                    Colour = drawableBullet.AccentColour.Opacity(0.2f)
                 };
 
             if (drawableBullet.Bullet.Ghost && currentCharacter == Characters.Characters.YuyukoSaigyouji | currentCharacter == Characters.Characters.AliceMuyart)

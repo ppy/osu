@@ -182,6 +182,11 @@ namespace osu.Game.Rulesets.Vitaru.Objects
                     b.Cs = Cs;
                     b.StackHeight = StackHeight;
 
+                    b.NewCombo = NewCombo;
+                    b.IndexInCurrentCombo = IndexInCurrentCombo;
+                    b.ComboIndex = ComboIndex;
+                    b.LastInCombo = LastInCombo;
+
                     b.ShootPlayer = shootPlayer;
 
                     AddNested(b);
@@ -238,7 +243,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects
                 {
                     StartTime = StartTime,
                     Position = Position,
-                    ComboColour = ComboColour,
                     BulletSpeed = PatternSpeed,
                     BulletAngleRadian = angle,
                     BulletDiameter = diameter,
@@ -262,7 +266,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects
                 {
                     StartTime = StartTime,
                     Position = Position,
-                    ComboColour = ComboColour,
                     BulletSpeed = speed,
                     BulletAngleRadian = patternAngleRadian,
                     BulletDiameter = diameter,
@@ -288,7 +291,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects
                 {
                     StartTime = StartTime,
                     Position = Position,
-                    ComboColour = ComboColour,
                     BulletSpeed = PatternSpeed,
                     BulletAngleRadian = angle,
                     BulletDiameter = diameter,
@@ -320,7 +322,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects
                     {
                         StartTime = StartTime,
                         Position = Position,
-                        ComboColour = ComboColour,
                         BulletSpeed = speed,
                         BulletAngleRadian = angle,
                         BulletDiameter = diameter,
@@ -351,7 +352,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects
                 {
                     StartTime = StartTime,
                     Position = Position,
-                    ComboColour = ComboColour,
                     BulletSpeed = speed,
                     BulletAngleRadian = patternAngleRadian,
                     BulletDiameter = diameter,
@@ -375,7 +375,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects
                 {
                     StartTime = StartTime,
                     Position = Position,
-                    ComboColour = ComboColour,
                     BulletSpeed = PatternSpeed,
                     BulletAngleRadian = patternAngleRadian,
                     BulletDiameter = diameter,

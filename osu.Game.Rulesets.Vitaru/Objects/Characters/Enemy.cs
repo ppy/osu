@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             AlwaysPresent = true;
             CharacterName = "enemy";
             Team = 1;
-            CharacterColor = pattern.ComboColour;
+            CharacterColor = drawablePattern.AccentColour;
             HitboxWidth = 27;
         }
 

@@ -1,6 +1,9 @@
 ﻿using osu.Game.Rulesets.Objects.Drawables;
 using Symcol.Rulesets.Core.HitObjects;
 using System.ComponentModel;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Skinning;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
 {
@@ -11,6 +14,16 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
         public static float TIME_FADEOUT = 1200;
 
         public readonly Framework.Graphics.Containers.Container ParentContainer;
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+
+            if (HitObject is IHasComboInformation combo && HitObject.ColorOverride == Color4.White)
+                AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
+            else
+                AccentColour = HitObject.ColorOverride;
+        }
 
         public DrawableVitaruHitObject(VitaruHitObject hitObject, Framework.Graphics.Containers.Container parent) : base(hitObject)
         {

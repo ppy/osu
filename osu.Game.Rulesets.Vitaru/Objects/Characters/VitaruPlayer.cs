@@ -688,7 +688,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             {
                 LaserSize = new Vector2(80, 400),
                 Team = Team,
-                ComboColour = CharacterColor,
                 StartTime = Time.Current,
                 EndTime = Time.Current + 2000
             }));
@@ -1148,11 +1147,11 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 StartTime = Time.Current,
                 Cs = 1.2f,
                 DummyMode = true,
-                ComboColour = color,
                 BulletAngleRadian = angle,
                 BulletSpeed = speed,
                 BulletDiameter = 16,
                 BulletDamage = 20 * damageMultiplier,
+                ColorOverride = color,
                 Team = Team,
                 Ghost = currentCharacter == Characters.YuyukoSaigyouji | currentCharacter == Characters.AliceMuyart
             }));

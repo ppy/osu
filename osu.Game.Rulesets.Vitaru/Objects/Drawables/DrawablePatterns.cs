@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
                         Size = new Vector2(30),
                         CornerRadius = 30f / 2,
                         BorderThickness = 10,
-                        BorderColour = pattern.ComboColour,
+                        BorderColour = AccentColour,
                         Children = new Drawable[]
                         {
                             new Box
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Shadow,
-                            Colour = pattern.ComboColour.Opacity(0.5f),
+                            Colour = AccentColour.Opacity(0.5f),
                             Radius = Width / 2,
                         }
                     };
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
                         Origin = Anchor.Centre,
                         Size = new Vector2(20),
                         BorderThickness = 6,
-                        BorderColour = pattern.ComboColour,
+                        BorderColour = AccentColour,
                         Children = new Drawable[]
                         {
                             new Box
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Shadow,
-                            Colour = pattern.ComboColour.Opacity(0.5f),
+                            Colour = AccentColour.Opacity(0.5f),
                             Radius = Width / 2,
                         }
                     };
@@ -141,7 +141,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
                 foreach (var o in pattern.NestedHitObjects)
                 {
                     var b = (Bullet)o;
-                    b.ComboColour = pattern.ComboColour;
                     DrawableBullet drawableBullet = new DrawableBullet(ParentContainer, b, this);
                     ParentContainer.Add(drawableBullet);
                     AddNested(drawableBullet);

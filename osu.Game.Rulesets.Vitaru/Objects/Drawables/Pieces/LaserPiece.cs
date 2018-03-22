@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables.Pieces
             CornerRadius = 16;
 
             BorderThickness = 8;
-            BorderColour = drawableLaser.Laser.ComboColour;
+            BorderColour = drawableLaser.AccentColour;
 
             Child = new Box
             {

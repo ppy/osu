@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters.Pieces
                 Team = ParentCharacter.Team,
                 BulletSpeed = 0.8f,
                 BulletDamage = 5,
-                ComboColour = ParentCharacter.CharacterColor,
+                ColorOverride = ParentCharacter.CharacterColor,
                 StartAngle = StartAngle,
             }));
             s.MoveTo(ToSpaceOfOtherDrawable(new Vector2(0, 0), s));

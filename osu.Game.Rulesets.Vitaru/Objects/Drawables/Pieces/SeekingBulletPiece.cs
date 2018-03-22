@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             BorderThickness = 4;
             AlwaysPresent = true;
-            BorderColour = seekingBullet.SeekingBullet.ComboColour;
+            BorderColour = seekingBullet.AccentColour;
             CornerRadius = 4;
 
             Child = new Box
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables.Pieces
             {
                 Type = EdgeEffectType.Shadow,
                 Radius = 8,
-                Colour = seekingBullet.SeekingBullet.ComboColour.Opacity(0.25f),
+                Colour = seekingBullet.AccentColour.Opacity(0.25f),
             };
         }
 

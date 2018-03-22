@@ -3,10 +3,12 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Objects.Types;
+using System;
 
 namespace osu.Game.Rulesets.Vitaru.Objects
 {
-    public abstract class VitaruHitObject : HitObject
+    public abstract class VitaruHitObject : HitObject, IHasComboInformation
     {
         public float BPM;
 
@@ -30,9 +32,16 @@ namespace osu.Game.Rulesets.Vitaru.Objects
 
         public abstract HitObjectType Type { get; }
 
-        public Color4 ComboColour { get; set; }
+        //TODO: make null != White
+        public Color4 ColorOverride { get; set; } = Color4.White;
+
         public virtual bool NewCombo { get; set; }
+
+        public int IndexInCurrentCombo { get; set; }
+
         public int ComboIndex { get; set; }
+
+        public bool LastInCombo { get; set; }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
