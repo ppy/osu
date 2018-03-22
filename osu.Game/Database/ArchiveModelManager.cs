@@ -101,7 +101,7 @@ namespace osu.Game.Database
                     using (ArchiveReader reader = getReaderFrom(path))
                         imported.Add(Import(reader));
 
-                    notification.Progress = (float)(current - 1) / paths.Length;
+                    notification.Progress = (float)current / paths.Length;
 
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with items from default storage.
@@ -220,9 +220,11 @@ namespace osu.Game.Database
                         // user requested abort
                         return;
 
-                    notification.Progress = (float)i / items.Count;
                     notification.Text = $"Deleting ({++i} of {items.Count})";
+
                     Delete(b);
+
+                    notification.Progress = (float)i / items.Count;
                 }
             }
 
@@ -256,9 +258,11 @@ namespace osu.Game.Database
                         // user requested abort
                         return;
 
-                    notification.Progress = (float)i / items.Count;
                     notification.Text = $"Restoring ({++i} of {items.Count})";
+
                     Undelete(item);
+
+                    notification.Progress = (float)i / items.Count;
                 }
             }
 
