@@ -5,6 +5,8 @@ using System;
 using System.Drawing.Imaging;
 using System.IO;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -24,14 +26,18 @@ namespace osu.Game.Graphics
         private Storage storage;
         private NotificationOverlay notificationOverlay;
 
+        private SampleChannel shutter;
+
         [BackgroundDependencyLoader]
-        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay)
+        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
         {
             this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
             this.notificationOverlay = notificationOverlay;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
+
+            shutter = audio.Sample.Get("UI/shutter");
         }
 
         public bool OnPressed(GlobalAction action)
@@ -39,6 +45,7 @@ namespace osu.Game.Graphics
             switch (action)
             {
                 case GlobalAction.TakeScreenshot:
+                    shutter.Play();
                     TakeScreenshotAsync();
                     return true;
             }
