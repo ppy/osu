@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
         private bool loaded;
         private bool started;
         private bool done;
+
+        private readonly double endTime;
         
         private int currentRepeat;
 
@@ -37,9 +39,12 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
             this.pattern = pattern;
 
             if (!pattern.IsSlider && !pattern.IsSpinner)
-                this.pattern.EndTime = this.pattern.StartTime + TIME_FADEOUT;
+            {
+                endTime = this.pattern.StartTime + TIME_FADEOUT;
+                this.pattern.EndTime = endTime;
+            }
             else if (pattern.IsSlider)
-                this.pattern.EndTime += TIME_FADEOUT;
+                endTime = this.pattern.EndTime += TIME_FADEOUT;
         }
 
         protected override void LoadComplete()
@@ -47,9 +52,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
             base.LoadComplete();
 
             PatternCount++;
-
-            if (pattern.IsSlider)
-                pattern.EndTime = pattern.StartTime + pattern.RepeatCount * pattern.Curve.Distance / pattern.Velocity;
 
             LifetimeStart = pattern.StartTime - (TIME_PREEMPT + 1000f);
         }
@@ -303,9 +305,8 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
         #region Slider Stuff
         private void sliderUpdate()
         {
-            double progress = MathHelper.Clamp((Time.Current - pattern.StartTime) / pattern.Duration, 0, 1);
-            int repeat = pattern.RepeatAt(progress);
-            progress = pattern.ProgressAt(progress);
+            double completionProgress = MathHelper.Clamp((Time.Current - pattern.StartTime) / pattern.Duration, 0, 1);
+            int repeat = pattern.RepeatAt(completionProgress);
 
             if (HitObject.StartTime <= Time.Current && !started)
             {
@@ -315,9 +316,9 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Drawables
 
             if (!done && started)
             {
-                Position = pattern.Curve.PositionAt(progress);
+                Position = pattern.PositionAt(completionProgress);
                 if (currentGameMode != VitaruGamemode.Dodge)
-                    enemy.Position = pattern.Curve.PositionAt(progress);
+                    enemy.Position = pattern.PositionAt(completionProgress);
             }
 
             if (repeat > currentRepeat)

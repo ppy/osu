@@ -24,7 +24,6 @@ namespace osu.Game.Rulesets.Vitaru.Beatmaps
 
         protected override IEnumerable<VitaruHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
-            var curveData = original as IHasCurve;
             var endTimeData = original as IHasEndTime;
             var positionData = original as IHasPosition;
             var comboData = original as IHasCombo;
@@ -43,9 +42,8 @@ namespace osu.Game.Rulesets.Vitaru.Beatmaps
             bool isCoolWave = samples.Any(s => s.Name == SampleInfo.HIT_CLAP);
 
             Pattern p;
-            Pattern a;
 
-            if (curveData != null)
+            if (original is IHasCurve curveData)
             {
                 if (isLine)
                 {
@@ -245,8 +243,7 @@ namespace osu.Game.Rulesets.Vitaru.Beatmaps
                 }
             }
 
-            a = p;
-            HitObjectList.Add(a);
+            HitObjectList.Add(p);
             yield return p;
         }
 

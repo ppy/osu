@@ -9,7 +9,7 @@ using System;
 
 namespace osu.Game.Rulesets.Vitaru.Objects
 {
-    public class Pattern : VitaruHitObject
+    public class Pattern : VitaruHitObject, IHasCurve
     {
         public override HitObjectType Type => HitObjectType.Pattern;
 
@@ -38,20 +38,13 @@ namespace osu.Game.Rulesets.Vitaru.Objects
         public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
         private const float base_scoring_distance = 100;
         public double Duration => EndTime - StartTime;
-        public readonly SliderCurve Curve = new SliderCurve();
-        public int RepeatCount { get; set; } = 1;
+        public SliderCurve Curve { get; } = new SliderCurve();
+        public int RepeatCount { get; set; }
         public double Velocity;
+        public double SpanDuration => Duration / this.SpanCount();
 
-        public override Vector2 EndPosition => PositionAt(1);
-        public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
-
-        public double ProgressAt(double progress)
-        {
-            double p = progress * RepeatCount % 1;
-            if (RepeatAt(progress) % 2 == 1)
-                p = 1 - p;
-            return p;
-        }
+        public override Vector2 EndPosition => Position + this.CurvePositionAt(1);
+        public Vector2 PositionAt(double t) => Position + this.CurvePositionAt(t);
 
         public int RepeatAt(double progress) => (int)(progress * RepeatCount);
 
@@ -83,6 +76,9 @@ namespace osu.Game.Rulesets.Vitaru.Objects
             double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
+
+            if (IsSlider)
+                EndTime = StartTime + this.SpanCount() * Curve.Distance / Velocity;
         }
         #endregion
 
@@ -109,7 +105,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects
                     totalBullets += (int)(PatternDifficulty + 2) / 2;
                     break;
                 case 4:
-                    totalBullets += (int)(PatternDifficulty * 2) + 3;
+                    totalBullets += (int)(PatternDifficulty * 4);
                     break;
                 case 5:
                     totalBullets += (int)(30 * (PatternDifficulty / 3) * (Duration / 1000));
@@ -130,44 +126,29 @@ namespace osu.Game.Rulesets.Vitaru.Objects
 
         private void createBullets()
         {
-
-            var length = Curve.Distance;
-            var repeatPointDistance = Math.Min(Distance, length);
-            var repeatDuration = length / Velocity;
-            int repeatCount = RepeatCount;
-
             if (IsSlider)
             {
-                repeatCount += 1;
-                bool sliderStart = false;
-                for (var repeat = 0; repeat < repeatCount; repeat++)
+                for (int repeatIndex = 0, repeat = 0; repeatIndex < RepeatCount + 1; repeatIndex++, repeat++)
                 {
-                    sliderStart = !sliderStart;
-                    for (var d = repeatPointDistance; d <= length; d += repeatPointDistance)
+                    IEnumerable<Bullet> bullets = createPattern();
+
+                    foreach (Bullet b in bullets)
                     {
-                        var repeatStartTime = StartTime + repeat * repeatDuration;
-                        var distanceProgress = d / length;
-
-                        IEnumerable<Bullet> bullets = createPattern();
-
-                        foreach (Bullet b in bullets)
+                        if (IsSlider)
                         {
-                            if (IsSlider)
-                            {
-                                b.StartTime = repeatStartTime;
+                            b.StartTime = StartTime + repeat * SpanDuration;
 
-                                b.Position = Curve.PositionAt(!sliderStart ? distanceProgress : 0);
-                            }
-
-                            b.NewCombo = NewCombo;
-                            b.Ar = Ar;
-                            b.Cs = Cs;
-                            b.StackHeight = StackHeight;
-
-                            b.ShootPlayer = shootPlayer;
-
-                            AddNested(b);
+                            b.Position = Position + Curve.PositionAt(repeat % 2);
                         }
+
+                        b.NewCombo = NewCombo;
+                        b.Ar = Ar;
+                        b.Cs = Cs;
+                        b.StackHeight = StackHeight;
+
+                        b.ShootPlayer = shootPlayer;
+
+                        AddNested(b);
                     }
                 }
             }
@@ -220,7 +201,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects
                     return PatternTriangleWave(bulletDiameter);
                 case 4:
                     shootPlayer = false;
-                    return PatternCoolWave(bulletDiameter);
+                    return PatternCircle(bulletDiameter);
                 case 5:
                     shootPlayer = true;
                     //should be PatternSpin() once its fixed
@@ -277,32 +258,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects
             }
             return bullets;
         }
-        public List<Bullet> PatternCoolWave(float diameter)
-        {
-            List<Bullet> bullets = new List<Bullet>();
-            int numberbullets = (int)(PatternDifficulty * 2) + 3;
-            float speedModifier = 0.02f * (PatternDifficulty);
-            float directionModifier = -0.15f * (PatternDifficulty);
-            for (int i = 1; i <= numberbullets; i++)
-            {
-                PatternSpeed = PatternSpeed + Math.Abs(speedModifier);
-                float angle = directionModifier + patternAngleRadian;
-                bullets.Add(new Bullet
-                {
-                    StartTime = StartTime,
-                    Position = Position,
-                    BulletSpeed = PatternSpeed,
-                    BulletAngleRadian = angle,
-                    BulletDiameter = diameter,
-                    BulletDamage = PatternDamage,
-                    DynamicBulletVelocity = dynamicPatternVelocity,
-                    Team = 1,
-                });
-                speedModifier -= 0.01f;
-                directionModifier += 0.075f;
-            }
-            return bullets;
-        }
         public List<Bullet> PatternTriangleWave(float diameter)
         {
             List<Bullet> bullets = new List<Bullet>();
@@ -334,39 +289,12 @@ namespace osu.Game.Rulesets.Vitaru.Objects
             }
             return bullets;
         }
-
-        public List<Bullet> PatternCurve(float diameter)
-        {
-            List<Bullet> bullets = new List<Bullet>();
-            int numberbullets = (int)(PatternDifficulty + 10) / 2;
-            float originalDirection = 0.01f * ((float)numberbullets / 2);
-            float speedModifier = 0f;
-            float directionModifier = 0f;
-            for (int i = 1; i <= numberbullets; i++)
-            {
-                var speed = PatternSpeed + speedModifier;
-                patternAngleRadian = patternAngleRadian - originalDirection + directionModifier;
-                directionModifier += 0.015f;
-                speedModifier -= (i * 0.002f);
-                bullets.Add(new Bullet
-                {
-                    StartTime = StartTime,
-                    Position = Position,
-                    BulletSpeed = speed,
-                    BulletAngleRadian = patternAngleRadian,
-                    BulletDiameter = diameter,
-                    BulletDamage = PatternDamage,
-                    DynamicBulletVelocity = dynamicPatternVelocity,
-                    Team = 1,
-                });
-            }
-            return bullets;
-        }
         public List<Bullet> PatternCircle(float diameter)
         {
             List<Bullet> bullets = new List<Bullet>();
-            int numberbullets = (int)(PatternDifficulty + 1) * 8;
+            int numberbullets = (int)(PatternDifficulty * 4);
             float directionModifier = (360f / numberbullets);
+            float direction = MathHelper.DegreesToRadians(-90);
             directionModifier = MathHelper.DegreesToRadians(directionModifier);
             for (int i = 1; i <= numberbullets; i++)
             {
