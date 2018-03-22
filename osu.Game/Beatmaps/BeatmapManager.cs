@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Audio;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -55,6 +56,8 @@ namespace osu.Game.Beatmaps
 
         private readonly APIAccess api;
 
+        private readonly AudioManager audioManager;
+
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
         /// <summary>
@@ -62,7 +65,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Storage> GetStableStorage { private get; set; }
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, IIpcHost importHost = null)
             : base(storage, contextFactory, new BeatmapStore(contextFactory), importHost)
         {
             beatmaps = (BeatmapStore)ModelStore;
@@ -71,6 +74,7 @@ namespace osu.Game.Beatmaps
 
             this.rulesets = rulesets;
             this.api = api;
+            this.audioManager = audioManager;
         }
 
         protected override void Populate(BeatmapSetInfo model, ArchiveReader archive)
@@ -217,7 +221,7 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, beatmapInfo);
+            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, beatmapInfo, audioManager);
 
             previous?.TransferTo(working);
 
