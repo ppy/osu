@@ -23,6 +23,6 @@ namespace osu.Game.Skinning
 
         SampleChannel GetSample(string sampleName);
 
-        Color4? GetComboColour(IHasComboIndex comboObject);
+        Color4? GetComboColour(IHasComboInformation comboObject);
     }
 }

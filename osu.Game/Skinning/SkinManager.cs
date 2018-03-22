@@ -124,6 +124,6 @@ namespace osu.Game.Skinning
 
         public SampleChannel GetSample(string sampleName) => CurrentSkin.Value.GetSample(sampleName);
 
-        public Color4? GetComboColour(IHasComboIndex comboObject) => CurrentSkin.Value.GetComboColour(comboObject);
+        public Color4? GetComboColour(IHasComboInformation comboObject) => CurrentSkin.Value.GetComboColour(comboObject);
     }
 }

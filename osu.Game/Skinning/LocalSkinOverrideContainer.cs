@@ -22,7 +22,7 @@ namespace osu.Game.Skinning
 
         public SampleChannel GetSample(string sampleName) => source.GetSample(sampleName) ?? fallbackSource?.GetSample(sampleName);
 
-        public Color4? GetComboColour(IHasComboIndex comboObject) => source.GetComboColour(comboObject) ?? fallbackSource?.GetComboColour(comboObject);
+        public Color4? GetComboColour(IHasComboInformation comboObject) => source.GetComboColour(comboObject) ?? fallbackSource?.GetComboColour(comboObject);
 
         private readonly ISkinSource source;
         private ISkinSource fallbackSource;
