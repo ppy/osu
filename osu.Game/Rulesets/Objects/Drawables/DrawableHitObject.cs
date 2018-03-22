@@ -102,14 +102,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
-        {
-            base.SkinChanged(skin, allowFallback);
-
-            if (HitObject is IHasComboInformation combo)
-                AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.ComboColours?.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
