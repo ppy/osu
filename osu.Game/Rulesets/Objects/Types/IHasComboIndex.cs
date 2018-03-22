@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Objects.Types
         int IndexInCurrentCombo { get; set; }
 
         /// <summary>
-        /// The offset of this hitobject in the current combo.
+        /// The offset of this combo in relation to the beatmap.
         /// </summary>
         int ComboIndex { get; set; }
 
