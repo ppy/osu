@@ -10,6 +10,8 @@ namespace osu.Game.Skinning
     {
         public readonly SkinInfo SkinInfo;
 
+        public virtual SkinConfiguration Configuration { get; protected set; }
+
         public abstract Drawable GetDrawableComponent(string componentName);
 
         public abstract SampleChannel GetSample(string sampleName);
