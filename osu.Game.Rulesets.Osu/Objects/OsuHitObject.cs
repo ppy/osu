@@ -10,7 +10,7 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasComboIndex, IHasPosition
+    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
     {
         public const double OBJECT_RADIUS = 64;
 

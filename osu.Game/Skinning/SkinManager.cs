@@ -14,8 +14,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
-using osu.Game.Rulesets.Objects.Types;
-using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -120,10 +118,12 @@ namespace osu.Game.Skinning
 
         public Drawable GetDrawableComponent(string componentName) => CurrentSkin.Value.GetDrawableComponent(componentName);
 
-        public Texture GetTexture(string componentName)=> CurrentSkin.Value.GetTexture(componentName);
+        public Texture GetTexture(string componentName) => CurrentSkin.Value.GetTexture(componentName);
 
         public SampleChannel GetSample(string sampleName) => CurrentSkin.Value.GetSample(sampleName);
 
-        public Color4? GetComboColour(IHasComboIndex comboObject) => CurrentSkin.Value.GetComboColour(comboObject);
+        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class => CurrentSkin.Value.GetValue(query);
+
+        public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct => CurrentSkin.Value.GetValue(query);
     }
 }
