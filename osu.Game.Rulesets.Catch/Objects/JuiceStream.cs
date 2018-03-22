@@ -65,54 +65,59 @@ namespace osu.Game.Rulesets.Catch.Objects
                 X = X
             });
 
-            for (var span = 0; span < this.SpanCount(); span++)
+            double lastDropletTime = StartTime;
+
+            for (int span = 0; span < this.SpanCount(); span++)
             {
                 var spanStartTime = StartTime + span * spanDuration;
                 var reversed = span % 2 == 1;
 
-                for (var d = tickDistance; d <= length; d += tickDistance)
+                for (double d = 0; d <= length; d += tickDistance)
                 {
-                    if (d > length - minDistanceFromEnd)
-                        break;
-
                     var timeProgress = d / length;
                     var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
 
-                    var lastTickTime = spanStartTime + timeProgress * spanDuration;
-                    AddNested(new Droplet
+                    double time = spanStartTime + timeProgress * spanDuration;
+
+                    double tinyTickInterval = time - lastDropletTime;
+                    while (tinyTickInterval > 100)
+                        tinyTickInterval /= 2;
+
+                    for (double t = lastDropletTime + tinyTickInterval; t < time; t += tinyTickInterval)
                     {
-                        StartTime = lastTickTime,
-                        ComboColour = ComboColour,
-                        X = X + Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
-                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                        double progress = reversed ? 1 - (t - spanStartTime) / spanDuration : (t - spanStartTime) / spanDuration;
+
+                        AddNested(new TinyDroplet
                         {
-                            Bank = s.Bank,
-                            Name = @"slidertick",
-                            Volume = s.Volume
-                        }))
-                    });
-                }
+                            StartTime = t,
+                            ComboColour = ComboColour,
+                            X = X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
+                            Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                            {
+                                Bank = s.Bank,
+                                Name = @"slidertick",
+                                Volume = s.Volume
+                            }))
+                        });
+                    }
 
-                double tinyTickInterval = tickDistance / length * spanDuration;
-                while (tinyTickInterval > 100)
-                    tinyTickInterval /= 2;
-
-                for (double t = 0; t < spanDuration; t += tinyTickInterval)
-                {
-                    double progress = reversed ? 1 - t / spanDuration : t / spanDuration;
-
-                    AddNested(new TinyDroplet
+                    if (d > minDistanceFromEnd && Math.Abs(d - length) > minDistanceFromEnd)
                     {
-                        StartTime = spanStartTime + t,
-                        ComboColour = ComboColour,
-                        X = X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
-                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                        AddNested(new Droplet
                         {
-                            Bank = s.Bank,
-                            Name = @"slidertick",
-                            Volume = s.Volume
-                        }))
-                    });
+                            StartTime = time,
+                            ComboColour = ComboColour,
+                            X = X + Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
+                            Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                            {
+                                Bank = s.Bank,
+                                Name = @"slidertick",
+                                Volume = s.Volume
+                            }))
+                        });
+                    }
+
+                    lastDropletTime = time;
                 }
 
                 AddNested(new Fruit
