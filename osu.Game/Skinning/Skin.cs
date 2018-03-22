@@ -4,18 +4,29 @@
 using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Skinning
 {
-    public abstract class Skin : IDisposable
+    public abstract class Skin : IDisposable, ISkinSource
     {
         public readonly SkinInfo SkinInfo;
 
         public virtual SkinConfiguration Configuration { get; protected set; }
 
+        public event Action SourceChanged;
+
         public abstract Drawable GetDrawableComponent(string componentName);
 
         public abstract SampleChannel GetSample(string sampleName);
+
+        public abstract Texture GetTexture(string componentName);
+
+        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
+            => Configuration is TConfiguration conf ? query?.Invoke(conf) : null;
+
+        public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
+            => Configuration is TConfiguration conf ? query?.Invoke(conf) : null;
 
         protected Skin(SkinInfo skin)
         {

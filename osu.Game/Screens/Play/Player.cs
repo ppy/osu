@@ -26,6 +26,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Ranking;
+using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Play
@@ -163,7 +164,11 @@ namespace osu.Game.Screens.Play
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
                         },
-                        RulesetContainer,
+                        new LocalSkinOverrideContainer(working.Skin)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = RulesetContainer
+                        },
                         new SkipOverlay(firstObjectTime)
                         {
                             Clock = Clock, // skip button doesn't want to use the audio clock directly
