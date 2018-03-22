@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using osu.Framework.Logging;
 using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
@@ -31,7 +32,11 @@ namespace osu.Game.Beatmaps.Formats
                 if (line.StartsWith(@"[") && line.EndsWith(@"]"))
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
-                        throw new InvalidDataException($@"Unknown osu section {line}");
+                    {
+                        Logger.Log($"Unknown section \"{line}\" in {beatmap}");
+                        section = Section.None;
+                    }
+
                     continue;
                 }
 
@@ -55,7 +60,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleColours(T output, string line)
         {
-            var pair = SplitKeyVal(line, ':');
+            var pair = SplitKeyVal(line);
 
             bool isCombo = pair.Key.StartsWith(@"Combo");
 
@@ -89,7 +94,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator)
+        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
         {
             var split = line.Trim().Split(new[] { separator }, 2);
 

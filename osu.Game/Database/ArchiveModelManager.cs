@@ -13,6 +13,7 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
+using SharpCompress.Common;
 using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Database
@@ -79,7 +80,6 @@ namespace osu.Game.Database
             var notification = new ProgressNotification
             {
                 Text = "Import is initialising...",
-                CompletionText = "Import successful!",
                 Progress = 0,
                 State = ProgressNotificationState.Active,
             };
@@ -88,7 +88,8 @@ namespace osu.Game.Database
 
             List<TModel> imported = new List<TModel>();
 
-            int i = 0;
+            int current = 0;
+            int errors = 0;
             foreach (string path in paths)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)
@@ -97,11 +98,11 @@ namespace osu.Game.Database
 
                 try
                 {
-                    notification.Text = $"Importing ({i} of {paths.Length})\n{Path.GetFileName(path)}";
+                    notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
                     using (ArchiveReader reader = getReaderFrom(path))
                         imported.Add(Import(reader));
 
-                    notification.Progress = (float)++i / paths.Length;
+                    notification.Progress = (float)current / paths.Length;
 
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with items from default storage.
@@ -121,9 +122,11 @@ namespace osu.Game.Database
                 {
                     e = e.InnerException ?? e;
                     Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
+                    errors++;
                 }
             }
 
+            notification.Text = errors > 0 ? $"Import complete with {errors} errors" : "Import successful!";
             notification.State = ProgressNotificationState.Completed;
         }
 
@@ -218,9 +221,11 @@ namespace osu.Game.Database
                         // user requested abort
                         return;
 
-                    notification.Text = $"Deleting ({i} of {items.Count})";
-                    notification.Progress = (float)++i / items.Count;
+                    notification.Text = $"Deleting ({++i} of {items.Count})";
+
                     Delete(b);
+
+                    notification.Progress = (float)i / items.Count;
                 }
             }
 
@@ -254,9 +259,11 @@ namespace osu.Game.Database
                         // user requested abort
                         return;
 
-                    notification.Text = $"Restoring ({i} of {items.Count})";
-                    notification.Progress = (float)++i / items.Count;
+                    notification.Text = $"Restoring ({++i} of {items.Count})";
+
                     Undelete(item);
+
+                    notification.Progress = (float)i / items.Count;
                 }
             }
 
@@ -331,7 +338,9 @@ namespace osu.Game.Database
         {
             if (ZipFile.IsZipFile(path))
                 return new ZipArchiveReader(Files.Storage.GetStream(path), Path.GetFileName(path));
-            return new LegacyFilesystemReader(path);
+            if (Directory.Exists(path))
+                return new LegacyFilesystemReader(path);
+            throw new InvalidFormatException($"{path} is not a valid archive");
         }
     }
 }
