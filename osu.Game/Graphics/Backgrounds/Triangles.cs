@@ -242,7 +242,7 @@ namespace osu.Game.Graphics.Backgrounds
                         triangle,
                         colourInfo,
                         null,
-                        Shared.VertexBatch.Add,
+                        Shared.VertexBatch.AddAction,
                         Vector2.Divide(localInflationAmount, size));
                 }
 
