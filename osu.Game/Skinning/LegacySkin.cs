@@ -10,21 +10,33 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Game.Database;
+using OpenTK;
 
 namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
-        private readonly TextureStore textures;
+        protected TextureStore Textures;
 
-        private readonly SampleManager samples;
+        protected SampleManager Samples;
 
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
-            : base(skin)
+            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
-            storage = new LegacySkinResourceStore(skin, storage);
-            samples = audioManager.GetSampleManager(storage);
-            textures = new TextureStore(new RawTextureLoaderStore(storage));
+        }
+
+        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename) : base(skin)
+        {
+            Stream stream = storage.GetStream(filename);
+            if (stream != null)
+                using (StreamReader reader = new StreamReader(stream))
+                    Configuration = new LegacySkinDecoder().Decode(reader);
+            else
+                Configuration = new SkinConfiguration();
+
+            Samples = audioManager.GetSampleManager(storage);
+            Textures = new TextureStore(new RawTextureLoaderStore(storage));
         }
 
         public override Drawable GetDrawableComponent(string componentName)
@@ -45,37 +57,62 @@ namespace osu.Game.Skinning
                     break;
             }
 
-            var texture = textures.Get(componentName);
+            float ratio = 0.72f; // brings sizing roughly in-line with stable
+
+            var texture = GetTexture($"{componentName}@2x");
+            if (texture == null)
+            {
+                ratio *= 2;
+                GetTexture(componentName);
+            }
+
             if (texture == null) return null;
 
-            return new Sprite { Texture = texture };
+            return new Sprite
+            {
+                Texture = texture,
+                Scale = new Vector2(ratio),
+            };
         }
 
-        public override SampleChannel GetSample(string sampleName) => samples.Get(sampleName);
+        public override Texture GetTexture(string componentName) => Textures.Get(componentName);
 
-        private class LegacySkinResourceStore : IResourceStore<byte[]>
+        public override SampleChannel GetSample(string sampleName) => Samples.Get(sampleName);
+
+        protected class LegacySkinResourceStore<T> : IResourceStore<byte[]>
+            where T : INamedFileInfo
         {
-            private readonly SkinInfo skin;
+            private readonly IHasFiles<T> source;
             private readonly IResourceStore<byte[]> underlyingStore;
 
             private string getPathForFile(string filename)
             {
+                bool hasExtension = filename.Contains('.');
+
                 string lastPiece = filename.Split('/').Last();
 
-                var file = skin.Files.FirstOrDefault(f =>
-                    string.Equals(Path.GetFileNameWithoutExtension(f.Filename), lastPiece, StringComparison.InvariantCultureIgnoreCase));
+                var file = source.Files.FirstOrDefault(f =>
+                    string.Equals(hasExtension ? f.Filename : Path.GetFileNameWithoutExtension(f.Filename), lastPiece, StringComparison.InvariantCultureIgnoreCase));
                 return file?.FileInfo.StoragePath;
             }
 
-            public LegacySkinResourceStore(SkinInfo skin, IResourceStore<byte[]> underlyingStore)
+            public LegacySkinResourceStore(IHasFiles<T> source, IResourceStore<byte[]> underlyingStore)
             {
-                this.skin = skin;
+                this.source = source;
                 this.underlyingStore = underlyingStore;
             }
 
-            public Stream GetStream(string name) => underlyingStore.GetStream(getPathForFile(name));
+            public Stream GetStream(string name)
+            {
+                string path = getPathForFile(name);
+                return path == null ? null : underlyingStore.GetStream(path);
+            }
 
-            byte[] IResourceStore<byte[]>.Get(string name) => underlyingStore.Get(getPathForFile(name));
+            byte[] IResourceStore<byte[]>.Get(string name)
+            {
+                string path = getPathForFile(name);
+                return path == null ? null : underlyingStore.Get(path);
+            }
         }
     }
 }

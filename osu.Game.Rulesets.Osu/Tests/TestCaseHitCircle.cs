@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Game.Rulesets.Osu.Judgements;
 using System.Collections.Generic;
 using System;
@@ -61,7 +60,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000 + timeOffset,
                 Position = positionOffset.Value,
-                ComboColour = Color4.LightSeaGreen
             };
 
             circle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
