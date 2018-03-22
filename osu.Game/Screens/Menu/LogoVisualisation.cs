@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Menu
                                 rectangle,
                                 colourInfo,
                                 null,
-                                Shared.VertexBatch.Add,
+                                Shared.VertexBatch.AddAction,
                                 //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                 Vector2.Divide(inflation, barSize.Yx));
                         }
