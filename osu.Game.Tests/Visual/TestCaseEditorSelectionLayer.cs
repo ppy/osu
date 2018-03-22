@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Timing;
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
@@ -34,6 +35,11 @@ namespace osu.Game.Tests.Visual
             typeof(SliderCircleMask)
         };
 
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
+
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {
@@ -58,6 +64,10 @@ namespace osu.Game.Tests.Visual
                     }
                 },
             });
+
+            var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            dependencies.CacheAs<IAdjustableClock>(clock);
+            dependencies.CacheAs<IFrameBasedClock>(clock);
 
             Child = new OsuHitObjectComposer(new OsuRuleset());
         }

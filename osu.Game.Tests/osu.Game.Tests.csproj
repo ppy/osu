@@ -116,6 +116,7 @@
     <Compile Include="Visual\TestCaseBeatmapOptionsOverlay.cs" />
     <Compile Include="Visual\TestCaseBeatmapScoresContainer.cs" />
     <Compile Include="Visual\TestCaseBeatmapSetOverlay.cs" />
+    <Compile Include="Visual\TestCaseBeatDivisorControl.cs" />
     <Compile Include="Visual\TestCaseBeatSyncedContainer.cs" />
     <Compile Include="Visual\TestCaseBreadcrumbs.cs" />
     <Compile Include="Visual\TestCaseBreakOverlay.cs" />

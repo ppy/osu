@@ -33,7 +33,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             var catchObject = (DrawableCatchHitObject)h;
 
             catchObject.CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
-            catchObject.AccentColour = HitObject.ComboColour;
 
             dropletContainer.Add(h);
             base.AddNested(h);

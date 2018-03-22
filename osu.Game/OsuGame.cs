@@ -133,7 +133,6 @@ namespace osu.Game
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
-
             SkinManager.CurrentSkinInfo.ValueChanged += s => configSkin.Value = s.ID;
             configSkin.ValueChanged += id => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == id) ?? SkinInfo.Default;
             configSkin.TriggerChange();
@@ -240,6 +239,7 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
+            loadComponentSingleFile(new ScreenshotManager(), Add);
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
@@ -295,6 +295,21 @@ namespace osu.Game
                     if (state == Visibility.Hidden) return;
 
                     foreach (var c in singleDisplayOverlays)
+                    {
+                        if (c == overlay) continue;
+                        c.State = Visibility.Hidden;
+                    }
+                };
+            }
+
+            var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
+            foreach (var overlay in singleDisplaySideOverlays)
+            {
+                overlay.StateChanged += state =>
+                {
+                    if (state == Visibility.Hidden) return;
+
+                    foreach (var c in singleDisplaySideOverlays)
                     {
                         if (c == overlay) continue;
                         c.State = Visibility.Hidden;

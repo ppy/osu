@@ -4,12 +4,14 @@
 using System;
 using System.IO;
 using System.Linq;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Graphics.Textures;
+using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
@@ -19,11 +21,13 @@ namespace osu.Game.Beatmaps
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
             private readonly IResourceStore<byte[]> store;
+            private readonly AudioManager audioManager;
 
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo)
+            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo, AudioManager audioManager)
                 : base(beatmapInfo)
             {
                 this.store = store;
+                this.audioManager = audioManager;
             }
 
             protected override Beatmap GetBeatmap()
@@ -99,6 +103,22 @@ namespace osu.Game.Beatmaps
                 storyboard.BeatmapInfo = BeatmapInfo;
 
                 return storyboard;
+            }
+
+            protected override Skin GetSkin()
+            {
+                Skin skin;
+                try
+                {
+                    skin = new LegacyBeatmapSkin(BeatmapInfo, store, audioManager);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Skin failed to load");
+                    skin = new DefaultSkin();
+                }
+
+                return skin;
             }
         }
     }
