@@ -259,6 +259,8 @@ namespace osu.Game.Screens.Select
 
         private void workingBeatmapChanged(WorkingBeatmap beatmap)
         {
+            if (beatmap is DummyWorkingBeatmap) return;
+
             if (IsCurrentScreen && !Carousel.SelectBeatmap(beatmap?.BeatmapInfo, false))
                 // If selecting new beatmap without bypassing filters failed, there's possibly a ruleset mismatch
                 if (beatmap?.BeatmapInfo?.Ruleset != null && beatmap.BeatmapInfo.Ruleset != Ruleset.Value)
