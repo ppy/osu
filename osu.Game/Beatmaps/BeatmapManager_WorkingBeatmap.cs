@@ -110,7 +110,7 @@ namespace osu.Game.Beatmaps
                 Skin skin;
                 try
                 {
-                    skin = new BeatmapSkin(BeatmapInfo, store, audioManager);
+                    skin = new LegacyBeatmapSkin(BeatmapInfo, store, audioManager);
                 }
                 catch (Exception e)
                 {

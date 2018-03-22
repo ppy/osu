@@ -374,13 +374,15 @@
     <Compile Include="Overlays\Social\SocialPanel.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Rulesets\Objects\HitWindows.cs" />
-    <Compile Include="Rulesets\Objects\Types\IHasComboIndex.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasComboInformation.cs" />
     <Compile Include="Rulesets\Replays\Legacy\LegacyReplayFrame.cs" />
     <Compile Include="Rulesets\Replays\Legacy\ReplayButtonState.cs" />
     <Compile Include="Rulesets\Replays\ReplayFrame.cs" />
     <Compile Include="Rulesets\Replays\Types\IConvertibleReplayFrame.cs" />
     <Compile Include="Rulesets\Scoring\Legacy\LegacyScoreParser.cs" />
     <Compile Include="Rulesets\UI\JudgementContainer.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\BindableBeatDivisor.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\BeatDivisorControl.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Layers\BorderLayer.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Layers\HitObjectMaskLayer.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Layers\SelectionBox.cs" />
@@ -872,7 +874,7 @@
     <Compile Include="Screens\Tournament\Teams\DrawingsTeam.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
-    <Compile Include="Skinning\BeatmapSkin.cs" />
+    <Compile Include="Skinning\LegacyBeatmapSkin.cs" />
     <Compile Include="Skinning\DefaultSkin.cs" />
     <Compile Include="Skinning\ISkinSource.cs" />
     <Compile Include="Skinning\LegacySkin.cs" />

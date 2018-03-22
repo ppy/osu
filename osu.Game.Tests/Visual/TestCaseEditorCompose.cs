@@ -1,6 +1,8 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
@@ -13,6 +15,8 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseEditorCompose : OsuTestCase
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Compose) };
+
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
