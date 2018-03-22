@@ -23,6 +23,26 @@ namespace osu.Game.Skinning
 
         public Color4? GetColour(string colourName) => source.GetColour(colourName) ?? fallbackSource?.GetColour(colourName);
 
+        public TValue? GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
+        {
+            TValue? val = null;
+            var conf = (source as Skin)?.Configuration as TConfiguration;
+            if (conf != null)
+                val = query?.Invoke(conf);
+
+            return val ?? fallbackSource?.GetConfiguration(query);
+        }
+
+        public TValue GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
+        {
+            TValue val = null;
+            var conf = (source as Skin)?.Configuration as TConfiguration;
+            if (conf != null)
+                val = query?.Invoke(conf);
+
+            return val ?? fallbackSource?.GetConfiguration(query);
+        }
+
         private readonly ISkinSource source;
         private ISkinSource fallbackSource;
 

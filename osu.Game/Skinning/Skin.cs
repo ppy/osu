@@ -34,7 +34,7 @@ namespace osu.Game.Skinning
                     {
                         case "Combo":
                             int index = int.Parse(namespaces[2]);
-                            return Configuration.ComboColours.Count == 0 ? (Color4?)null : Configuration.ComboColours[index % Configuration.ComboColours.Count];
+                            return GetConfiguration<SkinConfiguration, Color4>(s => s.ComboColours.Count == 0 ? (Color4?)null : Configuration.ComboColours[index % Configuration.ComboColours.Count]);
                     }
 
                     break;
@@ -42,6 +42,12 @@ namespace osu.Game.Skinning
 
             return null;
         }
+
+        public TValue GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
+            => Configuration is TConfiguration conf ? query?.Invoke(conf) : null;
+
+        public TValue? GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
+            => Configuration is TConfiguration conf ? query?.Invoke(conf) : null;
 
         protected Skin(SkinInfo skin)
         {
