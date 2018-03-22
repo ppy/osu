@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
         private Bindable<Characters> selectedCharacter;
 
         private Bindable<bool> familiar;
+        private Bindable<bool> late;
         private Bindable<bool> lastDance;
         private Bindable<bool> insane;
         private Bindable<bool> awoken;
@@ -48,6 +49,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
             selectedCharacter = VitaruSettings.VitaruConfigManager.GetBindable<Characters>(VitaruSetting.Characters);
 
             familiar = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Familiar);
+            late = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Late);
             lastDance = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.LastDance);
             insane = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Insane);
             awoken = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Awoken);
@@ -264,7 +266,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nDifficulty: Time Freeze" +
                         "\nAbility (passive): Leader (WIP)";
 
-                        if (false)//selectedGamemode.Value == VitaruGamemode.Touhosu)
+                        if (selectedGamemode.Value == VitaruGamemode.Touhosu && late)
                             stats = stats + "\n\nHong was your typical war hero. She fought valiantly, saved allies, showed no mercy against the enemy. " +
                         "She didn't really care for all the medals or attention though, now that the war was over she just wanted to retire to her mansion.\n\n" +
                         "Upon returning home she met with the Scarlet sisters she had entrusted the house with, ony to find they are different. " +

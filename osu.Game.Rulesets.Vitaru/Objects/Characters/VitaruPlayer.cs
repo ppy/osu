@@ -1568,6 +1568,9 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         private readonly Bindable<bool> familiar = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Familiar);
         private int familiarity;
 
+        private readonly Bindable<bool> late = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Late);
+        private int time;
+
         private readonly Bindable<bool> lastDance = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.LastDance);
         private int dance;
 
@@ -1661,7 +1664,16 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && insane && playerList.Count == 1)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 0 && currentCharacter == Characters.SakuyaIzayoi && !late && playerList.Count == 1)
+            {
+                if (Time.Current >= 0 && time == 0)
+                {
+                    Speak("Can't be late. . .");
+                    time++;
+                }
+            }
+
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && late && insane && playerList.Count == 1)
             {
                 if (Time.Current >= 760 && insanity == 0)
                 {
@@ -1681,7 +1693,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && !insane && playerList.Count == 1)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && late && !insane && playerList.Count == 1)
             {
                 if (Time.Current >= 760 && insanity == 0)
                 {
@@ -1830,7 +1842,6 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
     public enum Characters
     {
-        //Alex,
         [System.ComponentModel.Description("Reimu Hakurei")]
         ReimuHakurei = 1,
         [System.ComponentModel.Description("Marisa Kirisame")]

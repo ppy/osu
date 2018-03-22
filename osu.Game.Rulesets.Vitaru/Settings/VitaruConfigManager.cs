@@ -51,11 +51,13 @@ namespace osu.Game.Rulesets.Vitaru.Settings
 
             //Touhosu
             Set(VitaruSetting.Familiar, false);
+            Set(VitaruSetting.Late, false);
             Set(VitaruSetting.LastDance, false);
             Set(VitaruSetting.Insane, true);
             Set(VitaruSetting.Awoken, false);
             Set(VitaruSetting.Sacred, false);
             Set(VitaruSetting.Resurrected, false);
+            Set(VitaruSetting.Bonded, false);
             Set(VitaruSetting.Revenge, false);
 
             //Online Multiplayer
@@ -105,6 +107,7 @@ namespace osu.Game.Rulesets.Vitaru.Settings
 
         //Touhosu
         Familiar,
+        Late,
         LastDance,
         Insane,
         Awoken,
