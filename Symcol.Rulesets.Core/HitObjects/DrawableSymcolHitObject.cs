@@ -15,8 +15,8 @@ namespace Symcol.Rulesets.Core.HitObjects
         where TObject : HitObject
     {
         //Future prep?
-        public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null) { }
-        public override void ApplyTransformsAt(double time, bool propagateChildren = false) { }
+        //public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null) { }
+        //public override void ApplyTransformsAt(double time, bool propagateChildren = false) { }
 
         protected virtual Container<Drawable> Content => new Container();
 
