@@ -5,23 +5,24 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public abstract class CatchHitObject : HitObject, IHasXPosition, IHasCombo
+    public abstract class CatchHitObject : HitObject, IHasXPosition, IHasComboInformation
     {
         public const double OBJECT_RADIUS = 44;
 
         public float X { get; set; }
-
-        public Color4 ComboColour { get; set; }
 
         public int IndexInBeatmap { get; set; }
 
         public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(IndexInBeatmap % 4);
 
         public virtual bool NewCombo { get; set; }
+
+        public int IndexInCurrentCombo { get; set; }
+
+        public int ComboIndex { get; set; }
 
         /// <summary>
         /// The next fruit starts a new combo. Used for explodey.

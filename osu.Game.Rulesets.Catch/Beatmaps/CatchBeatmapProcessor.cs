@@ -16,29 +16,13 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
     {
         public override void PostProcess(Beatmap<CatchHitObject> beatmap)
         {
-            if (beatmap.ComboColours.Count == 0)
-                return;
-
-            int index = 0;
-            int colourIndex = 0;
-
-            CatchHitObject lastObj = null;
-
             initialiseHyperDash(beatmap.HitObjects);
 
+            base.PostProcess(beatmap);
+
+            int index = 0;
             foreach (var obj in beatmap.HitObjects)
-            {
-                if (obj.NewCombo)
-                {
-                    if (lastObj != null) lastObj.LastInCombo = true;
-                    colourIndex = (colourIndex + 1) % beatmap.ComboColours.Count;
-                }
-
                 obj.IndexInBeatmap = index++;
-                obj.ComboColour = beatmap.ComboColours[colourIndex];
-
-                lastObj = obj;
-            }
         }
 
         private void initialiseHyperDash(List<CatchHitObject> objects)

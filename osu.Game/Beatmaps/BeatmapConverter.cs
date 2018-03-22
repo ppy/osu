@@ -57,7 +57,6 @@ namespace osu.Game.Beatmaps
             beatmap.ControlPointInfo = original.ControlPointInfo;
             beatmap.HitObjects = original.HitObjects.SelectMany(h => convert(h, original)).ToList();
             beatmap.Breaks = original.Breaks;
-            beatmap.ComboColours = original.ComboColours;
 
             return beatmap;
         }

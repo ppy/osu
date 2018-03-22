@@ -374,6 +374,7 @@
     <Compile Include="Overlays\Social\SocialPanel.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Rulesets\Objects\HitWindows.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasComboInformation.cs" />
     <Compile Include="Rulesets\Replays\Legacy\LegacyReplayFrame.cs" />
     <Compile Include="Rulesets\Replays\Legacy\ReplayButtonState.cs" />
     <Compile Include="Rulesets\Replays\ReplayFrame.cs" />
@@ -871,9 +872,12 @@
     <Compile Include="Screens\Tournament\Teams\DrawingsTeam.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Skinning\LegacyBeatmapSkin.cs" />
     <Compile Include="Skinning\DefaultSkin.cs" />
+    <Compile Include="Skinning\ISkinSource.cs" />
     <Compile Include="Skinning\LegacySkin.cs" />
     <Compile Include="Skinning\LegacySkinDecoder.cs" />
+    <Compile Include="Skinning\LocalSkinOverrideContainer.cs" />
     <Compile Include="Skinning\Skin.cs" />
     <Compile Include="Skinning\SkinConfiguration.cs" />
     <Compile Include="Skinning\SkinFileInfo.cs" />
