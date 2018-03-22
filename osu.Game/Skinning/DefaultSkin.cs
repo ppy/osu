@@ -11,6 +11,7 @@ namespace osu.Game.Skinning
         public DefaultSkin()
             : base(SkinInfo.Default)
         {
+            Configuration = new SkinConfiguration();
         }
 
         public override Drawable GetDrawableComponent(string componentName)
