@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
-using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -23,30 +22,10 @@ namespace osu.Game.Skinning
 
         public abstract Texture GetTexture(string componentName);
 
-        public virtual Color4? GetColour(string colourName)
-        {
-            var namespaces = colourName.Split('/');
-
-            switch (namespaces[0])
-            {
-                case "Play":
-                    switch (namespaces[1])
-                    {
-                        case "Combo":
-                            int index = int.Parse(namespaces[2]);
-                            return GetConfiguration<SkinConfiguration, Color4>(s => s.ComboColours.Count == 0 ? (Color4?)null : Configuration.ComboColours[index % Configuration.ComboColours.Count]);
-                    }
-
-                    break;
-            }
-
-            return null;
-        }
-
-        public TValue GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
+        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
             => Configuration is TConfiguration conf ? query?.Invoke(conf) : null;
 
-        public TValue? GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
+        public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
             => Configuration is TConfiguration conf ? query?.Invoke(conf) : null;
 
         protected Skin(SkinInfo skin)
