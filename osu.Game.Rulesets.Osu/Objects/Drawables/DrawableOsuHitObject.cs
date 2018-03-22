@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
-            AccentColour = HitObject.ComboColour;
             Alpha = 0;
         }
 
