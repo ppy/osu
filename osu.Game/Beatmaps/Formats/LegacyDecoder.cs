@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleColours(T output, string line)
         {
-            var pair = SplitKeyVal(line, ':');
+            var pair = SplitKeyVal(line);
 
             bool isCombo = pair.Key.StartsWith(@"Combo");
 
@@ -89,7 +89,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator)
+        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
         {
             var split = line.Trim().Split(new[] { separator }, 2);
 
