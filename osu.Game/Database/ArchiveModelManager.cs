@@ -13,6 +13,7 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
+using SharpCompress.Common;
 using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Database
@@ -331,7 +332,9 @@ namespace osu.Game.Database
         {
             if (ZipFile.IsZipFile(path))
                 return new ZipArchiveReader(Files.Storage.GetStream(path), Path.GetFileName(path));
-            return new LegacyFilesystemReader(path);
+            if (Directory.Exists(path))
+                return new LegacyFilesystemReader(path);
+            throw new InvalidFormatException($"{path} is not a valid archive");
         }
     }
 }
