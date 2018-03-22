@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "A = Left\n" +
                         "D = Right\n" +
                         "Shift = Slow the player to half speed and show the hitbox.\n" +
-                        "Space = Speed up to twice as fast (yes, holding space + shift cancles out speed but will still reveal hitbox)\n" +
+                        "Space = Speed up to twice as fast (holding space + shift cancles out speed but will still reveal hitbox)\n" +
                         "Left Mouse = Shoot (while in vitaru or touhosu mode)\n" +
                         "Right mouse = Spell (while in touhosu mode)\n\n" +
                         "Some individual character's spells will use additional binds, those will be listed in their spell's description under the \"Characters\" section."));

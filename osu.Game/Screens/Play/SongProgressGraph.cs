@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Play
                 {
                     var endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
 
-                    Debug.Assert(endTime >= h.StartTime);
+                    //Debug.Assert(endTime >= h.StartTime);
 
                     int startRange = (int)((h.StartTime - firstHit) / interval);
                     int endRange = (int)((endTime - firstHit) / interval);
