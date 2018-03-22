@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public double? SnakedStart { get; private set; }
         public double? SnakedEnd { get; private set; }
 
-        private Color4 accentColour;
+        private Color4 accentColour = Color4.White;
         /// <summary>
         /// Used to colour the path.
         /// </summary>
@@ -173,6 +173,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             texture.SetData(upload);
             path.Texture = texture;
+
+            container.ForceRedraw();
         }
 
         private void computeSize()
