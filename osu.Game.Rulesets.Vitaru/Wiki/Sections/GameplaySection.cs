@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
         private Bindable<bool> insane;
         private Bindable<bool> awoken;
         private Bindable<bool> sacred;
+        private Bindable<bool> bonded;
         private Bindable<bool> resurrected;
 
         private WikiOptionEnumExplanation<Characters> characterDescription;
@@ -54,6 +55,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
             insane = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Insane);
             awoken = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Awoken);
             sacred = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Sacred);
+            bonded = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Bonded);
             resurrected = VitaruSettings.VitaruConfigManager.GetBindable<bool>(VitaruSetting.Resurrected);
 
             Content.Add(new WikiParagraph("Your objective in vitaru is simple, don't get hit by the bullets flying at you, although this is easier said than done."));
@@ -296,7 +298,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "Hong was thinking, then she saw her staring at the shedding cherry blossoms over by the maze.\n\n" +
                         "\"How about Sakuya?\"\n\n" +
                         "\"Huh?\"\n\n" +
-                        "\"Your name? How about Sakuya. It means 'time warden' in an old arcane language I studied in my free time.\"\n\n" +
+                        "\"Your name? How about Sakuya. It means 'time keeper' in an old arcane language I studied in my free time.\"\n\n" +
                         "\"Hmm, its better than 'time waster', I like it.\"\n\n" +
                         "Hong was wondering where Sakuya came from, and would question the Scarlet sisters later about. " +
                         "For now though, she was transfixed on how similar she is to Hong was when she was little, slightly defient but eager to help.\n\n" +
@@ -353,7 +355,7 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nDifficulty: Another" +
                         "\nAbility (4 energy, 4 per second): Rift (Buggy?)";
 
-                        if (false)//selectedGamemode.Value == VitaruGamemode.Touhosu)
+                        if (selectedGamemode.Value == VitaruGamemode.Touhosu && bonded)
                             stats = stats + "\n\nThere are many stories about Yukari, some say she was born of some rich folk to the far west and some say she predates the known universe itself. " +
                         "While that would explain her unatural abilities in combat they would not explain her uncanny abitlity to empithize with her \"creations\". " +
                         "The only other individual to supposedly be even relativly this old is cold and heartless (perhaps litterally).";
@@ -378,6 +380,9 @@ namespace osu.Game.Rulesets.Vitaru.Wiki.Sections
                         "\nRole: Support" +
                         "\nDifficulty: Hard" +
                         "\nSpell (4 energy): Lunar Shift (Not Implemented)";
+
+                        if (false)//selectedGamemode.Value == VitaruGamemode.Touhosu && sacred)
+                            stats = stats + "\n\n";
                         break;
                     case Characters.IbarakiKasen:
                         stats = "\nMax Health: 40" +

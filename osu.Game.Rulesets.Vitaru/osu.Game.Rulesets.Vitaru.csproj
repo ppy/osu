@@ -52,6 +52,7 @@
     <Compile Include="Multi\VitaruNetworkingClientHandler.cs" />
     <Compile Include="Multi\VitaruPacket.cs" />
     <Compile Include="Objects\Characters\Pieces\Rift.cs" />
+    <Compile Include="Objects\Characters\Pieces\Seal.cs" />
     <Compile Include="Objects\Drawables\DrawableSeekingBullet.cs" />
     <Compile Include="Objects\Characters\Pieces\Mask.cs" />
     <Compile Include="Objects\Characters\Pieces\Metranome.cs" />
@@ -209,6 +210,14 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\Textures\vortex.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\seal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\gearLarge.png" />
+    <EmbeddedResource Include="Assets\Textures\gearMedium.png" />
+    <EmbeddedResource Include="Assets\Textures\gearSmall.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

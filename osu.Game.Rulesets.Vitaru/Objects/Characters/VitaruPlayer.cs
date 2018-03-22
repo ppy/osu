@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
     public class VitaruPlayer : VitaruCharacter, IKeyBindingHandler<VitaruAction>
     {
         #region Fields
-        private readonly Characters currentCharacter;
+        public readonly Characters CurrentCharacter;
         private readonly GraphicsPresets currentSkin = VitaruSettings.VitaruConfigManager.GetBindable<GraphicsPresets>(VitaruSetting.GraphicsPresets);
         private readonly ScoringMetric currentScoringMetric = VitaruSettings.VitaruConfigManager.GetBindable<ScoringMetric>(VitaruSetting.ScoringMetric);
         private readonly VitaruGamemode currentGameMode = VitaruSettings.VitaruConfigManager.GetBindable<VitaruGamemode>(VitaruSetting.GameMode);
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
             playerList.Add(this);
 
-            currentCharacter = characterOverride;
+            CurrentCharacter = characterOverride;
 
             parent.Add(cursor = new Container
             {
@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             MaxHealth = 100;
             Position = new Vector2(256, 700);
 
-            switch (currentCharacter)
+            switch (CurrentCharacter)
             {
                 default:
                     CharacterColor = Color4.White;
@@ -303,7 +303,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         {
             base.LoadComplete();
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 221777 && currentCharacter == Characters.HongMeiling)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 221777 && CurrentCharacter == Characters.HongMeiling)
             {
                 MaxHealth = 120;
                 originalMaxHealth = MaxHealth;
@@ -320,7 +320,17 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
             if (currentGameMode == VitaruGamemode.Touhosu)
             {
-                if (currentCharacter == Characters.ReimuHakurei | currentCharacter == Characters.MarisaKirisame)
+                Add(textContainer = new OsuTextFlowContainer(t => { t.TextSize = 24; })
+                {
+                    Alpha = 0,
+                    Position = new Vector2(0, 48),
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.TopCentre,
+                    AutoSizeAxes = Axes.Both,
+                    Text = ""
+                });
+
+                if (CurrentCharacter == Characters.ReimuHakurei | CurrentCharacter == Characters.MarisaKirisame)
                 {
                     AddRange(new Drawable[]
                     {
@@ -337,17 +347,13 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     });
                 }
 
-                Add(textContainer = new OsuTextFlowContainer(t => { t.TextSize = 24; })
+                if (false)//CurrentCharacter == Characters.SakuyaIzayoi)
                 {
-                    Alpha = 0,
-                    Position = new Vector2(0, 48),
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.TopCentre,
-                    AutoSizeAxes = Axes.Both,
-                    Text = ""
-                });
+                    Add(new Seal(this));
+                    Remove(CharacterSign);
+                }
 
-                if (currentCharacter == Characters.Cirno)
+                if (CurrentCharacter == Characters.Cirno)
                 {
                     for (int i = 0; i < 20; i++)
                     {
@@ -357,7 +363,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     }
                 }
 
-                if (currentCharacter == Characters.YukariYakumo)
+                if (CurrentCharacter == Characters.YukariYakumo)
                 {
                     Parent.AddRange(new Drawable[]
                     {
@@ -369,7 +375,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     riftEnd.LinkedRift = riftStart;
                 }
 
-                if (currentCharacter == Characters.KokoroHatano)
+                if (CurrentCharacter == Characters.KokoroHatano)
                 {
                     Add(metranome = new Metranome());
                     Remove(CharacterSign);
@@ -381,7 +387,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     Origin = Anchor.Centre
                 });
 
-                if (currentCharacter == Characters.NueHoujuu)
+                if (CurrentCharacter == Characters.NueHoujuu)
                 {
                     ufoMark = new UFO(this, UFOType.Mark) { Position = new Vector2(0, -60) };
                     ufoHealth = new UFO(this, UFOType.Health) { Position = new Vector2(-60, 0) };
@@ -418,7 +424,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             if (!Clone && Bot && currentGameMode == VitaruGamemode.Touhosu)
                 spell();
 
-            if (Actions[VitaruAction.Shoot] && currentGameMode != VitaruGamemode.Dodge && currentCharacter == Characters.MarisaKirisame | currentCharacter == Characters.ReimuHakurei)
+            if (Actions[VitaruAction.Shoot] && currentGameMode != VitaruGamemode.Dodge && CurrentCharacter == Characters.MarisaKirisame | CurrentCharacter == Characters.ReimuHakurei)
             {
                 leftTotem.Shoot();
                 rightTotem.Shoot();
@@ -470,9 +476,9 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         {
             nextHalfBeat = -1;
 
-            if (Actions[VitaruAction.Shoot] && currentGameMode != VitaruGamemode.Dodge && currentCharacter == Characters.Cirno && !shattered)
+            if (Actions[VitaruAction.Shoot] && currentGameMode != VitaruGamemode.Dodge && CurrentCharacter == Characters.Cirno && !shattered)
                 patternWave();
-            else if (Actions[VitaruAction.Shoot] && currentGameMode != VitaruGamemode.Dodge && currentCharacter != Characters.Cirno)
+            else if (Actions[VitaruAction.Shoot] && currentGameMode != VitaruGamemode.Dodge && CurrentCharacter != Characters.Cirno)
                 patternWave();
 
             if (CanHeal)
@@ -536,7 +542,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             float distance = (float)Math.Sqrt(Math.Pow(object2Pos.X, 2) + Math.Pow(object2Pos.Y, 2));
             float edgeDistance = distance - (bullet.Width / 2 + Hitbox.Width / 2);
 
-            if (currentCharacter == Characters.YuyukoSaigyouji && ghastlytActive)
+            if (CurrentCharacter == Characters.YuyukoSaigyouji && ghastlytActive)
             {
                 Hitbox.HitDetection = true;
                 if (Hitbox.HitDetect(Hitbox, bullet.Hitbox) && bullet.Bullet.Ghost)
@@ -600,39 +606,39 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         #region Spell Stuff
         private void spell(bool keyUp = false, VitaruAction action = VitaruAction.Spell)
         {
-            if (Energy >= energyRequired && currentGameMode == VitaruGamemode.Touhosu && !keyUp || currentCharacter == Characters.AliceMuyart && currentGameMode == VitaruGamemode.Touhosu && !keyUp)
+            if (Energy >= energyRequired && currentGameMode == VitaruGamemode.Touhosu && !keyUp || CurrentCharacter == Characters.AliceMuyart && currentGameMode == VitaruGamemode.Touhosu && !keyUp)
             {
                 //if (currentCharacter == Characters.Alex && action == VitaruAction.Spell)
                 //alexSpell();
-                if (currentCharacter == Characters.ReimuHakurei && action == VitaruAction.Spell)
+                if (CurrentCharacter == Characters.ReimuHakurei && action == VitaruAction.Spell)
                     reimuaSpell();
-                else if (currentCharacter == Characters.MarisaKirisame && action == VitaruAction.Spell)
+                else if (CurrentCharacter == Characters.MarisaKirisame && action == VitaruAction.Spell)
                     marisaSpell();
-                else if (currentCharacter == Characters.SakuyaIzayoi && action == VitaruAction.Spell)
+                else if (CurrentCharacter == Characters.SakuyaIzayoi && action == VitaruAction.Spell)
                     sakuyaSpell();
-                else if (currentCharacter == Characters.FlandreScarlet && !Clone && !tabooActive && action == VitaruAction.Spell)
+                else if (CurrentCharacter == Characters.FlandreScarlet && !Clone && !tabooActive && action == VitaruAction.Spell)
                     flandereSpell();
-                else if (currentCharacter == Characters.RemiliaScarlet && action == VitaruAction.Spell)
+                else if (CurrentCharacter == Characters.RemiliaScarlet && action == VitaruAction.Spell)
                 {
 
                 }
-                else if (currentCharacter == Characters.YuyukoSaigyouji && action == VitaruAction.Spell)
+                else if (CurrentCharacter == Characters.YuyukoSaigyouji && action == VitaruAction.Spell)
                 {
 
                 }
-                else if (currentCharacter == Characters.YuyukoSaigyouji && !Clone && !ghastlytActive && action == VitaruAction.Spell)
+                else if (CurrentCharacter == Characters.YuyukoSaigyouji && !Clone && !ghastlytActive && action == VitaruAction.Spell)
                     yuyukoSpell();
-                else if (currentCharacter == Characters.YukariYakumo && action == VitaruAction.Spell)
+                else if (CurrentCharacter == Characters.YukariYakumo && action == VitaruAction.Spell)
                     yukariSpell();
-                else if (currentCharacter == Characters.Chen && action == VitaruAction.Spell)
+                else if (CurrentCharacter == Characters.Chen && action == VitaruAction.Spell)
                 {
 
                 }
-                else if (currentCharacter == Characters.IbarakiKasen && action == VitaruAction.Spell)
+                else if (CurrentCharacter == Characters.IbarakiKasen && action == VitaruAction.Spell)
                     ibarakiSpell();
-                else if (currentCharacter == Characters.NueHoujuu && action == VitaruAction.Spell | action == VitaruAction.Spell2 | action == VitaruAction.Spell3 | action == VitaruAction.Spell4)
+                else if (CurrentCharacter == Characters.NueHoujuu && action == VitaruAction.Spell | action == VitaruAction.Spell2 | action == VitaruAction.Spell3 | action == VitaruAction.Spell4)
                     nueSpell(action);
-                else if (currentCharacter == Characters.AliceMuyart && !Clone)
+                else if (CurrentCharacter == Characters.AliceMuyart && !Clone)
                 {
                     switch (action)
                     {
@@ -651,7 +657,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             }
             else if (keyUp)
             {
-                switch (currentCharacter)
+                switch (CurrentCharacter)
                 {
                     case Characters.SakuyaIzayoi when action == VitaruAction.Spell:
                         timeFreezeActive = false;
@@ -733,7 +739,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
 
                 VitaruPlayer player;
-                Parent.Add(player = new VitaruPlayer(Parent, currentCharacter, this)
+                Parent.Add(player = new VitaruPlayer(Parent, CurrentCharacter, this)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -761,7 +767,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
         private void kokoroSpell()
         {
-            if (currentCharacter == Characters.KokoroHatano)
+            if (CurrentCharacter == Characters.KokoroHatano)
             {
                 if (Time.Current <= lastQuarterBeat + hitwindow | Time.Current >= nextQuarterBeat - hitwindow)
                     Combo++;
@@ -791,7 +797,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             Hitbox.HitDetection = false;
 
             VitaruPlayer player;
-            Parent.Add(player = new VitaruPlayer(Parent, currentCharacter, this)
+            Parent.Add(player = new VitaruPlayer(Parent, CurrentCharacter, this)
             {
                 Alpha = 0,
                 Anchor = Anchor.Centre,
@@ -906,7 +912,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
         private void spellUpdate()
         {
-            if (currentCharacter != Characters.NueHoujuu)
+            if (CurrentCharacter != Characters.NueHoujuu)
             {
                 ufoMark = null;
                 ufoHealth = null;
@@ -1095,7 +1101,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
         public override float Damage(float damage)
         {
-            if (currentCharacter == Characters.Cirno)
+            if (CurrentCharacter == Characters.Cirno)
             {
                 Health -= damage;
 
@@ -1153,7 +1159,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 BulletDamage = 20 * damageMultiplier,
                 ColorOverride = color,
                 Team = Team,
-                Ghost = currentCharacter == Characters.YuyukoSaigyouji | currentCharacter == Characters.AliceMuyart
+                Ghost = CurrentCharacter == Characters.YuyukoSaigyouji | CurrentCharacter == Characters.AliceMuyart
             }));
             if (vampuric)
                 drawableBullet.OnHit = () => Heal(0.5f);
@@ -1167,7 +1173,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             Color4 color = CharacterColor;
             for (int i = 1; i <= numberbullets; i++)
             {
-                if (currentCharacter == Characters.NueHoujuu)
+                if (CurrentCharacter == Characters.NueHoujuu)
                 {
                     if (i == 1)
                         color = Color4.Red;
@@ -1412,14 +1418,14 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             if (!Bot && !Puppet)
             {
                 //Keyboard Stuff
-                if (currentCharacter == Characters.AliceMuyart)
+                if (CurrentCharacter == Characters.AliceMuyart)
                 {
                     if (action == VitaruAction.Increase)
                         SetRate = Math.Min((float)Math.Round(SetRate + 0.1f, 1), 2f);
                     if (action == VitaruAction.Decrease)
                         SetRate = Math.Max((float)Math.Round(SetRate - 0.1f, 1), -2f);
                 }
-                else if (currentCharacter == Characters.SakuyaIzayoi)
+                else if (CurrentCharacter == Characters.SakuyaIzayoi)
                 {
                     if (action == VitaruAction.Increase)
                         SetRate = Math.Min((float)Math.Round(SetRate + 0.2f, 1), 0.8f);
@@ -1435,7 +1441,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                     Actions[VitaruAction.Left] = true;
                 if (action == VitaruAction.Right)
                     Actions[VitaruAction.Right] = true;
-                if (action == VitaruAction.Fast && currentCharacter != Characters.IbarakiKasen)
+                if (action == VitaruAction.Fast && CurrentCharacter != Characters.IbarakiKasen)
                     Actions[VitaruAction.Fast] = true;
                 if (action == VitaruAction.Slow)
                 {
@@ -1444,7 +1450,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
                     Actions[VitaruAction.Slow] = true;
                 }
-                if (action == VitaruAction.LeftShoot | action == VitaruAction.RightShoot | action == VitaruAction.Shoot | action == VitaruAction.Spell && currentCharacter == Characters.KokoroHatano)
+                if (action == VitaruAction.LeftShoot | action == VitaruAction.RightShoot | action == VitaruAction.Shoot | action == VitaruAction.Spell && CurrentCharacter == Characters.KokoroHatano)
                 {
                     kokoroSpell();
 
@@ -1453,7 +1459,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
 
                 //Mouse Stuff
-                if (action == VitaruAction.Shoot && currentCharacter != Characters.KokoroHatano)
+                if (action == VitaruAction.Shoot && CurrentCharacter != Characters.KokoroHatano)
                     Actions[VitaruAction.Shoot] = true;
 
                 spell(false, action);
@@ -1510,7 +1516,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             {
                 VitaruPlayerInformation playerInformation = new VitaruPlayerInformation
                 {
-                    Character = currentCharacter,
+                    Character = CurrentCharacter,
                     MouseX = cursor.Position.X,
                     MouseY = cursor.Position.Y,
                     PlayerX = Position.X,
@@ -1608,7 +1614,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             if (Time.Current > startSpeaking + lengthOfSpeaking)
                 textContainer.FadeOut(200);
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 1371893 && currentCharacter == Characters.ReimuHakurei && !familiar && playerList.Count == 1)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 1371893 && CurrentCharacter == Characters.ReimuHakurei && !familiar && playerList.Count == 1)
             {
                 if (Time.Current >= 5200 && familiarity == 0)
                 {
@@ -1663,7 +1669,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 0 && currentCharacter == Characters.SakuyaIzayoi && !late && playerList.Count == 1)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 0 && CurrentCharacter == Characters.SakuyaIzayoi && !late && playerList.Count == 1)
             {
                 if (Time.Current >= 0 && time == 0)
                 {
@@ -1672,7 +1678,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && late && insane && playerList.Count == 1)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && CurrentCharacter == Characters.FlandreScarlet && late && insane && playerList.Count == 1)
             {
                 if (Time.Current >= 760 && insanity == 0)
                 {
@@ -1692,7 +1698,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                 }
             }
 
-            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && currentCharacter == Characters.FlandreScarlet && late && !insane && playerList.Count == 1)
+            if (workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && CurrentCharacter == Characters.FlandreScarlet && late && !insane && playerList.Count == 1)
             {
                 if (Time.Current >= 760 && insanity == 0)
                 {
@@ -1702,7 +1708,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
             }
             if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 114716 && !insane && playerList.Count == 2)
             {
-                if (currentCharacter == Characters.RemiliaScarlet)
+                if (CurrentCharacter == Characters.RemiliaScarlet)
                 {
                     if (Time.Current >= 760 && awakening == 0)
                     {
@@ -1745,7 +1751,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                         awakening++;
                     }
                 }
-                else if (currentCharacter == Characters.FlandreScarlet)
+                else if (CurrentCharacter == Characters.FlandreScarlet)
                 {
                     if (Time.Current >= 0 && awakening == 0)
                     {
@@ -1757,7 +1763,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
             if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 148000 && playerList.Count == 2)
             {
-                if (currentCharacter == Characters.Kaguya)
+                if (CurrentCharacter == Characters.Kaguya)
                 {
                     if (Time.Current >= 1280 && tresspassing == 0)
                     {
@@ -1790,7 +1796,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                         tresspassing++;
                     }
                 }
-                else if (currentCharacter == Characters.MarisaKirisame)
+                else if (CurrentCharacter == Characters.MarisaKirisame)
                 {
                     if (Time.Current >= 88740 && tresspassing == 0)
                     {
@@ -1802,7 +1808,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
 
             if (false)//workingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == 221777 && playerList.Count == 2)
             {
-                if (currentCharacter == Characters.HongMeiling)
+                if (CurrentCharacter == Characters.HongMeiling)
                 {
                     if (Time.Current >= 0 && bond == 0)
                     {
@@ -1810,7 +1816,7 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
                         bond++;
                     }
                 }
-                else if (currentCharacter == Characters.SakuyaIzayoi)
+                else if (CurrentCharacter == Characters.SakuyaIzayoi)
                 {
 
                 }
@@ -1889,6 +1895,8 @@ namespace osu.Game.Rulesets.Vitaru.Objects.Characters
         NueHoujuu,
         [System.ComponentModel.Description("Jorolf")]
         Rock,
+        [System.ComponentModel.Description("mangomizer")]
+        Mango,
         [System.ComponentModel.Description("Alice Muyart")]
         AliceMuyart,
         [System.ComponentModel.Description("Arysa Muyart")]
