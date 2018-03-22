@@ -875,7 +875,9 @@
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
     <Compile Include="Skinning\DefaultSkin.cs" />
     <Compile Include="Skinning\LegacySkin.cs" />
+    <Compile Include="Skinning\LegacySkinDecoder.cs" />
     <Compile Include="Skinning\Skin.cs" />
+    <Compile Include="Skinning\SkinConfiguration.cs" />
     <Compile Include="Skinning\SkinFileInfo.cs" />
     <Compile Include="Skinning\SkinInfo.cs" />
     <Compile Include="Skinning\SkinManager.cs" />
