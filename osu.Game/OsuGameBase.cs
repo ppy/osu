@@ -105,6 +105,7 @@ namespace osu.Game
             runMigrations();
 
             dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
+            dependencies.CacheAs<ISkinSource>(SkinManager);
 
             var api = new APIAccess(LocalConfig);
 
@@ -113,7 +114,7 @@ namespace osu.Game
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, api, Host));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, api, Audio, Host));
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));

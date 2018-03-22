@@ -9,8 +9,8 @@ namespace osu.Game.Skinning
 {
     public class SkinnableDrawable : SkinnableDrawable<Drawable>
     {
-        public SkinnableDrawable(string name, Func<string, Drawable> defaultImplementation, bool fallback = true, bool restrictSize = true)
-            : base(name, defaultImplementation, fallback, restrictSize)
+        public SkinnableDrawable(string name, Func<string, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
+            : base(name, defaultImplementation, allowFallback, restrictSize)
         {
         }
     }
@@ -31,7 +31,7 @@ namespace osu.Game.Skinning
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
         /// <param name="fallback">Whther to fallback to the default implementation when a custom skin is specified but not implementation is present.</param>
         /// <param name="restrictSize">Whether a user-skin drawable should be limited to the size of our parent.</param>
-        public SkinnableDrawable(string name, Func<string, T> defaultImplementation, bool fallback = true, bool restrictSize = true) : base(fallback)
+        public SkinnableDrawable(string name, Func<string, T> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true) : base(allowFallback)
         {
             componentName = name;
             createDefault = defaultImplementation;
@@ -40,7 +40,7 @@ namespace osu.Game.Skinning
             RelativeSizeAxes = Axes.Both;
         }
 
-        protected override void SkinChanged(Skin skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             var drawable = skin.GetDrawableComponent(componentName);
             if (drawable != null)
@@ -49,6 +49,7 @@ namespace osu.Game.Skinning
                 {
                     drawable.RelativeSizeAxes = Axes.Both;
                     drawable.Size = Vector2.One;
+                    drawable.Scale = Vector2.One;
                     drawable.FillMode = FillMode.Fit;
                 }
             }

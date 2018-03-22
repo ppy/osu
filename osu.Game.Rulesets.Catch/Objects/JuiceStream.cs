@@ -60,7 +60,6 @@ namespace osu.Game.Rulesets.Catch.Objects
             AddNested(new Fruit
             {
                 Samples = Samples,
-                ComboColour = ComboColour,
                 StartTime = StartTime,
                 X = X
             });
@@ -90,7 +89,6 @@ namespace osu.Game.Rulesets.Catch.Objects
                         AddNested(new TinyDroplet
                         {
                             StartTime = t,
-                            ComboColour = ComboColour,
                             X = X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
                             Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                             {
@@ -106,7 +104,6 @@ namespace osu.Game.Rulesets.Catch.Objects
                         AddNested(new Droplet
                         {
                             StartTime = time,
-                            ComboColour = ComboColour,
                             X = X + Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
                             Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                             {
@@ -123,7 +120,6 @@ namespace osu.Game.Rulesets.Catch.Objects
                 AddNested(new Fruit
                 {
                     Samples = Samples,
-                    ComboColour = ComboColour,
                     StartTime = spanStartTime + spanDuration,
                     X = X + Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
                 });

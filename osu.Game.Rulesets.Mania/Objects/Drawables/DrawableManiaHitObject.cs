@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using OpenTK.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
@@ -27,17 +26,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             if (action != null)
                 Action = action.Value;
-        }
-
-        public override Color4 AccentColour
-        {
-            get { return base.AccentColour; }
-            set
-            {
-                if (base.AccentColour == value)
-                    return;
-                base.AccentColour = value;
-            }
         }
     }
 }

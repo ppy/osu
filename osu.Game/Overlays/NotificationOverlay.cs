@@ -110,17 +110,7 @@ namespace osu.Game.Overlays
 
         private int runningDepth;
 
-        private void notificationClosed()
-        {
-            Schedule(() =>
-            {
-                // hide ourselves if all notifications have been dismissed.
-                if (totalCount == 0)
-                    State = Visibility.Hidden;
-            });
-
-            updateCounts();
-        }
+        private void notificationClosed() => updateCounts();
 
         private readonly Scheduler postScheduler = new Scheduler();
 
@@ -140,6 +130,8 @@ namespace osu.Game.Overlays
 
             var section = sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)));
             section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
+
+            State = Visibility.Visible;
 
             updateCounts();
         });
