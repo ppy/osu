@@ -54,7 +54,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (caughtFruit == null) return;
 
-                caughtFruit.AccentColour = fruit.AccentColour;
                 caughtFruit.RelativePositionAxes = Axes.None;
                 caughtFruit.Position = new Vector2(MovableCatcher.ToLocalSpace(fruit.ScreenSpaceDrawQuad.Centre).X - MovableCatcher.DrawSize.X / 2, 0);
 

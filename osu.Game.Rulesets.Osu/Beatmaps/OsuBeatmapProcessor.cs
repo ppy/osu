@@ -13,18 +13,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         public override void PostProcess(Beatmap<OsuHitObject> beatmap)
         {
             applyStacking(beatmap);
-
-            int comboIndex = 0;
-
-            foreach (var obj in beatmap.HitObjects)
-            {
-                if (obj.NewCombo)
-                {
-                    comboIndex = 0;
-                }
-
-                obj.IndexInCurrentCombo = comboIndex++;
-            }
+            base.PostProcess(beatmap);
         }
 
         private void applyStacking(Beatmap<OsuHitObject> beatmap)
