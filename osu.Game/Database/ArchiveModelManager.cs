@@ -220,8 +220,8 @@ namespace osu.Game.Database
                         // user requested abort
                         return;
 
-                    notification.Text = $"Deleting ({i} of {items.Count})";
-                    notification.Progress = (float)++i / items.Count;
+                    notification.Progress = (float)i / items.Count;
+                    notification.Text = $"Deleting ({++i} of {items.Count})";
                     Delete(b);
                 }
             }
@@ -256,8 +256,8 @@ namespace osu.Game.Database
                         // user requested abort
                         return;
 
-                    notification.Text = $"Restoring ({i} of {items.Count})";
-                    notification.Progress = (float)++i / items.Count;
+                    notification.Progress = (float)i / items.Count;
+                    notification.Text = $"Restoring ({++i} of {items.Count})";
                     Undelete(item);
                 }
             }
