@@ -7,8 +7,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Rulesets.Objects.Types;
-using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -22,7 +20,25 @@ namespace osu.Game.Skinning
 
         public SampleChannel GetSample(string sampleName) => source.GetSample(sampleName) ?? fallbackSource?.GetSample(sampleName);
 
-        public Color4? GetComboColour(IHasComboIndex comboObject) => source.GetComboColour(comboObject) ?? fallbackSource?.GetComboColour(comboObject);
+        public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
+        {
+            TValue? val = null;
+            var conf = (source as Skin)?.Configuration as TConfiguration;
+            if (conf != null)
+                val = query?.Invoke(conf);
+
+            return val ?? fallbackSource?.GetValue(query);
+        }
+
+        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
+        {
+            TValue val = null;
+            var conf = (source as Skin)?.Configuration as TConfiguration;
+            if (conf != null)
+                val = query?.Invoke(conf);
+
+            return val ?? fallbackSource?.GetValue(query);
+        }
 
         private readonly ISkinSource source;
         private ISkinSource fallbackSource;
