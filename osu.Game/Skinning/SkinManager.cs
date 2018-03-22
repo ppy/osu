@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
-using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -124,6 +123,6 @@ namespace osu.Game.Skinning
 
         public SampleChannel GetSample(string sampleName) => CurrentSkin.Value.GetSample(sampleName);
 
-        public Color4? GetComboColour(IHasComboInformation comboObject) => CurrentSkin.Value.GetComboColour(comboObject);
+        public Color4? GetColour(string colourName) => CurrentSkin.Value.GetColour(colourName);
     }
 }

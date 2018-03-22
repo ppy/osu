@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -24,8 +23,25 @@ namespace osu.Game.Skinning
 
         public abstract Texture GetTexture(string componentName);
 
-        public virtual Color4? GetComboColour(IHasComboInformation comboObject) =>
-            Configuration.ComboColours.Count == 0 ? (Color4?)null : Configuration.ComboColours[comboObject.ComboIndex % Configuration.ComboColours.Count];
+        public virtual Color4? GetColour(string colourName)
+        {
+            var namespaces = colourName.Split('/');
+
+            switch (namespaces[0])
+            {
+                case "Play":
+                    switch (namespaces[1])
+                    {
+                        case "Combo":
+                            int index = int.Parse(namespaces[2]);
+                            return Configuration.ComboColours.Count == 0 ? (Color4?)null : Configuration.ComboColours[index % Configuration.ComboColours.Count];
+                    }
+
+                    break;
+            }
+
+            return null;
+        }
 
         protected Skin(SkinInfo skin)
         {
