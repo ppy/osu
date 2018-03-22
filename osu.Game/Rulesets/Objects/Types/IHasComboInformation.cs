@@ -6,7 +6,7 @@ namespace osu.Game.Rulesets.Objects.Types
     /// <summary>
     /// A HitObject that is part of a combo and has extended information about its position relative to other combo objects.
     /// </summary>
-    public interface IHasComboIndex : IHasCombo
+    public interface IHasComboInformation : IHasCombo
     {
         /// <summary>
         /// The offset of this hitobject in the current combo.
