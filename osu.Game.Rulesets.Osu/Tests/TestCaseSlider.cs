@@ -117,7 +117,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-(distance / 2), 0),
-                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
                     Vector2.Zero,
@@ -138,7 +137,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
                     Vector2.Zero,
@@ -162,7 +160,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 CurveType = CurveType.Linear,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
                     Vector2.Zero,
@@ -189,7 +186,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 CurveType = CurveType.Bezier,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
                     Vector2.Zero,
@@ -215,7 +211,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 CurveType = CurveType.Linear,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(0, 0),
-                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
                     Vector2.Zero,
@@ -245,7 +240,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-100, 0),
-                ComboColour = Color4.LightSeaGreen,
                 CurveType = CurveType.Catmull,
                 ControlPoints = new List<Vector2>
                 {
