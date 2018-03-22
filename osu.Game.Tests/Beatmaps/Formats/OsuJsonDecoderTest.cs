@@ -12,7 +12,6 @@ using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Resources;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -87,24 +86,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.AreEqual(9, difficulty.ApproachRate);
             Assert.AreEqual(1.8, difficulty.SliderMultiplier);
             Assert.AreEqual(2, difficulty.SliderTickRate);
-        }
-
-        [Test]
-        public void TestDecodeColors()
-        {
-            var beatmap = decodeAsJson(normal);
-            Color4[] expected =
-            {
-                new Color4(142, 199, 255, 255),
-                new Color4(255, 128, 128, 255),
-                new Color4(128, 255, 255, 255),
-                new Color4(128, 255, 128, 255),
-                new Color4(255, 187, 255, 255),
-                new Color4(255, 177, 140, 255),
-            };
-            Assert.AreEqual(expected.Length, beatmap.ComboColours.Count);
-            for (int i = 0; i < expected.Length; i++)
-                Assert.AreEqual(expected[i], beatmap.ComboColours[i]);
         }
 
         [Test]

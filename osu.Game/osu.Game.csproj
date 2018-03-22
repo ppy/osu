@@ -872,6 +872,7 @@
     <Compile Include="Screens\Tournament\Teams\DrawingsTeam.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Skinning\LegacyBeatmapSkin.cs" />
     <Compile Include="Skinning\DefaultSkin.cs" />
     <Compile Include="Skinning\LegacySkin.cs" />
     <Compile Include="Skinning\LegacySkinDecoder.cs" />
