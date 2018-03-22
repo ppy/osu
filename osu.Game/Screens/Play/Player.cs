@@ -89,6 +89,13 @@ namespace osu.Game.Screens.Play
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
 
             WorkingBeatmap working = Beatmap.Value;
+
+            if (working is DummyWorkingBeatmap)
+            {
+                Exit();
+                return;
+            }
+
             Beatmap beatmap;
 
             try
