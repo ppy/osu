@@ -24,7 +24,7 @@ namespace osu.Game.Skinning
 
         public abstract Texture GetTexture(string componentName);
 
-        public virtual Color4? GetComboColour(IHasComboIndex comboObject) =>
+        public virtual Color4? GetComboColour(IHasComboInformation comboObject) =>
             Configuration.ComboColours.Count == 0 ? (Color4?)null : Configuration.ComboColours[comboObject.ComboIndex % Configuration.ComboColours.Count];
 
         protected Skin(SkinInfo skin)
