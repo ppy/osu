@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Tests.Beatmaps;
 using OpenTK;
 using OpenTK.Graphics;
@@ -30,6 +31,8 @@ namespace osu.Game.Tests.Visual
 
         private Track track;
         private HitObjectComposer composer;
+
+        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor(4);
 
         private DecoupleableInterpolatingFramedClock clock;
 
@@ -44,6 +47,7 @@ namespace osu.Game.Tests.Visual
             clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
             dependencies.CacheAs<IAdjustableClock>(clock);
             dependencies.CacheAs<IFrameBasedClock>(clock);
+            dependencies.Cache(beatDivisor);
 
             var testBeatmap = new Beatmap
             {

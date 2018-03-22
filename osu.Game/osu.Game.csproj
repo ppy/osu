@@ -381,6 +381,8 @@
     <Compile Include="Rulesets\Replays\Types\IConvertibleReplayFrame.cs" />
     <Compile Include="Rulesets\Scoring\Legacy\LegacyScoreParser.cs" />
     <Compile Include="Rulesets\UI\JudgementContainer.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\BindableBeatDivisor.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\BeatDivisorControl.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Layers\BorderLayer.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Layers\HitObjectMaskLayer.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Layers\SelectionBox.cs" />

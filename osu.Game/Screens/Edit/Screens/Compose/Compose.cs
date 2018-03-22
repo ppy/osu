@@ -17,11 +17,20 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
 
+        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
+
         private Container composerContainer;
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            dependencies.Cache(beatDivisor);
+
             ScrollableTimeline timeline;
             Children = new Drawable[]
             {
@@ -48,15 +57,28 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                         Name = "Timeline content",
                                         RelativeSizeAxes = Axes.Both,
                                         Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
-                                        Children = new Drawable[]
+                                        Child = new GridContainer
                                         {
-                                            new Container
+                                            RelativeSizeAxes = Axes.Both,
+                                            Content = new[]
                                             {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Right = 115 },
-                                                Child = timeline = new ScrollableTimeline { RelativeSizeAxes = Axes.Both }
+                                                new Drawable[]
+                                                {
+                                                    new Container
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Padding = new MarginPadding { Right = 5 },
+                                                        Child = timeline = new ScrollableTimeline { RelativeSizeAxes = Axes.Both }
+                                                    },
+                                                    new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
+                                                },
+                                            },
+                                            ColumnDimensions = new[]
+                                            {
+                                                new Dimension(),
+                                                new Dimension(GridSizeMode.Absolute, 90),
                                             }
-                                        }
+                                        },
                                     }
                                 }
                             }

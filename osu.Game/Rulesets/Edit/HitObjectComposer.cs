@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -16,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
 
@@ -31,6 +33,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly List<Container> layerContainers = new List<Container>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
         private IAdjustableClock adjustableClock;
 
@@ -41,10 +44,13 @@ namespace osu.Game.Rulesets.Edit
             RelativeSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, IAdjustableClock adjustableClock, IFrameBasedClock framedClock)
+        [BackgroundDependencyLoader(true)]
+        private void load([NotNull] OsuGameBase osuGame, [NotNull] IAdjustableClock adjustableClock, [NotNull] IFrameBasedClock framedClock, [CanBeNull] BindableBeatDivisor beatDivisor)
         {
             this.adjustableClock = adjustableClock;
+
+            if (beatDivisor != null)
+                this.beatDivisor.BindTo(beatDivisor);
 
             beatmap.BindTo(osuGame.Beatmap);
 
@@ -167,9 +173,6 @@ namespace osu.Game.Rulesets.Edit
 
         private void seek(int direction, bool snapped)
         {
-            // Todo: This should not be a constant, but feels good for now
-            const int beat_snap_divisor = 4;
-
             var cpi = beatmap.Value.Beatmap.ControlPointInfo;
 
             var timingPoint = cpi.TimingPointAt(adjustableClock.CurrentTime);
@@ -181,7 +184,7 @@ namespace osu.Game.Rulesets.Edit
                     timingPoint = cpi.TimingPoints[--activeIndex];
             }
 
-            double seekAmount = timingPoint.BeatLength / beat_snap_divisor;
+            double seekAmount = timingPoint.BeatLength / beatDivisor;
             double seekTime = adjustableClock.CurrentTime + seekAmount * direction;
 
             if (!snapped || cpi.TimingPoints.Count == 0)
@@ -222,9 +225,6 @@ namespace osu.Game.Rulesets.Edit
 
         public void SeekTo(double seekTime, bool snapped = false)
         {
-            // Todo: This should not be a constant, but feels good for now
-            const int beat_snap_divisor = 4;
-
             if (!snapped)
             {
                 adjustableClock.Seek(seekTime);
@@ -232,7 +232,7 @@ namespace osu.Game.Rulesets.Edit
             }
 
             var timingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(seekTime);
-            double beatSnapLength = timingPoint.BeatLength / beat_snap_divisor;
+            double beatSnapLength = timingPoint.BeatLength / beatDivisor;
 
             // We will be snapping to beats within the timing point
             seekTime -= timingPoint.Time;
