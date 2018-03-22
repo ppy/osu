@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Menu
             public Texture Texture;
             public VisualiserSharedData Shared;
 
-            private Action<TexturedVertex2D> addAction;
+            private readonly Action<TexturedVertex2D> addAction;
 
             //Asuming the logo is a circle, we don't need a second dimension.
             public float Size;
@@ -172,6 +172,7 @@ namespace osu.Game.Screens.Menu
 
             public VisualisationDrawNode()
             {
+                // reduce allocations of delegates in draw method.
                 addAction = v => Shared.VertexBatch.Add(v);
             }
 

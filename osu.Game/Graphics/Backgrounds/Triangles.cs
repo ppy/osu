@@ -114,10 +114,11 @@ namespace osu.Game.Graphics.Backgrounds
             if (CreateNewTriangles)
                 addTriangles(false);
 
-            float adjustedAlpha = HideAlphaDiscrepancies ?
+            float adjustedAlpha = HideAlphaDiscrepancies
+                ?
                 // Cubically scale alpha to make it drop off more sharply.
-                (float)Math.Pow(DrawInfo.Colour.AverageColour.Linear.A, 3) :
-                1;
+                (float)Math.Pow(DrawInfo.Colour.AverageColour.Linear.A, 3)
+                : 1;
 
             float elapsedSeconds = (float)Time.Elapsed / 1000;
             // Since position is relative, the velocity needs to scale inversely with DrawHeight.
@@ -185,6 +186,7 @@ namespace osu.Game.Graphics.Backgrounds
         protected override DrawNode CreateDrawNode() => new TrianglesDrawNode();
 
         private readonly TrianglesDrawNodeSharedData sharedData = new TrianglesDrawNodeSharedData();
+
         protected override void ApplyDrawNode(DrawNode node)
         {
             base.ApplyDrawNode(node);
@@ -215,6 +217,14 @@ namespace osu.Game.Graphics.Backgrounds
             public readonly List<TriangleParticle> Parts = new List<TriangleParticle>();
             public Vector2 Size;
 
+            private readonly Action<TexturedVertex2D> addAction;
+
+            public TrianglesDrawNode()
+            {
+                // reduce allocations of delegates in draw method.
+                addAction = v => Shared.VertexBatch.Add(v);
+            }
+
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
                 base.Draw(vertexAction);
@@ -242,7 +252,7 @@ namespace osu.Game.Graphics.Backgrounds
                         triangle,
                         colourInfo,
                         null,
-                        Shared.VertexBatch.Add,
+                        addAction,
                         Vector2.Divide(localInflationAmount, size));
                 }
 
