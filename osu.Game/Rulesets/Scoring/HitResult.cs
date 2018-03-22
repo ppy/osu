@@ -18,33 +18,27 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates that the object has been judged as a miss.
         /// </summary>
         [Description(@"Miss")]
-        [JudgementColour(@"ed1121")]
         Miss,
 
         [Description(@"Meh")]
-        [JudgementColour(@"ffcc22")]
         Meh,
 
         /// <summary>
         /// Optional judgement.
         /// </summary>
         [Description(@"OK")]
-        [JudgementColour(@"88b300")]
         Ok,
 
         [Description(@"Good")]
-        [JudgementColour(@"88b300")]
         Good,
 
         [Description(@"Great")]
-        [JudgementColour(@"66ccff")]
         Great,
 
         /// <summary>
         /// Optional judgement.
         /// </summary>
         [Description(@"Perfect")]
-        [JudgementColour(@"66ccff")]
         Perfect,
     }
 }
