@@ -187,6 +187,7 @@
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.2.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\System.Diagnostics.DiagnosticSource.4.4.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Interactive.Async, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\System.Interactive.Async.3.1.1\lib\net46\System.Interactive.Async.dll</HintPath>
     </Reference>
@@ -290,6 +291,7 @@
     <Compile Include="Database\SingletonContextFactory.cs" />
     <Compile Include="Graphics\Containers\LinkFlowContainer.cs" />
     <Compile Include="Graphics\DrawableDate.cs" />
+    <Compile Include="Graphics\ScreenshotManager.cs" />
     <Compile Include="Graphics\Textures\LargeTextureStore.cs" />
     <Compile Include="IO\Archives\ArchiveReader.cs" />
     <Compile Include="IO\Archives\LegacyFilesystemReader.cs" />
@@ -374,12 +376,15 @@
     <Compile Include="Overlays\Social\SocialPanel.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDrawableHitObject.cs" />
     <Compile Include="Rulesets\Objects\HitWindows.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasComboInformation.cs" />
     <Compile Include="Rulesets\Replays\Legacy\LegacyReplayFrame.cs" />
     <Compile Include="Rulesets\Replays\Legacy\ReplayButtonState.cs" />
     <Compile Include="Rulesets\Replays\ReplayFrame.cs" />
     <Compile Include="Rulesets\Replays\Types\IConvertibleReplayFrame.cs" />
     <Compile Include="Rulesets\Scoring\Legacy\LegacyScoreParser.cs" />
     <Compile Include="Rulesets\UI\JudgementContainer.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\BindableBeatDivisor.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\BeatDivisorControl.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Layers\BorderLayer.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Layers\HitObjectMaskLayer.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Layers\SelectionBox.cs" />
@@ -871,9 +876,14 @@
     <Compile Include="Screens\Tournament\Teams\DrawingsTeam.cs" />
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Skinning\LegacyBeatmapSkin.cs" />
     <Compile Include="Skinning\DefaultSkin.cs" />
+    <Compile Include="Skinning\ISkinSource.cs" />
     <Compile Include="Skinning\LegacySkin.cs" />
+    <Compile Include="Skinning\LegacySkinDecoder.cs" />
+    <Compile Include="Skinning\LocalSkinOverrideContainer.cs" />
     <Compile Include="Skinning\Skin.cs" />
+    <Compile Include="Skinning\SkinConfiguration.cs" />
     <Compile Include="Skinning\SkinFileInfo.cs" />
     <Compile Include="Skinning\SkinInfo.cs" />
     <Compile Include="Skinning\SkinManager.cs" />
