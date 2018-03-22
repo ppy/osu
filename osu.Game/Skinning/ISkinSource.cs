@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
-using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -22,10 +21,8 @@ namespace osu.Game.Skinning
 
         SampleChannel GetSample(string sampleName);
 
-        Color4? GetColour(string colourName);
+        TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class;
 
-        TValue GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class;
-
-        TValue? GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct;
+        TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct;
     }
 }

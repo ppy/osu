@@ -7,7 +7,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
-using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -21,26 +20,24 @@ namespace osu.Game.Skinning
 
         public SampleChannel GetSample(string sampleName) => source.GetSample(sampleName) ?? fallbackSource?.GetSample(sampleName);
 
-        public Color4? GetColour(string colourName) => source.GetColour(colourName) ?? fallbackSource?.GetColour(colourName);
-
-        public TValue? GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
+        public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
         {
             TValue? val = null;
             var conf = (source as Skin)?.Configuration as TConfiguration;
             if (conf != null)
                 val = query?.Invoke(conf);
 
-            return val ?? fallbackSource?.GetConfiguration(query);
+            return val ?? fallbackSource?.GetValue(query);
         }
 
-        public TValue GetConfiguration<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
+        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
         {
             TValue val = null;
             var conf = (source as Skin)?.Configuration as TConfiguration;
             if (conf != null)
                 val = query?.Invoke(conf);
 
-            return val ?? fallbackSource?.GetConfiguration(query);
+            return val ?? fallbackSource?.GetValue(query);
         }
 
         private readonly ISkinSource source;
