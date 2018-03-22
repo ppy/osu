@@ -5,8 +5,6 @@ using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Rulesets.Objects.Types;
-using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -23,6 +21,8 @@ namespace osu.Game.Skinning
 
         SampleChannel GetSample(string sampleName);
 
-        Color4? GetComboColour(IHasComboIndex comboObject);
+        TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class;
+
+        TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct;
     }
 }

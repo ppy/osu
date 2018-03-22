@@ -29,7 +29,7 @@ namespace osu.Game.Skinning
                             break;
                     }
 
-                    return;
+                    break;
             }
 
             base.ParseLine(output, section, line);

@@ -22,23 +22,21 @@ namespace osu.Game.Skinning
         protected SampleManager Samples;
 
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
-            : this(skin)
+            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
-            storage = new LegacySkinResourceStore<SkinFileInfo>(skin, storage);
-            Samples = audioManager.GetSampleManager(storage);
-            Textures = new TextureStore(new RawTextureLoaderStore(storage));
+        }
 
-            Stream stream = storage.GetStream("skin.ini");
+        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename) : base(skin)
+        {
+            Stream stream = storage.GetStream(filename);
             if (stream != null)
                 using (StreamReader reader = new StreamReader(stream))
                     Configuration = new LegacySkinDecoder().Decode(reader);
             else
                 Configuration = new SkinConfiguration();
-        }
 
-        protected LegacySkin(SkinInfo skin)
-            : base(skin)
-        {
+            Samples = audioManager.GetSampleManager(storage);
+            Textures = new TextureStore(new RawTextureLoaderStore(storage));
         }
 
         public override Drawable GetDrawableComponent(string componentName)
