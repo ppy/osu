@@ -60,6 +60,8 @@ namespace osu.Game.Graphics
             using (var bitmap = await host.TakeScreenshotAsync())
             {
                 var fileName = getFileName();
+                if (fileName == null) return;
+
                 var stream = storage.GetStream(fileName, FileAccess.Write);
 
                 switch (screenshotFormat.Value)
@@ -102,7 +104,7 @@ namespace osu.Game.Graphics
                     return indexedName;
             }
 
-            throw new Exception($"Failed to find suitable file name for saving {fileExt} image");
+            return null;
         }
     }
 }
