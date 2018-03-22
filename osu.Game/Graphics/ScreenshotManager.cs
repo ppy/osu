@@ -53,10 +53,7 @@ namespace osu.Game.Graphics
             return false;
         }
 
-        public bool OnReleased(GlobalAction action)
-        {
-            return false;
-        }
+        public bool OnReleased(GlobalAction action) => false;
 
         public async void TakeScreenshotAsync()
         {
@@ -77,7 +74,15 @@ namespace osu.Game.Graphics
                         throw new ArgumentOutOfRangeException(nameof(screenshotFormat));
                 }
 
-                notificationOverlay.Post(new SimpleNotification { Text = $"{fileName} saved" });
+                notificationOverlay.Post(new SimpleNotification
+                {
+                    Text = $"{fileName} saved!",
+                    Activated = () =>
+                    {
+                        storage.OpenInNativeExplorer();
+                        return true;
+                    }
+                });
             }
         }
 
