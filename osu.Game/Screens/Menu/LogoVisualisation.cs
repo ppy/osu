@@ -161,11 +161,20 @@ namespace osu.Game.Screens.Menu
             public Shader Shader;
             public Texture Texture;
             public VisualiserSharedData Shared;
+
+            private readonly Action<TexturedVertex2D> addAction;
+
             //Asuming the logo is a circle, we don't need a second dimension.
             public float Size;
 
             public Color4 Colour;
             public float[] AudioData;
+
+            public VisualisationDrawNode()
+            {
+                // reduce allocations of delegates in draw method.
+                addAction = v => Shared.VertexBatch.Add(v);
+            }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
@@ -211,7 +220,7 @@ namespace osu.Game.Screens.Menu
                                 rectangle,
                                 colourInfo,
                                 null,
-                                Shared.VertexBatch.Add,
+                                addAction,
                                 //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                 Vector2.Divide(inflation, barSize.Yx));
                         }
