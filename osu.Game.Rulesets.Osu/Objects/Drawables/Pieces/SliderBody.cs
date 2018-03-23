@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             var texture = new Texture(textureWidth, 1);
 
             //initialise background
-            var upload = new TextureUpload(textureWidth * 4);
+            var upload = new TextureUploadByteArray(textureWidth * 4);
             var bytes = upload.Data;
 
             const float aa_portion = 0.02f;

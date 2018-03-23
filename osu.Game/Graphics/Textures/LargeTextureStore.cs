@@ -11,7 +11,7 @@ namespace osu.Game.Graphics.Textures
     /// </summary>
     public class LargeTextureStore : TextureStore
     {
-        public LargeTextureStore(IResourceStore<RawTexture> store = null) : base(store, false)
+        public LargeTextureStore(IResourceStore<RawTextureBitmap> store = null) : base(store, false)
         {
         }
     }
