@@ -44,7 +44,6 @@ namespace osu.Game.Online.API
 
         protected bool HasLogin => Token != null || !string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password);
 
-        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (should dispose of this or at very least keep a reference).
         private readonly Thread thread;
 
         private readonly Logger log;
@@ -267,10 +266,7 @@ namespace osu.Game.Online.API
 
         public bool IsLoggedIn => LocalUser.Value.Id > 1;
 
-        public void Queue(APIRequest request)
-        {
-            queue.Enqueue(request);
-        }
+        public void Queue(APIRequest request) => queue.Enqueue(request);
 
         public event StateChangeDelegate OnStateChange;
 
@@ -312,6 +308,9 @@ namespace osu.Game.Online.API
 
             config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? Token : string.Empty);
             config.Save();
+
+            flushQueue();
+            thread?.Abort();
         }
     }
 
