@@ -82,6 +82,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
             Set(OsuSetting.Version, string.Empty);
+
+            Set(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
         }
 
         public OsuConfigManager(Storage storage) : base(storage)
@@ -125,6 +127,7 @@ namespace osu.Game.Configuration
         Version,
         ShowConvertedBeatmaps,
         SpeedChangeVisualisation,
-        Skin
+        Skin,
+        ScreenshotFormat
     }
 }

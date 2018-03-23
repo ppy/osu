@@ -328,7 +328,10 @@ namespace osu.Game.Screens.Select
         public void FlushPendingFilterOperations()
         {
             if (FilterTask?.Completed == false)
+            {
                 applyActiveCriteria(false, false);
+                Update();
+            }
         }
 
         public void Filter(FilterCriteria newCriteria, bool debounce = true)
