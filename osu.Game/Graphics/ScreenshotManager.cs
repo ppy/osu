@@ -22,6 +22,8 @@ namespace osu.Game.Graphics
     public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalInput
     {
         private Bindable<ScreenshotFormat> screenshotFormat;
+        private Bindable<bool> captureMenuCursor;
+
         private GameHost host;
         private Storage storage;
         private NotificationOverlay notificationOverlay;
@@ -36,6 +38,7 @@ namespace osu.Game.Graphics
             this.notificationOverlay = notificationOverlay;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
+            captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
             shutter = audio.Sample.Get("UI/shutter");
         }
