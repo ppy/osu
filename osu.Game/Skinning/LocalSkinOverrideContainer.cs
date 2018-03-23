@@ -48,13 +48,15 @@ namespace osu.Game.Skinning
             this.source = source;
         }
 
+        private void onSourceChanged() => SourceChanged?.Invoke();
+
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
             fallbackSource = dependencies.Get<ISkinSource>();
             if (fallbackSource != null)
-                fallbackSource.SourceChanged += () => SourceChanged?.Invoke();
+                fallbackSource.SourceChanged += onSourceChanged;
 
             dependencies.CacheAs<ISkinSource>(this);
 
@@ -66,7 +68,7 @@ namespace osu.Game.Skinning
             base.Dispose(isDisposing);
 
             if (fallbackSource != null)
-                fallbackSource.SourceChanged -= SourceChanged;
+                fallbackSource.SourceChanged -= onSourceChanged;
         }
     }
 }
