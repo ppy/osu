@@ -988,7 +988,7 @@ namespace osu.Game.Graphics
         fa_osu_expert_mania = 0xe028,
 
         // mod icons
-        fa_osu_mod_perfect = 0xe02d,
+        fa_osu_mod_perfect = 0xe049,
         fa_osu_mod_autopilot = 0xe03a,
         fa_osu_mod_auto = 0xe03b,
         fa_osu_mod_cinema = 0xe03c,
