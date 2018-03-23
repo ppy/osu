@@ -45,8 +45,7 @@ namespace osu.Game.Overlays.Settings
                 if (text == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    Add(text = new OsuSpriteText());
-                    FlowContent.SetLayoutPosition(text, -1);
+                    FlowContent.Add(text = new OsuSpriteText(), -1);
                 }
 
                 text.Text = value;
