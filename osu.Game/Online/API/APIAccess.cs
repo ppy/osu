@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
@@ -44,7 +45,7 @@ namespace osu.Game.Online.API
 
         protected bool HasLogin => Token != null || !string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password);
 
-        private readonly Thread thread;
+        private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
         private readonly Logger log;
 
@@ -58,8 +59,7 @@ namespace osu.Game.Online.API
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
             Token = config.Get<string>(OsuSetting.Token);
 
-            thread = new Thread(run) { IsBackground = true };
-            thread.Start();
+            Task.Factory.StartNew(run, cancellationToken.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
@@ -92,7 +92,7 @@ namespace osu.Game.Online.API
 
         private void run()
         {
-            while (thread.IsAlive)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 switch (State)
                 {
@@ -310,7 +310,7 @@ namespace osu.Game.Online.API
             config.Save();
 
             flushQueue();
-            thread?.Abort();
+            cancellationToken.Cancel();
         }
     }
 
