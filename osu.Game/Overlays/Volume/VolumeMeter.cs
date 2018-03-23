@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
+using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
@@ -93,19 +94,25 @@ namespace osu.Game.Overlays.Volume
                         Colour = colours.Gray2,
                         Size = new Vector2(0.8f)
                     },
-                    (volumeCircle = new CircularProgress
+                    new Container
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        InnerRadius = 0.05f,
-                        Rotation = 180,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Size = new Vector2(0.8f)
-                    }).WithEffect(new GlowEffect
-                    {
-                        Colour = meterColour,
-                        Strength = 2
-                    }),
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0.8f),
+                        Padding = new MarginPadding(-Blur.KernelSize(5)),
+                        Rotation = 180,
+                        Child = (volumeCircle = new CircularProgress
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            InnerRadius = 0.05f,
+                        }).WithEffect(new GlowEffect
+                        {
+                            Colour = meterColour,
+                            Strength = 2,
+                            PadExtent = true
+                        }),
+                    },
                     maxGlow = (text = new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
