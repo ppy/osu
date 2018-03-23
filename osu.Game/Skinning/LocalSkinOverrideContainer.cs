@@ -55,12 +55,17 @@ namespace osu.Game.Skinning
             var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
             fallbackSource = dependencies.Get<ISkinSource>();
-            if (fallbackSource != null)
-                fallbackSource.SourceChanged += onSourceChanged;
-
             dependencies.CacheAs<ISkinSource>(this);
 
             return dependencies;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (fallbackSource != null)
+                fallbackSource.SourceChanged += onSourceChanged;
         }
 
         protected override void Dispose(bool isDisposing)
