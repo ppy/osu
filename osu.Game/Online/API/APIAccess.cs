@@ -64,7 +64,7 @@ namespace osu.Game.Online.API
 
         private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
 
-        internal void Schedule(Action action) => base.Schedule(action);
+        internal new void Schedule(Action action) => base.Schedule(action);
 
         public void Register(IOnlineComponent component)
         {
