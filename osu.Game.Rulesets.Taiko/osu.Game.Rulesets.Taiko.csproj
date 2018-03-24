@@ -20,4 +20,7 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="NUnit" Version="3.8.1" />
   </ItemGroup>
+  <ItemGroup Label="Resources">
+    <EmbeddedResource Include="Resources\**\*.*" />
+  </ItemGroup>
 </Project>
