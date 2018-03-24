@@ -11,6 +11,8 @@
     <Copyright>ppy Pty Ltd 2007-2017</Copyright>
     <AssemblyTitle>osu.Game.Tests</AssemblyTitle>
     <Product>osu.Game.Tests</Product>
+    <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway. -->
+    <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />

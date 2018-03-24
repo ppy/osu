@@ -12,6 +12,7 @@
     <AssemblyTitle>osu.Game</AssemblyTitle>
     <Description>click the circles. to the beat.</Description>
     <Product>osu.Game</Product>
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
