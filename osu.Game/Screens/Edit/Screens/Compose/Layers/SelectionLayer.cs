@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
+using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {

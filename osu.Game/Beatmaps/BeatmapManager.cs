@@ -20,8 +20,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Utils;
-using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
@@ -196,96 +194,6 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmap">The <see cref="BeatmapSetInfo"/> whose download request is wanted.</param>
         /// <returns>The <see cref="DownloadBeatmapSetRequest"/> object if it exists, or null.</returns>
         public DownloadBeatmapSetRequest GetExistingDownload(BeatmapSetInfo beatmap) => currentDownloads.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
-
-        /// <summary>
-        /// Delete a beatmap from the manager.
-        /// Is a no-op for already deleted beatmaps.
-        /// </summary>
-        /// <param name="beatmapSet">The beatmap set to delete.</param>
-        public void Delete(BeatmapSetInfo beatmapSet)
-        {
-            lock (importContextLock)
-            {
-                var context = importContext.Value;
-
-                using (var transaction = context.BeginTransaction())
-                {
-                    context.ChangeTracker.AutoDetectChangesEnabled = false;
-
-                    // re-fetch the beatmap set on the import context.
-                    // ReSharper disable once AccessToModifiedClosure
-                    beatmapSet = context.BeatmapSetInfo.Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == beatmapSet.ID);
-
-                    // create local stores so we can isolate and thread safely, and share a context/transaction.
-                    var iFiles = new FileStore(() => context, storage);
-                    var iBeatmaps = createBeatmapStore(() => context);
-
-                    if (iBeatmaps.Delete(beatmapSet))
-                    {
-                        if (!beatmapSet.Protected)
-                            iFiles.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
-                    }
-
-                    context.ChangeTracker.AutoDetectChangesEnabled = true;
-                    context.SaveChanges(transaction);
-                }
-            }
-        }
-
-        public void UndeleteAll()
-        {
-            var deleteMaps = QueryBeatmapSets(bs => bs.DeletePending).ToList();
-
-            if (!deleteMaps.Any()) return;
-
-            var notification = new ProgressNotification
-            {
-                CompletionText = "Restored all deleted beatmaps!",
-                Progress = 0,
-                State = ProgressNotificationState.Active,
-            };
-
-            PostNotification?.Invoke(notification);
-
-            int i = 0;
-
-            foreach (var bs in deleteMaps)
-            {
-                if (notification.State == ProgressNotificationState.Cancelled)
-                    // user requested abort
-                    return;
-
-                notification.Text = $"Restoring ({i} of {deleteMaps.Count})";
-                notification.Progress = (float)++i / deleteMaps.Count;
-                Undelete(bs);
-            }
-
-            notification.State = ProgressNotificationState.Completed;
-        }
-
-        public void Undelete(BeatmapSetInfo beatmapSet)
-        {
-            if (beatmapSet.Protected)
-                return;
-
-            lock (importContextLock)
-            {
-                var context = importContext.Value;
-
-                using (var transaction = context.BeginTransaction())
-                {
-                    context.ChangeTracker.AutoDetectChangesEnabled = false;
-
-                    var iFiles = new FileStore(() => context, storage);
-                    var iBeatmaps = createBeatmapStore(() => context);
-
-                    undelete(iBeatmaps, iFiles, beatmapSet);
-
-                    context.ChangeTracker.AutoDetectChangesEnabled = true;
-                    context.SaveChanges(transaction);
-                }
-            }
-        }
 
         /// <summary>
         /// Delete a beatmap difficulty.
