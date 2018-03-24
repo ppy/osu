@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
                         break;
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new MessagePlaceholder(@"Please login to view online leaderboards!"));
+                        replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
                         break;
                     case PlaceholderState.NotSupporter:
                         replacePlaceholder(new MessagePlaceholder(@"Please invest in a supporter tag to view this leaderboard!"));

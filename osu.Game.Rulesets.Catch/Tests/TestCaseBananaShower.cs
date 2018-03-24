@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Catch.UI;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    [Ignore("getting CI working")]
     public class TestCaseBananaShower : Game.Tests.Visual.TestCasePlayer
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
@@ -29,16 +28,14 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
         }
 
-        protected override Beatmap CreateBeatmap()
+        protected override Beatmap CreateBeatmap(Ruleset ruleset)
         {
             var beatmap = new Beatmap
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BaseDifficulty = new BeatmapDifficulty
-                    {
-                        CircleSize = 6,
-                    }
+                    BaseDifficulty = new BeatmapDifficulty { CircleSize = 6 },
+                    Ruleset = ruleset.RulesetInfo
                 }
             };
 

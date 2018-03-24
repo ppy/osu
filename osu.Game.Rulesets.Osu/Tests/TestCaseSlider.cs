@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
@@ -16,6 +15,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using NUnit.Framework;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -24,7 +24,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    [Ignore("getting CI working")]
+    [TestFixture]
     public class TestCaseSlider : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
@@ -90,9 +90,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Catmull Slider", () => testCatmull());
             AddStep("Catmull Slider 1 Repeat", () => testCatmull(1));
             AddStep("Catmull Slider 2 Repeats", () => testCatmull(2));
+
+            AddStep("Big Single, Large StackOffset", () => testSimpleBigLargeStackOffset());
+            AddStep("Big 1 Repeat, Large StackOffset", () => testSimpleBigLargeStackOffset(1));
         }
 
         private void testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
+
+        private void testSimpleBigLargeStackOffset(int repeats = 0) => createSlider(2, repeats: repeats, stackHeight: 10);
 
         private void testSimpleMedium(int repeats = 0) => createSlider(5, repeats: repeats);
 
@@ -106,21 +111,21 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void testShortHighSpeed(int repeats = 0) => createSlider(distance: 100, repeats: repeats, speedMultiplier: 15);
 
-        private void createSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2)
+        private void createSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2, int stackHeight = 0)
         {
             var slider = new Slider
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-(distance / 2), 0),
-                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
-                    new Vector2(-(distance / 2), 0),
-                    new Vector2(distance / 2, 0),
+                    Vector2.Zero,
+                    new Vector2(distance, 0),
                 },
                 Distance = distance,
                 RepeatCount = repeats,
-                RepeatSamples = createEmptySamples(repeats)
+                RepeatSamples = createEmptySamples(repeats),
+                StackHeight = stackHeight
             };
 
             addSlider(slider, circleSize, speedMultiplier);
@@ -132,12 +137,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
-                    new Vector2(-200, 0),
-                    new Vector2(0, 200),
-                    new Vector2(200, 0)
+                    Vector2.Zero,
+                    new Vector2(200, 200),
+                    new Vector2(400, 0)
                 },
                 Distance = 600,
                 RepeatCount = repeats,
@@ -156,15 +160,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                 CurveType = CurveType.Linear,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
-                    new Vector2(-200, 0),
-                    new Vector2(-50, 75),
-                    new Vector2(0, 100),
-                    new Vector2(100, -200),
+                    Vector2.Zero,
+                    new Vector2(150, 75),
                     new Vector2(200, 0),
-                    new Vector2(230, 0)
+                    new Vector2(300, -200),
+                    new Vector2(400, 0),
+                    new Vector2(430, 0)
                 },
                 Distance = 793.4417,
                 RepeatCount = repeats,
@@ -183,14 +186,13 @@ namespace osu.Game.Rulesets.Osu.Tests
                 CurveType = CurveType.Bezier,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
-                    new Vector2(-200, 0),
-                    new Vector2(-50, 75),
-                    new Vector2(0, 100),
-                    new Vector2(100, -200),
-                    new Vector2(230, 0)
+                    Vector2.Zero,
+                    new Vector2(150, 75),
+                    new Vector2(200, 100),
+                    new Vector2(300, -200),
+                    new Vector2(430, 0)
                 },
                 Distance = 480,
                 RepeatCount = repeats,
@@ -209,10 +211,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 CurveType = CurveType.Linear,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(0, 0),
-                ComboColour = Color4.LightSeaGreen,
                 ControlPoints = new List<Vector2>
                 {
-                    new Vector2(0, 0),
+                    Vector2.Zero,
                     new Vector2(-200, 0),
                     new Vector2(0, 0),
                     new Vector2(0, -200),
@@ -239,14 +240,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-100, 0),
-                ComboColour = Color4.LightSeaGreen,
                 CurveType = CurveType.Catmull,
                 ControlPoints = new List<Vector2>
                 {
-                    new Vector2(-100, 0),
-                    new Vector2(-50, -50),
-                    new Vector2(50, 50),
-                    new Vector2(100, 0)
+                    Vector2.Zero,
+                    new Vector2(50, -50),
+                    new Vector2(150, 50),
+                    new Vector2(200, 0)
                 },
                 Distance = 300,
                 RepeatCount = repeats,
