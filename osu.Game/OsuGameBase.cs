@@ -214,7 +214,7 @@ namespace osu.Game
 
             GlobalActionContainer globalBinding;
 
-            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
+            dependencies.Cache(CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both });
             CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
