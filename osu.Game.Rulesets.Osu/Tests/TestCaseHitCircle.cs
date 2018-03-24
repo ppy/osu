@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -11,17 +10,17 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Game.Rulesets.Osu.Judgements;
 using System.Collections.Generic;
 using System;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using NUnit.Framework;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    [Ignore("getting CI working")]
+    [TestFixture]
     public class TestCaseHitCircle : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
@@ -61,7 +60,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000 + timeOffset,
                 Position = positionOffset.Value,
-                ComboColour = Color4.LightSeaGreen
             };
 
             circle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });

@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    [Ignore("getting CI working")]
+    [TestFixture]
     public class TestCasePerformancePoints : Game.Tests.Visual.TestCasePerformancePoints
     {
         public TestCasePerformancePoints()

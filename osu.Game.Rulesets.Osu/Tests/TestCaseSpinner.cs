@@ -17,7 +17,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    [Ignore("getting CI working")]
+    [TestFixture]
     public class TestCaseSpinner : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

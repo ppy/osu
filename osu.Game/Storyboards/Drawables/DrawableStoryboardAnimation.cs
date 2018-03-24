@@ -17,6 +17,8 @@ namespace osu.Game.Storyboards.Drawables
         public bool FlipH { get; set; }
         public bool FlipV { get; set; }
 
+        public override bool RemoveWhenNotAlive => false;
+
         protected override Vector2 DrawScale
             => new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y);
 

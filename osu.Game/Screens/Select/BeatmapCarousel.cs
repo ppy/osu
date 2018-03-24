@@ -169,20 +169,43 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public void SelectBeatmap(BeatmapInfo beatmap)
+        /// <summary>
+        /// Selects a given beatmap on the carousel.
+        ///
+        /// If bypassFilters is false, we will try to select another unfiltered beatmap in the same set. If the
+        /// entire set is filtered, no selection is made.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to select.</param>
+        /// <param name="bypassFilters">Whether to select the beatmap even if it is filtered (i.e., not visible on carousel).</param>
+        /// <returns>True if a selection was made, False if it wasn't.</returns>
+        public bool SelectBeatmap(BeatmapInfo beatmap, bool bypassFilters = true)
         {
             if (beatmap?.Hidden != false)
-                return;
+                return false;
 
-            foreach (CarouselBeatmapSet group in beatmapSets)
+            foreach (CarouselBeatmapSet set in beatmapSets)
             {
-                var item = group.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
+                if (!bypassFilters && set.Filtered)
+                    continue;
+
+                var item = set.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
+
+                if (item == null)
+                    // The beatmap that needs to be selected doesn't exist in this set
+                    continue;
+
+                if (!bypassFilters && item.Filtered)
+                    // The beatmap exists in this set but is filtered, so look for the first unfiltered map in the set
+                    item = set.Beatmaps.FirstOrDefault(b => !b.Filtered);
+
                 if (item != null)
                 {
                     select(item);
-                    return;
+                    return true;
                 }
             }
+
+            return false;
         }
 
         /// <summary>
@@ -192,7 +215,9 @@ namespace osu.Game.Screens.Select
         /// <param name="skipDifficulties">Whether to skip individual difficulties and only increment over full groups.</param>
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            if (!Items.Any())
+            var visibleItems = Items.Where(s => !s.Item.Filtered).ToList();
+
+            if (!visibleItems.Any())
                 return;
 
             DrawableCarouselItem drawable = null;
@@ -202,15 +227,15 @@ namespace osu.Game.Screens.Select
                 // we can fix this by changing this method to not reference drawables / Items in the first place.
                 return;
 
-            int originalIndex = Items.IndexOf(drawable);
+            int originalIndex = visibleItems.IndexOf(drawable);
             int currentIndex = originalIndex;
 
             // local function to increment the index in the required direction, wrapping over extremities.
-            int incrementIndex() => currentIndex = (currentIndex + direction + Items.Count) % Items.Count;
+            int incrementIndex() => currentIndex = (currentIndex + direction + visibleItems.Count) % visibleItems.Count;
 
             while (incrementIndex() != originalIndex)
             {
-                var item = Items[currentIndex].Item;
+                var item = visibleItems[currentIndex].Item;
 
                 if (item.Filtered || item.State == CarouselItemState.Selected) continue;
 
@@ -303,7 +328,10 @@ namespace osu.Game.Screens.Select
         public void FlushPendingFilterOperations()
         {
             if (FilterTask?.Completed == false)
+            {
                 applyActiveCriteria(false, false);
+                Update();
+            }
         }
 
         public void Filter(FilterCriteria newCriteria, bool debounce = true)
@@ -407,12 +435,14 @@ namespace osu.Game.Screens.Select
                     continue;
                 }
 
+                float depth = i + (item is DrawableCarouselBeatmapSet ? -Items.Count : 0);
+
                 // Only add if we're not already part of the content.
                 if (!scrollableContent.Contains(item))
                 {
                     // Makes sure headers are always _below_ items,
                     // and depth flows downward.
-                    item.Depth = i + (item is DrawableCarouselBeatmapSet ? -Items.Count : 0);
+                    item.Depth = depth;
 
                     switch (item.LoadState)
                     {
@@ -425,6 +455,10 @@ namespace osu.Game.Screens.Select
                             scrollableContent.Add(item);
                             break;
                     }
+                }
+                else
+                {
+                    scrollableContent.ChangeChildDepth(item, depth);
                 }
             }
 

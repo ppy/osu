@@ -6,6 +6,8 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModKey2 : ManiaKeyMod
     {
         public override int KeyCount => 2;
-        public override string Name => "2K";
+        public override string Name => "Two Keys";
+        public override string ShortenedName => "2K";
+        public override string Description => @"Play with two keys.";
     }
 }

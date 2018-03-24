@@ -20,9 +20,17 @@ namespace osu.Game.Beatmaps
         public float DrainRate { get; set; } = DEFAULT_DIFFICULTY;
         public float CircleSize { get; set; } = DEFAULT_DIFFICULTY;
         public float OverallDifficulty { get; set; } = DEFAULT_DIFFICULTY;
-        public float ApproachRate { get; set; } = DEFAULT_DIFFICULTY;
-        public float SliderMultiplier { get; set; } = 1;
-        public float SliderTickRate { get; set; } = 1;
+
+        private float? approachRate;
+
+        public float ApproachRate
+        {
+            get => approachRate ?? OverallDifficulty;
+            set => approachRate = value;
+        }
+
+        public double SliderMultiplier { get; set; } = 1;
+        public double SliderTickRate { get; set; } = 1;
 
         /// <summary>
         /// Maps a difficulty value [0, 10] to a two-piece linear range of values.

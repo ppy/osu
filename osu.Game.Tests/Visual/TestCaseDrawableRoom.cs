@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +13,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseDrawableRoom : OsuTestCase
     {
         private RulesetStore rulesets;

@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
                 var controlPoint = controlPointAt(obj.HitObject.StartTime);
                 obj.LifetimeStart = obj.HitObject.StartTime - timeRange / controlPoint.Multiplier;
 
-                if (obj.NestedHitObjects != null)
+                if (obj.HasNestedHitObjects)
                 {
                     ComputeInitialStates(obj.NestedHitObjects, direction, timeRange, length);
                     ComputePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
