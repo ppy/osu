@@ -39,7 +39,7 @@ namespace osu.Desktop.Deploy
         /// <summary>
         /// How many previous build deltas we want to keep when publishing.
         /// </summary>
-        private const int keep_delta_count = 3;
+        private const int keep_delta_count = 4;
 
         private static string codeSigningCmd => string.IsNullOrEmpty(codeSigningPassword) ? "" : $"-n \"/a /f {codeSigningCertPath} /p {codeSigningPassword} /t http://timestamp.comodoca.com/authenticode\"";
 
