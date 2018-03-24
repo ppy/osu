@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
+using System.Reflection;
 
 namespace osu.Game.Rulesets.Judgements
 {
@@ -48,7 +49,7 @@ namespace osu.Game.Rulesets.Judgements
             {
                 Text = Judgement.Result.GetDescription().ToUpper(),
                 Font = @"Venera",
-                Colour = Judgement.Result == HitResult.Miss ? colours.Red : Color4.White,
+                Colour = judgementColours(Judgement.Result, colours),
                 Scale = new Vector2(0.85f, 1),
                 TextSize = 12
             }, restrictSize: false);
@@ -82,6 +83,27 @@ namespace osu.Game.Rulesets.Judgements
             }
 
             Expire(true);
+        }
+
+        private Color4 judgementColours(HitResult judgement, OsuColour colours)
+        {
+            switch (judgement)
+            {
+                case HitResult.Perfect:
+                case HitResult.Great:
+                    return colours.Blue;
+
+                case HitResult.Ok:
+                case HitResult.Good:
+                    return colours.Green;
+
+                case HitResult.Meh:
+                    return colours.Yellow;
+
+                case HitResult.Miss:
+                    return colours.Red;
+            }
+            return Color4.White;
         }
     }
 }
