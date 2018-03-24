@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Judgements
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
         /// <param name="judgement">The judgement to visualise.</param>
+        /// <param name="judgedObject">The object which was judged.</param>
         public DrawableJudgement(Judgement judgement, DrawableHitObject judgedObject)
         {
             Judgement = judgement;

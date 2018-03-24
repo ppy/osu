@@ -6,7 +6,6 @@ using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics
@@ -14,7 +13,6 @@ namespace osu.Game.Graphics
     public class DrawableDate : OsuSpriteText, IHasTooltip
     {
         private readonly DateTimeOffset date;
-        private ScheduledDelegate updateTask;
 
         public DrawableDate(DateTimeOffset date)
         {
@@ -61,6 +59,7 @@ namespace osu.Game.Graphics
         public override bool HandleMouseInput => true;
 
         private void updateTime() => Text = date.Humanize();
+
         public string TooltipText => date.ToString();
     }
 }
