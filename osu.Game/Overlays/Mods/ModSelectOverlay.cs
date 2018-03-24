@@ -27,10 +27,11 @@ namespace osu.Game.Overlays.Mods
     {
         private const float content_width = 0.8f;
 
-        protected Color4 LowMultiplierColour, HighMultiplierColour;
+        protected Color4 LowMultiplierColour, HighMultiplierColour, RankedColour;
 
         protected readonly TriangleButton DeselectAllButton;
         protected readonly OsuSpriteText MultiplierLabel;
+        protected readonly OsuSpriteText RankedLabel;
         private readonly FillFlowContainer footerContainer;
 
         protected override bool BlockPassThroughKeyboard => false;
@@ -55,8 +56,9 @@ namespace osu.Game.Overlays.Mods
         {
             SelectedMods.ValueChanged += selectedModsChanged;
 
-            LowMultiplierColour = colours.Red;
+            LowMultiplierColour = colours.Yellow;
             HighMultiplierColour = colours.Green;
+            RankedColour = colours.Red;
 
             if (osu != null)
                 Ruleset.BindTo(osu.Ruleset);
@@ -98,15 +100,24 @@ namespace osu.Game.Overlays.Mods
             }
 
             MultiplierLabel.Text = $"{multiplier:N2}x";
-            if (!ranked)
-                MultiplierLabel.Text += " (Unranked)";
-
             if (multiplier > 1.0)
                 MultiplierLabel.FadeColour(HighMultiplierColour, 200);
             else if (multiplier < 1.0)
                 MultiplierLabel.FadeColour(LowMultiplierColour, 200);
             else
                 MultiplierLabel.FadeColour(Color4.White, 200);
+
+            RankedLabel.Text = null;
+            if (!ranked)
+            {
+                RankedLabel.Text += " (Unranked)";
+                RankedLabel.FadeColour(RankedColour, 200);
+            }
+            else
+            {
+                RankedLabel.Text = null;
+                RankedLabel.FadeColour(Color4.White, 200);
+            }
         }
 
         protected override void PopOut()
@@ -362,6 +373,16 @@ namespace osu.Game.Overlays.Mods
                                             }
                                         },
                                         MultiplierLabel = new OsuSpriteText
+                                        {
+                                            Font = @"Exo2.0-Bold",
+                                            TextSize = 30,
+                                            Shadow = true,
+                                            Margin = new MarginPadding
+                                            {
+                                                Top = 5
+                                            }
+                                        },
+                                        RankedLabel = new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-Bold",
                                             TextSize = 30,
