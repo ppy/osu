@@ -254,7 +254,7 @@ namespace osu.Game.Screens.Select
 
             private OsuSpriteText[] getMapper(BeatmapMetadata metadata)
             {
-                if (metadata.Author == null || string.IsNullOrEmpty(metadata.Author.Username))
+                if (string.IsNullOrEmpty(metadata.Author?.Username))
                     return Array.Empty<OsuSpriteText>();
 
                 return new[]
@@ -268,6 +268,7 @@ namespace osu.Game.Screens.Select
                     new OsuSpriteText
                     {
                         Font = @"Exo2.0-Bold",
+                        // ReSharper disable once PossibleNullReferenceException (resharper broken?)
                         Text = metadata.Author.Username,
                         TextSize = 15,
                     }
