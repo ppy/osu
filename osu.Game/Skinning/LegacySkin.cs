@@ -63,7 +63,7 @@ namespace osu.Game.Skinning
             if (texture == null)
             {
                 ratio *= 2;
-                GetTexture(componentName);
+                texture = GetTexture(componentName);
             }
 
             if (texture == null) return null;
