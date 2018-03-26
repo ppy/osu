@@ -19,7 +19,6 @@ namespace osu.Desktop
         public static int Main(string[] args)
         {
             // required to initialise native SQLite libraries on some platforms.
-            SQLitePCL.Batteries_V2.Init();
 
             if (!RuntimeInfo.IsMono)
                 useMulticoreJit();
