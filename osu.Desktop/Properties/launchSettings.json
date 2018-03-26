@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "osu.Desktop": {
+      // this avoids an ugly command window appearing when running without debugger attached from VS2017
+      "commandName": "Executable",
+      "executablePath": ".\\osu!.exe"
+    }
+  }
+}
