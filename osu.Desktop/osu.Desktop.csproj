@@ -2,7 +2,8 @@
   <Import Project="..\osu.Game.props" />
   <Import Project="..\OpenTK.props" />
   <PropertyGroup Label="Project">
-    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+    <TargetFramework Condition="'$(BuildingInsideVisualStudio)' == 'true'">net461</TargetFramework>
+    <TargetFrameworks Condition="'$(BuildingInsideVisualStudio)' != 'true'">net461;netcoreapp2.0</TargetFrameworks>
     <OutputType>WinExe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
