@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Game.props" />
   <Import Project="..\OpenTK.props" />
+  <Import Project="..\TestableProject.props" />
   <PropertyGroup Label="Project">
     <TargetFramework Condition="'$(BuildingInsideVisualStudio)' == 'true'">net461</TargetFramework>
     <TargetFrameworks Condition="'$(BuildingInsideVisualStudio)' != 'true'">net461;netstandard2.0;netcoreapp2.0</TargetFrameworks>
@@ -20,7 +21,6 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
-    <PackageReference Include="NUnit" Version="3.8.1" />
   </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="Resources\**\*.*" />
