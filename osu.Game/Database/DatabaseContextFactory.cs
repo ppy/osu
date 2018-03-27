@@ -17,7 +17,7 @@ namespace osu.Game.Database
         private readonly object writeLock = new object();
 
         private bool currentWriteDidWrite;
-        private volatile int currentWriteUsages;
+        private int currentWriteUsages;
 
         public DatabaseContextFactory(GameHost host)
         {

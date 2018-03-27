@@ -1,198 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Game.props" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C92A607B-1FDD-4954-9F92-03FF547D9080}</ProjectGuid>
+  <PropertyGroup Label="Project">
+    <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>osu.Game.Rulesets.Osu</RootNamespace>
-    <AssemblyName>osu.Game.Rulesets.Osu</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Company>ppy Pty Ltd</Company>
+    <Version>1.0.0.0</Version>
+    <Copyright>ppy Pty Ltd 2007-2017</Copyright>
+    <AssemblyTitle>osu.Game.Rulesets.Osu</AssemblyTitle>
+    <Description>click the circles. to the beat.</Description>
+    <Product>osu.Game.Rulesets.Osu</Product>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\JetBrains.Annotations.11.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
-      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0.13\lib\net45\OpenTK.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_green, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a84b7dcfb1391f7f, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\net45\SQLitePCLRaw.batteries_green.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_v2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8226ea5df37bcae9, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\net45\SQLitePCLRaw.batteries_v2.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1488e028ca7ab535, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.core.1.1.8\lib\net45\SQLitePCLRaw.core.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.provider.e_sqlite3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9c301db686d0bd12, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\SQLitePCLRaw.provider.e_sqlite3.net45.1.1.8\lib\net45\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
+  <ItemGroup Label="Service">
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Beatmaps\OsuBeatmapConverter.cs" />
-    <Compile Include="Beatmaps\OsuBeatmapProcessor.cs" />
-    <Compile Include="Edit\Layers\Selection\Overlays\HitCircleMask.cs" />
-    <Compile Include="Edit\Layers\Selection\Overlays\SliderCircleMask.cs" />
-    <Compile Include="Edit\Layers\Selection\Overlays\SliderMask.cs" />
-    <Compile Include="Edit\OsuEditPlayfield.cs" />
-    <Compile Include="Edit\OsuEditRulesetContainer.cs" />
-    <Compile Include="Edit\OsuHitObjectComposer.cs" />
-    <Compile Include="Judgements\OsuSliderTailJudgement.cs" />
-    <Compile Include="Mods\OsuModAutopilot.cs" />
-    <Compile Include="Mods\OsuModAutoplay.cs" />
-    <Compile Include="Mods\OsuModDaycore.cs" />
-    <Compile Include="Mods\OsuModDoubleTime.cs" />
-    <Compile Include="Mods\OsuModEasy.cs" />
-    <Compile Include="Mods\OsuModFlashlight.cs" />
-    <Compile Include="Mods\OsuModHalfTime.cs" />
-    <Compile Include="Mods\OsuModHardRock.cs" />
-    <Compile Include="Mods\OsuModHidden.cs" />
-    <Compile Include="Mods\OsuModNightcore.cs" />
-    <Compile Include="Mods\OsuModPerfect.cs" />
-    <Compile Include="Mods\OsuModRelax.cs" />
-    <Compile Include="Mods\OsuModSpunOut.cs" />
-    <Compile Include="Mods\OsuModSuddenDeath.cs" />
-    <Compile Include="Mods\OsuModTarget.cs" />
-    <Compile Include="Objects\Drawables\DrawableSliderHead.cs" />
-    <Compile Include="Objects\Drawables\DrawableOsuHitObject.cs" />
-    <Compile Include="Objects\Drawables\Connections\ConnectionRenderer.cs" />
-    <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
-    <Compile Include="Judgements\OsuJudgement.cs" />
-    <Compile Include="Objects\Drawables\DrawableRepeatPoint.cs" />
-    <Compile Include="Objects\Drawables\DrawableSliderTail.cs" />
-    <Compile Include="Objects\Drawables\IRequireTracking.cs" />
-    <Compile Include="Objects\Drawables\ITrackSnaking.cs" />
-    <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
-    <Compile Include="Objects\Drawables\Pieces\DefaultCirclePiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\SpinnerBackground.cs" />
-    <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
-    <Compile Include="Objects\Drawables\DrawableSlider.cs" />
-    <Compile Include="Objects\Drawables\Connections\FollowPoint.cs" />
-    <Compile Include="Objects\Drawables\DrawableSpinner.cs" />
-    <Compile Include="Objects\Drawables\Pieces\ExplodePiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\FlashPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
-    <Compile Include="Objects\Drawables\DrawableOsuJudgement.cs" />
-    <Compile Include="Objects\Drawables\Pieces\NumberPiece.cs" />
-    <Compile Include="Objects\Drawables\DrawableSliderTick.cs" />
-    <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\SpinnerDisc.cs" />
-    <Compile Include="Objects\Drawables\Pieces\SpinnerSpmCounter.cs" />
-    <Compile Include="Objects\Drawables\Pieces\SpinnerTicks.cs" />
-    <Compile Include="Objects\Drawables\Pieces\TrianglesPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\SliderBall.cs" />
-    <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
-    <Compile Include="Objects\ISliderProgress.cs" />
-    <Compile Include="Objects\RepeatPoint.cs" />
-    <Compile Include="Objects\SliderCircle.cs" />
-    <Compile Include="Objects\SliderTick.cs" />
-    <Compile Include="OsuDifficulty\OsuDifficultyCalculator.cs" />
-    <Compile Include="OsuDifficulty\Preprocessing\OsuDifficultyBeatmap.cs" />
-    <Compile Include="OsuDifficulty\Preprocessing\OsuDifficultyHitObject.cs" />
-    <Compile Include="OsuDifficulty\Skills\Aim.cs" />
-    <Compile Include="OsuDifficulty\Skills\Skill.cs" />
-    <Compile Include="OsuDifficulty\Skills\Speed.cs" />
-    <Compile Include="OsuDifficulty\Utils\History.cs" />
-    <Compile Include="OsuInputManager.cs" />
-    <Compile Include="Replays\OsuReplayFrame.cs" />
-    <Compile Include="Replays\OsuReplayInputHandler.cs" />
-    <Compile Include="Tests\OsuBeatmapConversionTest.cs" />
-    <Compile Include="Tests\TestCaseEditor.cs" />
-    <Compile Include="Tests\TestCaseGameplayCursor.cs" />
-    <Compile Include="Tests\TestCaseHitCircle.cs" />
-    <Compile Include="Tests\TestCaseHitCircleHidden.cs" />
-    <Compile Include="Tests\TestCasePerformancePoints.cs" />
-    <Compile Include="Tests\TestCaseSlider.cs" />
-    <Compile Include="Tests\TestCaseSliderHidden.cs" />
-    <Compile Include="Tests\TestCaseSpinner.cs" />
-    <Compile Include="Tests\TestCaseSpinnerHidden.cs" />
-    <Compile Include="UI\Cursor\CursorTrail.cs" />
-    <Compile Include="UI\Cursor\GameplayCursor.cs" />
-    <Compile Include="UI\OsuSettings.cs" />
-    <Compile Include="Scoring\OsuPerformanceCalculator.cs" />
-    <Compile Include="Scoring\OsuScoreProcessor.cs" />
-    <Compile Include="UI\OsuRulesetContainer.cs" />
-    <Compile Include="UI\OsuPlayfield.cs" />
-    <Compile Include="OsuRuleset.cs" />
-    <Compile Include="Objects\HitCircle.cs" />
-    <Compile Include="Objects\Drawables\DrawableHitCircle.cs" />
-    <Compile Include="Objects\OsuHitObject.cs" />
-    <Compile Include="Objects\Slider.cs" />
-    <Compile Include="Objects\Spinner.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Mods\OsuModNoFail.cs" />
-    <Compile Include="Replays\OsuAutoGenerator.cs" />
-    <Compile Include="Replays\OsuAutoGeneratorBase.cs" />
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="OpenTK.dll.config" />
-    <None Include="packages.config" />
+  <ItemGroup Label="Package References">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
+    <PackageReference Include="NUnit" Version="3.8.1" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
-      <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
-      <Name>osu.Framework</Name>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
-      <Name>osu.Game</Name>
-      <Private>True</Private>
-    </ProjectReference>
+  <ItemGroup Label="Resources">
+    <EmbeddedResource Include="Resources\**\*.*" />
   </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Testing\Beatmaps\basic-expected-conversion.json" />
-    <EmbeddedResource Include="Resources\Testing\Beatmaps\basic.osu" />
-    <EmbeddedResource Include="Resources\Testing\Beatmaps\colinear-perfect-curve-expected-conversion.json" />
-    <EmbeddedResource Include="Resources\Testing\Beatmaps\colinear-perfect-curve.osu" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets" Condition="Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets'))" />
-    <Error Condition="!Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets'))" />
-    <Error Condition="!Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets'))" />
-  </Target>
-  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets" Condition="Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.osx.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.osx.targets')" />
-  <Import Project="$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets" Condition="Exists('$(SolutionDir)\packages\SQLitePCLRaw.lib.e_sqlite3.v110_xp.1.1.8\build\net35\SQLitePCLRaw.lib.e_sqlite3.v110_xp.targets')" />
 </Project>
