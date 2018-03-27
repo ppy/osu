@@ -16,8 +16,6 @@ install:
 before_build:
   - cmd: CodeFileSanity.exe
   - cmd: nuget restore -verbosity quiet
-environment:
-  TargetFramework: net461
 build:
   project: osu.sln
   parallel: true
