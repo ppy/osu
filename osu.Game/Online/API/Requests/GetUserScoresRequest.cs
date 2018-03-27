@@ -18,6 +18,7 @@ namespace osu.Game.Online.API.Requests
             this.offset = offset;
         }
 
+        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLower()}?offset={offset}";
     }
 

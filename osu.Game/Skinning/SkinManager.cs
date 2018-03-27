@@ -80,8 +80,6 @@ namespace osu.Game.Skinning
             return new LegacySkin(skinInfo, Files.Store, audio);
         }
 
-        private SkinStore store;
-
         public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost, AudioManager audio)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), importHost)
         {

@@ -68,6 +68,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Origin = Anchor.CentreLeft,
                             Font = @"Exo2.0-MediumItalic",
                             TextSize = 22,
+                            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
                             Text = RankPosition.ToString(),
                         },
                     },
