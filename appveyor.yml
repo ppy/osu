@@ -16,3 +16,7 @@ build:
   project: osu.sln
   parallel: true
   verbosity: minimal
+test:
+  assemblies:
+    only:
+      - 'osu.Game.Tests\bin\**\*.dll'
