@@ -10,14 +10,8 @@ cache:
   - packages -> **\packages.config
 install:
   - cmd: git submodule update --init --recursive --depth=5
-  - cmd: choco install resharper-clt -y
-  - cmd: choco install nvika -y
-  - cmd: appveyor DownloadFile https://github.com/peppy/CodeFileSanity/releases/download/v0.2.4/CodeFileSanity.exe
 before_build:
-  - cmd: CodeFileSanity.exe
   - cmd: nuget restore -verbosity quiet
-environment:
-  TargetFramework: net461
 build:
   project: osu.sln
   parallel: true
@@ -25,7 +19,4 @@ build:
 test:
   assemblies:
     only:
-      - 'osu.Desktop\**\*.dll'
-after_build:
-  - cmd: inspectcode --o="inspectcodereport.xml" --projects:osu.Game* --caches-home="inspectcode" osu.sln > NUL
-  - cmd: NVika parsereport "inspectcodereport.xml" --treatwarningsaserrors
+      - 'osu.Game.Tests\bin\**\*.dll'

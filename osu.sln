@@ -23,6 +23,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Tests", "osu.Game.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Desktop", "osu.Desktop\osu.Desktop.csproj", "{419659FD-72EA-4678-9EB8-B22A746CED70}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Rulesets.Catch.Runnable", "osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.Runnable.csproj", "{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Rulesets.Mania.Runnable", "osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.Runnable.csproj", "{23386369-F259-4D67-8B31-E2E47DAFA01C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Rulesets.Osu.Runnable", "osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.Runnable.csproj", "{D6AD2984-D2E2-4FBA-AD20-13655CEF8805}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Rulesets.Taiko.Runnable", "osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.Runnable.csproj", "{A0C9D59B-3BFA-4EB6-9C67-949E9D5D43F9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Tests.Runnable", "osu.Game.Tests\osu.Game.Tests.Runnable.csproj", "{35B89CB0-039F-4C96-9952-9CE06D398ABE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +97,36 @@ Global
 		{419659FD-72EA-4678-9EB8-B22A746CED70}.Release|Any CPU.Build.0 = Release|Any CPU
 		{419659FD-72EA-4678-9EB8-B22A746CED70}.VisualTests|Any CPU.ActiveCfg = VisualTests|Any CPU
 		{419659FD-72EA-4678-9EB8-B22A746CED70}.VisualTests|Any CPU.Build.0 = VisualTests|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.VisualTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.VisualTests|Any CPU.Build.0 = Debug|Any CPU
+		{23386369-F259-4D67-8B31-E2E47DAFA01C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23386369-F259-4D67-8B31-E2E47DAFA01C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23386369-F259-4D67-8B31-E2E47DAFA01C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23386369-F259-4D67-8B31-E2E47DAFA01C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23386369-F259-4D67-8B31-E2E47DAFA01C}.VisualTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{23386369-F259-4D67-8B31-E2E47DAFA01C}.VisualTests|Any CPU.Build.0 = Debug|Any CPU
+		{D6AD2984-D2E2-4FBA-AD20-13655CEF8805}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6AD2984-D2E2-4FBA-AD20-13655CEF8805}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6AD2984-D2E2-4FBA-AD20-13655CEF8805}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6AD2984-D2E2-4FBA-AD20-13655CEF8805}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6AD2984-D2E2-4FBA-AD20-13655CEF8805}.VisualTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6AD2984-D2E2-4FBA-AD20-13655CEF8805}.VisualTests|Any CPU.Build.0 = Debug|Any CPU
+		{A0C9D59B-3BFA-4EB6-9C67-949E9D5D43F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0C9D59B-3BFA-4EB6-9C67-949E9D5D43F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0C9D59B-3BFA-4EB6-9C67-949E9D5D43F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0C9D59B-3BFA-4EB6-9C67-949E9D5D43F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0C9D59B-3BFA-4EB6-9C67-949E9D5D43F9}.VisualTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0C9D59B-3BFA-4EB6-9C67-949E9D5D43F9}.VisualTests|Any CPU.Build.0 = Debug|Any CPU
+		{35B89CB0-039F-4C96-9952-9CE06D398ABE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35B89CB0-039F-4C96-9952-9CE06D398ABE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35B89CB0-039F-4C96-9952-9CE06D398ABE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35B89CB0-039F-4C96-9952-9CE06D398ABE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35B89CB0-039F-4C96-9952-9CE06D398ABE}.VisualTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{35B89CB0-039F-4C96-9952-9CE06D398ABE}.VisualTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

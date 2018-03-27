@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="osu.Game.Rulesets.Taiko.props" />
+  <PropertyGroup Label="Project">
+    <TargetFramework>net461</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyTitle>osu.Game.Rulesets.Taiko.Runnable</AssemblyTitle>
+    <Product>osu.Game.Rulesets.Taiko.Runnable</Product>
+  </PropertyGroup>
+  <ItemGroup Label="Package References">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup Condition="$(MSBuildProjectName.Contains('.Runnable'))">
+    <BaseIntermediateOutputPath>obj_runnable\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>

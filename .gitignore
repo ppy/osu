@@ -257,3 +257,5 @@ paket-files/
 __pycache__/
 *.pyc
 Staging/
+
+obj_runnable/
