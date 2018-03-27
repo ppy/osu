@@ -1,4 +1,7 @@
-﻿#if NET_FRAMEWORK
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+#if NET_FRAMEWORK
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -119,16 +122,19 @@ namespace osu.Desktop.Overlays
                 this.updateManager = updateManager;
             }
 
-            protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification
+            protected override Notification CreateCompletionNotification()
             {
-                Text = @"Update ready to install. Click to restart!",
-                Activated = () =>
+                return new ProgressCompletionNotification
                 {
-                    updateManager.PrepareUpdate();
-                    game.GracefullyExit();
-                    return true;
-                }
-            };
+                    Text = @"Update ready to install. Click to restart!",
+                    Activated = () =>
+                    {
+                        updateManager.PrepareUpdate();
+                        game.GracefullyExit();
+                        return true;
+                    }
+                };
+            }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, OsuGame game)
