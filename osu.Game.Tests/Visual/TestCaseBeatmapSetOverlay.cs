@@ -52,6 +52,7 @@ namespace osu.Game.Tests.Visual
                         FavouriteCount = 356,
                         Submitted = new DateTime(2016, 2, 10),
                         Ranked = new DateTime(2016, 6, 19),
+                        Status = BeatmapSetOnlineStatus.Ranked,
                         BPM = 236,
                         HasVideo = true,
                         Covers = new BeatmapSetOnlineCovers
@@ -222,6 +223,7 @@ namespace osu.Game.Tests.Visual
                         FavouriteCount = 58,
                         Submitted = new DateTime(2016, 6, 11),
                         Ranked = new DateTime(2016, 7, 12),
+                        Status = BeatmapSetOnlineStatus.Pending,
                         BPM = 160,
                         HasVideo = false,
                         Covers = new BeatmapSetOnlineCovers

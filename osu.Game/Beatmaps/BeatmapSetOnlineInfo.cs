@@ -27,6 +27,11 @@ namespace osu.Game.Beatmaps
         public DateTimeOffset? LastUpdated { get; set; }
 
         /// <summary>
+        /// The status of this beatmap set.
+        /// </summary>
+        public BeatmapSetOnlineStatus Status { get; set; }
+
+        /// <summary>
         /// Whether or not this beatmap set has a background video.
         /// </summary>
         public bool HasVideo { get; set; }

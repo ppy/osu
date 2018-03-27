@@ -257,6 +257,7 @@
     <Compile Include="Beatmaps\BeatmapSetFileInfo.cs" />
     <Compile Include="Beatmaps\BeatmapSetInfo.cs" />
     <Compile Include="Beatmaps\BeatmapSetOnlineInfo.cs" />
+    <Compile Include="Beatmaps\BeatmapSetOnlineStatus.cs" />
     <Compile Include="Beatmaps\BeatmapStatistic.cs" />
     <Compile Include="Beatmaps\BeatmapStore.cs" />
     <Compile Include="Beatmaps\ControlPoints\ControlPoint.cs" />
@@ -268,6 +269,7 @@
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapSetOnlineStatusPill.cs" />
     <Compile Include="Beatmaps\Formats\IHasComboColours.cs" />
     <Compile Include="Beatmaps\Formats\IHasCustomColours.cs" />
     <Compile Include="Beatmaps\Formats\JsonBeatmapDecoder.cs" />
@@ -306,6 +308,7 @@
       <DependentUpon>20180125143340_Settings.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\20180131154205_AddMuteBinding.cs" />
+    <Compile Include="Overlays\Direct\IconPill.cs" />
     <Compile Include="Overlays\Profile\Sections\Recent\DrawableRecentActivity.cs" />
     <Compile Include="Overlays\Profile\Sections\Recent\MedalIcon.cs" />
     <Compile Include="Overlays\Profile\Sections\Recent\PaginatedRecentActivityContainer.cs" />

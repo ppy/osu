@@ -11,7 +11,9 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -20,7 +22,7 @@ namespace osu.Game.Overlays.Direct
         private const float horizontal_padding = 10;
         private const float vertical_padding = 5;
 
-        private FillFlowContainer bottomPanel;
+        private FillFlowContainer bottomPanel, statusContainer;
         private PlayButton playButton;
         private Box progressBar;
 
@@ -199,7 +201,37 @@ namespace osu.Game.Overlays.Direct
                     Size = new Vector2(30),
                     Alpha = 0,
                 },
+                statusContainer = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Margin = new MarginPadding { Top = 5, Left = 5 },
+                    Spacing = new Vector2(5),
+                },
             });
+
+            if (SetInfo.OnlineInfo?.HasVideo ?? false)
+            {
+                statusContainer.Add(new IconPill(FontAwesome.fa_film));
+            }
+
+            statusContainer.Add(new BeatmapSetOnlineStatusPill(12, new MarginPadding { Horizontal = 10, Vertical = 5 })
+            {
+                Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
+            });
+        }
+
+        protected override bool OnHover(InputState state)
+        {
+            statusContainer.FadeOut(120, Easing.InOutQuint);
+
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            base.OnHoverLost(state);
+
+            statusContainer.FadeIn(120, Easing.InOutQuint);
         }
     }
 }
