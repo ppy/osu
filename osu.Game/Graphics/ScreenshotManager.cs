@@ -41,7 +41,7 @@ namespace osu.Game.Graphics
             this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
             this.notificationOverlay = notificationOverlay;
-            this.menuCursorContainer = cursorOverrideContainer.Cursor;
+            menuCursorContainer = cursorOverrideContainer.Cursor;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
