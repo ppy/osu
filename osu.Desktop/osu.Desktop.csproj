@@ -15,6 +15,9 @@
     <Configurations>$(CONFIGURATIONS);VisualTests</Configurations>
     <Version>0.0.0.0</Version>
     <FileVersion>0.0.0.0</FileVersion>
+    <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
+    (Not sure why this is needed here, since we don't directly reference DeepEquals in this project...) -->
+    <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
   <PropertyGroup Label="Defines">
     <DefineConstants Condition="'$(TargetFramework)' == 'net461'">$(DefineConstants);NET_FRAMEWORK</DefineConstants>
