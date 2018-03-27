@@ -1,6 +1,6 @@
 <!-- Contains required properties for OpenTK includes. -->
 <Project>
   <ItemGroup Label="OpenTK">
-    <PackageReference Include="ppy.OpenTK.NS20" Version="1.0.1" />
+    <PackageReference Include="ppy.OpenTK.NS20" Version="1.0.2" />
   </ItemGroup>
 </Project>
