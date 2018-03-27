@@ -5,7 +5,7 @@ namespace osu.Game.Beatmaps
 {
     public enum BeatmapSetOnlineStatus
     {
-        None,
+        None = -3,
         Graveyard = -2,
         WIP = -1,
         Pending = 0,

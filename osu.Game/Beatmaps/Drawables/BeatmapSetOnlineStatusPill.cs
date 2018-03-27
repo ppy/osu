@@ -20,6 +20,7 @@ namespace osu.Game.Beatmaps.Drawables
             get { return status; }
             set
             {
+                if (value == status) return;
                 status = value;
 
                 statusText.Text = Enum.GetName(typeof(BeatmapSetOnlineStatus), Status)?.ToUpper();
