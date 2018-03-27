@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Tests", "osu.Game.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Desktop", "osu.Desktop\osu.Desktop.csproj", "{419659FD-72EA-4678-9EB8-B22A746CED70}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Rulesets.Catch.Runnable", "osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.Runnable.csproj", "{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,12 @@ Global
 		{419659FD-72EA-4678-9EB8-B22A746CED70}.Release|Any CPU.Build.0 = Release|Any CPU
 		{419659FD-72EA-4678-9EB8-B22A746CED70}.VisualTests|Any CPU.ActiveCfg = VisualTests|Any CPU
 		{419659FD-72EA-4678-9EB8-B22A746CED70}.VisualTests|Any CPU.Build.0 = VisualTests|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.VisualTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{791BAB6D-4D64-4D7B-9C26-F24C8CE14D8C}.VisualTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
