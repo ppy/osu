@@ -116,14 +116,13 @@ namespace osu.Game.Overlays.Mods
             else
                 MultiplierLabel.FadeColour(Color4.White, 200);
 
-            RankedLabel.Text = null;
+            RankedLabel.Text = "(Unranked)";
+            RankedLabel.FadeColour(RankedColour, 200);
+            RankedLabel.FadeOut(200);
             if (!ranked)
             {
-                RankedLabel.Text = "(Unranked)";
-                RankedLabel.FadeColour(RankedColour, 200);
+                RankedLabel.FadeIn(200);
             }
-            else
-                RankedLabel.FadeColour(Color4.White, 200);
         }
 
         protected override void PopOut()
