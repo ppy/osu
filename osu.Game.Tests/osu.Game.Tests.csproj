@@ -10,8 +10,6 @@
     <Copyright>ppy Pty Ltd 2007-2017</Copyright>
     <AssemblyTitle>osu.Game.Tests</AssemblyTitle>
     <Product>osu.Game.Tests</Product>
-    <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway. -->
-    <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
   <ItemGroup Label="Service">
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
@@ -27,7 +25,9 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
-    <PackageReference Include="DeepEqual" Version="1.6.0" />
+    <PackageReference Include="DeepEqual" Version="1.6.0">
+      <NoWarn>NU1701</NoWarn>
+    </PackageReference>
     <PackageReference Include="NUnit" Version="3.8.1" />
   </ItemGroup>
   <ItemGroup Label="Resources">
