@@ -9,7 +9,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Company>ppy Pty Ltd</Company>
     <Version>1.0.0.0</Version>
-    <Copyright>ppy Pty Ltd 2007-2017</Copyright>
+    <Copyright>ppy Pty Ltd 2007-2018</Copyright>
     <AssemblyTitle>osu.Game</AssemblyTitle>
     <Description>click the circles. to the beat.</Description>
     <Product>osu.Game</Product>
