@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public BreadcrumbControl()
         {
-            Height = 26;
+            Height = 32;
             TabContainer.Spacing = new Vector2(padding, 0f);
             Current.ValueChanged += tab =>
             {
@@ -36,6 +36,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
+            private readonly Vector2 chevronSize = new Vector2(10);
+
             public event Action<Visibility> StateChanged;
 
             public readonly SpriteIcon Chevron;
@@ -75,13 +77,15 @@ namespace osu.Game.Graphics.UserInterface
 
             public BreadcrumbTabItem(T value) : base(value)
             {
-                Text.TextSize = 16;
-                Padding = new MarginPadding { Right = padding + 8 }; //padding + chevron width
+                Text.TextSize = 18;
+                Text.Margin = new MarginPadding { Vertical = 8 };
+                Padding = new MarginPadding { Right = padding + chevronSize.X };
+
                 Add(Chevron = new SpriteIcon
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
-                    Size = new Vector2(12),
+                    Size = chevronSize,
                     Icon = FontAwesome.fa_chevron_right,
                     Margin = new MarginPadding { Left = padding },
                     Alpha = 0f,
