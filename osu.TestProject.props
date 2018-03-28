@@ -1,10 +1,19 @@
 <Project>
-  <Import Project=".\osu.Game.props" />
-  <PropertyGroup Label="Defines">
-    <DefineConstants Condition="'$(TargetFramework)' == 'net461'">$(DefineConstants);NET_FRAMEWORK</DefineConstants>
-  </PropertyGroup>
+  <Import Project="osu.Game.props" />
   <PropertyGroup>
     <StartupObject>osu.Game.Tests.VisualTestRunner</StartupObject>
+  </PropertyGroup>
+  <ItemGroup Label="Service">
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+  <PropertyGroup Label="Project">
+    <OutputType>WinExe</OutputType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
+    (Not sure why this is needed here, since we don't directly reference DeepEquals in this project...) -->
+    <NoWarn>NU1701</NoWarn>
+    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
@@ -12,8 +21,11 @@
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
     <PackageReference Include="DeepEqual" Version="1.6.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.1" />
     <PackageReference Include="NUnit" Version="3.8.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
   </ItemGroup>
   <ItemGroup>  
     <Compile Include="..\osu.Game\Tests\VisualTestRunner.cs">
