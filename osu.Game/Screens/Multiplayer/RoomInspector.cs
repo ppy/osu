@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
@@ -43,7 +44,7 @@ namespace osu.Game.Screens.Multiplayer
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
-        private readonly Bindable<User[]> participantsBind = new Bindable<User[]>();
+        private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
 
         private OsuColour colours;
         private LocalisationEngine localisation;
@@ -58,16 +59,16 @@ namespace osu.Game.Screens.Multiplayer
                 if (value == room) return;
                 room = value;
 
+                nameBind.UnbindBindings();
+                hostBind.UnbindBindings();
+                statusBind.UnbindBindings();
+                typeBind.UnbindBindings();
+                beatmapBind.UnbindBindings();
+                maxParticipantsBind.UnbindBindings();
+                participantsBind.UnbindBindings();
+
                 if (Room == null)
                 {
-                    nameBind.UnbindBindings();
-                    hostBind.UnbindBindings();
-                    statusBind.UnbindBindings();
-                    typeBind.UnbindBindings();
-                    beatmapBind.UnbindBindings();
-                    maxParticipantsBind.UnbindBindings();
-                    participantsBind.UnbindBindings();
-
                     showNullRoom();
                 }
                 else
@@ -425,9 +426,9 @@ namespace osu.Game.Screens.Multiplayer
             }
         }
 
-        private void displayParticipants(User[] value)
+        private void displayParticipants(IEnumerable<User> value)
         {
-            participants.Text = value.Length.ToString();
+            participants.Text = value.Count().ToString();
             participantInfo.Participants = value;
             participantsFlow.ChildrenEnumerable = value.Select(u => new UserTile(u));
         }

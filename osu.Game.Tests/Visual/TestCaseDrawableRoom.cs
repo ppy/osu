@@ -69,7 +69,10 @@ namespace osu.Game.Tests.Visual
                                 new User { Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 8756 } } },
                             },
                         },
-                    }),
+                    })
+                    {
+                        State = Visibility.Visible,
+                    },
                     new DrawableRoom(new Room
                     {
                         Name = { Value = @"Relax It's The Weekend" },
@@ -121,6 +124,8 @@ namespace osu.Game.Tests.Visual
                 new User { Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 1254 } } },
                 new User { Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 123189 } } },
             });
+
+            AddStep(@"deselect", () => first.State = Visibility.Hidden);
         }
 
         [BackgroundDependencyLoader]

@@ -3,8 +3,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using OpenTK;
@@ -13,7 +16,10 @@ namespace osu.Game.Screens.Multiplayer
 {
     public class Lobby : MultiplayerScreen
     {
-        private readonly FillFlowContainer<DrawableRoom> roomsContainer;
+        private readonly LobbyFilterControl filter;
+        private readonly Container content;
+        private readonly SearchContainer search;
+        private readonly RoomsFilterContainer roomsContainer;
         private readonly RoomInspector roomInspector;
 
         public override string Title => "lounge";
@@ -28,7 +34,15 @@ namespace osu.Game.Screens.Multiplayer
                 if (Equals(value, rooms)) return;
                 rooms = value;
 
-                roomsContainer.Children = Rooms.Select(r => new DrawableRoom(r)).ToList();
+                roomsContainer.Children = Rooms.Select(r => new DrawableRoom(r)
+                {
+                    Action = select,
+                }).ToList();
+
+                if (!Rooms.Contains(roomInspector.Room))
+                {
+                    roomInspector.Room = null;
+                }
             }
         }
 
@@ -36,23 +50,32 @@ namespace osu.Game.Screens.Multiplayer
         {
             Children = new Drawable[]
             {
-                new Container
+                filter = new LobbyFilterControl(),
+                content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
                         new ScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.55f,
-                            Padding = new MarginPadding { Vertical = 35, Right = 20 },
-                            Child = roomsContainer = new FillFlowContainer<DrawableRoom>
+                            Padding = new MarginPadding
+                            {
+                                Vertical = 35 - DrawableRoom.SELECTION_BORDER_WIDTH,
+                                Right = 20 - DrawableRoom.SELECTION_BORDER_WIDTH
+                            },
+                            Child = search = new SearchContainer
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical,
-                                Spacing = new Vector2(10),
+                                Child = roomsContainer = new RoomsFilterContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(10 - DrawableRoom.SELECTION_BORDER_WIDTH * 2),
+                                },
                             },
                         },
                         roomInspector = new RoomInspector
@@ -65,6 +88,83 @@ namespace osu.Game.Screens.Multiplayer
                     },
                 },
             };
+
+            filter.Search.Current.ValueChanged += s => search.SearchTerm = s;
+            filter.Search.Exit += Exit;
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            content.Padding = new MarginPadding
+            {
+                Top = filter.DrawHeight,
+                Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH,
+                Right = SearchableListOverlay.WIDTH_PADDING,
+            };
+        }
+
+        protected override void OnFocus(InputState state)
+        {
+            GetContainingInputManager().ChangeFocus(filter.Search);
+        }
+
+        protected override void OnEntering(Screen last)
+        {
+            base.OnEntering(last);
+
+            filter.Search.HoldFocus = true;
+        }
+
+        protected override bool OnExiting(Screen next)
+        {
+            filter.Search.HoldFocus = false;
+
+            return base.OnExiting(next);
+        }
+
+        protected override void OnResuming(Screen last)
+        {
+            base.OnResuming(last);
+
+            filter.Search.HoldFocus = true;
+        }
+
+        protected override void OnSuspending(Screen next)
+        {
+            base.OnSuspending(next);
+
+            filter.Search.HoldFocus = false;
+        }
+
+        private void select(DrawableRoom room)
+        {
+            roomsContainer.Children.ForEach(c => c.State = Visibility.Hidden);
+            room.State = Visibility.Visible;
+            roomInspector.Room = room.Room;
+        }
+
+        private class RoomsFilterContainer : FillFlowContainer<DrawableRoom>, IHasFilterableChildren
+        {
+            public IEnumerable<string> FilterTerms => new string[] { };
+
+            public bool MatchingFilter
+            {
+                set
+                {
+                    if (value)
+                        InvalidateLayout();
+                }
+            }
+
+            public IEnumerable<IFilterable> FilterableChildren => Children;
+
+            public RoomsFilterContainer()
+            {
+                LayoutDuration = 200;
+                LayoutEasing = Easing.OutQuint;
+            }
         }
     }
 }
