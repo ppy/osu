@@ -43,6 +43,8 @@ namespace osu.Game.Screens.Multiplayer
                 {
                     roomInspector.Room = null;
                 }
+
+                filterRooms();
             }
         }
 
@@ -89,7 +91,8 @@ namespace osu.Game.Screens.Multiplayer
                 },
             };
 
-            filter.Search.Current.ValueChanged += s => search.SearchTerm = s;
+            filter.Search.Current.ValueChanged += s => filterRooms();
+            filter.Tabs.Current.ValueChanged += a => filterRooms();
             filter.Search.Exit += Exit;
         }
 
@@ -138,6 +141,16 @@ namespace osu.Game.Screens.Multiplayer
             filter.Search.HoldFocus = false;
         }
 
+        private void filterRooms()
+        {
+            search.SearchTerm = filter.Search.Current.Value ?? string.Empty;
+
+            foreach (DrawableRoom room in roomsContainer.Children)
+            {
+                room.MatchingFilter = room.MatchingFilter && room.Room.Availability.Value == filter.Tabs.Current.Value;
+            }
+        }
+
         private void select(DrawableRoom room)
         {
             roomsContainer.Children.ForEach(c => c.State = Visibility.Hidden);
@@ -148,6 +161,7 @@ namespace osu.Game.Screens.Multiplayer
         private class RoomsFilterContainer : FillFlowContainer<DrawableRoom>, IHasFilterableChildren
         {
             public IEnumerable<string> FilterTerms => new string[] { };
+            public IEnumerable<IFilterable> FilterableChildren => Children;
 
             public bool MatchingFilter
             {
@@ -157,8 +171,6 @@ namespace osu.Game.Screens.Multiplayer
                         InvalidateLayout();
                 }
             }
-
-            public IEnumerable<IFilterable> FilterableChildren => Children;
 
             public RoomsFilterContainer()
             {

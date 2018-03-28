@@ -73,11 +73,16 @@ namespace osu.Game.Screens.Multiplayer
 
         public IEnumerable<string> FilterTerms => new[] { Room.Name.Value };
 
+        private bool matchingFilter;
         public bool MatchingFilter
         {
+            get { return matchingFilter; }
             set
             {
-                this.FadeTo(value ? 1 : 0, 200);
+                if (value == matchingFilter) return;
+                matchingFilter = value;
+
+                this.FadeTo(MatchingFilter ? 1 : 0, 200);
             }
         }
 
