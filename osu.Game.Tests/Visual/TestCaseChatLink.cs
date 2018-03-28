@@ -57,8 +57,8 @@ namespace osu.Game.Tests.Visual
             {
                 AvailableChannels =
                 {
-                    new Channel { Name = "#english" },
-                    new Channel { Name = "#japanese" }
+                    new ChannelChat { Name = "#english" },
+                    new ChannelChat { Name = "#japanese" }
                 }
             });
 

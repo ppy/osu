@@ -10,7 +10,7 @@ using osu.Framework.Lists;
 
 namespace osu.Game.Online.Chat
 {
-    public class Channel
+    public class ChannelChat
     {
         [JsonProperty(@"name")]
         public string Name;
@@ -35,7 +35,7 @@ namespace osu.Game.Online.Chat
         public const int MAX_HISTORY = 300;
 
         [JsonConstructor]
-        public Channel()
+        public ChannelChat()
         {
         }
 

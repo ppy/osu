@@ -60,7 +60,7 @@ namespace osu.Game.Overlays
 
         public Bindable<double> ChatHeight { get; set; }
 
-        public List<Channel> AvailableChannels { get; private set; } = new List<Channel>();
+        public List<ChannelChat> AvailableChannels { get; private set; } = new List<ChannelChat>();
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
 
@@ -191,7 +191,7 @@ namespace osu.Game.Overlays
         private double startDragChatHeight;
         private bool isDragging;
 
-        public void OpenChannel(Channel channel) => addChannel(channel);
+        public void OpenChannel(ChannelChat channel) => addChannel(channel);
 
         protected override bool OnDragStart(InputState state)
         {
@@ -289,7 +289,7 @@ namespace osu.Game.Overlays
 
         private long? lastMessageId;
 
-        private readonly List<Channel> careChannels = new List<Channel>();
+        private readonly List<ChannelChat> careChannels = new List<ChannelChat>();
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
@@ -300,7 +300,7 @@ namespace osu.Game.Overlays
             messageRequest?.Cancel();
 
             ListChannelsRequest req = new ListChannelsRequest();
-            req.Success += delegate (List<Channel> channels)
+            req.Success += delegate (List<ChannelChat> channels)
             {
                 AvailableChannels = channels;
 
@@ -328,9 +328,9 @@ namespace osu.Game.Overlays
             api.Queue(req);
         }
 
-        private Channel currentChannel;
+        private ChannelChat currentChannel;
 
-        protected Channel CurrentChannel
+        protected ChannelChat CurrentChannel
         {
             get
             {
@@ -380,7 +380,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void addChannel(Channel channel)
+        private void addChannel(ChannelChat channel)
         {
             if (channel == null) return;
 
@@ -407,7 +407,7 @@ namespace osu.Game.Overlays
             channel.Joined.Value = true;
         }
 
-        private void removeChannel(Channel channel)
+        private void removeChannel(ChannelChat channel)
         {
             if (channel == null) return;
 
@@ -420,9 +420,9 @@ namespace osu.Game.Overlays
             channel.Joined.Value = false;
         }
 
-        private void fetchInitialMessages(Channel channel)
+        private void fetchInitialMessages(ChannelChat channel)
         {
-            var req = new GetMessagesRequest(new List<Channel> { channel }, null);
+            var req = new GetMessagesRequest(new List<ChannelChat> { channel }, null);
 
             req.Success += delegate (List<Message> messages)
             {

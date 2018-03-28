@@ -10,10 +10,10 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetMessagesRequest : APIRequest<List<Message>>
     {
-        private readonly List<Channel> channels;
+        private readonly List<ChannelChat> channels;
         private long? since;
 
-        public GetMessagesRequest(List<Channel> channels, long? sinceId)
+        public GetMessagesRequest(List<ChannelChat> channels, long? sinceId)
         {
             this.channels = channels;
             since = sinceId;
