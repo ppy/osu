@@ -68,7 +68,6 @@ namespace osu.Game.Screens.Multiplayer
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-
             content.Padding = new MarginPadding { Top = header.DrawHeight };
         }
 

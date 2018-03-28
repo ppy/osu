@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Multiplayer
 {
     public class Lounge : MultiplayerScreen
     {
-        private readonly LobbyFilterControl filter;
+        private readonly LoungeFilterControl filter;
         private readonly Container content;
         private readonly SearchContainer search;
         private readonly RoomsFilterContainer roomsContainer;
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Multiplayer
         {
             Children = new Drawable[]
             {
-                filter = new LobbyFilterControl(),
+                filter = new LoungeFilterControl(),
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Multiplayer
             };
 
             filter.Search.Current.ValueChanged += s => filterRooms();
-            filter.Tabs.Current.ValueChanged += a => filterRooms();
+            filter.Tabs.Current.ValueChanged += t => filterRooms();
             filter.Search.Exit += Exit;
         }
 
@@ -118,28 +118,24 @@ namespace osu.Game.Screens.Multiplayer
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
-
             filter.Search.HoldFocus = true;
         }
 
         protected override bool OnExiting(Screen next)
         {
             filter.Search.HoldFocus = false;
-
             return base.OnExiting(next);
         }
 
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
-
             filter.Search.HoldFocus = true;
         }
 
         protected override void OnSuspending(Screen next)
         {
             base.OnSuspending(next);
-
             filter.Search.HoldFocus = false;
         }
 
@@ -160,6 +156,7 @@ namespace osu.Game.Screens.Multiplayer
             room.State = Visibility.Visible;
             roomInspector.Room = room.Room;
 
+            // open the room if its selected and is clicked again
             if (lastState == Visibility.Visible)
             {
                 Push(new Match(room.Room));

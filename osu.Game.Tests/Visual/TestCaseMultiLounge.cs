@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual
                     Name = { Value = @"My New, Better Than Ever Room" },
                     Host = { Value = new User { Username = @"Angelsim", Id = 1777162, Country = new Country { FlagName = @"KR" } } },
                     Status = { Value = new RoomStatusPlaying() },
-                    Availability = { Value = RoomAvailability.Private },
+                    Availability = { Value = RoomAvailability.FriendsOnly },
                     Type = { Value = new GameTypeTagTeam() },
                     Beatmap =
                     {

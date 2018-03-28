@@ -73,7 +73,6 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Y,
                 Width = 520,
-                Room = null,
             });
 
             AddStep(@"set room", () => inspector.Room = room);

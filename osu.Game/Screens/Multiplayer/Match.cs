@@ -24,10 +24,7 @@ namespace osu.Game.Screens.Multiplayer
                 Origin = Anchor.Centre,
                 Width = 100,
                 Text = @"Match",
-                Action = () => Push(new Match(new Room
-                {
-                    Name = { Value = @"Two Awesome Room" },
-                })),
+                Action = () => Push(new Match(room)),
             };
         }
     }
