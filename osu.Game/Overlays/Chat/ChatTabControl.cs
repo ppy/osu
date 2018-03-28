@@ -21,11 +21,11 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatTabControl : OsuTabControl<Channel>
+    public class ChatTabControl : OsuTabControl<ChannelChat>
     {
         private const float shear_width = 10;
 
-        public Action<Channel> OnRequestLeave;
+        public Action<ChannelChat> OnRequestLeave;
 
         public readonly Bindable<bool> ChannelSelectorActive = new Bindable<bool>();
 
@@ -46,12 +46,12 @@ namespace osu.Game.Overlays.Chat
                 Margin = new MarginPadding(10),
             });
 
-            AddTabItem(selectorTab = new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }));
+            AddTabItem(selectorTab = new ChannelTabItem.ChannelSelectorTabItem(new ChannelChat { Name = "+" }));
 
             ChannelSelectorActive.BindTo(selectorTab.Active);
         }
 
-        protected override void AddTabItem(TabItem<Channel> item, bool addToDropdown = true)
+        protected override void AddTabItem(TabItem<ChannelChat> item, bool addToDropdown = true)
         {
             if (item != selectorTab && TabContainer.GetLayoutPosition(selectorTab) < float.MaxValue)
                 // performTabSort might've made selectorTab's position wonky, fix it
@@ -63,9 +63,9 @@ namespace osu.Game.Overlays.Chat
                 SelectTab(item);
         }
 
-        protected override TabItem<Channel> CreateTabItem(Channel value) => new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
+        protected override TabItem<ChannelChat> CreateTabItem(ChannelChat value) => new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
 
-        protected override void SelectTab(TabItem<Channel> tab)
+        protected override void SelectTab(TabItem<ChannelChat> tab)
         {
             if (tab is ChannelTabItem.ChannelSelectorTabItem)
             {
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Chat
             base.SelectTab(tab);
         }
 
-        private void tabCloseRequested(TabItem<Channel> tab)
+        private void tabCloseRequested(TabItem<ChannelChat> tab)
         {
             int totalTabs = TabContainer.Count - 1; // account for selectorTab
             int currentIndex = MathHelper.Clamp(TabContainer.IndexOf(tab), 1, totalTabs);
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Chat
             OnRequestLeave?.Invoke(tab.Value);
         }
 
-        private class ChannelTabItem : TabItem<Channel>
+        private class ChannelTabItem : TabItem<ChannelChat>
         {
             private Color4 backgroundInactive;
             private Color4 backgroundHover;
@@ -175,7 +175,7 @@ namespace osu.Game.Overlays.Chat
                 updateState();
             }
 
-            public ChannelTabItem(Channel value) : base(value)
+            public ChannelTabItem(ChannelChat value) : base(value)
             {
                 Width = 150;
 
@@ -307,7 +307,7 @@ namespace osu.Game.Overlays.Chat
             {
                 public override bool IsRemovable => false;
 
-                public ChannelSelectorTabItem(Channel value) : base(value)
+                public ChannelSelectorTabItem(ChannelChat value) : base(value)
                 {
                     Depth = float.MaxValue;
                     Width = 45;

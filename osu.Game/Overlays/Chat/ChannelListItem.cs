@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Chat
         private const float text_size = 15;
         private const float transition_duration = 100;
 
-        private readonly Channel channel;
+        private readonly ChannelChat channel;
 
         private readonly Bindable<bool> joinedBind = new Bindable<bool>();
         private readonly OsuSpriteText name;
@@ -44,10 +44,10 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        public Action<Channel> OnRequestJoin;
-        public Action<Channel> OnRequestLeave;
+        public Action<ChannelChat> OnRequestJoin;
+        public Action<ChannelChat> OnRequestLeave;
 
-        public ChannelListItem(Channel channel)
+        public ChannelListItem(ChannelChat channel)
         {
             this.channel = channel;
 

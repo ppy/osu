@@ -17,11 +17,11 @@ namespace osu.Game.Overlays.Chat
 {
     public class DrawableChannel : Container
     {
-        public readonly Channel Channel;
+        public readonly ChannelChat Channel;
         private readonly ChatLineContainer flow;
         private readonly ScrollContainer scroll;
 
-        public DrawableChannel(Channel channel)
+        public DrawableChannel(ChannelChat channel)
         {
             Channel = channel;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Chat
         private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
             // Add up to last Channel.MAX_HISTORY messages
-            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
+            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - ChannelChat.MAX_HISTORY));
 
             flow.AddRange(displayMessages.Select(m => new ChatLine(m)));
 
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Chat
                 scrollToEnd();
 
             var staleMessages = flow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
-            int count = staleMessages.Length - Channel.MAX_HISTORY;
+            int count = staleMessages.Length - ChannelChat.MAX_HISTORY;
 
             for (int i = 0; i < count; i++)
             {
