@@ -48,10 +48,10 @@ namespace osu.Game.Overlays
 
         public SocialOverlay()
         {
-            FirstWaveColour = OsuColour.FromHex(@"cb5fa0");
-            SecondWaveColour = OsuColour.FromHex(@"b04384");
-            ThirdWaveColour = OsuColour.FromHex(@"9b2b6e");
-            FourthWaveColour = OsuColour.FromHex(@"6d214d");
+            Waves.FirstWaveColour = OsuColour.FromHex(@"cb5fa0");
+            Waves.SecondWaveColour = OsuColour.FromHex(@"b04384");
+            Waves.ThirdWaveColour = OsuColour.FromHex(@"9b2b6e");
+            Waves.FourthWaveColour = OsuColour.FromHex(@"6d214d");
 
             Add(loading = new LoadingAnimation());
 

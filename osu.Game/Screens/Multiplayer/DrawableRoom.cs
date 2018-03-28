@@ -68,6 +68,8 @@ namespace osu.Game.Screens.Multiplayer
                     selectionBox.FadeIn(transition_duration);
                 else
                     selectionBox.FadeOut(transition_duration);
+
+                StateChanged?.Invoke(State);
             }
         }
 
