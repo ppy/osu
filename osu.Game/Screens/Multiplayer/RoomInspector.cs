@@ -7,6 +7,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.Multiplayer
 
         private readonly Box statusStrip;
         private readonly Container coverContainer;
-        private readonly FillFlowContainer topFlow, participantsFlow;
+        private readonly FillFlowContainer topFlow, participantNumbersFlow, infoPanelFlow, participantsFlow;
         private readonly ModeTypeInfo modeTypeInfo;
         private readonly OsuSpriteText participants, participantsSlash, maxParticipants, name, status, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor;
         private readonly ParticipantInfo participantInfo;
@@ -57,21 +58,35 @@ namespace osu.Game.Screens.Multiplayer
                 if (value == room) return;
                 room = value;
 
-                nameBind.BindTo(Room.Name);
-                hostBind.BindTo(Room.Host);
-                statusBind.BindTo(Room.Status);
-                typeBind.BindTo(Room.Type);
-                beatmapBind.BindTo(Room.Beatmap);
-                maxParticipantsBind.BindTo(Room.MaxParticipants);
-                participantsBind.BindTo(Room.Participants);
+                if (Room == null)
+                {
+                    nameBind.UnbindBindings();
+                    hostBind.UnbindBindings();
+                    statusBind.UnbindBindings();
+                    typeBind.UnbindBindings();
+                    beatmapBind.UnbindBindings();
+                    maxParticipantsBind.UnbindBindings();
+                    participantsBind.UnbindBindings();
+
+                    showNullRoom();
+                }
+                else
+                {
+                    defaultState();
+
+                    nameBind.BindTo(Room.Name);
+                    hostBind.BindTo(Room.Host);
+                    statusBind.BindTo(Room.Status);
+                    typeBind.BindTo(Room.Type);
+                    beatmapBind.BindTo(Room.Beatmap);
+                    maxParticipantsBind.BindTo(Room.MaxParticipants);
+                    participantsBind.BindTo(Room.Participants);
+                }
             }
         }
 
         public RoomInspector()
         {
-            Width = 520;
-            RelativeSizeAxes = Axes.Y;
-
             Children = new Drawable[]
             {
                 new Box
@@ -120,7 +135,7 @@ namespace osu.Game.Screens.Multiplayer
                                     Padding = new MarginPadding(20),
                                     Children = new Drawable[]
                                     {
-                                        new FillFlowContainer
+                                        participantNumbersFlow = new FillFlowContainer
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
@@ -178,6 +193,7 @@ namespace osu.Game.Screens.Multiplayer
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
+                                    LayoutDuration = transition_duration,
                                     Padding = contentPadding,
                                     Spacing = new Vector2(0f, 5f),
                                     Children = new Drawable[]
@@ -187,7 +203,7 @@ namespace osu.Game.Screens.Multiplayer
                                             TextSize = 14,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        new FillFlowContainer
+                                        infoPanelFlow = new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.X,
                                             Height = 30,
@@ -288,8 +304,15 @@ namespace osu.Game.Screens.Multiplayer
             statusBind.ValueChanged += displayStatus;
             beatmapBind.ValueChanged += displayBeatmap;
 
-            statusBind.TriggerChange();
-            beatmapBind.TriggerChange();
+            if (Room != null)
+            {
+                statusBind.TriggerChange();
+                beatmapBind.TriggerChange();
+            }
+            else
+            {
+                showNullRoom();
+            }
         }
 
         protected override void UpdateAfterChildren()
@@ -297,6 +320,36 @@ namespace osu.Game.Screens.Multiplayer
             base.UpdateAfterChildren();
 
             participantsScroll.Height = DrawHeight - topFlow.DrawHeight;
+        }
+
+        private void showNullRoom()
+        {
+            participantNumbersFlow.FadeOut(transition_duration);
+
+            coverContainer.Children.ForEach(c => c.FadeOut(transition_duration).Finally(d => d.Expire()));
+            name.FadeOut(transition_duration);
+
+            status.Text = "No Room Selected";
+
+            foreach (Drawable d in new Drawable[] { statusStrip, status })
+                d.FadeColour(colours.Gray8, transition_duration);
+
+            infoPanelFlow.FadeOut(transition_duration);
+
+            participantInfo.FadeOut(transition_duration);
+            participantsFlow.FadeOut(transition_duration);
+        }
+
+        private void defaultState()
+        {
+            participantNumbersFlow.FadeIn(transition_duration);
+
+            name.FadeIn(transition_duration);
+
+            infoPanelFlow.FadeIn(transition_duration);
+
+            participantInfo.FadeIn(transition_duration);
+            participantsFlow.FadeIn(transition_duration);
         }
 
         private void displayName(string value)

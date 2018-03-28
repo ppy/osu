@@ -71,9 +71,12 @@ namespace osu.Game.Tests.Visual
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Room = room,
+                RelativeSizeAxes = Axes.Y,
+                Width = 520,
+                Room = null,
             });
 
+            AddStep(@"set room", () => inspector.Room = room);
             AddStep(@"change title", () => room.Name.Value = @"A Better Room Than The Above");
             AddStep(@"change host", () => room.Host.Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" } });
             AddStep(@"change status", () => room.Status.Value = new RoomStatusPlaying());
@@ -132,6 +135,8 @@ namespace osu.Game.Tests.Visual
 
                 inspector.Room = newRoom;
             });
+
+            AddStep(@"null room", () => inspector.Room = null);
         }
 
         [BackgroundDependencyLoader]

@@ -3,23 +3,31 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.Multiplayer
 {
     public class Match : MultiplayerScreen
     {
-        public override string Title => "room";
-        public override string Name => "One Awesome Room"; //todo: temporary
+        private readonly Room room;
 
-        public Match()
+        public override string Title => "room";
+        public override string Name => room.Name.Value;
+
+        public Match(Room room)
         {
+            this.room = room;
+
             Child = new TriangleButton
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Width = 100,
                 Text = @"Match",
-                Action = () => Push(new Match()),
+                Action = () => Push(new Match(new Room
+                {
+                    Name = { Value = @"Two Awesome Room" },
+                })),
             };
         }
     }

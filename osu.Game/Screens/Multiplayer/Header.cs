@@ -11,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.SearchableList;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.Multiplayer
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 80 },
+                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
