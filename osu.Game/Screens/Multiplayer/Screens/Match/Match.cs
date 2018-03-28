@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 
-namespace osu.Game.Screens.Multiplayer
+namespace osu.Game.Screens.Multiplayer.Screens.Match
 {
     public class Match : MultiplayerScreen
     {

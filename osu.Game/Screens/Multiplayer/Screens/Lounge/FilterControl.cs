@@ -6,14 +6,14 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Multiplayer
+namespace osu.Game.Screens.Multiplayer.Screens.Lounge
 {
-    public class LoungeFilterControl : SearchableListFilterControl<LoungeTab, LoungeTab>
+    public class FilterControl : SearchableListFilterControl<LoungeTab, LoungeTab>
     {
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"362e42");
         protected override LoungeTab DefaultTab => LoungeTab.Public;
 
-        public LoungeFilterControl()
+        public FilterControl()
         {
             DisplayStyleControl.Hide();
         }

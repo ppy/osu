@@ -10,13 +10,14 @@ using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Screens.Multiplayer.Components;
 using OpenTK;
 
-namespace osu.Game.Screens.Multiplayer
+namespace osu.Game.Screens.Multiplayer.Screens.Lounge
 {
     public class Lounge : MultiplayerScreen
     {
-        private readonly LoungeFilterControl filter;
+        private readonly FilterControl filter;
         private readonly Container content;
         private readonly SearchContainer search;
         private readonly RoomsFilterContainer roomsContainer;
@@ -54,7 +55,7 @@ namespace osu.Game.Screens.Multiplayer
         {
             Children = new Drawable[]
             {
-                filter = new LoungeFilterControl(),
+                filter = new FilterControl(),
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -159,7 +160,7 @@ namespace osu.Game.Screens.Multiplayer
             // open the room if its selected and is clicked again
             if (lastState == Visibility.Visible)
             {
-                Push(new Match(room.Room));
+                Push(new Match.Match(room.Room));
             }
         }
 

@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -21,8 +19,10 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Multiplayer
+namespace osu.Game.Screens.Multiplayer.Components
 {
     public class DrawableRoom : OsuClickableContainer, IStateful<Visibility>, IFilterable
     {

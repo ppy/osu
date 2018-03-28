@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -22,8 +20,10 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Multiplayer
+namespace osu.Game.Screens.Multiplayer.Components
 {
     public class RoomInspector : Container
     {
@@ -327,7 +327,7 @@ namespace osu.Game.Screens.Multiplayer
         {
             participantNumbersFlow.FadeOut(transition_duration);
 
-            coverContainer.Children.ForEach(c => c.FadeOut(transition_duration).Finally(d => d.Expire()));
+            coverContainer.Children.ForEach(c => TransformableExtensions.FadeOut<Drawable>(c, transition_duration).Finally(d => d.Expire()));
             name.FadeOut(transition_duration);
 
             status.Text = "No Room Selected";

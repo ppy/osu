@@ -6,7 +6,7 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Multiplayer;
+using osu.Game.Screens.Multiplayer.Screens.Lounge;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
