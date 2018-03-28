@@ -49,7 +49,7 @@ namespace osu.Game.Overlays
 
         public const float TAB_AREA_HEIGHT = 50;
 
-        private GetMessagesRequest fetchReq;
+        private GetChannelMessagesRequest fetchReq;
 
         private readonly ChatTabControl channelTabs;
 
@@ -422,7 +422,7 @@ namespace osu.Game.Overlays
 
         private void fetchInitialMessages(ChannelChat channel)
         {
-            var req = new GetMessagesRequest(new List<ChannelChat> { channel }, null);
+            var req = new GetChannelMessagesRequest(new List<ChannelChat> { channel }, null);
 
             req.Success += delegate (List<Message> messages)
             {
@@ -442,7 +442,7 @@ namespace osu.Game.Overlays
         {
             if (fetchReq != null) return;
 
-            fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
+            fetchReq = new GetChannelMessagesRequest(careChannels, lastMessageId);
 
             fetchReq.Success += delegate (List<Message> messages)
             {
