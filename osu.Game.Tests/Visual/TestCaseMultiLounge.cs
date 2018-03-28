@@ -12,15 +12,15 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseMultiLobby : OsuTestCase
+    public class TestCaseMultiLounge : OsuTestCase
     {
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            Lobby lobby;
-            Add(lobby = new Lobby());
+            Lounge lounge;
+            Add(lounge = new Lounge());
 
-            AddStep(@"add rooms", () => lobby.Rooms = new[]
+            AddStep(@"add rooms", () => lounge.Rooms = new[]
             {
                 new Room
                 {
@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual
                 },
             });
 
-            AddStep(@"clear rooms", () => lobby.Rooms = new Room[] { });
+            AddStep(@"clear rooms", () => lounge.Rooms = new Room[] { });
         }
     }
 }

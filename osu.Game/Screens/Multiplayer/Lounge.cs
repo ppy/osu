@@ -14,7 +14,7 @@ using OpenTK;
 
 namespace osu.Game.Screens.Multiplayer
 {
-    public class Lobby : MultiplayerScreen
+    public class Lounge : MultiplayerScreen
     {
         private readonly LobbyFilterControl filter;
         private readonly Container content;
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Multiplayer
             }
         }
 
-        public Lobby()
+        public Lounge()
         {
             Children = new Drawable[]
             {

@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Multiplayer
                 FourthWaveColour = OsuColour.FromHex(@"392850"),
             });
 
-            Lobby lobby;
+            Lounge lounge;
             Children = new Drawable[]
             {
                 new Container
@@ -57,12 +57,12 @@ namespace osu.Game.Screens.Multiplayer
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = lobby = new Lobby(),
+                    Child = lounge = new Lounge(),
                 },
             };
 
-            header.CurrentScreen = lobby;
-            lobby.Exited += s => Exit();
+            header.CurrentScreen = lounge;
+            lounge.Exited += s => Exit();
         }
 
         protected override void UpdateAfterChildren()
