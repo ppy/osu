@@ -1,37 +1,26 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using osu.Framework.Screens;
-using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Play;
-using OpenTK.Graphics;
-using osu.Game.Screens.Select;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Multiplayer
 {
-    public class Match : ScreenWhiteBox
+    public class Match : MultiplayerScreen
     {
-        protected override IEnumerable<Type> PossibleChildren => new[] {
-            typeof(MatchSongSelect),
-            typeof(Player),
-        };
+        public override string Title => "room";
+        public override string Name => "One Awesome Room"; //todo: temporary
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
-
-        protected override void OnEntering(Screen last)
+        public Match()
         {
-            base.OnEntering(last);
-
-            Background.FadeColour(Color4.DarkGray, 500);
-        }
-
-        protected override bool OnExiting(Screen next)
-        {
-            Background.FadeColour(Color4.White, 500);
-            return base.OnExiting(next);
+            Child = new TriangleButton
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Width = 100,
+                Text = @"Match",
+                Action = () => Push(new Match()),
+            };
         }
     }
 }

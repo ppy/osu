@@ -15,7 +15,10 @@ namespace osu.Game.Graphics.UserInterface
     {
         private const float padding = 10;
 
-        protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value);
+        protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value)
+        {
+            AccentColour = AccentColour,
+        };
 
         public BreadcrumbControl()
         {
@@ -47,9 +50,9 @@ namespace osu.Game.Graphics.UserInterface
 
             public override bool HandleKeyboardInput => State == Visibility.Visible;
             public override bool HandleMouseInput => State == Visibility.Visible;
+            public override bool IsRemovable => true;
 
             private Visibility state;
-
             public Visibility State
             {
                 get { return state; }

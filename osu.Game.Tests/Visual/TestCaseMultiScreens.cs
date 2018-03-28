@@ -7,11 +7,11 @@ using osu.Game.Screens.Multiplayer;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseLobby : OsuTestCase
+    public class TestCaseMultiScreens : OsuTestCase
     {
-        public TestCaseLobby()
+        public TestCaseMultiScreens()
         {
-            Add(new Lobby());
+            Add(new Multi());
         }
     }
 }
