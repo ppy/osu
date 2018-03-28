@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Catch.Objects;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    [Ignore("getting CI working")]
     public class TestCaseHyperdash : Game.Tests.Visual.TestCasePlayer
     {
         public TestCaseHyperdash()
@@ -16,9 +15,10 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
         }
 
-        protected override Beatmap CreateBeatmap()
+        protected override Beatmap CreateBeatmap(Ruleset ruleset)
         {
-            var beatmap = new Beatmap();
+            var beatmap = new Beatmap { BeatmapInfo = { Ruleset = ruleset.RulesetInfo } };
+
 
             for (int i = 0; i < 512; i++)
                 if (i % 5 < 3)

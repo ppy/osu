@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             RelativeSizeAxes = Axes.X;
             Height = 1;
 
-            Add(new Box
+            AddInternal(new Box
             {
                 Name = "Bar line",
                 Anchor = Anchor.BottomCentre,
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             if (isMajor)
             {
-                Add(new EquilateralTriangle
+                AddInternal(new EquilateralTriangle
                 {
                     Name = "Left triangle",
                     Anchor = Anchor.BottomLeft,
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Rotation = 90
                 });
 
-                Add(new EquilateralTriangle
+                AddInternal(new EquilateralTriangle
                 {
                     Name = "Right triangle",
                     Anchor = Anchor.BottomRight,

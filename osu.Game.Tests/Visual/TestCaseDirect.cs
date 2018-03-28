@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -9,6 +10,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseDirect : OsuTestCase
     {
         private DirectOverlay direct;

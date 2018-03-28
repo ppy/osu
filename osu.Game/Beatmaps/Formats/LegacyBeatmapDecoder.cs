@@ -4,89 +4,99 @@
 using System;
 using System.Globalization;
 using System.IO;
-using OpenTK.Graphics;
+using System.Linq;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Framework;
 
 namespace osu.Game.Beatmaps.Formats
 {
-    public class LegacyBeatmapDecoder : LegacyDecoder
+    public class LegacyBeatmapDecoder : LegacyDecoder<Beatmap>
     {
+        public const int LATEST_VERSION = 14;
+
         private Beatmap beatmap;
 
-        private bool hasCustomColours;
         private ConvertHitObjectParser parser;
 
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
 
-        public LegacyBeatmapDecoder()
+        public static void Register()
         {
+            AddDecoder<Beatmap>(@"osu file format v", m => new LegacyBeatmapDecoder(int.Parse(m.Split('v').Last())));
         }
 
-        public LegacyBeatmapDecoder(string header)
+        /// <summary>
+        /// lazer's audio timings in general doesn't match stable. this is the result of user testing, albeit limited.
+        /// This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
+        /// </summary>
+        public static int UniversalOffset => RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? -22 : 0;
+
+        /// <summary>
+        /// Whether or not beatmap or runtime offsets should be applied. Defaults on; only disable for testing purposes.
+        /// </summary>
+        public bool ApplyOffsets = true;
+
+        private readonly int offset = UniversalOffset;
+
+        public LegacyBeatmapDecoder(int version = LATEST_VERSION) : base(version)
         {
-            BeatmapVersion = int.Parse(header.Substring(17));
+            // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
+            offset += FormatVersion < 5 ? 24 : 0;
         }
 
-        protected override void ParseBeatmap(StreamReader stream, Beatmap beatmap)
+        protected override void ParseStreamInto(StreamReader stream, Beatmap beatmap)
         {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-            if (beatmap == null)
-                throw new ArgumentNullException(nameof(beatmap));
-
             this.beatmap = beatmap;
-            this.beatmap.BeatmapInfo.BeatmapVersion = BeatmapVersion;
+            this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
 
-            ParseContent(stream);
+            base.ParseStreamInto(stream, beatmap);
+
+            // objects may be out of order *only* if a user has manually edited an .osu file.
+            // unfortunately there are ranked maps in this state (example: https://osu.ppy.sh/s/594828).
+            this.beatmap.HitObjects.Sort((x, y) => x.StartTime.CompareTo(y.StartTime));
 
             foreach (var hitObject in this.beatmap.HitObjects)
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
         }
 
-        protected override bool ShouldSkipLine(string line)
-        {
-            if (base.ShouldSkipLine(line) || line.StartsWith(" ") || line.StartsWith("_"))
-                return true;
-            return false;
-        }
+        protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(" ") || line.StartsWith("_");
 
-        protected override void ProcessSection(Section section, string line)
+        protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
             switch (section)
             {
                 case Section.General:
                     handleGeneral(line);
-                    break;
+                    return;
                 case Section.Editor:
                     handleEditor(line);
-                    break;
+                    return;
                 case Section.Metadata:
                     handleMetadata(line);
-                    break;
+                    return;
                 case Section.Difficulty:
                     handleDifficulty(line);
-                    break;
+                    return;
                 case Section.Events:
                     handleEvents(line);
-                    break;
+                    return;
                 case Section.TimingPoints:
                     handleTimingPoints(line);
-                    break;
-                case Section.Colours:
-                    handleColours(line);
-                    break;
+                    return;
                 case Section.HitObjects:
                     handleHitObjects(line);
-                    break;
+                    return;
             }
+
+            base.ParseLine(beatmap, section, line);
         }
 
         private void handleGeneral(string line)
         {
-            var pair = SplitKeyVal(line, ':');
+            var pair = SplitKeyVal(line);
 
             var metadata = beatmap.BeatmapInfo.Metadata;
             switch (pair.Key)
@@ -98,7 +108,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.AudioLeadIn = int.Parse(pair.Value);
                     break;
                 case @"PreviewTime":
-                    metadata.PreviewTime = int.Parse(pair.Value);
+                    metadata.PreviewTime = getOffsetTime(int.Parse(pair.Value));
                     break;
                 case @"Countdown":
                     beatmap.BeatmapInfo.Countdown = int.Parse(pair.Value) == 1;
@@ -145,7 +155,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEditor(string line)
         {
-            var pair = SplitKeyVal(line, ':');
+            var pair = SplitKeyVal(line);
 
             switch (pair.Key)
             {
@@ -169,7 +179,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleMetadata(string line)
         {
-            var pair = SplitKeyVal(line, ':');
+            var pair = SplitKeyVal(line);
 
             var metadata = beatmap.BeatmapInfo.Metadata;
             switch (pair.Key)
@@ -210,7 +220,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleDifficulty(string line)
         {
-            var pair = SplitKeyVal(line, ':');
+            var pair = SplitKeyVal(line);
 
             var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
             switch (pair.Key)
@@ -228,10 +238,10 @@ namespace osu.Game.Beatmaps.Formats
                     difficulty.ApproachRate = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"SliderMultiplier":
-                    difficulty.SliderMultiplier = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    difficulty.SliderMultiplier = double.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"SliderTickRate":
-                    difficulty.SliderTickRate = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
+                    difficulty.SliderTickRate = double.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
                     break;
             }
         }
@@ -253,8 +263,8 @@ namespace osu.Game.Beatmaps.Formats
                 case EventType.Break:
                     var breakEvent = new BreakPeriod
                     {
-                        StartTime = double.Parse(split[1], NumberFormatInfo.InvariantInfo),
-                        EndTime = double.Parse(split[2], NumberFormatInfo.InvariantInfo)
+                        StartTime = getOffsetTime(double.Parse(split[1], NumberFormatInfo.InvariantInfo)),
+                        EndTime = getOffsetTime(double.Parse(split[2], NumberFormatInfo.InvariantInfo))
                     };
 
                     if (!breakEvent.HasEffect)
@@ -269,7 +279,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             string[] split = line.Split(',');
 
-            double time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo);
+            double time = getOffsetTime(double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo));
             double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
             double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
@@ -351,38 +361,6 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleColours(string line)
-        {
-            var pair = SplitKeyVal(line, ':');
-
-            string[] split = pair.Value.Split(',');
-
-            if (split.Length != 3)
-                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {pair.Value}");
-
-            byte r, g, b;
-            if (!byte.TryParse(split[0], out r) || !byte.TryParse(split[1], out g) || !byte.TryParse(split[2], out b))
-                throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
-
-            if (!hasCustomColours)
-            {
-                beatmap.ComboColors.Clear();
-                hasCustomColours = true;
-            }
-
-            // Note: the combo index specified in the beatmap is discarded
-            if (pair.Key.StartsWith(@"Combo"))
-            {
-                beatmap.ComboColors.Add(new Color4
-                {
-                    R = r / 255f,
-                    G = g / 255f,
-                    B = b / 255f,
-                    A = 1f,
-                });
-            }
-        }
-
         private void handleHitObjects(string line)
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
@@ -392,7 +370,14 @@ namespace osu.Game.Beatmaps.Formats
             var obj = parser.Parse(line);
 
             if (obj != null)
+            {
+                obj.StartTime = getOffsetTime(obj.StartTime);
                 beatmap.HitObjects.Add(obj);
+            }
         }
+
+        private int getOffsetTime(int time) => time + (ApplyOffsets ? offset : 0);
+
+        private double getOffsetTime(double time) => time + (ApplyOffsets ? offset : 0);
     }
 }

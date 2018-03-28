@@ -12,6 +12,8 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Replays;
+using osu.Game.Rulesets.Replays.Types;
 
 namespace osu.Game.Rulesets.Mania
 {
@@ -89,6 +91,7 @@ namespace osu.Game.Rulesets.Mania
                         },
                         new ManiaModRandom(),
                         new ManiaModDualStages(),
+                        new ManiaModMirror(),
                         new MultiMod
                         {
                             Mods = new Mod[]
@@ -110,9 +113,11 @@ namespace osu.Game.Rulesets.Mania
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_mania_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new ManiaDifficultyCalculator(beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new ManiaDifficultyCalculator(beatmap, mods);
 
-        public override int LegacyID => 3;
+        public override int? LegacyID => 3;
+
+        public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 
         public ManiaRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)

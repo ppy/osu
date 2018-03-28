@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
@@ -18,7 +17,7 @@ using System.ComponentModel;
 using osu.Game.Graphics;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
-
+using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Settings.Sections.General
@@ -208,9 +207,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     username = new OsuTextBox
                     {
-                        PlaceholderText = "Username",
+                        PlaceholderText = "Email address",
                         RelativeSizeAxes = Axes.X,
-                        Text = api?.Username ?? string.Empty,
+                        Text = api?.ProvidedUsername ?? string.Empty,
                         TabbableContentContainer = this
                     },
                     password = new OsuPasswordTextBox
@@ -222,12 +221,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     },
                     new SettingsCheckbox
                     {
-                        LabelText = "Remember username",
+                        LabelText = "Remember email address",
                         Bindable = config.GetBindable<bool>(OsuSetting.SaveUsername),
                     },
                     new SettingsCheckbox
                     {
-                        LabelText = "Stay logged in",
+                        LabelText = "Stay signed in",
                         Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
                     new SettingsButton
@@ -237,7 +236,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     },
                     new SettingsButton
                     {
-                        Text = "Register new account",
+                        Text = "Register",
                         //Action = registerLink
                     }
                 };

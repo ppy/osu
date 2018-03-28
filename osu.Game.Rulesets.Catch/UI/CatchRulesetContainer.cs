@@ -3,6 +3,7 @@
 
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
+using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
 
-        protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
+        protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
         protected override BeatmapProcessor<CatchHitObject> CreateBeatmapProcessor() => new CatchBeatmapProcessor();
 

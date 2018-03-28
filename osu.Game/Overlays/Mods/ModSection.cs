@@ -27,14 +27,8 @@ namespace osu.Game.Overlays.Mods
 
         public string Header
         {
-            get
-            {
-                return headerLabel.Text;
-            }
-            set
-            {
-                headerLabel.Text = value;
-            }
+            get => headerLabel.Text;
+            set => headerLabel.Text = value;
         }
 
         public IEnumerable<Mod> SelectedMods => buttons.Select(b => b.SelectedMod).Where(m => m != null);
@@ -47,12 +41,12 @@ namespace osu.Game.Overlays.Mods
                 {
                     if (m == null)
                         return new ModButtonEmpty();
-                    else
-                        return new ModButton(m)
-                        {
-                            SelectedColour = selectedColour,
-                            SelectionChanged = Action,
-                        };
+
+                    return new ModButton(m)
+                    {
+                        SelectedColour = selectedColour,
+                        SelectionChanged = Action,
+                    };
                 }).ToArray();
 
                 ButtonsContainer.Children = modContainers;
@@ -65,10 +59,7 @@ namespace osu.Game.Overlays.Mods
         private Color4 selectedColour = Color4.White;
         public Color4 SelectedColour
         {
-            get
-            {
-                return selectedColour;
-            }
+            get => selectedColour;
             set
             {
                 if (value == selectedColour) return;
@@ -102,31 +93,31 @@ namespace osu.Game.Overlays.Mods
             {
                 Mod selected = button.SelectedMod;
                 if (selected == null) continue;
-                foreach (Type type in modTypes)
+                foreach (var type in modTypes)
                     if (type.IsInstanceOfType(selected))
                     {
                         if (immediate)
                             button.Deselect();
                         else
-                            Scheduler.AddDelayed(() => button.Deselect(), delay += 50);
+                            Scheduler.AddDelayed(button.Deselect, delay += 50);
                     }
             }
         }
 
         /// <summary>
-        /// Select one or more mods in this section.
+        /// Select one or more mods in this section and deselects all other ones.
         /// </summary>
-        /// <param name="mods">The types of <see cref="Mod"/>s which should be deselected.</param>
-        public void SelectTypes(IEnumerable<Mod> mods)
+        /// <param name="modTypes">The types of <see cref="Mod"/>s which should be selected.</param>
+        public void SelectTypes(IEnumerable<Type> modTypes)
         {
             foreach (var button in buttons)
             {
-                for (int i = 0; i < button.Mods.Length; i++)
-                {
-                    foreach (var mod in mods)
-                        if (mod.GetType().IsInstanceOfType(button.Mods[i]))
-                            button.SelectAt(i);
-                }
+                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t.IsInstanceOfType(m)));
+
+                if (i >= 0)
+                    button.SelectAt(i);
+                else
+                    button.Deselect();
             }
         }
 
