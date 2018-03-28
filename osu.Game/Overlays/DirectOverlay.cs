@@ -89,10 +89,10 @@ namespace osu.Game.Overlays
 
             // osu!direct colours are not part of the standard palette
 
-            FirstWaveColour = OsuColour.FromHex(@"19b0e2");
-            SecondWaveColour = OsuColour.FromHex(@"2280a2");
-            ThirdWaveColour = OsuColour.FromHex(@"005774");
-            FourthWaveColour = OsuColour.FromHex(@"003a4e");
+            Waves.FirstWaveColour = OsuColour.FromHex(@"19b0e2");
+            Waves.SecondWaveColour = OsuColour.FromHex(@"2280a2");
+            Waves.ThirdWaveColour = OsuColour.FromHex(@"005774");
+            Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
             ScrollFlow.Children = new Drawable[]
             {
