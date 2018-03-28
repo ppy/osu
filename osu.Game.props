@@ -8,4 +8,7 @@
       <Link>osu.licenseheader</Link>
     </None>
   </ItemGroup>
+  <ItemGroup Label="Resources">
+    <EmbeddedResource Include="Resources\**\*.*" />
+  </ItemGroup>
 </Project>

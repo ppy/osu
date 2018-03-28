@@ -1,0 +1,6 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\osu.TestProject.props" />
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
+  </ItemGroup>
+</Project>
