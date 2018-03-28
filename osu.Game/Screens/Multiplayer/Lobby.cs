@@ -22,6 +22,8 @@ namespace osu.Game.Screens.Multiplayer
         private readonly RoomsFilterContainer roomsContainer;
         private readonly RoomInspector roomInspector;
 
+        protected override Container<Drawable> TransitionContent => content;
+
         public override string Title => "lounge";
         public override string Name => "Lounge";
 
@@ -153,9 +155,15 @@ namespace osu.Game.Screens.Multiplayer
 
         private void select(DrawableRoom room)
         {
+            var lastState = room.State;
             roomsContainer.Children.ForEach(c => c.State = Visibility.Hidden);
             room.State = Visibility.Visible;
             roomInspector.Room = room.Room;
+
+            if (lastState == Visibility.Visible)
+            {
+                Push(new Match(room.Room));
+            }
         }
 
         private class RoomsFilterContainer : FillFlowContainer<DrawableRoom>, IHasFilterableChildren
