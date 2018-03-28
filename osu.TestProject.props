@@ -10,9 +10,6 @@
     <OutputType>WinExe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
-    (Not sure why this is needed here, since we don't directly reference DeepEquals in this project...) -->
-    <NoWarn>NU1701</NoWarn>
     <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup Label="Project References">
