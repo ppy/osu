@@ -12,8 +12,16 @@ namespace osu.Game.Beatmaps
     /// Converts a Beatmap for another mode.
     /// </summary>
     /// <typeparam name="T">The type of HitObject stored in the Beatmap.</typeparam>
-    public abstract class BeatmapConverter<T> where T : HitObject
+    public abstract class BeatmapConverter<T> : IBeatmapConverter
+        where T : HitObject
     {
+        private event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+        event Action<HitObject, IEnumerable<HitObject>> IBeatmapConverter.ObjectConverted
+        {
+            add => ObjectConverted += value;
+            remove => ObjectConverted -= value;
+        }
+
         /// <summary>
         /// Checks if a Beatmap can be converted using this Beatmap Converter.
         /// </summary>
@@ -32,6 +40,8 @@ namespace osu.Game.Beatmaps
             return ConvertBeatmap(new Beatmap(original));
         }
 
+        void IBeatmapConverter.Convert(Beatmap original) => Convert(original);
+
         /// <summary>
         /// Performs the conversion of a Beatmap using this Beatmap Converter.
         /// </summary>
@@ -40,9 +50,13 @@ namespace osu.Game.Beatmaps
         protected virtual Beatmap<T> ConvertBeatmap(Beatmap original)
         {
             var beatmap = CreateBeatmap();
+
+            // todo: this *must* share logic (or directly use) Beatmap<T>'s constructor.
+            // right now this isn't easily possible due to generic entanglement.
             beatmap.BeatmapInfo = original.BeatmapInfo;
             beatmap.ControlPointInfo = original.ControlPointInfo;
             beatmap.HitObjects = original.HitObjects.SelectMany(h => convert(h, original)).ToList();
+            beatmap.Breaks = original.Breaks;
 
             return beatmap;
         }
@@ -63,8 +77,11 @@ namespace osu.Game.Beatmaps
                 yield break;
             }
 
+            var converted = ConvertHitObject(original, beatmap).ToList();
+            ObjectConverted?.Invoke(original, converted);
+
             // Convert the hit object
-            foreach (var obj in ConvertHitObject(original, beatmap))
+            foreach (var obj in converted)
             {
                 if (obj == null)
                     continue;

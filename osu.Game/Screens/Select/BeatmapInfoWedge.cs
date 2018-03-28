@@ -268,6 +268,7 @@ namespace osu.Game.Screens.Select
                     new OsuSpriteText
                     {
                         Font = @"Exo2.0-Bold",
+                        // ReSharper disable once PossibleNullReferenceException (resharper broken?)
                         Text = metadata.Author.Username,
                         TextSize = 15,
                     }

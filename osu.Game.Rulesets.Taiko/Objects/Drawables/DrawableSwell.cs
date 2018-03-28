@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             FillMode = FillMode.Fit;
 
-            Add(bodyContainer = new Container
+            AddInternal(bodyContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = 1,

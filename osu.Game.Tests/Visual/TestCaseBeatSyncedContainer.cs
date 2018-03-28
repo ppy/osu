@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -17,6 +18,7 @@ using osu.Framework.Lists;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseBeatSyncedContainer : OsuTestCase
     {
         private readonly MusicController mc;

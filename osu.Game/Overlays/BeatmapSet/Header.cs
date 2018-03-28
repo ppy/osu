@@ -223,13 +223,13 @@ namespace osu.Game.Overlays.BeatmapSet
             tabsBg.Colour = colours.Gray3;
             this.beatmaps = beatmaps;
 
-            beatmaps.BeatmapSetAdded += handleBeatmapAdd;
+            beatmaps.ItemAdded += handleBeatmapAdd;
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            if (beatmaps != null) beatmaps.BeatmapSetAdded -= handleBeatmapAdd;
+            if (beatmaps != null) beatmaps.ItemAdded -= handleBeatmapAdd;
         }
 
         private void handleBeatmapAdd(BeatmapSetInfo beatmap)

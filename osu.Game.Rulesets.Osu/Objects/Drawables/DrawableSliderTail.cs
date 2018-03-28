@@ -16,11 +16,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public bool Tracking { get; set; }
 
-        public DrawableSliderTail(HitCircle hitCircle)
+        public DrawableSliderTail(Slider slider, HitCircle hitCircle)
             : base(hitCircle)
         {
-            AlwaysPresent = true;
+            Origin = Anchor.Centre;
+
             RelativeSizeAxes = Axes.Both;
+            FillMode = FillMode.Fit;
+
+            AlwaysPresent = true;
+
+            Position = HitObject.Position - slider.Position;
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)

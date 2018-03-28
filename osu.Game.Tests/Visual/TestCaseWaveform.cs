@@ -16,7 +16,7 @@ using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Tests.Visual
 {
-    [Ignore("CI regularly hangs on this TestCase...")]
+    [TestFixture]
     public class TestCaseWaveform : OsuTestCase
     {
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();

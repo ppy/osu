@@ -26,10 +26,6 @@ namespace osu.Game.Users
         [JsonProperty(@"age")]
         public int? Age;
 
-        public int GlobalRank;
-
-        public int CountryRank;
-
         //public Team Team;
 
         [JsonProperty(@"profile_colour")]
@@ -60,19 +56,19 @@ namespace osu.Game.Users
             public int? Id;
         }
 
-        [JsonProperty(@"isAdmin")]
+        [JsonProperty(@"is_admin")]
         public bool IsAdmin;
 
-        [JsonProperty(@"isSupporter")]
+        [JsonProperty(@"is_supporter")]
         public bool IsSupporter;
 
-        [JsonProperty(@"isGMT")]
+        [JsonProperty(@"is_gmt")]
         public bool IsGMT;
 
-        [JsonProperty(@"isQAT")]
+        [JsonProperty(@"is_qat")]
         public bool IsQAT;
 
-        [JsonProperty(@"isBNG")]
+        [JsonProperty(@"is_bng")]
         public bool IsBNG;
 
         [JsonProperty(@"is_active")]
@@ -111,7 +107,7 @@ namespace osu.Game.Users
         [JsonProperty(@"playmode")]
         public string PlayMode;
 
-        [JsonProperty(@"profileOrder")]
+        [JsonProperty(@"profile_order")]
         public string[] ProfileOrder;
 
         [JsonProperty(@"kudosu")]

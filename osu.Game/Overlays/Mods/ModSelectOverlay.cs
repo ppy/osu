@@ -15,6 +15,8 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets;
 using osu.Game.Graphics.UserInterface;
@@ -49,7 +51,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, RulesetStore rulesets)
+        private void load(OsuColour colours, OsuGame osu, RulesetStore rulesets, AudioManager audio)
         {
             SelectedMods.ValueChanged += selectedModsChanged;
 
@@ -63,12 +65,23 @@ namespace osu.Game.Overlays.Mods
 
             Ruleset.ValueChanged += rulesetChanged;
             Ruleset.TriggerChange();
+
+            sampleOn = audio.Sample.Get(@"UI/check-on");
+            sampleOff = audio.Sample.Get(@"UI/check-off");
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            Ruleset.UnbindAll();
+            SelectedMods.UnbindAll();
         }
 
         private void selectedModsChanged(IEnumerable<Mod> obj)
         {
             foreach (ModSection section in ModSectionsContainer.Children)
-                section.SelectTypes(obj);
+                section.SelectTypes(obj.Select(m => m.GetType()).ToList());
 
             updateMods();
         }
@@ -146,10 +159,21 @@ namespace osu.Game.Overlays.Mods
                 section.DeselectTypes(modTypes, immediate);
         }
 
+
+        private SampleChannel sampleOn, sampleOff;
+
         private void modButtonPressed(Mod selectedMod)
         {
             if (selectedMod != null)
+            {
+                if (State == Visibility.Visible) sampleOn?.Play();
                 DeselectTypes(selectedMod.IncompatibleMods, true);
+            }
+            else
+            {
+                if (State == Visibility.Visible) sampleOff?.Play();
+            }
+
             refreshSelectedMods();
         }
 
@@ -279,7 +303,7 @@ namespace osu.Game.Overlays.Mods
                                     Anchor = Anchor.TopCentre,
                                     Action = modButtonPressed,
                                 },
-                                new AssistedSection
+                                new SpecialSection
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
