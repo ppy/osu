@@ -4,18 +4,32 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Multiplayer
 {
     public class Multi : OsuScreen
     {
+        private readonly MultiWaveContainer waves;
         private readonly Header header;
         private readonly Container content;
 
+        protected override Container<Drawable> Content => waves;
+
         public Multi()
         {
+            AddInternal(waves = new MultiWaveContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                FirstWaveColour = OsuColour.FromHex(@"654d8c"),
+                SecondWaveColour = OsuColour.FromHex(@"554075"),
+                ThirdWaveColour = OsuColour.FromHex(@"44325e"),
+                FourthWaveColour = OsuColour.FromHex(@"392850"),
+            });
+
             Lobby lobby;
             Children = new Drawable[]
             {
@@ -56,6 +70,35 @@ namespace osu.Game.Screens.Multiplayer
             base.UpdateAfterChildren();
 
             content.Padding = new MarginPadding { Top = header.DrawHeight };
+        }
+
+        protected override void OnEntering(Screen last)
+        {
+            base.OnEntering(last);
+            waves.Show();
+        }
+
+        protected override bool OnExiting(Screen next)
+        {
+            waves.Hide();
+            return base.OnExiting(next);
+        }
+
+        protected override void OnResuming(Screen last)
+        {
+            base.OnResuming(last);
+            waves.Show();
+        }
+
+        protected override void OnSuspending(Screen next)
+        {
+            base.OnSuspending(next);
+            waves.Hide();
+        }
+
+        private class MultiWaveContainer : WaveContainer
+        {
+            protected override bool StartHidden => true;
         }
     }
 }
