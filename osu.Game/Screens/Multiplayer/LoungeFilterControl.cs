@@ -8,16 +8,20 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Multiplayer
 {
-    public class LoungeFilterControl : SearchableListFilterControl<RoomAvailability, RoomAvailability>
+    public class LoungeFilterControl : SearchableListFilterControl<LoungeTab, LoungeTab>
     {
-        // todo: special lounge filter tabs instead of RoomAvailability
-
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"362e42");
-        protected override RoomAvailability DefaultTab => RoomAvailability.Public;
+        protected override LoungeTab DefaultTab => LoungeTab.Public;
 
         public LoungeFilterControl()
         {
             DisplayStyleControl.Hide();
         }
+    }
+
+    public enum LoungeTab
+    {
+        Public = RoomAvailability.Public,
+        Private = RoomAvailability.FriendsOnly,
     }
 }
