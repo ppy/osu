@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            HitObjectMaskLayer hitObjectMaskLayer = new HitObjectMaskLayer(this);
+            HitObjectMaskLayer hitObjectMaskLayer = new HitObjectMaskLayer(rulesetContainer.Playfield, this);
             SelectionLayer selectionLayer = new SelectionLayer(rulesetContainer.Playfield);
 
             var layerBelowRuleset = new BorderLayer
@@ -121,11 +121,6 @@ namespace osu.Game.Rulesets.Edit
                     new Dimension(GridSizeMode.Absolute, 200),
                 }
             };
-
-            selectionLayer.ObjectSelected += hitObjectMaskLayer.AddOverlay;
-            selectionLayer.ObjectDeselected += hitObjectMaskLayer.RemoveOverlay;
-            selectionLayer.SelectionCleared += hitObjectMaskLayer.RemoveSelectionOverlay;
-            selectionLayer.SelectionFinished += hitObjectMaskLayer.AddSelectionOverlay;
 
             toolboxCollection.Items =
                 new[] { new RadioButton("Select", () => setCompositionTool(null)) }
@@ -267,7 +262,7 @@ namespace osu.Game.Rulesets.Edit
         /// and handles all hitobject movement/pattern adjustments.
         /// </summary>
         /// <param name="overlays">The <see cref="DrawableHitObject"/> overlays.</param>
-        public virtual SelectionBox CreateSelectionOverlay(IReadOnlyList<HitObjectMask> overlays) => new SelectionBox(overlays);
+        public virtual SelectionBox CreateSelectionBox(IReadOnlyList<HitObjectMask> overlays) => new SelectionBox(overlays);
 
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
