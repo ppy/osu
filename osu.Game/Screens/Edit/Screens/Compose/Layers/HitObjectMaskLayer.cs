@@ -1,10 +1,12 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -17,6 +19,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private readonly HitObjectComposer composer;
         private readonly Container<HitObjectMask> overlayContainer;
 
+        private readonly SelectionBox selectionBox;
+
+        private readonly HashSet<HitObjectMask> selectedObjects = new HashSet<HitObjectMask>();
+
         public HitObjectMaskLayer(Playfield playfield, HitObjectComposer composer)
         {
             this.playfield = playfield;
@@ -24,7 +30,19 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = overlayContainer = new Container<HitObjectMask> { RelativeSizeAxes = Axes.Both };
+            overlayContainer = new Container<HitObjectMask>();
+            selectionBox = composer.CreateSelectionBox();
+
+            var dragBox = new DragBox(overlayContainer);
+            dragBox.DragEnd += () => selectionBox.FinishSelection();
+
+            InternalChildren = new Drawable[]
+            {
+                dragBox,
+                overlayContainer,
+                selectionBox,
+                dragBox.CreateProxy()
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -44,7 +62,12 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             if (overlay == null)
                 return;
 
+            overlay.Selected += onSelected;
+            overlay.Deselected += onDeselected;
+            overlay.SingleSelectionRequested += onSingleSelectionRequested;
+
             overlayContainer.Add(overlay);
+            selectionBox.AddMask(overlay);
         }
 
         /// <summary>
@@ -57,22 +80,29 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             if (existing == null)
                 return;
 
-            existing.Hide();
-            existing.Expire();
+            existing.Selected -= onSelected;
+            existing.Deselected -= onDeselected;
+            existing.SingleSelectionRequested -= onSingleSelectionRequested;
+
+            overlayContainer.Remove(existing);
+            selectionBox.RemoveMask(existing);
         }
 
-        private SelectionBox currentSelectionBox;
+        private void onSelected(HitObjectMask mask) => selectedObjects.Add(mask);
 
-        private void addSelectionBox()
+        private void onDeselected(HitObjectMask mask) => selectedObjects.Remove(mask);
+
+        private void onSingleSelectionRequested(HitObjectMask mask) => DeselectAll();
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (overlayContainer.Count > 0)
-                AddInternal(currentSelectionBox = composer.CreateSelectionBox(overlayContainer));
+            DeselectAll();
+            return true;
         }
 
-        private void removeSelectionBox()
-        {
-            currentSelectionBox?.Hide();
-            currentSelectionBox?.Expire();
-        }
+        /// <summary>
+        /// Deselects all selected <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        public void DeselectAll() => overlayContainer.ToList().ForEach(m => m.Deselect());
     }
 }
