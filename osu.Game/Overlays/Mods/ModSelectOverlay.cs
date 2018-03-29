@@ -27,12 +27,10 @@ namespace osu.Game.Overlays.Mods
     {
         private const float content_width = 0.8f;
 
-        protected Color4 LowMultiplierColour, HighMultiplierColour, RankedColour;
+        protected Color4 LowMultiplierColour, HighMultiplierColour;
 
         protected readonly TriangleButton DeselectAllButton;
-        protected readonly OsuSpriteText ScoreLabel;
-        protected readonly OsuSpriteText MultiplierLabel;
-        protected readonly OsuSpriteText RankedLabel;
+        protected readonly OsuSpriteText MultiplierLabel, RankedLabel;
         private readonly FillFlowContainer footerContainer;
 
         protected override bool BlockPassThroughKeyboard => false;
@@ -59,7 +57,6 @@ namespace osu.Game.Overlays.Mods
 
             LowMultiplierColour = colours.Red;
             HighMultiplierColour = colours.Green;
-            RankedColour = colours.Blue;
 
             if (osu != null)
                 Ruleset.BindTo(osu.Ruleset);
@@ -100,14 +97,6 @@ namespace osu.Game.Overlays.Mods
                 ranked &= mod.Ranked;
             }
 
-            ScoreLabel.Text = "Score Multiplier:";
-            if (multiplier > 1.0)
-                ScoreLabel.FadeColour(HighMultiplierColour, 200);
-            else if (multiplier < 1.0)
-                ScoreLabel.FadeColour(LowMultiplierColour, 200);
-            else
-                ScoreLabel.FadeColour(Color4.White, 200);
-
             MultiplierLabel.Text = $"{multiplier:N2}x";
             if (multiplier > 1.0)
                 MultiplierLabel.FadeColour(HighMultiplierColour, 200);
@@ -116,13 +105,10 @@ namespace osu.Game.Overlays.Mods
             else
                 MultiplierLabel.FadeColour(Color4.White, 200);
 
-            RankedLabel.Text = "(Unranked)";
-            RankedLabel.FadeColour(RankedColour, 200);
-            RankedLabel.FadeOut(200);
-            if (!ranked)
-            {
+            if (ranked)
+                RankedLabel.FadeOut(200);
+            else
                 RankedLabel.FadeIn(200);
-            }
         }
 
         protected override void PopOut()
@@ -367,8 +353,9 @@ namespace osu.Game.Overlays.Mods
                                                 Right = 20
                                             }
                                         },
-                                        ScoreLabel = new OsuSpriteText
+                                        new OsuSpriteText
                                         {
+                                            Text = @"Score Multiplier:",
                                             TextSize = 30,
                                             Shadow = true,
                                             Margin = new MarginPadding
@@ -390,7 +377,9 @@ namespace osu.Game.Overlays.Mods
                                         RankedLabel = new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-Bold",
+                                            Text = @"(Unranked)",
                                             TextSize = 30,
+                                            Colour = OsuColour.FromHex(@"66ccff"),
                                             Shadow = true,
                                             Margin = new MarginPadding
                                             {
