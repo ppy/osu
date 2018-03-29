@@ -17,9 +17,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     {
         private readonly Playfield playfield;
         private readonly HitObjectComposer composer;
-        private readonly Container<HitObjectMask> maskContainer;
 
-        private readonly SelectionBox selectionBox;
+        private Container<HitObjectMask> maskContainer;
+        private SelectionBox selectionBox;
 
         private readonly HashSet<HitObjectMask> selectedMasks = new HashSet<HitObjectMask>();
 
@@ -29,7 +29,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             this.composer = composer;
 
             RelativeSizeAxes = Axes.Both;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             maskContainer = new Container<HitObjectMask>();
             selectionBox = composer.CreateSelectionBox();
 
@@ -43,11 +47,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 selectionBox,
                 dragBox.CreateProxy()
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             foreach (var obj in playfield.HitObjects.Objects)
                 addMask(obj);
         }

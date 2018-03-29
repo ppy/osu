@@ -16,14 +16,29 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     public class HitObjectMask : VisibilityContainer
     {
+        /// <summary>
+        /// Invoked when this <see cref="HitObjectMask"/> has been selected.
+        /// </summary>
         public event Action<HitObjectMask> Selected;
+
+        /// <summary>
+        /// Invoked when this <see cref="HitObjectMask"/> has been deselected.
+        /// </summary>
         public event Action<HitObjectMask> Deselected;
+
+        /// <summary>
+        /// Invoked when this <see cref="HitObjectMask"/> is requesting to be the single selection.
+        /// This <see cref="HitObjectMask"/> has not been selected at this point, but will be selected immediately afterwards.
+        /// </summary>
         public event Action<HitObjectMask> SingleSelectionRequested;
 
+        /// <summary>
+        /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectMask"/> applies to.
+        /// </summary>
         public readonly DrawableHitObject HitObject;
 
         protected override bool ShouldBeAlive => HitObject.IsAlive || State == Visibility.Visible;
-        public override bool HandleMouseInput => true;
+        public override bool HandleMouseInput => HitObject.IsPresent;
 
         public HitObjectMask(DrawableHitObject hitObject)
         {
@@ -63,14 +78,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (HitObject.IsPresent)
-            {
-                SingleSelectionRequested?.Invoke(this);
-                Select();
-                return true;
-            }
-
-            return false;
+            SingleSelectionRequested?.Invoke(this);
+            Select();
+            return true;
         }
 
         protected override bool OnDragStart(InputState state) => true;
