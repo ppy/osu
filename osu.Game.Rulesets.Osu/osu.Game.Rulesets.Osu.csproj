@@ -5,25 +5,9 @@
     <OutputType>Library</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Company>ppy Pty Ltd</Company>
-    <Version>1.0.0.0</Version>
-    <Copyright>ppy Pty Ltd 2007-2017</Copyright>
-    <AssemblyTitle>osu.Game.Rulesets.Osu</AssemblyTitle>
     <Description>click the circles. to the beat.</Description>
-    <Product>osu.Game.Rulesets.Osu</Product>
   </PropertyGroup>
-  <ItemGroup Label="Service">
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-  </ItemGroup>
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
-  </ItemGroup>
-  <ItemGroup Label="Package References">
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
-    <PackageReference Include="NUnit" Version="3.8.1" />
-  </ItemGroup>
-  <ItemGroup Label="Resources">
-    <EmbeddedResource Include="Resources\**\*.*" />
   </ItemGroup>
 </Project>

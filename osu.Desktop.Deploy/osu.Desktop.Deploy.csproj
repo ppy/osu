@@ -5,10 +5,6 @@
     <OutputType>Exe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Company>ppy Pty Ltd</Company>
-    <Copyright>ppy Pty Ltd 2007-2017</Copyright>
-    <Title>osu.Desktop.Deploy</Title>
-    <Product>osu.Desktop.Deploy</Product>
   </PropertyGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
