@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             selectionBox = composer.CreateSelectionBox();
 
             var dragBox = new DragBox(maskContainer);
-            dragBox.DragEnd += () => selectionBox.FinishSelection();
+            dragBox.DragEnd += () => selectionBox.UpdateVisibility();
 
             InternalChildren = new Drawable[]
             {

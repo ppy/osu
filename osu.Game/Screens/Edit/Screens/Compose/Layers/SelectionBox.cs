@@ -12,13 +12,12 @@ using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Types;
-using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     /// <summary>
-    /// A box which surrounds <see cref="DrawableHitObject"/>s and provides interactive handles, context menus etc.
+    /// A box which surrounds <see cref="HitObjectMask"/>s and provides interactive handles, context menus etc.
     /// </summary>
     public class SelectionBox : CompositeDrawable
     {
@@ -52,6 +51,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             };
         }
 
+        /// <summary>
+        /// Tracks a selectable <see cref="HitObjectMask"/>.
+        /// </summary>
+        /// <param name="mask">The <see cref="HitObjectMask"/> to track.</param>
         public void AddMask(HitObjectMask mask)
         {
             mask.Selected += onSelected;
@@ -59,6 +62,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             mask.SingleSelectionRequested += onSingleSelectionRequested;
         }
 
+        /// <summary>
+        /// Stops tracking a <see cref="HitObjectMask"/>.
+        /// </summary>
+        /// <param name="mask">The <see cref="HitObjectMask"/> to stop tracking.</param>
         public void RemoveMask(HitObjectMask mask)
         {
             mask.Selected -= onSelected;
@@ -72,17 +79,18 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         {
             selectedMasks.Remove(mask);
 
+            // We don't want to update visibility if > 0, since we may be deselecting masks during drag-selection
             if (selectedMasks.Count == 0)
-                FinishSelection();
+                UpdateVisibility();
         }
 
         private void onSingleSelectionRequested(HitObjectMask mask)
         {
             selectedMasks.Add(mask);
-            FinishSelection();
+            UpdateVisibility();
         }
 
-        // Only handle clicks on the selected masks
+        // Only handle input on the selected masks
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => selectedMasks.Any(m => m.ReceiveMouseInputAt(screenSpacePos));
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
@@ -92,7 +100,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             if (state.Mouse.NativeState.PositionMouseDown == null)
                 throw new InvalidOperationException("Click event received without a mouse down position.");
 
-            // If the mouse has moved slightly, but hasn't been dragged, select the mask which would've handled the mouse down
+            // We handled mousedown, but if the mouse has been clicked and not dragged, select the mask which would've handled the mouse down
+            // A mousedown event is triggered such that a single selection is requested
             selectedMasks.First(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.PositionMouseDown.Value)).TriggerOnMouseDown(state);
             return true;
         }
@@ -118,7 +127,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         protected override bool OnDragEnd(InputState state) => true;
 
-        public void FinishSelection()
+        /// <summary>
+        /// Updates whether this <see cref="SelectionBox"/> is visible.
+        /// </summary>
+        public void UpdateVisibility()
         {
             if (selectedMasks.Count > 0)
                 Show();
