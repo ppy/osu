@@ -12,10 +12,13 @@ using OpenTK.Graphics;
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     /// <summary>
-    /// A box that represents a drag selection.
+    /// A box that handles and displays drag selection for a collection of <see cref="HitObjectMask"/>s.
     /// </summary>
     public class DragBox : CompositeDrawable
     {
+        /// <summary>
+        /// Invoked when the drag selection has finished.
+        /// </summary>
         public event Action DragEnd;
 
         private readonly IEnumerable<HitObjectMask> hitObjectMasks;
@@ -65,7 +68,21 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             var dragQuad = new Quad(dragStartPosition.X, dragStartPosition.Y, dragPosition.X - dragStartPosition.X, dragPosition.Y - dragStartPosition.Y);
 
             // We use AABBFloat instead of RectangleF since it handles negative sizes for us
-            SetDragRectangle(dragQuad.AABBFloat);
+            var dragRectangle = dragQuad.AABBFloat;
+
+            var topLeft = ToLocalSpace(dragRectangle.TopLeft);
+            var bottomRight = ToLocalSpace(dragRectangle.BottomRight);
+
+            box.Position = topLeft;
+            box.Size = bottomRight - topLeft;
+
+            foreach (var mask in hitObjectMasks)
+            {
+                if (mask.IsAlive && mask.IsPresent && dragRectangle.Contains(mask.SelectionPoint))
+                    mask.Select();
+                else
+                    mask.Deselect();
+            }
 
             return true;
         }
@@ -75,23 +92,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             this.FadeOut(250, Easing.OutQuint);
             DragEnd?.Invoke();
             return true;
-        }
-
-        public void SetDragRectangle(RectangleF screenSpaceRectangle)
-        {
-            var topLeft = ToLocalSpace(screenSpaceRectangle.TopLeft);
-            var bottomRight = ToLocalSpace(screenSpaceRectangle.BottomRight);
-
-            box.Position = topLeft;
-            box.Size = bottomRight - topLeft;
-
-            foreach (var mask in hitObjectMasks)
-            {
-                if (mask.IsAlive && mask.IsPresent && screenSpaceRectangle.Contains(mask.SelectionPoint))
-                    mask.Select();
-                else
-                    mask.Deselect();
-            }
         }
     }
 }
