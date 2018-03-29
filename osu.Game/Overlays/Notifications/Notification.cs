@@ -222,17 +222,24 @@ namespace osu.Game.Overlays.Notifications
 
             public new SRGBColour Colour
             {
+                get { return base.Colour; }
                 set
                 {
                     base.Colour = value;
-                    pulsateLayer.EdgeEffect = new EdgeEffectParameters
-                    {
-                        Colour = ((Color4)value).Opacity(0.5f), //todo: avoid cast
-                        Type = EdgeEffectType.Glow,
-                        Radius = 12,
-                        Roundness = 12,
-                    };
+                    if (IsLoaded)
+                        updateColour();
                 }
+            }
+
+            private void updateColour()
+            {
+                pulsateLayer.EdgeEffect = new EdgeEffectParameters
+                {
+                    Colour = ((Color4)Colour).Opacity(0.5f), //todo: avoid cast
+                    Type = EdgeEffectType.Glow,
+                    Radius = 12,
+                    Roundness = 12,
+                };
             }
 
             [BackgroundDependencyLoader]
@@ -257,6 +264,12 @@ namespace osu.Game.Overlays.Notifications
                         }
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                updateColour();
             }
         }
     }
