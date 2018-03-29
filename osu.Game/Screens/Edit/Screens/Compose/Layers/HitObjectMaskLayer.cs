@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         private readonly SelectionBox selectionBox;
 
-        private readonly HashSet<HitObjectMask> selectedObjects = new HashSet<HitObjectMask>();
+        private readonly HashSet<HitObjectMask> selectedMasks = new HashSet<HitObjectMask>();
 
         public HitObjectMaskLayer(Playfield playfield, HitObjectComposer composer)
         {
@@ -88,9 +88,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             selectionBox.RemoveMask(mask);
         }
 
-        private void onSelected(HitObjectMask mask) => selectedObjects.Add(mask);
+        private void onSelected(HitObjectMask mask) => selectedMasks.Add(mask);
 
-        private void onDeselected(HitObjectMask mask) => selectedObjects.Remove(mask);
+        private void onDeselected(HitObjectMask mask) => selectedMasks.Remove(mask);
 
         private void onSingleSelectionRequested(HitObjectMask mask) => DeselectAll();
 
@@ -103,6 +103,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <summary>
         /// Deselects all selected <see cref="DrawableHitObject"/>s.
         /// </summary>
-        public void DeselectAll() => maskContainer.ToList().ForEach(m => m.Deselect());
+        public void DeselectAll() => selectedMasks.ToList().ForEach(m => m.Deselect());
     }
 }
