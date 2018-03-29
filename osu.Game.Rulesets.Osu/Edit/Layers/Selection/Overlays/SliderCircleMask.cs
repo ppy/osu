@@ -3,6 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
@@ -38,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
             Scale = slider.HeadCircle.Scale;
 
             AddInternal(new RingPiece());
+
+            State = Visibility.Visible;
         }
 
         [BackgroundDependencyLoader]
@@ -52,5 +56,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
 
             RelativeAnchorPosition = hitObject.RelativeAnchorPosition;
         }
+
+        // Todo: This is temporary, since the slider circle masks don't do anything special yet. In the future they will handle input.
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => false;
     }
 }
