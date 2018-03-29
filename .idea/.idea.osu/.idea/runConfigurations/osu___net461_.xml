@@ -4,10 +4,6 @@
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Desktop" />
     <option name="PASS_PARENT_ENVS" value="1" />
-    <envs>
-      <env name="ASPNETCORE_ENVIRONMENT" value="Development" />
-      <env name="ASPNETCORE_URLS" value="http://localhost:5000" />
-    </envs>
     <option name="USE_MONO" value="0" />
     <option name="USE_EXTERNAL_CONSOLE" value="0" />
     <option name="PROJECT_PATH" value="$PROJECT_DIR$/osu.Desktop/osu.Desktop.csproj" />
@@ -16,7 +12,6 @@
     <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
     <option name="PROJECT_KIND" value="DotNetCore" />
     <option name="PROJECT_TFM" value=".NETFramework,Version=v4.6.1" />
-    <browser url="http://localhost:5000" />
     <method>
       <option name="Build" enabled="false" />
     </method>
