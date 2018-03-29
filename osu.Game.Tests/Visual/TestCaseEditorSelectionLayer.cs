@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
@@ -32,7 +33,8 @@ namespace osu.Game.Tests.Visual
             typeof(HitObjectMask),
             typeof(HitCircleMask),
             typeof(SliderMask),
-            typeof(SliderCircleMask)
+            typeof(SliderCircleMask),
+            typeof(NotNullAttribute)
         };
 
         private DependencyContainer dependencies;
