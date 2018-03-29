@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     {
         private readonly Playfield playfield;
         private readonly HitObjectComposer composer;
-        private readonly Container<HitObjectMask> overlayContainer;
+        private readonly Container<HitObjectMask> maskContainer;
 
         private readonly SelectionBox selectionBox;
 
@@ -30,16 +30,16 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             RelativeSizeAxes = Axes.Both;
 
-            overlayContainer = new Container<HitObjectMask>();
+            maskContainer = new Container<HitObjectMask>();
             selectionBox = composer.CreateSelectionBox();
 
-            var dragBox = new DragBox(overlayContainer);
+            var dragBox = new DragBox(maskContainer);
             dragBox.DragEnd += () => selectionBox.FinishSelection();
 
             InternalChildren = new Drawable[]
             {
                 dragBox,
-                overlayContainer,
+                maskContainer,
                 selectionBox,
                 dragBox.CreateProxy()
             };
@@ -49,43 +49,43 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private void load()
         {
             foreach (var obj in playfield.HitObjects.Objects)
-                addOverlay(obj);
+                addMask(obj);
         }
 
         /// <summary>
-        /// Adds an overlay for a <see cref="DrawableHitObject"/> which adds movement support.
+        /// Adds a mask for a <see cref="DrawableHitObject"/> which adds movement support.
         /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create an overlay for.</param>
-        private void addOverlay(DrawableHitObject hitObject)
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create a mask for.</param>
+        private void addMask(DrawableHitObject hitObject)
         {
-            var overlay = composer.CreateMaskFor(hitObject);
-            if (overlay == null)
+            var mask = composer.CreateMaskFor(hitObject);
+            if (mask == null)
                 return;
 
-            overlay.Selected += onSelected;
-            overlay.Deselected += onDeselected;
-            overlay.SingleSelectionRequested += onSingleSelectionRequested;
+            mask.Selected += onSelected;
+            mask.Deselected += onDeselected;
+            mask.SingleSelectionRequested += onSingleSelectionRequested;
 
-            overlayContainer.Add(overlay);
-            selectionBox.AddMask(overlay);
+            maskContainer.Add(mask);
+            selectionBox.AddMask(mask);
         }
 
         /// <summary>
-        /// Removes the overlay for a <see cref="DrawableHitObject"/>.
+        /// Removes the mask for a <see cref="DrawableHitObject"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to remove the overlay for.</param>
-        private void removeOverlay(DrawableHitObject hitObject)
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to remove the mask for.</param>
+        private void removeMask(DrawableHitObject hitObject)
         {
-            var existing = overlayContainer.FirstOrDefault(h => h.HitObject == hitObject);
-            if (existing == null)
+            var mask = maskContainer.FirstOrDefault(h => h.HitObject == hitObject);
+            if (mask == null)
                 return;
 
-            existing.Selected -= onSelected;
-            existing.Deselected -= onDeselected;
-            existing.SingleSelectionRequested -= onSingleSelectionRequested;
+            mask.Selected -= onSelected;
+            mask.Deselected -= onDeselected;
+            mask.SingleSelectionRequested -= onSingleSelectionRequested;
 
-            overlayContainer.Remove(existing);
-            selectionBox.RemoveMask(existing);
+            maskContainer.Remove(mask);
+            selectionBox.RemoveMask(mask);
         }
 
         private void onSelected(HitObjectMask mask) => selectedObjects.Add(mask);
@@ -103,6 +103,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <summary>
         /// Deselects all selected <see cref="DrawableHitObject"/>s.
         /// </summary>
-        public void DeselectAll() => overlayContainer.ToList().ForEach(m => m.Deselect());
+        public void DeselectAll() => maskContainer.ToList().ForEach(m => m.Deselect());
     }
 }
