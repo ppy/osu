@@ -9,13 +9,17 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A mask placed above a <see cref="DrawableHitObject"/> adding editing functionality.
     /// </summary>
-    public class HitObjectMask : Container
+    public class HitObjectMask : VisibilityContainer
     {
         public readonly DrawableHitObject HitObject;
 
         public HitObjectMask(DrawableHitObject hitObject)
         {
             HitObject = hitObject;
+            State = Visibility.Hidden;
         }
+
+        protected override void PopIn() => Alpha = 1;
+        protected override void PopOut() => Alpha = 0;
     }
 }
