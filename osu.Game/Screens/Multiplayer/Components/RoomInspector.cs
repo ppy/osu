@@ -327,7 +327,7 @@ namespace osu.Game.Screens.Multiplayer.Components
         {
             participantNumbersFlow.FadeOut(transition_duration);
 
-            coverContainer.Children.ForEach(c => TransformableExtensions.FadeOut<Drawable>(c, transition_duration).Finally(d => d.Expire()));
+            coverContainer.Children.ForEach(c => c.FadeOut(transition_duration).Finally(d => d.Expire()));
             name.FadeOut(transition_duration);
 
             status.Text = "No Room Selected";
