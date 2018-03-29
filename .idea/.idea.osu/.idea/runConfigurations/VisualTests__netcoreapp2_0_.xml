@@ -4,6 +4,7 @@
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Game.Tests" />
     <option name="PASS_PARENT_ENVS" value="1" />
+    <envs />
     <option name="USE_MONO" value="0" />
     <option name="USE_EXTERNAL_CONSOLE" value="0" />
     <option name="PROJECT_PATH" value="$PROJECT_DIR$/osu.Game.Tests/osu.Game.Tests.csproj" />
@@ -12,8 +13,6 @@
     <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
     <option name="PROJECT_KIND" value="DotNetCore" />
     <option name="PROJECT_TFM" value=".NETCoreApp,Version=v2.0" />
-    <method>
-      <option name="Build" enabled="false" />
-    </method>
+    <method />
   </configuration>
 </component>
