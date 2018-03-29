@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             foreach (var mask in selectedMasks)
             {
-                switch (mask.HitObject)
+                switch (mask.HitObject.HitObject)
                 {
                     case IHasEditablePosition editablePosition:
                         editablePosition.OffsetPosition(state.Mouse.Delta);
