@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.MathUtils;
 using System;
 using System.Linq;
 
@@ -11,8 +12,11 @@ namespace osu.Game.Screens.Select.Carousel
     /// </summary>
     public class CarouselGroupEagerSelect : CarouselGroup
     {
-        public CarouselGroupEagerSelect()
+        private readonly bool isRootSelector;
+
+        public CarouselGroupEagerSelect(bool isRootSelector = false)
         {
+            this.isRootSelector = isRootSelector;
             State.ValueChanged += v =>
             {
                 if (v == CarouselItemState.Selected)
@@ -83,9 +87,20 @@ namespace osu.Game.Screens.Select.Carousel
             // we only perform eager selection if none of our children are in a selected state already.
             if (Children.Any(i => i.State == CarouselItemState.Selected)) return;
 
-            CarouselItem nextToSelect =
-                Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered) ??
-                Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered);
+            CarouselItem nextToSelect = null;
+            if (isRootSelector && lastSelected == null)
+            {
+                var selectables = Children.Where(i => !i.Filtered).ToList();
+                if (selectables.Any())
+                    nextToSelect = selectables[RNG.Next(selectables.Count)];
+            }
+            else
+            {
+                nextToSelect =
+                    Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered) ??
+                    Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered);
+            }
+
 
             if (nextToSelect != null)
                 nextToSelect.State.Value = CarouselItemState.Selected;
