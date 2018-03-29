@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Multiplayer.Components
 
                 if (Room == null)
                 {
-                    showNullRoom();
+                    nullState();
                 }
                 else
                 {
@@ -312,7 +312,7 @@ namespace osu.Game.Screens.Multiplayer.Components
             }
             else
             {
-                showNullRoom();
+                nullState();
             }
         }
 
@@ -323,7 +323,7 @@ namespace osu.Game.Screens.Multiplayer.Components
             participantsScroll.Height = DrawHeight - topFlow.DrawHeight;
         }
 
-        private void showNullRoom()
+        private void nullState()
         {
             participantNumbersFlow.FadeOut(transition_duration);
 
