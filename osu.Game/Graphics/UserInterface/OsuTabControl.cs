@@ -27,6 +27,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem(value);
 
         protected virtual float StripWidth() => TabContainer.Children.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
+        protected virtual float StripHeight() => 1;
 
         private static bool isEnumType => typeof(T).IsEnum;
 
@@ -38,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
-                Height = 1,
+                Height = StripHeight(),
                 Colour = Color4.White.Opacity(0),
             });
 
