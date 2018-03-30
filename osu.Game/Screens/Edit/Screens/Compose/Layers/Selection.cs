@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private readonly List<HitObjectMask> selectedMasks = new List<HitObjectMask>();
         private IEnumerable<HitObjectMask> selectableMasks => maskContainer.AliveMasks;
 
-        private Drawable box;
+        private Drawable outline;
 
         public SelectionBox(MaskContainer maskContainer)
         {
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            InternalChild = box = new Container
+            InternalChild = outline = new Container
             {
                 Masking = true,
                 BorderThickness = BORDER_RADIUS,
@@ -165,8 +165,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             topLeft -= new Vector2(5);
             bottomRight += new Vector2(5);
 
-            box.Size = bottomRight - topLeft;
-            box.Position = topLeft;
+            outline.Size = bottomRight - topLeft;
+            outline.Position = topLeft;
         }
 
         protected override void Dispose(bool isDisposing)
