@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Edit
             }
 
             currentScreen.Beatmap.BindTo(Beatmap);
-            screenContainer.Add(currentScreen);
+            LoadComponentAsync(currentScreen, screenContainer.Add);
         }
 
         protected override void OnResuming(Screen last)
