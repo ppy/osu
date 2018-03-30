@@ -205,7 +205,6 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <param name="hitObject">The DrawableHitObject to add.</param>
         public override void Add(DrawableHitObject hitObject)
         {
-            hitObject.Depth = (float)hitObject.HitObject.StartTime;
             hitObject.AccentColour = AccentColour;
             hitObject.OnJudgement += OnJudgement;
 
@@ -263,21 +262,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public bool OnPressed(ManiaAction action)
         {
-            // Play the sounds of the next hitobject
-            if (HitObjects.AliveObjects.Any())
-            {
-                // If there are alive hitobjects, we can abuse the fact that AliveObjects are sorted by time (see: Add())
-                HitObjects.AliveObjects.First().PlaySamples();
-            }
-            else
-            {
-                // If not, we do a slow search - we might want to do a BinarySearch here if this becomes problematic
-                // We fallback to LastOrDefault() if we're beyond the last note in the map
-                var hitObject = HitObjects.Objects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ?? HitObjects.Objects.LastOrDefault();
-                hitObject?.PlaySamples();
-            }
+            if (action != Action)
+                return false;
 
-            return false;
+            var hitObject = HitObjects.Objects.LastOrDefault(h => h.HitObject.StartTime > Time.Current) ?? HitObjects.Objects.FirstOrDefault();
+            hitObject?.PlaySamples();
+
+            return true;
         }
 
         public bool OnReleased(ManiaAction action) => false;
