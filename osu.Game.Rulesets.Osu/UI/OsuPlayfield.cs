@@ -55,8 +55,6 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.Depth = (float)h.HitObject.StartTime;
-
             h.OnJudgement += onJudgement;
 
             var c = h as IDrawableHitObjectWithProxiedApproach;
