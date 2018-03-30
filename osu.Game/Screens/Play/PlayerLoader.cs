@@ -159,14 +159,11 @@ namespace osu.Game.Screens.Play
 
                         loadTask = null;
 
-                        if (!Push(player))
-                            Exit();
-                        else
-                        {
-                            //By default, we want to load the player and never be returned to.
-                            //Note that this may change if the player we load requested a re-run.
-                            ValidForResume = false;
-                        }
+                        //By default, we want to load the player and never be returned to.
+                        //Note that this may change if the player we load requested a re-run.
+                        ValidForResume = false;
+
+                        Push(player);
                     });
                 }, 500);
             }

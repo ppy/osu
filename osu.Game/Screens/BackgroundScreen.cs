@@ -26,14 +26,14 @@ namespace osu.Game.Screens
             return false;
         }
 
-        public override bool Push(Screen screen)
+        public override void Push(Screen screen)
         {
             // When trying to push a non-loaded screen, load it asynchronously and re-invoke Push
             // once it's done.
             if (screen.LoadState == LoadState.NotLoaded)
             {
                 LoadComponentAsync(screen, d => Push((BackgroundScreen)d));
-                return true;
+                return;
             }
 
             // Make sure the in-progress loading is complete before pushing the screen.
@@ -41,8 +41,6 @@ namespace osu.Game.Screens
                 Thread.Sleep(1);
 
             base.Push(screen);
-
-            return true;
         }
 
         protected override void Update()
