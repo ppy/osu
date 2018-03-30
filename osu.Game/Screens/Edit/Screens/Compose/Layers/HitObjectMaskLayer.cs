@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private readonly Playfield playfield;
         private readonly HitObjectComposer composer;
 
-        private Container<HitObjectMask> maskContainer;
+        private MaskContainer maskContainer;
         private SelectionBox selectionBox;
 
         private readonly HashSet<HitObjectMask> selectedMasks = new HashSet<HitObjectMask>();
@@ -34,10 +34,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         [BackgroundDependencyLoader]
         private void load()
         {
-            maskContainer = new Container<HitObjectMask>();
+            maskContainer = new MaskContainer();
+
             selectionBox = composer.CreateSelectionBox();
 
-            var dragBox = new DragBox(maskContainer);
+            var dragBox = new DragBox(maskContainer.AliveChildren);
             dragBox.DragEnd += () => selectionBox.UpdateVisibility();
 
             InternalChildren = new Drawable[]
@@ -104,5 +105,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// Deselects all selected <see cref="DrawableHitObject"/>s.
         /// </summary>
         public void DeselectAll() => selectedMasks.ToList().ForEach(m => m.Deselect());
+
+        private class MaskContainer : Container<HitObjectMask>
+        {
+            public new IEnumerable<HitObjectMask> AliveChildren => AliveInternalChildren.Cast<HitObjectMask>();
+        }
     }
 }
