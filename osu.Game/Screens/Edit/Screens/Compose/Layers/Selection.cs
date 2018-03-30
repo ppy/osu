@@ -68,6 +68,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
+            // If masks are overlapping, make sure we don't change the selection if the overlapped portion is pressed
             if (selectedMasks.Any(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position)))
                 return true;
 
@@ -80,6 +81,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         protected override bool OnClick(InputState state)
         {
+            // If there's only mask, this isn't going to change anything, so we can save on doing some processing here
             if (selectedMasks.Count == 1)
                 return true;
 
