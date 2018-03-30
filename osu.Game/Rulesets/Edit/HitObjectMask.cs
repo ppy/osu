@@ -4,8 +4,6 @@
 using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Input;
-using osu.Game.Rulesets.Edit.Types;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 
@@ -25,12 +23,6 @@ namespace osu.Game.Rulesets.Edit
         /// Invoked when this <see cref="HitObjectMask"/> has been deselected.
         /// </summary>
         public event Action<HitObjectMask> Deselected;
-
-        /// <summary>
-        /// Invoked when this <see cref="HitObjectMask"/> is requesting to be the single selection.
-        /// This <see cref="HitObjectMask"/> has not been selected at this point, but will be selected immediately afterwards.
-        /// </summary>
-        public event Action<HitObjectMask> SingleSelectionRequested;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectMask"/> applies to.
@@ -76,29 +68,6 @@ namespace osu.Game.Rulesets.Edit
             Deselected?.Invoke(this);
             return true;
         }
-
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            SingleSelectionRequested?.Invoke(this);
-            Select();
-            return true;
-        }
-
-        protected override bool OnDragStart(InputState state) => true;
-
-        protected override bool OnDrag(InputState state)
-        {
-            // Todo: Various forms of snapping
-            switch (HitObject.HitObject)
-            {
-                case IHasEditablePosition editablePosition:
-                    editablePosition.OffsetPosition(state.Mouse.Delta);
-                    break;
-            }
-            return true;
-        }
-
-        protected override bool OnDragEnd(InputState state) => true;
 
         protected override void PopIn() => Alpha = 1;
         protected override void PopOut() => Alpha = 0;

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -21,8 +20,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private MaskContainer maskContainer;
         private SelectionBox selectionBox;
 
-        private readonly HashSet<HitObjectMask> selectedMasks = new HashSet<HitObjectMask>();
-
         public HitObjectMaskLayer(Playfield playfield, HitObjectComposer composer)
         {
             this.playfield = playfield;
@@ -36,9 +33,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         {
             maskContainer = new MaskContainer();
 
-            selectionBox = composer.CreateSelectionBox();
+            selectionBox = composer.CreateSelectionBox(maskContainer);
 
-            var dragBox = new DragBox(maskContainer.AliveChildren);
+            var dragBox = new DragBox(maskContainer);
             dragBox.DragEnd += () => selectionBox.UpdateVisibility();
 
             InternalChildren = new Drawable[]
@@ -63,12 +60,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             if (mask == null)
                 return;
 
-            mask.Selected += onSelected;
-            mask.Deselected += onDeselected;
-            mask.SingleSelectionRequested += onSingleSelectionRequested;
-
             maskContainer.Add(mask);
-            selectionBox.AddMask(mask);
         }
 
         /// <summary>
@@ -81,34 +73,13 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             if (mask == null)
                 return;
 
-            mask.Selected -= onSelected;
-            mask.Deselected -= onDeselected;
-            mask.SingleSelectionRequested -= onSingleSelectionRequested;
-
             maskContainer.Remove(mask);
-            selectionBox.RemoveMask(mask);
         }
-
-        private void onSelected(HitObjectMask mask) => selectedMasks.Add(mask);
-
-        private void onDeselected(HitObjectMask mask) => selectedMasks.Remove(mask);
-
-        private void onSingleSelectionRequested(HitObjectMask mask) => DeselectAll();
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            DeselectAll();
+            selectionBox.DeselectAll();
             return true;
-        }
-
-        /// <summary>
-        /// Deselects all selected <see cref="DrawableHitObject"/>s.
-        /// </summary>
-        public void DeselectAll() => selectedMasks.ToList().ForEach(m => m.Deselect());
-
-        private class MaskContainer : Container<HitObjectMask>
-        {
-            public new IEnumerable<HitObjectMask> AliveChildren => AliveInternalChildren.Cast<HitObjectMask>();
         }
     }
 }
