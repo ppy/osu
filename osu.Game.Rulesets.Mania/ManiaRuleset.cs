@@ -2,24 +2,55 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mania.Mods;
-using osu.Game.Rulesets.Mania.UI;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Replays;
+using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania
 {
     public class ManiaRuleset : Ruleset
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new ManiaRulesetContainer(this, beatmap, isForCurrentRuleset);
+
+        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap)
+        {
+            IEnumerable<HitObject> hitObjects = beatmap.Beatmap.HitObjects;
+            IEnumerable<HitObject> notes = hitObjects.Where(c => !(c is IHasEndTime));
+            IEnumerable<HitObject> holdnotes = hitObjects.Where(s => s is IHasEndTime);
+
+            return new[]
+            {
+                new BeatmapStatistic
+                {
+                    Name = @"Object Count",
+                    Content = hitObjects.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Note Count",
+                    Content = notes.Count().ToString(),
+                    Icon = FontAwesome.fa_circle_o
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Hold Note Count",
+                    Content = holdnotes.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                },
+            };
+        }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {

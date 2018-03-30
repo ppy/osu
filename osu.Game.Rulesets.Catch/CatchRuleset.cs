@@ -1,17 +1,20 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Catch.Mods;
+using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.UI;
-using System.Collections.Generic;
-using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Catch.Replays;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch
 {
@@ -28,6 +31,42 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
         };
+
+        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap)
+        {
+            IEnumerable<HitObject> hitObjects = beatmap.Beatmap.HitObjects;
+            IEnumerable<HitObject> fruits = hitObjects.Where(c => !(c is IHasEndTime));
+            IEnumerable<HitObject> trails = hitObjects.Where(s => s is IHasCurve);
+            IEnumerable<HitObject> rain = hitObjects.Where(s => s is IHasEndTime && !(s is IHasCurve));
+
+            return new[]
+            {
+                new BeatmapStatistic
+                {
+                    Name = @"Object Count",
+                    Content = hitObjects.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Fruit Count",
+                    Content = fruits.Count().ToString(),
+                    Icon = FontAwesome.fa_circle_o
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Trail Count",
+                    Content = trails.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Rain Count",
+                    Content = rain.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                }
+            };
+        }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
