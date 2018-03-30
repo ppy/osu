@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using osu.Framework.Lists;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Types;
@@ -24,7 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         private readonly MaskContainer maskContainer;
 
-        private readonly List<HitObjectMask> selectedMasks = new List<HitObjectMask>();
+        private readonly SortedList<HitObjectMask> selectedMasks;
         private IEnumerable<HitObjectMask> selectableMasks => maskContainer.AliveMasks;
 
         private Drawable outline;
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         public SelectionBox(MaskContainer maskContainer)
         {
             this.maskContainer = maskContainer;
+
+            selectedMasks = new SortedList<HitObjectMask>(maskContainer.Compare);
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
@@ -61,7 +64,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         #region User Input Handling
 
         // Only handle input on selectable or selected masks
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => selectableMasks.Concat(selectedMasks).Any(m => m.ReceiveMouseInputAt(screenSpacePos));
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => selectableMasks.Reverse().Concat(selectedMasks).Any(m => m.ReceiveMouseInputAt(screenSpacePos));
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
@@ -69,7 +72,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 return true;
 
             DeselectAll();
-            selectableMasks.First(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position)).Select();
+            selectableMasks.Reverse().First(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position)).Select();
 
             UpdateVisibility();
             return true;
@@ -80,7 +83,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             if (selectedMasks.Count == 1)
                 return true;
 
-            var toSelect = selectedMasks.First(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position));
+            var toSelect = selectedMasks.Reverse().First(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position));
 
             DeselectAll();
             toSelect.Select();
