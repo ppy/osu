@@ -44,9 +44,6 @@ namespace osu.Desktop
                 {
                     switch (args.FirstOrDefault() ?? string.Empty)
                     {
-                        case "--tests":
-                            host.Run(new OsuTestBrowser());
-                            break;
                         default:
                             host.Run(new OsuGameDesktop(args));
                             break;
