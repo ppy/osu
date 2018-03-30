@@ -3,12 +3,11 @@
 
 using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osu.Game;
 using osu.Game.Screens.Backgrounds;
 
-namespace osu.Desktop
+namespace osu.Game.Tests
 {
-    internal class OsuTestBrowser : OsuGameBase
+    public class OsuTestBrowser : OsuGameBase
     {
         protected override void LoadComplete()
         {
