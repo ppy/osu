@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Edit;
 
@@ -49,5 +50,19 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         private void onMaskSelected(HitObjectMask mask) => MaskSelected?.Invoke(mask);
         private void onMaskDeselected(HitObjectMask mask) => MaskDeselected?.Invoke(mask);
+
+        protected override int Compare(Drawable x, Drawable y)
+        {
+            if (!(x is HitObjectMask xMask) || !(y is HitObjectMask yMask))
+                return base.Compare(x, y);
+            return Compare(xMask, yMask);
+        }
+
+        public int Compare(HitObjectMask x, HitObjectMask y)
+        {
+            // Put earlier hitobjects towards the end of the list, so they handle input first
+            int i = y.HitObject.HitObject.StartTime.CompareTo(x.HitObject.HitObject.StartTime);
+            return i == 0 ? CompareReverseChildID(x, y) : i;
+        }
     }
 }
