@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
             get { return beatmapSets.Select(g => g.BeatmapSet); }
             set
             {
-                CarouselGroup newRoot = new CarouselGroupEagerSelect(true);
+                CarouselGroup newRoot = new CarouselGroupEagerSelect(this);
 
                 Task.Run(() =>
                 {
@@ -102,10 +102,11 @@ namespace osu.Game.Screens.Select
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
-        private CarouselGroup root = new CarouselGroupEagerSelect(true);
+        private CarouselGroup root;
 
         public BeatmapCarousel()
         {
+            root = new CarouselGroupEagerSelect(this);
             Child = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,

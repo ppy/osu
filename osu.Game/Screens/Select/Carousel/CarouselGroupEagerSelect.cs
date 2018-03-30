@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.MathUtils;
 using System;
 using System.Linq;
 
@@ -12,11 +11,11 @@ namespace osu.Game.Screens.Select.Carousel
     /// </summary>
     public class CarouselGroupEagerSelect : CarouselGroup
     {
-        private readonly bool isRootSelector;
+        private readonly BeatmapCarousel parent;
 
-        public CarouselGroupEagerSelect(bool isRootSelector = false)
+        public CarouselGroupEagerSelect(BeatmapCarousel parent = null)
         {
-            this.isRootSelector = isRootSelector;
+            this.parent = parent;
             State.ValueChanged += v =>
             {
                 if (v == CarouselItemState.Selected)
@@ -87,20 +86,15 @@ namespace osu.Game.Screens.Select.Carousel
             // we only perform eager selection if none of our children are in a selected state already.
             if (Children.Any(i => i.State == CarouselItemState.Selected)) return;
 
-            CarouselItem nextToSelect = null;
-            if (isRootSelector && lastSelected == null)
+            if (parent != null && lastSelected == null)
             {
-                var selectables = Children.Where(i => !i.Filtered).ToList();
-                if (selectables.Any())
-                    nextToSelect = selectables[RNG.Next(selectables.Count)];
-            }
-            else
-            {
-                nextToSelect =
-                    Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered) ??
-                    Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered);
+                parent.SelectNextRandom();
+                return;
             }
 
+            CarouselItem nextToSelect =
+                Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered) ??
+                Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered);
 
             if (nextToSelect != null)
                 nextToSelect.State.Value = CarouselItemState.Selected;
