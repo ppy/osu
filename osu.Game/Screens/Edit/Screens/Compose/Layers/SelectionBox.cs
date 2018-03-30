@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -23,15 +22,23 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     {
         public const float BORDER_RADIUS = 2;
 
-        private readonly HashSet<HitObjectMask> selectedMasks = new HashSet<HitObjectMask>();
+        private readonly MaskContainer maskContainer;
+
+        private readonly List<HitObjectMask> selectedMasks = new List<HitObjectMask>();
+        private IEnumerable<HitObjectMask> selectableMasks => maskContainer.AliveMasks;
 
         private Drawable box;
 
-        public SelectionBox()
+        public SelectionBox(MaskContainer maskContainer)
         {
+            this.maskContainer = maskContainer;
+
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
             Alpha = 0;
+
+            maskContainer.MaskSelected += onSelected;
+            maskContainer.MaskDeselected += onDeselected;
         }
 
         [BackgroundDependencyLoader]
@@ -51,58 +58,34 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             };
         }
 
-        /// <summary>
-        /// Tracks a selectable <see cref="HitObjectMask"/>.
-        /// </summary>
-        /// <param name="mask">The <see cref="HitObjectMask"/> to track.</param>
-        public void AddMask(HitObjectMask mask)
+        #region User Input Handling
+
+        // Only handle input on selectable or selected masks
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => selectableMasks.Concat(selectedMasks).Any(m => m.ReceiveMouseInputAt(screenSpacePos));
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            mask.Selected += onSelected;
-            mask.Deselected += onDeselected;
-            mask.SingleSelectionRequested += onSingleSelectionRequested;
-        }
+            if (selectedMasks.Any(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position)))
+                return true;
 
-        /// <summary>
-        /// Stops tracking a <see cref="HitObjectMask"/>.
-        /// </summary>
-        /// <param name="mask">The <see cref="HitObjectMask"/> to stop tracking.</param>
-        public void RemoveMask(HitObjectMask mask)
-        {
-            mask.Selected -= onSelected;
-            mask.Deselected -= onDeselected;
-            mask.SingleSelectionRequested -= onSingleSelectionRequested;
-        }
+            DeselectAll();
+            selectableMasks.First(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position)).Select();
 
-        private void onSelected(HitObjectMask mask) => selectedMasks.Add(mask);
-
-        private void onDeselected(HitObjectMask mask)
-        {
-            selectedMasks.Remove(mask);
-
-            // We don't want to update visibility if > 0, since we may be deselecting masks during drag-selection
-            if (selectedMasks.Count == 0)
-                UpdateVisibility();
-        }
-
-        private void onSingleSelectionRequested(HitObjectMask mask)
-        {
-            selectedMasks.Add(mask);
             UpdateVisibility();
+            return true;
         }
-
-        // Only handle input on the selected masks
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => selectedMasks.Any(m => m.ReceiveMouseInputAt(screenSpacePos));
-
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
         protected override bool OnClick(InputState state)
         {
-            if (state.Mouse.NativeState.PositionMouseDown == null)
-                throw new InvalidOperationException("Click event received without a mouse down position.");
+            if (selectedMasks.Count == 1)
+                return true;
 
-            // We handled mousedown, but if the mouse has been clicked and not dragged, select the mask which would've handled the mouse down
-            // A mousedown event is triggered such that a single selection is requested
-            selectedMasks.First(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.PositionMouseDown.Value)).TriggerOnMouseDown(state);
+            var toSelect = selectedMasks.First(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position));
+
+            DeselectAll();
+            toSelect.Select();
+
+            UpdateVisibility();
             return true;
         }
 
@@ -127,10 +110,32 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         protected override bool OnDragEnd(InputState state) => true;
 
+        #endregion
+
+        #region Selection Handling
+
+        private void onSelected(HitObjectMask mask) => selectedMasks.Add(mask);
+
+        private void onDeselected(HitObjectMask mask)
+        {
+            selectedMasks.Remove(mask);
+
+            // We don't want to update visibility if > 0, since we may be deselecting masks during drag-selection
+            if (selectedMasks.Count == 0)
+                UpdateVisibility();
+        }
+
+        /// <summary>
+        /// Deselects all selected <see cref="HitObjectMask"/>s.
+        /// </summary>
+        public void DeselectAll() => selectedMasks.ToList().ForEach(m => m.Deselect());
+
+        #endregion
+
         /// <summary>
         /// Updates whether this <see cref="SelectionBox"/> is visible.
         /// </summary>
-        public void UpdateVisibility()
+        internal void UpdateVisibility()
         {
             if (selectedMasks.Count > 0)
                 Show();
@@ -144,8 +149,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             if (selectedMasks.Count == 0)
                 return;
-
-            // Todo: We might need to optimise this
 
             // Move the rectangle to cover the hitobjects
             var topLeft = new Vector2(float.MaxValue, float.MaxValue);
@@ -164,6 +167,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             box.Size = bottomRight - topLeft;
             box.Position = topLeft;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            maskContainer.MaskSelected -= onSelected;
+            maskContainer.MaskDeselected -= onDeselected;
         }
     }
 }

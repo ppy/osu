@@ -253,8 +253,8 @@ namespace osu.Game.Rulesets.Edit
         /// Creates a <see cref="SelectionBox"/> which outlines <see cref="DrawableHitObject"/>s
         /// and handles hitobject pattern adjustments.
         /// </summary>
-        /// <param name="overlays">The <see cref="DrawableHitObject"/> overlays.</param>
-        public virtual SelectionBox CreateSelectionBox() => new SelectionBox();
+        /// <param name="maskContainer">The <see cref="HitObjectMask"/> container.</param>
+        public virtual SelectionBox CreateSelectionBox(MaskContainer maskContainer) => new SelectionBox(maskContainer);
 
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.

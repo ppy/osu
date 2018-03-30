@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,17 +23,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// </summary>
         public event Action DragEnd;
 
-        private readonly IEnumerable<HitObjectMask> selectableMasks;
+        private readonly MaskContainer maskContainer;
 
         private Drawable box;
 
         /// <summary>
         /// Creates a new <see cref="DragBox"/>.
         /// </summary>
-        /// <param name="selectableMasks">The selectable <see cref="HitObjectMask"/>s.</param>
-        public DragBox(IEnumerable<HitObjectMask> selectableMasks)
+        /// <param name="maskContainer">The selectable <see cref="HitObjectMask"/>s.</param>
+        public DragBox(MaskContainer maskContainer)
         {
-            this.selectableMasks = selectableMasks;
+            this.maskContainer = maskContainer;
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
@@ -79,7 +78,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             box.Position = topLeft;
             box.Size = bottomRight - topLeft;
 
-            foreach (var mask in selectableMasks)
+            foreach (var mask in maskContainer.AliveMasks)
             {
                 if (mask.IsPresent && dragRectangle.Contains(mask.SelectionPoint))
                     mask.Select();
