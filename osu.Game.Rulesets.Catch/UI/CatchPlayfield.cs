@@ -57,7 +57,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.Depth = (float)h.HitObject.StartTime;
             h.OnJudgement += onJudgement;
 
             base.Add(h);
