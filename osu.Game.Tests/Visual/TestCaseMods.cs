@@ -185,13 +185,13 @@ namespace osu.Game.Tests.Visual
         private void testRankedText(Mod mod)
         {
             AddWaitStep(1, "wait for fade");
-            AddAssert("check for ranked", () => modSelect.RankedLabel.Alpha.Equals(0));
+            AddAssert("check for ranked", () => modSelect.RankedLabel.Alpha == 0);
             selectNext(mod);
             AddWaitStep(1, "wait for fade");
-            AddAssert("check for unranked", () => !modSelect.RankedLabel.Alpha.Equals(0));
+            AddAssert("check for unranked", () => !(modSelect.RankedLabel.Alpha == 0));
             selectPrevious(mod);
             AddWaitStep(1, "wait for fade");
-            AddAssert("check for ranked", () => modSelect.RankedLabel.Alpha.Equals(0));
+            AddAssert("check for ranked", () => modSelect.RankedLabel.Alpha == 0);
         }
 
         private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));
