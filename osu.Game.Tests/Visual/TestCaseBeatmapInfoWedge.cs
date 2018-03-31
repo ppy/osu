@@ -14,6 +14,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps;
 
@@ -68,15 +71,23 @@ namespace osu.Game.Tests.Visual
                 var name = rulesetInfo.ShortName;
                 selectBeatmap(name);
 
-                // TODO: adjust cases once more info is shown for other gamemodes
                 switch (ruleset)
                 {
                     case OsuRuleset osu:
                         testOsuBeatmap(osu);
-                        testInfoLabels(5);
+                        testInfoLabels(6);
                         break;
-                    default:
-                        testInfoLabels(2);
+                    case TaikoRuleset taiko:
+                        testTaikoBeatmap(taiko);
+                        testInfoLabels(6);
+                        break;
+                    case CatchRuleset fruits:
+                        testCatchBeatmap(fruits);
+                        testInfoLabels(6);
+                        break;
+                    case ManiaRuleset mania:
+                        testManiaBeatmap(mania);
+                        testInfoLabels(5);
                         break;
                 }
             }
@@ -85,6 +96,30 @@ namespace osu.Game.Tests.Visual
         }
 
         private void testOsuBeatmap(OsuRuleset ruleset)
+        {
+            AddAssert("check version", () => infoWedge.Info.VersionLabel.Text == $"{ruleset.ShortName}Version");
+            AddAssert("check title", () => infoWedge.Info.TitleLabel.Text == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
+            AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Text == $"{ruleset.ShortName}Artist");
+            AddAssert("check author", () => infoWedge.Info.MapperContainer.Children.OfType<OsuSpriteText>().Any(s => s.Text == $"{ruleset.ShortName}Author"));
+        }
+
+        private void testTaikoBeatmap(TaikoRuleset ruleset)
+        {
+            AddAssert("check version", () => infoWedge.Info.VersionLabel.Text == $"{ruleset.ShortName}Version");
+            AddAssert("check title", () => infoWedge.Info.TitleLabel.Text == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
+            AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Text == $"{ruleset.ShortName}Artist");
+            AddAssert("check author", () => infoWedge.Info.MapperContainer.Children.OfType<OsuSpriteText>().Any(s => s.Text == $"{ruleset.ShortName}Author"));
+        }
+
+        private void testCatchBeatmap(CatchRuleset ruleset)
+        {
+            AddAssert("check version", () => infoWedge.Info.VersionLabel.Text == $"{ruleset.ShortName}Version");
+            AddAssert("check title", () => infoWedge.Info.TitleLabel.Text == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
+            AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Text == $"{ruleset.ShortName}Artist");
+            AddAssert("check author", () => infoWedge.Info.MapperContainer.Children.OfType<OsuSpriteText>().Any(s => s.Text == $"{ruleset.ShortName}Author"));
+        }
+
+        private void testManiaBeatmap(ManiaRuleset ruleset)
         {
             AddAssert("check version", () => infoWedge.Info.VersionLabel.Text == $"{ruleset.ShortName}Version");
             AddAssert("check title", () => infoWedge.Info.TitleLabel.Text == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
