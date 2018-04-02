@@ -223,6 +223,26 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
+        protected override bool OnJoystickPress(InputState state, JoystickPressEventArgs args)
+        {
+            if (!HasFocus)
+                return false;
+
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
+            finalise();
+
+            return true;
+        }
+
+        protected override bool OnJoystickRelease(InputState state, JoystickReleaseEventArgs args)
+        {
+            if (!HasFocus)
+                return base.OnJoystickRelease(state, args);
+
+            finalise();
+            return true;
+        }
+
         private void finalise()
         {
             if (bindTarget != null)
