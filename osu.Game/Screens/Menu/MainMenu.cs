@@ -97,12 +97,9 @@ namespace osu.Game.Screens.Menu
             if (escPressedTime != null)
             {
                 double progress = (Time.Current - escPressedTime.Value) / esc_threshold;
-                exitProgress.Progress = progress;
+                exitProgress.SetProgress(progress);
                 if (progress >= 1)
-                {
-                    exitProgress.Hide();
                     Exit();
-                }
             }
         }
 
@@ -217,6 +214,7 @@ namespace osu.Game.Screens.Menu
             if (args.Key == Key.Escape)
             {
                 escPressedTime = null;
+                exitProgress.SetProgress(0);
                 exitProgress.Hide();
                 return true;
             }
