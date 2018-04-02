@@ -328,7 +328,10 @@ namespace osu.Game.Screens.Select
         public void FlushPendingFilterOperations()
         {
             if (FilterTask?.Completed == false)
+            {
                 applyActiveCriteria(false, false);
+                Update();
+            }
         }
 
         public void Filter(FilterCriteria newCriteria, bool debounce = true)
@@ -544,6 +547,7 @@ namespace osu.Game.Screens.Select
 
                             float? setY = null;
                             if (!d.IsLoaded || beatmap.Alpha == 0) // can't use IsPresent due to DrawableCarouselItem override.
+                                // ReSharper disable once PossibleNullReferenceException (resharper broken?)
                                 setY = lastSet.Y + lastSet.DrawHeight + 5;
 
                             if (d.IsLoaded)

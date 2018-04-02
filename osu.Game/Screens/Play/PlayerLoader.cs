@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -26,6 +27,8 @@ namespace osu.Game.Screens.Play
 
         private bool showOverlays = true;
         public override bool ShowOverlaysOnEnter => showOverlays;
+
+        private Task loadTask;
 
         public PlayerLoader(Player player)
         {
@@ -55,7 +58,7 @@ namespace osu.Game.Screens.Play
                 Margin = new MarginPadding(25)
             });
 
-            LoadComponentAsync(player);
+            loadTask = LoadComponentAsync(player);
         }
 
         protected override void OnResuming(Screen last)
@@ -65,7 +68,7 @@ namespace osu.Game.Screens.Play
             contentIn();
 
             //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
-            LoadComponentAsync(player = new Player
+            loadTask = LoadComponentAsync(player = new Player
             {
                 RestartCount = player.RestartCount + 1,
                 RestartRequested = player.RestartRequested,
@@ -154,6 +157,8 @@ namespace osu.Game.Screens.Play
                     {
                         if (!IsCurrentScreen) return;
 
+                        loadTask = null;
+
                         if (!Push(player))
                             Exit();
                         else
@@ -190,6 +195,14 @@ namespace osu.Game.Screens.Play
             cancelLoad();
 
             return base.OnExiting(next);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // if the player never got pushed, we should explicitly dispose it.
+            loadTask?.ContinueWith(_ => player.Dispose());
         }
 
         private class BeatmapMetadataDisplay : Container

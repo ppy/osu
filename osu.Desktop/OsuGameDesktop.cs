@@ -2,17 +2,16 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Win32;
 using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
 using OpenTK.Input;
+using Microsoft.Win32;
 
 namespace osu.Desktop
 {
@@ -100,7 +99,7 @@ namespace osu.Desktop
             {
                 desktopWindow.CursorState |= CursorState.Hidden;
 
-                desktopWindow.Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
+                desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
                 desktopWindow.Title = Name;
 
                 desktopWindow.FileDrop += fileDrop;
@@ -109,7 +108,7 @@ namespace osu.Desktop
 
         private void fileDrop(object sender, FileDropEventArgs e)
         {
-            var filePaths = new [] { e.FileName };
+            var filePaths = new[] { e.FileName };
 
             var firstExtension = Path.GetExtension(filePaths.First());
 

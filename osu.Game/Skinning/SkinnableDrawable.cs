@@ -29,7 +29,7 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="name">The namespace-complete resource name for this skinnable element.</param>
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
-        /// <param name="fallback">Whther to fallback to the default implementation when a custom skin is specified but not implementation is present.</param>
+        /// <param name="allowFallback">A conditional to decide whether to allow fallback to the default implementation if a skinned element is not present.</param>
         /// <param name="restrictSize">Whether a user-skin drawable should be limited to the size of our parent.</param>
         public SkinnableDrawable(string name, Func<string, T> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true) : base(allowFallback)
         {
