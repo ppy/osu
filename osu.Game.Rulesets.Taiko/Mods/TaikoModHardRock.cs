@@ -8,5 +8,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
     public class TaikoModHardRock : ModHardRock
     {
         public override double ScoreMultiplier => 1.06;
+        public override bool Ranked => true;
     }
 }
