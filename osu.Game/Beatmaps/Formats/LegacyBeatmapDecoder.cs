@@ -81,13 +81,13 @@ namespace osu.Game.Beatmaps.Formats
                     handleDifficulty(line);
                     return;
                 case Section.Events:
-                    handleEvents(line);
+                    handleEvent(line);
                     return;
                 case Section.TimingPoints:
-                    handleTimingPoints(line);
+                    handleTimingPoint(line);
                     return;
                 case Section.HitObjects:
-                    handleHitObjects(line);
+                    handleHitObject(line);
                     return;
             }
 
@@ -246,7 +246,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleEvents(string line)
+        private void handleEvent(string line)
         {
             string[] split = line.Split(',');
 
@@ -275,7 +275,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleTimingPoints(string line)
+        private void handleTimingPoint(string line)
         {
             string[] split = line.Split(',');
 
@@ -361,7 +361,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleHitObjects(string line)
+        private void handleHitObject(string line)
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
             if (parser == null)
