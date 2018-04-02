@@ -1,11 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Users;
@@ -15,12 +12,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 {
     public class PaginatedBeatmapContainer : PaginatedContainer
     {
-        private const float panel_padding = 10f;
-
         private readonly BeatmapSetType type;
-
-        private DirectPanel currentlyPlaying;
-        private BeatmapManager manager;
+        private readonly DirectPanelsContainer panelsContainer;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
             : base(user, header, missing)
@@ -29,24 +22,14 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
             ItemsPerPage = 6;
 
-            ItemsContainer.Spacing = new Vector2(panel_padding);
+            Add(panelsContainer = new DirectPanelsContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+            });
         }
 
-        [BackgroundDependencyLoader]
-        private void load(BeatmapManager manager)
-        {
-            this.manager = manager;
-
-            manager.ItemAdded += handleBeatmapAdd;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (manager != null)
-                manager.ItemAdded -= handleBeatmapAdd;
-        }
+        // TODO: handle stopping preview when user profile is popping out
 
         protected override void ShowMore()
         {
@@ -70,36 +53,11 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     if (!s.OnlineBeatmapSetID.HasValue)
                         continue;
 
-                    bool beatmapExists = manager.QueryBeatmapSet(b => b.OnlineBeatmapSetID == s.OnlineBeatmapSetID) != null;
-
-                    var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets))
-                    {
-                        DownloadIndicatorsVisible = !beatmapExists,
-                    };
-
-                    ItemsContainer.Add(panel);
-
-                    panel.PreviewPlaying.ValueChanged += isPlaying =>
-                    {
-                        if (!isPlaying) return;
-
-                        if (currentlyPlaying != null && currentlyPlaying != panel)
-                            currentlyPlaying.PreviewPlaying.Value = false;
-
-                        currentlyPlaying = panel;
-                    };
+                    panelsContainer.AddPanel(s.ToBeatmapSet(Rulesets));
                 }
             };
 
             Api.Queue(req);
-        }
-
-        private void handleBeatmapAdd(BeatmapSetInfo set)
-        {
-            var displayedSet = ItemsContainer.Children.OfType<DirectGridPanel>().FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID);
-
-            if (displayedSet != null)
-                displayedSet.DownloadIndicatorsVisible = false;
         }
     }
 }

@@ -7,7 +7,9 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.Profile;
+using osu.Game.Overlays.Profile.Sections.Beatmaps;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
@@ -23,6 +25,8 @@ namespace osu.Game.Tests.Visual
             typeof(UserProfileOverlay),
             typeof(RankGraph),
             typeof(LineGraph),
+            typeof(PaginatedBeatmapContainer),
+            typeof(DirectPanelsContainer),
         };
 
         public TestCaseUserProfile()

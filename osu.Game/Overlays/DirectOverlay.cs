@@ -24,16 +24,13 @@ namespace osu.Game.Overlays
 {
     public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCriteria, RankStatus>
     {
-        private const float panel_padding = 10f;
-
         private APIAccess api;
         private RulesetStore rulesets;
         private BeatmapManager beatmaps;
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
-        private FillFlowContainer<DirectPanel> panels;
-        private DirectPanel playing;
+        private readonly DirectPanelsContainer panelsContainer;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"485e74");
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
@@ -115,6 +112,11 @@ namespace osu.Game.Overlays
                         },
                     }
                 },
+                panelsContainer = new DirectPanelsContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
             };
 
             Filter.Search.Current.ValueChanged += text =>
@@ -135,7 +137,7 @@ namespace osu.Game.Overlays
                 }
             };
             ((FilterControl)Filter).Ruleset.ValueChanged += ruleset => Scheduler.AddOnce(updateSearch);
-            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
+            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += newValue => panelsContainer.DisplayStyle = newValue;
             Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => Scheduler.AddOnce(updateSearch);
 
             Header.Tabs.Current.ValueChanged += tab =>
@@ -190,9 +192,8 @@ namespace osu.Game.Overlays
 
         private void setAdded(BeatmapSetInfo set)
         {
-            // if a new map was imported, we should remove it from search results (download completed etc.)
-            panels?.FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID)?.FadeOut(400).Expire();
             BeatmapSets = BeatmapSets?.Where(b => b.OnlineBeatmapSetID != set.OnlineBeatmapSetID);
+            panelsContainer.RemovePanel(set);
         }
 
         private void updateResultCounts()
@@ -208,63 +209,6 @@ namespace osu.Game.Overlays
         private string pluralize(string prefix, int value)
         {
             return $@"{value} {prefix}" + (value == 1 ? string.Empty : @"s");
-        }
-
-        private void recreatePanels(PanelDisplayStyle displayStyle)
-        {
-            if (panels != null)
-            {
-                panels.FadeOut(200);
-                panels.Expire();
-                panels = null;
-
-                if (playing != null)
-                {
-                    playing.PreviewPlaying.Value = false;
-                    playing = null;
-                }
-            }
-
-            if (BeatmapSets == null) return;
-
-            var newPanels = new FillFlowContainer<DirectPanel>
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(panel_padding),
-                Margin = new MarginPadding { Top = 10 },
-                ChildrenEnumerable = BeatmapSets.Select<BeatmapSetInfo, DirectPanel>(b =>
-                {
-                    switch (displayStyle)
-                    {
-                        case PanelDisplayStyle.Grid:
-                            return new DirectGridPanel(b)
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                            };
-                        default:
-                            return new DirectListPanel(b);
-                    }
-                })
-            };
-
-            LoadComponentAsync(newPanels, p =>
-            {
-                if (panels != null) ScrollFlow.Remove(panels);
-                ScrollFlow.Add(panels = newPanels);
-
-                foreach (DirectPanel panel in p.Children)
-                    panel.PreviewPlaying.ValueChanged += newValue =>
-                    {
-                        if (newValue)
-                        {
-                            if (playing != null && playing != panel)
-                                playing.PreviewPlaying.Value = false;
-                            playing = panel;
-                        }
-                    };
-            });
         }
 
         private SearchBeatmapSetsRequest getSetsRequest;
@@ -301,12 +245,8 @@ namespace osu.Game.Overlays
                     var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID) && !s.DeletePending).Select(r => r.OnlineBeatmapSetID).ToList();
                     var sets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID)).ToList();
 
-                    // may not need scheduling; loads async internally.
-                    Schedule(() =>
-                    {
-                        BeatmapSets = sets;
-                        recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
-                    });
+                    BeatmapSets = sets;
+                    panelsContainer.BeatmapSets = sets;
                 });
             };
 
@@ -317,8 +257,8 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            if (playing != null)
-                playing.PreviewPlaying.Value = false;
+            if (panelsContainer.CurrentPreview != null)
+                panelsContainer.CurrentPreview.PreviewPlaying.Value = false;
         }
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
