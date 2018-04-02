@@ -1,0 +1,87 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build (Debug, msbuild)",
+            "type": "shell",
+            "command": "msbuild",
+            "args": [
+                "osu.Game.Rulesets.Catch.Tests.csproj",
+                "/p:TargetFramework=net461",
+                "/p:GenerateFullPaths=true",
+                "/m",
+                "/verbosity:m"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build (Release, msbuild)",
+            "type": "shell",
+            "command": "msbuild",
+            "args": [
+                "osu.Game.Rulesets.Catch.Tests.csproj",
+                "/p:Configuration=Release",
+                "/p:TargetFramework=net461",
+                "/p:GenerateFullPaths=true",
+                "/m",
+                "/verbosity:m"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build (Debug, dotnet)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "--no-restore",
+                "osu.Game.Rulesets.Catch.Tests.csproj",
+                "/p:TargetFramework=netcoreapp2.0",
+                "/p:GenerateFullPaths=true",
+                "/m",
+                "/verbosity:m"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build (Release, dotnet)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "--no-restore",
+                "osu.Game.Rulesets.Catch.Tests.csproj",
+                "/p:TargetFramework=netcoreapp2.0",
+                "/p:Configuration=Release",
+                "/p:GenerateFullPaths=true",
+                "/m",
+                "/verbosity:m"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Restore (net461)",
+            "type": "shell",
+            "command": "nuget",
+            "args": [
+                "restore"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Restore (netcoreapp2.0)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "restore"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

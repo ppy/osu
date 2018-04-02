@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\osu.TestProject.props" />
+  <PropertyGroup Label="Project">
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
+  </ItemGroup>
+</Project>
