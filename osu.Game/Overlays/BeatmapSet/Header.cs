@@ -53,9 +53,12 @@ namespace osu.Game.Overlays.BeatmapSet
                 artist.Text = BeatmapSet.Metadata.Artist;
                 onlineStatusPill.Status = BeatmapSet.OnlineInfo.Status;
 
-                downloadButtonsContainer.FadeIn();
-                noVideoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 0 : 1, transition_duration);
-                videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
+                if (beatmaps.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID) == null)
+                {
+                    downloadButtonsContainer.FadeIn();
+                    noVideoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 0 : 1, transition_duration);
+                    videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
+                }
 
                 cover?.FadeOut(400, Easing.Out);
                 coverContainer.Add(cover = new DelayedLoadWrapper(
@@ -71,12 +74,6 @@ namespace osu.Game.Overlays.BeatmapSet
                     RelativeSizeAxes = Axes.Both,
                 });
             }
-        }
-
-        public bool DownloadButtonsVisible
-        {
-            get => downloadButtonsContainer.IsPresent;
-            set => downloadButtonsContainer.Alpha = value ? 1 : 0;
         }
 
         public Header()

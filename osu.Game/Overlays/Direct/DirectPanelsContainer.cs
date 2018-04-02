@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Direct
 
                 beatmapSets = value;
 
-                recreatePanels(DisplayStyle);
+                recreatePanels();
             }
         }
 
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Direct
 
                 displayStyle = value;
 
-                recreatePanels(displayStyle);
+                recreatePanels();
             }
         }
 
@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Direct
             CurrentPreview = panel;
         }
 
-        private void recreatePanels(PanelDisplayStyle displayStyle)
+        private void recreatePanels()
         {
             if (!IsLoaded)
                 return;
@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.Direct
                 {
                     DirectPanel panel;
 
-                    switch (displayStyle)
+                    switch (DisplayStyle)
                     {
                         case PanelDisplayStyle.Grid:
                             panel =  new DirectGridPanel(b)

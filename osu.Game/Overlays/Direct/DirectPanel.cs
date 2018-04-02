@@ -54,16 +54,8 @@ namespace osu.Game.Overlays.Direct
 
                 downloadIndicatorsVisible = value;
 
-                if (!downloadIndicatorsVisible)
-                {
-                    DownloadButton?.FadeOut(200);
-                    progressBar?.FadeOut(200);
-                }
-                else
-                {
-                    DownloadButton?.FadeIn(200);
-                    progressBar?.FadeIn(200);
-                }
+                if (IsLoaded)
+                    updateButtonVisibility();
             }
         }
 
@@ -134,15 +126,6 @@ namespace osu.Game.Overlays.Direct
             beatmaps.BeatmapDownloadBegan += attachDownload;
         }
 
-        protected override void LoadAsyncComplete()
-        {
-            base.LoadAsyncComplete();
-
-            // value may have been set before the panel had fully finished loading
-            if (!downloadIndicatorsVisible)
-                DownloadButton.Alpha = 0;
-        }
-
         public override bool DisposeOnDeathRemoval => true;
 
         protected override void Dispose(bool isDisposing)
@@ -205,6 +188,20 @@ namespace osu.Game.Overlays.Direct
             beatmaps.Download(SetInfo);
         }
 
+        private void updateButtonVisibility()
+        {
+            if (!downloadIndicatorsVisible)
+            {
+                DownloadButton?.FadeOut(200);
+                progressBar?.FadeOut(200);
+            }
+            else
+            {
+                DownloadButton?.FadeIn(200);
+                progressBar?.FadeIn(200);
+            }
+        }
+
         private void attachDownload(DownloadBeatmapSetRequest request)
         {
             if (request.BeatmapSet.OnlineBeatmapSetID != SetInfo.OnlineBeatmapSetID)
@@ -234,6 +231,8 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
             this.FadeInFromZero(200, Easing.Out);
+
+            updateButtonVisibility();
 
             PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
             PreviewPlaying.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
