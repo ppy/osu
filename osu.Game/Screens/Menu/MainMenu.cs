@@ -29,6 +29,10 @@ namespace osu.Game.Screens.Menu
         private readonly BackgroundScreenDefault background;
         private Screen songSelect;
 
+        private readonly ExitProgressOverlay exitProgress;
+        private double? escPressedTime;
+        private const double esc_threshold = 1000;
+
         private readonly MenuSideFlashes sideFlashes;
 
         protected override BackgroundScreen CreateBackground() => background;
@@ -39,6 +43,7 @@ namespace osu.Game.Screens.Menu
 
             Children = new Drawable[]
             {
+                exitProgress = new ExitProgressOverlay(),
                 new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
@@ -84,6 +89,21 @@ namespace osu.Game.Screens.Menu
             var s = songSelect;
             songSelect = null;
             return s;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (escPressedTime != null)
+            {
+                double progress = (Time.Current - escPressedTime.Value) / esc_threshold;
+                exitProgress.Progress = progress;
+                if (progress >= 1)
+                {
+                    exitProgress.Hide();
+                    Exit();
+                }
+            }
         }
 
         protected override void OnEntering(Screen last)
@@ -176,6 +196,13 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
+            if (!args.Repeat && args.Key == Key.Escape)
+            {
+                escPressedTime = Time.Current;
+                exitProgress.Show();
+                return true;
+            }
+
             if (!args.Repeat && state.Keyboard.ControlPressed && state.Keyboard.ShiftPressed && args.Key == Key.D)
             {
                 Push(new Drawings());
@@ -183,6 +210,18 @@ namespace osu.Game.Screens.Menu
             }
 
             return base.OnKeyDown(state, args);
+        }
+
+        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        {
+            if (args.Key == Key.Escape)
+            {
+                escPressedTime = null;
+                exitProgress.Hide();
+                return true;
+            }
+
+            return base.OnKeyUp(state, args);
         }
     }
 }
