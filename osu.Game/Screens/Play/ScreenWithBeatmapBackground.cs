@@ -46,6 +46,12 @@ namespace osu.Game.Screens.Play
             UpdateBackgroundElements();
         }
 
+        protected override void OnResuming(Screen last)
+        {
+            base.OnResuming(last);
+            UpdateBackgroundElements();
+        }
+
         protected virtual void UpdateBackgroundElements()
         {
             if (!IsCurrentScreen) return;

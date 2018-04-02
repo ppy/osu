@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Ionic.Zip;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -13,6 +12,7 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Utils;
 using SharpCompress.Common;
 using FileInfo = osu.Game.IO.FileInfo;
 
@@ -336,7 +336,7 @@ namespace osu.Game.Database
         /// <returns>A reader giving access to the archive's content.</returns>
         private ArchiveReader getReaderFrom(string path)
         {
-            if (ZipFile.IsZipFile(path))
+            if (ZipUtils.IsZipArchive(path))
                 return new ZipArchiveReader(Files.Storage.GetStream(path), Path.GetFileName(path));
             if (Directory.Exists(path))
                 return new LegacyFilesystemReader(path);

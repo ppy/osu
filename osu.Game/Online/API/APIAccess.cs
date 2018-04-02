@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
@@ -44,8 +45,7 @@ namespace osu.Game.Online.API
 
         protected bool HasLogin => Token != null || !string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password);
 
-        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (should dispose of this or at very least keep a reference).
-        private readonly Thread thread;
+        private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
         private readonly Logger log;
 
@@ -59,13 +59,12 @@ namespace osu.Game.Online.API
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
             Token = config.Get<string>(OsuSetting.Token);
 
-            thread = new Thread(run) { IsBackground = true };
-            thread.Start();
+            Task.Factory.StartNew(run, cancellationToken.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
 
-        internal void Schedule(Action action) => base.Schedule(action);
+        internal new void Schedule(Action action) => base.Schedule(action);
 
         public void Register(IOnlineComponent component)
         {
@@ -93,7 +92,7 @@ namespace osu.Game.Online.API
 
         private void run()
         {
-            while (thread.IsAlive)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 switch (State)
                 {
@@ -267,10 +266,7 @@ namespace osu.Game.Online.API
 
         public bool IsLoggedIn => LocalUser.Value.Id > 1;
 
-        public void Queue(APIRequest request)
-        {
-            queue.Enqueue(request);
-        }
+        public void Queue(APIRequest request) => queue.Enqueue(request);
 
         public event StateChangeDelegate OnStateChange;
 
@@ -312,6 +308,9 @@ namespace osu.Game.Online.API
 
             config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? Token : string.Empty);
             config.Save();
+
+            flushQueue();
+            cancellationToken.Cancel();
         }
     }
 

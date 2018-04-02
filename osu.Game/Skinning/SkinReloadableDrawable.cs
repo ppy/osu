@@ -23,7 +23,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Create a new <see cref="SkinReloadableDrawable"/>
         /// </summary>
-        /// <param name="fallback">Whether fallback to default skin should be allowed if the custom skin is missing this resource.</param>
+        /// <param name="allowFallback">A conditional to decide whether to allow fallback to the default implementation if a skinned element is not present.</param>
         protected SkinReloadableDrawable(Func<ISkinSource, bool> allowFallback = null)
         {
             this.allowFallback = allowFallback;
