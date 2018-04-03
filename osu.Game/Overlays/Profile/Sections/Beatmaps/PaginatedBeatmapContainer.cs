@@ -7,6 +7,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Users;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 {
@@ -14,6 +16,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
     {
         private readonly BeatmapSetType type;
         private readonly DirectPanelsContainer panelsContainer;
+
+        private UserProfileOverlay overlay;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
             : base(user, header, missing)
@@ -29,7 +33,30 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             });
         }
 
-        // TODO: handle stopping preview when user profile is popping out
+        [BackgroundDependencyLoader]
+        private void load(UserProfileOverlay overlay)
+        {
+            if (overlay != null)
+            {
+                this.overlay = overlay;
+                overlay.StateChanged += handleVisibilityChanged;
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (overlay != null)
+                overlay.StateChanged -= handleVisibilityChanged;
+        }
+
+        private void handleVisibilityChanged(Visibility visibility)
+        {
+            if (visibility == Visibility.Hidden && panelsContainer.CurrentPreview != null)
+                panelsContainer.CurrentPreview.PreviewPlaying.Value = false;
+
+        }
 
         protected override void ShowMore()
         {
