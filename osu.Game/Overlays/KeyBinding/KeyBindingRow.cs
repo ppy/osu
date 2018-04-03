@@ -223,7 +223,7 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnJoystickPress(InputState state, JoystickPressEventArgs args)
+        protected override bool OnJoystickPress(InputState state, Framework.Input.JoystickEventArgs args)
         {
             if (!HasFocus)
                 return false;
@@ -234,7 +234,7 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnJoystickRelease(InputState state, JoystickReleaseEventArgs args)
+        protected override bool OnJoystickRelease(InputState state, Framework.Input.JoystickEventArgs args)
         {
             if (!HasFocus)
                 return base.OnJoystickRelease(state, args);
