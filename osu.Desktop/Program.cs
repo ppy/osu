@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -7,6 +7,9 @@ using System.Linq;
 using osu.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
+#if NET_FRAMEWORK
+using System.Runtime;
+#endif
 
 namespace osu.Desktop
 {
@@ -16,7 +19,9 @@ namespace osu.Desktop
         public static int Main(string[] args)
         {
             // required to initialise native SQLite libraries on some platforms.
-            SQLitePCL.Batteries_V2.Init();
+
+            if (!RuntimeInfo.IsMono)
+                useMulticoreJit();
 
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
@@ -25,7 +30,7 @@ namespace osu.Desktop
             {
                 if (!host.IsPrimaryInstance)
                 {
-                    var importer = new BeatmapIPCChannel(host);
+                    var importer = new ArchiveImportIPCChannel(host);
                     // Restore the cwd so relative paths given at the command line work correctly
                     Directory.SetCurrentDirectory(cwd);
                     foreach (var file in args)
@@ -39,17 +44,23 @@ namespace osu.Desktop
                 {
                     switch (args.FirstOrDefault() ?? string.Empty)
                     {
-                        case "--tests":
-                            host.Run(new OsuTestBrowser());
-                            break;
                         default:
                             host.Run(new OsuGameDesktop(args));
                             break;
                     }
-
                 }
+
                 return 0;
             }
+        }
+
+        private static void useMulticoreJit()
+        {
+#if NET_FRAMEWORK
+            var directory = Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Profiles"));
+            ProfileOptimization.SetProfileRoot(directory.FullName);
+            ProfileOptimization.StartProfile("Startup.Profile");
+#endif
         }
     }
 }

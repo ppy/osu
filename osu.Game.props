@@ -8,4 +8,14 @@
       <Link>osu.licenseheader</Link>
     </None>
   </ItemGroup>
+  <ItemGroup Label="Resources">
+    <EmbeddedResource Include="Resources\**\*.*" />
+  </ItemGroup>
+  <PropertyGroup Label="Project">
+    <Company>ppy Pty Ltd</Company>
+    <Copyright>ppy Pty Ltd 2007-2018</Copyright>
+    <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
+    This is required due to https://github.com/NuGet/Home/issues/5740 -->
+    <NoWarn>NU1701</NoWarn>
+  </PropertyGroup>
 </Project>

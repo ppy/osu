@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Mania.Objects;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
@@ -24,25 +25,39 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
+        public int TargetColumns;
+        public readonly bool IsForCurrentRuleset;
+
         private Pattern lastPattern = new Pattern();
         private FastRandom random;
-        private Beatmap beatmap;
 
-        private readonly int availableColumns;
-        private readonly bool isForCurrentRuleset;
+        private ManiaBeatmap beatmap;
 
-        public ManiaBeatmapConverter(bool isForCurrentRuleset, int availableColumns)
+        public ManiaBeatmapConverter(bool isForCurrentRuleset, Beatmap original)
         {
-            if (availableColumns <= 0) throw new ArgumentOutOfRangeException(nameof(availableColumns));
+            IsForCurrentRuleset = isForCurrentRuleset;
 
-            this.isForCurrentRuleset = isForCurrentRuleset;
-            this.availableColumns = availableColumns;
+            var roundedCircleSize = Math.Round(original.BeatmapInfo.BaseDifficulty.CircleSize);
+            var roundedOverallDifficulty = Math.Round(original.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+
+            if (isForCurrentRuleset)
+                TargetColumns = (int)Math.Max(1, roundedCircleSize);
+            else
+            {
+                float percentSliderOrSpinner = (float)original.HitObjects.Count(h => h is IHasEndTime) / original.HitObjects.Count;
+                if (percentSliderOrSpinner < 0.2)
+                    TargetColumns = 7;
+                else if (percentSliderOrSpinner < 0.3 || roundedCircleSize >= 5)
+                    TargetColumns = roundedOverallDifficulty > 5 ? 7 : 6;
+                else if (percentSliderOrSpinner > 0.6)
+                    TargetColumns = roundedOverallDifficulty > 4 ? 5 : 4;
+                else
+                    TargetColumns = Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
+            }
         }
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(Beatmap original)
         {
-            beatmap = original;
-
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
             int seed = (int)Math.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)Math.Round(difficulty.ApproachRate);
@@ -50,6 +65,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             return base.ConvertBeatmap(original);
         }
+
+        protected override Beatmap<ManiaHitObject> CreateBeatmap() => beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
@@ -60,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield break;
             }
 
-            var objects = isForCurrentRuleset ? generateSpecific(original) : generateConverted(original);
+            var objects = IsForCurrentRuleset ? generateSpecific(original, beatmap) : generateConverted(original, beatmap);
 
             if (objects == null)
                 yield break;
@@ -93,10 +110,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// Method that generates hit objects for osu!mania specific beatmaps.
         /// </summary>
         /// <param name="original">The original hit object.</param>
+        /// <param name="originalBeatmap">The original beatmap. This is used to look-up any values dependent on a fully-loaded beatmap.</param>
         /// <returns>The hit objects generated.</returns>
-        private IEnumerable<ManiaHitObject> generateSpecific(HitObject original)
+        private IEnumerable<ManiaHitObject> generateSpecific(HitObject original, Beatmap originalBeatmap)
         {
-            var generator = new SpecificBeatmapPatternGenerator(random, original, beatmap, availableColumns, lastPattern);
+            var generator = new SpecificBeatmapPatternGenerator(random, original, beatmap, lastPattern, originalBeatmap);
 
             Pattern newPattern = generator.Generate();
             lastPattern = newPattern;
@@ -108,26 +126,25 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// Method that generates hit objects for non-osu!mania beatmaps.
         /// </summary>
         /// <param name="original">The original hit object.</param>
+        /// <param name="originalBeatmap">The original beatmap. This is used to look-up any values dependent on a fully-loaded beatmap.</param>
         /// <returns>The hit objects generated.</returns>
-        private IEnumerable<ManiaHitObject> generateConverted(HitObject original)
+        private IEnumerable<ManiaHitObject> generateConverted(HitObject original, Beatmap originalBeatmap)
         {
             var endTimeData = original as IHasEndTime;
             var distanceData = original as IHasDistance;
             var positionData = original as IHasPosition;
 
-            // Following lines currently commented out to appease resharper
-
             Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
-                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, availableColumns, lastPattern);
+                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, lastPattern, originalBeatmap);
             else if (endTimeData != null)
-                conversion = new EndTimeObjectPatternGenerator(random, original, beatmap, availableColumns);
+                conversion = new EndTimeObjectPatternGenerator(random, original, beatmap, originalBeatmap);
             else if (positionData != null)
             {
                 computeDensity(original.StartTime);
 
-                conversion = new HitObjectPatternGenerator(random, original, beatmap, availableColumns, lastPattern, lastTime, lastPosition, density, lastStair);
+                conversion = new HitObjectPatternGenerator(random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair, originalBeatmap);
 
                 recordNote(original.StartTime, positionData.Position);
             }
@@ -136,10 +153,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 return null;
 
             Pattern newPattern = conversion.Generate();
-            lastPattern = newPattern;
 
-            var stairPatternGenerator = conversion as HitObjectPatternGenerator;
-            lastStair = stairPatternGenerator?.StairType ?? lastStair;
+            lastPattern = conversion is EndTimeObjectPatternGenerator ? lastPattern : newPattern;
+            lastStair = (conversion as HitObjectPatternGenerator)?.StairType ?? lastStair;
 
             return newPattern.HitObjects;
         }
@@ -149,8 +165,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         private class SpecificBeatmapPatternGenerator : Patterns.Legacy.PatternGenerator
         {
-            public SpecificBeatmapPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern)
-                : base(random, hitObject, beatmap, availableColumns, previousPattern)
+            public SpecificBeatmapPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, Beatmap originalBeatmap)
+                : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
             {
             }
 
@@ -199,7 +215,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 if (curveData == null)
                     return HitObject.Samples;
 
-                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.RepeatCount;
+                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();
 
                 int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
                 return curveData.RepeatSamples[index];

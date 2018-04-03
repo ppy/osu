@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
@@ -20,11 +20,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     public class DrawableDrumRoll : DrawableTaikoHitObject<DrumRoll>
     {
         /// <summary>
-        /// Number of rolling hits required to reach the dark/final accent colour.
+        /// Number of rolling hits required to reach the dark/final colour.
         /// </summary>
-        private const int rolling_hits_for_dark_accent = 5;
-
-        private Color4 accentDarkColour;
+        private const int rolling_hits_for_engaged_colour = 5;
 
         /// <summary>
         /// Rolling number of tick hits. This increases for hits and decreases for misses.
@@ -34,15 +32,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
-            Width = (float)HitObject.Duration;
+            RelativeSizeAxes = Axes.Y;
 
             Container<DrawableDrumRollTick> tickContainer;
-            MainPiece.Add(tickContainer = new Container<DrawableDrumRollTick>
-            {
-                RelativeSizeAxes = Axes.Both,
-                RelativeChildOffset = new Vector2((float)HitObject.StartTime, 0),
-                RelativeChildSize = new Vector2((float)HitObject.Duration, 1)
-            });
+            MainPiece.Add(tickContainer = new Container<DrawableDrumRollTick> { RelativeSizeAxes = Axes.Both });
 
             foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
             {
@@ -58,11 +51,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(TaikoAction action) => false;
 
+        private Color4 colourIdle;
+        private Color4 colourEngaged;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            MainPiece.AccentColour = AccentColour = colours.YellowDark;
-            accentDarkColour = colours.YellowDarker;
+            MainPiece.AccentColour = colourIdle = colours.YellowDark;
+            colourEngaged = colours.YellowDarker;
         }
 
         private void onTickJudgement(DrawableHitObject obj, Judgement judgement)
@@ -72,10 +68,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             else
                 rollingHits--;
 
-            rollingHits = MathHelper.Clamp(rollingHits, 0, rolling_hits_for_dark_accent);
+            rollingHits = MathHelper.Clamp(rollingHits, 0, rolling_hits_for_engaged_colour);
 
-            Color4 newAccent = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_dark_accent, AccentColour, accentDarkColour, 0, 1);
-            MainPiece.FadeAccent(newAccent, 100);
+            Color4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
+            MainPiece.FadeAccent(newColour, 100);
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
@@ -86,9 +82,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (timeOffset < 0)
                 return;
 
-            int countHit = NestedHitObjects.Count(o => o.AllJudged);
-
-            if (countHit > HitObject.RequiredGoodHits)
+            int countHit = NestedHitObjects.Count(o => o.IsHit);
+            if (countHit >= HitObject.RequiredGoodHits)
             {
                 AddJudgement(new TaikoJudgement { Result = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good });
                 if (HitObject.IsStrong)
@@ -100,6 +95,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+            switch (state)
+            {
+                case ArmedState.Hit:
+                case ArmedState.Miss:
+                    this.FadeOut(100).Expire();
+                    break;
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
@@ -28,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 laneGlowPiece = new LaneGlowPiece
                 {
@@ -49,13 +48,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             get { return base.AccentColour; }
             set
             {
-                if (base.AccentColour == value)
-                    return;
                 base.AccentColour = value;
-
-                laneGlowPiece.AccentColour = value;
-                GlowPiece.AccentColour = value;
-                headPiece.AccentColour = value;
+                laneGlowPiece.AccentColour = AccentColour;
+                GlowPiece.AccentColour = AccentColour;
+                headPiece.AccentColour = AccentColour;
             }
         }
 
@@ -63,21 +59,27 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             if (!userTriggered)
             {
-                if (timeOffset > HitObject.HitWindows.Bad / 2)
+                if (!HitObject.HitWindows.CanBeHit(timeOffset))
                     AddJudgement(new ManiaJudgement { Result = HitResult.Miss });
                 return;
             }
 
-            double offset = Math.Abs(timeOffset);
-
-            if (offset > HitObject.HitWindows.Miss / 2)
+            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            if (result == HitResult.None)
                 return;
 
-            AddJudgement(new ManiaJudgement { Result = HitObject.HitWindows.ResultFor(offset) ?? HitResult.Miss });
+            AddJudgement(new ManiaJudgement { Result = result });
         }
 
         protected override void UpdateState(ArmedState state)
         {
+            switch (state)
+            {
+                case ArmedState.Hit:
+                case ArmedState.Miss:
+                    this.FadeOut(100).Expire();
+                    break;
+            }
         }
 
         public virtual bool OnPressed(ManiaAction action)

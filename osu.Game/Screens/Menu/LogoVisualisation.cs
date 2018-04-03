@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -64,7 +64,8 @@ namespace osu.Game.Screens.Menu
 
         private readonly float[] frequencyAmplitudes = new float[256];
 
-        public override bool HandleInput => false;
+        public override bool HandleKeyboardInput => false;
+        public override bool HandleMouseInput => false;
 
         private Shader shader;
         private readonly Texture texture;
@@ -210,7 +211,7 @@ namespace osu.Game.Screens.Menu
                                 rectangle,
                                 colourInfo,
                                 null,
-                                Shared.VertexBatch.Add,
+                                Shared.VertexBatch.AddAction,
                                 //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                 Vector2.Divide(inflation, barSize.Yx));
                         }

@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
@@ -43,7 +44,7 @@ namespace osu.Desktop
         {
             protected override string LocateBasePath()
             {
-                Func<string, bool> checkExists = p => Directory.Exists(Path.Combine(p, "Songs"));
+                bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
 
                 string stableInstallPath;
 
@@ -98,7 +99,7 @@ namespace osu.Desktop
             {
                 desktopWindow.CursorState |= CursorState.Hidden;
 
-                // desktopWindow.Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
+                desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
                 desktopWindow.Title = Name;
 
                 desktopWindow.FileDrop += fileDrop;
@@ -109,16 +110,11 @@ namespace osu.Desktop
         {
             var filePaths = new[] { e.FileName };
 
-            if (filePaths.All(f => Path.GetExtension(f) == @".osz"))
-                Task.Factory.StartNew(() => BeatmapManager.Import(filePaths), TaskCreationOptions.LongRunning);
-            else if (filePaths.All(f => Path.GetExtension(f) == @".osr"))
-                Task.Run(() =>
-                {
-                    var score = ScoreStore.ReadReplayFile(filePaths.First());
-                    Schedule(() => LoadScore(score));
-                });
-        }
+            var firstExtension = Path.GetExtension(filePaths.First());
 
-        private static readonly string[] allowed_extensions = { @".osz", @".osr" };
+            if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
+
+            Task.Factory.StartNew(() => Import(filePaths), TaskCreationOptions.LongRunning);
+        }
     }
 }

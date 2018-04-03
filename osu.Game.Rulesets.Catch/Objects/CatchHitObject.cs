@@ -1,24 +1,28 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public abstract class CatchHitObject : HitObject, IHasXPosition, IHasCombo
+    public abstract class CatchHitObject : HitObject, IHasXPosition, IHasComboInformation
     {
         public const double OBJECT_RADIUS = 44;
 
         public float X { get; set; }
 
-        public Color4 ComboColour { get; set; } = Color4.Gray;
-        public int ComboIndex { get; set; }
+        public int IndexInBeatmap { get; set; }
+
+        public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(IndexInBeatmap % 4);
 
         public virtual bool NewCombo { get; set; }
+
+        public int IndexInCurrentCombo { get; set; }
+
+        public int ComboIndex { get; set; }
 
         /// <summary>
         /// The next fruit starts a new combo. Used for explodey.
@@ -43,5 +47,14 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             Scale = 1.0f - 0.7f * (difficulty.CircleSize - 5) / 5;
         }
+    }
+
+    public enum FruitVisualRepresentation
+    {
+        Pear,
+        Grape,
+        Raspberry,
+        Pineapple,
+        Banana // banananananannaanana
     }
 }

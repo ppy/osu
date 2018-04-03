@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
@@ -11,6 +12,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseUserProfile : OsuTestCase
     {
         private readonly TestUserProfileOverlay profile;
@@ -42,11 +44,10 @@ namespace osu.Game.Tests.Visual
                 LastVisit = DateTimeOffset.Now,
                 Age = 1,
                 ProfileOrder = new[] { "me" },
-                CountryRank = 1,
                 Statistics = new UserStatistics
                 {
-                    Rank = 2148,
-                    PP = 4567.89m
+                    Ranks = new UserStatistics.UserRanks { Global = 2148, Country = 1 },
+                    PP = 4567.89m,
                 },
                 RankHistory = new User.RankHistoryData
                 {
@@ -56,6 +57,12 @@ namespace osu.Game.Tests.Visual
             }, false));
 
             checkSupporterTag(false);
+
+            AddStep("Show null dummy", () => profile.ShowUser(new User
+            {
+                Username = @"Null",
+                Id = 1,
+            }, false));
 
             AddStep("Show ppy", () => profile.ShowUser(new User
             {

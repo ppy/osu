@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Objects.Drawables;
@@ -15,17 +15,14 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     public class DrawableTaikoJudgement : DrawableJudgement
     {
-        public readonly DrawableHitObject JudgedObject;
-
         /// <summary>
         /// Creates a new judgement text.
         /// </summary>
         /// <param name="judgedObject">The object which is being judged.</param>
         /// <param name="judgement">The judgement to visualise.</param>
-        public DrawableTaikoJudgement(DrawableHitObject judgedObject, Judgement judgement)
-            : base(judgement)
+        public DrawableTaikoJudgement(Judgement judgement, DrawableHitObject judgedObject)
+            : base(judgement, judgedObject)
         {
-            JudgedObject = judgedObject;
         }
 
         [BackgroundDependencyLoader]

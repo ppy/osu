@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -15,6 +15,8 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets;
 using osu.Game.Graphics.UserInterface;
@@ -49,8 +51,10 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, RulesetStore rulesets)
+        private void load(OsuColour colours, OsuGame osu, RulesetStore rulesets, AudioManager audio)
         {
+            SelectedMods.ValueChanged += selectedModsChanged;
+
             LowMultiplierColour = colours.Red;
             HighMultiplierColour = colours.Green;
 
@@ -61,6 +65,48 @@ namespace osu.Game.Overlays.Mods
 
             Ruleset.ValueChanged += rulesetChanged;
             Ruleset.TriggerChange();
+
+            sampleOn = audio.Sample.Get(@"UI/check-on");
+            sampleOff = audio.Sample.Get(@"UI/check-off");
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            Ruleset.UnbindAll();
+            SelectedMods.UnbindAll();
+        }
+
+        private void selectedModsChanged(IEnumerable<Mod> obj)
+        {
+            foreach (ModSection section in ModSectionsContainer.Children)
+                section.SelectTypes(obj.Select(m => m.GetType()).ToList());
+
+            updateMods();
+        }
+
+        private void updateMods()
+        {
+            double multiplier = 1.0;
+            bool ranked = true;
+
+            foreach (Mod mod in SelectedMods.Value)
+            {
+                multiplier *= mod.ScoreMultiplier;
+                ranked &= mod.Ranked;
+            }
+
+            MultiplierLabel.Text = $"{multiplier:N2}x";
+            if (!ranked)
+                MultiplierLabel.Text += " (Unranked)";
+
+            if (multiplier > 1.0)
+                MultiplierLabel.FadeColour(HighMultiplierColour, 200);
+            else if (multiplier < 1.0)
+                MultiplierLabel.FadeColour(LowMultiplierColour, 200);
+            else
+                MultiplierLabel.FadeColour(Color4.White, 200);
         }
 
         protected override void PopOut()
@@ -97,6 +143,7 @@ namespace osu.Game.Overlays.Mods
         {
             foreach (ModSection section in ModSectionsContainer.Children)
                 section.DeselectAll();
+
             refreshSelectedMods();
         }
 
@@ -112,37 +159,25 @@ namespace osu.Game.Overlays.Mods
                 section.DeselectTypes(modTypes, immediate);
         }
 
+
+        private SampleChannel sampleOn, sampleOff;
+
         private void modButtonPressed(Mod selectedMod)
         {
             if (selectedMod != null)
+            {
+                if (State == Visibility.Visible) sampleOn?.Play();
                 DeselectTypes(selectedMod.IncompatibleMods, true);
+            }
+            else
+            {
+                if (State == Visibility.Visible) sampleOff?.Play();
+            }
+
             refreshSelectedMods();
         }
 
-        private void refreshSelectedMods()
-        {
-            SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
-
-            double multiplier = 1.0;
-            bool ranked = true;
-
-            foreach (Mod mod in SelectedMods.Value)
-            {
-                multiplier *= mod.ScoreMultiplier;
-                ranked &= mod.Ranked;
-            }
-
-            MultiplierLabel.Text = $"{multiplier:N2}x";
-            if (!ranked)
-                MultiplierLabel.Text += " (Unranked)";
-
-            if (multiplier > 1.0)
-                MultiplierLabel.FadeColour(HighMultiplierColour, 200);
-            else if (multiplier < 1.0)
-                MultiplierLabel.FadeColour(LowMultiplierColour, 200);
-            else
-                MultiplierLabel.FadeColour(Color4.White, 200);
-        }
+        private void refreshSelectedMods() => SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
 
         public ModSelectOverlay()
         {
@@ -268,7 +303,7 @@ namespace osu.Game.Overlays.Mods
                                     Anchor = Anchor.TopCentre,
                                     Action = modButtonPressed,
                                 },
-                                new AssistedSection
+                                new SpecialSection
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,

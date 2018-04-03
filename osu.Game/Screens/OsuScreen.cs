@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -35,9 +35,12 @@ namespace osu.Game.Screens
         /// </summary>
         public virtual bool ShowOverlaysOnEnter => true;
 
-        protected new OsuGameBase Game => base.Game as OsuGameBase;
+        /// <summary>
+        /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.
+        /// </summary>
+        public virtual bool CursorVisible => true;
 
-        public virtual bool HasLocalCursorDisplayed => false;
+        protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         private OsuLogo logo;
 
@@ -48,6 +51,10 @@ namespace osu.Game.Screens
         public virtual bool AllowBeatmapRulesetChange => true;
 
         protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+        protected virtual float BackgroundParallaxAmount => 1;
+
+        private ParallaxContainer backgroundParallaxContainer;
 
         public WorkingBeatmap InitialBeatmap
         {
@@ -99,11 +106,10 @@ namespace osu.Game.Screens
 
         protected override void OnResuming(Screen last)
         {
-            base.OnResuming(last);
-            logo.AppendAnimatingAction(() => LogoArriving(logo, true), true);
             sampleExit?.Play();
+            applyArrivingDefaults(true);
 
-            ShowOverlays.Value = ShowOverlaysOnEnter;
+            base.OnResuming(last);
         }
 
         protected override void OnSuspending(Screen next)
@@ -120,6 +126,8 @@ namespace osu.Game.Screens
 
             if (lastOsu?.Background != null)
             {
+                backgroundParallaxContainer = lastOsu.backgroundParallaxContainer;
+
                 if (bg == null || lastOsu.Background.Equals(bg))
                     //we can keep the previous mode's background.
                     Background = lastOsu.Background;
@@ -133,7 +141,7 @@ namespace osu.Game.Screens
                 // this makes up for the fact our padding changes when the global toolbar is visible.
                 bg.Scale = new Vector2(1.06f);
 
-                AddInternal(new ParallaxContainer
+                AddInternal(backgroundParallaxContainer = new ParallaxContainer
                 {
                     Depth = float.MaxValue,
                     Children = new[]
@@ -146,11 +154,9 @@ namespace osu.Game.Screens
             if ((logo = lastOsu?.logo) == null)
                 LoadComponentAsync(logo = new OsuLogo { Alpha = 0 }, AddInternal);
 
-            logo.AppendAnimatingAction(() => LogoArriving(logo, false), true);
+            applyArrivingDefaults(false);
 
             base.OnEntering(last);
-
-            ShowOverlays.Value = ShowOverlaysOnEnter;
         }
 
         protected override bool OnExiting(Screen next)
@@ -188,6 +194,16 @@ namespace osu.Game.Screens
             logo.RelativePositionAxes = Axes.None;
             logo.Triangles = true;
             logo.Ripple = true;
+        }
+
+        private void applyArrivingDefaults(bool isResuming)
+        {
+            logo.AppendAnimatingAction(() => LogoArriving(logo, isResuming), true);
+
+            if (backgroundParallaxContainer != null)
+                backgroundParallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * BackgroundParallaxAmount;
+
+            ShowOverlays.Value = ShowOverlaysOnEnter;
         }
 
         private void onExitingLogo()

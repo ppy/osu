@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
@@ -12,21 +11,16 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderTick : DrawableOsuHitObject
+    public class DrawableSliderTick : DrawableOsuHitObject, IRequireTracking
     {
-        private readonly SliderTick sliderTick;
+        public const double ANIM_DURATION = 150;
 
-        public double FadeInTime;
-        public double FadeOutTime;
-
-        public bool Tracking;
+        public bool Tracking { get; set; }
 
         public override bool DisplayJudgement => false;
 
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
-            this.sliderTick = sliderTick;
-
             Size = new Vector2(16) * sliderTick.Scale;
 
             Masking = true;
@@ -37,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             BorderThickness = 2;
             BorderColour = Color4.White;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -56,14 +50,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdatePreemptState()
         {
-            var animIn = Math.Min(150, sliderTick.StartTime - FadeInTime);
-
-            this.Animate(
-                d => d.FadeIn(animIn),
-                d => d.ScaleTo(0.5f).ScaleTo(1.2f, animIn)
-            ).Then(
-                d => d.ScaleTo(1, 150, Easing.Out)
-            );
+            this.FadeOut().FadeIn(ANIM_DURATION);
+            this.ScaleTo(0.5f).ScaleTo(1f, ANIM_DURATION * 4, Easing.OutElasticHalf);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -71,15 +59,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(FadeOutTime - sliderTick.StartTime).FadeOut();
+                    this.Delay(HitObject.TimePreempt).FadeOut();
                     break;
                 case ArmedState.Miss:
-                    this.FadeOut(160)
-                        .FadeColour(Color4.Red, 80);
+                    this.FadeOut(ANIM_DURATION);
+                    this.FadeColour(Color4.Red, ANIM_DURATION / 2);
                     break;
                 case ArmedState.Hit:
-                    this.FadeOut(120, Easing.OutQuint)
-                        .ScaleTo(Scale * 1.5f, 120, Easing.OutQuint);
+                    this.FadeOut(ANIM_DURATION, Easing.OutQuint);
+                    this.ScaleTo(Scale * 1.5f, ANIM_DURATION, Easing.Out);
                     break;
             }
         }

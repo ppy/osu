@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -25,6 +25,11 @@ namespace osu.Game.Beatmaps
         /// The date this beatmap set was last updated.
         /// </summary>
         public DateTimeOffset? LastUpdated { get; set; }
+
+        /// <summary>
+        /// The status of this beatmap set.
+        /// </summary>
+        public BeatmapSetOnlineStatus Status { get; set; }
 
         /// <summary>
         /// Whether or not this beatmap set has a background video.

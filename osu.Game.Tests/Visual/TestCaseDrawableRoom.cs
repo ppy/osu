@@ -1,6 +1,7 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +13,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseDrawableRoom : OsuTestCase
     {
         private RulesetStore rulesets;
@@ -63,8 +65,8 @@ namespace osu.Game.Tests.Visual
                         {
                             Value = new[]
                             {
-                                new User { GlobalRank = 1355 },
-                                new User { GlobalRank = 8756 },
+                                new User { Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 1355 } } },
+                                new User { Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 8756 } } },
                             },
                         },
                     }),
@@ -99,10 +101,10 @@ namespace osu.Game.Tests.Visual
                         },
                         Participants =
                         {
-                            Value =  new[]
+                            Value = new[]
                             {
-                                new User { GlobalRank = 578975 },
-                                new User { GlobalRank = 24554 },
+                                new User { Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 578975 } } },
+                                new User { Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 24554 } } },
                             },
                         },
                     }),
@@ -116,8 +118,8 @@ namespace osu.Game.Tests.Visual
             AddStep(@"change beatmap", () => first.Room.Beatmap.Value = null);
             AddStep(@"change participants", () => first.Room.Participants.Value = new[]
             {
-                new User { GlobalRank = 1254 },
-                new User { GlobalRank = 123189 },
+                new User { Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 1254 } } },
+                new User { Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 123189 } } },
             });
         }
 

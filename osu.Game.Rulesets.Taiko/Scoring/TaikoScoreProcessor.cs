@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// <summary>
         /// Taiko fails at the end of the map if the player has not half-filled their HP bar.
         /// </summary>
-        protected override bool DefaultFailCondition => Hits == MaxHits && Health.Value <= 0.5;
+        protected override bool DefaultFailCondition => JudgedHits == MaxHits && Health.Value <= 0.5;
 
         private double hpIncreaseTick;
         private double hpIncreaseGreat;

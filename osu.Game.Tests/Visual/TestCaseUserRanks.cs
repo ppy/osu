@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
@@ -10,9 +10,11 @@ using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Users;
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseUserRanks : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(DrawableProfileScore), typeof(RanksSection) };

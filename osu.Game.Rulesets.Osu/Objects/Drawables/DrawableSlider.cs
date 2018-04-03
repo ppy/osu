@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -7,23 +7,23 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSlider : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
         private readonly Slider slider;
+        private readonly List<Drawable> components = new List<Drawable>();
 
-        public readonly DrawableHitCircle InitialCircle;
-
-        private readonly List<ISliderProgress> components = new List<ISliderProgress>();
-
-        private readonly Container<DrawableSliderTick> ticks;
-        private readonly Container<DrawableRepeatPoint> repeatPoints;
+        public readonly DrawableHitCircle HeadCircle;
+        public readonly DrawableSliderTail TailCircle;
 
         public readonly SliderBody Body;
         public readonly SliderBall Ball;
@@ -33,84 +33,78 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             slider = s;
 
-            Children = new Drawable[]
+            Position = s.StackedPosition;
+
+            Container<DrawableSliderTick> ticks;
+            Container<DrawableRepeatPoint> repeatPoints;
+
+            InternalChildren = new Drawable[]
             {
                 Body = new SliderBody(s)
                 {
-                    AccentColour = AccentColour,
-                    Position = s.StackedPosition,
                     PathWidth = s.Scale * 64,
                 },
-                ticks = new Container<DrawableSliderTick>(),
-                repeatPoints = new Container<DrawableRepeatPoint>(),
+                ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
+                repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s)
                 {
+                    BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
-                    AccentColour = AccentColour,
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                InitialCircle = new DrawableHitCircle(new HitCircle
-                {
-                    StartTime = s.StartTime,
-                    Position = s.StackedPosition,
-                    ComboIndex = s.ComboIndex,
-                    Scale = s.Scale,
-                    ComboColour = s.ComboColour,
-                    Samples = s.Samples,
-                    SampleControlPoint = s.SampleControlPoint
-                })
+                HeadCircle = new DrawableSliderHead(s, s.HeadCircle),
+                TailCircle = new DrawableSliderTail(s, s.TailCircle)
             };
 
             components.Add(Body);
             components.Add(Ball);
 
-            AddNested(InitialCircle);
+            AddNested(HeadCircle);
 
-            var repeatDuration = s.Curve.Distance / s.Velocity;
+            AddNested(TailCircle);
+            components.Add(TailCircle);
+
             foreach (var tick in s.NestedHitObjects.OfType<SliderTick>())
             {
-                var repeatStartTime = s.StartTime + tick.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (tick.StartTime - repeatStartTime) / 2 - (tick.RepeatIndex == 0 ? FadeInDuration : FadeInDuration / 2);
-                var fadeOutTime = repeatStartTime + repeatDuration;
-
-                var drawableTick = new DrawableSliderTick(tick)
-                {
-                    FadeInTime = fadeInTime,
-                    FadeOutTime = fadeOutTime,
-                    Position = tick.Position,
-                };
+                var drawableTick = new DrawableSliderTick(tick) { Position = tick.Position - s.Position };
 
                 ticks.Add(drawableTick);
+                components.Add(drawableTick);
                 AddNested(drawableTick);
             }
 
             foreach (var repeatPoint in s.NestedHitObjects.OfType<RepeatPoint>())
             {
-                var repeatStartTime = s.StartTime + repeatPoint.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? FadeInDuration : FadeInDuration / 2);
-                var fadeOutTime = repeatStartTime + repeatDuration;
-
-                var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
-                {
-                    FadeInTime = fadeInTime,
-                    FadeOutTime = fadeOutTime,
-                    Position = repeatPoint.Position,
-                };
+                var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this) { Position = repeatPoint.Position - s.Position };
 
                 repeatPoints.Add(drawableRepeatPoint);
+                components.Add(drawableRepeatPoint);
                 AddNested(drawableRepeatPoint);
+            }
+
+            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+        }
+
+        public override Color4 AccentColour
+        {
+            get { return base.AccentColour; }
+            set
+            {
+                base.AccentColour = value;
+                Body.AccentColour = AccentColour;
+                Ball.AccentColour = AccentColour;
             }
         }
 
-        private int currentRepeat;
-        public bool Tracking;
-
-        public override double FadeInDuration
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
-            get { return base.FadeInDuration; }
-            set { InitialCircle.FadeInDuration = base.FadeInDuration = value; }
+            config.BindWith(OsuSetting.SnakingInSliders, Body.SnakingIn);
+            config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
         }
+
+        public bool Tracking;
 
         protected override void Update()
         {
@@ -118,35 +112,35 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Tracking = Ball.Tracking;
 
-            double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
+            double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
-            int repeat = slider.RepeatAt(progress);
-            progress = slider.ProgressAt(progress);
+            foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
+            foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
+            foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
 
-            if (repeat > currentRepeat)
-                currentRepeat = repeat;
+            Size = Body.Size;
+            OriginPosition = Body.PathOffset;
 
-            //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (!InitialCircle.Judgements.Any(j => j.IsHit))
-                InitialCircle.Position = slider.Curve.PositionAt(progress);
-
-            foreach (var c in components) c.UpdateProgress(progress, repeat);
-            foreach (var t in ticks.Children) t.Tracking = Ball.Tracking;
+            if (DrawSize != Vector2.Zero)
+            {
+                var childAnchorPosition = Vector2.Divide(OriginPosition, DrawSize);
+                foreach (var obj in NestedHitObjects)
+                    obj.RelativeAnchorPosition = childAnchorPosition;
+                Ball.RelativeAnchorPosition = childAnchorPosition;
+            }
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
-                var judgementsCount = ticks.Children.Count + repeatPoints.Children.Count + 1;
-                var judgementsHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit)) + repeatPoints.Children.Count(t => t.Judgements.Any(j => j.IsHit));
-                if (InitialCircle.Judgements.Any(j => j.IsHit))
-                    judgementsHit++;
+                var judgementsCount = NestedHitObjects.Count;
+                var judgementsHit = NestedHitObjects.Count(h => h.IsHit);
 
                 var hitFraction = (double)judgementsHit / judgementsCount;
-                if (hitFraction == 1 && InitialCircle.Judgements.Any(j => j.Result == HitResult.Great))
+                if (hitFraction == 1 && HeadCircle.Judgements.Any(j => j.Result == HitResult.Great))
                     AddJudgement(new OsuJudgement { Result = HitResult.Great });
-                else if (hitFraction >= 0.5 && InitialCircle.Judgements.Any(j => j.Result >= HitResult.Good))
+                else if (hitFraction >= 0.5 && HeadCircle.Judgements.Any(j => j.Result >= HitResult.Good))
                     AddJudgement(new OsuJudgement { Result = HitResult.Good });
                 else if (hitFraction > 0)
                     AddJudgement(new OsuJudgement { Result = HitResult.Meh });
@@ -176,11 +170,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
             }
+
+            Expire(true);
         }
 
-        public Drawable ProxiedLayer => InitialCircle.ApproachCircle;
+        public Drawable ProxiedLayer => HeadCircle.ApproachCircle;
 
-        public override Vector2 SelectionPoint => ToScreenSpace(Body.Position);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Body.ReceiveMouseInputAt(screenSpacePos);
+
+        public override Vector2 SelectionPoint => ToScreenSpace(OriginPosition);
         public override Quad SelectionQuad => Body.PathDrawQuad;
     }
 }

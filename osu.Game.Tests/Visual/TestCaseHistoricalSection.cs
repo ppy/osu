@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,6 +14,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseHistoricalSection : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes =>

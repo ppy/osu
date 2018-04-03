@@ -1,9 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
-using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
@@ -20,12 +19,13 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public readonly SliderCurve Curve = new SliderCurve();
-
-        public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
-        public override Vector2 EndPosition => PositionAt(1);
+        public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
+        public override Vector2 EndPosition => Position + this.CurvePositionAt(1);
+
+        public SliderCurve Curve { get; } = new SliderCurve();
 
         public List<Vector2> ControlPoints
         {
@@ -58,21 +58,18 @@ namespace osu.Game.Rulesets.Osu.Objects
         internal float LazyTravelDistance;
 
         public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
-        public int RepeatCount { get; set; } = 1;
+        public int RepeatCount { get; set; }
 
-        private int stackHeight;
-        public override int StackHeight
-        {
-            get { return stackHeight; }
-            set
-            {
-                stackHeight = value;
-                Curve.Offset = StackOffset;
-            }
-        }
+        /// <summary>
+        /// The length of one span of this <see cref="Slider"/>.
+        /// </summary>
+        public double SpanDuration => Duration / this.SpanCount();
 
         public double Velocity;
         public double TickDistance;
+
+        public HitCircle HeadCircle;
+        public HitCircle TailCircle;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
@@ -87,40 +84,54 @@ namespace osu.Game.Rulesets.Osu.Objects
             TickDistance = scoringDistance / difficulty.SliderTickRate;
         }
 
-        public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
-
-        public double ProgressAt(double progress)
-        {
-            double p = progress * RepeatCount % 1;
-            if (RepeatAt(progress) % 2 == 1)
-                p = 1 - p;
-            return p;
-        }
-
-        public int RepeatAt(double progress) => (int)(progress * RepeatCount);
-
         protected override void CreateNestedHitObjects()
         {
             base.CreateNestedHitObjects();
 
+            createSliderEnds();
             createTicks();
             createRepeatPoints();
         }
 
+        private void createSliderEnds()
+        {
+            HeadCircle = new SliderCircle(this)
+            {
+                StartTime = StartTime,
+                Position = Position,
+                Samples = Samples,
+                SampleControlPoint = SampleControlPoint,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboIndex = ComboIndex,
+            };
+
+            TailCircle = new SliderCircle(this)
+            {
+                StartTime = EndTime,
+                Position = EndPosition,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboIndex = ComboIndex,
+            };
+
+            AddNested(HeadCircle);
+            AddNested(TailCircle);
+        }
+
         private void createTicks()
         {
-            if (TickDistance == 0) return;
-
             var length = Curve.Distance;
-            var tickDistance = Math.Min(TickDistance, length);
-            var repeatDuration = length / Velocity;
+            var tickDistance = MathHelper.Clamp(TickDistance, 0, length);
+
+            if (tickDistance == 0) return;
 
             var minDistanceFromEnd = Velocity * 0.01;
 
-            for (var repeat = 0; repeat < RepeatCount; repeat++)
+            var spanCount = this.SpanCount();
+
+            for (var span = 0; span < spanCount; span++)
             {
-                var repeatStartTime = StartTime + repeat * repeatDuration;
-                var reversed = repeat % 2 == 1;
+                var spanStartTime = StartTime + span * SpanDuration;
+                var reversed = span % 2 == 1;
 
                 for (var d = tickDistance; d <= length; d += tickDistance)
                 {
@@ -130,20 +141,26 @@ namespace osu.Game.Rulesets.Osu.Objects
                     var distanceProgress = d / length;
                     var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
 
+                    var firstSample = Samples.FirstOrDefault(s => s.Name == SampleInfo.HIT_NORMAL) ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+                    var sampleList = new List<SampleInfo>();
+
+                    if (firstSample != null)
+                        sampleList.Add(new SampleInfo
+                        {
+                            Bank = firstSample.Bank,
+                            Volume = firstSample.Volume,
+                            Name = @"slidertick",
+                        });
+
                     AddNested(new SliderTick
                     {
-                        RepeatIndex = repeat,
-                        StartTime = repeatStartTime + timeProgress * repeatDuration,
-                        Position = Curve.PositionAt(distanceProgress),
+                        SpanIndex = span,
+                        SpanStartTime = spanStartTime,
+                        StartTime = spanStartTime + timeProgress * SpanDuration,
+                        Position = Position + Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
                         Scale = Scale,
-                        ComboColour = ComboColour,
-                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
-                        {
-                            Bank = s.Bank,
-                            Name = @"slidertick",
-                            Volume = s.Volume
-                        }))
+                        Samples = sampleList
                     });
                 }
             }
@@ -151,21 +168,17 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createRepeatPoints()
         {
-            var repeatDuration = Distance / Velocity;
-
-            for (var repeat = 1; repeat < RepeatCount; repeat++)
+            for (int repeatIndex = 0, repeat = 1; repeatIndex < RepeatCount; repeatIndex++, repeat++)
             {
-                var repeatStartTime = StartTime + repeat * repeatDuration;
-
                 AddNested(new RepeatPoint
                 {
-                    RepeatIndex = repeat,
-                    StartTime = repeatStartTime,
-                    Position = Curve.PositionAt(repeat % 2),
+                    RepeatIndex = repeatIndex,
+                    SpanDuration = SpanDuration,
+                    StartTime = StartTime + repeat * SpanDuration,
+                    Position = Position + Curve.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
-                    ComboColour = ComboColour,
-                    Samples = new List<SampleInfo>(RepeatSamples[repeat])
+                    Samples = new List<SampleInfo>(RepeatSamples[repeatIndex])
                 });
             }
         }

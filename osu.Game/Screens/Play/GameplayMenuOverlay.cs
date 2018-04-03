@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -18,7 +18,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class GameplayMenuOverlay : OverlayContainer, IRequireHighFrequencyMousePosition
+    public abstract class GameplayMenuOverlay : OverlayContainer
     {
         private const int transition_duration = 200;
         private const int button_height = 70;
@@ -141,8 +141,6 @@ namespace osu.Game.Screens.Play
                     updateRetryCount();
             }
         }
-
-        public override bool HandleInput => State == Visibility.Visible;
 
         protected override void PopIn() => this.FadeIn(transition_duration, Easing.In);
         protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);

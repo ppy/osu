@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -207,9 +207,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     username = new OsuTextBox
                     {
-                        PlaceholderText = "Username",
+                        PlaceholderText = "Email address",
                         RelativeSizeAxes = Axes.X,
-                        Text = api?.Username ?? string.Empty,
+                        Text = api?.ProvidedUsername ?? string.Empty,
                         TabbableContentContainer = this
                     },
                     password = new OsuPasswordTextBox
@@ -221,12 +221,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     },
                     new SettingsCheckbox
                     {
-                        LabelText = "Remember username",
+                        LabelText = "Remember email address",
                         Bindable = config.GetBindable<bool>(OsuSetting.SaveUsername),
                     },
                     new SettingsCheckbox
                     {
-                        LabelText = "Stay logged in",
+                        LabelText = "Stay signed in",
                         Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
                     new SettingsButton
@@ -236,7 +236,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     },
                     new SettingsButton
                     {
-                        Text = "Register new account",
+                        Text = "Register",
                         //Action = registerLink
                     }
                 };

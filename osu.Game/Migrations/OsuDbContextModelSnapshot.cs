@@ -189,6 +189,28 @@ namespace osu.Game.Migrations
                     b.ToTable("BeatmapSetInfo");
                 });
 
+            modelBuilder.Entity("osu.Game.Configuration.DatabasedSetting", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("IntKey")
+                        .HasColumnName("Key");
+
+                    b.Property<int?>("RulesetID");
+
+                    b.Property<string>("StringValue")
+                        .HasColumnName("Value");
+
+                    b.Property<int?>("Variant");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("RulesetID", "Variant");
+
+                    b.ToTable("Settings");
+                });
+
             modelBuilder.Entity("osu.Game.Input.Bindings.DatabasedKeyBinding", b =>
                 {
                     b.Property<int>("ID")
@@ -208,7 +230,7 @@ namespace osu.Game.Migrations
 
                     b.HasIndex("IntAction");
 
-                    b.HasIndex("Variant");
+                    b.HasIndex("RulesetID", "Variant");
 
                     b.ToTable("KeyBinding");
                 });
@@ -255,6 +277,43 @@ namespace osu.Game.Migrations
                     b.ToTable("RulesetInfo");
                 });
 
+            modelBuilder.Entity("osu.Game.Skinning.SkinFileInfo", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("FileInfoID");
+
+                    b.Property<string>("Filename")
+                        .IsRequired();
+
+                    b.Property<int>("SkinInfoID");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("FileInfoID");
+
+                    b.HasIndex("SkinInfoID");
+
+                    b.ToTable("SkinFileInfo");
+                });
+
+            modelBuilder.Entity("osu.Game.Skinning.SkinInfo", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Creator");
+
+                    b.Property<bool>("DeletePending");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("SkinInfo");
+                });
+
             modelBuilder.Entity("osu.Game.Beatmaps.BeatmapInfo", b =>
                 {
                     b.HasOne("osu.Game.Beatmaps.BeatmapDifficulty", "BaseDifficulty")
@@ -295,6 +354,19 @@ namespace osu.Game.Migrations
                     b.HasOne("osu.Game.Beatmaps.BeatmapMetadata", "Metadata")
                         .WithMany("BeatmapSets")
                         .HasForeignKey("MetadataID");
+                });
+
+            modelBuilder.Entity("osu.Game.Skinning.SkinFileInfo", b =>
+                {
+                    b.HasOne("osu.Game.IO.FileInfo", "FileInfo")
+                        .WithMany()
+                        .HasForeignKey("FileInfoID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("osu.Game.Skinning.SkinInfo")
+                        .WithMany("Files")
+                        .HasForeignKey("SkinInfoID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

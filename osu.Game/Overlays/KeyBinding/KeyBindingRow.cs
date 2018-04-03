@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         private FillFlowContainer<KeyButton> buttons;
 
-        public IEnumerable<string> FilterTerms => new[] { text.Text }.Concat(bindings.Select(b => b.KeyCombination.ReadableString()));
+        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(text.Text);
 
         public KeyBindingRow(object action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
         {

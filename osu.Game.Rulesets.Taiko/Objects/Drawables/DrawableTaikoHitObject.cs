@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public abstract class DrawableTaikoHitObject<TaikoHitType> : DrawableScrollingHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
+    public abstract class DrawableTaikoHitObject<TaikoHitType> : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
         where TaikoHitType : TaikoHitObject
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RelativeSizeAxes = Axes.Both;
             Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
 
-            Add(MainPiece = CreateMainPiece());
+            InternalChild = MainPiece = CreateMainPiece();
             MainPiece.KiaiMode = HitObject.Kiai;
         }
 

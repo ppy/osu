@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
@@ -19,8 +20,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     {
         private readonly Drawable marker;
 
-        public MarkerPart()
+        private readonly IAdjustableClock adjustableClock;
+
+        public MarkerPart(IAdjustableClock adjustableClock)
         {
+            this.adjustableClock = adjustableClock;
+
             Add(marker = new MarkerVisualisation());
         }
 
@@ -53,12 +58,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             seekTo(markerPos / DrawWidth * Beatmap.Value.Track.Length);
         }
 
-        private void seekTo(double time) => Beatmap.Value?.Track.Seek(time);
+        private void seekTo(double time) => adjustableClock.Seek(time);
 
         protected override void Update()
         {
             base.Update();
-            marker.X = (float)(Beatmap.Value?.Track.CurrentTime ?? 0);
+            marker.X = (float)adjustableClock.CurrentTime;
         }
 
         protected override void LoadBeatmap(WorkingBeatmap beatmap)

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
@@ -8,6 +8,9 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Edit.Screens
 {
+    /// <summary>
+    /// TODO: eventually make this inherit Screen and add a local scren stack inside the Editor.
+    /// </summary>
     public class EditorScreen : Container
     {
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();

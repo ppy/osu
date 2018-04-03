@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Overlays.Profile;
@@ -9,11 +9,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using System.Collections.Generic;
 using System;
+using NUnit.Framework;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseRankGraph : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
@@ -65,7 +67,7 @@ namespace osu.Game.Tests.Visual
                 {
                     Statistics = new UserStatistics
                     {
-                        Rank = 123456,
+                        Ranks = new UserStatistics.UserRanks { Global = 123456 },
                         PP = 12345,
                     }
                 };
@@ -77,7 +79,7 @@ namespace osu.Game.Tests.Visual
                 {
                     Statistics = new UserStatistics
                     {
-                        Rank = 89000,
+                        Ranks = new UserStatistics.UserRanks { Global = 89000 },
                         PP = 12345,
                     },
                     RankHistory = new User.RankHistoryData
@@ -93,7 +95,7 @@ namespace osu.Game.Tests.Visual
                 {
                     Statistics = new UserStatistics
                     {
-                        Rank = 89000,
+                        Ranks = new UserStatistics.UserRanks { Global = 89000 },
                         PP = 12345,
                     },
                     RankHistory = new User.RankHistoryData
@@ -109,7 +111,7 @@ namespace osu.Game.Tests.Visual
                 {
                     Statistics = new UserStatistics
                     {
-                        Rank = 12000,
+                        Ranks = new UserStatistics.UserRanks { Global = 12000 },
                         PP = 12345,
                     },
                     RankHistory = new User.RankHistoryData

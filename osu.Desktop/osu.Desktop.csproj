@@ -1,14 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Game.props" />
-  <Import Project="..\OpenTK.props" />
   <PropertyGroup Label="Project">
     <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Company>ppy Pty Ltd</Company>
     <Description>click the circles. to the beat.</Description>
-    <Copyright>ppy Pty Ltd 2007-2017</Copyright>
     <AssemblyName>osu!</AssemblyName>
     <Title>osu!lazer</Title>
     <Product>osu!lazer</Product>
@@ -19,19 +16,21 @@
   <PropertyGroup Label="Defines">
     <DefineConstants Condition="'$(TargetFramework)' == 'net461'">$(DefineConstants);NET_FRAMEWORK</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>osu.Desktop.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
-    <PackageReference Include="NUnit" Version="3.8.1" />
     <PackageReference Include="squirrel.windows" Version="1.7.8" Condition="'$(TargetFramework)' == 'net461'" />
   </ItemGroup>
   <ItemGroup Label="Resources">

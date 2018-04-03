@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -17,6 +17,8 @@ using osu.Game.Rulesets.Taiko.Replays;
 using OpenTK;
 using System.Linq;
 using osu.Framework.Input;
+using osu.Game.Input.Handlers;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -77,7 +79,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        protected override Vector2 GetPlayfieldAspectAdjust()
+        protected override Vector2 GetAspectAdjustedSize()
         {
             const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
             const float default_aspect = 16f / 9f;
@@ -86,6 +88,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             return new Vector2(1, default_relative_height * aspectAdjust);
         }
+
+        protected override Vector2 PlayfieldArea => Vector2.One;
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
@@ -130,6 +134,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             return null;
         }
 
-        protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
+        protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
     }
 }

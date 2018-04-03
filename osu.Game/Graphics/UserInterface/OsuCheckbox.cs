@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -76,17 +76,22 @@ namespace osu.Game.Graphics.UserInterface
 
             Nub.Current.BindTo(Current);
 
+            Current.DisabledChanged += disabled =>
+            {
+                Alpha = disabled ? 0.3f : 1;
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             Current.ValueChanged += newValue =>
             {
                 if (newValue)
                     sampleChecked?.Play();
                 else
                     sampleUnchecked?.Play();
-            };
-
-            Current.DisabledChanged += disabled =>
-            {
-                Alpha = disabled ? 0.3f : 1;
             };
         }
 

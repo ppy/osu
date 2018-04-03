@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
@@ -10,6 +10,8 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Catch.Replays;
+using osu.Game.Rulesets.Replays.Types;
 
 namespace osu.Game.Rulesets.Catch
 {
@@ -80,7 +82,7 @@ namespace osu.Game.Rulesets.Catch
                         {
                             Mods = new Mod[]
                             {
-                                new ModAutoplay(),
+                                new CatchModAutoplay(),
                                 new ModCinema(),
                             },
                         },
@@ -99,9 +101,11 @@ namespace osu.Game.Rulesets.Catch
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new CatchDifficultyCalculator(beatmap);
 
-        public override int LegacyID => 2;
+        public override int? LegacyID => 2;
 
-        public CatchRuleset(RulesetInfo rulesetInfo)
+        public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
+
+        public CatchRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
         {
         }

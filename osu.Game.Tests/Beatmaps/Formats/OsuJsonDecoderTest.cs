@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.IO;
@@ -12,7 +12,6 @@ using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Resources;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -85,26 +84,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.AreEqual(4, difficulty.CircleSize);
             Assert.AreEqual(8, difficulty.OverallDifficulty);
             Assert.AreEqual(9, difficulty.ApproachRate);
-            Assert.AreEqual(1.8f, difficulty.SliderMultiplier);
+            Assert.AreEqual(1.8, difficulty.SliderMultiplier);
             Assert.AreEqual(2, difficulty.SliderTickRate);
-        }
-
-        [Test]
-        public void TestDecodeColors()
-        {
-            var beatmap = decodeAsJson(normal);
-            Color4[] expected =
-            {
-                new Color4(142, 199, 255, 255),
-                new Color4(255, 128, 128, 255),
-                new Color4(128, 255, 255, 255),
-                new Color4(128, 255, 128, 255),
-                new Color4(255, 187, 255, 255),
-                new Color4(255, 177, 140, 255),
-            };
-            Assert.AreEqual(expected.Length, beatmap.ComboColors.Count);
-            for (int i = 0; i < expected.Length; i++)
-                Assert.AreEqual(expected[i], beatmap.ComboColors[i]);
         }
 
         [Test]
@@ -159,7 +140,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var sr = new StreamReader(stream))
             {
 
-                var legacyDecoded = new LegacyBeatmapDecoder().DecodeBeatmap(sr);
+                var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
                 using (var ms = new MemoryStream())
                 using (var sw = new StreamWriter(ms))
                 using (var sr2 = new StreamReader(ms))
@@ -168,7 +149,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     sw.Flush();
 
                     ms.Position = 0;
-                    return (legacyDecoded, new JsonBeatmapDecoder().DecodeBeatmap(sr2));
+                    return (legacyDecoded, new JsonBeatmapDecoder().Decode(sr2));
                 }
             }
         }

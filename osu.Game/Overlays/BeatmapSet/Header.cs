@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly FillFlowContainer videoButtons;
         private readonly AuthorInfo author;
         private readonly Container downloadButtonsContainer;
+        private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
         public Details Details;
 
         private BeatmapManager beatmaps;
@@ -50,6 +51,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = BeatmapSet;
                 title.Text = BeatmapSet.Metadata.Title;
                 artist.Text = BeatmapSet.Metadata.Artist;
+                onlineStatusPill.Status = BeatmapSet.OnlineInfo.Status;
 
                 downloadButtonsContainer.FadeIn();
                 noVideoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 0 : 1, transition_duration);
@@ -204,11 +206,23 @@ namespace osu.Game.Overlays.BeatmapSet
                                 },
                             },
                         },
-                        Details = new Details
+                        new FillFlowContainer
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
+                            AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding { Right = BeatmapSetOverlay.X_PADDING },
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(10),
+                            Children = new Drawable[]
+                            {
+                                onlineStatusPill = new BeatmapSetOnlineStatusPill(14, new MarginPadding { Horizontal = 25, Vertical = 8 })
+                                {
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                },
+                                Details = new Details(),
+                            },
                         },
                     },
                 },
@@ -223,13 +237,13 @@ namespace osu.Game.Overlays.BeatmapSet
             tabsBg.Colour = colours.Gray3;
             this.beatmaps = beatmaps;
 
-            beatmaps.BeatmapSetAdded += handleBeatmapAdd;
+            beatmaps.ItemAdded += handleBeatmapAdd;
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            if (beatmaps != null) beatmaps.BeatmapSetAdded -= handleBeatmapAdd;
+            if (beatmaps != null) beatmaps.ItemAdded -= handleBeatmapAdd;
         }
 
         private void handleBeatmapAdd(BeatmapSetInfo beatmap)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -21,9 +21,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public readonly SliderCurve Curve = new SliderCurve();
-
-        public int RepeatCount { get; set; } = 1;
+        public int RepeatCount { get; set; }
 
         public double Velocity;
         public double TickDistance;
@@ -55,83 +53,82 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             var length = Curve.Distance;
             var tickDistance = Math.Min(TickDistance, length);
-            var repeatDuration = length / Velocity;
+            var spanDuration = length / Velocity;
 
             var minDistanceFromEnd = Velocity * 0.01;
 
             AddNested(new Fruit
             {
                 Samples = Samples,
-                ComboColour = ComboColour,
                 StartTime = StartTime,
                 X = X
             });
 
-            for (var repeat = 0; repeat < RepeatCount; repeat++)
+            double lastDropletTime = StartTime;
+
+            for (int span = 0; span < this.SpanCount(); span++)
             {
-                var repeatStartTime = StartTime + repeat * repeatDuration;
-                var reversed = repeat % 2 == 1;
+                var spanStartTime = StartTime + span * spanDuration;
+                var reversed = span % 2 == 1;
 
-                for (var d = tickDistance; d <= length; d += tickDistance)
+                for (double d = 0; d <= length; d += tickDistance)
                 {
-                    if (d > length - minDistanceFromEnd)
-                        break;
-
                     var timeProgress = d / length;
                     var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
 
-                    var lastTickTime = repeatStartTime + timeProgress * repeatDuration;
-                    AddNested(new Droplet
+                    double time = spanStartTime + timeProgress * spanDuration;
+
+                    double tinyTickInterval = time - lastDropletTime;
+                    while (tinyTickInterval > 100)
+                        tinyTickInterval /= 2;
+
+                    for (double t = lastDropletTime + tinyTickInterval; t < time; t += tinyTickInterval)
                     {
-                        StartTime = lastTickTime,
-                        ComboColour = ComboColour,
-                        X = Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
-                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                        double progress = reversed ? 1 - (t - spanStartTime) / spanDuration : (t - spanStartTime) / spanDuration;
+
+                        AddNested(new TinyDroplet
                         {
-                            Bank = s.Bank,
-                            Name = @"slidertick",
-                            Volume = s.Volume
-                        }))
-                    });
-                }
+                            StartTime = t,
+                            X = X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
+                            Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                            {
+                                Bank = s.Bank,
+                                Name = @"slidertick",
+                                Volume = s.Volume
+                            }))
+                        });
+                    }
 
-                double tinyTickInterval = tickDistance / length * repeatDuration;
-                while (tinyTickInterval > 100)
-                    tinyTickInterval /= 2;
-
-                for (double t = 0; t < repeatDuration; t += tinyTickInterval)
-                {
-                    double progress = reversed ? 1 - t / repeatDuration : t / repeatDuration;
-
-                    AddNested(new TinyDroplet
+                    if (d > minDistanceFromEnd && Math.Abs(d - length) > minDistanceFromEnd)
                     {
-                        StartTime = repeatStartTime + t,
-                        ComboColour = ComboColour,
-                        X = Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
-                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                        AddNested(new Droplet
                         {
-                            Bank = s.Bank,
-                            Name = @"slidertick",
-                            Volume = s.Volume
-                        }))
-                    });
+                            StartTime = time,
+                            X = X + Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
+                            Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                            {
+                                Bank = s.Bank,
+                                Name = @"slidertick",
+                                Volume = s.Volume
+                            }))
+                        });
+                    }
+
+                    lastDropletTime = time;
                 }
 
                 AddNested(new Fruit
                 {
                     Samples = Samples,
-                    ComboColour = ComboColour,
-                    StartTime = repeatStartTime + repeatDuration,
-                    X = Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
+                    StartTime = spanStartTime + spanDuration,
+                    X = X + Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
                 });
             }
-
         }
 
+        public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
 
-        public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
-
-        public float EndX => Curve.PositionAt(ProgressAt(1)).X / CatchPlayfield.BASE_WIDTH;
+        public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
 
         public double Duration => EndTime - StartTime;
 
@@ -140,6 +137,8 @@ namespace osu.Game.Rulesets.Catch.Objects
             get { return Curve.Distance; }
             set { Curve.Distance = value; }
         }
+
+        public SliderCurve Curve { get; } = new SliderCurve();
 
         public List<Vector2> ControlPoints
         {
@@ -154,17 +153,5 @@ namespace osu.Game.Rulesets.Catch.Objects
             get { return Curve.CurveType; }
             set { Curve.CurveType = value; }
         }
-
-        public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
-
-        public double ProgressAt(double progress)
-        {
-            double p = progress * RepeatCount % 1;
-            if (RepeatAt(progress) % 2 == 1)
-                p = 1 - p;
-            return p;
-        }
-
-        public int RepeatAt(double progress) => (int)(progress * RepeatCount);
     }
 }

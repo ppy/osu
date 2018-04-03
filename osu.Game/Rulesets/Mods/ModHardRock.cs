@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
         {
             const float ratio = 1.4f;
             difficulty.CircleSize *= 1.3f; // CS uses a custom 1.3 ratio.
-            difficulty.ApproachRate *= ratio;
+            difficulty.ApproachRate = Math.Min(difficulty.ApproachRate * ratio, 10.0f);
             difficulty.DrainRate *= ratio;
             difficulty.OverallDifficulty *= ratio;
         }
