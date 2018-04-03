@@ -13,9 +13,9 @@ namespace osu.Game.Input.Handlers
     public abstract class ReplayInputHandler : InputHandler
     {
         /// <summary>
-        /// A function provided to convert replay coordinates from gamefield to screen space.
+        /// A function that converts coordinates from gamefield to screen space.
         /// </summary>
-        public Func<Vector2, Vector2> ToScreenSpace { protected get; set; }
+        public Func<Vector2, Vector2> GamefieldToScreenSpace { protected get; set; }
 
         /// <summary>
         /// Update the current frame based on an incoming time value.
