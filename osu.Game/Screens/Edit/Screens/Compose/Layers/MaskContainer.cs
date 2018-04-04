@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             if (result)
             {
                 drawable.Selected -= onMaskSelected;
-                drawable.Deselected += onMaskDeselected;
+                drawable.Deselected -= onMaskDeselected;
             }
 
             return result;
