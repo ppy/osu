@@ -78,14 +78,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             box.Position = topLeft;
             box.Size = bottomRight - topLeft;
 
-            foreach (var mask in maskContainer.AliveMasks)
-            {
-                if (mask.IsPresent && dragRectangle.Contains(mask.SelectionPoint))
-                    mask.Select();
-                else
-                    mask.Deselect();
-            }
-
+            maskContainer.Select(dragRectangle);
             return true;
         }
 
