@@ -18,7 +18,6 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using System.Linq;
-using osu.Framework.Configuration;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays

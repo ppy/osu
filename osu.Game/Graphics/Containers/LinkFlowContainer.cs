@@ -72,7 +72,7 @@ namespace osu.Game.Graphics.Containers
                     {
                         case LinkAction.OpenBeatmap:
                             // TODO: proper query params handling
-                            if (int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
+                            if (linkArgument != null && int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
                                 game?.ShowBeatmap(beatmapId);
                             break;
                         case LinkAction.OpenBeatmapSet:
