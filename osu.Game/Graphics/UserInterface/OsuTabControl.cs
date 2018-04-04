@@ -14,21 +14,35 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
+        private readonly Box strip;
+
         protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown();
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem(value);
+
+        protected virtual float StripWidth() => TabContainer.Children.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
+        protected virtual float StripHeight() => 1;
 
         private static bool isEnumType => typeof(T).IsEnum;
 
         public OsuTabControl()
         {
             TabContainer.Spacing = new Vector2(10f, 0f);
+
+            Add(strip = new Box
+            {
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                Height = StripHeight(),
+                Colour = Color4.White.Opacity(0),
+            });
 
             if (isEnumType)
                 foreach (var val in (T[])Enum.GetValues(typeof(T)))
@@ -57,6 +71,12 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        public Color4 StripColour
+        {
+            get => strip.Colour;
+            set => strip.Colour = value;
+        }
+
         protected override TabFillFlowContainer CreateTabFlow() => new OsuTabFillFlowContainer
         {
             Direction = FillDirection.Full,
@@ -64,6 +84,15 @@ namespace osu.Game.Graphics.UserInterface
             Depth = -1,
             Masking = true
         };
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            // dont bother calculating if the strip is invisible
+            if (strip.Colour.MaxAlpha > 0)
+                strip.Width = Interpolation.ValueAt(MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth(), 0, 500, Easing.OutQuint);
+        }
 
         public class OsuTabItem : TabItem<T>, IHasAccentColour
         {
