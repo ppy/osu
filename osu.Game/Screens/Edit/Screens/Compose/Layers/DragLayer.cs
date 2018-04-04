@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         public DragLayer(Action<RectangleF> performSelection)
         {
             this.performSelection = performSelection;
+
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
             Alpha = 0;
