@@ -119,9 +119,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// Handle a mask requesting selection.
         /// </summary>
         /// <param name="mask">The mask.</param>
-        public void HandleSelectionRequested(HitObjectMask mask)
+        public void HandleSelectionRequested(HitObjectMask mask, InputState state)
         {
-            if (GetContainingInputManager().CurrentState.Keyboard.ControlPressed)
+            if (state.Keyboard.ControlPressed)
             {
                 if (mask.State == Visibility.Visible)
                     // we don't want this deselection to affect input for this frame.
