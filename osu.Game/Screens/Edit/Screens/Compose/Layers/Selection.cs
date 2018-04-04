@@ -63,7 +63,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         #region User Input Handling
 
-        // Only handle input on selectable or selected masks
+        /// <summary>
+        /// Handle input on currently selectable or already selected masks.
+        /// Keep in mind that selectedMasks may contain masks for non-current objects, which we still want to handle input while selected.
+        /// </summary>
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => selectableMasks.Reverse().Concat(selectedMasks).Any(m => m.ReceiveMouseInputAt(screenSpacePos));
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
