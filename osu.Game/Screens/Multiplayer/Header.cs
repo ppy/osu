@@ -21,7 +21,6 @@ namespace osu.Game.Screens.Multiplayer
     public class Header : Container
     {
         private readonly OsuSpriteText screenTitle;
-        private readonly Box tabStrip;
         private readonly BreadcrumbControl<MultiplayerScreen> breadcrumbs;
 
         private MultiplayerScreen currentScreen;
@@ -108,13 +107,6 @@ namespace osu.Game.Screens.Multiplayer
                                 },
                             },
                         },
-                        tabStrip = new Box
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Width = 0,
-                            Height = 1,
-                        },
                         breadcrumbs = new BreadcrumbControl<MultiplayerScreen>
                         {
                             Anchor = Anchor.BottomLeft,
@@ -142,7 +134,7 @@ namespace osu.Game.Screens.Multiplayer
         private void load(OsuColour colours)
         {
             screenTitle.Colour = colours.Yellow;
-            tabStrip.Colour = colours.Green;
+            breadcrumbs.StripColour = colours.Green;
         }
 
         private void onExited(Screen screen)

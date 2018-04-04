@@ -14,13 +14,14 @@ namespace osu.Game.Graphics.UserInterface
     public class BreadcrumbControl<T> : OsuTabControl<T>
     {
         private const float padding = 10;
+        private const float item_chevron_size = 10;
 
         protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value)
         {
             AccentColour = AccentColour,
         };
 
-        protected override float StripWidth() => base.StripWidth() - (padding + 8);
+        protected override float StripWidth() => base.StripWidth() - (padding + item_chevron_size);
 
         public BreadcrumbControl()
         {
@@ -41,8 +42,6 @@ namespace osu.Game.Graphics.UserInterface
 
         private class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
-            private readonly Vector2 chevronSize = new Vector2(10);
-
             public event Action<Visibility> StateChanged;
 
             public readonly SpriteIcon Chevron;
@@ -84,13 +83,13 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Text.TextSize = 18;
                 Text.Margin = new MarginPadding { Vertical = 8 };
-                Padding = new MarginPadding { Right = padding + chevronSize.X };
+                Padding = new MarginPadding { Right = padding + item_chevron_size };
 
                 Add(Chevron = new SpriteIcon
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
-                    Size = chevronSize,
+                    Size = new Vector2(item_chevron_size),
                     Icon = FontAwesome.fa_chevron_right,
                     Margin = new MarginPadding { Left = padding },
                     Alpha = 0f,
