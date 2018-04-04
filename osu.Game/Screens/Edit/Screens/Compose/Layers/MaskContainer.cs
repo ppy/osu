@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Game.Rulesets.Edit;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 
@@ -26,7 +27,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <summary>
         /// Invoked when any <see cref="HitObjectMask"/> requests selection.
         /// </summary>
-        public event Action<HitObjectMask> MaskSelectionRequested;
+        public event Action<HitObjectMask, InputState> MaskSelectionRequested;
 
         private IEnumerable<HitObjectMask> aliveMasks => AliveInternalChildren.Cast<HitObjectMask>();
 
@@ -78,7 +79,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         private void onMaskSelected(HitObjectMask mask) => MaskSelected?.Invoke(mask);
         private void onMaskDeselected(HitObjectMask mask) => MaskDeselected?.Invoke(mask);
-        private void onSelectionRequested(HitObjectMask mask) => MaskSelectionRequested?.Invoke(mask);
+        private void onSelectionRequested(HitObjectMask mask, InputState state) => MaskSelectionRequested?.Invoke(mask, state);
 
         protected override int Compare(Drawable x, Drawable y)
         {

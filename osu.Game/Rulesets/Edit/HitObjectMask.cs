@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Edit
         /// Invoked when this <see cref="HitObjectMask"/> has requested selection.
         /// Will fire even if already selected. Does not actually perform selection.
         /// </summary>
-        public event Action<HitObjectMask> SelectionRequested;
+        public event Action<HitObjectMask, InputState> SelectionRequested;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectMask"/> applies to.
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            SelectionRequested?.Invoke(this);
+            SelectionRequested?.Invoke(this, state);
             return base.OnMouseDown(state, args);
         }
 
