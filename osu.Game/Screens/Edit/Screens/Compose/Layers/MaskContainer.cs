@@ -23,6 +23,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// </summary>
         public event Action<HitObjectMask> MaskDeselected;
 
+        /// <summary>
+        /// Invoked when any <see cref="HitObjectMask"/> requests selection.
+        /// </summary>
         public event Action<HitObjectMask> MaskSelectionRequested;
 
         private IEnumerable<HitObjectMask> aliveMasks => AliveInternalChildren.Cast<HitObjectMask>();

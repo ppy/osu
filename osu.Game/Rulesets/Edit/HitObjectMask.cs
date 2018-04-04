@@ -26,9 +26,8 @@ namespace osu.Game.Rulesets.Edit
         public event Action<HitObjectMask> Deselected;
 
         /// <summary>
-        /// Invoked when this <see cref="HitObjectMask"/> has rqeuested selection.
-        /// Will fire even if already selected.
-        /// Does not actually perform selection.
+        /// Invoked when this <see cref="HitObjectMask"/> has requested selection.
+        /// Will fire even if already selected. Does not actually perform selection.
         /// </summary>
         public event Action<HitObjectMask> SelectionRequested;
 
