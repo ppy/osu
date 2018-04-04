@@ -35,15 +35,15 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             selectionBox = composer.CreateSelectionBox(maskContainer);
 
-            var dragBox = new DragLayer(maskContainer);
-            dragBox.DragEnd += () => selectionBox.UpdateVisibility();
+            var dragLayer = new DragLayer(maskContainer);
+            dragLayer.DragEnd += () => selectionBox.UpdateVisibility();
 
             InternalChildren = new Drawable[]
             {
-                dragBox,
+                dragLayer,
                 maskContainer,
                 selectionBox,
-                dragBox.CreateProxy()
+                dragLayer.CreateProxy()
             };
 
             foreach (var obj in playfield.HitObjects.Objects)
