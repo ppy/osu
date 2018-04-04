@@ -13,9 +13,9 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestCaseJuiceStream : TestCasePlayer
+    public class TestCaseAutoJuiceStream : TestCasePlayer
     {
-        public TestCaseJuiceStream()
+        public TestCaseAutoJuiceStream()
             : base(new CatchRuleset())
         {
         }
