@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -22,26 +23,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     {
         public const float BORDER_RADIUS = 2;
 
-        private readonly MaskContainer maskContainer;
-
         private readonly SortedList<HitObjectMask> selectedMasks;
 
         private Drawable outline;
 
-        public MaskSelection(MaskContainer maskContainer)
+        public MaskSelection()
         {
-            // todo: remove this
-            this.maskContainer = maskContainer;
-
-            selectedMasks = new SortedList<HitObjectMask>(maskContainer.Compare);
+            selectedMasks = new SortedList<HitObjectMask>(MaskContainer.Compare);
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
             Alpha = 0;
-
-            maskContainer.MaskSelected += onSelected;
-            maskContainer.MaskDeselected += onDeselected;
-            maskContainer.MaskSelectionRequested += onSelectionRequested;
         }
 
         [BackgroundDependencyLoader]
@@ -99,9 +91,22 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         #region Selection Handling
 
-        private void onSelected(HitObjectMask mask) => selectedMasks.Add(mask);
+        /// <summary>
+        /// Bind an action to deselect all selected masks.
+        /// </summary>
+        public Action DeselectAll { private get; set; }
 
-        private void onDeselected(HitObjectMask mask)
+        /// <summary>
+        /// Handle a mask becoming selected.
+        /// </summary>
+        /// <param name="mask">The mask.</param>
+        public void HandleSelected(HitObjectMask mask) => selectedMasks.Add(mask);
+
+        /// <summary>
+        /// Handle a mask becoming deselected.
+        /// </summary>
+        /// <param name="mask">The mask.</param>
+        public void HandleDeselected(HitObjectMask mask)
         {
             selectedMasks.Remove(mask);
 
@@ -110,7 +115,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 UpdateVisibility();
         }
 
-        private void onSelectionRequested(HitObjectMask mask)
+        /// <summary>
+        /// Handle a mask requesting selection.
+        /// </summary>
+        /// <param name="mask">The mask.</param>
+        public void HandleSelectionRequested(HitObjectMask mask)
         {
             if (GetContainingInputManager().CurrentState.Keyboard.ControlPressed)
             {
@@ -125,7 +134,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 if (mask.State == Visibility.Visible)
                     return;
 
-                maskContainer.DeselectAll();
+
+                DeselectAll?.Invoke();
                 mask.Select();
             }
 
@@ -169,15 +179,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             outline.Size = bottomRight - topLeft;
             outline.Position = topLeft;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            maskContainer.MaskSelected -= onSelected;
-            maskContainer.MaskDeselected -= onDeselected;
-            maskContainer.MaskSelectionRequested -= onSelectionRequested;
         }
     }
 }

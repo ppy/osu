@@ -18,7 +18,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private readonly HitObjectComposer composer;
 
         private MaskContainer maskContainer;
-        private MaskSelection maskSelection;
 
         public HitObjectMaskLayer(Playfield playfield, HitObjectComposer composer)
         {
@@ -33,7 +32,12 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         {
             maskContainer = new MaskContainer();
 
-            maskSelection = composer.CreateSelectionBox(maskContainer);
+            var maskSelection = composer.CreateMaskSelection();
+
+            maskContainer.MaskSelected += maskSelection.HandleSelected;
+            maskContainer.MaskDeselected += maskSelection.HandleDeselected;
+            maskContainer.MaskSelectionRequested += maskSelection.HandleSelectionRequested;
+            maskSelection.DeselectAll = maskContainer.DeselectAll;
 
             var dragLayer = new DragLayer(maskContainer.Select);
             dragLayer.DragEnd += () => maskSelection.UpdateVisibility();
