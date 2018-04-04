@@ -123,15 +123,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         {
             if (state.Keyboard.ControlPressed)
             {
-                if (mask.State == Visibility.Visible)
-                    // we don't want this deselection to affect input for this frame.
-                    Schedule(() => mask.Deselect());
+                if (mask.IsSelected)
+                    mask.Deselect();
                 else
                     mask.Select();
             }
             else
             {
-                if (mask.State == Visibility.Visible)
+                if (mask.IsSelected)
                     return;
 
 

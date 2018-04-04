@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
@@ -40,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
 
             AddInternal(new RingPiece());
 
-            State = Visibility.Visible;
+            Select();
         }
 
         [BackgroundDependencyLoader]

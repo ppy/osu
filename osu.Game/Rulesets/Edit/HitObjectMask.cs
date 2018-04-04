@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A mask placed above a <see cref="DrawableHitObject"/> adding editing functionality.
     /// </summary>
-    public class HitObjectMask : VisibilityContainer
+    public class HitObjectMask : CompositeDrawable, IStateful<SelectionState>
     {
         /// <summary>
         /// Invoked when this <see cref="HitObjectMask"/> has been selected.
@@ -36,7 +37,7 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public readonly DrawableHitObject HitObject;
 
-        protected override bool ShouldBeAlive => HitObject.IsAlive && HitObject.IsPresent || State == Visibility.Visible;
+        protected override bool ShouldBeAlive => HitObject.IsAlive && HitObject.IsPresent || State == SelectionState.Selected;
         public override bool HandleMouseInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
@@ -45,45 +46,72 @@ namespace osu.Game.Rulesets.Edit
             HitObject = hitObject;
 
             AlwaysPresent = true;
-            State = Visibility.Hidden;
+            Alpha = 0;
+        }
+
+        private SelectionState state;
+
+        public event Action<SelectionState> StateChanged;
+
+        public SelectionState State
+        {
+            get => state;
+            set
+            {
+                if (state == value) return;
+
+                state = value;
+                switch (state)
+                {
+                    case SelectionState.Selected:
+                        Show();
+                        Selected?.Invoke(this);
+                        break;
+                    case SelectionState.NotSelected:
+                        Hide();
+                        Deselected?.Invoke(this);
+                        break;
+                }
+            }
         }
 
         /// <summary>
         /// Selects this <see cref="HitObjectMask"/>, causing it to become visible.
         /// </summary>
-        /// <returns>True if the <see cref="HitObjectMask"/> was selected. False if the <see cref="HitObjectMask"/> was already selected.</returns>
-        public bool Select()
-        {
-            if (State == Visibility.Visible)
-                return false;
-
-            Show();
-            Selected?.Invoke(this);
-            return true;
-        }
-
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            SelectionRequested?.Invoke(this, state);
-            return base.OnMouseDown(state, args);
-        }
+        public void Select() => State = SelectionState.Selected;
 
         /// <summary>
         /// Deselects this <see cref="HitObjectMask"/>, causing it to become invisible.
         /// </summary>
-        /// <returns>True if the <see cref="HitObjectMask"/> was deselected. False if the <see cref="HitObjectMask"/> was already deselected.</returns>
-        public bool Deselect()
-        {
-            if (State == Visibility.Hidden)
-                return false;
+        public void Deselect() => State = SelectionState.NotSelected;
 
-            Hide();
-            Deselected?.Invoke(this);
-            return true;
+        public bool IsSelected => State == SelectionState.Selected;
+
+        private bool selectionRequested;
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            selectionRequested = false;
+
+            if (State == SelectionState.NotSelected && !selectionRequested)
+            {
+                SelectionRequested?.Invoke(this, state);
+                selectionRequested = true;
+            }
+
+            return base.OnMouseDown(state, args);
         }
 
-        protected override void PopIn() => Alpha = 1;
-        protected override void PopOut() => Alpha = 0;
+        protected override bool OnClick(InputState state)
+        {
+            if (State == SelectionState.Selected && !selectionRequested)
+            {
+                selectionRequested = true;
+                SelectionRequested?.Invoke(this, state);
+            }
+
+            return base.OnClick(state);
+        }
 
         /// <summary>
         /// The screen-space point that causes this <see cref="HitObjectMask"/> to be selected.
@@ -94,5 +122,11 @@ namespace osu.Game.Rulesets.Edit
         /// The screen-space quad that outlines this <see cref="HitObjectMask"/> for selections.
         /// </summary>
         public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
+    }
+
+    public enum SelectionState
+    {
+        NotSelected,
+        Selected
     }
 }
