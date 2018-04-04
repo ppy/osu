@@ -115,10 +115,8 @@ namespace osu.Game.Rulesets.Edit
             };
 
             toolboxCollection.Items =
-                new[] { new RadioButton("Select", () => setCompositionTool(null)) }
-                .Concat(
-                    CompositionTools.Select(t => new RadioButton(t.Name, () => setCompositionTool(t)))
-                )
+                CompositionTools.Select(t => new RadioButton(t.Name, () => setCompositionTool(t)))
+                .Prepend(new RadioButton("Select", () => setCompositionTool(null)))
                 .ToList();
 
             toolboxCollection.Items[0].Select();
