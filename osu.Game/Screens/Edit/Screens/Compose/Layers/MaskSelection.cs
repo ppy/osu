@@ -63,8 +63,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         #region User Input Handling
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
-
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => handleInput(state);
 
         protected override bool OnDragStart(InputState state) => handleInput(state);
@@ -73,7 +71,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         private bool handleInput(InputState state)
         {
-            if (!selectedMasks.Any(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position)))
+            if (!selectedMasks.Any(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.PositionMouseDown ?? state.Mouse.NativeState.Position)))
                 return false;
 
             UpdateVisibility();
