@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Edit;
+using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
@@ -46,6 +47,21 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Select all masks in a given rectangle selection area.
+        /// </summary>
+        /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
+        public void Select(RectangleF rect)
+        {
+            foreach (var mask in AliveMasks)
+            {
+                if (mask.IsPresent && rect.Contains(mask.SelectionPoint))
+                    mask.Select();
+                else
+                    mask.Deselect();
+            }
         }
 
         private void onMaskSelected(HitObjectMask mask) => MaskSelected?.Invoke(mask);
