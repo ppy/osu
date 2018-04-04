@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private readonly HitObjectComposer composer;
 
         private MaskContainer maskContainer;
-        private SelectionBox selectionBox;
+        private MaskSelection maskSelection;
 
         public HitObjectMaskLayer(Playfield playfield, HitObjectComposer composer)
         {
@@ -33,21 +33,27 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         {
             maskContainer = new MaskContainer();
 
-            selectionBox = composer.CreateSelectionBox(maskContainer);
+            maskSelection = composer.CreateSelectionBox(maskContainer);
 
-            dragLayer.DragEnd += () => selectionBox.UpdateVisibility();
             var dragLayer = new DragLayer(maskContainer.Select);
+            dragLayer.DragEnd += () => maskSelection.UpdateVisibility();
 
             InternalChildren = new Drawable[]
             {
                 dragLayer,
+                maskSelection,
                 maskContainer,
-                selectionBox,
                 dragLayer.CreateProxy()
             };
 
             foreach (var obj in playfield.HitObjects.Objects)
                 addMask(obj);
+        }
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            maskContainer.DeselectAll();
+            return true;
         }
 
         /// <summary>
@@ -74,12 +80,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 return;
 
             maskContainer.Remove(mask);
-        }
-
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            selectionBox.DeselectAll();
-            return true;
         }
     }
 }

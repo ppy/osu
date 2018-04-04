@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 
@@ -25,13 +26,21 @@ namespace osu.Game.Rulesets.Edit
         public event Action<HitObjectMask> Deselected;
 
         /// <summary>
+        /// Invoked when this <see cref="HitObjectMask"/> has rqeuested selection.
+        /// Will fire even if already selected.
+        /// Does not actually perform selection.
+        /// </summary>
+        public event Action<HitObjectMask> SelectionRequested;
+
+        /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectMask"/> applies to.
         /// </summary>
         public readonly DrawableHitObject HitObject;
 
         protected override bool ShouldBeAlive => HitObject.IsAlive || State == Visibility.Visible;
         public override bool RemoveWhenNotAlive => false;
-        public override bool HandleMouseInput => HitObject.IsPresent;
+
+        public override bool HandleMouseInput => ShouldBeAlive;
 
         public HitObjectMask(DrawableHitObject hitObject)
         {
@@ -53,6 +62,12 @@ namespace osu.Game.Rulesets.Edit
             Show();
             Selected?.Invoke(this);
             return true;
+        }
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            SelectionRequested?.Invoke(this);
+            return base.OnMouseDown(state, args);
         }
 
         /// <summary>

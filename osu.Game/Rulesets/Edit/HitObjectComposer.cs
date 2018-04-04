@@ -248,11 +248,11 @@ namespace osu.Game.Rulesets.Edit
         public virtual HitObjectMask CreateMaskFor(DrawableHitObject hitObject) => null;
 
         /// <summary>
-        /// Creates a <see cref="SelectionBox"/> which outlines <see cref="DrawableHitObject"/>s
+        /// Creates a <see cref="MaskSelection"/> which outlines <see cref="DrawableHitObject"/>s
         /// and handles hitobject pattern adjustments.
         /// </summary>
         /// <param name="maskContainer">The <see cref="HitObjectMask"/> container.</param>
-        public virtual SelectionBox CreateSelectionBox(MaskContainer maskContainer) => new SelectionBox(maskContainer);
+        public virtual MaskSelection CreateSelectionBox(MaskContainer maskContainer) => new MaskSelection(maskContainer);
 
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.

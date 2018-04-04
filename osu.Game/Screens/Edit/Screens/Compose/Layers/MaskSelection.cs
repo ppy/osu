@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -19,19 +18,19 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     /// <summary>
     /// A box which surrounds <see cref="HitObjectMask"/>s and provides interactive handles, context menus etc.
     /// </summary>
-    public class SelectionBox : CompositeDrawable
+    public class MaskSelection : CompositeDrawable
     {
         public const float BORDER_RADIUS = 2;
 
         private readonly MaskContainer maskContainer;
 
         private readonly SortedList<HitObjectMask> selectedMasks;
-        private IEnumerable<HitObjectMask> selectableMasks => maskContainer.AliveMasks;
 
         private Drawable outline;
 
-        public SelectionBox(MaskContainer maskContainer)
+        public MaskSelection(MaskContainer maskContainer)
         {
+            // todo: remove this
             this.maskContainer = maskContainer;
 
             selectedMasks = new SortedList<HitObjectMask>(maskContainer.Compare);
@@ -42,6 +41,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             maskContainer.MaskSelected += onSelected;
             maskContainer.MaskDeselected += onDeselected;
+            maskContainer.MaskSelectionRequested += onSelectionRequested;
         }
 
         [BackgroundDependencyLoader]
@@ -63,41 +63,22 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         #region User Input Handling
 
-        /// <summary>
-        /// Handle input on currently selectable or already selected masks.
-        /// Keep in mind that selectedMasks may contain masks for non-current objects, which we still want to handle input while selected.
-        /// </summary>
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => selectableMasks.Reverse().Concat(selectedMasks).Any(m => m.ReceiveMouseInputAt(screenSpacePos));
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => handleInput(state);
+
+        protected override bool OnDragStart(InputState state) => handleInput(state);
+
+        protected override bool OnDragEnd(InputState state) => true;
+
+        private bool handleInput(InputState state)
         {
-            // If masks are overlapping, make sure we don't change the selection if the overlapped portion is pressed
-            if (selectedMasks.Any(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position)))
-                return true;
-
-            DeselectAll();
-            selectableMasks.Reverse().First(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position)).Select();
+            if (!selectedMasks.Any(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position)))
+                return false;
 
             UpdateVisibility();
             return true;
         }
-
-        protected override bool OnClick(InputState state)
-        {
-            // If there's only mask, this isn't going to change anything, so we can save on doing some processing here
-            if (selectedMasks.Count == 1)
-                return true;
-
-            var toSelect = selectedMasks.Reverse().First(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.Position));
-
-            DeselectAll();
-            toSelect.Select();
-
-            UpdateVisibility();
-            return true;
-        }
-
-        protected override bool OnDragStart(InputState state) => true;
 
         protected override bool OnDrag(InputState state)
         {
@@ -116,8 +97,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             return true;
         }
 
-        protected override bool OnDragEnd(InputState state) => true;
-
         #endregion
 
         #region Selection Handling
@@ -133,15 +112,32 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 UpdateVisibility();
         }
 
-        /// <summary>
-        /// Deselects all selected <see cref="HitObjectMask"/>s.
-        /// </summary>
-        public void DeselectAll() => selectedMasks.ToList().ForEach(m => m.Deselect());
+        private void onSelectionRequested(HitObjectMask mask)
+        {
+            if (GetContainingInputManager().CurrentState.Keyboard.ControlPressed)
+            {
+                if (mask.State == Visibility.Visible)
+                    // we don't want this deselection to affect input for this frame.
+                    Schedule(() => mask.Deselect());
+                else
+                    mask.Select();
+            }
+            else
+            {
+                if (mask.State == Visibility.Visible)
+                    return;
+
+                maskContainer.DeselectAll();
+                mask.Select();
+            }
+
+            UpdateVisibility();
+        }
 
         #endregion
 
         /// <summary>
-        /// Updates whether this <see cref="SelectionBox"/> is visible.
+        /// Updates whether this <see cref="MaskSelection"/> is visible.
         /// </summary>
         internal void UpdateVisibility()
         {
@@ -183,6 +179,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             maskContainer.MaskSelected -= onSelected;
             maskContainer.MaskDeselected -= onDeselected;
+            maskContainer.MaskSelectionRequested -= onSelectionRequested;
         }
     }
 }

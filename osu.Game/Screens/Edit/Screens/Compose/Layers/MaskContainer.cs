@@ -23,10 +23,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// </summary>
         public event Action<HitObjectMask> MaskDeselected;
 
+        public event Action<HitObjectMask> MaskSelectionRequested;
+
         /// <summary>
         /// All the <see cref="HitObjectMask"/>s with <see cref="IsAlive"/> == true.
         /// </summary>
         public IEnumerable<HitObjectMask> AliveMasks => AliveInternalChildren.Cast<HitObjectMask>();
+
+        public MaskContainer()
+        {
+            RelativeSizeAxes = Axes.Both;
+        }
 
         public override void Add(HitObjectMask drawable)
         {
@@ -34,6 +41,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             drawable.Selected += onMaskSelected;
             drawable.Deselected += onMaskDeselected;
+            drawable.SelectionRequested += onSelectionRequested;
         }
 
         public override bool Remove(HitObjectMask drawable)
@@ -44,6 +52,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             {
                 drawable.Selected -= onMaskSelected;
                 drawable.Deselected -= onMaskDeselected;
+                drawable.SelectionRequested -= onSelectionRequested;
             }
 
             return result;
@@ -59,13 +68,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             {
                 if (mask.IsPresent && rect.Contains(mask.SelectionPoint))
                     mask.Select();
-                else
-                    mask.Deselect();
             }
         }
 
+        /// <summary>
+        /// Deselects all selected <see cref="HitObjectMask"/>s.
+        /// </summary>
+        public void DeselectAll() => AliveMasks.ToList().ForEach(m => m.Deselect());
+
         private void onMaskSelected(HitObjectMask mask) => MaskSelected?.Invoke(mask);
         private void onMaskDeselected(HitObjectMask mask) => MaskDeselected?.Invoke(mask);
+        private void onSelectionRequested(HitObjectMask mask) => MaskSelectionRequested?.Invoke(mask);
 
         protected override int Compare(Drawable x, Drawable y)
         {
