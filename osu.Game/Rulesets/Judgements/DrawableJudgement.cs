@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Judgements
         private void load(OsuColour colours)
         {
             this.colours = colours;
+
             Child = new SkinnableDrawable($"Play/{Judgement.Result}", _ => JudgementText = new OsuSpriteText
             {
                 Text = Judgement.Result.GetDescription().ToUpper(),
