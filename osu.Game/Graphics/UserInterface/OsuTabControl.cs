@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
@@ -90,7 +91,7 @@ namespace osu.Game.Graphics.UserInterface
 
             // dont bother calculating if the strip is invisible
             if (strip.Colour.MaxAlpha > 0)
-                strip.ResizeWidthTo(StripWidth(), 500, Easing.OutQuint);
+                strip.Width = Interpolation.ValueAt(MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth(), 0, 500, Easing.OutQuint);
         }
 
         public class OsuTabItem : TabItem<T>, IHasAccentColour
