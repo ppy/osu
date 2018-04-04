@@ -25,10 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         public event Action<HitObjectMask> MaskSelectionRequested;
 
-        /// <summary>
-        /// All the <see cref="HitObjectMask"/>s with <see cref="IsAlive"/> == true.
-        /// </summary>
-        public IEnumerable<HitObjectMask> AliveMasks => AliveInternalChildren.Cast<HitObjectMask>();
+        private IEnumerable<HitObjectMask> aliveMasks => AliveInternalChildren.Cast<HitObjectMask>();
 
         public MaskContainer()
         {
@@ -64,7 +61,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
         public void Select(RectangleF rect)
         {
-            foreach (var mask in AliveMasks)
+            foreach (var mask in aliveMasks)
             {
                 if (mask.IsPresent && rect.Contains(mask.SelectionPoint))
                     mask.Select();
@@ -74,7 +71,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <summary>
         /// Deselects all selected <see cref="HitObjectMask"/>s.
         /// </summary>
-        public void DeselectAll() => AliveMasks.ToList().ForEach(m => m.Deselect());
+        public void DeselectAll() => aliveMasks.ToList().ForEach(m => m.Deselect());
 
         private void onMaskSelected(HitObjectMask mask) => MaskSelected?.Invoke(mask);
         private void onMaskDeselected(HitObjectMask mask) => MaskDeselected?.Invoke(mask);
