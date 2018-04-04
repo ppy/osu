@@ -1,39 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\osu.Game.props" />
+  <Import Project="..\osu.TestProject.props" />
   <PropertyGroup Label="Project">
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <OutputType>Library</OutputType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Company>ppy Pty Ltd</Company>
-    <Version>1.0.0.0</Version>
-    <Copyright>ppy Pty Ltd 2007-2017</Copyright>
-    <AssemblyTitle>osu.Game.Tests</AssemblyTitle>
-    <Product>osu.Game.Tests</Product>
-    <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway. -->
-    <NoWarn>NU1701</NoWarn>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
   </PropertyGroup>
-  <ItemGroup Label="Service">
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-  </ItemGroup>
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
-    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
-  </ItemGroup>
-  <ItemGroup Label="Package References">
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
-    <PackageReference Include="DeepEqual" Version="1.6.0" />
-    <PackageReference Include="NUnit" Version="3.8.1" />
-  </ItemGroup>
-  <ItemGroup Label="Resources">
-    <EmbeddedResource Include="Resources\Soleily - Renatus %28Gamu%29 [Insane].osu" />
-    <EmbeddedResource Include="Resources\Himeringo - Yotsuya-san ni Yoroshiku %28RLC%29 [Winber1%27s Extreme].osu" />
-    <EmbeddedResource Include="Resources\Within Temptation - The Unforgiving %28Armin%29 [Marathon].osu" />
-    <EmbeddedResource Include="Resources\Kozato snow - Rengetsu Ouka %28_Kiva%29 [Yuki YukI].osu" />
   </ItemGroup>
 </Project>
