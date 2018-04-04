@@ -95,14 +95,11 @@ namespace osu.Game.Rulesets.Judgements
                 case HitResult.Perfect:
                 case HitResult.Great:
                     return colours.Blue;
-
                 case HitResult.Ok:
                 case HitResult.Good:
                     return colours.Green;
-
                 case HitResult.Meh:
                     return colours.Yellow;
-
                 case HitResult.Miss:
                     return colours.Red;
             }
