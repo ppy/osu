@@ -18,12 +18,12 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     /// </summary>
     public class DragLayer : CompositeDrawable
     {
+        private readonly Action<RectangleF> performSelection;
+
         /// <summary>
         /// Invoked when the drag selection has finished.
         /// </summary>
         public event Action DragEnd;
-
-        private readonly MaskContainer maskContainer;
 
         private Drawable box;
 
@@ -31,10 +31,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// Creates a new <see cref="DragLayer"/>.
         /// </summary>
         /// <param name="maskContainer">The selectable <see cref="HitObjectMask"/>s.</param>
-        public DragLayer(MaskContainer maskContainer)
+        public DragLayer(Action<RectangleF> performSelection)
         {
-            this.maskContainer = maskContainer;
-
+            this.performSelection = performSelection;
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
             Alpha = 0;
@@ -78,7 +77,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             box.Position = topLeft;
             box.Size = bottomRight - topLeft;
 
-            maskContainer.Select(dragRectangle);
+            performSelection?.Invoke(dragRectangle);
             return true;
         }
 
