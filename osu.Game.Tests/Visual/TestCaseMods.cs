@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("check for ranked", () => modSelect.RankedLabel.Alpha == 0);
             selectNext(mod);
             AddWaitStep(1, "wait for fade");
-            AddAssert("check for unranked", () => !(modSelect.RankedLabel.Alpha == 0));
+            AddAssert("check for unranked", () => modSelect.RankedLabel.Alpha != 0);
             selectPrevious(mod);
             AddWaitStep(1, "wait for fade");
             AddAssert("check for ranked", () => modSelect.RankedLabel.Alpha == 0);
