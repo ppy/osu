@@ -83,12 +83,19 @@ namespace osu.Game.Screens.Play
         private void load(AudioManager audio, APIAccess api, OsuConfigManager config)
         {
             this.api = api;
+
+            WorkingBeatmap working = Beatmap.Value;
+            if (working is DummyWorkingBeatmap)
+            {
+                Exit();
+                return;
+            }
+
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
 
-            WorkingBeatmap working = Beatmap.Value;
             Beatmap beatmap;
 
             try
