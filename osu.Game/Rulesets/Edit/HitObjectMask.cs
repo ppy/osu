@@ -37,10 +37,9 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public readonly DrawableHitObject HitObject;
 
-        protected override bool ShouldBeAlive => HitObject.IsAlive || State == Visibility.Visible;
-        public override bool RemoveWhenNotAlive => false;
-
+        protected override bool ShouldBeAlive => HitObject.IsAlive && HitObject.IsPresent || State == Visibility.Visible;
         public override bool HandleMouseInput => ShouldBeAlive;
+        public override bool RemoveWhenNotAlive => false;
 
         public HitObjectMask(DrawableHitObject hitObject)
         {
