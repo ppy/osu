@@ -69,6 +69,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             {
                 if (mask.IsPresent && rect.Contains(mask.SelectionPoint))
                     mask.Select();
+                else
+                    mask.Deselect();
             }
         }
 
