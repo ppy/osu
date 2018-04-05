@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         {
             dependencies.Cache(beatDivisor);
 
-            ScrollableTimeline timeline;
+            TimelineContainer timelineContainer;
             Children = new Drawable[]
             {
                 new GridContainer
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
                                                         Padding = new MarginPadding { Right = 5 },
-                                                        Child = timeline = new ScrollableTimeline { RelativeSizeAxes = Axes.Both }
+                                                        Child = timelineContainer = new TimelineContainer { RelativeSizeAxes = Axes.Both }
                                                     },
                                                     new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
                                                 },
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 },
             };
 
-            timeline.Beatmap.BindTo(Beatmap);
+            timelineContainer.Beatmap.BindTo(Beatmap);
 
             var ruleset = Beatmap.Value.BeatmapInfo.Ruleset?.CreateInstance();
             if (ruleset == null)
