@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             private float startScrollOffset;
 
             /// <summary>
-            /// Transforms <see cref="Timeline.zoom"/> to a new value.
+            /// Transforms <see cref="TimeTimelinem"/> to a new value.
             /// </summary>
             /// <param name="focusPoint">The focus point in the waveform, in absolute coordinates local to the waveform.</param>
             /// <param name="waveformSize">The size of the waveform.</param>
