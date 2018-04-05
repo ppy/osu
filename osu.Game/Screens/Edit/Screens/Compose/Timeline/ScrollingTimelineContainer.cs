@@ -44,6 +44,12 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
         }
 
+        public int Zoom
+        {
+            get => zoomTarget;
+            set => setZoomTarget(value, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), waveformContainer).X);
+        }
+
         protected override void Update()
         {
             base.Update();
