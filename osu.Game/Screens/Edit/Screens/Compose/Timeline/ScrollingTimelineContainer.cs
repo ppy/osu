@@ -61,14 +61,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             return true;
         }
 
-        private float zoomTarget = 10;
-        private void setZoomTarget(float newZoom, float focusPoint)
+        private int zoomTarget = 10;
+        private void setZoomTarget(int newZoom, float focusPoint)
         {
             zoomTarget = MathHelper.Clamp(newZoom, 1, 60);
             transformZoomTo(zoomTarget, focusPoint, 200, Easing.OutQuint);
         }
 
-        private void transformZoomTo(float newZoom, float focusPoint, double duration = 0, Easing easing = Easing.None)
+        private void transformZoomTo(int newZoom, float focusPoint, double duration = 0, Easing easing = Easing.None)
             => this.TransformTo(this.PopulateTransform(new TransformZoom(focusPoint, waveformContainer.DrawWidth, DrawWidth, Current), newZoom, duration, easing));
 
         private class TransformZoom : Transform<float, ScrollingTimelineContainer>
