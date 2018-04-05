@@ -33,82 +33,90 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.FromHex("111")
                 },
-                new FillFlowContainer
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Children = new Drawable[]
+                    Content = new[]
                     {
-                        new Container
+                        new Drawable[]
                         {
-                            AutoSizeAxes = Axes.X,
-                            RelativeSizeAxes = Axes.Y,
-                            Children = new Drawable[]
+                            new Container
                             {
-                                new Box
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.FromHex("222")
-                                },
-                                new FillFlowContainer
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    AutoSizeAxes = Axes.Y,
-                                    Width = 160,
-                                    Padding = new MarginPadding { Horizontal = 15 },
-                                    Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0, 4),
-                                    Children = new[]
+                                    new Box
                                     {
-                                        hitObjectsCheckbox = new OsuCheckbox { LabelText = "Hitobjects" },
-                                        hitSoundsCheckbox = new OsuCheckbox { LabelText = "Hitsounds" },
-                                        waveformCheckbox = new OsuCheckbox { LabelText = "Waveform" }
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = OsuColour.FromHex("222")
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        AutoSizeAxes = Axes.Y,
+                                        Width = 160,
+                                        Padding = new MarginPadding { Horizontal = 15 },
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(0, 4),
+                                        Children = new[]
+                                        {
+                                            hitObjectsCheckbox = new OsuCheckbox { LabelText = "Hitobjects" },
+                                            hitSoundsCheckbox = new OsuCheckbox { LabelText = "Hitsounds" },
+                                            waveformCheckbox = new OsuCheckbox { LabelText = "Waveform" }
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        new Container
-                        {
-                            AutoSizeAxes = Axes.X,
-                            RelativeSizeAxes = Axes.Y,
-                            Children = new Drawable[]
+                            },
+                            new Container
                             {
-                                new Box
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.FromHex("333")
-                                },
-                                new Container<TimelineButton>
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    RelativeSizeAxes = Axes.Y,
-                                    AutoSizeAxes = Axes.X,
-                                    Masking = true,
-                                    Children = new[]
+                                    new Box
                                     {
-                                        new TimelineButton
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = OsuColour.FromHex("333")
+                                    },
+                                    new Container<TimelineButton>
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        RelativeSizeAxes = Axes.Y,
+                                        AutoSizeAxes = Axes.X,
+                                        Masking = true,
+                                        Children = new[]
                                         {
-                                            RelativeSizeAxes = Axes.Y,
-                                            Height = 0.5f,
-                                            Icon = FontAwesome.fa_search_plus,
-                                            Action = () => timelineContainer.Zoom++
-                                        },
-                                        new TimelineButton
-                                        {
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            RelativeSizeAxes = Axes.Y,
-                                            Height = 0.5f,
-                                            Icon = FontAwesome.fa_search_minus,
-                                            Action = () => timelineContainer.Zoom--
-                                        },
+                                            new TimelineButton
+                                            {
+                                                RelativeSizeAxes = Axes.Y,
+                                                Height = 0.5f,
+                                                Icon = FontAwesome.fa_search_plus,
+    //                                            Action = () => timelineContainer.Zoom++
+                                            },
+                                            new TimelineButton
+                                            {
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                RelativeSizeAxes = Axes.Y,
+                                                Height = 0.5f,
+                                                Icon = FontAwesome.fa_search_minus,
+    //                                            Action = () => timelineContainer.Zoom--
+                                            },
+                                        }
                                     }
                                 }
-                            }
+                            },
+                            timelineContainer = new ScrollingTimelineContainer { RelativeSizeAxes = Axes.Both }
                         },
-                        timelineContainer = new ScrollingTimelineContainer { RelativeSizeAxes = Axes.Y }
+                    },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Distributed),
                     }
                 }
             };
@@ -119,13 +127,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
             timelineContainer.Beatmap.BindTo(Beatmap);
             timelineContainer.WaveformVisible.BindTo(waveformCheckbox.Current);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            timelineContainer.Size = new Vector2(DrawSize.X - timelineContainer.DrawPosition.X, 1);
         }
     }
 }
