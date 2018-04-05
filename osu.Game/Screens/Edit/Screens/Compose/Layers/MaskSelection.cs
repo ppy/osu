@@ -2,13 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Framework.Lists;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Types;
@@ -23,13 +23,13 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     {
         public const float BORDER_RADIUS = 2;
 
-        private readonly SortedList<HitObjectMask> selectedMasks;
+        private readonly List<HitObjectMask> selectedMasks;
 
         private Drawable outline;
 
         public MaskSelection()
         {
-            selectedMasks = new SortedList<HitObjectMask>(MaskContainer.Compare);
+            selectedMasks = new List<HitObjectMask>();
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
