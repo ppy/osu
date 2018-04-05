@@ -8,12 +8,12 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 {
-    public class ScrollingTimelineContainer : ZoomableScrollContainer
+    public class Timeline : ZoomableScrollContainer
     {
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        public ScrollingTimelineContainer()
+        public Timeline()
         {
             BeatmapWaveformGraph waveform;
             Child = waveform = new BeatmapWaveformGraph
