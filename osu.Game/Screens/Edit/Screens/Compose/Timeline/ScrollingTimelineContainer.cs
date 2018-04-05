@@ -14,6 +14,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
+        private readonly Container waveformContainer;
         private readonly BeatmapWaveformGraph waveform;
 
         public ScrollingTimelineContainer()
@@ -21,18 +22,29 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         {
             Masking = true;
 
-            Content.AutoSizeAxes = Axes.None;
-            Content.RelativeSizeAxes = Axes.Both;
-
-            Add(waveform = new BeatmapWaveformGraph
+            Child = waveformContainer = new Container
             {
-                RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.FromHex("222"),
-                Depth = float.MaxValue
-            });
+                RelativeSizeAxes = Axes.Y,
+                Child = waveform = new BeatmapWaveformGraph
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.FromHex("222"),
+                    Depth = float.MaxValue
+                }
+            };
 
             waveform.Beatmap.BindTo(Beatmap);
             WaveformVisible.ValueChanged += waveformVisibilityChanged;
+        }
+
+        private float zoom = 10;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            waveformContainer.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
+            waveformContainer.Width = DrawWidth * zoom;
         }
 
         private void waveformVisibilityChanged(bool visible) => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
