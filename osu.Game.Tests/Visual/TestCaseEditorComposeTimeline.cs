@@ -16,9 +16,9 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseEditorComposeTimeline : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ScrollableTimeline), typeof(ScrollingTimelineContainer), typeof(BeatmapWaveformGraph), typeof(TimelineButton) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(TimelineContainer), typeof(Timeline), typeof(BeatmapWaveformGraph), typeof(TimelineButton) };
 
-        private readonly ScrollableTimeline timeline;
+        private readonly TimelineContainer timelineContainer;
 
         public TestCaseEditorComposeTimeline()
         {
@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual
                     Origin = Anchor.TopCentre,
                     State = Visibility.Visible
                 },
-                timeline = new ScrollableTimeline
+                timelineContainer = new TimelineContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {
-            timeline.Beatmap.BindTo(osuGame.Beatmap);
+            timelineContainer.Beatmap.BindTo(osuGame.Beatmap);
         }
     }
 }

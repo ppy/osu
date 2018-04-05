@@ -12,13 +12,13 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 {
-    public class ScrollableTimeline : CompositeDrawable
+    public class TimelineContainer : CompositeDrawable
     {
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        private readonly ScrollingTimelineContainer timelineContainer;
+        private readonly Timeline timeline;
 
-        public ScrollableTimeline()
+        public TimelineContainer()
         {
             Masking = true;
             CornerRadius = 5;
@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.fa_search_plus,
-                                                Action = () => timelineContainer.Zoom++
+                                                Action = () => timeline.Zoom++
                                             },
                                             new TimelineButton
                                             {
@@ -103,13 +103,13 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.fa_search_minus,
-                                                Action = () => timelineContainer.Zoom--
+                                                Action = () => timeline.Zoom--
                                             },
                                         }
                                     }
                                 }
                             },
-                            timelineContainer = new ScrollingTimelineContainer { RelativeSizeAxes = Axes.Both }
+                            timeline = new Timeline { RelativeSizeAxes = Axes.Both }
                         },
                     },
                     ColumnDimensions = new[]
@@ -125,8 +125,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             hitSoundsCheckbox.Current.Value = true;
             waveformCheckbox.Current.Value = true;
 
-            timelineContainer.Beatmap.BindTo(Beatmap);
-            timelineContainer.WaveformVisible.BindTo(waveformCheckbox.Current);
+            timeline.Beatmap.BindTo(Beatmap);
+            timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
         }
     }
 }
