@@ -12,13 +12,13 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 {
-    public class TimelineContainer : CompositeDrawable
+    public class TimelineArea : CompositeDrawable
     {
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private readonly Timeline timeline;
 
-        public TimelineContainer()
+        public TimelineArea()
         {
             Masking = true;
             CornerRadius = 5;
