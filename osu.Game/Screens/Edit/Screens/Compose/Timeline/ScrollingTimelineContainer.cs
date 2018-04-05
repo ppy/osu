@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        private readonly Container waveformContainer;
+        private readonly Container zoomedContent;
 
         private float currentZoom = 10;
 
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             Masking = true;
 
             BeatmapWaveformGraph waveform;
-            Child = waveformContainer = new Container
+            Child = zoomedContent = new Container
             {
                 RelativeSizeAxes = Axes.Y,
                 Child = waveform = new BeatmapWaveformGraph
@@ -44,18 +44,21 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
         }
 
+        /// <summary>
+        /// Gets or sets the content zoom of this <see cref="ScrollingTimelineContainer"/>.
+        /// </summary>
         public int Zoom
         {
             get => zoomTarget;
-            set => setZoomTarget(value, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), waveformContainer).X);
+            set => setZoomTarget(value, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            waveformContainer.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
-            waveformContainer.Width = DrawWidth * currentZoom;
+            zoomedContent.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
+            zoomedContent.Width = DrawWidth * currentZoom;
         }
 
         protected override bool OnWheel(InputState state)
@@ -63,7 +66,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             if (!state.Keyboard.ControlPressed)
                 return base.OnWheel(state);
 
-            setZoomTarget(zoomTarget + state.Mouse.WheelDelta, waveformContainer.ToLocalSpace(state.Mouse.NativeState.Position).X);
+            setZoomTarget(zoomTarget + state.Mouse.WheelDelta, zoomedContent.ToLocalSpace(state.Mouse.NativeState.Position).X);
             return true;
         }
 
@@ -75,7 +78,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         }
 
         private void transformZoomTo(int newZoom, float focusPoint, double duration = 0, Easing easing = Easing.None)
-            => this.TransformTo(this.PopulateTransform(new TransformZoom(focusPoint, waveformContainer.DrawWidth), newZoom, duration, easing));
+            => this.TransformTo(this.PopulateTransform(new TransformZoom(focusPoint, zoomedContent.DrawWidth), newZoom, duration, easing));
 
         private class TransformZoom : Transform<float, ScrollingTimelineContainer>
         {
