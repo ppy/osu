@@ -34,7 +34,8 @@ namespace osu.Game.Tests.Visual
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(1000, 100)
+                    RelativeSizeAxes = Axes.X,
+                    Size = new Vector2(0.8f, 100)
                 }
             };
         }
