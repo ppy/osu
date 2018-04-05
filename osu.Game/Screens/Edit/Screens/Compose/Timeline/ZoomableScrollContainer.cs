@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         }
 
         /// <summary>
-        /// Gets or sets the content zoom of this <see cref="ScrollingTimelineContainer"/>.
+        /// Gets or sets the content zoom of this <see cref="Timeline"/>.
         /// </summary>
         public int Zoom
         {
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             private float startScrollOffset;
 
             /// <summary>
-            /// Transforms <see cref="ScrollingTimelineContainer.zoom"/> to a new value.
+            /// Transforms <see cref="Timeline.zoom"/> to a new value.
             /// </summary>
             /// <param name="focusPoint">The focus point in the waveform, in absolute coordinates local to the waveform.</param>
             /// <param name="waveformSize">The size of the waveform.</param>
