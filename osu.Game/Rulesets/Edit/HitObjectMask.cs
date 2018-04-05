@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Edit
         {
             selectionRequested = false;
 
-            if (State == SelectionState.NotSelected && !selectionRequested)
+            if (State == SelectionState.NotSelected)
             {
                 SelectionRequested?.Invoke(this, state);
                 selectionRequested = true;
