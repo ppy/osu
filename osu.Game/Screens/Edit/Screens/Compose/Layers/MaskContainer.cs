@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             return Compare(xMask, yMask);
         }
 
-        public static int Compare(HitObjectMask x, HitObjectMask y)
+        public int Compare(HitObjectMask x, HitObjectMask y)
         {
             // Put earlier hitobjects towards the end of the list, so they handle input first
             int i = y.HitObject.HitObject.StartTime.CompareTo(x.HitObject.HitObject.StartTime);
