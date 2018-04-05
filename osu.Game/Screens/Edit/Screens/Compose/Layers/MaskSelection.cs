@@ -133,7 +133,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 if (mask.IsSelected)
                     return;
 
-
                 DeselectAll?.Invoke();
                 mask.Select();
             }
