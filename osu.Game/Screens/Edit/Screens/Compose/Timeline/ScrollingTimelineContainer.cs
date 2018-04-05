@@ -34,7 +34,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             };
 
             waveform.Beatmap.BindTo(Beatmap);
-            WaveformVisible.ValueChanged += waveformVisibilityChanged;
+            
+            WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
         }
 
         private float zoom = 10;
@@ -46,7 +47,5 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             waveformContainer.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
             waveformContainer.Width = DrawWidth * zoom;
         }
-
-        private void waveformVisibilityChanged(bool visible) => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
     }
 }
