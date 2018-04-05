@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.fa_search_plus,
-    //                                            Action = () => timelineContainer.Zoom++
+                                                Action = () => timelineContainer.Zoom++
                                             },
                                             new TimelineButton
                                             {
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.fa_search_minus,
-    //                                            Action = () => timelineContainer.Zoom--
+                                                Action = () => timelineContainer.Zoom--
                                             },
                                         }
                                     }
