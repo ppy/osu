@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -15,7 +14,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
 
@@ -31,7 +29,6 @@ namespace osu.Game.Rulesets.Edit
         private readonly List<Container> layerContainers = new List<Container>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -40,12 +37,9 @@ namespace osu.Game.Rulesets.Edit
             RelativeSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load([NotNull] OsuGameBase osuGame, [NotNull] IFrameBasedClock framedClock, [CanBeNull] BindableBeatDivisor beatDivisor)
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase osuGame, IFrameBasedClock framedClock)
         {
-            if (beatDivisor != null)
-                this.beatDivisor.BindTo(beatDivisor);
-
             beatmap.BindTo(osuGame.Beatmap);
 
             try
