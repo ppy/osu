@@ -6,14 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -231,16 +229,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual void CheckForJudgements(bool userTriggered, double timeOffset)
         {
         }
-
-        /// <summary>
-        /// The screen-space point that causes this <see cref="DrawableHitObject"/> to be selected in the Editor.
-        /// </summary>
-        public virtual Vector2 SelectionPoint => ScreenSpaceDrawQuad.Centre;
-
-        /// <summary>
-        /// The screen-space quad that outlines this <see cref="DrawableHitObject"/> for selections in the Editor.
-        /// </summary>
-        public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject
