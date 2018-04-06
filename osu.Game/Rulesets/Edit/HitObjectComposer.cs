@@ -65,9 +65,6 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            HitObjectMaskLayer hitObjectMaskLayer = new HitObjectMaskLayer(this);
-            SelectionLayer selectionLayer = new SelectionLayer(rulesetContainer.Playfield);
-
             var layerBelowRuleset = new BorderLayer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -75,12 +72,7 @@ namespace osu.Game.Rulesets.Edit
             };
 
             var layerAboveRuleset = CreateLayerContainer();
-            layerAboveRuleset.Children = new Drawable[]
-            {
-                selectionLayer, // Below object overlays for input
-                hitObjectMaskLayer,
-                selectionLayer.CreateProxy() // Proxy above object overlays for selections
-            };
+            layerAboveRuleset.Child = new HitObjectMaskLayer(rulesetContainer.Playfield, this);
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -121,11 +113,6 @@ namespace osu.Game.Rulesets.Edit
                     new Dimension(GridSizeMode.Absolute, 200),
                 }
             };
-
-            selectionLayer.ObjectSelected += hitObjectMaskLayer.AddOverlay;
-            selectionLayer.ObjectDeselected += hitObjectMaskLayer.RemoveOverlay;
-            selectionLayer.SelectionCleared += hitObjectMaskLayer.RemoveSelectionOverlay;
-            selectionLayer.SelectionFinished += hitObjectMaskLayer.AddSelectionOverlay;
 
             toolboxCollection.Items =
                 CompositionTools.Select(t => new RadioButton(t.Name, () => setCompositionTool(t)))
@@ -261,11 +248,10 @@ namespace osu.Game.Rulesets.Edit
         public virtual HitObjectMask CreateMaskFor(DrawableHitObject hitObject) => null;
 
         /// <summary>
-        /// Creates a <see cref="SelectionBox"/> which outlines <see cref="DrawableHitObject"/>s
-        /// and handles all hitobject movement/pattern adjustments.
+        /// Creates a <see cref="MaskSelection"/> which outlines <see cref="DrawableHitObject"/>s
+        /// and handles hitobject pattern adjustments.
         /// </summary>
-        /// <param name="overlays">The <see cref="DrawableHitObject"/> overlays.</param>
-        public virtual SelectionBox CreateSelectionOverlay(IReadOnlyList<HitObjectMask> overlays) => new SelectionBox(overlays);
+        public virtual MaskSelection CreateMaskSelection() => new MaskSelection();
 
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
