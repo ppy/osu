@@ -31,6 +31,8 @@ namespace osu.Game.Tests.Visual
         {
             this.osuGame = osuGame;
 
+            dependencies.Cache(BeatDivisor);
+
             osuGame.Beatmap.ValueChanged += reinitializeClock;
             reinitializeClock(osuGame.Beatmap.Value);
         }
