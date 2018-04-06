@@ -55,22 +55,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         #region User Input Handling
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => handleInput(state);
-
-        protected override bool OnDragStart(InputState state) => handleInput(state);
-
-        protected override bool OnDragEnd(InputState state) => true;
-
-        private bool handleInput(InputState state)
-        {
-            if (!selectedMasks.Any(m => m.ReceiveMouseInputAt(state.Mouse.NativeState.PositionMouseDown ?? state.Mouse.NativeState.Position)))
-                return false;
-
-            UpdateVisibility();
-            return true;
-        }
-
-        protected override bool OnDrag(InputState state)
+        public void HandleDrag(HitObjectMask m, InputState state)
         {
             // Todo: Various forms of snapping
 
@@ -83,8 +68,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                         break;
                 }
             }
-
-            return true;
         }
 
         #endregion
