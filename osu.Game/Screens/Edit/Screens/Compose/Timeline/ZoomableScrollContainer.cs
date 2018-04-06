@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         }
 
         private void transformZoomTo(int newZoom, float focusPoint, double duration = 0, Easing easing = Easing.None)
-            => this.TransformTo(this.PopulateTransform(new TransformZoom(focusPoint, zoomedContent.DrawWidth), newZoom, duration, easing));
+            => this.TransformTo(this.PopulateTransform(new TransformZoom(focusPoint, zoomedContent.DrawWidth, Current), newZoom, duration, easing));
 
         private class TransformZoom : Transform<float, ZoomableScrollContainer>
         {
@@ -71,19 +71,21 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             private readonly float waveformSize;
 
             /// <summary>
-            /// The scroll offset at the start time of the transform/
+            /// The scroll offset at the start of the transform.
             /// </summary>
-            private float startScrollOffset;
+            private readonly float scrollOffset;
 
             /// <summary>
             /// Transforms <see cref="TimeTimelinem"/> to a new value.
             /// </summary>
             /// <param name="focusPoint">The focus point in the waveform, in absolute coordinates local to the waveform.</param>
             /// <param name="waveformSize">The size of the waveform.</param>
-            public TransformZoom(float focusPoint, float waveformSize)
+            /// <param name="scrollOffset">The scroll offset at the start of the transform.</param>
+            public TransformZoom(float focusPoint, float waveformSize, float scrollOffset)
             {
                 this.focusPoint = focusPoint;
                 this.waveformSize = waveformSize;
+                this.scrollOffset = scrollOffset;
             }
 
             public override string TargetMember => nameof(currentZoom);
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             {
                 float newZoom = valueAt(time);
 
-                float focusOffset = focusPoint - startScrollOffset;
+                float focusOffset = focusPoint - scrollOffset;
                 float expectedWidth = d.DrawWidth * newZoom;
                 float targetOffset = expectedWidth * (focusPoint / waveformSize) - focusOffset;
 
@@ -108,11 +110,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                 d.ScrollTo(targetOffset, false);
             }
 
-            protected override void ReadIntoStartValue(ZoomableScrollContainer d)
-            {
-                startScrollOffset = d.Current;
-                StartValue = d.currentZoom;
-            }
+            protected override void ReadIntoStartValue(ZoomableScrollContainer d) => StartValue = d.currentZoom;
         }
     }
 }
