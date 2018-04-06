@@ -52,6 +52,7 @@ namespace osu.Game.Screens.Edit
 
             dependencies.CacheAs<IFrameBasedClock>(clock);
             dependencies.CacheAs<IAdjustableClock>(clock);
+            dependencies.Cache(beatDivisor);
 
             EditorMenuBar menuBar;
             TimeInfoContainer timeInfo;
