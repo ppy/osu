@@ -81,13 +81,13 @@ namespace osu.Game.Beatmaps.Formats
                     handleDifficulty(line);
                     return;
                 case Section.Events:
-                    handleEvents(line);
+                    handleEvent(line);
                     return;
                 case Section.TimingPoints:
-                    handleTimingPoints(line);
+                    handleTimingPoint(line);
                     return;
                 case Section.HitObjects:
-                    handleHitObjects(line);
+                    handleHitObject(line);
                     return;
             }
 
@@ -246,7 +246,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleEvents(string line)
+        private void handleEvent(string line)
         {
             string[] split = line.Split(',');
 
@@ -275,93 +275,99 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleTimingPoints(string line)
+        private void handleTimingPoint(string line)
         {
-            string[] split = line.Split(',');
-
-            double time = getOffsetTime(double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo));
-            double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
-            double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
-
-            TimeSignatures timeSignature = TimeSignatures.SimpleQuadruple;
-            if (split.Length >= 3)
-                timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)int.Parse(split[2]);
-
-            LegacySampleBank sampleSet = defaultSampleBank;
-            if (split.Length >= 4)
-                sampleSet = (LegacySampleBank)int.Parse(split[3]);
-
-            //SampleBank sampleBank = SampleBank.Default;
-            //if (split.Length >= 5)
-            //    sampleBank = (SampleBank)int.Parse(split[4]);
-
-            int sampleVolume = defaultSampleVolume;
-            if (split.Length >= 6)
-                sampleVolume = int.Parse(split[5]);
-
-            bool timingChange = true;
-            if (split.Length >= 7)
-                timingChange = split[6][0] == '1';
-
-            bool kiaiMode = false;
-            bool omitFirstBarSignature = false;
-            if (split.Length >= 8)
+            try
             {
-                int effectFlags = int.Parse(split[7]);
-                kiaiMode = (effectFlags & 1) > 0;
-                omitFirstBarSignature = (effectFlags & 8) > 0;
-            }
+                string[] split = line.Split(',');
 
-            string stringSampleSet = sampleSet.ToString().ToLower();
-            if (stringSampleSet == @"none")
-                stringSampleSet = @"normal";
+                double time = getOffsetTime(double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo));
+                double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
+                double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
-            DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(time);
-            SampleControlPoint samplePoint = beatmap.ControlPointInfo.SamplePointAt(time);
-            EffectControlPoint effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
+                TimeSignatures timeSignature = TimeSignatures.SimpleQuadruple;
+                if (split.Length >= 3)
+                    timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)int.Parse(split[2]);
 
-            if (timingChange)
-            {
-                beatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint
+                LegacySampleBank sampleSet = defaultSampleBank;
+                if (split.Length >= 4)
+                    sampleSet = (LegacySampleBank)int.Parse(split[3]);
+
+                //SampleBank sampleBank = SampleBank.Default;
+                //if (split.Length >= 5)
+                //    sampleBank = (SampleBank)int.Parse(split[4]);
+
+                int sampleVolume = defaultSampleVolume;
+                if (split.Length >= 6)
+                    sampleVolume = int.Parse(split[5]);
+
+                bool timingChange = true;
+                if (split.Length >= 7)
+                    timingChange = split[6][0] == '1';
+
+                bool kiaiMode = false;
+                bool omitFirstBarSignature = false;
+                if (split.Length >= 8)
                 {
-                    Time = time,
-                    BeatLength = beatLength,
-                    TimeSignature = timeSignature
-                });
-            }
+                    int effectFlags = int.Parse(split[7]);
+                    kiaiMode = (effectFlags & 1) > 0;
+                    omitFirstBarSignature = (effectFlags & 8) > 0;
+                }
 
-            if (speedMultiplier != difficultyPoint.SpeedMultiplier)
-            {
-                beatmap.ControlPointInfo.DifficultyPoints.RemoveAll(x => x.Time == time);
-                beatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint
-                {
-                    Time = time,
-                    SpeedMultiplier = speedMultiplier
-                });
-            }
+                string stringSampleSet = sampleSet.ToString().ToLower();
+                if (stringSampleSet == @"none")
+                    stringSampleSet = @"normal";
 
-            if (stringSampleSet != samplePoint.SampleBank || sampleVolume != samplePoint.SampleVolume)
-            {
-                beatmap.ControlPointInfo.SamplePoints.Add(new SampleControlPoint
-                {
-                    Time = time,
-                    SampleBank = stringSampleSet,
-                    SampleVolume = sampleVolume
-                });
-            }
+                DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(time);
+                SampleControlPoint samplePoint = beatmap.ControlPointInfo.SamplePointAt(time);
+                EffectControlPoint effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
 
-            if (kiaiMode != effectPoint.KiaiMode || omitFirstBarSignature != effectPoint.OmitFirstBarLine)
-            {
-                beatmap.ControlPointInfo.EffectPoints.Add(new EffectControlPoint
+                if (timingChange)
                 {
-                    Time = time,
-                    KiaiMode = kiaiMode,
-                    OmitFirstBarLine = omitFirstBarSignature
-                });
+                    beatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint
+                    {
+                        Time = time,
+                        BeatLength = beatLength,
+                        TimeSignature = timeSignature
+                    });
+                }
+
+                if (speedMultiplier != difficultyPoint.SpeedMultiplier)
+                {
+                    beatmap.ControlPointInfo.DifficultyPoints.RemoveAll(x => x.Time == time);
+                    beatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint
+                    {
+                        Time = time,
+                        SpeedMultiplier = speedMultiplier
+                    });
+                }
+
+                if (stringSampleSet != samplePoint.SampleBank || sampleVolume != samplePoint.SampleVolume)
+                {
+                    beatmap.ControlPointInfo.SamplePoints.Add(new SampleControlPoint
+                    {
+                        Time = time,
+                        SampleBank = stringSampleSet,
+                        SampleVolume = sampleVolume
+                    });
+                }
+
+                if (kiaiMode != effectPoint.KiaiMode || omitFirstBarSignature != effectPoint.OmitFirstBarLine)
+                {
+                    beatmap.ControlPointInfo.EffectPoints.Add(new EffectControlPoint
+                    {
+                        Time = time,
+                        KiaiMode = kiaiMode,
+                        OmitFirstBarLine = omitFirstBarSignature
+                    });
+                }
+            }
+            catch (FormatException e)
+            {
             }
         }
 
-        private void handleHitObjects(string line)
+        private void handleHitObject(string line)
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
             if (parser == null)
