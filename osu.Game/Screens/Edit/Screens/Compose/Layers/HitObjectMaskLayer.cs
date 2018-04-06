@@ -21,7 +21,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         public HitObjectMaskLayer(Playfield playfield, HitObjectComposer composer)
         {
+            // we need the playfield as HitObjects may not be initialised until its BDL.
             this.playfield = playfield;
+
             this.composer = composer;
 
             RelativeSizeAxes = Axes.Both;
