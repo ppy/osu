@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Visual
 
         private void checkNonmatchingFilter()
         {
-            AddStep("Toggel non-matching filter", () =>
+            AddStep("Toggle non-matching filter", () =>
             {
                 carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
                 carousel.Filter(new FilterCriteria(), false);
