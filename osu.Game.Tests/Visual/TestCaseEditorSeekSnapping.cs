@@ -8,30 +8,29 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Screens.Compose;
+using osu.Game.Tests.Beatmaps;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseEditorSeekSnapping : OsuTestCase
+    public class TestCaseEditorSeekSnapping : EditorClockTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(HitObjectComposer) };
 
-        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor(4);
-
-        private EditorClock clock;
+        public TestCaseEditorSeekSnapping()
+        {
+            BeatDivisor.Value = 4;
+        }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuGameBase osuGame)
         {
             var testBeatmap = new Beatmap
             {
@@ -54,9 +53,9 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            clock = new EditorClock(testBeatmap.ControlPointInfo, beatDivisor) { IsCoupled = false };
+            osuGame.Beatmap.Value = new TestWorkingBeatmap(testBeatmap);
 
-            Child = new TimingPointVisualiser(testBeatmap, 5000) { Clock = clock };
+            Child = new TimingPointVisualiser(testBeatmap, 5000) { Clock = Clock };
 
             testSeekNoSnapping();
             testSeekSnappingOnBeat();
@@ -69,15 +68,6 @@ namespace osu.Game.Tests.Visual
             testSeekingWithFloatingPointBeatLength();
         }
 
-        protected override bool OnWheel(InputState state)
-        {
-            if (state.Mouse.WheelDelta > 0)
-                clock.SeekBackward(true);
-            else
-                clock.SeekForward(true);
-            return true;
-        }
-
         /// <summary>
         /// Tests whether time is correctly seeked without snapping.
         /// </summary>
@@ -86,18 +76,18 @@ namespace osu.Game.Tests.Visual
             reset();
 
             // Forwards
-            AddStep("Seek(0)", () => clock.Seek(0));
-            AddAssert("Time = 0", () => clock.CurrentTime == 0);
-            AddStep("Seek(33)", () => clock.Seek(33));
-            AddAssert("Time = 33", () => clock.CurrentTime == 33);
-            AddStep("Seek(89)", () => clock.Seek(89));
-            AddAssert("Time = 89", () => clock.CurrentTime == 89);
+            AddStep("Seek(0)", () => Clock.Seek(0));
+            AddAssert("Time = 0", () => Clock.CurrentTime == 0);
+            AddStep("Seek(33)", () => Clock.Seek(33));
+            AddAssert("Time = 33", () => Clock.CurrentTime == 33);
+            AddStep("Seek(89)", () => Clock.Seek(89));
+            AddAssert("Time = 89", () => Clock.CurrentTime == 89);
 
             // Backwards
-            AddStep("Seek(25)", () => clock.Seek(25));
-            AddAssert("Time = 25", () => clock.CurrentTime == 25);
-            AddStep("Seek(0)", () => clock.Seek(0));
-            AddAssert("Time = 0", () => clock.CurrentTime == 0);
+            AddStep("Seek(25)", () => Clock.Seek(25));
+            AddAssert("Time = 25", () => Clock.CurrentTime == 25);
+            AddStep("Seek(0)", () => Clock.Seek(0));
+            AddAssert("Time = 0", () => Clock.CurrentTime == 0);
         }
 
         /// <summary>
@@ -108,20 +98,20 @@ namespace osu.Game.Tests.Visual
         {
             reset();
 
-            AddStep("Seek(0), Snap", () => clock.Seek(0, true));
-            AddAssert("Time = 0", () => clock.CurrentTime == 0);
-            AddStep("Seek(50), Snap", () => clock.Seek(50, true));
-            AddAssert("Time = 50", () => clock.CurrentTime == 50);
-            AddStep("Seek(100), Snap", () => clock.Seek(100, true));
-            AddAssert("Time = 100", () => clock.CurrentTime == 100);
-            AddStep("Seek(175), Snap", () => clock.Seek(175, true));
-            AddAssert("Time = 175", () => clock.CurrentTime == 175);
-            AddStep("Seek(350), Snap", () => clock.Seek(350, true));
-            AddAssert("Time = 350", () => clock.CurrentTime == 350);
-            AddStep("Seek(400), Snap", () => clock.Seek(400, true));
-            AddAssert("Time = 400", () => clock.CurrentTime == 400);
-            AddStep("Seek(450), Snap", () => clock.Seek(450, true));
-            AddAssert("Time = 450", () => clock.CurrentTime == 450);
+            AddStep("Seek(0), Snap", () => Clock.SeekSnapped(0));
+            AddAssert("Time = 0", () => Clock.CurrentTime == 0);
+            AddStep("Seek(50), Snap", () => Clock.SeekSnapped(50));
+            AddAssert("Time = 50", () => Clock.CurrentTime == 50);
+            AddStep("Seek(100), Snap", () => Clock.SeekSnapped(100));
+            AddAssert("Time = 100", () => Clock.CurrentTime == 100);
+            AddStep("Seek(175), Snap", () => Clock.SeekSnapped(175));
+            AddAssert("Time = 175", () => Clock.CurrentTime == 175);
+            AddStep("Seek(350), Snap", () => Clock.SeekSnapped(350));
+            AddAssert("Time = 350", () => Clock.CurrentTime == 350);
+            AddStep("Seek(400), Snap", () => Clock.SeekSnapped(400));
+            AddAssert("Time = 400", () => Clock.CurrentTime == 400);
+            AddStep("Seek(450), Snap", () => Clock.SeekSnapped(450));
+            AddAssert("Time = 450", () => Clock.CurrentTime == 450);
         }
 
         /// <summary>
@@ -133,18 +123,18 @@ namespace osu.Game.Tests.Visual
         {
             reset();
 
-            AddStep("Seek(24), Snap", () => clock.Seek(24, true));
-            AddAssert("Time = 0", () => clock.CurrentTime == 0);
-            AddStep("Seek(26), Snap", () => clock.Seek(26, true));
-            AddAssert("Time = 50", () => clock.CurrentTime == 50);
-            AddStep("Seek(150), Snap", () => clock.Seek(150, true));
-            AddAssert("Time = 100", () => clock.CurrentTime == 100);
-            AddStep("Seek(170), Snap", () => clock.Seek(170, true));
-            AddAssert("Time = 175", () => clock.CurrentTime == 175);
-            AddStep("Seek(274), Snap", () => clock.Seek(274, true));
-            AddAssert("Time = 175", () => clock.CurrentTime == 175);
-            AddStep("Seek(276), Snap", () => clock.Seek(276, true));
-            AddAssert("Time = 350", () => clock.CurrentTime == 350);
+            AddStep("Seek(24), Snap", () => Clock.SeekSnapped(24));
+            AddAssert("Time = 0", () => Clock.CurrentTime == 0);
+            AddStep("Seek(26), Snap", () => Clock.SeekSnapped(26));
+            AddAssert("Time = 50", () => Clock.CurrentTime == 50);
+            AddStep("Seek(150), Snap", () => Clock.SeekSnapped(150));
+            AddAssert("Time = 100", () => Clock.CurrentTime == 100);
+            AddStep("Seek(170), Snap", () => Clock.SeekSnapped(170));
+            AddAssert("Time = 175", () => Clock.CurrentTime == 175);
+            AddStep("Seek(274), Snap", () => Clock.SeekSnapped(274));
+            AddAssert("Time = 175", () => Clock.CurrentTime == 175);
+            AddStep("Seek(276), Snap", () => Clock.SeekSnapped(276));
+            AddAssert("Time = 350", () => Clock.CurrentTime == 350);
         }
 
         /// <summary>
@@ -154,16 +144,16 @@ namespace osu.Game.Tests.Visual
         {
             reset();
 
-            AddStep("SeekForward", () => clock.SeekForward());
-            AddAssert("Time = 50", () => clock.CurrentTime == 50);
-            AddStep("SeekForward", () => clock.SeekForward());
-            AddAssert("Time = 100", () => clock.CurrentTime == 100);
-            AddStep("SeekForward", () => clock.SeekForward());
-            AddAssert("Time = 200", () => clock.CurrentTime == 200);
-            AddStep("SeekForward", () => clock.SeekForward());
-            AddAssert("Time = 400", () => clock.CurrentTime == 400);
-            AddStep("SeekForward", () => clock.SeekForward());
-            AddAssert("Time = 450", () => clock.CurrentTime == 450);
+            AddStep("SeekForward", () => Clock.SeekForward());
+            AddAssert("Time = 50", () => Clock.CurrentTime == 50);
+            AddStep("SeekForward", () => Clock.SeekForward());
+            AddAssert("Time = 100", () => Clock.CurrentTime == 100);
+            AddStep("SeekForward", () => Clock.SeekForward());
+            AddAssert("Time = 200", () => Clock.CurrentTime == 200);
+            AddStep("SeekForward", () => Clock.SeekForward());
+            AddAssert("Time = 400", () => Clock.CurrentTime == 400);
+            AddStep("SeekForward", () => Clock.SeekForward());
+            AddAssert("Time = 450", () => Clock.CurrentTime == 450);
         }
 
         /// <summary>
@@ -173,18 +163,18 @@ namespace osu.Game.Tests.Visual
         {
             reset();
 
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 50", () => clock.CurrentTime == 50);
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 100", () => clock.CurrentTime == 100);
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 175", () => clock.CurrentTime == 175);
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 350", () => clock.CurrentTime == 350);
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 400", () => clock.CurrentTime == 400);
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 450", () => clock.CurrentTime == 450);
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 50", () => Clock.CurrentTime == 50);
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 100", () => Clock.CurrentTime == 100);
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 175", () => Clock.CurrentTime == 175);
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 350", () => Clock.CurrentTime == 350);
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 400", () => Clock.CurrentTime == 400);
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 450", () => Clock.CurrentTime == 450);
         }
 
         /// <summary>
@@ -195,30 +185,30 @@ namespace osu.Game.Tests.Visual
         {
             reset();
 
-            AddStep("Seek(49)", () => clock.Seek(49));
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 50", () => clock.CurrentTime == 50);
-            AddStep("Seek(49.999)", () => clock.Seek(49.999));
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 50", () => clock.CurrentTime == 50);
-            AddStep("Seek(99)", () => clock.Seek(99));
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 100", () => clock.CurrentTime == 100);
-            AddStep("Seek(99.999)", () => clock.Seek(99.999));
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 100", () => clock.CurrentTime == 100);
-            AddStep("Seek(174)", () => clock.Seek(174));
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 175", () => clock.CurrentTime == 175);
-            AddStep("Seek(349)", () => clock.Seek(349));
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 350", () => clock.CurrentTime == 350);
-            AddStep("Seek(399)", () => clock.Seek(399));
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 400", () => clock.CurrentTime == 400);
-            AddStep("Seek(449)", () => clock.Seek(449));
-            AddStep("SeekForward, Snap", () => clock.SeekForward(true));
-            AddAssert("Time = 450", () => clock.CurrentTime == 450);
+            AddStep("Seek(49)", () => Clock.Seek(49));
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 50", () => Clock.CurrentTime == 50);
+            AddStep("Seek(49.999)", () => Clock.Seek(49.999));
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 50", () => Clock.CurrentTime == 50);
+            AddStep("Seek(99)", () => Clock.Seek(99));
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 100", () => Clock.CurrentTime == 100);
+            AddStep("Seek(99.999)", () => Clock.Seek(99.999));
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 100", () => Clock.CurrentTime == 100);
+            AddStep("Seek(174)", () => Clock.Seek(174));
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 175", () => Clock.CurrentTime == 175);
+            AddStep("Seek(349)", () => Clock.Seek(349));
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 350", () => Clock.CurrentTime == 350);
+            AddStep("Seek(399)", () => Clock.Seek(399));
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 400", () => Clock.CurrentTime == 400);
+            AddStep("Seek(449)", () => Clock.Seek(449));
+            AddStep("SeekForward, Snap", () => Clock.SeekForward(true));
+            AddAssert("Time = 450", () => Clock.CurrentTime == 450);
         }
 
         /// <summary>
@@ -228,19 +218,19 @@ namespace osu.Game.Tests.Visual
         {
             reset();
 
-            AddStep("Seek(450)", () => clock.Seek(450));
-            AddStep("SeekBackward", () => clock.SeekBackward());
-            AddAssert("Time = 425", () => clock.CurrentTime == 425);
-            AddStep("SeekBackward", () => clock.SeekBackward());
-            AddAssert("Time = 375", () => clock.CurrentTime == 375);
-            AddStep("SeekBackward", () => clock.SeekBackward());
-            AddAssert("Time = 325", () => clock.CurrentTime == 325);
-            AddStep("SeekBackward", () => clock.SeekBackward());
-            AddAssert("Time = 125", () => clock.CurrentTime == 125);
-            AddStep("SeekBackward", () => clock.SeekBackward());
-            AddAssert("Time = 25", () => clock.CurrentTime == 25);
-            AddStep("SeekBackward", () => clock.SeekBackward());
-            AddAssert("Time = 0", () => clock.CurrentTime == 0);
+            AddStep("Seek(450)", () => Clock.Seek(450));
+            AddStep("SeekBackward", () => Clock.SeekBackward());
+            AddAssert("Time = 425", () => Clock.CurrentTime == 425);
+            AddStep("SeekBackward", () => Clock.SeekBackward());
+            AddAssert("Time = 375", () => Clock.CurrentTime == 375);
+            AddStep("SeekBackward", () => Clock.SeekBackward());
+            AddAssert("Time = 325", () => Clock.CurrentTime == 325);
+            AddStep("SeekBackward", () => Clock.SeekBackward());
+            AddAssert("Time = 125", () => Clock.CurrentTime == 125);
+            AddStep("SeekBackward", () => Clock.SeekBackward());
+            AddAssert("Time = 25", () => Clock.CurrentTime == 25);
+            AddStep("SeekBackward", () => Clock.SeekBackward());
+            AddAssert("Time = 0", () => Clock.CurrentTime == 0);
         }
 
         /// <summary>
@@ -250,19 +240,19 @@ namespace osu.Game.Tests.Visual
         {
             reset();
 
-            AddStep("Seek(450)", () => clock.Seek(450));
-            AddStep("SeekBackward, Snap", () => clock.SeekBackward(true));
-            AddAssert("Time = 400", () => clock.CurrentTime == 400);
-            AddStep("SeekBackward, Snap", () => clock.SeekBackward(true));
-            AddAssert("Time = 350", () => clock.CurrentTime == 350);
-            AddStep("SeekBackward, Snap", () => clock.SeekBackward(true));
-            AddAssert("Time = 175", () => clock.CurrentTime == 175);
-            AddStep("SeekBackward, Snap", () => clock.SeekBackward(true));
-            AddAssert("Time = 100", () => clock.CurrentTime == 100);
-            AddStep("SeekBackward, Snap", () => clock.SeekBackward(true));
-            AddAssert("Time = 50", () => clock.CurrentTime == 50);
-            AddStep("SeekBackward, Snap", () => clock.SeekBackward(true));
-            AddAssert("Time = 0", () => clock.CurrentTime == 0);
+            AddStep("Seek(450)", () => Clock.Seek(450));
+            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddAssert("Time = 400", () => Clock.CurrentTime == 400);
+            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddAssert("Time = 350", () => Clock.CurrentTime == 350);
+            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddAssert("Time = 175", () => Clock.CurrentTime == 175);
+            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddAssert("Time = 100", () => Clock.CurrentTime == 100);
+            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddAssert("Time = 50", () => Clock.CurrentTime == 50);
+            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddAssert("Time = 0", () => Clock.CurrentTime == 0);
         }
 
         /// <summary>
@@ -273,18 +263,18 @@ namespace osu.Game.Tests.Visual
         {
             reset();
 
-            AddStep("Seek(451)", () => clock.Seek(451));
-            AddStep("SeekBackward, Snap", () => clock.SeekBackward(true));
-            AddAssert("Time = 450", () => clock.CurrentTime == 450);
-            AddStep("Seek(450.999)", () => clock.Seek(450.999));
-            AddStep("SeekBackward, Snap", () => clock.SeekBackward(true));
-            AddAssert("Time = 450", () => clock.CurrentTime == 450);
-            AddStep("Seek(401)", () => clock.Seek(401));
-            AddStep("SeekBackward, Snap", () => clock.SeekBackward(true));
-            AddAssert("Time = 400", () => clock.CurrentTime == 400);
-            AddStep("Seek(401.999)", () => clock.Seek(401.999));
-            AddStep("SeekBackward, Snap", () => clock.SeekBackward(true));
-            AddAssert("Time = 400", () => clock.CurrentTime == 400);
+            AddStep("Seek(451)", () => Clock.Seek(451));
+            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddAssert("Time = 450", () => Clock.CurrentTime == 450);
+            AddStep("Seek(450.999)", () => Clock.Seek(450.999));
+            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddAssert("Time = 450", () => Clock.CurrentTime == 450);
+            AddStep("Seek(401)", () => Clock.Seek(401));
+            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddAssert("Time = 400", () => Clock.CurrentTime == 400);
+            AddStep("Seek(401.999)", () => Clock.Seek(401.999));
+            AddStep("SeekBackward, Snap", () => Clock.SeekBackward(true));
+            AddAssert("Time = 400", () => Clock.CurrentTime == 400);
         }
 
         /// <summary>
@@ -296,34 +286,34 @@ namespace osu.Game.Tests.Visual
 
             double lastTime = 0;
 
-            AddStep("Seek(0)", () => clock.Seek(0));
+            AddStep("Seek(0)", () => Clock.Seek(0));
 
             for (int i = 0; i < 20; i++)
             {
                 AddStep("SeekForward, Snap", () =>
                 {
-                    lastTime = clock.CurrentTime;
-                    clock.SeekForward(true);
+                    lastTime = Clock.CurrentTime;
+                    Clock.SeekForward(true);
                 });
-                AddAssert("Time > lastTime", () => clock.CurrentTime > lastTime);
+                AddAssert("Time > lastTime", () => Clock.CurrentTime > lastTime);
             }
 
             for (int i = 0; i < 20; i++)
             {
                 AddStep("SeekBackward, Snap", () =>
                 {
-                    lastTime = clock.CurrentTime;
-                    clock.SeekBackward(true);
+                    lastTime = Clock.CurrentTime;
+                    Clock.SeekBackward(true);
                 });
-                AddAssert("Time < lastTime", () => clock.CurrentTime < lastTime);
+                AddAssert("Time < lastTime", () => Clock.CurrentTime < lastTime);
             }
 
-            AddAssert("Time = 0", () => clock.CurrentTime == 0);
+            AddAssert("Time = 0", () => Clock.CurrentTime == 0);
         }
 
         private void reset()
         {
-            AddStep("Reset", () => clock.Seek(0));
+            AddStep("Reset", () => Clock.Seek(0));
         }
 
         private class TestHitObjectComposer : HitObjectComposer
