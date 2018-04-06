@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
         public void Select(RectangleF rect)
         {
-            foreach (var mask in aliveMasks)
+            foreach (var mask in aliveMasks.ToList())
             {
                 if (mask.IsPresent && rect.Contains(mask.SelectionPoint))
                     mask.Select();
