@@ -86,8 +86,18 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// </summary>
         public void DeselectAll() => aliveMasks.ToList().ForEach(m => m.Deselect());
 
-        private void onMaskSelected(HitObjectMask mask) => MaskSelected?.Invoke(mask);
-        private void onMaskDeselected(HitObjectMask mask) => MaskDeselected?.Invoke(mask);
+        private void onMaskSelected(HitObjectMask mask)
+        {
+            MaskSelected?.Invoke(mask);
+            ChangeChildDepth(mask, 1);
+        }
+
+        private void onMaskDeselected(HitObjectMask mask)
+        {
+            MaskDeselected?.Invoke(mask);
+            ChangeChildDepth(mask, 0);
+        }
+
         private void onSelectionRequested(HitObjectMask mask, InputState state) => MaskSelectionRequested?.Invoke(mask, state);
         private void onDragRequested(HitObjectMask mask, InputState state) => MaskDragRequested?.Invoke(mask, state);
 
@@ -100,6 +110,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         public int Compare(HitObjectMask x, HitObjectMask y)
         {
+            // dpeth is used to denote selected status (we always want selected masks to handle input first).
+            int d = x.Depth.CompareTo(y.Depth);
+            if (d != 0)
+                return d;
+
             // Put earlier hitobjects towards the end of the list, so they handle input first
             int i = y.HitObject.HitObject.StartTime.CompareTo(x.HitObject.HitObject.StartTime);
             return i == 0 ? CompareReverseChildID(x, y) : i;
