@@ -29,6 +29,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// </summary>
         public event Action<HitObjectMask, InputState> MaskSelectionRequested;
 
+        /// <summary>
+        /// Invoked when any <see cref="HitObjectMask"/> requests drag.
+        /// </summary>
+        public event Action<HitObjectMask, InputState> MaskDragRequested;
+
         private IEnumerable<HitObjectMask> aliveMasks => AliveInternalChildren.Cast<HitObjectMask>();
 
         public MaskContainer()
@@ -43,6 +48,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             drawable.Selected += onMaskSelected;
             drawable.Deselected += onMaskDeselected;
             drawable.SelectionRequested += onSelectionRequested;
+            drawable.DragRequested += onDragRequested;
         }
 
         public override bool Remove(HitObjectMask drawable)
@@ -54,6 +60,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 drawable.Selected -= onMaskSelected;
                 drawable.Deselected -= onMaskDeselected;
                 drawable.SelectionRequested -= onSelectionRequested;
+                drawable.DragRequested -= onDragRequested;
             }
 
             return result;
@@ -82,6 +89,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private void onMaskSelected(HitObjectMask mask) => MaskSelected?.Invoke(mask);
         private void onMaskDeselected(HitObjectMask mask) => MaskDeselected?.Invoke(mask);
         private void onSelectionRequested(HitObjectMask mask, InputState state) => MaskSelectionRequested?.Invoke(mask, state);
+        private void onDragRequested(HitObjectMask mask, InputState state) => MaskDragRequested?.Invoke(mask, state);
 
         protected override int Compare(Drawable x, Drawable y)
         {

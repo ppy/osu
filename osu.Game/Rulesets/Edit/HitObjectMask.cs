@@ -33,6 +33,11 @@ namespace osu.Game.Rulesets.Edit
         public event Action<HitObjectMask, InputState> SelectionRequested;
 
         /// <summary>
+        /// Invoked when this <see cref="HitObjectMask"/> has requested drag.
+        /// </summary>
+        public event Action<HitObjectMask, InputState> DragRequested;
+
+        /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectMask"/> applies to.
         /// </summary>
         public readonly DrawableHitObject HitObject;
@@ -99,7 +104,7 @@ namespace osu.Game.Rulesets.Edit
                 selectionRequested = true;
             }
 
-            return base.OnMouseDown(state, args);
+            return IsSelected;
         }
 
         protected override bool OnClick(InputState state)
@@ -108,9 +113,18 @@ namespace osu.Game.Rulesets.Edit
             {
                 selectionRequested = true;
                 SelectionRequested?.Invoke(this, state);
+                return true;
             }
 
             return base.OnClick(state);
+        }
+
+        protected override bool OnDragStart(InputState state) => true;
+
+        protected override bool OnDrag(InputState state)
+        {
+            DragRequested?.Invoke(this, state);
+            return true;
         }
 
         /// <summary>

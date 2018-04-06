@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             maskContainer.MaskSelected += maskSelection.HandleSelected;
             maskContainer.MaskDeselected += maskSelection.HandleDeselected;
             maskContainer.MaskSelectionRequested += maskSelection.HandleSelectionRequested;
+            maskContainer.MaskDragRequested += maskSelection.HandleDrag;
+
             maskSelection.DeselectAll = maskContainer.DeselectAll;
 
             var dragLayer = new DragLayer(maskContainer.Select);
