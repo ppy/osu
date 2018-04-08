@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override double ScoreMultiplier => 1.12;
         public override bool Ranked => true;
-        
+
         private float lastStartX;
         private int lastStartTime;
 
