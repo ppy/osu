@@ -29,7 +29,6 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
-using osu.Game.Online.Chat;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
