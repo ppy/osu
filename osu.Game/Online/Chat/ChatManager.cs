@@ -62,7 +62,7 @@ namespace osu.Game.Online.Chat
         private void currentChatChanged(ChatBase chatBase)
         {
             if (chatBase is ChannelChat channel && !JoinedChannels.Contains(channel))
-                JoinedChannels.Add(channel); 
+                JoinedChannels.Add(channel);
         }
 
         /// <summary>
