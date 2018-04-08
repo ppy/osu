@@ -40,7 +40,6 @@ namespace osu.Game.Overlays.Chat
             EdgeEffect = deactivateEdgeEffect;
             Masking = false;
             Shear = shear;
-
             Children = new Drawable[]
             {
                 new Container()
@@ -82,7 +81,6 @@ namespace osu.Game.Overlays.Chat
                         Origin = Anchor.TopLeft,
                         Anchor = Anchor.TopLeft,
                         Shear = -shear,
-                        
                         Children = new Drawable[]
                         {
                             new Container
@@ -97,7 +95,6 @@ namespace osu.Game.Overlays.Chat
                                 Anchor = Anchor.BottomLeft,
                                 Children = new Drawable[]
                                 {
-
                                     new SpriteIcon
                                     {
                                         Icon = FontAwesome.fa_eercast,
@@ -138,13 +135,12 @@ namespace osu.Game.Overlays.Chat
                                 Origin = Anchor.BottomLeft,
                                 Anchor = Anchor.BottomLeft,
                                 RelativeSizeAxes = Axes.Y,
-
                                 Action = delegate
                                 {
                                     if (IsRemovable) OnRequestClose?.Invoke(this);
                                 },
                             },
-                    }
+                        }
                     }
                 }
             };
