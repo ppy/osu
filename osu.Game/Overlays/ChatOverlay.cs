@@ -220,7 +220,7 @@ namespace osu.Game.Overlays
                         {
                             chatManager.CurrentChat.Value = newChannel;
                         }
-                            
+
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:

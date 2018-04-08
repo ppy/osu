@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Chat
         private readonly Box backgroundBox;
         private readonly OsuSpriteText username;
         private readonly ChatTabItemCloseButton closeButton;
-       
+
         public UserChatTabItem(UserChat value)
             : base(value)
         {
