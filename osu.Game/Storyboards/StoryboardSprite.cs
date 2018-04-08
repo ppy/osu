@@ -101,6 +101,7 @@ namespace osu.Game.Storyboards
         private IEnumerable<CommandTimeline<T>.TypedCommand> getCommands<T>(CommandTimelineSelector<T> timelineSelector, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups)
         {
             var commands = TimelineGroup.GetCommands(timelineSelector);
+            // ReSharper disable once AccessToModifiedClosure
             loops.ForEach(loop => commands = commands.Concat(loop.GetCommands(timelineSelector)));
             if (triggeredGroups != null)
                 foreach (var pair in triggeredGroups)

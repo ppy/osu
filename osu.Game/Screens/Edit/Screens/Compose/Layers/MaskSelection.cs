@@ -150,7 +150,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             selectedMasks.ForEach(mask =>
             {
+                // ReSharper disable once AccessToModifiedClosure
                 topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(mask.SelectionQuad.TopLeft));
+                // ReSharper disable once AccessToModifiedClosure
                 bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(mask.SelectionQuad.BottomRight));
             });
 
