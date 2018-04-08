@@ -225,7 +225,7 @@ namespace osu.Game.Overlays
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     foreach (ChannelChat removedChannel in args.OldItems)
-                    { 
+                    {
                         channelTabs.RemoveItem(removedChannel);
                         loadedChannels.Remove(loadedChannels.Find(c => c.Chat == removedChannel ));
                         removedChannel.Joined.Value = false;
@@ -371,7 +371,7 @@ namespace osu.Game.Overlays
             chatManager.CurrentChat.ValueChanged += currentChatChanged;
             chatManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
             chatManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
-            chatManager.OpenedUserChats.CollectionChanged += openedUserChatsChanged; 
+            chatManager.OpenedUserChats.CollectionChanged += openedUserChatsChanged;
         }
 
         private void openedUserChatsChanged(object sender, NotifyCollectionChangedEventArgs args)

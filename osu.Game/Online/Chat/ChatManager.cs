@@ -222,7 +222,7 @@ namespace osu.Game.Online.Chat
             var req = new ListChannelsRequest();
 
             req.Success += channels =>
-            { 
+            {
                 channels.Where(channel => AvailableChannels.All(c => c.ChatID != channel.ChatID))
                         .ForEach(channel => AvailableChannels.Add(channel));
 
