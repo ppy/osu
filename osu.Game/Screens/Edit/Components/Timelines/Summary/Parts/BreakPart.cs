@@ -17,8 +17,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         protected override void LoadBeatmap(WorkingBeatmap beatmap)
         {
             base.LoadBeatmap(beatmap);
-            foreach (var breakPeriod in beatmap.Beatmap.Breaks)
-                Add(new BreakVisualisation(breakPeriod));
+            beatmap.Beatmap.Breaks.ForEach(breakPeriod => Add(new BreakVisualisation(breakPeriod)));
         }
 
         private class BreakVisualisation : DurationVisualisation

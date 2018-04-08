@@ -47,12 +47,10 @@ namespace osu.Game.Beatmaps
             foreach (var mod in Mods.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(Beatmap.BeatmapInfo.BaseDifficulty);
 
-            foreach (var h in Beatmap.HitObjects)
-                h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
+            Beatmap.HitObjects.ForEach(h => h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty));
 
             foreach (var mod in mods.OfType<IApplicableToHitObject<T>>())
-                foreach (var obj in Beatmap.HitObjects)
-                    mod.ApplyToHitObject(obj);
+                Beatmap.HitObjects.ForEach(obj => mod.ApplyToHitObject(obj));
         }
 
         protected virtual void PreprocessHitObjects()

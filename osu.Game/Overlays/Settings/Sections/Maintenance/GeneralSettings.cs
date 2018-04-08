@@ -53,8 +53,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         restoreButton.Enabled.Value = false;
                         Task.Run(() =>
                         {
-                            foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
-                                beatmaps.Restore(b);
+                            beatmaps.QueryBeatmaps(b => b.Hidden).ToList().ForEach(beatmaps.Restore);
                         }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
                     }
                 },

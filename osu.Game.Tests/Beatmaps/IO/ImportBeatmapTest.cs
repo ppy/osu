@@ -271,8 +271,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 $@"Incorrect database beatmap count post-import ({countBeatmaps} but should be {countBeatmapSetBeatmaps}).", timeout);
 
             var set = queryBeatmapSets().First();
-            foreach (BeatmapInfo b in set.Beatmaps)
-                Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineBeatmapID == b.OnlineBeatmapID));
+            set.Beatmaps.ForEach(b => Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineBeatmapID == b.OnlineBeatmapID)));
             Assert.IsTrue(set.Beatmaps.Count > 0);
             var beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);

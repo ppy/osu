@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             hpIncreaseGood = hpMultiplierNormal * hp_hit_good;
             hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
 
-            foreach (var obj in beatmap.HitObjects)
+            beatmap.HitObjects.ForEach(obj =>
             {
                 if (obj is Hit)
                 {
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                 {
                     AddJudgement(new TaikoJudgement { Result = HitResult.Great });
                 }
-            }
+            });
         }
 
         protected override void OnNewJudgement(Judgement judgement)

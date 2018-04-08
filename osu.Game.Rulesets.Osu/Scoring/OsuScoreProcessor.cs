@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
 
-            foreach (var obj in beatmap.HitObjects)
+            beatmap.HitObjects.ForEach(obj =>
             {
                 if (obj is Slider slider)
                 {
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 }
 
                 AddJudgement(new OsuJudgement { Result = HitResult.Great });
-            }
+            });
         }
 
         protected override void Reset(bool storeResults)

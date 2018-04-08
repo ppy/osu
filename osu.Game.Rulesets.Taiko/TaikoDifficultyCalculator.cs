@@ -40,8 +40,7 @@ namespace osu.Game.Rulesets.Taiko
             // Fill our custom DifficultyHitObject class, that carries additional information
             difficultyHitObjects.Clear();
 
-            foreach (var hitObject in Beatmap.HitObjects)
-                difficultyHitObjects.Add(new TaikoHitObjectDifficulty(hitObject));
+            Beatmap.HitObjects.ForEach(hitObject => difficultyHitObjects.Add(new TaikoHitObjectDifficulty(hitObject)));
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
@@ -90,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko
             double maximumStrain = 0; // We need to keep track of the maximum strain in the current interval
 
             TaikoHitObjectDifficulty previousHitObject = null;
-            foreach (var hitObject in difficultyHitObjects)
+            difficultyHitObjects.ForEach(hitObject =>
             {
                 // While we are beyond the current interval push the currently available maximum to our strain list
                 while (hitObject.BaseHitObject.StartTime > intervalEndTime)
@@ -117,18 +116,18 @@ namespace osu.Game.Rulesets.Taiko
                 maximumStrain = Math.Max(hitObject.Strain, maximumStrain);
 
                 previousHitObject = hitObject;
-            }
+            });
 
             // Build the weighted sum over the highest strains for each interval
             double difficulty = 0;
             double weight = 1;
             highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
 
-            foreach (double strain in highestStrains)
+            highestStrains.ForEach(strain =>
             {
                 difficulty += weight * strain;
                 weight *= decay_weight;
-            }
+            });
 
             return difficulty;
         }

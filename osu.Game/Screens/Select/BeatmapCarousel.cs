@@ -479,11 +479,11 @@ namespace osu.Game.Screens.Select
                 return null;
 
             // todo: remove the need for this.
-            foreach (var b in beatmapSet.Beatmaps)
+            beatmapSet.Beatmaps.ForEach(b =>
             {
                 if (b.Metadata == null)
                     b.Metadata = beatmapSet.Metadata;
-            }
+            });
 
             var set = new CarouselBeatmapSet(beatmapSet);
 
@@ -520,7 +520,7 @@ namespace osu.Game.Screens.Select
 
             scrollTarget = null;
 
-            foreach (DrawableCarouselItem d in Items)
+            Items.ForEach(d =>
             {
                 if (d.IsPresent)
                 {
@@ -530,10 +530,12 @@ namespace osu.Game.Screens.Select
                             lastSet = set;
 
                             set.MoveToX(set.Item.State == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
+                            // ReSharper disable once AccessToModifiedClosure
                             set.MoveToY(currentY, 750, Easing.OutExpo);
                             break;
                         case DrawableCarouselBeatmap beatmap:
                             if (beatmap.Item.State.Value == CarouselItemState.Selected)
+                                // ReSharper disable once AccessToModifiedClosure
                                 scrollTarget = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;
 
                             void performMove(float y, float? startY = null)
@@ -551,9 +553,11 @@ namespace osu.Game.Screens.Select
                                 setY = lastSet.Y + lastSet.DrawHeight + 5;
 
                             if (d.IsLoaded)
+                                // ReSharper disable once AccessToModifiedClosure
                                 performMove(currentY, setY);
                             else
                             {
+                                // ReSharper disable once AccessToModifiedClosure
                                 float y = currentY;
                                 d.OnLoadComplete = _ => performMove(y, setY);
                             }
@@ -562,11 +566,13 @@ namespace osu.Game.Screens.Select
                     }
                 }
 
+                // ReSharper disable once AccessToModifiedClosure
                 yPositions.Add(currentY);
 
                 if (d.Item.Visible)
+                    // ReSharper disable once AccessToModifiedClosure
                     currentY += d.DrawHeight + 5;
-            }
+            });
 
             currentY += DrawHeight / 2;
             scrollableContent.Height = currentY;

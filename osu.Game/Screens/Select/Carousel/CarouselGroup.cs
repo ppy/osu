@@ -21,8 +21,7 @@ namespace osu.Game.Screens.Select.Carousel
             get
             {
                 var drawables = base.Drawables;
-                foreach (var c in InternalChildren)
-                    drawables.AddRange(c.Drawables);
+                InternalChildren.ForEach(c => drawables.AddRange(c.Drawables));
                 return drawables;
             }
         }

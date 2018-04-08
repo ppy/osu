@@ -278,13 +278,13 @@ namespace osu.Game.Screens.Tournament
 
         private void addFlags()
         {
-            foreach (DrawingsTeam t in availableTeams)
+            availableTeams.ForEach(t =>
             {
                 Add(new ScrollingTeam(t)
                 {
                     X = leftPos + DrawWidth
                 });
-            }
+            });
         }
 
         private void resetSelected()

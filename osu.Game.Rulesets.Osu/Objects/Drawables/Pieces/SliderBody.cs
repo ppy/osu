@@ -181,8 +181,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             // Generate the entire curve
             slider.Curve.GetPathToProgress(CurrentCurve, 0, 1);
-            foreach (Vector2 p in CurrentCurve)
-                path.AddVertex(p);
+            CurrentCurve.ForEach(p => path.AddVertex(p));
 
             Size = path.Size;
 
@@ -200,8 +199,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             slider.Curve.GetPathToProgress(CurrentCurve, p0, p1);
 
             path.ClearVertices();
-            foreach (Vector2 p in CurrentCurve)
-                path.AddVertex(p);
+            CurrentCurve.ForEach(p => path.AddVertex(p));
 
             return true;
         }

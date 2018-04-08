@@ -81,11 +81,11 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
             double weight = 1;
 
             // Difficulty is the weighted sum of the highest strains from every section.
-            foreach (double strain in strainPeaks)
+            strainPeaks.ForEach(strain =>
             {
                 difficulty += strain * weight;
                 weight *= 0.9;
-            }
+            });
 
             return difficulty;
         }

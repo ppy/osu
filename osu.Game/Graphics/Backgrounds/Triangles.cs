@@ -224,7 +224,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                 Vector2 localInflationAmount = edge_smoothness * DrawInfo.MatrixInverse.ExtractScale().Xy;
 
-                foreach (TriangleParticle particle in Parts)
+                Parts.ForEach(particle =>
                 {
                     var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
                     var size = new Vector2(2 * offset.X, offset.Y);
@@ -244,7 +244,7 @@ namespace osu.Game.Graphics.Backgrounds
                         null,
                         Shared.VertexBatch.AddAction,
                         Vector2.Divide(localInflationAmount, size));
-                }
+                });
 
                 Shader.Unbind();
             }

@@ -115,8 +115,7 @@ namespace osu.Game.Screens.Tournament
         public string GetStringRepresentation()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (GroupTeam gt in allTeams)
-                sb.AppendLine(gt.Team.FullName);
+            allTeams.ForEach(gt => sb.AppendLine(gt.Team.FullName));
             return sb.ToString();
         }
 

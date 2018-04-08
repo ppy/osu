@@ -82,9 +82,11 @@ namespace osu.Game.Beatmaps
             model.Beatmaps = createBeatmapDifficulties(archive);
 
             // remove metadata from difficulties where it matches the set
-            foreach (BeatmapInfo b in model.Beatmaps)
+            model.Beatmaps.ForEach(b =>
+            {
                 if (model.Metadata.Equals(b.Metadata))
                     b.Metadata = null;
+            });
         }
 
         protected override BeatmapSetInfo CheckForExisting(BeatmapSetInfo model)
@@ -297,7 +299,7 @@ namespace osu.Game.Beatmaps
             return hashable.ComputeSHA2Hash();
         }
 
-       protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
+        protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));

@@ -208,8 +208,7 @@ namespace osu.Game.Overlays.Direct
         {
             var icons = new List<DifficultyIcon>();
 
-            foreach (var b in SetInfo.Beatmaps)
-                icons.Add(new DifficultyIcon(b));
+            SetInfo.Beatmaps.ForEach(b => icons.Add(new DifficultyIcon(b)));
 
             return icons;
         }

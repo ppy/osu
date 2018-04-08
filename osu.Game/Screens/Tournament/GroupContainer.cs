@@ -81,8 +81,7 @@ namespace osu.Game.Screens.Tournament
 
         public void ClearTeams()
         {
-            foreach (Group g in groups)
-                g.ClearTeams();
+            groups.ForEach(g => g.ClearTeams());
 
             currentGroup = 0;
         }
@@ -91,13 +90,13 @@ namespace osu.Game.Screens.Tournament
         {
             StringBuilder sb = new StringBuilder();
 
-            foreach (Group g in groups)
+            groups.ForEach(g =>
             {
                 if (g != groups.First())
                     sb.AppendLine();
                 sb.AppendLine($"Group {g.GroupName}");
                 sb.Append(g.GetStringRepresentation());
-            }
+            });
 
             return sb.ToString();
         }
