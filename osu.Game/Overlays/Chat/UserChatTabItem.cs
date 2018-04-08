@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Chat
             Shear = shear;
             Children = new Drawable[]
             {
-                new Container()
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]

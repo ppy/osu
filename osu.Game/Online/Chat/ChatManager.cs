@@ -11,7 +11,6 @@ using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
