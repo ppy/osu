@@ -36,10 +36,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
                 MissingText.Hide();
 
-                foreach (RecentActivity activity in activities)
-                {
-                    ItemsContainer.Add(new DrawableRecentActivity(activity));
-                }
+                activities.ForEach(activity => ItemsContainer.Add(new DrawableRecentActivity(activity)));
             };
 
             Api.Queue(req);

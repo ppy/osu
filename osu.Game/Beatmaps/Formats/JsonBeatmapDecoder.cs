@@ -20,8 +20,7 @@ namespace osu.Game.Beatmaps.Formats
 
             stream.ReadToEnd().DeserializeInto(beatmap);
 
-            foreach (var hitObject in beatmap.HitObjects)
-                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
+            beatmap.HitObjects.ForEach(hitObject => hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty));
         }
     }
 }

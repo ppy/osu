@@ -241,8 +241,7 @@ namespace osu.Game.Rulesets.UI
             processor.PostProcess(Beatmap);
 
             // Apply defaults
-            foreach (var h in Beatmap.HitObjects)
-                h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
+            Beatmap.HitObjects.ForEach(h => h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty));
 
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
@@ -278,8 +277,7 @@ namespace osu.Game.Rulesets.UI
                 return;
 
             foreach (var mod in mods.OfType<IApplicableToHitObject<TObject>>())
-                foreach (var obj in Beatmap.HitObjects)
-                    mod.ApplyToHitObject(obj);
+                Beatmap.HitObjects.ForEach(obj => mod.ApplyToHitObject(obj));
 
             foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);

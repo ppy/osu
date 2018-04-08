@@ -38,11 +38,11 @@ namespace osu.Game.Rulesets.Mania.Mods
                 return;
 
             var newDefinitions = new List<StageDefinition>();
-            foreach (var existing in mrc.Beatmap.Stages)
+            mrc.Beatmap.Stages.ForEach(existing =>
             {
                 newDefinitions.Add(new StageDefinition { Columns = existing.Columns / 2 });
                 newDefinitions.Add(new StageDefinition { Columns = existing.Columns / 2 });
-            }
+            });
 
             mrc.Beatmap.Stages = newDefinitions;
         }

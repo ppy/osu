@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
             while (true)
             {
-                foreach (var obj in beatmap.HitObjects)
+                beatmap.HitObjects.ForEach(obj =>
                 {
                     var holdNote = obj as HoldNote;
 
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
                     }
 
                     AddJudgement(new ManiaJudgement { Result = HitResult.Perfect });
-                }
+                });
 
                 if (!HasFailed)
                     break;

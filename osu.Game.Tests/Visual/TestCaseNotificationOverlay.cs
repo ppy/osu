@@ -116,13 +116,13 @@ namespace osu.Game.Tests.Visual
                     p.State = ProgressNotificationState.Active;
             }
 
-            foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))
+            progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active).ForEach(n =>
             {
                 if (n.Progress < 1)
                     n.Progress += (float)(Time.Elapsed / 400) * RNG.NextSingle();
                 else
                     n.State = ProgressNotificationState.Completed;
-            }
+            });
         }
 
         private void sendDownloadProgress()

@@ -101,8 +101,7 @@ namespace osu.Game.Storyboards
         private IEnumerable<CommandTimeline<T>.TypedCommand> getCommands<T>(CommandTimelineSelector<T> timelineSelector, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups)
         {
             var commands = TimelineGroup.GetCommands(timelineSelector);
-            foreach (var loop in loops)
-                commands = commands.Concat(loop.GetCommands(timelineSelector));
+            loops.ForEach(loop => commands = commands.Concat(loop.GetCommands(timelineSelector)));
             if (triggeredGroups != null)
                 foreach (var pair in triggeredGroups)
                     commands = commands.Concat(pair.Item1.GetCommands(timelineSelector, pair.Item2));

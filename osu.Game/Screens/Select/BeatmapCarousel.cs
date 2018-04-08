@@ -479,11 +479,11 @@ namespace osu.Game.Screens.Select
                 return null;
 
             // todo: remove the need for this.
-            foreach (var b in beatmapSet.Beatmaps)
+            beatmapSet.Beatmaps.ForEach(b =>
             {
                 if (b.Metadata == null)
                     b.Metadata = beatmapSet.Metadata;
-            }
+            });
 
             var set = new CarouselBeatmapSet(beatmapSet);
 
@@ -520,7 +520,7 @@ namespace osu.Game.Screens.Select
 
             scrollTarget = null;
 
-            foreach (DrawableCarouselItem d in Items)
+            Items.ForEach(d =>
             {
                 if (d.IsPresent)
                 {
@@ -566,7 +566,7 @@ namespace osu.Game.Screens.Select
 
                 if (d.Item.Visible)
                     currentY += d.DrawHeight + 5;
-            }
+            });
 
             currentY += DrawHeight / 2;
             scrollableContent.Height = currentY;

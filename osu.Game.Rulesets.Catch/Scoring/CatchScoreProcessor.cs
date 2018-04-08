@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
 
         protected override void SimulateAutoplay(Beatmap<CatchHitObject> beatmap)
         {
-            foreach (var obj in beatmap.HitObjects)
+            beatmap.HitObjects.ForEach(obj =>
             {
                 switch (obj)
                 {
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
                         AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
                         break;
                 }
-            }
+            });
 
             base.SimulateAutoplay(beatmap);
         }

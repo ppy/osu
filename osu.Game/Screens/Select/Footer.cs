@@ -76,13 +76,13 @@ namespace osu.Game.Screens.Select
             overlays.Add(overlay);
             AddButton(text, colour, () =>
             {
-                foreach (var o in overlays)
+                overlays.ForEach(o =>
                 {
                     if (o == overlay)
                         o.ToggleVisibility();
                     else
                         o.Hide();
-                }
+                });
             }, hotkey, depth);
         }
 

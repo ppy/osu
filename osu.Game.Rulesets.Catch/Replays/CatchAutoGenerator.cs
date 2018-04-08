@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 lastPosition = h.X;
             }
 
-            foreach (var obj in Beatmap.HitObjects)
+            Beatmap.HitObjects.ForEach(obj =>
             {
                 switch (obj)
                 {
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                             break;
                     }
                 }
-            }
+            });
 
             return Replay;
         }

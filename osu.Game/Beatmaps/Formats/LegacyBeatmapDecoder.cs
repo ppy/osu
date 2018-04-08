@@ -58,8 +58,7 @@ namespace osu.Game.Beatmaps.Formats
             // unfortunately there are ranked maps in this state (example: https://osu.ppy.sh/s/594828).
             this.beatmap.HitObjects.Sort((x, y) => x.StartTime.CompareTo(y.StartTime));
 
-            foreach (var hitObject in this.beatmap.HitObjects)
-                hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
+            this.beatmap.HitObjects.ForEach(hitObject => hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty));
         }
 
         protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(" ") || line.StartsWith("_");

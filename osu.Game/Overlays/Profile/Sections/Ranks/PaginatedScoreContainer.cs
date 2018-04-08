@@ -35,8 +35,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
             req.Success += scores =>
             {
-                foreach (var s in scores)
-                    s.ApplyRuleset(Rulesets.GetRuleset(s.OnlineRulesetID));
+                scores.ForEach(s => s.ApplyRuleset(Rulesets.GetRuleset(s.OnlineRulesetID)));
 
                 ShowMoreButton.FadeTo(scores.Count == ItemsPerPage ? 1 : 0);
                 ShowMoreLoading.Hide();
@@ -49,7 +48,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
                 MissingText.Hide();
 
-                foreach (OnlineScore score in scores)
+                scores.ForEach(score =>
                 {
                     DrawableProfileScore drawableScore;
 
@@ -64,7 +63,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     }
 
                     ItemsContainer.Add(drawableScore);
-                }
+                });
             };
 
             Api.Queue(req);

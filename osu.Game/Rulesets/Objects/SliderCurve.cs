@@ -62,9 +62,12 @@ namespace osu.Game.Rulesets.Objects
                 if (i == ControlPoints.Count - 1 || ControlPoints[i] == ControlPoints[i + 1])
                 {
                     List<Vector2> subpath = calculateSubpath(subControlPoints);
-                    foreach (Vector2 t in subpath)
+                    subpath.ForEach(t =>
+                    {
                         if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
                             calculatedPath.Add(t);
+                    });
+
 
                     subControlPoints.Clear();
                 }

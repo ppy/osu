@@ -65,7 +65,7 @@ namespace osu.Game.IO.Serialization.Converters
 
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
-            foreach (var item in list)
+            list.ForEach(item =>
             {
                 var type = item.GetType();
                 var assemblyName = type.Assembly.GetName();
@@ -84,7 +84,7 @@ namespace osu.Game.IO.Serialization.Converters
                 var itemObject = JObject.FromObject(item, serializer);
                 itemObject.AddFirst(new JProperty("type", typeId));
                 objects.Add(itemObject);
-            }
+            });
 
             writer.WriteStartObject();
 

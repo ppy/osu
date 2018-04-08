@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         {
             // Todo: Various forms of snapping
 
-            foreach (var mask in selectedMasks)
+            selectedMasks.ForEach(mask =>
             {
                 switch (mask.HitObject.HitObject)
                 {
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                         editablePosition.OffsetPosition(state.Mouse.Delta);
                         break;
                 }
-            }
+            });
         }
 
         #endregion
@@ -148,11 +148,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             bool hasSelection = false;
 
-            foreach (var mask in selectedMasks)
+            selectedMasks.ForEach(mask =>
             {
                 topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(mask.SelectionQuad.TopLeft));
                 bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(mask.SelectionQuad.BottomRight));
-            }
+            });
 
             topLeft -= new Vector2(5);
             bottomRight += new Vector2(5);

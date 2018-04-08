@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     public class PaginatedMostPlayedBeatmapContainer : PaginatedContainer
     {
         public PaginatedMostPlayedBeatmapContainer(Bindable<User> user)
-            :base(user, "Most Played Beatmaps", "No records. :(")
+            : base(user, "Most Played Beatmaps", "No records. :(")
         {
             ItemsPerPage = 5;
 
@@ -39,10 +39,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
                 MissingText.Hide();
 
-                foreach (var beatmap in beatmaps)
-                {
-                    ItemsContainer.Add(new DrawableMostPlayedRow(beatmap.GetBeatmapInfo(Rulesets), beatmap.PlayCount));
-                }
+                beatmaps.ForEach(beatmap => ItemsContainer.Add(new DrawableMostPlayedRow(beatmap.GetBeatmapInfo(Rulesets), beatmap.PlayCount)));
             };
 
             Api.Queue(req);

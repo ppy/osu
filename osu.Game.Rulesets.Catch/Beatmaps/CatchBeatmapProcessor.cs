@@ -21,8 +21,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             base.PostProcess(beatmap);
 
             int index = 0;
-            foreach (var obj in beatmap.HitObjects)
-                obj.IndexInBeatmap = index++;
+            beatmap.HitObjects.ForEach(obj => obj.IndexInBeatmap = index++);
         }
 
         private void initialiseHyperDash(List<CatchHitObject> objects)

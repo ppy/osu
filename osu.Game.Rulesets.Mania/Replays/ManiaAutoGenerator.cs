@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             var normalAction = ManiaAction.Key1;
             var specialAction = ManiaAction.Special1;
             int totalCounter = 0;
-            foreach (var stage in Beatmap.Stages)
+            Beatmap.Stages.ForEach(stage =>
             {
                 for (int i = 0; i < stage.Columns; i++)
                 {
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Replays
                         columnActions[totalCounter] = normalAction++;
                     totalCounter++;
                 }
-            }
+            });
         }
 
         protected Replay Replay;

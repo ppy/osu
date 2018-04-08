@@ -233,11 +233,8 @@ namespace osu.Game.Screens.Menu
                             buttonAreaBackground.ScaleTo(Vector2.One, 500, Easing.Out);
                             buttonArea.FadeOut(300);
 
-                            foreach (Button b in buttonsTopLevel)
-                                b.State = ButtonState.Contracted;
-
-                            foreach (Button b in buttonsPlay)
-                                b.State = ButtonState.Contracted;
+                            buttonsTopLevel.ForEach(b => b.State = ButtonState.Contracted);
+                            buttonsPlay.ForEach(b => b.State = ButtonState.Contracted);
 
                             if (state != MenuState.Exit && lastState == MenuState.TopLevel)
                                 sampleBack?.Play();
@@ -247,18 +244,12 @@ namespace osu.Game.Screens.Menu
 
                             buttonArea.FadeIn(300);
 
-                            foreach (Button b in buttonsTopLevel)
-                                b.State = ButtonState.Expanded;
-
-                            foreach (Button b in buttonsPlay)
-                                b.State = ButtonState.Contracted;
+                            buttonsTopLevel.ForEach(b => b.State = ButtonState.Expanded);
+                            buttonsPlay.ForEach(b => b.State = ButtonState.Contracted);
                             break;
                         case MenuState.Play:
-                            foreach (Button b in buttonsTopLevel)
-                                b.State = ButtonState.Exploded;
-
-                            foreach (Button b in buttonsPlay)
-                                b.State = ButtonState.Expanded;
+                            buttonsTopLevel.ForEach(b => b.State = ButtonState.Exploded);
+                            buttonsPlay.ForEach(b => b.State = ButtonState.Expanded);
                             break;
                         case MenuState.EnteringMode:
                             buttonAreaBackground.ScaleTo(new Vector2(2, 0), 300, Easing.InSine);
@@ -268,11 +259,8 @@ namespace osu.Game.Screens.Menu
                             backButton.ContractStyle = 1;
                             settingsButton.ContractStyle = 1;
 
-                            foreach (Button b in buttonsTopLevel)
-                                b.State = ButtonState.Contracted;
-
-                            foreach (Button b in buttonsPlay)
-                                b.State = ButtonState.Contracted;
+                            buttonsTopLevel.ForEach(b => b.State = ButtonState.Contracted);
+                            buttonsPlay.ForEach(b => b.State = ButtonState.Contracted);
                             break;
                     }
 

@@ -51,12 +51,12 @@ namespace osu.Game.Graphics.Containers
             }
 
             int previousLinkEnd = 0;
-            foreach (var link in links)
+            links.ForEach(link =>
             {
                 AddText(text.Substring(previousLinkEnd, link.Index - previousLinkEnd));
                 AddLink(text.Substring(link.Index, link.Length), link.Url, link.Action, link.Argument);
                 previousLinkEnd = link.Index + link.Length;
-            }
+            });
 
             AddText(text.Substring(previousLinkEnd));
         }
