@@ -15,6 +15,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
@@ -50,17 +51,14 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, IAPIProvider api)
         {
             linkColour = colours.Blue;
-            dependencies.Cache(new ChatOverlay
-            {
-                AvailableChannels =
-                {
-                    new ChannelChat { Name = "#english" },
-                    new ChannelChat { Name = "#japanese" }
-                }
-            });
+            dependencies.Cache(new ChatOverlay());
+
+            var chatManager = new ChatManager(Scheduler);
+            api.Register(chatManager);
+            dependencies.Cache(chatManager);
 
             testLinksGeneral();
             testEcho();

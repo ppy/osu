@@ -22,7 +22,7 @@ namespace osu.Game.Online.Chat
         public TargetType TargetType;
 
         [JsonProperty(@"target_id")]
-        public int TargetId;
+        public long TargetId;
 
         [JsonProperty(@"is_action")]
         public bool IsAction;
