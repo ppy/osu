@@ -8,10 +8,7 @@
             },
             "type": "mono",
             "request": "launch",
-            "program": "${workspaceRoot}/osu.Desktop/bin/Debug/net461/osu!.exe",
-            "args": [
-                "--tests"
-            ],
+            "program": "${workspaceRoot}/osu.Game.Tests/bin/Debug/net461/osu.Game.Tests.exe",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Debug, msbuild)",
             "runtimeExecutable": null,
@@ -25,10 +22,7 @@
             },
             "type": "mono",
             "request": "launch",
-            "program": "${workspaceRoot}/osu.Desktop/bin/Release/net461/osu!.exe",
-            "args": [
-                "--tests"
-            ],
+            "program": "${workspaceRoot}/osu.Game.Tests/bin/Debug/net461/osu.Game.Tests.exe",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Release, msbuild)",
             "runtimeExecutable": null,
@@ -69,8 +63,7 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.0/osu!.dll",
-                "--tests"
+                "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp2.0/osu.Game.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Debug, dotnet)",
@@ -83,8 +76,7 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.0/osu!.dll",
-                "--tests"
+                "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp2.0/osu.Game.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Release, dotnet)",

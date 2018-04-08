@@ -5,19 +5,13 @@
     <OutputType>WinExe</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Company>ppy Pty Ltd</Company>
     <Description>click the circles. to the beat.</Description>
-    <Copyright>ppy Pty Ltd 2007-2017</Copyright>
     <AssemblyName>osu!</AssemblyName>
     <Title>osu!lazer</Title>
     <Product>osu!lazer</Product>
     <ApplicationIcon>lazer.ico</ApplicationIcon>
-    <Configurations>$(CONFIGURATIONS);VisualTests</Configurations>
     <Version>0.0.0.0</Version>
     <FileVersion>0.0.0.0</FileVersion>
-    <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
-    (Not sure why this is needed here, since we don't directly reference DeepEquals in this project...) -->
-    <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
   <PropertyGroup Label="Defines">
     <DefineConstants Condition="'$(TargetFramework)' == 'net461'">$(DefineConstants);NET_FRAMEWORK</DefineConstants>
@@ -25,23 +19,18 @@
   <PropertyGroup>
     <StartupObject>osu.Desktop.Program</StartupObject>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'VisualTests|AnyCPU'">
-    <StartArguments>--tests</StartArguments>
-  </PropertyGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
-    <ProjectReference Include="..\osu.Game.Tests\osu.Game.Tests.csproj" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.1" />
-    <PackageReference Include="NUnit" Version="3.8.1" />
     <PackageReference Include="squirrel.windows" Version="1.7.8" Condition="'$(TargetFramework)' == 'net461'" />
   </ItemGroup>
   <ItemGroup Label="Resources">

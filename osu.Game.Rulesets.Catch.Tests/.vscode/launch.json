@@ -1,0 +1,59 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "VisualTests (Debug, net461)",
+            "windows": {
+                "type": "clr"
+            },
+            "type": "mono",
+            "request": "launch",
+            "program": "${workspaceRoot}/bin/Debug/net461/osu.Game.Rulesets.Catch.Tests.exe",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Debug, msbuild)",
+            "runtimeExecutable": null,
+            "env": {},
+            "console": "internalConsole"
+        },
+        {
+            "name": "VisualTests (Release, net461)",
+            "windows": {
+                "type": "clr"
+            },
+            "type": "mono",
+            "request": "launch",
+            "program": "${workspaceRoot}/bin/Debug/net461/osu.Game.Rulesets.Catch.Tests.exe",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Release, msbuild)",
+            "runtimeExecutable": null,
+            "env": {},
+            "console": "internalConsole"
+        },
+        {
+            "name": "VisualTests (Debug, netcoreapp2.0)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/bin/Debug/netcoreapp2.0/osu.Game.Rulesets.Catch.Tests.dll"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Debug, dotnet)",
+            "env": {},
+            "console": "internalConsole"
+        },
+        {
+            "name": "VisualTests (Release, netcoreapp2.0)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/bin/Debug/netcoreapp2.0/osu.Game.Rulesets.Catch.Tests.dll"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Release, dotnet)",
+            "env": {},
+            "console": "internalConsole"
+        }
+    ]
+}
