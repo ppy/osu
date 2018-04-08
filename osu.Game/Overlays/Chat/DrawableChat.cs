@@ -15,15 +15,15 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class DrawableChannel : Container
+    public class DrawableChat : Container
     {
-        public readonly ChannelChat Channel;
+        public readonly ChatBase Chat;
         private readonly ChatLineContainer flow;
         private readonly ScrollContainer scroll;
 
-        public DrawableChannel(ChannelChat channel)
+        public DrawableChat(ChatBase chat)
         {
-            Channel = channel;
+            Chat = chat;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -50,15 +50,15 @@ namespace osu.Game.Overlays.Chat
                 }
             };
 
-            Channel.NewMessagesArrived += newMessagesArrived;
-            Channel.MessageRemoved += messageRemoved;
-            Channel.PendingMessageResolved += pendingMessageResolved;
+            Chat.NewMessagesArrived += newMessagesArrived;
+            Chat.MessageRemoved += messageRemoved;
+            Chat.PendingMessageResolved += pendingMessageResolved;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            newMessagesArrived(Channel.Messages);
+            newMessagesArrived(Chat.Messages);
         }
 
         protected override void LoadComplete()
@@ -71,15 +71,15 @@ namespace osu.Game.Overlays.Chat
         {
             base.Dispose(isDisposing);
 
-            Channel.NewMessagesArrived -= newMessagesArrived;
-            Channel.MessageRemoved -= messageRemoved;
-            Channel.PendingMessageResolved -= pendingMessageResolved;
+            Chat.NewMessagesArrived -= newMessagesArrived;
+            Chat.MessageRemoved -= messageRemoved;
+            Chat.PendingMessageResolved -= pendingMessageResolved;
         }
 
         private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
-            // Add up to last Channel.MAX_HISTORY messages
-            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - ChannelChat.MAX_HISTORY));
+            // Add up to last ChatBase.MAX_HISTORY messages
+            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - ChatBase.MAX_HISTORY));
 
             flow.AddRange(displayMessages.Select(m => new ChatLine(m)));
 
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Chat
                 scrollToEnd();
 
             var staleMessages = flow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
-            int count = staleMessages.Length - ChannelChat.MAX_HISTORY;
+            int count = staleMessages.Length - ChatBase.MAX_HISTORY;
 
             for (int i = 0; i < count; i++)
             {

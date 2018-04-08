@@ -1,10 +1,9 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -16,40 +15,35 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
-using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer, IOnlineComponent
+    public class ChatOverlay : OsuFocusedOverlayContainer
     {
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
 
-        private ScheduledDelegate messageRequest;
+        private ChatManager chatManager;
 
-        private readonly Container<DrawableChannel> currentChannelContainer;
+        private readonly Container<DrawableChat> currentChannelContainer;
+        private readonly List<DrawableChat> loadedChannels = new List<DrawableChat>();
 
         private readonly LoadingAnimation loading;
 
         private readonly FocusedTextBox textbox;
-
-        private APIAccess api;
 
         private const int transition_length = 500;
 
         public const float DEFAULT_HEIGHT = 0.4f;
 
         public const float TAB_AREA_HEIGHT = 50;
-
-        private GetChannelMessagesRequest fetchReq;
 
         private readonly ChatTabControl channelTabs;
 
@@ -60,9 +54,9 @@ namespace osu.Game.Overlays
 
         public Bindable<double> ChatHeight { get; set; }
 
-        public List<ChannelChat> AvailableChannels { get; private set; } = new List<ChannelChat>();
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
+
 
         public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceiveMouseInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceiveMouseInputAt(screenSpacePos);
 
@@ -110,7 +104,7 @@ namespace osu.Game.Overlays
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                currentChannelContainer = new Container<DrawableChannel>
+                                currentChannelContainer = new Container<DrawableChat>
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding
@@ -163,7 +157,7 @@ namespace osu.Game.Overlays
                                 channelTabs = new ChatTabControl
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    OnRequestLeave = removeChannel,
+                                    OnRequestLeave = channel => chatManager.JoinedChannels.Remove(channel),
                                 },
                             }
                         },
@@ -171,7 +165,7 @@ namespace osu.Game.Overlays
                 },
             };
 
-            channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
+            channelTabs.Current.ValueChanged += newChannel => chatManager.CurrentChat.Value = newChannel;
             channelTabs.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
             channelSelection.StateChanged += state =>
             {
@@ -186,12 +180,96 @@ namespace osu.Game.Overlays
                 else
                     textbox.HoldFocus = true;
             };
+            channelSelection.OnRequestJoin = channel =>
+            {
+                if (!chatManager.JoinedChannels.Contains(channel))
+                    chatManager.JoinedChannels.Add(channel);
+            };
+            channelSelection.OnRequestLeave = channel => chatManager.JoinedChannels.Remove(channel);
+        }
+
+        private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            channelSelection.Sections = new[]
+            {
+                new ChannelSection
+                {
+                    Header = "All Channels",
+                    Channels = chatManager.AvailableChannels,
+                },
+            };
+        }
+
+        private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (ChannelChat newChannel in args.NewItems)
+                    {
+                        channelTabs.AddItem(newChannel);
+                        newChannel.Joined.Value = true;
+                        if (chatManager.CurrentChat.Value == null)
+                        {
+                            chatManager.CurrentChat.Value = newChannel;
+                        }
+                            
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (ChannelChat removedChannel in args.OldItems)
+                    { 
+                        channelTabs.RemoveItem(removedChannel);
+                        loadedChannels.Remove(loadedChannels.Find(c => c.Chat == removedChannel ));
+                        removedChannel.Joined.Value = false;
+                        if (chatManager.CurrentChat.Value == removedChannel)
+                            chatManager.CurrentChat.Value = null;
+                    }
+                    break;
+            }
+        }
+
+        private void currentChatChanged(ChatBase chat)
+        {
+            if (chat == null)
+            {
+                textbox.Current.Disabled = true;
+                currentChannelContainer.Clear(false);
+                return;
+            }
+
+            textbox.Current.Disabled = chat.ReadOnly;
+
+            if (chat is ChannelChat channelChat)
+                channelTabs.Current.Value = channelChat;
+
+            var loaded = loadedChannels.Find(d => d.Chat == chat);
+            if (loaded == null)
+            {
+                currentChannelContainer.FadeOut(500, Easing.OutQuint);
+                loading.Show();
+
+                loaded = new DrawableChat(chat);
+                loadedChannels.Add(loaded);
+                LoadComponentAsync(loaded, l =>
+                {
+                    loading.Hide();
+
+
+                    currentChannelContainer.Clear(false);
+                    currentChannelContainer.Add(loaded);
+                    currentChannelContainer.FadeIn(500, Easing.OutQuint);
+                });
+            }
+            else
+            {
+                currentChannelContainer.Clear(false);
+                currentChannelContainer.Add(loaded);
+            }
         }
 
         private double startDragChatHeight;
         private bool isDragging;
-
-        public void OpenChannel(ChannelChat channel) => addChannel(channel);
 
         protected override bool OnDragStart(InputState state)
         {
@@ -229,19 +307,6 @@ namespace osu.Game.Overlays
             return base.OnDragEnd(state);
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
-        {
-            switch (state)
-            {
-                case APIState.Online:
-                    initializeChannels();
-                    break;
-                default:
-                    messageRequest?.Cancel();
-                    break;
-            }
-        }
-
         public override bool AcceptsFocus => true;
 
         protected override void OnFocus(InputState state)
@@ -270,10 +335,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, OsuConfigManager config, OsuColour colours)
+        private void load(APIAccess api, OsuConfigManager config, OsuColour colours, ChatManager chatManager)
         {
-            this.api = api;
-            api.Register(this);
+            api.Register(chatManager);
 
             ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
             ChatHeight.ValueChanged += h =>
@@ -285,253 +349,27 @@ namespace osu.Game.Overlays
             ChatHeight.TriggerChange();
 
             chatBackground.Colour = colours.ChatBlue;
-        }
-
-        private long? lastMessageId;
-
-        private readonly List<ChannelChat> careChannels = new List<ChannelChat>();
-
-        private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
-
-        private void initializeChannels()
-        {
             loading.Show();
 
-            messageRequest?.Cancel();
-
-            ListChannelsRequest req = new ListChannelsRequest();
-            req.Success += delegate (List<ChannelChat> channels)
-            {
-                AvailableChannels = channels;
-
-                Scheduler.Add(delegate
-                {
-                    addChannel(channels.Find(c => c.Name == @"#lazer"));
-                    addChannel(channels.Find(c => c.Name == @"#osu"));
-                    addChannel(channels.Find(c => c.Name == @"#lobby"));
-
-                    channelSelection.OnRequestJoin = addChannel;
-                    channelSelection.OnRequestLeave = removeChannel;
-                    channelSelection.Sections = new[]
-                    {
-                        new ChannelSection
-                        {
-                            Header = "All Channels",
-                            Channels = channels,
-                        },
-                    };
-                });
-
-                messageRequest = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
-            };
-
-            api.Queue(req);
-        }
-
-        private ChannelChat currentChannel;
-
-        protected ChannelChat CurrentChannel
-        {
-            get
-            {
-                return currentChannel;
-            }
-
-            set
-            {
-                if (currentChannel == value) return;
-
-                if (value == null)
-                {
-                    currentChannel = null;
-                    textbox.Current.Disabled = true;
-                    currentChannelContainer.Clear(false);
-                    return;
-                }
-
-                currentChannel = value;
-
-                textbox.Current.Disabled = currentChannel.ReadOnly;
-                channelTabs.Current.Value = value;
-
-                var loaded = loadedChannels.Find(d => d.Channel == value);
-                if (loaded == null)
-                {
-                    currentChannelContainer.FadeOut(500, Easing.OutQuint);
-                    loading.Show();
-
-                    loaded = new DrawableChannel(currentChannel);
-                    loadedChannels.Add(loaded);
-                    LoadComponentAsync(loaded, l =>
-                    {
-                        if (currentChannel.Messages.Any())
-                            loading.Hide();
-
-                        currentChannelContainer.Clear(false);
-                        currentChannelContainer.Add(loaded);
-                        currentChannelContainer.FadeIn(500, Easing.OutQuint);
-                    });
-                }
-                else
-                {
-                    currentChannelContainer.Clear(false);
-                    currentChannelContainer.Add(loaded);
-                }
-            }
-        }
-
-        private void addChannel(ChannelChat channel)
-        {
-            if (channel == null) return;
-
-            // ReSharper disable once AccessToModifiedClosure
-            var existing = careChannels.Find(c => c.Id == channel.Id);
-
-            if (existing != null)
-            {
-                // if we already have this channel loaded, we don't want to make a second one.
-                channel = existing;
-            }
-            else
-            {
-                careChannels.Add(channel);
-                channelTabs.AddItem(channel);
-            }
-
-            // let's fetch a small number of messages to bring us up-to-date with the backlog.
-            fetchInitialMessages(channel);
-
-            if (CurrentChannel == null)
-                CurrentChannel = channel;
-
-            channel.Joined.Value = true;
-        }
-
-        private void removeChannel(ChannelChat channel)
-        {
-            if (channel == null) return;
-
-            if (channel == CurrentChannel) CurrentChannel = null;
-
-            careChannels.Remove(channel);
-            loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
-            channelTabs.RemoveItem(channel);
-
-            channel.Joined.Value = false;
-        }
-
-        private void fetchInitialMessages(ChannelChat channel)
-        {
-            var req = new GetChannelMessagesRequest(new List<ChannelChat> { channel }, null);
-
-            req.Success += delegate (List<Message> messages)
-            {
-                loading.Hide();
-                channel.AddNewMessages(messages.ToArray());
-                Debug.Write("success!");
-            };
-            req.Failure += delegate
-            {
-                Debug.Write("failure!");
-            };
-
-            api.Queue(req);
-        }
-
-        private void fetchNewMessages()
-        {
-            if (fetchReq != null) return;
-
-            fetchReq = new GetChannelMessagesRequest(careChannels, lastMessageId);
-
-            fetchReq.Success += delegate (List<Message> messages)
-            {
-                foreach (var group in messages.Where(m => m.TargetType == TargetType.Channel).GroupBy(m => m.TargetId))
-                    careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
-
-                lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
-
-                Debug.Write("success!");
-                fetchReq = null;
-            };
-
-            fetchReq.Failure += delegate
-            {
-                Debug.Write("failure!");
-                fetchReq = null;
-            };
-
-            api.Queue(fetchReq);
+            this.chatManager = chatManager;
+            chatManager.CurrentChat.ValueChanged += currentChatChanged;
+            chatManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
+            chatManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
         }
 
         private void postMessage(TextBox textbox, bool newText)
         {
-            var postText = textbox.Text;
+            var text = textbox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
+            if (text[0] == '/')
+                chatManager.PostCommand(text.Substring(1));
+            else
+                chatManager.PostMessage(text);
 
             textbox.Text = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(postText))
-                return;
-
-            var target = currentChannel;
-
-            if (target == null) return;
-
-            if (!api.IsLoggedIn)
-            {
-                target.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
-                return;
-            }
-
-            bool isAction = false;
-
-            if (postText[0] == '/')
-            {
-                string[] parameters = postText.Substring(1).Split(new[] { ' ' }, 2);
-                string command = parameters[0];
-                string content = parameters.Length == 2 ? parameters[1] : string.Empty;
-
-                switch (command)
-                {
-                    case "me":
-
-                        if (string.IsNullOrWhiteSpace(content))
-                        {
-                            currentChannel.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
-                            return;
-                        }
-
-                        isAction = true;
-                        postText = content;
-                        break;
-
-                    case "help":
-                        currentChannel.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
-                        return;
-
-                    default:
-                        currentChannel.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
-                        return;
-                }
-            }
-
-            var message = new LocalEchoMessage
-            {
-                Sender = api.LocalUser.Value,
-                Timestamp = DateTimeOffset.Now,
-                TargetType = TargetType.Channel, //TODO: read this from channel
-                TargetId = target.Id,
-                IsAction = isAction,
-                Content = postText
-            };
-
-            var req = new PostMessageRequest(message);
-
-            target.AddLocalEcho(message);
-            req.Failure += e => target.ReplaceMessage(message, null);
-            req.Success += m => target.ReplaceMessage(message, m);
-
-            api.Queue(req);
         }
 
         private void transformChatHeightTo(double newChatHeight, double duration = 0, Easing easing = Easing.None)
