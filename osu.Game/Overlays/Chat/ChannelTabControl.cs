@@ -21,7 +21,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatTabControl : OsuTabControl<ChannelChat>
+    public class ChannelTabControl : OsuTabControl<ChannelChat>
     {
         private const float shear_width = 10;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Chat
 
         private readonly ChannelTabItem.ChannelSelectorTabItem selectorTab;
 
-        public ChatTabControl()
+        public ChannelTabControl()
         {
             TabContainer.Margin = new MarginPadding { Left = 50 };
             TabContainer.Spacing = new Vector2(-shear_width, 0);
@@ -49,6 +49,13 @@ namespace osu.Game.Overlays.Chat
             AddTabItem(selectorTab = new ChannelTabItem.ChannelSelectorTabItem(new ChannelChat { Name = "+" }));
 
             ChannelSelectorActive.BindTo(selectorTab.Active);
+        }
+
+        public void DeselectAll()
+        {
+            if (SelectedTab != null)
+                SelectedTab.Active.Value = false;
+            SelectedTab = null;
         }
 
         protected override void AddTabItem(TabItem<ChannelChat> item, bool addToDropdown = true)
