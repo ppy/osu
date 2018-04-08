@@ -36,6 +36,10 @@ using osu.Game.Overlays.Volume;
 
 namespace osu.Game
 {
+    /// <summary>
+    /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
+    /// for initial components that are generally retrieved via DI.
+    /// </summary>
     public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     {
         public Toolbar Toolbar;
