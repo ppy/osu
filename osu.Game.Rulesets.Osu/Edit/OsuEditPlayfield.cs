@@ -7,7 +7,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuEditPlayfield : OsuPlayfield
     {
-        protected override bool ProxyApproachCircles => false;
         protected override bool DisplayJudgements => false;
     }
 }

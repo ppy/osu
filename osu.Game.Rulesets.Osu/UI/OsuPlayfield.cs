@@ -21,9 +21,6 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
-        // Todo: This should not be a thing, but is currently required for the editor
-        // https://github.com/ppy/osu-framework/issues/1283
-        protected virtual bool ProxyApproachCircles => true;
         protected virtual bool DisplayJudgements => true;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
@@ -59,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.UI
             h.OnJudgement += onJudgement;
 
             var c = h as IDrawableHitObjectWithProxiedApproach;
-            if (c != null && ProxyApproachCircles)
+            if (c != null)
                 approachCircles.Add(c.ProxiedLayer.CreateProxy());
 
             base.Add(h);
