@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Judgements
     {
         private const float judgement_size = 80;
 
+        private OsuColour colours;
+
         protected readonly Judgement Judgement;
 
         public readonly DrawableHitObject JudgedObject;
@@ -33,6 +35,7 @@ namespace osu.Game.Rulesets.Judgements
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
         /// <param name="judgement">The judgement to visualise.</param>
+        /// <param name="judgedObject">The object which was judged.</param>
         public DrawableJudgement(Judgement judgement, DrawableHitObject judgedObject)
         {
             Judgement = judgement;
@@ -44,11 +47,13 @@ namespace osu.Game.Rulesets.Judgements
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            this.colours = colours;
+
             Child = new SkinnableDrawable($"Play/{Judgement.Result}", _ => JudgementText = new OsuSpriteText
             {
                 Text = Judgement.Result.GetDescription().ToUpper(),
                 Font = @"Venera",
-                Colour = Judgement.Result == HitResult.Miss ? colours.Red : Color4.White,
+                Colour = judgementColour(Judgement.Result),
                 Scale = new Vector2(0.85f, 1),
                 TextSize = 12
             }, restrictSize: false);
@@ -82,6 +87,25 @@ namespace osu.Game.Rulesets.Judgements
             }
 
             Expire(true);
+        }
+
+        private Color4 judgementColour(HitResult judgement)
+        {
+            switch (judgement)
+            {
+                case HitResult.Perfect:
+                case HitResult.Great:
+                    return colours.Blue;
+                case HitResult.Ok:
+                case HitResult.Good:
+                    return colours.Green;
+                case HitResult.Meh:
+                    return colours.Yellow;
+                case HitResult.Miss:
+                    return colours.Red;
+            }
+
+            return Color4.White;
         }
     }
 }

@@ -8,5 +8,6 @@ namespace osu.Game.Rulesets.Catch.Mods
     public class CatchModHardRock : ModHardRock
     {
         public override double ScoreMultiplier => 1.12;
+        public override bool Ranked => true;
     }
 }

@@ -131,6 +131,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 Trace.Assert(lastPosition.HasValue);
 
+                // ReSharper disable once PossibleInvalidOperationException
                 Vector2 pos1 = lastPosition.Value;
                 Vector2 diff = pos2 - pos1;
                 float distance = diff.Length;

@@ -24,7 +24,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
     public class BeatDivisorControl : CompositeDrawable
     {
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
-        private int currentDivisorIndex;
 
         public BeatDivisorControl(BindableBeatDivisor beatDivisor)
         {
