@@ -11,6 +11,7 @@ using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
@@ -52,6 +53,40 @@ namespace osu.Game.Online.Chat
         private long? lastChannelMsgId;
         private long? lastUserMsgId;
 
+        public void OpenChannelChat(string name)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            CurrentChat.Value = AvailableChannels.FirstOrDefault(c => c.Name == name)
+                                ?? throw new ArgumentException($"Channel {name} was not found.");
+        }
+
+        public void OpenUserChat(long userId)
+        {
+            var chat = OpenedUserChats.FirstOrDefault(c => c.ChatID == userId);
+
+            if (chat == null)
+            {
+                chat = new UserChat(new User
+                {
+                    Id = userId
+                });
+                chat.RequestDetails(api);
+            }
+
+            CurrentChat.Value = chat;
+        }
+
+        public void OpenUserChat(User user)
+        {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+
+            CurrentChat.Value = OpenedUserChats.FirstOrDefault(c => c.ChatID == user.Id)
+                       ?? new UserChat(user);
+        }
+
         public ChatManager(Scheduler scheduler)
         {
             this.scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
@@ -62,6 +97,9 @@ namespace osu.Game.Online.Chat
         {
             if (chatBase is ChannelChat channel && !JoinedChannels.Contains(channel))
                 JoinedChannels.Add(channel);
+
+            if (chatBase is UserChat userChat && !OpenedUserChats.Contains(userChat))
+                OpenedUserChats.Add(userChat);
         }
 
         /// <summary>
@@ -171,23 +209,19 @@ namespace osu.Game.Online.Chat
 
                 chat.AddNewMessages(messageGroup.ToArray());
                 var outgoingTargetMessages = outgoingMessagesGroups.FirstOrDefault(g => g.Key == targetUser.Id);
-                chat.AddNewMessages(outgoingTargetMessages.ToArray());
+                if (outgoingTargetMessages != null)
+                    chat.AddNewMessages(outgoingTargetMessages.ToArray());
             }
 
             var withoutReplyGroups = outgoingMessagesGroups.Where(g => OpenedUserChats.All(m => m.ChatID != g.Key));
 
             foreach (var withoutReplyGroup in withoutReplyGroups)
-            {
-                var getUserRequest = new GetUserRequest(withoutReplyGroup.First().TargetId);
-                getUserRequest.Success += user =>
-                {
-                    var chat = new UserChat(user);
+            { 
+                var chat = new UserChat(new User {Id = withoutReplyGroup.First().TargetId });
 
-                    chat.AddNewMessages(withoutReplyGroup.ToArray());
-                    OpenedUserChats.Add(chat);
-                };
-
-                api.Queue(getUserRequest);
+                chat.AddNewMessages(withoutReplyGroup.ToArray());
+                OpenedUserChats.Add(chat);
+                chat.RequestDetails(api);
             }
         }
 

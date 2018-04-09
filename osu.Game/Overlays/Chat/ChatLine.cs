@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
@@ -236,20 +237,24 @@ namespace osu.Game.Overlays.Chat
         {
             private readonly User sender;
 
+            private Action startChatAction;
+
             public MessageSender(User sender)
             {
                 this.sender = sender;
             }
 
             [BackgroundDependencyLoader(true)]
-            private void load(UserProfileOverlay profile)
+            private void load(UserProfileOverlay profile, ChatManager chatManager)
             {
                 Action = () => profile?.ShowUser(sender);
+                startChatAction = () => chatManager?.OpenUserChat(sender);
             }
 
             public MenuItem[] ContextMenuItems => new MenuItem[]
             {
                 new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action),
+                new OsuMenuItem("Start Chat", MenuItemType.Highlighted, startChatAction),
             };
         }
     }
