@@ -17,7 +17,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Manages everything chat related
     /// </summary>
-    public sealed class ChatManager : IOnlineComponent
+    public class ChatManager : IOnlineComponent
     {
         /// <summary>
         /// The channels the player joins on startup
