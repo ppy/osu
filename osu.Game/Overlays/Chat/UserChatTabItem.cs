@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Screens.Menu;
 using osu.Game.Users;
@@ -21,7 +22,7 @@ namespace osu.Game.Overlays.Chat
     public class UserChatTabItem : TabItem<UserChat>
     {
         private static readonly Vector2 shear = new Vector2(1f / 5f, 0);
-
+        private readonly UserChat chat;
         public override bool IsRemovable => true;
 
         private readonly Box highlightBox;
@@ -33,6 +34,7 @@ namespace osu.Game.Overlays.Chat
         public UserChatTabItem(UserChat value)
             : base(value)
         {
+            chat = value;
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
             Origin = Anchor.BottomRight;
@@ -189,9 +191,15 @@ namespace osu.Game.Overlays.Chat
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, IAPIProvider api)
         {
             backgroundBox.Colour = Value.User.Colour != null ? OsuColour.FromHex(Value.User.Colour) : colours.BlueDark;
+
+            if (chat.User.Username == null || chat.User.Id < 1)
+            {
+                chat.DetailsArrived += arrivedUser => { Scheduler.Add(() => { username.Text = arrivedUser.Username; }); };
+                chat.RequestDetails(api);
+            }
         }
     }
 }

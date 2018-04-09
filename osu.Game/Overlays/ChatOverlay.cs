@@ -217,10 +217,10 @@ namespace osu.Game.Overlays
                         channelTabs.AddItem(newChannel);
                         newChannel.Joined.Value = true;
                         if (chatManager.CurrentChat.Value == null)
-                        {
                             chatManager.CurrentChat.Value = newChannel;
-                        }
 
+                        if (chatManager.CurrentChat.Value == newChannel)
+                            channelTabs.Current.Value = newChannel;
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
@@ -247,17 +247,8 @@ namespace osu.Game.Overlays
 
             textbox.Current.Disabled = chat.ReadOnly;
 
-            switch (chat)
-            {
-                case ChannelChat channelChat:
-                    channelTabs.Current.Value = channelChat;
-                    userTabs.DeselectAll();
-                    break;
-                case UserChat userChat:
-                    userTabs.Current.Value = userChat;
-                    channelTabs.DeselectAll();
-                    break;
-            }
+            userTabs.DeselectAll();
+            channelTabs.DeselectAll();
 
             var loaded = loadedChannels.Find(d => d.Chat == chat);
             if (loaded == null)
@@ -270,7 +261,6 @@ namespace osu.Game.Overlays
                 LoadComponentAsync(loaded, l =>
                 {
                     loading.Hide();
-
 
                     currentChannelContainer.Clear(false);
                     currentChannelContainer.Add(loaded);
@@ -379,10 +369,17 @@ namespace osu.Game.Overlays
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    userTabs.AddItem(args.NewItems[0] as UserChat);
+                    foreach (UserChat chat in args.NewItems)
+                    {
+                        userTabs.AddItem(args.NewItems[0] as UserChat);
+
+                        if (chatManager.CurrentChat.Value == chat)
+                            userTabs.Current.Value = chat;
+                    }
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    userTabs.RemoveItem(args.OldItems[0] as UserChat);
+                    foreach (UserChat chat in args.OldItems)
+                        userTabs.RemoveItem(chat);
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     userTabs.Clear();
