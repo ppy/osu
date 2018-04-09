@@ -16,14 +16,12 @@ install:
 before_build:
   - cmd: CodeFileSanity.exe
   - cmd: nuget restore -verbosity quiet
+environment:
+  TargetFramework: net461
 build:
   project: osu.sln
   parallel: true
   verbosity: minimal
-test:
-  assemblies:
-    only:
-      - 'osu.Desktop\**\*.dll'
 after_build:
   - cmd: inspectcode --o="inspectcodereport.xml" --projects:osu.Game* --caches-home="inspectcode" osu.sln > NUL
   - cmd: NVika parsereport "inspectcodereport.xml" --treatwarningsaserrors

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -75,7 +76,8 @@ namespace osu.Game.Screens.Select
                 {
                     // if we have no beatmaps but osu-stable is found, let's prompt the user to import.
                     if (!beatmaps.GetAllUsableBeatmapSets().Any() && beatmaps.StableInstallationAvailable)
-                        dialogOverlay.Push(new ImportFromStablePopup(() => beatmaps.ImportFromStable()));
+                        dialogOverlay.Push(new ImportFromStablePopup(() =>
+                            Task.Factory.StartNew(beatmaps.ImportFromStable, TaskCreationOptions.LongRunning)));
                 });
             }
         }
@@ -148,7 +150,7 @@ namespace osu.Game.Screens.Select
                 var mods = modSelect.SelectedMods.Value;
                 if (mods.All(m => m.GetType() != autoType))
                 {
-                    modSelect.SelectedMods.Value = mods.Concat(new[] { auto });
+                    modSelect.SelectedMods.Value = mods.Append(auto);
                     removeAutoModOnResume = true;
                 }
             }

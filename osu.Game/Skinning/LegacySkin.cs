@@ -63,7 +63,7 @@ namespace osu.Game.Skinning
             if (texture == null)
             {
                 ratio *= 2;
-                GetTexture(componentName);
+                texture = GetTexture(componentName);
             }
 
             if (texture == null) return null;
@@ -92,7 +92,7 @@ namespace osu.Game.Skinning
                 string lastPiece = filename.Split('/').Last();
 
                 var file = source.Files.FirstOrDefault(f =>
-                    string.Equals(hasExtension ? f.Filename : Path.GetFileNameWithoutExtension(f.Filename), lastPiece, StringComparison.InvariantCultureIgnoreCase));
+                    string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), lastPiece, StringComparison.InvariantCultureIgnoreCase));
                 return file?.FileInfo.StoragePath;
             }
 
