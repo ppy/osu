@@ -3,6 +3,7 @@
 
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using System;
 
@@ -18,8 +19,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public void ApplyToHitObject(CatchHitObject hitObject)
         {
-            // Code from Stable, we keep calculation on a scale of 0 to 512
-            float position = hitObject.X * 512;
+            float position = hitObject.X;
             int startTime = (int)hitObject.StartTime;
 
             if (lastStartX == 0)
@@ -43,11 +43,11 @@ namespace osu.Game.Rulesets.Catch.Mods
             {
                 bool right = RNG.NextBool();
 
-                float rand = Math.Min(20, (float)RNG.NextDouble(0, timeDiff / 4));
+                float rand = Math.Min(20, (float)RNG.NextDouble(0, timeDiff / 4d)) / CatchPlayfield.BASE_WIDTH;
 
                 if (right)
                 {
-                    if (position + rand <= 512)
+                    if (position + rand <= 1)
                         position += rand;
                     else
                         position -= rand;
@@ -60,12 +60,12 @@ namespace osu.Game.Rulesets.Catch.Mods
                         position += rand;
                 }
 
-                hitObject.X = position / 512;
+                hitObject.X = position;
 
                 return;
             }
 
-            if (Math.Abs(diff) < timeDiff / 3)
+            if (Math.Abs(diff) < timeDiff / 3d)
             {
                 if (diff > 0)
                 {
@@ -74,12 +74,12 @@ namespace osu.Game.Rulesets.Catch.Mods
                 }
                 else
                 {
-                    if (position - diff < 512)
+                    if (position - diff < 1)
                         position -= diff;
                 }
             }
 
-            hitObject.X = position / 512;
+            hitObject.X = position;
 
             lastStartX = position;
             lastStartTime = startTime;
