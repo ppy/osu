@@ -247,16 +247,16 @@ namespace osu.Game.Overlays
 
             textbox.Current.Disabled = chat.ReadOnly;
 
-            if (chat is ChannelChat channelChat)
+            switch (chat)
             {
-                channelTabs.Current.Value = channelChat;
-                userTabs.DeselectAll();
-            }
-
-            if (chat is UserChat userChat)
-            {
-                userTabs.Current.Value = userChat;
-                channelTabs.DeselectAll();
+                case ChannelChat channelChat:
+                    channelTabs.Current.Value = channelChat;
+                    userTabs.DeselectAll();
+                    break;
+                case UserChat userChat:
+                    userTabs.Current.Value = userChat;
+                    channelTabs.DeselectAll();
+                    break;
             }
 
             var loaded = loadedChannels.Find(d => d.Chat == chat);
