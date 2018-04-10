@@ -55,12 +55,12 @@ namespace osu.Game.Overlays
                 if (beatmapSet == null)
                 {
                     scroll.FadeOut(fade_duration);
-                    loading.FadeIn(fade_duration);
+                    loading.Show();
                     return;
                 }
 
                 header.BeatmapSet = info.BeatmapSet = beatmapSet;
-                loading.FadeOut(fade_duration);
+                loading.Hide();
                 scroll.FadeIn(fade_duration);
             }
         }
@@ -98,9 +98,7 @@ namespace osu.Game.Overlays
                 },
                 loading = new LoadingAnimation
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Alpha = 1,
+                    State = Visibility.Visible,
                 },
                 scroll = new ScrollContainer
                 {
