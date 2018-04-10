@@ -200,24 +200,17 @@ namespace osu.Game.Overlays.KeyBinding
 
             KeyCombination keyCombination = KeyCombination.FromInputState(state);
 
-            switch (args.Key)
+            if (keyCombination.Equals(InputKey.Escape))
             {
-                case Key.Escape:
-                    finalise();
-                    return true;
-                case Key.Delete:
-                    if (keyCombination.Equals(InputKey.Delete))
-                    {
-                        bindTarget.UpdateKeyCombination(InputKey.None);
-                        finalise();
-                        return true;
-                    }
-                    else if (keyCombination.Equals(new[] { InputKey.Alt, InputKey.Delete }))
-                    {
-                        keyCombination = InputKey.Delete;
-                    }
+                finalise();
+                return true;
+            }
 
-                    break;
+            if (keyCombination.Equals(new[] { InputKey.Shift, InputKey.Delete }))
+            {
+                bindTarget.UpdateKeyCombination(InputKey.None);
+                finalise();
+                return true;
             }
 
             bindTarget.UpdateKeyCombination(keyCombination);
