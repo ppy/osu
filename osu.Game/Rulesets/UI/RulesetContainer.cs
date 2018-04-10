@@ -290,7 +290,7 @@ namespace osu.Game.Rulesets.UI
             base.SetReplay(replay);
 
             if (ReplayInputManager?.ReplayInputHandler != null)
-                ReplayInputManager.ReplayInputHandler.ToScreenSpace = input => Playfield.ScaledContent.ToScreenSpace(input);
+                ReplayInputManager.ReplayInputHandler.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
         }
 
         /// <summary>
