@@ -13,8 +13,7 @@ namespace osu.Game.Beatmaps
         Approved = 1,
         Loved = 8,
         Favourites = 2,
-        [Description("Mod Requests")]
-        ModRequests = 3,
+        Qualified = 3,
         Pending = 4,
         Graveyard = 5,
         [Description("My Maps")]
