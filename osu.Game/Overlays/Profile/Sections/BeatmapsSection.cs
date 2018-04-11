@@ -26,16 +26,15 @@ namespace osu.Game.Overlays.Profile.Sections
                 new PaginatedBeatmapContainer(BeatmapSetType.Graveyard, User, "Graveyarded Beatmaps"),
             };
 
-            foreach (var beatmapContainer in Children.OfType<PaginatedBeatmapContainer>())
+            foreach (var paginatedBeatmapContainer in Children.OfType<PaginatedBeatmapContainer>())
             {
-                beatmapContainer.BeatmapAdded += panel => panel.PreviewPlaying.ValueChanged += isPlaying =>
+                paginatedBeatmapContainer.BeganPlayingPreview += (BeatmapContainer) =>
                 {
-                    if (!isPlaying) return;
-
-                    if (currentlyPlaying != null && currentlyPlaying != panel)
-                        currentlyPlaying.PreviewPlaying.Value = false;
-
-                    currentlyPlaying = panel;
+                    foreach (var bc in Children.OfType<PaginatedBeatmapContainer>())
+                    {
+                        if (bc != BeatmapContainer)
+                            bc.StopPlayingPreview();
+                    }
                 };
             }
         }
