@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -19,24 +20,28 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Manages everything channel related
     /// </summary>
-    public class ChannelManager : Component, IOnlineComponent
+    public class ChannelManager : Component, IOnlineComponent, 
     {
         /// <summary>
         /// The channels the player joins on startup
         /// </summary>
         private readonly string[] defaultChannels =
         {
-            @"#lazer", @"#osu", @"#lobby"
+            @"#lazer",
+            @"#osu",
+            @"#lobby"
         };
 
         /// <summary>
         /// The currently opened channel
         /// </summary>
         public Bindable<Channel> CurrentChannel { get; } = new Bindable<Channel>();
+
         /// <summary>
         /// The Channels the player has joined
         /// </summary>
         public ObservableCollection<Channel> JoinedChannels { get; } = new ObservableCollection<Channel>();
+
         /// <summary>
         /// The channels available for the player to join
         /// </summary>
@@ -56,7 +61,7 @@ namespace osu.Game.Online.Chat
                 throw new ArgumentNullException(nameof(name));
 
             CurrentChannel.Value = AvailableChannels.FirstOrDefault(c => c.Name == name)
-                                ?? throw new ArgumentException($"Channel {name} was not found.");
+                                   ?? throw new ArgumentException($"Channel {name} was not found.");
         }
 
         public void OpenUserChannel(User user)
@@ -65,12 +70,11 @@ namespace osu.Game.Online.Chat
                 throw new ArgumentNullException(nameof(user));
 
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Target == TargetType.User && c.Id == user.Id)
-                       ?? new Channel(user);
+                                   ?? new Channel(user);
         }
 
-        public ChannelManager(Scheduler scheduler)
+        public ChannelManager()
         {
-            this.scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
 
@@ -131,6 +135,7 @@ namespace osu.Game.Online.Chat
                         CurrentChannel.Value.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
                         break;
                     }
+
                     PostMessage(content, true);
                     break;
 
@@ -253,7 +258,7 @@ namespace osu.Game.Online.Chat
                         {
                             JoinedChannels.Add(channel);
 
-                            var fetchInitialMsgReq = new GetChannelMessagesRequest(new[] {channel}, null);
+                            var fetchInitialMsgReq = new GetChannelMessagesRequest(new[] { channel }, null);
                             fetchInitialMsgReq.Success += handleChannelMessages;
                             fetchInitialMsgReq.Failure += exception => Logger.Error(exception, "Failed to fetch inital messages.");
                             api.Queue(fetchInitialMsgReq);
@@ -268,8 +273,6 @@ namespace osu.Game.Online.Chat
 
         public void APIStateChanged(APIAccess api, APIState state)
         {
-            this.api = api ?? throw new ArgumentNullException(nameof(api));
-
             switch (state)
             {
                 case APIState.Online:
@@ -284,6 +287,13 @@ namespace osu.Game.Online.Chat
 
                     break;
             }
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IAPIProvider api)
+        {
+            this.api = this.api;
+            api.Register(this);
         }
     }
 }
