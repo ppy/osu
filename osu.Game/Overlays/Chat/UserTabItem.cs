@@ -139,12 +139,14 @@ namespace osu.Game.Overlays.Chat
                                 Text = value.Name,
                                 Margin = new MarginPadding(1),
                                 TextSize = 18,
+                                Alpha = 0,
                             },
                             closeButton = new ChatTabItemCloseButton
                             {
                                 Height = 1,
                                 Origin = Anchor.BottomLeft,
                                 Anchor = Anchor.BottomLeft,
+                                Alpha = 0,
                                 Margin = new MarginPadding
                                 {
                                     Right = 5

@@ -31,14 +31,6 @@ namespace osu.Game.Overlays.Chat
             };
         }
 
-        protected override void AddTabItem(TabItem<Channel> item, bool addToDropdown = true)
-        {
-            base.AddTabItem(item, addToDropdown);
-
-            if (SelectedTab == null)
-                SelectTab(item);
-        }
-
         private void tabCloseRequested(TabItem<Channel> priv)
         {
             int totalTabs = TabContainer.Count -1; // account for selectorTab

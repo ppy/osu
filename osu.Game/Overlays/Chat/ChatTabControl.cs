@@ -79,6 +79,8 @@ namespace osu.Game.Overlays.Chat
                     ChannelTabControl.AddItem(channel);
                     break;
             }
+
+       
         }
 
         public void RemoveItem(Channel channel)
