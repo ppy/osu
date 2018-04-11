@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         private DirectPanel currentlyPlaying;
 
-        public event Action<DirectGridPanel> BeatmapAdded;
+        public event Action<PaginatedBeatmapContainer> BeganPlayingPreview;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
             : base(user, header, missing)
@@ -61,16 +61,22 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     {
                         if (!isPlaying) return;
 
+                        BeganPlayingPreview?.Invoke(this);
                         if (currentlyPlaying != null && currentlyPlaying != panel)
-                            currentlyPlaying.PreviewPlaying.Value = false;
+                            StopPlayingPreview();
 
                         currentlyPlaying = panel;
                     };
-                    BeatmapAdded?.Invoke(panel);
                 }
             };
 
             Api.Queue(req);
+        }
+
+        public void StopPlayingPreview()
+        {
+            if (currentlyPlaying != null)
+                currentlyPlaying.PreviewPlaying.Value = false;
         }
     }
 }
