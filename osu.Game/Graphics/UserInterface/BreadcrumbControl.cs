@@ -17,6 +17,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value);
 
+        protected override float StripWidth() => base.StripWidth() - (padding + 8);
+
         public BreadcrumbControl()
         {
             Height = 26;

@@ -189,11 +189,11 @@ namespace osu.Game.Overlays
             beatmaps.ItemAdded += setAdded;
         }
 
-        private void setAdded(BeatmapSetInfo set)
+        private void setAdded(BeatmapSetInfo set) => Schedule(() =>
         {
             BeatmapSets = BeatmapSets?.Where(b => b.OnlineBeatmapSetID != set.OnlineBeatmapSetID);
             panelsContainer.RemovePanel(set);
-        }
+        });
 
         private void updateResultCounts()
         {
@@ -261,6 +261,14 @@ namespace osu.Game.Overlays
         }
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmaps != null)
+                beatmaps.ItemAdded -= setAdded;
+        }
 
         public class ResultCounts
         {

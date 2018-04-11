@@ -21,9 +21,13 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override FontAwesome Icon => FontAwesome.fa_paint_brush;
 
+        private SkinManager skins;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, SkinManager skins)
         {
+            this.skins = skins;
+
             FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
@@ -47,13 +51,25 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
             };
 
-            void reloadSkins() => skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.ToString(), s.ID));
-            skins.ItemAdded += _ => reloadSkins();
-            skins.ItemRemoved += _ => reloadSkins();
+            skins.ItemAdded += reloadSkins;
+            skins.ItemRemoved += reloadSkins;
 
-            reloadSkins();
+            reloadSkins(null);
 
             skinDropdown.Bindable = config.GetBindable<int>(OsuSetting.Skin);
+        }
+
+        private void reloadSkins(SkinInfo changed) => Schedule(() => skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.ToString(), s.ID)));
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skins != null)
+            {
+                skins.ItemAdded -= reloadSkins;
+                skins.ItemRemoved -= reloadSkins;
+            }
         }
 
         private class SizeSlider : OsuSliderBar<double>
