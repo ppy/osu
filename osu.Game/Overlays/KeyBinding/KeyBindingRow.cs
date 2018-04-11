@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.KeyBinding
                 },
                 pressAKey = new OsuSpriteText
                 {
-                    Text = "Press a key to change binding, DEL to delete, ESC to cancel.",
+                    Text = "Press a key to change binding, SHIFT+DEL to delete, ESC to cancel.",
                     Y = height,
                     Margin = new MarginPadding(padding),
                     Alpha = 0,
