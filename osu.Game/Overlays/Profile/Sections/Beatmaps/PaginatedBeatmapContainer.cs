@@ -1,23 +1,23 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Users;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 {
     public class PaginatedBeatmapContainer : PaginatedContainer
     {
-        private const float panel_padding = 10f;
-
         private readonly BeatmapSetType type;
+        private readonly DirectPanelsContainer panelsContainer;
 
-        private DirectPanel currentlyPlaying;
+        private UserProfileOverlay overlay;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
             : base(user, header, missing)
@@ -26,7 +26,35 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
             ItemsPerPage = 6;
 
-            ItemsContainer.Spacing = new Vector2(panel_padding);
+            Add(panelsContainer = new DirectPanelsContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+            });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(UserProfileOverlay overlay)
+        {
+            if (overlay != null)
+            {
+                this.overlay = overlay;
+                overlay.StateChanged += handleVisibilityChanged;
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (overlay != null)
+                overlay.StateChanged -= handleVisibilityChanged;
+        }
+
+        private void handleVisibilityChanged(Visibility visibility)
+        {
+            if (visibility == Visibility.Hidden && panelsContainer.CurrentPreview != null)
+                panelsContainer.CurrentPreview.PreviewPlaying.Value = false;
         }
 
         protected override void ShowMore()
@@ -51,18 +79,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     if (!s.OnlineBeatmapSetID.HasValue)
                         continue;
 
-                    var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets));
-                    ItemsContainer.Add(panel);
-
-                    panel.PreviewPlaying.ValueChanged += isPlaying =>
-                    {
-                        if (!isPlaying) return;
-
-                        if (currentlyPlaying != null && currentlyPlaying != panel)
-                            currentlyPlaying.PreviewPlaying.Value = false;
-
-                        currentlyPlaying = panel;
-                    };
+                    panelsContainer.AddPanel(s.ToBeatmapSet(Rulesets));
                 }
             };
 

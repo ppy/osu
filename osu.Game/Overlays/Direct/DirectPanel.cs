@@ -36,10 +36,28 @@ namespace osu.Game.Overlays.Direct
         private BeatmapManager beatmaps;
         private BeatmapSetOverlay beatmapSetOverlay;
 
+        protected DownloadButton DownloadButton;
+
         public Track Preview => PlayButton.Preview;
         public Bindable<bool> PreviewPlaying => PlayButton.Playing;
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
+
+        private bool downloadIndicatorsVisible = true;
+        public bool DownloadIndicatorsVisible
+        {
+            get => downloadIndicatorsVisible;
+            set
+            {
+                if (value == downloadIndicatorsVisible)
+                    return;
+
+                downloadIndicatorsVisible = value;
+
+                if (IsLoaded)
+                    updateButtonVisibility();
+            }
+        }
 
         protected override Container<Drawable> Content => content;
 
@@ -170,6 +188,20 @@ namespace osu.Game.Overlays.Direct
             beatmaps.Download(SetInfo);
         }
 
+        private void updateButtonVisibility()
+        {
+            if (!downloadIndicatorsVisible)
+            {
+                DownloadButton?.FadeOut(200);
+                progressBar?.FadeOut(200);
+            }
+            else
+            {
+                DownloadButton?.FadeIn(200);
+                progressBar?.FadeIn(200);
+            }
+        }
+
         private void attachDownload(DownloadBeatmapSetRequest request)
         {
             if (request.BeatmapSet.OnlineBeatmapSetID != SetInfo.OnlineBeatmapSetID)
@@ -199,6 +231,8 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
             this.FadeInFromZero(200, Easing.Out);
+
+            updateButtonVisibility();
 
             PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
             PreviewPlaying.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
