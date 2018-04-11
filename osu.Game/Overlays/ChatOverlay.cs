@@ -32,7 +32,7 @@ namespace osu.Game.Overlays
 
         private ChatManager chatManager;
 
-        private readonly Container<DrawableChat> currentChannelContainer;
+        private readonly Container<DrawableChat> currentChatContainer;
         private readonly List<DrawableChat> loadedChannels = new List<DrawableChat>();
 
         private readonly LoadingAnimation loading;
@@ -45,8 +45,7 @@ namespace osu.Game.Overlays
 
         public const float TAB_AREA_HEIGHT = 50;
 
-        private readonly ChannelTabControl channelTabs;
-        private readonly UserChatTabControl userTabs;
+        private readonly ChatTabControl chatTabControl;
 
         private readonly Container chatContainer;
         private readonly Container tabsArea;
@@ -105,7 +104,7 @@ namespace osu.Game.Overlays
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                currentChannelContainer = new Container<DrawableChat>
+                                currentChatContainer = new Container<DrawableChat>
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding
@@ -155,15 +154,16 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black,
                                 },
-                                channelTabs = new ChannelTabControl
+                                chatTabControl = new ChatTabControl
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    OnRequestLeave = channel => chatManager.JoinedChannels.Remove(channel),
-                                },
-                                userTabs = new UserChatTabControl
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    OnRequestLeave = privateChat => chatManager.OpenedUserChats.Remove(privateChat),
+                                    OnRequestLeave = chat =>
+                                    {
+                                        if (chat is ChannelChat channelChat) 
+                                            chatManager.JoinedChannels.Remove(channelChat);
+                                        if (chat is UserChat userChat)
+                                            chatManager.OpenedUserChats.Remove(userChat);
+                                    }
                                 }
                             }
                         },
@@ -171,12 +171,11 @@ namespace osu.Game.Overlays
                 },
             };
 
-            userTabs.Current.ValueChanged += user => chatManager.CurrentChat.Value = user;
-            channelTabs.Current.ValueChanged += newChannel => chatManager.CurrentChat.Value = newChannel;
-            channelTabs.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
+            chatTabControl.Current.ValueChanged += chat => chatManager.CurrentChat.Value = chat;
+            chatTabControl.channelTabControl.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
             channelSelection.StateChanged += state =>
             {
-                channelTabs.ChannelSelectorActive.Value = state == Visibility.Visible;
+                chatTabControl.channelTabControl.ChannelSelectorActive.Value = state == Visibility.Visible;
 
                 if (state == Visibility.Visible)
                 {
@@ -214,19 +213,16 @@ namespace osu.Game.Overlays
                 case NotifyCollectionChangedAction.Add:
                     foreach (ChannelChat newChannel in args.NewItems)
                     {
-                        channelTabs.AddItem(newChannel);
+                        chatTabControl.AddItem(newChannel);
                         newChannel.Joined.Value = true;
-                        if (chatManager.CurrentChat.Value == null)
-                            chatManager.CurrentChat.Value = newChannel;
-
-                        if (chatManager.CurrentChat.Value == newChannel)
-                            channelTabs.Current.Value = newChannel;
+                        //if (chatManager.CurrentChat.Value == null)
+                        //    chatManager.CurrentChat.Value = newChannel;
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     foreach (ChannelChat removedChannel in args.OldItems)
                     {
-                        channelTabs.RemoveItem(removedChannel);
+                        chatTabControl.RemoveItem(removedChannel);
                         loadedChannels.Remove(loadedChannels.Find(c => c.Chat == removedChannel ));
                         removedChannel.Joined.Value = false;
                         if (chatManager.CurrentChat.Value == removedChannel)
@@ -241,19 +237,19 @@ namespace osu.Game.Overlays
             if (chat == null)
             {
                 textbox.Current.Disabled = true;
-                currentChannelContainer.Clear(false);
+                currentChatContainer.Clear(false);
+                chatTabControl.Current.Value = null;
                 return;
             }
 
             textbox.Current.Disabled = chat.ReadOnly;
-
-            userTabs.DeselectAll();
-            channelTabs.DeselectAll();
+            
+            Scheduler.Add(() => chatTabControl.Current.Value = chat);
 
             var loaded = loadedChannels.Find(d => d.Chat == chat);
             if (loaded == null)
             {
-                currentChannelContainer.FadeOut(500, Easing.OutQuint);
+                currentChatContainer.FadeOut(500, Easing.OutQuint);
                 loading.Show();
 
                 loaded = new DrawableChat(chat);
@@ -262,15 +258,15 @@ namespace osu.Game.Overlays
                 {
                     loading.Hide();
 
-                    currentChannelContainer.Clear(false);
-                    currentChannelContainer.Add(loaded);
-                    currentChannelContainer.FadeIn(500, Easing.OutQuint);
+                    currentChatContainer.Clear(false);
+                    currentChatContainer.Add(loaded);
+                    currentChatContainer.FadeIn(500, Easing.OutQuint);
                 });
             }
             else
             {
-                currentChannelContainer.Clear(false);
-                currentChannelContainer.Add(loaded);
+                currentChatContainer.Clear(false);
+                currentChatContainer.Add(loaded);
             }
         }
 
@@ -371,18 +367,15 @@ namespace osu.Game.Overlays
                 case NotifyCollectionChangedAction.Add:
                     foreach (UserChat chat in args.NewItems)
                     {
-                        userTabs.AddItem(args.NewItems[0] as UserChat);
+                        chatTabControl.AddItem(args.NewItems[0] as UserChat);
 
                         if (chatManager.CurrentChat.Value == chat)
-                            userTabs.Current.Value = chat;
+                            chatTabControl.Current.Value = chat;
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     foreach (UserChat chat in args.OldItems)
-                        userTabs.RemoveItem(chat);
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    userTabs.Clear();
+                        chatTabControl.RemoveItem(chat);
                     break;
             }
         }

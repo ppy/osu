@@ -38,5 +38,7 @@ namespace osu.Game.Online.Chat
             req.Failure += exception => Logger.Error(exception, $"Requesting details for user with Id:{User.Id} failed.");
             api.Queue(req);
         }
+
+        public override string ToString() => User.Username ?? User.Id.ToString();
     }
 }
