@@ -51,11 +51,11 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAPIProvider api)
+        private void load(OsuColour colours)
         {
             linkColour = colours.Blue;
 
-            var chatManager = new ChannelManager(Scheduler);
+            var chatManager = new ChannelManager();
             chatManager.AvailableChannels.Add(new Channel { Name = "#english"});
             chatManager.AvailableChannels.Add(new Channel { Name = "#japanese" });
             dependencies.Cache(chatManager);

@@ -20,7 +20,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Manages everything channel related
     /// </summary>
-    public class ChannelManager : Component, IOnlineComponent, 
+    public class ChannelManager : Component, IOnlineComponent
     {
         /// <summary>
         /// The channels the player joins on startup
@@ -284,7 +284,6 @@ namespace osu.Game.Online.Chat
                     fetchChannelMsgReq?.Cancel();
                     fetchChannelMsgReq = null;
                     fetchMessagesScheduleder?.Cancel();
-
                     break;
             }
         }
