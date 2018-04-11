@@ -51,15 +51,17 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
             };
 
-            skins.ItemAdded += reloadSkins;
-            skins.ItemRemoved += reloadSkins;
+            skins.ItemAdded += onItemsChanged;
+            skins.ItemRemoved += onItemsChanged;
 
-            reloadSkins(null);
+            reloadSkins();
 
             skinDropdown.Bindable = config.GetBindable<int>(OsuSetting.Skin);
         }
 
-        private void reloadSkins(SkinInfo changed) => Schedule(() => skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.ToString(), s.ID)));
+        private void reloadSkins() => skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.ToString(), s.ID));
+
+        private void onItemsChanged(SkinInfo _) => Schedule(reloadSkins);
 
         protected override void Dispose(bool isDisposing)
         {
@@ -67,8 +69,8 @@ namespace osu.Game.Overlays.Settings.Sections
 
             if (skins != null)
             {
-                skins.ItemAdded -= reloadSkins;
-                skins.ItemRemoved -= reloadSkins;
+                skins.ItemAdded -= onItemsChanged;
+                skins.ItemRemoved -= onItemsChanged;
             }
         }
 
