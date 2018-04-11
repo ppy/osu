@@ -11,7 +11,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -33,7 +32,7 @@ namespace osu.Game.Graphics
         private NotificationOverlay notificationOverlay;
 
         private SampleChannel shutter;
-        private CursorContainer menuCursorContainer;
+        private CursorOverrideContainer cursorOverrideContainer;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio, CursorOverrideContainer cursorOverrideContainer)
@@ -41,7 +40,7 @@ namespace osu.Game.Graphics
             this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
             this.notificationOverlay = notificationOverlay;
-            menuCursorContainer = cursorOverrideContainer.Cursor;
+            this.cursorOverrideContainer = cursorOverrideContainer;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
@@ -66,16 +65,14 @@ namespace osu.Game.Graphics
 
         public async void TakeScreenshotAsync()
         {
-            var menuCursorWasHidden = false;
-            if (!captureMenuCursor.Value && menuCursorContainer.State == Visibility.Visible)
+            if (!captureMenuCursor.Value)
             {
-                menuCursorContainer.ToggleVisibility();
+                cursorOverrideContainer.ShowMenuCursor = false;
                 await Task.Run(() =>
                 {
-                    while (menuCursorContainer.ActiveCursor.Alpha > 0)
+                    while (cursorOverrideContainer.Cursor.ActiveCursor.Alpha > 0)
                         Thread.Sleep(1);
                 });
-                menuCursorWasHidden = true;
             }
 
             using (var bitmap = await host.TakeScreenshotAsync())
@@ -108,8 +105,7 @@ namespace osu.Game.Graphics
                 });
             }
 
-            if (menuCursorWasHidden)
-                menuCursorContainer.ToggleVisibility();
+            cursorOverrideContainer.ShowMenuCursor = true;
         }
 
         private string getFileName()
