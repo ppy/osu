@@ -55,7 +55,6 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         {
             if (visibility == Visibility.Hidden && panelsContainer.CurrentPreview != null)
                 panelsContainer.CurrentPreview.PreviewPlaying.Value = false;
-
         }
 
         protected override void ShowMore()

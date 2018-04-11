@@ -59,6 +59,10 @@ namespace osu.Game.Overlays.BeatmapSet
                     noVideoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 0 : 1, transition_duration);
                     videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
                 }
+                else
+                {
+                    downloadButtonsContainer.FadeOut();
+                }
 
                 cover?.FadeOut(400, Easing.Out);
                 coverContainer.Add(cover = new DelayedLoadWrapper(
