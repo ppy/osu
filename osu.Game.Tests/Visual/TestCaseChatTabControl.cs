@@ -27,10 +27,10 @@ namespace osu.Game.Tests.Visual
         };
 
         private readonly ChatTabControl chatTabControl;
-        private readonly SpriteText currentText;
 
         public TestCaseChatTabControl()
         {
+            SpriteText currentText;
             Add(new Container
             {
                 RelativeSizeAxes = Axes.X,
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual
                 }
             });
 
-            Add(new Container()
+            Add(new Container
             {
                 Origin = Anchor.TopLeft,
                 Anchor = Anchor.TopLeft,
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual
 
         private void addChannel(string name)
         {
-            this.chatTabControl.AddItem(new Channel
+            chatTabControl.AddItem(new Channel
             {
                 Name = name
             });
