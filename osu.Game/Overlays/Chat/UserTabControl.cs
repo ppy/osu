@@ -10,13 +10,16 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class UserTabControl : OsuTabControl<UserChat>
+    public class UserTabControl : OsuTabControl<Channel>
     {
-        protected override TabItem<UserChat> CreateTabItem(UserChat value) => new UserTabItem(value) { OnRequestClose = tabCloseRequested };
+        protected override TabItem<Channel> CreateTabItem(Channel value)
+        {
+            if (value.Target != TargetType.User)
+                throw new ArgumentException("Argument value needs to have the targettype user.");
+            return new UserTabItem(value) { OnRequestClose = tabCloseRequested };
+        }
 
-        protected override Dropdown<UserChat> CreateDropdown() => null;
-
-        public Action<UserChat> OnRequestLeave;
+        public Action<Channel> OnRequestLeave;
 
         public UserTabControl()
         {
@@ -28,7 +31,7 @@ namespace osu.Game.Overlays.Chat
             };
         }
 
-        protected override void AddTabItem(TabItem<UserChat> item, bool addToDropdown = true)
+        protected override void AddTabItem(TabItem<Channel> item, bool addToDropdown = true)
         {
             base.AddTabItem(item, addToDropdown);
 
@@ -36,7 +39,7 @@ namespace osu.Game.Overlays.Chat
                 SelectTab(item);
         }
 
-        private void tabCloseRequested(TabItem<UserChat> priv)
+        private void tabCloseRequested(TabItem<Channel> priv)
         {
             int totalTabs = TabContainer.Count -1; // account for selectorTab
             int currentIndex = MathHelper.Clamp(TabContainer.IndexOf(priv), 1, totalTabs);
@@ -46,14 +49,6 @@ namespace osu.Game.Overlays.Chat
                 SelectTab(TabContainer[currentIndex == totalTabs ? currentIndex - 1 : currentIndex + 1]);
 
             OnRequestLeave?.Invoke(priv.Value);
-        }
-
-        public void DeselectAll()
-        {
-            if (SelectedTab != null)
-                SelectedTab.Active.Value = false;
-            SelectedTab = null;
-
         }
     }
 }

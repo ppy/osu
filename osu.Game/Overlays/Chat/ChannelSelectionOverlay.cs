@@ -32,8 +32,8 @@ namespace osu.Game.Overlays.Chat
         private readonly SearchTextBox search;
         private readonly SearchContainer<ChannelSection> sectionsFlow;
 
-        public Action<ChannelChat> OnRequestJoin;
-        public Action<ChannelChat> OnRequestLeave;
+        public Action<Channel> OnRequestJoin;
+        public Action<Channel> OnRequestLeave;
 
         public IEnumerable<ChannelSection> Sections
         {

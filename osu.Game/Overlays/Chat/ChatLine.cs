@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Chat
             Padding = new MarginPadding { Left = padding, Right = padding };
         }
 
-        private ChatManager chatManager;
+        private ChannelManager chatManager;
 
         private Message message;
         private OsuSpriteText username;
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Chat
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, ChatManager chatManager)
+        private void load(OsuColour colours, ChannelManager chatManager)
         {
             this.chatManager = chatManager;
             customUsernameColour = colours.ChatBlue;
@@ -245,10 +245,10 @@ namespace osu.Game.Overlays.Chat
             }
 
             [BackgroundDependencyLoader(true)]
-            private void load(UserProfileOverlay profile, ChatManager chatManager)
+            private void load(UserProfileOverlay profile, ChannelManager chatManager)
             {
                 Action = () => profile?.ShowUser(sender);
-                startChatAction = () => chatManager?.OpenUserChat(sender);
+                startChatAction = () => chatManager?.OpenUserChannel(sender);
             }
 
             public MenuItem[] ContextMenuItems => new MenuItem[]

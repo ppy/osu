@@ -113,7 +113,7 @@ namespace osu.Game
             dependencies.Cache(api);
             dependencies.CacheAs<IAPIProvider>(api);
 
-            var chatManager = new ChatManager(Scheduler);
+            var chatManager = new ChannelManager(Scheduler);
             api.Register(chatManager);
 
             dependencies.Cache(chatManager);

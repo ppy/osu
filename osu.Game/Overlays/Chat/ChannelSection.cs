@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Chat
             set { header.Text = value.ToUpper(); }
         }
 
-        public IEnumerable<ChannelChat> Channels
+        public IEnumerable<Channel> Channels
         {
             set { ChannelFlow.ChildrenEnumerable = value.Select(c => new ChannelListItem(c)); }
         }
