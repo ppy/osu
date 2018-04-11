@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Screens.Menu;
 using osu.Game.Users;
@@ -23,7 +22,6 @@ namespace osu.Game.Overlays.Chat
     public class UserTabItem : TabItem<Channel>
     {
         private static readonly Vector2 shear = new Vector2(1f / 5f, 0);
-        private readonly Channel channel;
         public override bool IsRemovable => true;
 
         private readonly Box highlightBox;
@@ -39,7 +37,6 @@ namespace osu.Game.Overlays.Chat
             if (value.Target != TargetType.User)
                 throw new ArgumentException("Argument value needs to have the targettype user!");
 
-            channel = value;
             AutoSizeAxes = Axes.X;
             Height = 50;
             Origin = Anchor.BottomRight;
@@ -208,7 +205,7 @@ namespace osu.Game.Overlays.Chat
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAPIProvider api)
+        private void load(OsuColour colours)
         {
             var user = Value.JoinedUsers.First();
 
