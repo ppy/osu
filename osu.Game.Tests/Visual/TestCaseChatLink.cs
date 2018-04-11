@@ -15,7 +15,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
