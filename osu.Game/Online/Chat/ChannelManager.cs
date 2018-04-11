@@ -197,7 +197,7 @@ namespace osu.Game.Online.Chat
             var withoutReplyGroups = outgoingMessagesGroups.Where(g => joinedUserChannels.All(m => m.Id != g.Key));
 
             foreach (var withoutReplyGroup in withoutReplyGroups)
-            { 
+            {
                 var userReq = new GetUserRequest(withoutReplyGroup.First().TargetId);
 
                 userReq.Failure += exception => Logger.Error(exception, "Failed to get user informations.");
