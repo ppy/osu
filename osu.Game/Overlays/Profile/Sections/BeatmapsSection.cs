@@ -28,11 +28,11 @@ namespace osu.Game.Overlays.Profile.Sections
 
             foreach (var paginatedBeatmapContainer in Children.OfType<PaginatedBeatmapContainer>())
             {
-                paginatedBeatmapContainer.BeganPlayingPreview += (BeatmapContainer) =>
+                paginatedBeatmapContainer.BeganPlayingPreview += beatmapContainer =>
                 {
                     foreach (var bc in Children.OfType<PaginatedBeatmapContainer>())
                     {
-                        if (bc != BeatmapContainer)
+                        if (bc != beatmapContainer)
                             bc.StopPlayingPreview();
                     }
                 };
