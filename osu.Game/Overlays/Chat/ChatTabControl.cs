@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -7,14 +8,13 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatTabControl : Container, IHasCurrentValue<ChatBase>
+    public class ChatTabControl : Container, IHasCurrentValue<Channel>
     {
-        public readonly ChannelTabControl channelTabControl;
-        private readonly UserTabControl userTabControl;
+        public readonly ChannelTabControl ChannelTabControl;
+        public readonly UserTabControl UserTabControl;
 
-        public Bindable<ChatBase> Current { get; } = new Bindable<ChatBase>();
-        public Action<ChatBase> OnRequestLeave;
-        public Action OnRequestChannelSelection;
+        public Bindable<Channel> Current { get; } = new Bindable<Channel>();
+        public Action<Channel> OnRequestLeave;
 
         public ChatTabControl()
         {
@@ -22,76 +22,80 @@ namespace osu.Game.Overlays.Chat
 
             Children = new Drawable[]
             {
-                channelTabControl = new ChannelTabControl
+                ChannelTabControl = new ChannelTabControl
                 {
                     Width = 0.5f,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
-                    OnRequestLeave = chat => OnRequestLeave?.Invoke(chat)
+                    OnRequestLeave = channel => OnRequestLeave?.Invoke(channel)
                 },
-                userTabControl = new UserTabControl
+                UserTabControl = new UserTabControl
                 {
                     Width = 0.5f,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     RelativeSizeAxes = Axes.Both,
-                    OnRequestLeave = chat => OnRequestLeave?.Invoke(chat)
+                    OnRequestLeave = channel => OnRequestLeave?.Invoke(channel)
                 },
             };
 
             Current.ValueChanged += currentTabChanged;
-            channelTabControl.Current.ValueChanged += chat =>
+            ChannelTabControl.Current.ValueChanged += channel =>
             {
-                if (chat != null)
-                    Current.Value = chat;
+                if (channel != null)
+                    Current.Value = channel;
             };
-            userTabControl.Current.ValueChanged += chat =>
+            UserTabControl.Current.ValueChanged += channel =>
             {
-                if (chat != null)
-                    Current.Value = chat;
+                if (channel != null)
+                    Current.Value = channel;
             };
         }
 
-        private void currentTabChanged(ChatBase tab)
+        private void currentTabChanged(Channel channel)
         {
-            switch (tab)
+            switch (channel.Target)
             {
-                case UserChat userChat:
-                    userTabControl.Current.Value = userChat;
-                    channelTabControl.Current.Value = null;
+                case TargetType.User:
+                    UserTabControl.Current.Value = channel;
+                    ChannelTabControl.Current.Value = null;
                     break;
-                case ChannelChat channelChat:
-                    channelTabControl.Current.Value = channelChat;
-                    userTabControl.Current.Value = null;
+                case TargetType.Channel:
+                    ChannelTabControl.Current.Value = channel;
+                    UserTabControl.Current.Value = null;
                     break;
             }
         }
 
-        public void AddItem(ChatBase chat)
+        public void AddItem(Channel channel)
         {
-            switch (chat)
+            switch (channel.Target)
             {
-                case UserChat userChat:
-                    userTabControl.AddItem(userChat);
+                case TargetType.User:
+                    UserTabControl.AddItem(channel);
                     break;
-                case ChannelChat channelChat:
-                    channelTabControl.AddItem(channelChat);
+                case TargetType.Channel:
+                    ChannelTabControl.AddItem(channel);
                     break;
             }
         }
 
-        public void RemoveItem(ChatBase chat)
+        public void RemoveItem(Channel channel)
         {
-            switch (chat)
+            Channel nextSelectedChannel = null;
+
+            switch (channel.Target)
             {
-                case UserChat userChat:
-                    userTabControl.RemoveItem(userChat);
-                    Current.Value = null;
+                case TargetType.User:
+                    UserTabControl.RemoveItem(channel);
+                    if (Current.Value == channel)
+                        Current.Value = UserTabControl.Items.FirstOrDefault() ?? ChannelTabControl.Items.FirstOrDefault();
                     break;
-                case ChannelChat channelChat:
-                    channelTabControl.RemoveItem(channelChat);
-                    Current.Value = null;
+                case TargetType.Channel:
+                    ChannelTabControl.RemoveItem(channel);
+                    if (Current.Value == channel)
+                        Current.Value = ChannelTabControl.Items.FirstOrDefault() ?? UserTabControl.Items.FirstOrDefault();
                     break;
             }
         }

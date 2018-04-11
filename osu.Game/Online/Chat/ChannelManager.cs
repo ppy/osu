@@ -17,9 +17,9 @@ using osu.Game.Users;
 namespace osu.Game.Online.Chat
 {
     /// <summary>
-    /// Manages everything chat related
+    /// Manages everything channel related
     /// </summary>
-    public class ChatManager : Component, IOnlineComponent
+    public class ChannelManager : Component, IOnlineComponent
     {
         /// <summary>
         /// The channels the player joins on startup
@@ -30,21 +30,17 @@ namespace osu.Game.Online.Chat
         };
 
         /// <summary>
-        /// The currently opened chat
+        /// The currently opened channel
         /// </summary>
-        public Bindable<ChatBase> CurrentChat { get; } = new Bindable<ChatBase>();
+        public Bindable<Channel> CurrentChannel { get; } = new Bindable<Channel>();
         /// <summary>
         /// The Channels the player has joined
         /// </summary>
-        public ObservableCollection<ChannelChat> JoinedChannels { get; } = new ObservableCollection<ChannelChat>();
+        public ObservableCollection<Channel> JoinedChannels { get; } = new ObservableCollection<Channel>();
         /// <summary>
         /// The channels available for the player to join
         /// </summary>
-        public ObservableCollection<ChannelChat> AvailableChannels { get; } = new ObservableCollection<ChannelChat>();
-        /// <summary>
-        /// The user chats opened.
-        /// </summary>
-        public ObservableCollection<UserChat> OpenedUserChats { get; } = new ObservableCollection<UserChat>();
+        public ObservableCollection<Channel> AvailableChannels { get; } = new ObservableCollection<Channel>();
 
         private APIAccess api;
         private readonly Scheduler scheduler;
@@ -54,68 +50,49 @@ namespace osu.Game.Online.Chat
         private long? lastChannelMsgId;
         private long? lastUserMsgId;
 
-        public void OpenChannelChat(string name)
+        public void OpenChannel(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-            CurrentChat.Value = AvailableChannels.FirstOrDefault(c => c.Name == name)
+            CurrentChannel.Value = AvailableChannels.FirstOrDefault(c => c.Name == name)
                                 ?? throw new ArgumentException($"Channel {name} was not found.");
         }
 
-        public void OpenUserChat(long userId)
-        {
-            var chat = OpenedUserChats.FirstOrDefault(c => c.ChatID == userId);
-
-            if (chat == null)
-            {
-                chat = new UserChat(new User
-                {
-                    Id = userId
-                });
-                chat.RequestDetails(api);
-            }
-
-            CurrentChat.Value = chat;
-        }
-
-        public void OpenUserChat(User user)
+        public void OpenUserChannel(User user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            CurrentChat.Value = OpenedUserChats.FirstOrDefault(c => c.ChatID == user.Id)
-                       ?? new UserChat(user);
+            CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Target == TargetType.User && c.Id == user.Id)
+                       ?? new Channel(user);
         }
 
-        public ChatManager(Scheduler scheduler)
+        public ChannelManager(Scheduler scheduler)
         {
             this.scheduler = scheduler ?? throw new ArgumentNullException(nameof(scheduler));
-            CurrentChat.ValueChanged += currentChatChanged;
+            CurrentChannel.ValueChanged += currentChannelChanged;
         }
 
-        private void currentChatChanged(ChatBase chatBase)
+        private void currentChannelChanged(Channel channel)
         {
-            if (chatBase is ChannelChat channel && !JoinedChannels.Contains(channel))
+            if (!JoinedChannels.Contains(channel))
                 JoinedChannels.Add(channel);
-
-            if (chatBase is UserChat userChat && !OpenedUserChats.Contains(userChat))
-                OpenedUserChats.Add(userChat);
         }
 
         /// <summary>
-        /// Posts a message to the currently opened chat.
+        /// Posts a message to the currently opened channel.
         /// </summary>
         /// <param name="text">The message text that is going to be posted</param>
         /// <param name="isAction">Is true if the message is an action, e.g.: user is currently eating </param>
         public void PostMessage(string text, bool isAction = false)
         {
-            if (CurrentChat.Value == null)
+            if (CurrentChannel.Value == null)
                 return;
 
             if (!api.IsLoggedIn)
             {
-                CurrentChat.Value.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
+                CurrentChannel.Value.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
                 return;
             }
 
@@ -123,23 +100,23 @@ namespace osu.Game.Online.Chat
             {
                 Sender = api.LocalUser.Value,
                 Timestamp = DateTimeOffset.Now,
-                TargetType = CurrentChat.Value.Target,
-                TargetId = CurrentChat.Value.ChatID,
+                TargetType = CurrentChannel.Value.Target,
+                TargetId = CurrentChannel.Value.Id,
                 IsAction = isAction,
                 Content = text
             };
 
-            CurrentChat.Value.AddLocalEcho(message);
+            CurrentChannel.Value.AddLocalEcho(message);
 
             var req = new PostMessageRequest(message);
-            req.Failure += e => CurrentChat.Value?.ReplaceMessage(message, null);
-            req.Success += m => CurrentChat.Value?.ReplaceMessage(message, m);
+            req.Failure += e => CurrentChannel.Value?.ReplaceMessage(message, null);
+            req.Success += m => CurrentChannel.Value?.ReplaceMessage(message, m);
             api.Queue(req);
         }
 
         public void PostCommand(string text)
         {
-            if (CurrentChat.Value == null)
+            if (CurrentChannel.Value == null)
                 return;
 
             var parameters = text.Split(new[] { ' ' }, 2);
@@ -151,18 +128,18 @@ namespace osu.Game.Online.Chat
                 case "me":
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                        CurrentChat.Value.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
+                        CurrentChannel.Value.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
                         break;
                     }
                     PostMessage(content, true);
                     break;
 
                 case "help":
-                    CurrentChat.Value.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
+                    CurrentChannel.Value.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
                     break;
 
                 default:
-                    CurrentChat.Value.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
+                    CurrentChannel.Value.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
                     break;
             }
         }
@@ -193,6 +170,8 @@ namespace osu.Game.Online.Chat
 
         private void handleUserMessages(IEnumerable<Message> messages)
         {
+            var joinedUserChannels = JoinedChannels.Where(c => c.Target == TargetType.User).ToList();
+
             var outgoingMessages = messages.Where(m => m.Sender.Id == api.LocalUser.Value.Id);
             var outgoingMessagesGroups = outgoingMessages.GroupBy(m => m.TargetId);
             var incomingMessagesGroups = messages.Except(outgoingMessages).GroupBy(m => m.UserId);
@@ -200,35 +179,43 @@ namespace osu.Game.Online.Chat
             foreach (var messageGroup in incomingMessagesGroups)
             {
                 var targetUser = messageGroup.First().Sender;
-                var chat = OpenedUserChats.FirstOrDefault(c => c.User.Id == targetUser.Id);
+                var channel = joinedUserChannels.FirstOrDefault(c => c.Id == targetUser.Id);
 
-                if (chat == null)
+                if (channel == null)
                 {
-                    chat = new UserChat(targetUser);
-                    OpenedUserChats.Add(chat);
+                    channel = new Channel(targetUser);
+                    JoinedChannels.Add(channel);
+                    joinedUserChannels.Add(channel);
                 }
 
-                chat.AddNewMessages(messageGroup.ToArray());
+                channel.AddNewMessages(messageGroup.ToArray());
                 var outgoingTargetMessages = outgoingMessagesGroups.FirstOrDefault(g => g.Key == targetUser.Id);
                 if (outgoingTargetMessages != null)
-                    chat.AddNewMessages(outgoingTargetMessages.ToArray());
+                    channel.AddNewMessages(outgoingTargetMessages.ToArray());
             }
 
-            var withoutReplyGroups = outgoingMessagesGroups.Where(g => OpenedUserChats.All(m => m.ChatID != g.Key));
+            var withoutReplyGroups = outgoingMessagesGroups.Where(g => joinedUserChannels.All(m => m.Id != g.Key));
 
             foreach (var withoutReplyGroup in withoutReplyGroups)
             { 
-                var chat = new UserChat(new User { Id = withoutReplyGroup.First().TargetId });
+                var userReq = new GetUserRequest(withoutReplyGroup.First().TargetId);
 
-                chat.AddNewMessages(withoutReplyGroup.ToArray());
-                OpenedUserChats.Add(chat);
-                chat.RequestDetails(api);
+                userReq.Failure += exception => Logger.Error(exception, "Failed to get user informations.");
+                userReq.Success += user =>
+                {
+                    var channel = new Channel(user);
+
+                    channel.AddNewMessages(withoutReplyGroup.ToArray());
+                    JoinedChannels.Add(channel);
+                };
+
+                api.Queue(userReq);
             }
         }
 
         private void fetchNewChannelMessages()
         {
-            fetchChannelMsgReq = new GetChannelMessagesRequest(JoinedChannels, lastChannelMsgId);
+            fetchChannelMsgReq = new GetChannelMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastChannelMsgId);
 
             fetchChannelMsgReq.Success += messages =>
             {
@@ -257,22 +244,24 @@ namespace osu.Game.Online.Chat
 
             req.Success += channels =>
             {
-                channels.Where(channel => AvailableChannels.All(c => c.ChatID != channel.ChatID))
+                channels.Where(channel => AvailableChannels.All(c => c.Id != channel.Id))
                         .ForEach(channel => AvailableChannels.Add(channel));
 
                 channels.Where(channel => defaultChannels.Contains(channel.Name))
-                        .Where(channel => JoinedChannels.All(c => c.ChatID != channel.ChatID))
+                        .Where(channel => JoinedChannels.All(c => c.Id != channel.Id))
                         .ForEach(channel =>
                         {
                             JoinedChannels.Add(channel);
+
                             var fetchInitialMsgReq = new GetChannelMessagesRequest(new[] {channel}, null);
                             fetchInitialMsgReq.Success += handleChannelMessages;
+                            fetchInitialMsgReq.Failure += exception => Logger.Error(exception, "Failed to fetch inital messages.");
                             api.Queue(fetchInitialMsgReq);
                         });
 
                 fetchNewMessages();
             };
-            req.Failure += error => Logger.Error(error, "Fetching channels failed");
+            req.Failure += error => Logger.Error(error, "Fetching channel list failed");
 
             api.Queue(req);
         }

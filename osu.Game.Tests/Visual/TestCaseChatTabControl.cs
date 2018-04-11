@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual
 
         private void addUser(long id, string name)
         {
-            chatTabControl.AddItem(new UserChat(new User
+            chatTabControl.AddItem(new Channel(new User
             {
                 Id = id,
                 Username = name
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual
 
         private void addChannel(string name)
         {
-            this.chatTabControl.AddItem(new ChannelChat
+            this.chatTabControl.AddItem(new Channel
             {
                 Name = name
             });

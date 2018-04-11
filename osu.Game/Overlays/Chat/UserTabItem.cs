@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -19,10 +20,10 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class UserTabItem : TabItem<UserChat>
+    public class UserTabItem : TabItem<Channel>
     {
         private static readonly Vector2 shear = new Vector2(1f / 5f, 0);
-        private readonly UserChat chat;
+        private readonly Channel channel;
         public override bool IsRemovable => true;
 
         private readonly Box highlightBox;
@@ -32,10 +33,13 @@ namespace osu.Game.Overlays.Chat
         private readonly Avatar avatarContainer;
         private readonly ChatTabItemCloseButton closeButton;
 
-        public UserTabItem(UserChat value)
+        public UserTabItem(Channel value)
             : base(value)
         {
-            chat = value;
+            if (value.Target != TargetType.User)
+                throw new ArgumentException("Argument value needs to have the targettype user!");
+
+            channel = value;
             AutoSizeAxes = Axes.X;
             Height = 50;
             Origin = Anchor.BottomRight;
@@ -117,7 +121,7 @@ namespace osu.Game.Overlays.Chat
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Masking = true,
-                                        Child = new DelayedLoadWrapper(new Avatar(value.User)
+                                        Child = new DelayedLoadWrapper(new Avatar(value.JoinedUsers.First())
                                         {
                                             Size = new Vector2(ChatOverlay.TAB_AREA_HEIGHT),
                                             OnLoadComplete = d => d.FadeInFromZero(300, Easing.OutQuint),
@@ -132,7 +136,7 @@ namespace osu.Game.Overlays.Chat
                             {
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
-                                Text = value.User.Username,
+                                Text = value.Name,
                                 Margin = new MarginPadding(1),
                                 TextSize = 18,
                             },
@@ -177,12 +181,14 @@ namespace osu.Game.Overlays.Chat
             username.ScaleTo(new Vector2(1, 1), activate_length, Easing.OutQuint);
             closeButton.ScaleTo(new Vector2(1, 1), activate_length, Easing.OutQuint);
             closeButton.FadeIn(activate_length, Easing.OutQuint);
-           // TweenEdgeEffectTo(activateEdgeEffect, activate_length);
+            TweenEdgeEffectTo(activateEdgeEffect, activate_length);
         }
 
         private readonly EdgeEffectParameters deactivateEdgeEffect = new EdgeEffectParameters
         {
-            Colour = Color4.Black.Opacity(0.0f),
+            Type = EdgeEffectType.Shadow,
+            Radius = 10,
+            Colour = Color4.Black.Opacity(0.2f),
         };
 
         protected override void OnDeactivated()
@@ -196,19 +202,15 @@ namespace osu.Game.Overlays.Chat
             username.ScaleTo(new Vector2(0, 1), deactivate_length, Easing.OutQuint);
             closeButton.FadeOut(deactivate_length, Easing.OutQuint);
             closeButton.ScaleTo(new Vector2(0, 1), deactivate_length, Easing.OutQuint);
-          //  TweenEdgeEffectTo(deactivateEdgeEffect, deactivate_length);
+            TweenEdgeEffectTo(deactivateEdgeEffect, deactivate_length);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, IAPIProvider api)
         {
-            backgroundBox.Colour = Value.User.Colour != null ? OsuColour.FromHex(Value.User.Colour) : colours.BlueDark;
+            var user = Value.JoinedUsers.First();
 
-            if (chat.User.Username == null || chat.User.Id < 1)
-            {
-                chat.DetailsArrived += arrivedUser => { Scheduler.Add(() => { username.Text = arrivedUser.Username; }); };
-                chat.RequestDetails(api);
-            }
+            backgroundBox.Colour = user.Colour != null ? OsuColour.FromHex(user.Colour) : colours.BlueDark;
         }
     }
 }

@@ -23,11 +23,11 @@ namespace osu.Game.Graphics.Containers
         public override bool HandleMouseInput => true;
 
         private OsuGame game;
-        private ChatManager chatManager;
+        private ChannelManager chatManager;
         private Action showNotImplementedError;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications, ChatManager chatManager)
+        private void load(OsuGame game, NotificationOverlay notifications, ChannelManager chatManager)
         {
             // will be null in tests
             this.game = game;
@@ -82,7 +82,7 @@ namespace osu.Game.Graphics.Containers
                         case LinkAction.OpenChannel:
                             var channel = chatManager.AvailableChannels.FirstOrDefault(c => c.Name == linkArgument);
                             if (channel != null)
-                                chatManager.CurrentChat.Value = channel;
+                                chatManager.CurrentChannel.Value = channel;
                             break;
                         case LinkAction.OpenEditorTimestamp:
                         case LinkAction.JoinMultiplayerMatch:
