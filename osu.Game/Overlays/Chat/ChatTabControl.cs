@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -79,8 +82,6 @@ namespace osu.Game.Overlays.Chat
                     ChannelTabControl.AddItem(channel);
                     break;
             }
-
-       
         }
 
         public void RemoveItem(Channel channel)
