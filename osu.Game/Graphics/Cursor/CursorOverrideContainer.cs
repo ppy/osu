@@ -21,6 +21,7 @@ namespace osu.Game.Graphics.Cursor
         /// Whether any cursors can be displayed.
         /// </summary>
         public bool CanShowCursor = true;
+        public bool ShowMenuCursor = true;
 
         public CursorContainer Cursor { get; }
         public bool ProvidingUserCursor => true;
@@ -51,6 +52,14 @@ namespace osu.Game.Graphics.Cursor
             {
                 currentTarget?.Cursor?.Hide();
                 return;
+            }
+
+            if (currentTarget?.Cursor is MenuCursor)
+            {
+                if (ShowMenuCursor && currentTarget?.Cursor.State == Visibility.Hidden)
+                    currentTarget?.Cursor?.Show();
+                else if (!ShowMenuCursor && currentTarget?.Cursor.State == Visibility.Visible)
+                    currentTarget?.Cursor?.Hide();
             }
 
             var newTarget = inputManager.HoveredDrawables.OfType<IProvideCursor>().FirstOrDefault(t => t.ProvidingUserCursor) ?? this;
