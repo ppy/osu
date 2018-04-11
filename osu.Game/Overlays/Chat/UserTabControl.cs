@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
@@ -9,16 +10,22 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class UserChatTabControl : OsuTabControl<UserChat>
+    public class UserTabControl : OsuTabControl<UserChat>
     {
-        protected override TabItem<UserChat> CreateTabItem(UserChat value) => new UserChatTabItem(value) { OnRequestClose = tabCloseRequested };
+        protected override TabItem<UserChat> CreateTabItem(UserChat value) => new UserTabItem(value) { OnRequestClose = tabCloseRequested };
+
+        protected override Dropdown<UserChat> CreateDropdown() => null;
 
         public Action<UserChat> OnRequestLeave;
 
-        public UserChatTabControl()
+        public UserTabControl()
         {
             TabContainer.Spacing = new Vector2(-10, 0);
             TabContainer.Masking = false;
+            Margin = new MarginPadding
+            {
+                Right = 10
+            };
         }
 
         protected override void AddTabItem(TabItem<UserChat> item, bool addToDropdown = true)
@@ -46,6 +53,7 @@ namespace osu.Game.Overlays.Chat
             if (SelectedTab != null)
                 SelectedTab.Active.Value = false;
             SelectedTab = null;
+
         }
     }
 }

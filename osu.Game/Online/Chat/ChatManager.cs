@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
@@ -18,7 +19,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Manages everything chat related
     /// </summary>
-    public class ChatManager : IOnlineComponent
+    public class ChatManager : Component, IOnlineComponent
     {
         /// <summary>
         /// The channels the player joins on startup
@@ -217,7 +218,7 @@ namespace osu.Game.Online.Chat
 
             foreach (var withoutReplyGroup in withoutReplyGroups)
             { 
-                var chat = new UserChat(new User {Id = withoutReplyGroup.First().TargetId });
+                var chat = new UserChat(new User { Id = withoutReplyGroup.First().TargetId });
 
                 chat.AddNewMessages(withoutReplyGroup.ToArray());
                 OpenedUserChats.Add(chat);

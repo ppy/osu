@@ -19,7 +19,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class UserChatTabItem : TabItem<UserChat>
+    public class UserTabItem : TabItem<UserChat>
     {
         private static readonly Vector2 shear = new Vector2(1f / 5f, 0);
         private readonly UserChat chat;
@@ -29,18 +29,19 @@ namespace osu.Game.Overlays.Chat
         private readonly Container backgroundContainer;
         private readonly Box backgroundBox;
         private readonly OsuSpriteText username;
+        private readonly Avatar avatarContainer;
         private readonly ChatTabItemCloseButton closeButton;
 
-        public UserChatTabItem(UserChat value)
+        public UserTabItem(UserChat value)
             : base(value)
         {
             chat = value;
             AutoSizeAxes = Axes.X;
-            RelativeSizeAxes = Axes.Y;
+            Height = 50;
             Origin = Anchor.BottomRight;
             Anchor = Anchor.BottomRight;
-            EdgeEffect = deactivateEdgeEffect;
-            Masking = false;
+            EdgeEffect = activateEdgeEffect;
+            Masking = true;
             Shear = shear;
             Children = new Drawable[]
             {
@@ -116,7 +117,11 @@ namespace osu.Game.Overlays.Chat
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Masking = true,
-                                        Child = new Avatar(value.User)
+                                        Child = new DelayedLoadWrapper(new Avatar(value.User)
+                                        {
+                                            Size = new Vector2(ChatOverlay.TAB_AREA_HEIGHT),
+                                            OnLoadComplete = d => d.FadeInFromZero(300, Easing.OutQuint),
+                                        })
                                         {
                                             Size = new Vector2(ChatOverlay.TAB_AREA_HEIGHT),
                                         }
@@ -136,6 +141,10 @@ namespace osu.Game.Overlays.Chat
                                 Height = 1,
                                 Origin = Anchor.BottomLeft,
                                 Anchor = Anchor.BottomLeft,
+                                Margin = new MarginPadding
+                                {
+                                    Right = 5
+                                },
                                 RelativeSizeAxes = Axes.Y,
                                 Action = delegate
                                 {
@@ -148,13 +157,13 @@ namespace osu.Game.Overlays.Chat
             };
         }
 
-        public Action<UserChatTabItem> OnRequestClose;
+        public Action<UserTabItem> OnRequestClose;
 
         private readonly EdgeEffectParameters activateEdgeEffect = new EdgeEffectParameters
         {
             Type = EdgeEffectType.Shadow,
-            Radius = 30,
-            Colour = Color4.Black.Opacity(0.3f),
+            Radius = 15,
+            Colour = Color4.Black.Opacity(0.4f),
         };
 
         protected override void OnActivated()
@@ -168,7 +177,7 @@ namespace osu.Game.Overlays.Chat
             username.ScaleTo(new Vector2(1, 1), activate_length, Easing.OutQuint);
             closeButton.ScaleTo(new Vector2(1, 1), activate_length, Easing.OutQuint);
             closeButton.FadeIn(activate_length, Easing.OutQuint);
-            TweenEdgeEffectTo(activateEdgeEffect, activate_length);
+           // TweenEdgeEffectTo(activateEdgeEffect, activate_length);
         }
 
         private readonly EdgeEffectParameters deactivateEdgeEffect = new EdgeEffectParameters
@@ -187,7 +196,7 @@ namespace osu.Game.Overlays.Chat
             username.ScaleTo(new Vector2(0, 1), deactivate_length, Easing.OutQuint);
             closeButton.FadeOut(deactivate_length, Easing.OutQuint);
             closeButton.ScaleTo(new Vector2(0, 1), deactivate_length, Easing.OutQuint);
-            TweenEdgeEffectTo(deactivateEdgeEffect, deactivate_length);
+          //  TweenEdgeEffectTo(deactivateEdgeEffect, deactivate_length);
         }
 
         [BackgroundDependencyLoader]
