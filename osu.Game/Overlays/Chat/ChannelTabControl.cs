@@ -58,9 +58,6 @@ namespace osu.Game.Overlays.Chat
                 TabContainer.SetLayoutPosition(selectorTab, float.MaxValue);
 
             base.AddTabItem(item, addToDropdown);
-
-            if (SelectedTab == null)
-                SelectTab(item);
         }
 
         protected override TabItem<Channel> CreateTabItem(Channel value) => new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
