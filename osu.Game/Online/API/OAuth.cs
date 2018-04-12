@@ -15,6 +15,12 @@ namespace osu.Game.Online.API
 
         public readonly Bindable<OAuthToken> Token = new Bindable<OAuthToken>();
 
+        public string TokenString
+        {
+            get => Token.Value?.ToString();
+            set => Token.Value = string.IsNullOrEmpty(value) ? null : OAuthToken.Parse(value);
+        }
+
         internal OAuth(string clientId, string clientSecret, string endpoint)
         {
             Debug.Assert(clientId != null);
