@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
