@@ -10,6 +10,9 @@ using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Screens.Edit
 {
+    /// <summary>
+    /// A decoupled clock which adds editor-specific functionality, such as snapping to a user-defined beat divisor.
+    /// </summary>
     public class EditorClock : DecoupleableInterpolatingFramedClock
     {
         public ControlPointInfo ControlPointInfo;
@@ -23,6 +26,11 @@ namespace osu.Game.Screens.Edit
             ControlPointInfo = controlPointInfo;
         }
 
+        /// <summary>
+        /// Seek to the closest valid snap value.
+        /// </summary>
+        /// <param name="position">The raw position which should be seeked around.</param>
+        /// <returns>Whether the seek could be performed.</returns>
         public bool SeekSnapped(double position)
         {
             var timingPoint = ControlPointInfo.TimingPointAt(position);
