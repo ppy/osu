@@ -34,7 +34,7 @@ namespace osu.Game.Online.Chat
         }
 
         /// <summary>
-        /// Contructs a privatechannel
+        /// Contructs a private channel
         /// TODO this class needs to be serialized from something like channels/private, instead of creating from a contructor
         /// </summary>
         /// <param name="user">The user </param>

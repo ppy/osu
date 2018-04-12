@@ -22,8 +22,7 @@ namespace osu.Game.Tests.Visual
         {
             typeof(ChatTabControl),
             typeof(ChannelTabControl),
-            typeof(UserTabControl),
-
+            typeof(UserTabControl)
         };
 
         private readonly ChatTabControl chatTabControl;

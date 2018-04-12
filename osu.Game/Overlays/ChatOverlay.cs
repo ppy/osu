@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
 
-        private ChannelManager chatManager;
+        private ChannelManager channelManager;
 
         private readonly Container<DrawableChat> currentChatContainer;
         private readonly List<DrawableChat> loadedChannels = new List<DrawableChat>();
@@ -157,7 +157,7 @@ namespace osu.Game.Overlays
                                 chatTabControl = new ChatTabControl
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    OnRequestLeave = channel => chatManager.JoinedChannels.Remove(channel)
+                                    OnRequestLeave = channel => channelManager.JoinedChannels.Remove(channel)
                                 }
                             }
                         },
@@ -165,7 +165,7 @@ namespace osu.Game.Overlays
                 },
             };
 
-            chatTabControl.Current.ValueChanged += chat => chatManager.CurrentChannel.Value = chat;
+            chatTabControl.Current.ValueChanged += chat => channelManager.CurrentChannel.Value = chat;
             chatTabControl.ChannelTabControl.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
             channelSelection.StateChanged += state =>
             {
@@ -182,10 +182,10 @@ namespace osu.Game.Overlays
             };
             channelSelection.OnRequestJoin = channel =>
             {
-                if (!chatManager.JoinedChannels.Contains(channel))
-                    chatManager.JoinedChannels.Add(channel);
+                if (!channelManager.JoinedChannels.Contains(channel))
+                    channelManager.JoinedChannels.Add(channel);
             };
-            channelSelection.OnRequestLeave = channel => chatManager.JoinedChannels.Remove(channel);
+            channelSelection.OnRequestLeave = channel => channelManager.JoinedChannels.Remove(channel);
         }
 
         private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
@@ -195,7 +195,7 @@ namespace osu.Game.Overlays
                 new ChannelSection
                 {
                     Header = "All Channels",
-                    Channels = chatManager.AvailableChannels,
+                    Channels = channelManager.AvailableChannels,
                 },
             };
         }
@@ -328,10 +328,8 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, OsuConfigManager config, OsuColour colours, ChannelManager chatManager)
+        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
         {
-            api.Register(chatManager);
-
             ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
             ChatHeight.ValueChanged += h =>
             {
@@ -344,10 +342,10 @@ namespace osu.Game.Overlays
             chatBackground.Colour = colours.ChatBlue;
             loading.Show();
 
-            this.chatManager = chatManager;
-            chatManager.CurrentChannel.ValueChanged += currentChatChanged;
-            chatManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
-            chatManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
+            this.channelManager = channelManager;
+            channelManager.CurrentChannel.ValueChanged += currentChatChanged;
+            channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
+            channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
         }
 
         private void postMessage(TextBox textbox, bool newText)
@@ -358,9 +356,9 @@ namespace osu.Game.Overlays
                 return;
 
             if (text[0] == '/')
-                chatManager.PostCommand(text.Substring(1));
+                channelManager.PostCommand(text.Substring(1));
             else
-                chatManager.PostMessage(text);
+                channelManager.PostMessage(text);
 
             textbox.Text = string.Empty;
         }

@@ -7,11 +7,11 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserMessagesRequest : APIRequest<List<Message>>
+    public class GetPrivateMessagesRequest : APIRequest<List<Message>>
     {
         private long? since;
 
-        public GetUserMessagesRequest(long? sinceId = null)
+        public GetPrivateMessagesRequest(long? sinceId = null)
         {
             since = sinceId;
         }
