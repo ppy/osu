@@ -56,13 +56,6 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            // We don't have any explicit way to start/stop the track, but want a relatively accurate IsRunning state
-            // The track's IsRunning state is used to determine our clock's IsRunning state
-            if (osuGame.Beatmap.Value.Track.IsRunning)
-                Clock.Start();
-            else
-                Clock.Stop();
-
             Clock.ProcessFrame();
         }
 
