@@ -15,7 +15,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class FilterControl : SearchableListFilterControl<DirectSortCriteria, RankStatus>
+    public class FilterControl : SearchableListFilterControl<DirectSortCriteria, BeatmapSearchCategory>
     {
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
         private FillFlowContainer<RulesetToggleButton> modeButtons;

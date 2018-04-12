@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace osu.Game.Beatmaps
 {
-    public enum RankStatus
+    public enum BeatmapSearchCategory
     {
         Any = 7,
         [Description("Ranked & Approved")]

@@ -13,12 +13,12 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly string query;
         private readonly RulesetInfo ruleset;
-        private readonly RankStatus rankStatus;
+        private readonly BeatmapSearchCategory rankStatus;
         private readonly DirectSortCriteria sortCriteria;
         private readonly SortDirection direction;
         private string directionString => direction == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, RankStatus rankStatus = RankStatus.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
+        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory rankStatus = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
         {
             this.query = System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
