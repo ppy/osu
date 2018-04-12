@@ -23,15 +23,15 @@ namespace osu.Game.Graphics.Containers
         public override bool HandleMouseInput => true;
 
         private OsuGame game;
-        private ChannelManager chatManager;
+        private ChannelManager channelManager;
         private Action showNotImplementedError;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications, ChannelManager chatManager)
+        private void load(OsuGame game, NotificationOverlay notifications, ChannelManager channelManager)
         {
             // will be null in tests
             this.game = game;
-            this.chatManager = chatManager;
+            this.channelManager = channelManager;
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
                 Text = @"This link type is not yet supported!",
@@ -80,9 +80,14 @@ namespace osu.Game.Graphics.Containers
                                 game?.ShowBeatmapSet(setId);
                             break;
                         case LinkAction.OpenChannel:
-                            var channel = chatManager.AvailableChannels.FirstOrDefault(c => c.Name == linkArgument);
-                            if (channel != null)
-                                chatManager.CurrentChannel.Value = channel;
+                            try
+                            {
+                                channelManager.OpenChannel(linkArgument);
+                            }
+                            catch (ArgumentException)
+                            {
+                                //channel was not found
+                            }
                             break;
                         case LinkAction.OpenEditorTimestamp:
                         case LinkAction.JoinMultiplayerMatch:

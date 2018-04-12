@@ -50,8 +50,8 @@ namespace osu.Game.Online.Chat
         private APIAccess api;
         private readonly Scheduler scheduler;
         private ScheduledDelegate fetchMessagesScheduleder;
-        private GetChannelMessagesRequest fetchChannelMsgReq;
-        private GetUserMessagesRequest fetchUserMsgReq;
+        private GetMessagesRequest fetchMsgReq;
+        private GetPrivateMessagesRequest fetchPrivateMsgReq;
         private long? lastChannelMsgId;
         private long? lastUserMsgId;
 
@@ -151,26 +151,26 @@ namespace osu.Game.Online.Chat
 
         private void fetchNewMessages()
         {
-            if (fetchChannelMsgReq == null)
+            if (fetchMsgReq == null)
                 fetchNewChannelMessages();
 
-            if (fetchUserMsgReq == null)
+            if (fetchPrivateMsgReq == null)
                 fetchNewUserMessages();
         }
 
         private void fetchNewUserMessages()
         {
-            fetchUserMsgReq = new GetUserMessagesRequest(lastUserMsgId);
+            fetchPrivateMsgReq = new GetPrivateMessagesRequest(lastUserMsgId);
 
-            fetchUserMsgReq.Success += messages =>
+            fetchPrivateMsgReq.Success += messages =>
             {
                 handleUserMessages(messages);
                 lastUserMsgId = messages.LastOrDefault()?.Id ?? lastUserMsgId;
-                fetchUserMsgReq = null;
+                fetchPrivateMsgReq = null;
             };
-            fetchUserMsgReq.Failure += exception => Logger.Error(exception, "Fetching user messages failed.");
+            fetchPrivateMsgReq.Failure += exception => Logger.Error(exception, "Fetching user messages failed.");
 
-            api.Queue(fetchUserMsgReq);
+            api.Queue(fetchPrivateMsgReq);
         }
 
         private void handleUserMessages(IEnumerable<Message> messages)
@@ -220,19 +220,19 @@ namespace osu.Game.Online.Chat
 
         private void fetchNewChannelMessages()
         {
-            fetchChannelMsgReq = new GetChannelMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastChannelMsgId);
+            fetchMsgReq = new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastChannelMsgId);
 
-            fetchChannelMsgReq.Success += messages =>
+            fetchMsgReq.Success += messages =>
             {
                 if (messages == null)
                     return;
                 handleChannelMessages(messages);
                 lastChannelMsgId = messages.LastOrDefault()?.Id ?? lastChannelMsgId;
-                fetchChannelMsgReq = null;
+                fetchMsgReq = null;
             };
-            fetchChannelMsgReq.Failure += exception => Logger.Error(exception, "Fetching channel messages failed.");
+            fetchMsgReq.Failure += exception => Logger.Error(exception, "Fetching channel messages failed.");
 
-            api.Queue(fetchChannelMsgReq);
+            api.Queue(fetchMsgReq);
         }
 
         private void handleChannelMessages(IEnumerable<Message> messages)
@@ -258,7 +258,7 @@ namespace osu.Game.Online.Chat
                         {
                             JoinedChannels.Add(channel);
 
-                            var fetchInitialMsgReq = new GetChannelMessagesRequest(new[] { channel }, null);
+                            var fetchInitialMsgReq = new GetMessagesRequest(new[] { channel }, null);
                             fetchInitialMsgReq.Success += handleChannelMessages;
                             fetchInitialMsgReq.Failure += exception => Logger.Error(exception, "Failed to fetch inital messages.");
                             api.Queue(fetchInitialMsgReq);
@@ -281,8 +281,8 @@ namespace osu.Game.Online.Chat
                     fetchMessagesScheduleder = scheduler.AddDelayed(fetchNewMessages, 1000, true);
                     break;
                 default:
-                    fetchChannelMsgReq?.Cancel();
-                    fetchChannelMsgReq = null;
+                    fetchMsgReq?.Cancel();
+                    fetchMsgReq = null;
                     fetchMessagesScheduleder?.Cancel();
                     break;
             }

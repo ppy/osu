@@ -9,12 +9,12 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetChannelMessagesRequest : APIRequest<List<Message>>
+    public class GetMessagesRequest : APIRequest<List<Message>>
     {
         private readonly IEnumerable<Channel> channels;
         private long? since;
 
-        public GetChannelMessagesRequest(IEnumerable<Channel> channels, long? sinceId)
+        public GetMessagesRequest(IEnumerable<Channel> channels, long? sinceId)
         {
             if (channels == null)
                 throw new ArgumentNullException(nameof(channels));
