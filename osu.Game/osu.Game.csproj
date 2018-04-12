@@ -21,6 +21,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="SharpCompress" Version="0.18.1" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
 
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
