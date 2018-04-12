@@ -108,6 +108,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                         case BananaShower.Banana _:
                         case TinyDroplet _:
                         case Droplet _:
+                        case Fruit _:
                             moveToNext(nestedObj);
                             break;
                     }
