@@ -55,10 +55,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             if (Beatmap.Value.Track.Length == double.PositiveInfinity) return;
 
             float markerPos = MathHelper.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
-            seekTo(markerPos / DrawWidth * Beatmap.Value.Track.Length);
+            adjustableClock.Seek(markerPos / DrawWidth * Beatmap.Value.Track.Length);
         }
-
-        private void seekTo(double time) => adjustableClock.Seek(time);
 
         protected override void Update()
         {
