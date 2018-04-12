@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual
             osuGame.Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             SummaryTimeline summaryTimeline;
-            Add(summaryTimeline = new SummaryTimeline(Clock)
+            Add(summaryTimeline = new SummaryTimeline
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

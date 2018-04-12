@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Edit
                                             Padding = new MarginPadding { Right = 10 },
                                             Child = timeInfo = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
                                         },
-                                        timeline = new SummaryTimeline(clock)
+                                        timeline = new SummaryTimeline
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },

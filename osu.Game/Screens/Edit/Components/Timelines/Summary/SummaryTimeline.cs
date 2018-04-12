@@ -17,15 +17,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
     /// </summary>
     public class SummaryTimeline : BottomBarContainer
     {
-        private readonly IAdjustableClock adjustableClock;
-
-        public SummaryTimeline(IAdjustableClock adjustableClock)
-        {
-            this.adjustableClock = adjustableClock;
-        }
-
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, IAdjustableClock adjustableClock)
         {
             TimelinePart markerPart, controlPointPart, bookmarkPart, breakPart;
 
