@@ -3,15 +3,16 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Timing;
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
-using osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Tests.Beatmaps;
@@ -19,20 +20,22 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseEditorSelectionLayer : EditorClockTestCase
+    public class TestCaseHitObjectComposer : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(SelectionLayer),
-            typeof(SelectionBox),
+            typeof(MaskSelection),
+            typeof(DragLayer),
             typeof(HitObjectComposer),
             typeof(OsuHitObjectComposer),
             typeof(HitObjectMaskLayer),
-            typeof(HitObjectMask),
-            typeof(HitCircleMask),
-            typeof(SliderMask),
-            typeof(SliderCircleMask)
+            typeof(NotNullAttribute)
         };
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
@@ -58,6 +61,10 @@ namespace osu.Game.Tests.Visual
                     }
                 },
             });
+
+            var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            dependencies.CacheAs<IAdjustableClock>(clock);
+            dependencies.CacheAs<IFrameBasedClock>(clock);
 
             Child = new OsuHitObjectComposer(new OsuRuleset());
         }

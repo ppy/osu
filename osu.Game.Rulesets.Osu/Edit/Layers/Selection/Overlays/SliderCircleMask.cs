@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
             Scale = slider.HeadCircle.Scale;
 
             AddInternal(new RingPiece());
+
+            Select();
         }
 
         [BackgroundDependencyLoader]
@@ -52,5 +54,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
 
             RelativeAnchorPosition = hitObject.RelativeAnchorPosition;
         }
+
+        // Todo: This is temporary, since the slider circle masks don't do anything special yet. In the future they will handle input.
+        public override bool HandleMouseInput => false;
     }
 }
