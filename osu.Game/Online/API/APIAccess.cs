@@ -39,8 +39,8 @@ namespace osu.Game.Online.API
 
         public string Token
         {
-            get { return authentication.Token?.ToString(); }
-            set { authentication.Token = string.IsNullOrEmpty(value) ? null : OAuthToken.Parse(value); }
+            get { return authentication.Token.Value?.ToString(); }
+            set { authentication.Token.Value = string.IsNullOrEmpty(value) ? null : OAuthToken.Parse(value); }
         }
 
         protected bool HasLogin => Token != null || !string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password);
@@ -59,8 +59,12 @@ namespace osu.Game.Online.API
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
             Token = config.Get<string>(OsuSetting.Token);
 
+            authentication.Token.ValueChanged += onTokenChanged;
+
             Task.Factory.StartNew(run, cancellationToken.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
+
+        private void onTokenChanged(OAuthToken token) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? Token : string.Empty);
 
         private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
 
@@ -305,9 +309,6 @@ namespace osu.Game.Online.API
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
-            config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? Token : string.Empty);
-            config.Save();
 
             flushQueue();
             cancellationToken.Cancel();
