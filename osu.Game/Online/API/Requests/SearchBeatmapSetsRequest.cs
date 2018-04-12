@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Direct;
@@ -29,5 +30,20 @@ namespace osu.Game.Online.API.Requests
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&s={(int)rankStatus}&sort={sortCriteria.ToString().ToLower()}_{directionString}";
+    }
+
+    public enum BeatmapSearchCategory
+    {
+        Any = 7,
+        [Description("Ranked & Approved")]
+        RankedApproved = 0,
+        Approved = 1,
+        Loved = 8,
+        Favourites = 2,
+        Qualified = 3,
+        Pending = 4,
+        Graveyard = 5,
+        [Description("My Maps")]
+        MyMaps = 6,
     }
 }
