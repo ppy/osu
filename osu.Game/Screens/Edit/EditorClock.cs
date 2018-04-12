@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit
         }
 
         /// <summary>
-        /// Seek to the closest valid snap value.
+        /// Seek to the closest snappable beat from a time.
         /// </summary>
         /// <param name="position">The raw position which should be seeked around.</param>
         /// <returns>Whether the seek could be performed.</returns>
@@ -53,15 +53,15 @@ namespace osu.Game.Screens.Edit
         }
 
         /// <summary>
-        /// Seeks the current time one beat-snapped beat-length backwards.
+        /// Seeks backwards by one beat length.
         /// </summary>
-        /// <param name="snapped">Whether to snap to the closest beat.</param>
+        /// <param name="snapped">Whether to snap to the closest beat after seeking.</param>
         public void SeekBackward(bool snapped = false) => seek(-1, snapped);
 
         /// <summary>
-        /// Seeks the current time one beat-snapped beat-length forwards.
+        /// Seeks forwards by one beat length.
         /// </summary>
-        /// <param name="snapped">Whether to snap to the closest beat.</param>
+        /// <param name="snapped">Whether to snap to the closest beat after seeking.</param>
         public void SeekForward(bool snapped = false) => seek(1, snapped);
 
         private void seek(int direction, bool snapped)
