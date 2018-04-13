@@ -16,7 +16,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -25,6 +24,14 @@ namespace osu.Game.Graphics
 {
     public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalInput
     {
+        private readonly BindableBool cursorVisibility = new BindableBool(true);
+
+        /// <summary>
+        /// Invoked when screenshots are or have finished being taken, to control whether cursors should be visible.
+        /// If cursors should not be visible, cursors have 3 frames to hide themselves.
+        /// </summary>
+        public IBindable<bool> CursorVisibility => cursorVisibility;
+
         private Bindable<ScreenshotFormat> screenshotFormat;
         private Bindable<bool> captureMenuCursor;
 
@@ -33,12 +40,6 @@ namespace osu.Game.Graphics
         private NotificationOverlay notificationOverlay;
 
         private SampleChannel shutter;
-        private readonly MenuCursor menuCursor;
-
-        public ScreenshotManager(MenuCursor menuCursor)
-        {
-            this.menuCursor = menuCursor;
-        }
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
@@ -76,7 +77,7 @@ namespace osu.Game.Graphics
 
             if (!captureMenuCursor.Value)
             {
-                menuCursor.ShowCursor = false;
+                cursorVisibility.Value = false;
 
                 // We need to wait for at most 3 draw nodes to be drawn, following which we can be assured at least one DrawNode has been generated/drawn with the set value
                 const int frames_to_wait = 3;
@@ -126,8 +127,8 @@ namespace osu.Game.Graphics
         {
             base.Update();
 
-            if (Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
-                menuCursor.ShowCursor = true;
+            if (cursorVisibility == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
+                cursorVisibility.Value = true;
         }
 
         private string getFileName()
