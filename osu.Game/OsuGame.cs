@@ -56,6 +56,8 @@ namespace osu.Game
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
+        private ScreenshotManager screenshotManager;
+
         public virtual Storage GetStorageForStableInstall() => null;
 
         private Intro intro
@@ -125,6 +127,7 @@ namespace osu.Game
             }
 
             dependencies.CacheAs(this);
+            dependencies.Cache(screenshotManager = new ScreenshotManager());
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
@@ -239,7 +242,8 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
-            loadComponentSingleFile(new ScreenshotManager(CursorOverrideContainer.MenuCursor), Add);
+
+            loadComponentSingleFile(screenshotManager, Add);
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
