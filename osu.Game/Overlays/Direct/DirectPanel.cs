@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using OpenTK;
@@ -209,7 +208,7 @@ namespace osu.Game.Overlays.Direct
         {
             var icons = new List<DifficultyIcon>();
 
-            foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
+            foreach (var b in SetInfo.Beatmaps)
                 icons.Add(new DifficultyIcon(b));
 
             return icons;
