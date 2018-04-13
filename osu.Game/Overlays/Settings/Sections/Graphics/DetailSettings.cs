@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Capture menu cursor",
+                    LabelText = "Show menu cursor in screenshots",
                     Bindable = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
                 }
             };
