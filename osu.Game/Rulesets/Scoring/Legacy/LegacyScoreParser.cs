@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Replays.Legacy;
 using osu.Game.Users;
 using SharpCompress.Compressors.LZMA;
 using osu.Game.Beatmaps.Legacy;
-using osu.Game.Rulesets.Mods;
 using System.Linq;
 
 namespace osu.Game.Rulesets.Scoring.Legacy
