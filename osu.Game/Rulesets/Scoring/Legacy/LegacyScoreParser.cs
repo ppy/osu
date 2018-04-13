@@ -9,6 +9,9 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Legacy;
 using osu.Game.Users;
 using SharpCompress.Compressors.LZMA;
+using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Mods;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Scoring.Legacy
 {
@@ -64,7 +67,7 @@ namespace osu.Game.Rulesets.Scoring.Legacy
                 /* score.Perfect = */
                 sr.ReadBoolean();
                 /* score.EnabledMods = (Mods)*/
-                sr.ReadInt32();
+                score.Mods = currentRuleset.GetLegacyModsFor((LegacyMods)sr.ReadInt32()).ToArray();
                 /* score.HpGraphString = */
                 sr.ReadString();
                 /* score.Date = */

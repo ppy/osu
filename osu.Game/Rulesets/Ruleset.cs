@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets
 {
@@ -32,6 +33,8 @@ namespace osu.Game.Rulesets
                                                     .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
+
+        public abstract IEnumerable<Mod> GetLegacyModsFor(LegacyMods mods);
 
         public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
 
