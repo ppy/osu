@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
@@ -63,20 +64,31 @@ namespace osu.Game.Graphics
 
         public bool OnReleased(GlobalAction action) => false;
 
-        public async void TakeScreenshotAsync()
+        private volatile int screenShotTasks;
+
+        public async Task TakeScreenshotAsync() => Task.Run(async () =>
         {
+            Interlocked.Increment(ref screenShotTasks);
+
             if (!captureMenuCursor.Value)
             {
                 cursorOverrideContainer.ShowMenuCursor = false;
-                await Task.Run(() =>
-                {
-                    while (cursorOverrideContainer.Cursor.ActiveCursor.Alpha > 0)
-                        Thread.Sleep(1);
-                });
+
+                // We need to wait for at most 3 draw nodes to be drawn, following which we can be assured at least one DrawNode has been generated/drawn with the set value
+                const int frames_to_wait = 3;
+
+                int framesWaited = 0;
+                ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() => framesWaited++, 0, true);
+                while (framesWaited < frames_to_wait)
+                    Thread.Sleep(10);
+
+                waitDelegate.Cancel();
             }
 
             using (var bitmap = await host.TakeScreenshotAsync())
             {
+                Interlocked.Decrement(ref screenShotTasks);
+
                 var fileName = getFileName();
                 if (fileName == null) return;
 
@@ -104,8 +116,14 @@ namespace osu.Game.Graphics
                     }
                 });
             }
+        });
 
-            cursorOverrideContainer.ShowMenuCursor = true;
+        protected override void Update()
+        {
+            base.Update();
+
+            if (Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
+                cursorOverrideContainer.ShowMenuCursor = true;
         }
 
         private string getFileName()

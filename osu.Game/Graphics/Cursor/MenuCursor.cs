@@ -18,6 +18,9 @@ namespace osu.Game.Graphics.Cursor
 {
     public class MenuCursor : CursorContainer
     {
+        public bool ShowCursor = true;
+        public override bool IsPresent => ShowCursor && base.IsPresent;
+
         protected override Drawable CreateCursor() => new Cursor();
 
         private Bindable<bool> cursorRotate;
