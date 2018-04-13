@@ -125,6 +125,9 @@ namespace osu.Game.Screens.Select
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SelectScrollRightClick, RightClickScrollingEnabled);
+
+            RightClickScrollingEnabled.ValueChanged += v => RightMouseScrollbar = v;
+            RightClickScrollingEnabled.TriggerChange();
         }
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -400,31 +403,6 @@ namespace osu.Game.Screens.Select
 
             SelectNext(direction, skipDifficulties);
             return true;
-        }
-
-        private bool rightClickScrolling = false;
-
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            bool result = base.OnMouseDown(state, args);
-
-            if (RightClickScrollingEnabled.Value && !result && args.Button == MouseButton.Right)
-            {
-                rightClickScrolling = true;
-                return true;
-            }
-
-            return result;
-        }
-
-        protected override bool OnMouseMove(InputState state)
-        {
-            if (state.Mouse.Buttons.Contains(MouseButton.Right) && rightClickScrolling)
-                ScrollTo((state.Mouse.Position.Y / DrawHeight) * scrollableContent.Height);
-            else
-                rightClickScrolling = false;
-
-            return base.OnMouseMove(state);
         }
 
         protected override void Update()
