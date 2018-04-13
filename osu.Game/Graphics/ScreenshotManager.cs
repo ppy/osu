@@ -33,15 +33,19 @@ namespace osu.Game.Graphics
         private NotificationOverlay notificationOverlay;
 
         private SampleChannel shutter;
-        private CursorOverrideContainer cursorOverrideContainer;
+        private readonly MenuCursor menuCursor;
+
+        public ScreenshotManager(MenuCursor menuCursor)
+        {
+            this.menuCursor = menuCursor;
+        }
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio, CursorOverrideContainer cursorOverrideContainer)
+        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
         {
             this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
             this.notificationOverlay = notificationOverlay;
-            this.cursorOverrideContainer = cursorOverrideContainer;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
@@ -72,7 +76,7 @@ namespace osu.Game.Graphics
 
             if (!captureMenuCursor.Value)
             {
-                cursorOverrideContainer.ShowMenuCursor = false;
+                menuCursor.ShowCursor = false;
 
                 // We need to wait for at most 3 draw nodes to be drawn, following which we can be assured at least one DrawNode has been generated/drawn with the set value
                 const int frames_to_wait = 3;
@@ -123,7 +127,7 @@ namespace osu.Game.Graphics
             base.Update();
 
             if (Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
-                cursorOverrideContainer.ShowMenuCursor = true;
+                menuCursor.ShowCursor = true;
         }
 
         private string getFileName()
