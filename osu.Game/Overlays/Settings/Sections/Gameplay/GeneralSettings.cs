@@ -20,13 +20,15 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Background dim",
                     Bindable = config.GetBindable<double>(OsuSetting.DimLevel),
-                    KeyboardStep = 0.1f
+                    SmallKeyboardStep = 0.1f,
+                    LargeKeyboardStep = 0.5f
                 },
                 new SettingsSlider<double>
                 {
                     LabelText = "Background blur",
                     Bindable = config.GetBindable<double>(OsuSetting.BlurLevel),
-                    KeyboardStep = 0.1f
+                    SmallKeyboardStep = 0.1f,
+                    LargeKeyboardStep = 0.5f
                 },
                 new SettingsCheckbox
                 {
