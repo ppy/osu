@@ -70,7 +70,7 @@ namespace osu.Game.Graphics
 
         private volatile int screenShotTasks;
 
-        public async Task TakeScreenshotAsync() => Task.Run(async () =>
+        public async Task TakeScreenshotAsync() => await Task.Run(async () =>
         {
             Interlocked.Increment(ref screenShotTasks);
 

@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.Cursor
         /// </summary>
         internal bool CanShowCursor = true;
         internal readonly MenuCursor MenuCursor;
-        
+
         public CursorContainer Cursor => MenuCursor;
         public bool ProvidingUserCursor => true;
 
