@@ -97,6 +97,9 @@ namespace osu.Game.Screens.Select
 
         private readonly Container<DrawableCarouselItem> scrollableContent;
 
+
+        public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
+
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
@@ -121,6 +124,7 @@ namespace osu.Game.Screens.Select
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
+            config.BindWith(OsuSetting.SelectScrollRightClick, RightClickScrollingEnabled);
         }
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -396,6 +400,31 @@ namespace osu.Game.Screens.Select
 
             SelectNext(direction, skipDifficulties);
             return true;
+        }
+
+        private bool rightClickScrolling = false;
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            bool result = base.OnMouseDown(state, args);
+
+            if (RightClickScrollingEnabled.Value && !result && args.Button == MouseButton.Right)
+            {
+                rightClickScrolling = true;
+                return true;
+            }
+
+            return result;
+        }
+
+        protected override bool OnMouseMove(InputState state)
+        {
+            if (state.Mouse.Buttons.Contains(MouseButton.Right) && rightClickScrolling)
+                ScrollTo((state.Mouse.Position.Y / DrawHeight) * scrollableContent.Height);
+            else
+                rightClickScrolling = false;
+
+            return base.OnMouseMove(state);
         }
 
         protected override void Update()
