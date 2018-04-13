@@ -21,16 +21,15 @@ namespace osu.Game.Graphics.Cursor
         /// Whether any cursors can be displayed.
         /// </summary>
         internal bool CanShowCursor = true;
-        internal readonly MenuCursor MenuCursor;
 
-        public CursorContainer Cursor => MenuCursor;
+        public CursorContainer Cursor { get; }
         public bool ProvidingUserCursor => true;
 
         public CursorOverrideContainer()
         {
             AddRangeInternal(new Drawable[]
             {
-                MenuCursor = new MenuCursor { State = Visibility.Hidden },
+                Cursor = new MenuCursor { State = Visibility.Hidden },
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
         }

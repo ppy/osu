@@ -12,14 +12,15 @@ using osu.Framework.Input;
 using osu.Game.Configuration;
 using System;
 using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Graphics.Cursor
 {
     public class MenuCursor : CursorContainer
     {
-        public bool ShowCursor = true;
-        public override bool IsPresent => ShowCursor && base.IsPresent;
+        private readonly IBindable<bool> screenshotCursorVisibility = new Bindable<bool>(true);
+        public override bool IsPresent => screenshotCursorVisibility.Value && base.IsPresent;
 
         protected override Drawable CreateCursor() => new Cursor();
 
@@ -27,6 +28,17 @@ namespace osu.Game.Graphics.Cursor
         private bool dragging;
 
         private bool startRotation;
+
+        private ScreenshotManager screenshotManager;
+
+        [BackgroundDependencyLoader(true)]
+        private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager)
+        {
+            cursorRotate = config.GetBindable<bool>(OsuSetting.CursorRotation);
+
+            if (screenshotManager != null)
+                screenshotCursorVisibility.BindTo(screenshotManager.CursorVisibility);
+        }
 
         protected override bool OnMouseMove(InputState state)
         {
@@ -105,12 +117,6 @@ namespace osu.Game.Graphics.Cursor
         {
             ActiveCursor.FadeTo(0, 250, Easing.OutQuint);
             ActiveCursor.ScaleTo(0.6f, 250, Easing.In);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            cursorRotate = config.GetBindable<bool>(OsuSetting.CursorRotation);
         }
 
         public class Cursor : Container
