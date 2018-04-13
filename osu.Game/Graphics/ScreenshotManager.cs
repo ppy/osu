@@ -4,6 +4,8 @@
 using System;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -13,6 +15,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -22,20 +25,25 @@ namespace osu.Game.Graphics
     public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalInput
     {
         private Bindable<ScreenshotFormat> screenshotFormat;
+        private Bindable<bool> captureMenuCursor;
+
         private GameHost host;
         private Storage storage;
         private NotificationOverlay notificationOverlay;
 
         private SampleChannel shutter;
+        private CursorOverrideContainer cursorOverrideContainer;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
+        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio, CursorOverrideContainer cursorOverrideContainer)
         {
             this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
             this.notificationOverlay = notificationOverlay;
+            this.cursorOverrideContainer = cursorOverrideContainer;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
+            captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
             shutter = audio.Sample.Get("UI/shutter");
         }
@@ -57,6 +65,16 @@ namespace osu.Game.Graphics
 
         public async void TakeScreenshotAsync()
         {
+            if (!captureMenuCursor.Value)
+            {
+                cursorOverrideContainer.ShowMenuCursor = false;
+                await Task.Run(() =>
+                {
+                    while (cursorOverrideContainer.Cursor.ActiveCursor.Alpha > 0)
+                        Thread.Sleep(1);
+                });
+            }
+
             using (var bitmap = await host.TakeScreenshotAsync())
             {
                 var fileName = getFileName();
@@ -86,6 +104,8 @@ namespace osu.Game.Graphics
                     }
                 });
             }
+
+            cursorOverrideContainer.ShowMenuCursor = true;
         }
 
         private string getFileName()
