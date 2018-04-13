@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 Beatmap.Value = BeatmapSet.Beatmaps.First();
                 plays.Value = BeatmapSet.OnlineInfo.PlayCount;
                 favourites.Value = BeatmapSet.OnlineInfo.FavouriteCount;
-                difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Select(b => new DifficultySelectorButton(b)
+                difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty).Select(b => new DifficultySelectorButton(b)
                 {
                     State = DifficultySelectorState.NotSelected,
                     OnHovered = beatmap =>
