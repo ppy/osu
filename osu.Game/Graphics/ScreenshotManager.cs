@@ -27,7 +27,7 @@ namespace osu.Game.Graphics
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 
         /// <summary>
-        /// Invoked when screenshots are or have finished being taken, to control whether cursors should be visible.
+        /// Changed when screenshots are being or have finished being taken, to control whether cursors should be visible.
         /// If cursors should not be visible, cursors have 3 frames to hide themselves.
         /// </summary>
         public IBindable<bool> CursorVisibility => cursorVisibility;
