@@ -239,7 +239,7 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
-            loadComponentSingleFile(new ScreenshotManager(), Add);
+            loadComponentSingleFile(new ScreenshotManager(CursorOverrideContainer.MenuCursor), Add);
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
