@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
             get { return beatmapSets.Select(g => g.BeatmapSet); }
             set
             {
-                CarouselGroup newRoot = new CarouselGroupEagerSelect();
+                CarouselRoot newRoot = new CarouselRoot(this);
 
                 Task.Run(() =>
                 {
@@ -102,10 +102,11 @@ namespace osu.Game.Screens.Select
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
-        private CarouselGroup root = new CarouselGroupEagerSelect();
+        private CarouselRoot root;
 
         public BeatmapCarousel()
         {
+            root = new CarouselRoot(this);
             Child = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -626,6 +627,24 @@ namespace osu.Game.Screens.Select
             // additional container and setting that container's alpha) such that we can
             // layer transformations on top, with a similar reasoning to the previous comment.
             p.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
+        }
+
+        private class CarouselRoot : CarouselGroupEagerSelect
+        {
+            private readonly BeatmapCarousel carousel;
+
+            public CarouselRoot(BeatmapCarousel carousel)
+            {
+                this.carousel = carousel;
+            }
+
+            protected override void PerformSelection()
+            {
+                if (LastSelected == null)
+                    carousel.SelectNextRandom();
+                else
+                    base.PerformSelection();
+            }
         }
     }
 }
