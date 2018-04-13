@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
@@ -19,6 +19,8 @@ using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Replays.Types;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -143,9 +145,11 @@ namespace osu.Game.Rulesets.Osu
 
         public override SettingsSubsection CreateSettings() => new OsuSettings();
 
-        public override int LegacyID => 0;
+        public override int? LegacyID => 0;
 
-        public OsuRuleset(RulesetInfo rulesetInfo)
+        public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
+
+        public OsuRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
         {
         }

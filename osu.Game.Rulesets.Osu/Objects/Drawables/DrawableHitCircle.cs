@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -21,22 +22,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
-        public DrawableHitCircle(HitCircle h) : base(h)
+        public DrawableHitCircle(HitCircle h)
+            : base(h)
         {
             Origin = Anchor.Centre;
 
             Position = HitObject.StackedPosition;
             Scale = new Vector2(h.Scale);
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
-                glow = new GlowPiece
-                {
-                    Colour = AccentColour
-                },
+                glow = new GlowPiece(),
                 circle = new CirclePiece
                 {
-                    Colour = AccentColour,
                     Hit = () =>
                     {
                         if (AllJudged)
@@ -48,38 +46,53 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 number = new NumberPiece
                 {
-                    Text = (HitObject.ComboIndex + 1).ToString(),
+                    Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
                 },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
-                explode = new ExplodePiece
-                {
-                    Colour = AccentColour,
-                },
+                explode = new ExplodePiece(),
                 ApproachCircle = new ApproachCircle
                 {
                     Alpha = 0,
                     Scale = new Vector2(4),
-                    Colour = AccentColour,
                 }
             };
 
             //may not be so correct
             Size = circle.DrawSize;
+
+            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+        }
+
+        public override Color4 AccentColour
+        {
+            get { return base.AccentColour; }
+            set
+            {
+                base.AccentColour = value;
+                explode.Colour = AccentColour;
+                glow.Colour = AccentColour;
+                circle.Colour = AccentColour;
+                ApproachCircle.Colour = AccentColour;
+            }
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
-                if (timeOffset > HitObject.HitWindowFor(HitResult.Meh))
+                if (!HitObject.HitWindows.CanBeHit(timeOffset))
                     AddJudgement(new OsuJudgement { Result = HitResult.Miss });
                 return;
             }
 
+            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            if (result == HitResult.None)
+                return;
+
             AddJudgement(new OsuJudgement
             {
-                Result = HitObject.ScoreResultForOffset(Math.Abs(timeOffset)),
+                Result = result,
                 PositionOffset = Vector2.Zero //todo: set to correct value
             });
         }
@@ -88,8 +101,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            ApproachCircle.FadeIn(Math.Min(FadeInDuration * 2, TIME_PREEMPT));
-            ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
+            ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadein * 2, HitObject.TimePreempt));
+            ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -99,12 +112,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(TIME_PREEMPT).FadeOut(500);
+                    this.Delay(HitObject.TimePreempt).FadeOut(500);
 
                     Expire(true);
 
                     // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
-                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindowFor(HitResult.Miss);
+                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.HalfWindowFor(HitResult.Miss);
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);

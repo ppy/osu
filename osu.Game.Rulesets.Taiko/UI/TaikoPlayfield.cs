@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Taiko.Judgements;
@@ -17,6 +16,8 @@ using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -37,10 +38,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         private const float left_area_size = 240;
 
+        protected override bool UserScrollSpeedAdjustment => false;
 
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
-        private readonly Container<DrawableTaikoJudgement> judgementContainer;
+        private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -56,7 +58,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
-            : base(Axes.X)
+            : base(ScrollingDirection.Left)
         {
             AddRangeInternal(new Drawable[]
             {
@@ -130,7 +132,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
                             Blending = BlendingMode.Additive
                         },
-                        judgementContainer = new Container<DrawableTaikoJudgement>
+                        judgementContainer = new JudgementContainer<DrawableTaikoJudgement>
                         {
                             Name = "Judgements",
                             RelativeSizeAxes = Axes.Y,
@@ -206,7 +208,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.Depth = (float)h.HitObject.StartTime;
+            h.OnJudgement += OnJudgement;
 
             base.Add(h);
 
@@ -220,11 +222,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                 swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
         }
 
-        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
-                judgementContainer.Add(new DrawableTaikoJudgement(judgedObject, judgement)
+                judgementContainer.Add(new DrawableTaikoJudgement(judgement, judgedObject)
                 {
                     Anchor = judgement.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
                     Origin = judgement.IsHit ? Anchor.BottomCentre : Anchor.Centre,

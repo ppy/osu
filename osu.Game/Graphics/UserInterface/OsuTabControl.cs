@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -9,25 +9,40 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
+        private readonly Box strip;
+
         protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown();
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem(value);
+
+        protected virtual float StripWidth() => TabContainer.Children.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
+        protected virtual float StripHeight() => 1;
 
         private static bool isEnumType => typeof(T).IsEnum;
 
         public OsuTabControl()
         {
             TabContainer.Spacing = new Vector2(10f, 0f);
+
+            Add(strip = new Box
+            {
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                Height = StripHeight(),
+                Colour = Color4.White.Opacity(0),
+            });
 
             if (isEnumType)
                 foreach (var val in (T[])Enum.GetValues(typeof(T)))
@@ -54,6 +69,29 @@ namespace osu.Game.Graphics.UserInterface
                 foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
                     i.AccentColour = value;
             }
+        }
+
+        public Color4 StripColour
+        {
+            get => strip.Colour;
+            set => strip.Colour = value;
+        }
+
+        protected override TabFillFlowContainer CreateTabFlow() => new OsuTabFillFlowContainer
+        {
+            Direction = FillDirection.Full,
+            RelativeSizeAxes = Axes.Both,
+            Depth = -1,
+            Masking = true
+        };
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            // dont bother calculating if the strip is invisible
+            if (strip.Colour.MaxAlpha > 0)
+                strip.Width = Interpolation.ValueAt(MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth(), 0, 500, Easing.OutQuint);
         }
 
         public class OsuTabItem : TabItem<T>, IHasAccentColour
@@ -180,7 +218,6 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-
             protected class OsuTabDropdownHeader : OsuDropdownHeader
             {
                 public override Color4 AccentColour
@@ -239,6 +276,11 @@ namespace osu.Game.Graphics.UserInterface
                     base.OnHoverLost(state);
                 }
             }
+        }
+
+        private class OsuTabFillFlowContainer : TabFillFlowContainer
+        {
+            protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
         }
     }
 }

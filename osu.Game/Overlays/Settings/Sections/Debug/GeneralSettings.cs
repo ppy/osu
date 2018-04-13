@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -18,14 +18,19 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Bypass caching",
-                    Bindable = config.GetBindable<bool>(DebugSetting.BypassCaching)
+                    LabelText = "Show log overlay",
+                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Debug logs",
-                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
-                }
+                    LabelText = "Performance logging",
+                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.PerformanceLogging)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Bypass caching (slow)",
+                    Bindable = config.GetBindable<bool>(DebugSetting.BypassCaching)
+                },
             };
         }
     }

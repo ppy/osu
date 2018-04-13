@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -268,6 +268,7 @@ namespace osu.Game.Screens.Select
                     new OsuSpriteText
                     {
                         Font = @"Exo2.0-Bold",
+                        // ReSharper disable once PossibleNullReferenceException (resharper broken?)
                         Text = metadata.Author.Username,
                         TextSize = 15,
                     }

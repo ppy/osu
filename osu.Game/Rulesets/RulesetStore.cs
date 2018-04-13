@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets
                 loadRulesetFromFile(file);
         }
 
-        public RulesetStore(Func<OsuDbContext> factory)
+        public RulesetStore(IDatabaseContextFactory factory)
             : base(factory)
         {
             AddMissingRulesets();
@@ -56,56 +56,50 @@ namespace osu.Game.Rulesets
 
         protected void AddMissingRulesets()
         {
-            var context = GetContext();
-
-            var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo())).ToList();
-
-            //add all legacy modes in correct order
-            foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
+            using (var usage = ContextFactory.GetForWrite())
             {
-                var rulesetInfo = createRulesetInfo(r);
-                if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == rulesetInfo.ID) == null)
+                var context = usage.Context;
+
+                var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
+
+                //add all legacy modes in correct order
+                foreach (var r in instances.Where(r => r.LegacyID != null).OrderBy(r => r.LegacyID))
                 {
-                    context.RulesetInfo.Add(rulesetInfo);
+                    if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == r.RulesetInfo.ID) == null)
+                        context.RulesetInfo.Add(r.RulesetInfo);
                 }
-            }
 
-            context.SaveChanges();
+                context.SaveChanges();
 
-            //add any other modes
-            foreach (var r in instances.Where(r => r.LegacyID < 0))
-            {
-                var us = createRulesetInfo(r);
+                //add any other modes
+                foreach (var r in instances.Where(r => r.LegacyID == null))
+                    if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
+                        context.RulesetInfo.Add(r.RulesetInfo);
 
-                var existing = context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == us.InstantiationInfo);
+                context.SaveChanges();
 
-                if (existing == null)
-                    context.RulesetInfo.Add(us);
-            }
-
-            context.SaveChanges();
-
-            //perform a consistency check
-            foreach (var r in context.RulesetInfo)
-            {
-                try
+                //perform a consistency check
+                foreach (var r in context.RulesetInfo)
                 {
-                    var instance = r.CreateInstance();
+                    try
+                    {
+                        var instance = r.CreateInstance();
 
-                    r.Name = instance.Description;
-                    r.ShortName = instance.ShortName;
+                        r.Name = instance.Description;
+                        r.ShortName = instance.ShortName;
 
-                    r.Available = true;
+                        r.Available = true;
+                    }
+                    catch
+                    {
+                        r.Available = false;
+                    }
                 }
-                catch
-                {
-                    r.Available = false;
-                }
+
+                context.SaveChanges();
+
+                AvailableRulesets = context.RulesetInfo.Where(r => r.Available).ToList();
             }
-
-            context.SaveChanges();
-
-            AvailableRulesets = context.RulesetInfo.Where(r => r.Available).ToList();
         }
 
         private static void loadRulesetFromFile(string file)
@@ -124,13 +118,5 @@ namespace osu.Game.Rulesets
             {
             }
         }
-
-        private RulesetInfo createRulesetInfo(Ruleset ruleset) => new RulesetInfo
-        {
-            Name = ruleset.Description,
-            ShortName = ruleset.ShortName,
-            InstantiationInfo = ruleset.GetType().AssemblyQualifiedName,
-            ID = ruleset.LegacyID
-        };
     }
 }

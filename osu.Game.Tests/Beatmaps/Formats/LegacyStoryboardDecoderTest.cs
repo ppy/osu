@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.IO;
@@ -18,11 +18,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeStoryboardEvents()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacyStoryboardDecoder();
             using (var resStream = Resource.OpenResource("Himeringo - Yotsuya-san ni Yoroshiku (RLC) [Winber1's Extreme].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var storyboard = decoder.GetStoryboardDecoder().DecodeStoryboard(stream);
+                var storyboard = decoder.Decode(stream);
 
                 Assert.IsTrue(storyboard.HasDrawable);
                 Assert.AreEqual(4, storyboard.Layers.Count());
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(new Vector2(320, 240), sprite.InitialPosition);
                 Assert.IsTrue(sprite.IsDrawable);
                 Assert.AreEqual(Anchor.Centre, sprite.Origin);
-                Assert.AreEqual(Path.Combine("SB", "lyric", "ja-21.png"), sprite.Path);
+                Assert.AreEqual("SB/lyric/ja-21.png", sprite.Path);
 
                 var animation = background.Elements.ElementAt(12) as StoryboardAnimation;
                 Assert.NotNull(animation);
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsTrue(animation.IsDrawable);
                 Assert.AreEqual(AnimationLoopType.LoopForever, animation.LoopType);
                 Assert.AreEqual(Anchor.Centre, animation.Origin);
-                Assert.AreEqual(Path.Combine("SB", "red jitter", "red_0000.jpg"), animation.Path);
+                Assert.AreEqual("SB/red jitter/red_0000.jpg", animation.Path);
                 Assert.AreEqual(78993, animation.StartTime);
             }
         }

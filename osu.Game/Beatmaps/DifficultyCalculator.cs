@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Objects;
@@ -24,9 +24,14 @@ namespace osu.Game.Beatmaps
 
         protected DifficultyCalculator(Beatmap beatmap, Mod[] mods = null)
         {
-            Beatmap = CreateBeatmapConverter(beatmap).Convert(beatmap);
             Mods = mods ?? new Mod[0];
 
+            var converter = CreateBeatmapConverter(beatmap);
+
+            foreach (var mod in Mods.OfType<IApplicableToBeatmapConverter<T>>())
+                mod.ApplyToBeatmapConverter(converter);
+
+            Beatmap = converter.Convert(beatmap);
 
             ApplyMods(Mods);
 
@@ -42,12 +47,12 @@ namespace osu.Game.Beatmaps
             foreach (var mod in Mods.OfType<IApplicableToDifficulty>())
                 mod.ApplyToDifficulty(Beatmap.BeatmapInfo.BaseDifficulty);
 
+            foreach (var h in Beatmap.HitObjects)
+                h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
+
             foreach (var mod in mods.OfType<IApplicableToHitObject<T>>())
                 foreach (var obj in Beatmap.HitObjects)
                     mod.ApplyToHitObject(obj);
-
-            foreach (var h in Beatmap.HitObjects)
-                h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
         }
 
         protected virtual void PreprocessHitObjects()

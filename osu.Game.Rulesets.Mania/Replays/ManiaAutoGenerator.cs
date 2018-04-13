@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
@@ -15,10 +15,31 @@ namespace osu.Game.Rulesets.Mania.Replays
     {
         public const double RELEASE_DELAY = 20;
 
-        public ManiaAutoGenerator(Beatmap<ManiaHitObject> beatmap)
+        public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
+
+        private readonly ManiaAction[] columnActions;
+
+        public ManiaAutoGenerator(ManiaBeatmap beatmap)
             : base(beatmap)
         {
             Replay = new Replay { User = new User { Username = @"Autoplay" } };
+
+            columnActions = new ManiaAction[Beatmap.TotalColumns];
+
+            var normalAction = ManiaAction.Key1;
+            var specialAction = ManiaAction.Special1;
+            int totalCounter = 0;
+            foreach (var stage in Beatmap.Stages)
+            {
+                for (int i = 0; i < stage.Columns; i++)
+                {
+                    if (stage.IsSpecialColumn(i))
+                        columnActions[totalCounter] = specialAction++;
+                    else
+                        columnActions[totalCounter] = normalAction++;
+                    totalCounter++;
+                }
+            }
         }
 
         protected Replay Replay;
@@ -30,18 +51,18 @@ namespace osu.Game.Rulesets.Mania.Replays
 
             var pointGroups = generateActionPoints().GroupBy(a => a.Time).OrderBy(g => g.First().Time);
 
-            int activeColumns = 0;
+            var actions = new List<ManiaAction>();
             foreach (var group in pointGroups)
             {
                 foreach (var point in group)
                 {
                     if (point is HitPoint)
-                        activeColumns |= 1 << point.Column;
+                        actions.Add(columnActions[point.Column]);
                     if (point is ReleasePoint)
-                        activeColumns ^= 1 << point.Column;
+                        actions.Remove(columnActions[point.Column]);
                 }
 
-                Replay.Frames.Add(new ManiaReplayFrame(group.First().Time, activeColumns));
+                Replay.Frames.Add(new ManiaReplayFrame(group.First().Time, actions.ToArray()));
             }
 
             return Replay;

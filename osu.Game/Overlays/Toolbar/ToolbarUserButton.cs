@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Toolbar
                     avatar.User = new User();
                     break;
                 case APIState.Online:
-                    Text = api.Username;
+                    Text = api.LocalUser.Value.Username;
                     avatar.User = api.LocalUser;
                     break;
             }

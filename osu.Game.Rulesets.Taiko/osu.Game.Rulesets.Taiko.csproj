@@ -6,16 +6,10 @@
     <OutputType>Library</OutputType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Company>ppy Pty Ltd</Company>
-    <Version>1.0.0.0</Version>
-    <Copyright>ppy Pty Ltd 2007-2017</Copyright>
-    <AssemblyTitle>osu.Game.Rulesets.Taiko</AssemblyTitle>
     <Description>bash the drum. to the beat.</Description>
-    <Product>osu.Game.Rulesets.Taiko</Product>
   </PropertyGroup>
 
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -16,6 +16,8 @@ namespace osu.Game.Graphics.UserInterface
         private const float padding = 10;
 
         protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value);
+
+        protected override float StripWidth() => base.StripWidth() - (padding + 8);
 
         public BreadcrumbControl()
         {
@@ -42,7 +44,9 @@ namespace osu.Game.Graphics.UserInterface
 
             //don't allow clicking between transitions and don't make the chevron clickable
             public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Alpha == 1f && Text.ReceiveMouseInputAt(screenSpacePos);
-            public override bool HandleInput => State == Visibility.Visible;
+
+            public override bool HandleKeyboardInput => State == Visibility.Visible;
+            public override bool HandleMouseInput => State == Visibility.Visible;
 
             private Visibility state;
 

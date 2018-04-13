@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -12,6 +13,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseBeatmapSetOverlay : OsuTestCase
     {
         private readonly BeatmapSetOverlay overlay;
@@ -50,6 +52,7 @@ namespace osu.Game.Tests.Visual
                         FavouriteCount = 356,
                         Submitted = new DateTime(2016, 2, 10),
                         Ranked = new DateTime(2016, 6, 19),
+                        Status = BeatmapSetOnlineStatus.Ranked,
                         BPM = 236,
                         HasVideo = true,
                         Covers = new BeatmapSetOnlineCovers
@@ -220,6 +223,7 @@ namespace osu.Game.Tests.Visual
                         FavouriteCount = 58,
                         Submitted = new DateTime(2016, 6, 11),
                         Ranked = new DateTime(2016, 7, 12),
+                        Status = BeatmapSetOnlineStatus.Pending,
                         BPM = 160,
                         HasVideo = false,
                         Covers = new BeatmapSetOnlineCovers

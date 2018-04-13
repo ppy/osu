@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             RelativeSizeAxes = Axes.X;
             Height = 1;
 
-            Add(new Box
+            AddInternal(new Box
             {
                 Name = "Bar line",
                 Anchor = Anchor.BottomCentre,
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             if (isMajor)
             {
-                Add(new EquilateralTriangle
+                AddInternal(new EquilateralTriangle
                 {
                     Name = "Left triangle",
                     Anchor = Anchor.BottomLeft,
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Rotation = 90
                 });
 
-                Add(new EquilateralTriangle
+                AddInternal(new EquilateralTriangle
                 {
                     Name = "Right triangle",
                     Anchor = Anchor.BottomRight,

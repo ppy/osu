@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -34,7 +34,19 @@ namespace osu.Game.Overlays.Music
 
         public Action<BeatmapSetInfo> OnSelect;
 
-        public bool IsDraggable => handle.IsHovered;
+        public bool IsDraggable { get; private set; }
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            IsDraggable = handle.IsHovered;
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            IsDraggable = false;
+            return base.OnMouseUp(state, args);
+        }
 
         private bool selected;
         public bool Selected
@@ -148,7 +160,6 @@ namespace osu.Game.Overlays.Music
 
         private class PlaylistItemHandle : SpriteIcon
         {
-
             public PlaylistItemHandle()
             {
                 Anchor = Anchor.TopLeft;

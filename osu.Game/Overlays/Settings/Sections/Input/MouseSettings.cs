@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -32,6 +32,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     LabelText = "Cursor Sensitivity",
                     Bindable = config.GetBindable<double>(FrameworkSetting.CursorSensitivity)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Map absolute input to window",
+                    Bindable = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
                 },
                 new SettingsEnumDropdown<ConfineMouseMode>
                 {
@@ -88,6 +93,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     // this bindable will still act as the "interactive" bindable displayed during a drag.
                     base.Bindable = new BindableDouble(doubleValue.Value)
                     {
+                        Default = doubleValue.Default,
                         MinValue = doubleValue.MinValue,
                         MaxValue = doubleValue.MaxValue
                     };

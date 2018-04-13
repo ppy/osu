@@ -1,8 +1,11 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -27,14 +30,22 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game
 {
-    public class OsuGameBase : Framework.Game, IOnlineComponent
+    /// <summary>
+    /// The most basic <see cref="Game"/> that can be used to host osu! components and systems.
+    /// Unlike <see cref="OsuGame"/>, this class will not load any kind of UI, allowing it to be used
+    /// for provide dependencies to test cases without interfering with them.
+    /// </summary>
+    public class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
         protected OsuConfigManager LocalConfig;
 
         protected BeatmapManager BeatmapManager;
+
+        protected SkinManager SkinManager;
 
         protected RulesetStore RulesetStore;
 
@@ -44,15 +55,15 @@ namespace osu.Game
 
         protected KeyBindingStore KeyBindingStore;
 
-        protected override string MainResourceFile => @"osu.Game.Resources.dll";
+        protected SettingsStore SettingsStore;
 
-        public APIAccess API;
+        protected CursorOverrideContainer CursorOverrideContainer;
+
+        protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
         private Container content;
 
         protected override Container<Drawable> Content => content;
-
-        protected MenuCursor Cursor;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
@@ -93,26 +104,33 @@ namespace osu.Game
 
             dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
 
-            dependencies.Cache(this);
+            dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
 
             runMigrations();
 
-            dependencies.Cache(API = new APIAccess
-            {
-                Username = LocalConfig.Get<string>(OsuSetting.Username),
-                Token = LocalConfig.Get<string>(OsuSetting.Token)
-            });
+            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
+            dependencies.CacheAs<ISkinSource>(SkinManager);
 
-            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory.GetContext));
-            dependencies.Cache(FileStore = new FileStore(contextFactory.GetContext, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory.GetContext, RulesetStore, API, Host));
-            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory.GetContext, Host, BeatmapManager, RulesetStore));
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory.GetContext, RulesetStore));
+            var api = new APIAccess(LocalConfig);
+
+            dependencies.Cache(api);
+            dependencies.CacheAs<IAPIProvider>(api);
+
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
+            dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, api, Audio, Host));
+            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory, Host, BeatmapManager, RulesetStore));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
+            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(new OsuColour());
 
+            fileImporters.Add(BeatmapManager);
+            fileImporters.Add(ScoreStore);
+            fileImporters.Add(SkinManager);
+
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 }, true);
+            dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 });
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
@@ -167,17 +185,17 @@ namespace osu.Game
                 lastBeatmap = b;
             };
 
-            API.Register(this);
-
             FileStore.Cleanup();
+
+            AddInternal(api);
         }
 
         private void runMigrations()
         {
             try
             {
-                using (var context = contextFactory.GetContext())
-                    context.Migrate();
+                using (var db = contextFactory.GetForWrite())
+                    db.Context.Migrate();
             }
             catch (MigrationFailedException e)
             {
@@ -188,44 +206,27 @@ namespace osu.Game
                 contextFactory.ResetDatabase();
                 Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
 
-                using (var context = contextFactory.GetContext())
-                    context.Migrate();
+                using (var db = contextFactory.GetForWrite())
+                    db.Context.Migrate();
             }
         }
 
         private WorkingBeatmap lastBeatmap;
 
-        public void APIStateChanged(APIAccess api, APIState state)
-        {
-            switch (state)
-            {
-                case APIState.Online:
-                    LocalConfig.Set(OsuSetting.Username, LocalConfig.Get<bool>(OsuSetting.SaveUsername) ? API.Username : string.Empty);
-                    break;
-            }
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            GlobalKeyBindingInputManager globalBinding;
+            GlobalActionContainer globalBinding;
 
-            base.Content.Add(new DrawSizePreservingFillContainer
+            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
+            CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
             {
-                Children = new Drawable[]
-                {
-                    Cursor = new MenuCursor(),
-                    globalBinding = new GlobalKeyBindingInputManager(this)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = content = new OsuTooltipContainer(Cursor)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    }
-                }
-            });
+                RelativeSizeAxes = Axes.Both,
+                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both }
+            };
+
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);
@@ -244,22 +245,16 @@ namespace osu.Game
             base.SetHost(host);
         }
 
-        protected override void Update()
+        private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
+
+        public void Import(params string[] paths)
         {
-            base.Update();
-            API.Update();
+            var extension = Path.GetExtension(paths.First());
+
+            foreach (var importer in fileImporters)
+                if (importer.HandledExtensions.Contains(extension)) importer.Import(paths);
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            //refresh token may have changed.
-            if (LocalConfig != null && API != null)
-            {
-                LocalConfig.Set(OsuSetting.Token, LocalConfig.Get<bool>(OsuSetting.SavePassword) ? API.Token : string.Empty);
-                LocalConfig.Save();
-            }
-
-            base.Dispose(isDisposing);
-        }
+        public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
     }
 }

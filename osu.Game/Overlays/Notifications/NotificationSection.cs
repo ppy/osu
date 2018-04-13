@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -25,10 +25,13 @@ namespace osu.Game.Overlays.Notifications
         private FlowContainer<Notification> notifications;
 
         public int DisplayedCount => notifications.Count(n => !n.WasClosed);
-
         public int UnreadCount => notifications.Count(n => !n.WasClosed && !n.Read);
 
-        public void Add(Notification notification) => notifications.Add(notification);
+        public void Add(Notification notification, float position)
+        {
+            notifications.Add(notification);
+            notifications.SetLayoutPosition(notification, position);
+        }
 
         public IEnumerable<Type> AcceptTypes;
 
@@ -168,5 +171,4 @@ namespace osu.Game.Overlays.Notifications
         // the layout portion of this is being tracked as a framework issue (https://github.com/ppy/osu-framework/issues/1297).
         protected override bool RequiresChildrenUpdate => true;
     }
-
 }

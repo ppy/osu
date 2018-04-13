@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
@@ -9,6 +9,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -21,6 +22,7 @@ namespace osu.Game.Overlays.Direct
         public Track Preview { get; private set; }
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
             get { return beatmapSet; }
@@ -38,6 +40,8 @@ namespace osu.Game.Overlays.Direct
         private Color4 hoverColour;
         private readonly SpriteIcon icon;
         private readonly LoadingAnimation loadingAnimation;
+
+        private readonly BindableDouble muteBindable = new BindableDouble();
 
         private const float transition_duration = 500;
 
@@ -83,9 +87,10 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load(OsuColour colour, AudioManager audio)
         {
             hoverColour = colour.Yellow;
+            this.audio = audio;
         }
 
         protected override bool OnClick(InputState state)
@@ -128,21 +133,36 @@ namespace osu.Game.Overlays.Direct
                     return;
                 }
 
-                Preview.Seek(0);
-                Preview.Start();
+                Preview.Restart();
+
+                audio.Track.AddAdjustment(AdjustableProperty.Volume, muteBindable);
             }
             else
             {
+                audio.Track.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+
                 Preview?.Stop();
                 loading = false;
             }
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Playing.Value = false;
+        }
+
         private TrackLoader trackLoader;
+        private AudioManager audio;
 
         private void beginAudioLoad()
         {
-            if (trackLoader != null) return;
+            if (trackLoader != null)
+            {
+                Preview = trackLoader.Preview;
+                Playing.TriggerChange();
+                return;
+            }
 
             loading = true;
 
@@ -164,6 +184,7 @@ namespace osu.Game.Overlays.Direct
             private readonly string preview;
 
             public Track Preview;
+            private TrackManager trackManager;
 
             public TrackLoader(string preview)
             {
@@ -171,13 +192,21 @@ namespace osu.Game.Overlays.Direct
             }
 
             [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
+            private void load(AudioManager audio, FrameworkConfigManager config)
             {
-                if (!string.IsNullOrEmpty(preview))
-                {
-                    Preview = audio.Track.Get(preview);
-                    Preview.Volume.Value = 0.5;
-                }
+                // create a local trackManager to bypass the mute we are applying above.
+                audio.AddItem(trackManager = new TrackManager(new OnlineStore()));
+
+                // add back the user's music volume setting (since we are no longer in the global TrackManager's hierarchy).
+                config.BindWith(FrameworkSetting.VolumeMusic, trackManager.Volume);
+
+                Preview = trackManager.Get(preview);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                trackManager?.Dispose();
             }
         }
     }

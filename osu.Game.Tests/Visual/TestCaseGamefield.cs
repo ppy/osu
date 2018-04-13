@@ -1,10 +1,12 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using NUnit.Framework;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseGamefield : OsuTestCase
     {
         protected override void LoadComplete()
@@ -56,25 +58,25 @@ namespace osu.Game.Tests.Visual
                     Clock = new FramedClock(),
                     Children = new Drawable[]
                     {
-                        new OsuRulesetContainer(new OsuRuleset(new RulesetInfo()), beatmap, false)
+                        new OsuRulesetContainer(new OsuRuleset(), beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft
                         },
-                        new TaikoRulesetContainer(new TaikoRuleset(new RulesetInfo()),beatmap, false)
+                        new TaikoRulesetContainer(new TaikoRuleset(),beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight
                         },
-                        new CatchRulesetContainer(new CatchRuleset(new RulesetInfo()),beatmap, false)
+                        new CatchRulesetContainer(new CatchRuleset(),beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft
                         },
-                        new ManiaRulesetContainer(new ManiaRuleset(new RulesetInfo()),beatmap, false)
+                        new ManiaRulesetContainer(new ManiaRuleset(),beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomRight,

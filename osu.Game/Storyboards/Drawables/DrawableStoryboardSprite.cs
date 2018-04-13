@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -16,6 +16,8 @@ namespace osu.Game.Storyboards.Drawables
 
         public bool FlipH { get; set; }
         public bool FlipV { get; set; }
+
+        public override bool RemoveWhenNotAlive => false;
 
         protected override Vector2 DrawScale
             => new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y);

@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Skinning;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
@@ -19,15 +20,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Blending = BlendingMode.Additive;
             Alpha = 0;
 
-            Children = new Drawable[]
+            Child = new SkinnableDrawable("Play/osu/hitcircle-explode", _ => new TrianglesPiece
             {
-                new TrianglesPiece
-                {
-                    Blending = BlendingMode.Additive,
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.2f,
-                }
-            };
+                Blending = BlendingMode.Additive,
+                RelativeSizeAxes = Axes.Both,
+                Alpha = 0.2f,
+            }, s => s.GetTexture("Play/osu/hitcircle") == null);
         }
     }
 }

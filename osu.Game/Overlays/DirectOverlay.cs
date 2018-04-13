@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -185,15 +185,15 @@ namespace osu.Game.Overlays
 
             resultCountsContainer.Colour = colours.Yellow;
 
-            beatmaps.BeatmapSetAdded += setAdded;
+            beatmaps.ItemAdded += setAdded;
         }
 
-        private void setAdded(BeatmapSetInfo set)
+        private void setAdded(BeatmapSetInfo set) => Schedule(() =>
         {
             // if a new map was imported, we should remove it from search results (download completed etc.)
             panels?.FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID)?.FadeOut(400).Expire();
             BeatmapSets = BeatmapSets?.Where(b => b.OnlineBeatmapSetID != set.OnlineBeatmapSetID);
-        }
+        });
 
         private void updateResultCounts()
         {
@@ -298,7 +298,7 @@ namespace osu.Game.Overlays
                 Task.Run(() =>
                 {
                     var onlineIds = response.Select(r => r.OnlineBeatmapSetID).ToList();
-                    var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID)).Select(r => r.OnlineBeatmapSetID).ToList();
+                    var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID) && !s.DeletePending).Select(r => r.OnlineBeatmapSetID).ToList();
                     var sets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID)).ToList();
 
                     // may not need scheduling; loads async internally.
@@ -313,7 +313,23 @@ namespace osu.Game.Overlays
             api.Queue(getSetsRequest);
         }
 
+        protected override void PopOut()
+        {
+            base.PopOut();
+
+            if (playing != null)
+                playing.PreviewPlaying.Value = false;
+        }
+
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmaps != null)
+                beatmaps.ItemAdded -= setAdded;
+        }
 
         public class ResultCounts
         {

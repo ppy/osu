@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
@@ -110,17 +110,7 @@ namespace osu.Game.Overlays
 
         private int runningDepth;
 
-        private void notificationClosed()
-        {
-            Schedule(() =>
-            {
-                // hide ourselves if all notifications have been dismissed.
-                if (totalCount == 0)
-                    State = Visibility.Hidden;
-            });
-
-            updateCounts();
-        }
+        private void notificationClosed() => updateCounts();
 
         private readonly Scheduler postScheduler = new Scheduler();
 
@@ -129,7 +119,6 @@ namespace osu.Game.Overlays
         public void Post(Notification notification) => postScheduler.Add(() =>
         {
             ++runningDepth;
-            notification.Depth = notification.DisplayOnTop ? runningDepth : -runningDepth;
 
             notification.Closed += notificationClosed;
 
@@ -138,7 +127,11 @@ namespace osu.Game.Overlays
                 hasCompletionTarget.CompletionTarget = Post;
 
             var ourType = notification.GetType();
-            sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
+
+            var section = sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)));
+            section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
+
+            State = Visibility.Visible;
 
             updateCounts();
         });

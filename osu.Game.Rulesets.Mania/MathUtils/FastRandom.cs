@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mania.MathUtils
     /// </summary>
     internal class FastRandom
     {
-        private const double uint_to_real = 1.0 / (uint.MaxValue + 1.0);
+        private const double int_to_real = 1.0 / (int.MaxValue + 1.0);
         private const uint int_mask = 0x7FFFFFFF;
         private const uint y = 842502087;
         private const uint z = 3579807591;
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.MathUtils
         /// Generates a random double value within the range [0, 1).
         /// </summary>
         /// <returns>The random value.</returns>
-        public double NextDouble() => uint_to_real * NextUInt();
+        public double NextDouble() => int_to_real * Next();
 
         private uint bitBuffer;
         private int bitIndex = 32;

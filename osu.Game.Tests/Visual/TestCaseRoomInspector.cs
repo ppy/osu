@@ -1,6 +1,7 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -11,6 +12,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseRoomInspector : OsuTestCase
     {
         private RulesetStore rulesets;
@@ -54,12 +56,12 @@ namespace osu.Game.Tests.Visual
                 {
                     Value = new[]
                     {
-                        new User { Username = @"flyte", Id = 3103765, GlobalRank = 1425 },
-                        new User { Username = @"Cookiezi", Id = 124493, GlobalRank = 5466 },
-                        new User { Username = @"Angelsim", Id = 1777162, GlobalRank = 2873 },
-                        new User { Username = @"Rafis", Id = 2558286, GlobalRank = 4687 },
-                        new User { Username = @"hvick225", Id = 50265, GlobalRank = 3258 },
-                        new User { Username = @"peppy", Id = 2, GlobalRank = 6251 }
+                        new User { Username = @"flyte", Id = 3103765, Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 142 } } },
+                        new User { Username = @"Cookiezi", Id = 124493, Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 546 } } },
+                        new User { Username = @"Angelsim", Id = 1777162, Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 287 } } },
+                        new User { Username = @"Rafis", Id = 2558286, Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 468 } } },
+                        new User { Username = @"hvick225", Id = 50265, Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 325 } } },
+                        new User { Username = @"peppy", Id = 2, Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 625 } } },
                     }
                 }
             };
@@ -80,8 +82,8 @@ namespace osu.Game.Tests.Visual
             AddStep(@"change max participants", () => room.MaxParticipants.Value = null);
             AddStep(@"change participants", () => room.Participants.Value = new[]
             {
-                new User { Username = @"filsdelama", Id = 2831793, GlobalRank = 8542 },
-                new User { Username = @"_index", Id = 652457, GlobalRank = 15024 }
+                new User { Username = @"filsdelama", Id = 2831793, Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 854 } } },
+                new User { Username = @"_index", Id = 652457, Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 150 } } }
             });
 
             AddStep(@"change room", () =>
@@ -121,9 +123,9 @@ namespace osu.Game.Tests.Visual
                     {
                         Value = new[]
                         {
-                            new User { Username = @"Angelsim", Id = 1777162, GlobalRank = 4 },
-                            new User { Username = @"HappyStick", Id = 256802, GlobalRank = 752 },
-                            new User { Username = @"-Konpaku-", Id = 2258797, GlobalRank = 571 }
+                            new User { Username = @"Angelsim", Id = 1777162, Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 4 } } },
+                            new User { Username = @"HappyStick", Id = 256802, Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 752 } } },
+                            new User { Username = @"-Konpaku-", Id = 2258797, Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 571 } } }
                         }
                     }
                 };

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -74,8 +74,8 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            beatmaps.BeatmapSetAdded += list.AddBeatmapSet;
-            beatmaps.BeatmapSetRemoved += list.RemoveBeatmapSet;
+            beatmaps.ItemAdded += handleBeatmapAdded;
+            beatmaps.ItemRemoved += handleBeatmapRemoved;
 
             list.BeatmapSets = beatmaps.GetAllUsableBeatmapSets();
 
@@ -94,6 +94,9 @@ namespace osu.Game.Overlays.Music
             beatmapBacking.ValueChanged += b => list.SelectedSet = b?.BeatmapSetInfo;
             beatmapBacking.TriggerChange();
         }
+
+        private void handleBeatmapAdded(BeatmapSetInfo setInfo) => Schedule(() => list.AddBeatmapSet(setInfo));
+        private void handleBeatmapRemoved(BeatmapSetInfo setInfo) => Schedule(() => list.RemoveBeatmapSet(setInfo));
 
         protected override void PopIn()
         {
@@ -152,6 +155,17 @@ namespace osu.Game.Overlays.Music
             var track = beatmapBacking.Value.Track;
 
             track.Restart();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmaps != null)
+            {
+                beatmaps.ItemAdded -= handleBeatmapAdded;
+                beatmaps.ItemRemoved -= handleBeatmapRemoved;
+            }
         }
     }
 

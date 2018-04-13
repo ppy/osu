@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -9,6 +9,7 @@ using System.Globalization;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -41,9 +42,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
                 else if ((type & ConvertHitObjectType.Slider) > 0)
                 {
+                    var pos = new Vector2(int.Parse(split[0]), int.Parse(split[1]));
+
                     CurveType curveType = CurveType.Catmull;
                     double length = 0;
-                    var points = new List<Vector2> { new Vector2(int.Parse(split[0]), int.Parse(split[1])) };
+                    var points = new List<Vector2> { Vector2.Zero };
 
                     string[] pointsplit = split[5].Split('|');
                     foreach (string t in pointsplit)
@@ -69,13 +72,22 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         }
 
                         string[] temp = t.Split(':');
-                        points.Add(new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)));
+                        points.Add(new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)) - pos);
                     }
+
+                    // osu-stable special-cased colinear perfect curves to a CurveType.Linear
+                    bool isLinear(List<Vector2> p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+                    if (points.Count == 3 && curveType == CurveType.PerfectCurve && isLinear(points))
+                        curveType = CurveType.Linear;
 
                     int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
 
                     if (repeatCount > 9000)
                         throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
+
+                    // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
+                    repeatCount = Math.Max(0, repeatCount - 1);
+
 
                     if (split.Length > 7)
                         length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
@@ -84,8 +96,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         readCustomSampleBanks(split[10], bankInfo);
 
                     // One node for each repeat + the start and end nodes
-                    // Note that the first length of the slider is considered a repeat, but there are no actual repeats happening
-                    int nodes = Math.Max(0, repeatCount - 1) + 2;
+                    int nodes = repeatCount + 2;
 
                     // Populate node sample bank infos with the default hit object sample bank
                     var nodeBankInfos = new List<SampleBankInfo>();
@@ -128,10 +139,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                     // Generate the final per-node samples
                     var nodeSamples = new List<List<SampleInfo>>(nodes);
-                    for (int i = 0; i <= repeatCount; i++)
+                    for (int i = 0; i < nodes; i++)
                         nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                    result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, nodeSamples);
+                    result = CreateSlider(pos, combo, points, length, curveType, repeatCount, nodeSamples);
                 }
                 else if ((type & ConvertHitObjectType.Spinner) > 0)
                 {
@@ -177,8 +188,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             string[] split = str.Split(':');
 
-            var bank = (LegacyDecoder.LegacySampleBank)Convert.ToInt32(split[0]);
-            var addbank = (LegacyDecoder.LegacySampleBank)Convert.ToInt32(split[1]);
+            var bank = (LegacyBeatmapDecoder.LegacySampleBank)Convert.ToInt32(split[0]);
+            var addbank = (LegacyBeatmapDecoder.LegacySampleBank)Convert.ToInt32(split[1]);
 
             // Let's not implement this for now, because this doesn't fit nicely into the bank structure
             //string sampleFile = split2.Length > 4 ? split2[4] : string.Empty;

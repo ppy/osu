@@ -1,8 +1,9 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,6 +13,7 @@ using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseEditorComposeTimeline : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ScrollableTimeline), typeof(ScrollingTimelineContainer), typeof(BeatmapWaveformGraph), typeof(TimelineButton) };

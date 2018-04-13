@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -988,7 +988,7 @@ namespace osu.Game.Graphics
         fa_osu_expert_mania = 0xe028,
 
         // mod icons
-        fa_osu_mod_perfect = 0xe02d,
+        fa_osu_mod_perfect = 0xe049,
         fa_osu_mod_autopilot = 0xe03a,
         fa_osu_mod_auto = 0xe03b,
         fa_osu_mod_cinema = 0xe03c,

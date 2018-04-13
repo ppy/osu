@@ -5,16 +5,10 @@
   <PropertyGroup Label="Project">
     <OutputType>Library</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Company>ppy Pty Ltd</Company>
-    <Version>1.0.0.0</Version>
-    <Copyright>ppy Pty Ltd 2007-2017</Copyright>
-    <AssemblyTitle>osu.Game.Rulesets.Osu</AssemblyTitle>
     <Description>click the circles. to the beat.</Description>
-    <Product>osu.Game.Rulesets.Osu</Product>
   </PropertyGroup>
 
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
 

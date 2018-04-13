@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.MathUtils;
@@ -19,6 +20,7 @@ using osu.Game.Tests.Platform;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCasePlaySongSelect : OsuTestCase
     {
         private BeatmapManager manager;
@@ -63,12 +65,10 @@ namespace osu.Game.Tests.Visual
             var storage = new TestStorage(@"TestCasePlaySongSelect");
 
             // this is by no means clean. should be replacing inside of OsuGameBase somehow.
-            var context = new OsuDbContext();
+            IDatabaseContextFactory factory = new SingletonContextFactory(new OsuDbContext());
 
-            Func<OsuDbContext> contextFactory = () => context;
-
-            dependencies.Cache(rulesets = new RulesetStore(contextFactory));
-            dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null)
+            dependencies.Cache(rulesets = new RulesetStore(factory));
+            dependencies.Cache(manager = new BeatmapManager(storage, factory, rulesets, null, null)
             {
                 DefaultBeatmap = defaultBeatmap = game.Beatmap.Default
             });
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual
             {
                 if (deleteMaps)
                 {
-                    manager.DeleteAll();
+                    manager.Delete(manager.GetAllUsableBeatmapSets());
                     game.Beatmap.SetDefault();
                 }
 

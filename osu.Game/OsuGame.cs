@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -9,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Framework.Logging;
-using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
@@ -18,6 +18,8 @@ using OpenTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Audio;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -27,10 +29,17 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Skinning;
 using OpenTK.Graphics;
+using osu.Game.Overlays.Volume;
 
 namespace osu.Game
 {
+    /// <summary>
+    /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
+    /// for initial components that are generally retrieved via DI.
+    /// </summary>
     public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     {
         public Toolbar Toolbar;
@@ -70,14 +79,20 @@ namespace osu.Game
 
         private OsuScreen screenStack;
 
-        private VolumeControl volume;
+        private VolumeOverlay volume;
+        private OnScreenDisplay onscreenDisplay;
 
         private Bindable<int> configRuleset;
         public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
+        private Bindable<int> configSkin;
+
         private readonly string[] args;
 
         private SettingsOverlay settings;
+
+        // todo: move this to SongSelect once Screen has the ability to unsuspend.
+        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
 
         public OsuGame(string[] args = null)
         {
@@ -98,6 +113,8 @@ namespace osu.Game
         {
             this.frameworkConfig = frameworkConfig;
 
+            ScoreStore.ScoreImported += score => Schedule(() => LoadScore(score));
+
             if (!Host.IsPrimaryInstance)
             {
                 Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
@@ -107,17 +124,45 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                Task.Run(() => BeatmapManager.Import(paths.ToArray()));
+
+                Task.Run(() => Import(paths.ToArray()));
             }
 
-            dependencies.Cache(this);
+            dependencies.CacheAs(this);
 
+            // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
+
+            // bind config int to database SkinInfo
+            configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
+            SkinManager.CurrentSkinInfo.ValueChanged += s => configSkin.Value = s.ID;
+            configSkin.ValueChanged += id => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == id) ?? SkinInfo.Default;
+            configSkin.TriggerChange();
+
+            LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
         }
 
         private ScheduledDelegate scoreLoad;
+
+        /// <summary>
+        /// Open chat to a channel matching the provided name, if present.
+        /// </summary>
+        /// <param name="channelName">The name of the channel.</param>
+        public void OpenChannel(string channelName) => chat.OpenChannel(chat.AvailableChannels.Find(c => c.Name == channelName));
+
+        /// <summary>
+        /// Show a beatmap set as an overlay.
+        /// </summary>
+        /// <param name="setId">The set to display.</param>
+        public void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
+
+        /// <summary>
+        /// Show a user's profile as an overlay.
+        /// </summary>
+        /// <param name="userId">The user to display.</param>
+        public void ShowUser(long userId) => userProfile.ShowUser(userId);
 
         protected void LoadScore(Score s)
         {
@@ -157,8 +202,15 @@ namespace osu.Game
         {
             base.LoadComplete();
 
+            // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
+            // in the cursor being shown for a few frames during the intro.
+            // This prevents the cursor from showing until we have a screen with CursorVisible = true
+            CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
+
             // hook up notifications to components.
+            SkinManager.PostNotification = n => notifications?.Post(n);
             BeatmapManager.PostNotification = n => notifications?.Post(n);
+
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
 
             AddRange(new Drawable[]
@@ -189,8 +241,9 @@ namespace osu.Game
                 },
             }, overlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeControl(), Add);
-            loadComponentSingleFile(new OnScreenDisplay(), Add);
+            loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
+            loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
+            loadComponentSingleFile(new ScreenshotManager(), Add);
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
@@ -227,6 +280,7 @@ namespace osu.Game
             forwardLoggedErrorsToNotifications();
 
             dependencies.Cache(settings);
+            dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
             dependencies.Cache(direct);
             dependencies.Cache(chat);
@@ -245,6 +299,21 @@ namespace osu.Game
                     if (state == Visibility.Hidden) return;
 
                     foreach (var c in singleDisplayOverlays)
+                    {
+                        if (c == overlay) continue;
+                        c.State = Visibility.Hidden;
+                    }
+                };
+            }
+
+            var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
+            foreach (var overlay in singleDisplaySideOverlays)
+            {
+                overlay.StateChanged += state =>
+                {
+                    if (state == Visibility.Hidden) return;
+
+                    foreach (var c in singleDisplaySideOverlays)
                     {
                         if (c == overlay) continue;
                         c.State = Visibility.Hidden;
@@ -297,8 +366,6 @@ namespace osu.Game
                 else
                     Toolbar.State = Visibility.Visible;
             };
-
-            Cursor.State = Visibility.Hidden;
         }
 
         private void forwardLoggedErrorsToNotifications()
@@ -373,6 +440,7 @@ namespace osu.Game
                     sensitivity.Disabled = true;
 
                     frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
+                    frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
                 case GlobalAction.ToggleToolbar:
                     Toolbar.ToggleVisibility();
@@ -386,6 +454,20 @@ namespace osu.Game
             }
 
             return false;
+        }
+
+        private readonly BindableDouble inactiveVolumeAdjust = new BindableDouble();
+
+        protected override void OnDeactivated()
+        {
+            base.OnDeactivated();
+            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+        }
+
+        protected override void OnActivated()
+        {
+            base.OnActivated();
+            Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
         }
 
         public bool OnReleased(GlobalAction action) => false;
@@ -447,7 +529,7 @@ namespace osu.Game
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
-            Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
+            CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
         private void screenAdded(Screen newScreen)

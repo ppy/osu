@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -30,6 +30,9 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty(@"video")]
         private bool hasVideo { get; set; }
 
+        [JsonProperty(@"status")]
+        private BeatmapSetOnlineStatus status { get; set; }
+
         [JsonProperty(@"submitted_date")]
         private DateTimeOffset submitted { get; set; }
 
@@ -60,6 +63,7 @@ namespace osu.Game.Online.API.Requests
                     PlayCount = playCount,
                     FavouriteCount = favouriteCount,
                     BPM = bpm,
+                    Status = status,
                     HasVideo = hasVideo,
                     Submitted = submitted,
                     Ranked = ranked,

@@ -1,12 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -20,10 +17,12 @@ using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.Music;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Music;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -65,14 +64,20 @@ namespace osu.Game.Overlays
             AlwaysPresent = true;
         }
 
+        private Vector2 dragStart;
+
+        protected override bool OnDragStart(InputState state)
+        {
+            base.OnDragStart(state);
+            dragStart = state.Mouse.Position;
+            return true;
+        }
+
         protected override bool OnDrag(InputState state)
         {
             if (base.OnDrag(state)) return true;
 
-            Trace.Assert(state.Mouse.PositionMouseDown != null, "state.Mouse.PositionMouseDown != null");
-
-            // ReSharper disable once PossibleInvalidOperationException
-            Vector2 change = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
+            Vector2 change = state.Mouse.Position - dragStart;
 
             // Diminish the drag distance as we go further to simulate "rubber band" feeling.
             change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;

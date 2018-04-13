@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
@@ -29,6 +29,9 @@ namespace osu.Game.Graphics.UserInterface
                     GetContainingInputManager().ChangeFocus(null);
             }
         }
+
+        // We may not be focused yet, but we need to handle keyboard input to be able to request focus
+        public override bool HandleKeyboardInput => HoldFocus || base.HandleKeyboardInput;
 
         protected override void OnFocus(InputState state)
         {

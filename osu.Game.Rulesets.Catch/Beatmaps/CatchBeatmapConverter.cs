@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
-    internal class CatchBeatmapConverter : BeatmapConverter<CatchHitObject>
+    public class CatchBeatmapConverter : BeatmapConverter<CatchHitObject>
     {
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             var curveData = obj as IHasCurve;
             var positionData = obj as IHasXPosition;
             var comboData = obj as IHasCombo;
+            var endTime = obj as IHasEndTime;
 
             if (positionData == null)
                 yield break;
@@ -36,6 +37,19 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     RepeatSamples = curveData.RepeatSamples,
                     RepeatCount = curveData.RepeatCount,
                     X = positionData.X / CatchPlayfield.BASE_WIDTH,
+                    NewCombo = comboData?.NewCombo ?? false
+                };
+
+                yield break;
+            }
+
+            if (endTime != null)
+            {
+                yield return new BananaShower
+                {
+                    StartTime = obj.StartTime,
+                    Samples = obj.Samples,
+                    Duration = endTime.Duration,
                     NewCombo = comboData?.NewCombo ?? false
                 };
 

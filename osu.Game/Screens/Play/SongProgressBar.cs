@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play
         {
             var xFill = value * UsableWidth;
             fill.Width = xFill;
-            handleBase.MoveToX(xFill);
+            handleBase.X = xFill;
         }
 
         protected override void OnUserChange() => OnSeek?.Invoke(Current);

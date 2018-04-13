@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
@@ -10,6 +10,8 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.Taiko.Replays;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -101,9 +103,11 @@ namespace osu.Game.Rulesets.Taiko
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new TaikoDifficultyCalculator(beatmap);
 
-        public override int LegacyID => 1;
+        public override int? LegacyID => 1;
 
-        public TaikoRuleset(RulesetInfo rulesetInfo)
+        public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
+
+        public TaikoRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
         {
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -25,16 +25,21 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// </summary>
         protected readonly FastRandom Random;
 
-        protected PatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern)
-            : base(hitObject, beatmap, availableColumns, previousPattern)
+        /// <summary>
+        /// The beatmap which <see cref="HitObject"/> is being converted from.
+        /// </summary>
+        protected readonly Beatmap OriginalBeatmap;
+
+        protected PatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, Beatmap originalBeatmap)
+            : base(hitObject, beatmap, previousPattern)
         {
             if (random == null) throw new ArgumentNullException(nameof(random));
-            if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
-            if (availableColumns <= 0) throw new ArgumentOutOfRangeException(nameof(availableColumns));
-            if (previousPattern == null) throw new ArgumentNullException(nameof(previousPattern));
+            if (originalBeatmap == null) throw new ArgumentNullException(nameof(originalBeatmap));
 
             Random = random;
-            RandomStart = AvailableColumns == 8 ? 1 : 0;
+            OriginalBeatmap = originalBeatmap;
+
+            RandomStart = TotalColumns == 8 ? 1 : 0;
         }
 
         /// <summary>
@@ -45,14 +50,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <returns>The column.</returns>
         protected int GetColumn(float position, bool allowSpecial = false)
         {
-            if (allowSpecial && AvailableColumns == 8)
+            if (allowSpecial && TotalColumns == 8)
             {
                 const float local_x_divisor = 512f / 7;
                 return MathHelper.Clamp((int)Math.Floor(position / local_x_divisor), 0, 6) + 1;
             }
 
-            float localXDivisor = 512f / AvailableColumns;
-            return MathHelper.Clamp((int)Math.Floor(position / localXDivisor), 0, AvailableColumns - 1);
+            float localXDivisor = 512f / TotalColumns;
+            return MathHelper.Clamp((int)Math.Floor(position / localXDivisor), 0, TotalColumns - 1);
         }
 
         /// <summary>
@@ -95,17 +100,20 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 if (conversionDifficulty != null)
                     return conversionDifficulty.Value;
 
-                HitObject lastObject = Beatmap.HitObjects.LastOrDefault();
-                HitObject firstObject = Beatmap.HitObjects.FirstOrDefault();
+                HitObject lastObject = OriginalBeatmap.HitObjects.LastOrDefault();
+                HitObject firstObject = OriginalBeatmap.HitObjects.FirstOrDefault();
 
                 double drainTime = (lastObject?.StartTime ?? 0) - (firstObject?.StartTime ?? 0);
-                drainTime -= Beatmap.TotalBreakTime;
+                drainTime -= OriginalBeatmap.TotalBreakTime;
 
                 if (drainTime == 0)
-                    drainTime = 10000;
+                    drainTime = 10000000;
 
-                BeatmapDifficulty difficulty = Beatmap.BeatmapInfo.BaseDifficulty;
-                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + Beatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
+                // We need this in seconds
+                drainTime /= 1000;
+
+                BeatmapDifficulty difficulty = OriginalBeatmap.BeatmapInfo.BaseDifficulty;
+                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + OriginalBeatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
                 conversionDifficulty = Math.Min(conversionDifficulty.Value, 12);
 
                 return conversionDifficulty.Value;

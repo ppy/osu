@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Spinner = s;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 circleContainer = new Container
                 {
@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             Disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
             if (!spmCounter.IsPresent && Disc.Tracking)
-                spmCounter.FadeIn(FadeInDuration);
+                spmCounter.FadeIn(HitObject.TimeFadein);
 
             base.Update();
         }
@@ -191,14 +191,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdatePreemptState();
 
             circleContainer.ScaleTo(Spinner.Scale * 0.3f);
-            circleContainer.ScaleTo(Spinner.Scale, TIME_PREEMPT / 1.4f, Easing.OutQuint);
+            circleContainer.ScaleTo(Spinner.Scale, HitObject.TimePreempt / 1.4f, Easing.OutQuint);
 
             Disc.RotateTo(-720);
             symbol.RotateTo(-720);
 
             mainContainer
                 .ScaleTo(0)
-                .ScaleTo(Spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, Easing.OutQuint)
+                .ScaleTo(Spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, HitObject.TimePreempt - 150, Easing.OutQuint)
                 .Then()
                 .ScaleTo(1, 500, Easing.OutQuint);
         }

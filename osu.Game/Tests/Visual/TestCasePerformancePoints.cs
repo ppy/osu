@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual
             private void load(BeatmapManager beatmaps)
             {
                 var sets = beatmaps.GetAllUsableBeatmapSets();
-                var allBeatmaps = sets.SelectMany(s => s.Beatmaps).Where(b => ruleset.LegacyID < 0 || b.RulesetID == ruleset.LegacyID);
+                var allBeatmaps = sets.SelectMany(s => s.Beatmaps).Where(b => ruleset.LegacyID == null || b.RulesetID == ruleset.LegacyID);
 
                 allBeatmaps.ForEach(b => beatmapDisplays.Add(new BeatmapDisplay(b)));
             }
@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = "Please login to see online scores",
+                        Text = "Please sign in to see online scores",
                     };
                 }
 
