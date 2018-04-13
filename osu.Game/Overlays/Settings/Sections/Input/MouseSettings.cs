@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override string Header => "Mouse";
 
         private readonly BindableBool rawInputToggle = new BindableBool();
-        private Bindable<string> activeInputHandlers;
+        private Bindable<string> ignoredInputHandler;
         private SensitivitySetting sensitivity;
 
         [BackgroundDependencyLoader]
@@ -61,20 +61,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 const string raw_mouse_handler = @"OpenTKRawMouseHandler";
                 const string standard_mouse_handler = @"OpenTKMouseHandler";
 
-                activeInputHandlers.Value = enabled ?
-                    activeInputHandlers.Value.Replace(standard_mouse_handler, raw_mouse_handler) :
-                    activeInputHandlers.Value.Replace(raw_mouse_handler, standard_mouse_handler);
+                ignoredInputHandler.Value = enabled ? standard_mouse_handler : raw_mouse_handler;
             };
 
-            activeInputHandlers = config.GetBindable<string>(FrameworkSetting.ActiveInputHandlers);
-            activeInputHandlers.ValueChanged += handlers =>
+            ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
+            ignoredInputHandler.ValueChanged += handler =>
             {
-                bool raw = handlers.Contains("Raw");
+                bool raw = !handler.Contains("Raw");
                 rawInputToggle.Value = raw;
                 sensitivity.Bindable.Disabled = !raw;
             };
 
-            activeInputHandlers.TriggerChange();
+            ignoredInputHandler.TriggerChange();
         }
 
         private class SensitivitySetting : SettingsSlider<double, SensitivitySlider>
