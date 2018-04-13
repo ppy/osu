@@ -21,16 +21,22 @@ namespace osu.Game.Graphics.Cursor
         /// Whether any cursors can be displayed.
         /// </summary>
         public bool CanShowCursor = true;
-        public bool ShowMenuCursor = true;
 
-        public CursorContainer Cursor { get; }
+        public bool ShowMenuCursor
+        {
+            get => cursor.ShowCursor;
+            set => cursor.ShowCursor = value;
+        }
+
+        private readonly MenuCursor cursor;
+        public CursorContainer Cursor => cursor;
         public bool ProvidingUserCursor => true;
 
         public CursorOverrideContainer()
         {
             AddRangeInternal(new Drawable[]
             {
-                Cursor = new MenuCursor { State = Visibility.Hidden },
+                cursor = new MenuCursor { State = Visibility.Hidden },
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
         }
@@ -52,14 +58,6 @@ namespace osu.Game.Graphics.Cursor
             {
                 currentTarget?.Cursor?.Hide();
                 return;
-            }
-
-            if (currentTarget?.Cursor is MenuCursor)
-            {
-                if (ShowMenuCursor && currentTarget?.Cursor.State == Visibility.Hidden)
-                    currentTarget?.Cursor?.Show();
-                else if (!ShowMenuCursor && currentTarget?.Cursor.State == Visibility.Visible)
-                    currentTarget?.Cursor?.Hide();
             }
 
             var newTarget = inputManager.HoveredDrawables.OfType<IProvideCursor>().FirstOrDefault(t => t.ProvidingUserCursor) ?? this;
