@@ -42,7 +42,6 @@ namespace osu.Game.Tests.Visual
 
 
         private readonly Stack<BeatmapSetInfo> selectedSets = new Stack<BeatmapSetInfo>();
-        private readonly HashSet<int> eagerSelectedIDs = new HashSet<int>();
 
         private BeatmapInfo currentSelection;
 
@@ -81,7 +80,6 @@ namespace osu.Game.Tests.Visual
             testEmptyTraversal();
             testHiding();
             testSelectingFilteredRuleset();
-            testCarouselRootIsRandom();
         }
 
         private void ensureRandomFetchSuccess() =>
@@ -151,17 +149,6 @@ namespace osu.Game.Tests.Visual
         {
             nextRandom();
             AddAssert("Selection is visible", selectedBeatmapVisible);
-        }
-
-        private void checkNonmatchingFilter()
-        {
-            AddStep("Toggle non-matching filter", () =>
-            {
-                carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
-                carousel.Filter(new FilterCriteria(), false);
-                eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
-            }
-            );
         }
 
         /// <summary>
@@ -414,23 +401,6 @@ namespace osu.Game.Tests.Visual
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testSingle.Beatmaps[0], false));
             checkNoSelection();
             AddStep("remove single ruleset set", () => carousel.RemoveBeatmapSet(testSingle));
-        }
-
-        private void testCarouselRootIsRandom()
-        {
-            List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
-
-            for (int i = 1; i <= 50; i++)
-                beatmapSets.Add(createTestBeatmapSet(i));
-
-            AddStep("Load 50 Beatmaps", () => { carousel.BeatmapSets = beatmapSets; });
-            advanceSelection(direction: 1, diff: false);
-            checkNonmatchingFilter();
-            checkNonmatchingFilter();
-            checkNonmatchingFilter();
-            checkNonmatchingFilter();
-            checkNonmatchingFilter();
-            AddAssert("Selection was random", () => eagerSelectedIDs.Count > 1);
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int id)

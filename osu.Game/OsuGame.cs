@@ -439,7 +439,7 @@ namespace osu.Game
                     sensitivity.Value = 1;
                     sensitivity.Disabled = true;
 
-                    frameworkConfig.Set(FrameworkSetting.IgnoredInputHandlers, string.Empty);
+                    frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
                 case GlobalAction.ToggleToolbar:
