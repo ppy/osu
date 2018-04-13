@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Beatmaps
 {
@@ -52,6 +53,8 @@ namespace osu.Game.Beatmaps
             private class DummyRuleset : Ruleset
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
+
+                public override IEnumerable<Mod> GetLegacyModsFor(LegacyMods mods) => new Mod[] { };
 
                 public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset)
                 {
