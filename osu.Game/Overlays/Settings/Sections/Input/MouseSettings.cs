@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 ignoredInputHandler.Value = enabled ? standard_mouse_handler : raw_mouse_handler;
             };
 
-            ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandler);
+            ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
             ignoredInputHandler.ValueChanged += handler =>
             {
                 bool raw = !handler.Contains("Raw");
