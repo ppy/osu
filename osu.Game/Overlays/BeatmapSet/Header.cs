@@ -246,11 +246,11 @@ namespace osu.Game.Overlays.BeatmapSet
             if (beatmaps != null) beatmaps.ItemAdded -= handleBeatmapAdd;
         }
 
-        private void handleBeatmapAdd(BeatmapSetInfo beatmap)
+        private void handleBeatmapAdd(BeatmapSetInfo beatmap) => Schedule(() =>
         {
             if (beatmap.OnlineBeatmapSetID == BeatmapSet?.OnlineBeatmapSetID)
                 downloadButtonsContainer.FadeOut(transition_duration);
-        }
+        });
 
         private void download(bool noVideo)
         {
