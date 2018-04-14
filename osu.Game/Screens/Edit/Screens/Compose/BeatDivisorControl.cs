@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     RelativeSizeAxes = Axes.Both,
                     Content = new[]
                     {
-                        new Drawable[]
+                        new Drawable[] // Row containing tick slider bar
                         {
                             new Container
                             {
@@ -62,14 +62,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = Color4.Black
                                     },
-                                    new TickSliderBar(beatDivisor, BindableBeatDivisor.VALID_DIVISORS)
+                                    new TickSliderBar(beatDivisor)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                     }
                                 }
                             }
                         },
-                        new Drawable[]
+                        new Drawable[] // Row containing left/right buttons and beat snap divisor
                         {
                             new Container
                             {
@@ -95,13 +95,13 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.fa_chevron_left,
-                                                        Action = beatDivisor.Previous
+                                                        Action = beatDivisor.PreviousDivisor
                                                     },
                                                     new DivisorText(beatDivisor),
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.fa_chevron_right,
-                                                        Action = beatDivisor.Next
+                                                        Action = beatDivisor.NextDivisor
                                                     }
                                                 },
                                             },
@@ -116,26 +116,143 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                 }
                             }
                         },
-                        new Drawable[]
+                        new Drawable[] // Row containing only the beat snap divisor text
                         {
-                            new TextFlowContainer(s => s.TextSize = 14)
+                            new Container
                             {
-                                Padding = new MarginPadding { Horizontal = 15 },
-                                Text = "beat snap divisor",
-                                RelativeSizeAxes = Axes.X,
-                                TextAnchor = Anchor.TopCentre
-                            },
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Horizontal = 5 },
+                                Children = new Drawable[]
+                                {
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding { Horizontal = 5 },
+                                        Child = new GridContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Content = new[]
+                                            {
+                                                new Drawable[]
+                                                {
+                                                    //new DivisorButton
+                                                    //{
+                                                    //    Icon = FontAwesome.fa_chevron_left,
+                                                    //    Action = beatDivisor.PreviousPanel,
+                                                    //    //Anchor = Anchor.BottomRight
+                                                    //},
+                                                    new TextFlowContainer(s => s.TextSize = 11)
+                                                    {
+                                                        Padding = new MarginPadding { Horizontal = 0 },
+                                                        Text = "beat snap divisor",
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        TextAnchor = Anchor.TopCentre
+                                                    },
+                                                    //new DivisorButton
+                                                    //{
+                                                    //    Icon = FontAwesome.fa_chevron_right,
+                                                    //    Action = beatDivisor.NextPanel,
+                                                    //    //Anchor = Anchor.BottomRight
+                                                    //},
+                                                },
+                                            },
+                                            ColumnDimensions = new[]
+                                            {
+                                                //new Dimension(GridSizeMode.Absolute, 60),
+                                                new Dimension(),
+                                                //new Dimension(GridSizeMode.Absolute, 20)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        new Drawable[] // Row containing text and button for swapping between snap divisor panels
+                        {
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Horizontal = 5 },
+                                Children = new Drawable[]
+                                {
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding { Horizontal = 5 },
+                                        Child = new GridContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Content = new[]
+                                            {
+                                                new Drawable[]
+                                                {
+                                                    new DivisorButton
+                                                    {
+                                                        Icon = FontAwesome.fa_chevron_left,
+                                                        Action = beatDivisor.PreviousPanel,
+                                                        //Anchor = Anchor.BottomRight
+                                                    },
+                                                    new DivisorPanelText(beatDivisor), // This does not update
+                                                    new DivisorButton
+                                                    {
+                                                        Icon = FontAwesome.fa_chevron_right,
+                                                        Action = beatDivisor.NextPanel,
+                                                        //Anchor = Anchor.BottomRight
+                                                    }
+                                                },
+                                            },
+                                            ColumnDimensions = new[]
+                                            {
+                                                new Dimension(),
+                                                new Dimension(GridSizeMode.Absolute, 50),
+                                                new Dimension()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     },
                     RowDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.Absolute, 30),
+                        new Dimension(GridSizeMode.Absolute, 25),
+                        new Dimension(GridSizeMode.Absolute, 25),
+                        new Dimension(GridSizeMode.Absolute, 11),
                         new Dimension(GridSizeMode.Absolute, 25),
                     }
                 }
             };
         }
 
+        private class DivisorPanelText : SpriteText
+        {
+            private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
+
+            public DivisorPanelText(BindableBeatDivisor beatDivisor)
+            {
+                this.beatDivisor.BindTo(beatDivisor);
+
+                TextSize = 12;
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Colour = colours.BlueLighter;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                beatDivisor.ValidDivisorsChanged += updateText;
+                updateText();
+            }
+
+            private void updateText() => Text = $"{beatDivisor.Panel}"; // Someone tell me why this does not get triggered when changing the divisors
+        }
         private class DivisorText : SpriteText
         {
             private readonly Bindable<int> beatDivisor = new Bindable<int>();
@@ -193,12 +310,12 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             private Marker marker;
 
             private readonly BindableBeatDivisor beatDivisor;
-            private readonly int[] availableDivisors;
+            // Removed local property, using object reference for the available divisors property
 
-            public TickSliderBar(BindableBeatDivisor beatDivisor, params int[] divisors)
+            public TickSliderBar(BindableBeatDivisor beatDivisor)
             {
                 CurrentNumber.BindTo(this.beatDivisor = beatDivisor);
-                availableDivisors = divisors;
+                //availableDivisors = beatDivisor.ValidDivisors;
 
                 Padding = new MarginPadding { Horizontal = 5 };
             }
@@ -206,7 +323,38 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             [BackgroundDependencyLoader]
             private void load()
             {
-                foreach (var t in availableDivisors)
+                //foreach (var t in availableDivisors)
+                //{
+                //    AddInternal(new Tick(t)
+                //    {
+                //        Anchor = Anchor.TopLeft,
+                //        Origin = Anchor.TopCentre,
+                //        RelativePositionAxes = Axes.X,
+                //        X = getMappedPosition(t)
+                //    });
+                //}
+
+                //AddInternal(marker = new Marker());
+
+                //CurrentNumber.ValueChanged += v =>
+                //{
+                //    marker.MoveToX(getMappedPosition(v), 100, Easing.OutQuint);
+                //    marker.Flash();
+                //};
+            }
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                beatDivisor.ValidDivisorsChanged += updateDivisors;
+                updateDivisors();
+            }
+
+            private void updateDivisors()
+            {
+                for (int i = this.Children.Count - 1; i >= 0; i--)
+                    RemoveInternal(this.Children[i]); // Remove all ticks to change the panel
+                foreach (var t in beatDivisor.ValidDivisors)
                 {
                     AddInternal(new Tick(t)
                     {
@@ -216,9 +364,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                         X = getMappedPosition(t)
                     });
                 }
-
                 AddInternal(marker = new Marker());
-
                 CurrentNumber.ValueChanged += v =>
                 {
                     marker.MoveToX(getMappedPosition(v), 100, Easing.OutQuint);
@@ -237,11 +383,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 switch (args.Key)
                 {
                     case Key.Right:
-                        beatDivisor.Next();
+                        beatDivisor.NextDivisor();
                         OnUserChange();
                         return true;
                     case Key.Left:
-                        beatDivisor.Previous();
+                        beatDivisor.PreviousDivisor();
                         OnUserChange();
                         return true;
                     default:
@@ -278,11 +424,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 // copied from SliderBar so we can do custom spacing logic.
                 var xPosition = (ToLocalSpace(state?.Mouse.NativeState.Position ?? Vector2.Zero).X - RangePadding) / UsableWidth;
 
-                CurrentNumber.Value = availableDivisors.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
+                CurrentNumber.Value = beatDivisor.ValidDivisors.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
                 OnUserChange();
             }
 
-            private float getMappedPosition(float divisor) => (float)Math.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
+            private float getMappedPosition(float divisor) => (float)Math.Pow((divisor - 1) / (beatDivisor.ValidDivisors.Last() - 1), 0.90f);
 
             private class Tick : CompositeDrawable
             {
@@ -317,12 +463,26 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                             return colours.BlueDarker;
                         case 16:
                             return colours.PurpleDark;
+                        case 32:
+                            return colours.Purple;
                         case 3:
                             return colours.YellowLight;
                         case 6:
                             return colours.Yellow;
+                        case 9:
+                            return colours.YellowDark;
                         case 12:
                             return colours.YellowDarker;
+                        case 18:
+                            return colours.RedDarker;
+                        case 24:
+                            return colours.RedDark;
+                        case 5:
+                            return colours.GrayD;
+                        case 7:
+                            return colours.GrayB;
+                        case 11:
+                            return colours.Gray8;
                         default:
                             return Color4.White;
                     }
