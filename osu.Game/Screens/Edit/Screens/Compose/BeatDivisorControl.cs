@@ -352,8 +352,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 
             private void updateDivisors()
             {
-                for (int i = this.Children.Count - 1; i >= 0; i--)
-                    RemoveInternal(this.Children[i]); // Remove all ticks to change the panel
+                for (int i = Children.Count - 1; i >= 0; i--)
+                    RemoveInternal(Children[i]); // Remove all ticks to change the panel
                 foreach (var t in beatDivisor.ValidDivisors)
                 {
                     AddInternal(new Tick(t)
