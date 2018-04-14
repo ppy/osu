@@ -9,12 +9,11 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetMessagesRequest : APIRequest<List<Message>>
+    public class GetMessagesRequest : APIMessagesRequest
     {
         private readonly IEnumerable<Channel> channels;
-        private long? since;
 
-        public GetMessagesRequest(IEnumerable<Channel> channels, long? sinceId)
+        public GetMessagesRequest(IEnumerable<Channel> channels, long? sinceId) : base(sinceId)
         {
             if (channels == null)
                 throw new ArgumentNullException(nameof(channels));
@@ -22,7 +21,6 @@ namespace osu.Game.Online.API.Requests
                 throw new ArgumentException("All channels in the argument channels must have the targettype Channel");
 
             this.channels = channels;
-            since = sinceId;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -31,7 +29,6 @@ namespace osu.Game.Online.API.Requests
 
             var req = base.CreateWebRequest();
             req.AddParameter(@"channels", channelString);
-            if (since.HasValue) req.AddParameter(@"since", since.Value.ToString());
 
             return req;
         }

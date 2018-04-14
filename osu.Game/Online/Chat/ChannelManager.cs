@@ -152,25 +152,46 @@ namespace osu.Game.Online.Chat
         private void fetchNewMessages()
         {
             if (fetchMsgReq == null)
-                fetchNewChannelMessages();
+                fetchMessages(
+                    () => new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastChannelMsgId),
+                    messages =>
+                    {
+                        if (messages == null)
+                            return;
+                        handleChannelMessages(messages);
+                        lastChannelMsgId = messages.LastOrDefault()?.Id ?? lastChannelMsgId;
+                        fetchMsgReq = null;
+                    }
+                );
+
 
             if (fetchPrivateMsgReq == null)
-                fetchNewUserMessages();
+                fetchMessages(
+                    () => new GetPrivateMessagesRequest(lastChannelMsgId),
+                    messages =>
+                    {
+                        if (messages == null)
+                            return;
+                        handleUserMessages(messages);
+                        lastUserMsgId = messages.LastOrDefault()?.Id ?? lastUserMsgId;
+                        fetchPrivateMsgReq = null;
+                    }
+                );
         }
 
-        private void fetchNewUserMessages()
+        private void fetchMessages(Func<APIMessagesRequest> messagesRequest, Action<List<Message>> handler)
         {
-            fetchPrivateMsgReq = new GetPrivateMessagesRequest(lastUserMsgId);
+            if (messagesRequest == null)
+                throw new ArgumentNullException(nameof(messagesRequest));
+            if (handler == null)
+                throw new ArgumentNullException(nameof(handler));
 
-            fetchPrivateMsgReq.Success += messages =>
-            {
-                handleUserMessages(messages);
-                lastUserMsgId = messages.LastOrDefault()?.Id ?? lastUserMsgId;
-                fetchPrivateMsgReq = null;
-            };
-            fetchPrivateMsgReq.Failure += exception => Logger.Error(exception, "Fetching user messages failed.");
+            var messagesReq = messagesRequest.Invoke();
 
-            api.Queue(fetchPrivateMsgReq);
+            messagesReq.Success += handler.Invoke;
+            messagesReq.Failure += exception => Logger.Error(exception, "Fetching messages failed.");
+
+            api.Queue(messagesReq);
         }
 
         private void handleUserMessages(IEnumerable<Message> messages)
@@ -216,23 +237,6 @@ namespace osu.Game.Online.Chat
 
                 api.Queue(userReq);
             }
-        }
-
-        private void fetchNewChannelMessages()
-        {
-            fetchMsgReq = new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastChannelMsgId);
-
-            fetchMsgReq.Success += messages =>
-            {
-                if (messages == null)
-                    return;
-                handleChannelMessages(messages);
-                lastChannelMsgId = messages.LastOrDefault()?.Id ?? lastChannelMsgId;
-                fetchMsgReq = null;
-            };
-            fetchMsgReq.Failure += exception => Logger.Error(exception, "Fetching channel messages failed.");
-
-            api.Queue(fetchMsgReq);
         }
 
         private void handleChannelMessages(IEnumerable<Message> messages)
