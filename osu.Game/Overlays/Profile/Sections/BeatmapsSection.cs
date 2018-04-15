@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.Profile.Sections.Beatmaps;
 
 namespace osu.Game.Overlays.Profile.Sections
@@ -13,8 +12,6 @@ namespace osu.Game.Overlays.Profile.Sections
         public override string Title => "Beatmaps";
 
         public override string Identifier => "beatmaps";
-
-        private DirectPanel currentlyPlaying;
 
         public BeatmapsSection()
         {
