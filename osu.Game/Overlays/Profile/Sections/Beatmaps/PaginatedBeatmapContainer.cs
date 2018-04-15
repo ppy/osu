@@ -59,13 +59,13 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
                     panel.PreviewPlaying.ValueChanged += isPlaying =>
                     {
-                        if (!isPlaying) return;
+                        StopPlayingPreview();
 
-                        BeganPlayingPreview?.Invoke(this);
-                        if (currentlyPlaying != null && currentlyPlaying != panel)
-                            StopPlayingPreview();
-
-                        currentlyPlaying = panel;
+                        if (isPlaying)
+                        {
+                            BeganPlayingPreview?.Invoke(this);
+                            currentlyPlaying = panel;
+                        }
                     };
                 }
             };
@@ -75,8 +75,9 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
         public void StopPlayingPreview()
         {
-            if (currentlyPlaying != null)
-                currentlyPlaying.PreviewPlaying.Value = false;
+            if (currentlyPlaying == null) return;
+            currentlyPlaying.PreviewPlaying.Value = false;
+            currentlyPlaying = null;
         }
     }
 }
