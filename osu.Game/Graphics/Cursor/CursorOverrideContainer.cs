@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Cursor
         /// <summary>
         /// Whether any cursors can be displayed.
         /// </summary>
-        public bool CanShowCursor = true;
+        internal bool CanShowCursor = true;
 
         public CursorContainer Cursor { get; }
         public bool ProvidingUserCursor => true;
