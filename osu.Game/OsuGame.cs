@@ -131,7 +131,6 @@ namespace osu.Game
             }
 
             dependencies.CacheAs(this);
-            dependencies.Cache(screenshotManager = new ScreenshotManager());
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
@@ -203,6 +202,9 @@ namespace osu.Game
 
         protected override void LoadComplete()
         {
+            // this needs to be cached before base.LoadComplete as it is used by CursorOverrideContainer.
+            dependencies.Cache(screenshotManager = new ScreenshotManager());
+
             base.LoadComplete();
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
