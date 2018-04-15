@@ -29,8 +29,6 @@ namespace osu.Game.Graphics.Cursor
 
         private bool startRotation;
 
-        private ScreenshotManager screenshotManager;
-
         [BackgroundDependencyLoader(true)]
         private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager)
         {
