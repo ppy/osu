@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Scoring.Legacy
                 /* score.Perfect = */
                 sr.ReadBoolean();
                 /* score.EnabledMods = (Mods)*/
-                score.Mods = currentRuleset.GetLegacyModsFor((LegacyMods)sr.ReadInt32()).ToArray();
+                score.Mods = currentRuleset.ConvertLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
                 /* score.HpGraphString = */
                 sr.ReadString();
                 /* score.Date = */

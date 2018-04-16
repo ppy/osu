@@ -22,14 +22,14 @@ namespace osu.Game.Rulesets.Mania
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new ManiaRulesetContainer(this, beatmap, isForCurrentRuleset);
 
-        public override IEnumerable<Mod> GetLegacyModsFor(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlag(LegacyMods.NightCore))
+            if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new ManiaModNightcore();
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new ManiaModDoubleTime();
 
-            if (mods.HasFlag(LegacyMods.AutoPlay))
+            if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new ManiaModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania
             if (mods.HasFlag(LegacyMods.FadeIn))
                 yield return new ManiaModFadeIn();
 
-            if (mods.HasFlag(LegacyMods.FlashLight))
+            if (mods.HasFlag(LegacyMods.Flashlight))
                 yield return new ManiaModFlashlight();
 
             if (mods.HasFlag(LegacyMods.HalfTime))

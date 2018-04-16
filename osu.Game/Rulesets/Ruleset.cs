@@ -34,7 +34,12 @@ namespace osu.Game.Rulesets
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
-        public abstract IEnumerable<Mod> GetLegacyModsFor(LegacyMods mods);
+        /// <summary>
+        /// Converts mods from legacy enum values. Do not override if you're not a legacy ruleset.
+        /// </summary>
+        /// <param name="mods">The legacy enum which will be converted</param>
+        /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
+        public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => new Mod[] { };
 
         public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
 

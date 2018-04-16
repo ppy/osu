@@ -67,24 +67,23 @@ namespace osu.Game.Rulesets.Osu
             };
         }
 
-        public override IEnumerable<Mod> GetLegacyModsFor(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlag(LegacyMods.NightCore))
+            if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new OsuModNightcore();
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new OsuModDoubleTime();
 
-
-            if (mods.HasFlag(LegacyMods.AutoPilot))
+            if (mods.HasFlag(LegacyMods.Autopilot))
                 yield return new OsuModAutopilot();
 
-            if (mods.HasFlag(LegacyMods.AutoPlay))
+            if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new OsuModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
                 yield return new OsuModEasy();
 
-            if (mods.HasFlag(LegacyMods.FlashLight))
+            if (mods.HasFlag(LegacyMods.Flashlight))
                 yield return new OsuModFlashlight();
 
             if (mods.HasFlag(LegacyMods.HalfTime))
@@ -111,7 +110,7 @@ namespace osu.Game.Rulesets.Osu
             if (mods.HasFlag(LegacyMods.SuddenDeath))
                 yield return new OsuModSuddenDeath();
 
-            if (mods.HasFlag(LegacyMods.TargetPractice))
+            if (mods.HasFlag(LegacyMods.Target))
                 yield return new OsuModTarget();
         }
 
