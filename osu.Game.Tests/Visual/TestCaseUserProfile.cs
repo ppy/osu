@@ -36,24 +36,36 @@ namespace osu.Game.Tests.Visual
         {
             base.LoadComplete();
 
-            AddStep("Show offline dummy", () => profile.ShowUser(createDummyUser(new Badge[0]), false));
-
-            AddStep("Show with badge", () => profile.ShowUser(createDummyUser(new[]
+            AddStep("Show offline dummy", () => profile.ShowUser(new User
             {
-                new Badge
+                Username = @"Somebody",
+                Id = 1,
+                Country = new Country { FullName = @"Alien" },
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
+                JoinDate = DateTimeOffset.Now.AddDays(-1),
+                LastVisit = DateTimeOffset.Now,
+                Age = 1,
+                ProfileOrder = new[] { "me" },
+                Statistics = new UserStatistics
                 {
-                    AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
-                    Description = "Outstanding help by being a voluntary test subject.",
-                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
+                    Ranks = new UserStatistics.UserRanks { Global = 2148, Country = 1 },
+                    PP = 4567.89m,
+                },
+                RankHistory = new User.RankHistoryData
+                {
+                    Mode = @"osu",
+                    Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                },
+                Badges = new[]
+                {
+                    new Badge
+                    {
+                        AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
+                        Description = "Outstanding help by being a voluntary test subject.",
+                        ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
+                    }
                 }
-            }), false));
-
-            AddStep("Show many badges", () => profile.ShowUser(createDummyUser(Enumerable.Range(0, 10).Select(i => new Badge
-            {
-                AwardedAt = DateTimeOffset.Now,
-                Description = i.ToString(),
-                ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
-            }).ToArray()), false));
+            }, false));
 
             checkSupporterTag(false);
 
@@ -92,32 +104,6 @@ namespace osu.Game.Tests.Visual
                 AddAssert("is supporter", () => profile.Header.SupporterTag.Alpha == 1);
             else
                 AddAssert("no supporter", () => profile.Header.SupporterTag.Alpha == 0);
-        }
-
-        private User createDummyUser(Badge[] badges)
-        {
-            return new User
-            {
-                Username = @"Somebody",
-                Id = 1,
-                Country = new Country { FullName = @"Alien" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
-                JoinDate = DateTimeOffset.Now.AddDays(-1),
-                LastVisit = DateTimeOffset.Now,
-                Age = 1,
-                ProfileOrder = new[] { "me" },
-                Statistics = new UserStatistics
-                {
-                    Ranks = new UserStatistics.UserRanks { Global = 2148, Country = 1 },
-                    PP = 4567.89m,
-                },
-                RankHistory = new User.RankHistoryData
-                {
-                    Mode = @"osu",
-                    Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
-                },
-                Badges = badges
-            };
         }
 
         private class TestUserProfileOverlay : UserProfileOverlay

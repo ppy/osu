@@ -31,8 +31,6 @@ namespace osu.Game.Overlays.Profile.Header
         {
             Child = new Container
             {
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
                 Masking = true,
                 CornerRadius = 4,
                 AutoSizeAxes = Axes.Both,
@@ -68,8 +66,6 @@ namespace osu.Game.Overlays.Profile.Header
                                 AutoSizeAxes = Axes.Both,
                                 Child = badgeFlowContainer = new FillFlowContainer
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
                                     Direction = FillDirection.Horizontal,
                                     AutoSizeAxes = Axes.Both,
                                 }
@@ -114,6 +110,7 @@ namespace osu.Game.Overlays.Profile.Header
             badgeCount = badges.Length;
             visibleBadge = 0;
 
+            badgeFlowContainer.Clear();
             foreach (var badge in badges)
             {
                 LoadComponentAsync(new DrawableBadge(badge)
