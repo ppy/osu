@@ -136,7 +136,7 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void onOuterHoverLost()
         {
-            badgeFlowContainer.MoveToX(-badge_size.X * visibleBadge, 500, Easing.InOutQuad);
+            badgeFlowContainer.X = -DrawableBadge.DRAWABLE_BADGE_SIZE.X * visibleBadge;
             badgeFlowContainer.Direction = FillDirection.Horizontal;
             outerBadgeContainer.AutoSizeAxes = Axes.Y;
             outerBadgeContainer.Width = DrawableBadge.DRAWABLE_BADGE_SIZE.X + outer_padding.TotalHorizontal;
