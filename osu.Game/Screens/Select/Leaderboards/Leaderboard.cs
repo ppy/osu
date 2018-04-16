@@ -255,23 +255,15 @@ namespace osu.Game.Screens.Select.Leaderboards
             PlaceholderState = PlaceholderState.Retrieving;
             loading.Show();
 
-            var localBeatmap = Beatmap;
-
             getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value ?? Beatmap.Ruleset, Scope);
             getScoresRequest.Success += r => Schedule(() =>
             {
-                if (localBeatmap != Beatmap)
-                    return;
-
                 Scores = r.Scores;
                 PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
             });
 
             getScoresRequest.Failure += e => Schedule(() =>
             {
-                if (localBeatmap != Beatmap)
-                    return;
-
                 if (e is OperationCanceledException)
                     return;
 
