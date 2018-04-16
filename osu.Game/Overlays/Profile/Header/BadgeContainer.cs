@@ -19,9 +19,8 @@ namespace osu.Game.Overlays.Profile.Header
 {
     public class BadgeContainer : Container
     {
-        private const float outer_container_width = 98;
-        private const float outer_container_padding = 3;
-        private static readonly Vector2 badge_size = new Vector2(outer_container_width - outer_container_padding * 2, 46);
+        private static readonly Vector2 badge_size = new Vector2(86, 40);
+        private static readonly MarginPadding outer_padding = new MarginPadding(3);
 
         private OsuSpriteText badgeCountText;
         private FillFlowContainer badgeFlowContainer;
@@ -49,8 +48,8 @@ namespace osu.Game.Overlays.Profile.Header
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding(outer_container_padding),
-                        Width = outer_container_width,
+                        Padding = outer_padding,
+                        Width = badge_size.X + outer_padding.TotalHorizontal * 2,
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
@@ -117,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Header
             {
                 LoadComponentAsync(new DrawableBadge(badge)
                 {
-                    Size = badge_size,
+                    Size = badge_size + outer_padding.Total,
                 }, badgeFlowContainer.Add);
             }
         }
@@ -134,10 +133,10 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void onOuterHoverLost()
         {
-            rotateBadges();
+            badgeFlowContainer.MoveToX(-badge_size.X * visibleBadge, 500, Easing.InOutQuad);
             badgeFlowContainer.Direction = FillDirection.Horizontal;
             outerBadgeContainer.AutoSizeAxes = Axes.Y;
-            outerBadgeContainer.Width = outer_container_width;
+            outerBadgeContainer.Width = badge_size.X + outer_padding.TotalHorizontal * 2;
         }
 
         private class OuterBadgeContainer : FillFlowContainer
