@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Lists;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 using OpenTK;
 
@@ -22,8 +23,24 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         {
             foreach (var obj in hitObjects)
             {
-                var controlPoint = controlPointAt(obj.HitObject.StartTime);
-                obj.LifetimeStart = obj.HitObject.StartTime - timeRange / controlPoint.Multiplier;
+                obj.LifetimeStart = obj.HitObject.StartTime - timeRange / controlPointAt(obj.HitObject.StartTime).Multiplier;
+
+                if (obj.HitObject is IHasEndTime endTime)
+                {
+                    var diff = -positionAt(endTime.EndTime, obj, timeRange);
+
+                    switch (direction)
+                    {
+                        case ScrollingDirection.Up:
+                        case ScrollingDirection.Down:
+                            obj.Height = (float)(diff * length.Y);
+                            break;
+                        case ScrollingDirection.Left:
+                        case ScrollingDirection.Right:
+                            obj.Width = (float)(diff * length.X);
+                            break;
+                    }
+                }
 
                 if (obj.HasNestedHitObjects)
                 {
@@ -37,9 +54,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         {
             foreach (var obj in hitObjects)
             {
-                var controlPoint = controlPointAt(obj.HitObject.StartTime);
-
-                var position = (obj.HitObject.StartTime - currentTime) * controlPoint.Multiplier / timeRange;
+                var position = positionAt(currentTime, obj, timeRange);
 
                 switch (direction)
                 {
@@ -58,6 +73,9 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
                 }
             }
         }
+
+        private double positionAt(double time, DrawableHitObject obj, double timeRange)
+            => (obj.HitObject.StartTime - time) * controlPointAt(obj.HitObject.StartTime).Multiplier / timeRange;
 
         private readonly MultiplierControlPoint searchPoint = new MultiplierControlPoint();
         private MultiplierControlPoint controlPointAt(double time)
