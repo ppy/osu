@@ -32,21 +32,20 @@ namespace osu.Game.Rulesets.Taiko
             new KeyBinding(InputKey.MouseRight, TaikoAction.RightRim),
         };
 
-        public override IEnumerable<Mod> GetLegacyModsFor(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlag(LegacyMods.NightCore))
+            if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new TaikoModNightcore();
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new TaikoModDoubleTime();
 
-
-            if (mods.HasFlag(LegacyMods.AutoPlay))
+            if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new TaikoModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
                 yield return new TaikoModEasy();
 
-            if (mods.HasFlag(LegacyMods.FlashLight))
+            if (mods.HasFlag(LegacyMods.Flashlight))
                 yield return new TaikoModFlashlight();
 
             if (mods.HasFlag(LegacyMods.HalfTime))

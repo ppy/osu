@@ -30,21 +30,20 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
         };
 
-        public override IEnumerable<Mod> GetLegacyModsFor(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlag(LegacyMods.NightCore))
+            if (mods.HasFlag(LegacyMods.Nightcore))
                 yield return new CatchModNightcore();
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new CatchModDoubleTime();
 
-
-            if (mods.HasFlag(LegacyMods.AutoPlay))
+            if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new CatchModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
                 yield return new CatchModEasy();
 
-            if (mods.HasFlag(LegacyMods.FlashLight))
+            if (mods.HasFlag(LegacyMods.Flashlight))
                 yield return new CatchModFlashlight();
 
             if (mods.HasFlag(LegacyMods.HalfTime))
