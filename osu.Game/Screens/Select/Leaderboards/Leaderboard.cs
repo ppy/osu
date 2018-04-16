@@ -282,24 +282,29 @@ namespace osu.Game.Screens.Select.Leaderboards
             api.Queue(getScoresRequest);
         }
 
+        private Placeholder currentPlaceholder;
+
         private void replacePlaceholder(Placeholder placeholder)
         {
-            var existingPlaceholder = placeholderContainer.Children.LastOrDefault() as Placeholder;
-
-            if (placeholder != null && placeholder.Equals(existingPlaceholder))
+            if (placeholder != null && placeholder.Equals(currentPlaceholder))
                 return;
 
-            existingPlaceholder?.FadeOut(150, Easing.OutQuint).Expire();
+            currentPlaceholder?.FadeOut(150, Easing.OutQuint).Expire();
 
             if (placeholder == null)
+            {
+                currentPlaceholder = null;
                 return;
+            }
 
             Scores = null;
 
-            placeholderContainer.Add(placeholder);
+            placeholderContainer.Child = placeholder;
 
             placeholder.ScaleTo(0.8f).Then().ScaleTo(1, fade_duration * 3, Easing.OutQuint);
             placeholder.FadeInFromZero(fade_duration, Easing.OutQuint);
+
+            currentPlaceholder = placeholder;
         }
 
         protected override void Update()
