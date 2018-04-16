@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Beatmaps
 {
