@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual
             {
                 AwardedAt = DateTimeOffset.Now,
                 Description = i.ToString(),
-                ImageUrl = "Flags/__"
+                ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
             }).ToArray()), false));
 
             checkSupporterTag(false);
