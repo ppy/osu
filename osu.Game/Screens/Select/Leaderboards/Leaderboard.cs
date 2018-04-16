@@ -39,8 +39,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private readonly LoadingAnimation loading;
 
-        private IEnumerable<Score> scores;
+        private ScheduledDelegate showScoresDelegate;
 
+        private IEnumerable<Score> scores;
         public IEnumerable<Score> Scores
         {
             get { return scores; }
@@ -59,29 +60,34 @@ namespace osu.Game.Screens.Select.Leaderboards
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
 
-                // schedule because we may not be loaded yet (LoadComponentAsync complains).
-                Schedule(() =>
+                var flow = scrollFlow = new FillFlowContainer<LeaderboardScore>
                 {
-                    LoadComponentAsync(new FillFlowContainer<LeaderboardScore>
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0f, 5f),
-                        Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                        ChildrenEnumerable = scores.Select((s, index) => new LeaderboardScore(s, index + 1) { Action = () => ScoreSelected?.Invoke(s) })
-                    }, f =>
-                    {
-                        scrollContainer.Add(scrollFlow = f);
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(0f, 5f),
+                    Padding = new MarginPadding { Top = 10, Bottom = 5 },
+                    ChildrenEnumerable = scores.Select((s, index) => new LeaderboardScore(s, index + 1) { Action = () => ScoreSelected?.Invoke(s) })
+                };
 
-                        int i = 0;
-                        foreach (var s in f.Children)
-                        {
-                            using (s.BeginDelayedSequence(i++ * 50, true))
-                                s.Show();
-                        }
+                // schedule because we may not be loaded yet (LoadComponentAsync complains).
+                showScoresDelegate?.Cancel();
+                if (!IsLoaded)
+                    showScoresDelegate = Schedule(showScores);
+                else
+                    showScores();
 
-                        scrollContainer.ScrollTo(0f, false);
-                    });
+                void showScores() => LoadComponentAsync(flow, _ =>
+                {
+                    scrollContainer.Add(flow);
+
+                    int i = 0;
+                    foreach (var s in flow.Children)
+                    {
+                        using (s.BeginDelayedSequence(i++ * 50, true))
+                            s.Show();
+                    }
+
+                    scrollContainer.ScrollTo(0f, false);
                 });
             }
         }
@@ -249,24 +255,31 @@ namespace osu.Game.Screens.Select.Leaderboards
             PlaceholderState = PlaceholderState.Retrieving;
             loading.Show();
 
+            var localBeatmap = Beatmap;
+
             getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value ?? Beatmap.Ruleset, Scope);
-            getScoresRequest.Success += r =>
+            getScoresRequest.Success += r => Schedule(() =>
             {
+                if (localBeatmap != Beatmap)
+                    return;
+
                 Scores = r.Scores;
                 PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
-            };
-            getScoresRequest.Failure += onUpdateFailed;
+            });
+
+            getScoresRequest.Failure += e => Schedule(() =>
+            {
+                if (localBeatmap != Beatmap)
+                    return;
+
+                if (e is OperationCanceledException)
+                    return;
+
+                PlaceholderState = PlaceholderState.NetworkFailure;
+                Logger.Error(e, @"Couldn't fetch beatmap scores!");
+            });
 
             api.Queue(getScoresRequest);
-        }
-
-        private void onUpdateFailed(Exception e)
-        {
-            if (e is OperationCanceledException)
-                return;
-
-            PlaceholderState = PlaceholderState.NetworkFailure;
-            Logger.Error(e, @"Couldn't fetch beatmap scores!");
         }
 
         private void replacePlaceholder(Placeholder placeholder)
