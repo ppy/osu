@@ -122,7 +122,8 @@ namespace osu.Game.Overlays.Profile
                                 },
                                 badgeContainer = new BadgeContainer
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
                                     Origin = Anchor.BottomLeft,
                                     Margin = new MarginPadding { Bottom = 5 },
                                     Alpha = 0,
