@@ -18,6 +18,7 @@ using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Graphics.UserInterface;
 
@@ -113,14 +114,14 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopOut();
 
-            footerContainer.MoveToX(footerContainer.DrawSize.X, DISAPPEAR_DURATION, Easing.InSine);
-            footerContainer.FadeOut(DISAPPEAR_DURATION, Easing.InSine);
+            footerContainer.MoveToX(footerContainer.DrawSize.X, WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
+            footerContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
 
             foreach (ModSection section in ModSectionsContainer.Children)
             {
-                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), DISAPPEAR_DURATION, Easing.InSine);
-                section.ButtonsContainer.MoveToX(100f, DISAPPEAR_DURATION, Easing.InSine);
-                section.ButtonsContainer.FadeOut(DISAPPEAR_DURATION, Easing.InSine);
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
+                section.ButtonsContainer.MoveToX(100f, WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
+                section.ButtonsContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
             }
         }
 
@@ -128,14 +129,14 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopIn();
 
-            footerContainer.MoveToX(0, APPEAR_DURATION, Easing.OutQuint);
-            footerContainer.FadeIn(APPEAR_DURATION, Easing.OutQuint);
+            footerContainer.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            footerContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
 
             foreach (ModSection section in ModSectionsContainer.Children)
             {
-                section.ButtonsContainer.TransformSpacingTo(new Vector2(50f, 0f), APPEAR_DURATION, Easing.OutQuint);
-                section.ButtonsContainer.MoveToX(0, APPEAR_DURATION, Easing.OutQuint);
-                section.ButtonsContainer.FadeIn(APPEAR_DURATION, Easing.OutQuint);
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(50f, 0f), WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+                section.ButtonsContainer.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+                section.ButtonsContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
             }
         }
 
@@ -181,14 +182,12 @@ namespace osu.Game.Overlays.Mods
 
         public ModSelectOverlay()
         {
-            FirstWaveColour = OsuColour.FromHex(@"19b0e2");
-            SecondWaveColour = OsuColour.FromHex(@"2280a2");
-            ThirdWaveColour = OsuColour.FromHex(@"005774");
-            FourthWaveColour = OsuColour.FromHex(@"003a4e");
+            Waves.FirstWaveColour = OsuColour.FromHex(@"19b0e2");
+            Waves.SecondWaveColour = OsuColour.FromHex(@"2280a2");
+            Waves.ThirdWaveColour = OsuColour.FromHex(@"005774");
+            Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
             Height = 510;
-            Content.RelativeSizeAxes = Axes.X;
-            Content.AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
                 new Container
