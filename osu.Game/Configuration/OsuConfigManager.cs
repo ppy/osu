@@ -84,6 +84,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Version, string.Empty);
 
             Set(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
+            Set(OsuSetting.ScreenshotCaptureMenuCursor, false);
         }
 
         public OsuConfigManager(Storage storage) : base(storage)
@@ -128,6 +129,7 @@ namespace osu.Game.Configuration
         ShowConvertedBeatmaps,
         SpeedChangeVisualisation,
         Skin,
-        ScreenshotFormat
+        ScreenshotFormat,
+        ScreenshotCaptureMenuCursor
     }
 }

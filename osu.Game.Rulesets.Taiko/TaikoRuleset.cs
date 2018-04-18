@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Taiko.Replays;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -30,6 +31,44 @@ namespace osu.Game.Rulesets.Taiko
             new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
             new KeyBinding(InputKey.MouseRight, TaikoAction.RightRim),
         };
+
+        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        {
+            if (mods.HasFlag(LegacyMods.Nightcore))
+                yield return new TaikoModNightcore();
+            else if (mods.HasFlag(LegacyMods.DoubleTime))
+                yield return new TaikoModDoubleTime();
+
+            if (mods.HasFlag(LegacyMods.Autoplay))
+                yield return new TaikoModAutoplay();
+
+            if (mods.HasFlag(LegacyMods.Easy))
+                yield return new TaikoModEasy();
+
+            if (mods.HasFlag(LegacyMods.Flashlight))
+                yield return new TaikoModFlashlight();
+
+            if (mods.HasFlag(LegacyMods.HalfTime))
+                yield return new TaikoModHalfTime();
+
+            if (mods.HasFlag(LegacyMods.HardRock))
+                yield return new TaikoModHardRock();
+
+            if (mods.HasFlag(LegacyMods.Hidden))
+                yield return new TaikoModHidden();
+
+            if (mods.HasFlag(LegacyMods.NoFail))
+                yield return new TaikoModNoFail();
+
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new TaikoModPerfect();
+
+            if (mods.HasFlag(LegacyMods.Relax))
+                yield return new TaikoModRelax();
+
+            if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new TaikoModSuddenDeath();
+        }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
