@@ -89,10 +89,10 @@ namespace osu.Game.Overlays
 
             // osu!direct colours are not part of the standard palette
 
-            FirstWaveColour = OsuColour.FromHex(@"19b0e2");
-            SecondWaveColour = OsuColour.FromHex(@"2280a2");
-            ThirdWaveColour = OsuColour.FromHex(@"005774");
-            FourthWaveColour = OsuColour.FromHex(@"003a4e");
+            Waves.FirstWaveColour = OsuColour.FromHex(@"19b0e2");
+            Waves.SecondWaveColour = OsuColour.FromHex(@"2280a2");
+            Waves.ThirdWaveColour = OsuColour.FromHex(@"005774");
+            Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
             ScrollFlow.Children = new Drawable[]
             {
@@ -188,12 +188,12 @@ namespace osu.Game.Overlays
             beatmaps.ItemAdded += setAdded;
         }
 
-        private void setAdded(BeatmapSetInfo set)
+        private void setAdded(BeatmapSetInfo set) => Schedule(() =>
         {
             // if a new map was imported, we should remove it from search results (download completed etc.)
             panels?.FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID)?.FadeOut(400).Expire();
             BeatmapSets = BeatmapSets?.Where(b => b.OnlineBeatmapSetID != set.OnlineBeatmapSetID);
-        }
+        });
 
         private void updateResultCounts()
         {
@@ -322,6 +322,14 @@ namespace osu.Game.Overlays
         }
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmaps != null)
+                beatmaps.ItemAdded -= setAdded;
+        }
 
         public class ResultCounts
         {
