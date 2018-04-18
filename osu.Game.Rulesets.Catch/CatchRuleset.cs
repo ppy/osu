@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Catch
 {
@@ -28,6 +29,44 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
         };
+
+        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        {
+            if (mods.HasFlag(LegacyMods.Nightcore))
+                yield return new CatchModNightcore();
+            else if (mods.HasFlag(LegacyMods.DoubleTime))
+                yield return new CatchModDoubleTime();
+
+            if (mods.HasFlag(LegacyMods.Autoplay))
+                yield return new CatchModAutoplay();
+
+            if (mods.HasFlag(LegacyMods.Easy))
+                yield return new CatchModEasy();
+
+            if (mods.HasFlag(LegacyMods.Flashlight))
+                yield return new CatchModFlashlight();
+
+            if (mods.HasFlag(LegacyMods.HalfTime))
+                yield return new CatchModHalfTime();
+
+            if (mods.HasFlag(LegacyMods.HardRock))
+                yield return new CatchModHardRock();
+
+            if (mods.HasFlag(LegacyMods.Hidden))
+                yield return new CatchModHidden();
+
+            if (mods.HasFlag(LegacyMods.NoFail))
+                yield return new CatchModNoFail();
+
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new CatchModPerfect();
+
+            if (mods.HasFlag(LegacyMods.Relax))
+                yield return new CatchModRelax();
+
+            if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new CatchModSuddenDeath();
+        }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
