@@ -293,8 +293,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return;
             }
 
-            Scores = null;
-
             placeholderContainer.Child = placeholder;
 
             placeholder.ScaleTo(0.8f).Then().ScaleTo(1, fade_duration * 3, Easing.OutQuint);
