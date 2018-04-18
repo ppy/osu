@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,12 +12,11 @@ using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.Direct;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Overlays.Direct;
-using osu.Framework.Configuration;
 
-namespace osu.Game.Overlays.BeatmapSet
+namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class PreviewButton : OsuClickableContainer
     {
@@ -85,6 +85,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 // prevent negative (potential infinite) width if a track without length was loaded
                 progress.Width = preview.Length > 0 ? (float)(preview.CurrentTime / preview.Length) : 0f;
             }
+            else
+                progress.Width = 0;
         }
 
         protected override void Dispose(bool isDisposing)
