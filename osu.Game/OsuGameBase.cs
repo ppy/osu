@@ -118,7 +118,9 @@ namespace osu.Game
             dependencies.Cache(api);
             dependencies.CacheAs<IAPIProvider>(api);
 
-            dependencies.Cache(new ChannelManager());
+            var channelManager = new ChannelManager();
+            dependencies.Inject(channelManager);
+            dependencies.Cache(channelManager);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));

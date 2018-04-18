@@ -21,8 +21,7 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(ChatTabControl),
-            typeof(ChannelTabControl),
-            typeof(UserTabControl)
+            typeof(ChannelTabControl)
         };
 
         private readonly ChatTabControl chatTabControl;

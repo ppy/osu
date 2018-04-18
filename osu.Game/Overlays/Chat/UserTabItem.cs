@@ -39,8 +39,8 @@ namespace osu.Game.Overlays.Chat
 
             AutoSizeAxes = Axes.X;
             Height = 50;
-            Origin = Anchor.BottomRight;
-            Anchor = Anchor.BottomRight;
+            Origin = Anchor.BottomLeft;
+            Anchor = Anchor.BottomLeft;
             EdgeEffect = activateEdgeEffect;
             Masking = true;
             Shear = shear;

@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Chat
         [BackgroundDependencyLoader]
         private void load()
         {
-            Scheduler.Add(() => newMessagesArrived(Chat.Messages));
+            newMessagesArrived(Chat.Messages);
         }
 
         protected override void LoadComplete()

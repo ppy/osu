@@ -345,6 +345,7 @@ namespace osu.Game.Overlays
             channelManager.CurrentChannel.ValueChanged += currentChatChanged;
             channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
             channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
+            Add(channelManager);
         }
 
         private void postMessage(TextBox textbox, bool newText)
