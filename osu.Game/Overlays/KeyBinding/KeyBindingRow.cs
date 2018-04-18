@@ -198,22 +198,25 @@ namespace osu.Game.Overlays.KeyBinding
             if (!HasFocus)
                 return false;
 
-            KeyCombination keyCombination = KeyCombination.FromInputState(state);
-
-            if (keyCombination.Equals(InputKey.Escape))
+            switch (args.Key)
             {
-                finalise();
-                return true;
+                case Key.Escape:
+                    finalise();
+                    return true;
+                case Key.Delete:
+                {
+                    if (state.Keyboard.ShiftPressed)
+                    {
+                        bindTarget.UpdateKeyCombination(InputKey.None);
+                        finalise();
+                        return true;
+                    }
+
+                    break;
+                }
             }
 
-            if (keyCombination.Equals(new[] { InputKey.Shift, InputKey.Delete }))
-            {
-                bindTarget.UpdateKeyCombination(InputKey.None);
-                finalise();
-                return true;
-            }
-
-            bindTarget.UpdateKeyCombination(keyCombination);
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
             if (!isModifier(args.Key)) finalise();
 
             return true;
