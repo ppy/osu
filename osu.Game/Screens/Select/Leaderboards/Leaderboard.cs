@@ -109,6 +109,10 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private PlaceholderState placeholderState;
 
+        /// <summary>
+        /// Update the placeholder visibility.
+        /// Setting this to anything other than PlaceholderState.Successful will cancel all existing retrieval requests and hide scores.
+        /// </summary>
         protected PlaceholderState PlaceholderState
         {
             get { return placeholderState; }
