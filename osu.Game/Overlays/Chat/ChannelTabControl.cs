@@ -60,7 +60,18 @@ namespace osu.Game.Overlays.Chat
             base.AddTabItem(item, addToDropdown);
         }
 
-        protected override TabItem<Channel> CreateTabItem(Channel value) => new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
+        protected override TabItem<Channel> CreateTabItem(Channel value)
+        {
+            switch (value.Target)
+            {
+                case TargetType.Channel:
+                    return new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
+                case TargetType.User:
+                    return new UserTabItem(value) { OnRequestClose = tabCloseRequested };
+                default:
+                    throw new InvalidOperationException("Only TargetType User and Channel are supported.");
+            }
+        }
 
         protected override void SelectTab(TabItem<Channel> tab)
         {

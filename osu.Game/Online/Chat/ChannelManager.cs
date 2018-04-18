@@ -47,8 +47,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public ObservableCollection<Channel> AvailableChannels { get; } = new ObservableCollection<Channel>();
 
-        private APIAccess api;
-        private readonly Scheduler scheduler;
+        private IAPIProvider api;
         private ScheduledDelegate fetchMessagesScheduleder;
         private GetMessagesRequest fetchMsgReq;
         private GetPrivateMessagesRequest fetchPrivateMsgReq;
@@ -282,7 +281,7 @@ namespace osu.Game.Online.Chat
                 case APIState.Online:
                     if (JoinedChannels.Count == 0)
                         initializeDefaultChannels();
-                    fetchMessagesScheduleder = scheduler.AddDelayed(fetchNewMessages, 1000, true);
+                    fetchMessagesScheduleder = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
                     break;
                 default:
                     fetchMsgReq?.Cancel();
@@ -295,7 +294,7 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
-            this.api = this.api;
+            this.api = api;
             api.Register(this);
         }
     }
