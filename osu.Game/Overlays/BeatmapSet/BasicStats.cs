@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Statistic length, bpm, circleCount, sliderCount;
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
             get { return beatmapSet; }
@@ -26,11 +27,12 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                bpm.Value = BeatmapSet.OnlineInfo.BPM.ToString(@"0.##");
+                updateDisplay();
             }
         }
 
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
             get { return beatmap; }
@@ -39,6 +41,22 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmap) return;
                 beatmap = value;
 
+                updateDisplay();
+            }
+        }
+
+        private void updateDisplay()
+        {
+            bpm.Value = BeatmapSet?.OnlineInfo.BPM.ToString(@"0.##") ?? "-";
+
+            if (beatmap == null)
+            {
+                length.Value = string.Empty;
+                circleCount.Value = string.Empty;
+                sliderCount.Value = string.Empty;
+            }
+            else
+            {
                 length.Value = TimeSpan.FromSeconds(beatmap.OnlineInfo.Length).ToString(@"m\:ss");
                 circleCount.Value = beatmap.OnlineInfo.CircleCount.ToString();
                 sliderCount.Value = beatmap.OnlineInfo.SliderCount.ToString();
@@ -62,12 +80,19 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            updateDisplay();
+        }
+
         private class Statistic : Container, IHasTooltip
         {
             private readonly string name;
             private readonly OsuSpriteText value;
 
             public string TooltipText => name;
+
             public string Value
             {
                 get { return value.Text; }

@@ -27,19 +27,31 @@ namespace osu.Game.Overlays
 
         private readonly Header header;
         private readonly Info info;
-        private readonly ScoresContainer scores;
-
         private APIAccess api;
         private RulesetStore rulesets;
-        private GetScoresRequest getScoresRequest;
 
         private readonly ScrollContainer scroll;
+
+        private BeatmapSetInfo beatmapSet;
+
+        public BeatmapSetInfo BeatmapSet
+        {
+            get => beatmapSet;
+            set
+            {
+                if (value == beatmapSet)
+                    return;
+
+                header.BeatmapSet = info.BeatmapSet = beatmapSet = value;
+            }
+        }
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
         {
+            ScoresContainer scores;
             Waves.FirstWaveColour = OsuColour.Gray(0.4f);
             Waves.SecondWaveColour = OsuColour.Gray(0.3f);
             Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
@@ -88,29 +100,8 @@ namespace osu.Game.Overlays
             header.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b;
-                updateScores(b);
+                scores.Beatmap = b;
             };
-        }
-
-        private void updateScores(BeatmapInfo beatmap)
-        {
-            getScoresRequest?.Cancel();
-
-            if (!beatmap.OnlineBeatmapID.HasValue)
-            {
-                scores.CleanAllScores();
-                return;
-            }
-
-            scores.IsLoading = true;
-
-            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-            getScoresRequest.Success += r =>
-            {
-                scores.Scores = r.Scores;
-                scores.IsLoading = false;
-            };
-            api.Queue(getScoresRequest);
         }
 
         [BackgroundDependencyLoader]
@@ -139,7 +130,7 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        public void ShowBeatmapSet(int beatmapSetId)
+        public void FetchAndShowBeatmapSet(int beatmapSetId)
         {
             // todo: display the overlay while we are loading here. we need to support setting BeatmapSet to null for this to work.
             var req = new GetBeatmapSetRequest(beatmapSetId);
