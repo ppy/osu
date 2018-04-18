@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Select.Carousel
             new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)),
             new OsuMenuItem("Details", MenuItemType.Standard, () =>
             {
-                if (beatmap.OnlineBeatmapID.HasValue) beatmapOverlay?.ShowBeatmap(beatmap.OnlineBeatmapID.Value);
+                if (beatmap.OnlineBeatmapID.HasValue) beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value);
             }),
         };
     }

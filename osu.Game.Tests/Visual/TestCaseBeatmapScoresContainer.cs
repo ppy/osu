@@ -47,9 +47,7 @@ namespace osu.Game.Tests.Visual
             AddStep("scores pack 1", () => scoresContainer.Scores = scores);
             AddStep("scores pack 2", () => scoresContainer.Scores = anotherScores);
             AddStep("only top score", () => scoresContainer.Scores = new[] { topScore });
-            AddStep("remove scores", scoresContainer.CleanAllScores);
-            AddStep("turn on loading", () => scoresContainer.IsLoading = true);
-            AddStep("turn off loading", () => scoresContainer.IsLoading = false);
+            AddStep("remove scores", () => scoresContainer.Scores = null);
             AddStep("resize to big", () => container.ResizeWidthTo(1, 300));
             AddStep("resize to normal", () => container.ResizeWidthTo(0.8f, 300));
 

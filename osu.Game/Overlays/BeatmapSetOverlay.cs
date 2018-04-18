@@ -18,7 +18,6 @@ using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using System.Linq;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
@@ -31,12 +30,9 @@ namespace osu.Game.Overlays
 
         private readonly Header header;
         private readonly Info info;
-        private readonly ScoresContainer scores;
-        private readonly LoadingAnimation loading;
 
         private APIAccess api;
         private RulesetStore rulesets;
-        private GetScoresRequest getScoresRequest;
 
         private readonly ScrollContainer scroll;
 
@@ -50,18 +46,7 @@ namespace osu.Game.Overlays
                 if (value == beatmapSet)
                     return;
 
-                beatmapSet = value;
-
-                if (beatmapSet == null)
-                {
-                    scroll.FadeOut(fade_duration);
-                    loading.Show();
-                    return;
-                }
-
-                header.BeatmapSet = info.BeatmapSet = beatmapSet;
-                loading.Hide();
-                scroll.FadeIn(fade_duration);
+                header.BeatmapSet = info.BeatmapSet = beatmapSet = value;
             }
         }
 
@@ -70,6 +55,7 @@ namespace osu.Game.Overlays
 
         public BeatmapSetOverlay()
         {
+            ScoresContainer scores;
             Waves.FirstWaveColour = OsuColour.Gray(0.4f);
             Waves.SecondWaveColour = OsuColour.Gray(0.3f);
             Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
@@ -96,15 +82,10 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
-                loading = new LoadingAnimation
-                {
-                    State = Visibility.Visible,
-                },
                 scroll = new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
-                    Alpha = 0,
                     Child = new ReverseChildIDFillFlowContainer<Drawable>
                     {
                         RelativeSizeAxes = Axes.X,
@@ -123,31 +104,8 @@ namespace osu.Game.Overlays
             header.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b;
-
-                if (b != null)
-                    updateScores(b);
+                scores.Beatmap = b;
             };
-        }
-
-        private void updateScores(BeatmapInfo beatmap)
-        {
-            getScoresRequest?.Cancel();
-
-            if (!beatmap.OnlineBeatmapID.HasValue)
-            {
-                scores.CleanAllScores();
-                return;
-            }
-
-            scores.IsLoading = true;
-
-            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-            getScoresRequest.Success += r =>
-            {
-                scores.Scores = r.Scores;
-                scores.IsLoading = false;
-            };
-            api.Queue(getScoresRequest);
         }
 
         [BackgroundDependencyLoader]
@@ -178,7 +136,7 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        public void ShowBeatmap(int beatmapId)
+        public void FetchAndShowBeatmap(int beatmapId)
         {
             BeatmapSet = null;
             var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
@@ -191,7 +149,7 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        public void ShowBeatmapSet(int beatmapSetId)
+        public void FetchAndShowBeatmapSet(int beatmapSetId)
         {
             BeatmapSet = null;
             var req = new GetBeatmapSetRequest(beatmapSetId);
