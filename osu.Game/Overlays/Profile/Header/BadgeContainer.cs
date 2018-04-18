@@ -180,10 +180,13 @@ namespace osu.Game.Overlays.Profile.Header
                     FillMode = FillMode.Fit,
                     RelativeSizeAxes = Axes.Both,
                     Texture = textures.Get(badge.ImageUrl),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    OnLoadComplete = d => d.FadeInFromZero(200)
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Child.FadeInFromZero(200);
             }
 
             public string TooltipText => badge.Description;
