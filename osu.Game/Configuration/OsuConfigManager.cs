@@ -84,6 +84,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Version, string.Empty);
 
             Set(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
+            Set(OsuSetting.ScreenshotCaptureMenuCursor, false);
 
             Set(OsuSetting.SelectScrollRightClick, false);
         }
@@ -131,6 +132,7 @@ namespace osu.Game.Configuration
         SpeedChangeVisualisation,
         Skin,
         ScreenshotFormat,
+        ScreenshotCaptureMenuCursor,
         SelectScrollRightClick
     }
 }
