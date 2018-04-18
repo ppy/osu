@@ -173,8 +173,9 @@ namespace osu.Game.Overlays.Direct
                     if (trackLoader != d) return;
 
                     Preview = d?.Preview;
-                    Playing.TriggerChange();
+                    updatePreviewTrack(Playing);
                     loading = false;
+
                     Add(trackLoader);
                 });
         }
