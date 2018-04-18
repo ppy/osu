@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Replays;
@@ -15,12 +16,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.UI;
-using System.Collections.Generic;
-using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Catch.Replays;
-using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Catch
 {
@@ -80,7 +75,7 @@ namespace osu.Game.Rulesets.Catch
         {
             IEnumerable<HitObject> hitObjects = beatmap.Beatmap.HitObjects;
             IEnumerable<HitObject> fruits = hitObjects.Where(c => !(c is IHasEndTime));
-            IEnumerable<HitObject> trails = hitObjects.Where(s => s is IHasCurve);
+            IEnumerable<HitObject> juiceStreams = hitObjects.Where(s => s is IHasCurve);
             IEnumerable<HitObject> rain = hitObjects.Where(s => s is IHasEndTime && !(s is IHasCurve));
 
             return new[]
@@ -99,8 +94,8 @@ namespace osu.Game.Rulesets.Catch
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Trail Count",
-                    Content = trails.Count().ToString(),
+                    Name = @"Juice Stream Count",
+                    Content = juiceStreams.Count().ToString(),
                     Icon = FontAwesome.fa_circle
                 },
                 new BeatmapStatistic

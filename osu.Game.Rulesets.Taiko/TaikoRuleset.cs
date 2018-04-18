@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -15,12 +16,6 @@ using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
-using System.Collections.Generic;
-using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.Taiko.Replays;
-using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Taiko
 {

@@ -12,11 +12,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
-using osu.Game.Rulesets.Catch;
-using osu.Game.Rulesets.Mania;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps;
 

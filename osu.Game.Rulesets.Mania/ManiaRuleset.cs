@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Replays;
@@ -16,7 +17,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.UI;
-using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Mania
 {
