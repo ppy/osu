@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets
 {
@@ -32,6 +33,13 @@ namespace osu.Game.Rulesets
                                                     .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
+
+        /// <summary>
+        /// Converts mods from legacy enum values. Do not override if you're not a legacy ruleset.
+        /// </summary>
+        /// <param name="mods">The legacy enum which will be converted</param>
+        /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
+        public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => new Mod[] { };
 
         public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
 
