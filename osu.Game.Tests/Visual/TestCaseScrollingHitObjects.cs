@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual
                 Direction = direction;
 
                 Padding = new MarginPadding(2);
-                ScaledContent.Masking = true;
+                Content.Masking = true;
 
                 AddInternal(new Box
                 {

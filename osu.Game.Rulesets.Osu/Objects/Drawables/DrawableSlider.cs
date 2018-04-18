@@ -10,7 +10,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using OpenTK.Graphics;
@@ -177,8 +176,5 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public Drawable ProxiedLayer => HeadCircle.ApproachCircle;
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Body.ReceiveMouseInputAt(screenSpacePos);
-
-        public override Vector2 SelectionPoint => ToScreenSpace(OriginPosition);
-        public override Quad SelectionQuad => Body.PathDrawQuad;
     }
 }

@@ -92,17 +92,17 @@ namespace osu.Game.Rulesets.Osu.Replays
             if (h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Miss) > endTime + h.HitWindows.HalfWindowFor(HitResult.Meh) + 50)
             {
                 if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new OsuReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(prev.StackedEndPosition.X, prev.StackedEndPosition.Y)));
-                if (!(h is Spinner)) AddFrameToReplay(new OsuReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
+                if (!(h is Spinner)) AddFrameToReplay(new OsuReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Miss), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
             }
             else if (h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh) > endTime + h.HitWindows.HalfWindowFor(HitResult.Meh) + 50)
             {
                 if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new OsuReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(prev.StackedEndPosition.X, prev.StackedEndPosition.Y)));
                 if (!(h is Spinner)) AddFrameToReplay(new OsuReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
             }
-            else if (h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh) > endTime + h.HitWindows.HalfWindowFor(HitResult.Meh) + 50)
+            else if (h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Good) > endTime + h.HitWindows.HalfWindowFor(HitResult.Good) + 50)
             {
-                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new OsuReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(prev.StackedEndPosition.X, prev.StackedEndPosition.Y)));
-                if (!(h is Spinner)) AddFrameToReplay(new OsuReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Meh), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
+                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new OsuReplayFrame(endTime + h.HitWindows.HalfWindowFor(HitResult.Good), new Vector2(prev.StackedEndPosition.X, prev.StackedEndPosition.Y)));
+                if (!(h is Spinner)) AddFrameToReplay(new OsuReplayFrame(h.StartTime - h.HitWindows.HalfWindowFor(HitResult.Good), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
             }
         }
 
