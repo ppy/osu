@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -64,6 +65,53 @@ namespace osu.Game.Rulesets.Osu
                     Icon = FontAwesome.fa_circle
                 }
             };
+        }
+
+        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        {
+            if (mods.HasFlag(LegacyMods.Nightcore))
+                yield return new OsuModNightcore();
+            else if (mods.HasFlag(LegacyMods.DoubleTime))
+                yield return new OsuModDoubleTime();
+
+            if (mods.HasFlag(LegacyMods.Autopilot))
+                yield return new OsuModAutopilot();
+
+            if (mods.HasFlag(LegacyMods.Autoplay))
+                yield return new OsuModAutoplay();
+
+            if (mods.HasFlag(LegacyMods.Easy))
+                yield return new OsuModEasy();
+
+            if (mods.HasFlag(LegacyMods.Flashlight))
+                yield return new OsuModFlashlight();
+
+            if (mods.HasFlag(LegacyMods.HalfTime))
+                yield return new OsuModHalfTime();
+
+            if (mods.HasFlag(LegacyMods.HardRock))
+                yield return new OsuModHardRock();
+
+            if (mods.HasFlag(LegacyMods.Hidden))
+                yield return new OsuModHidden();
+
+            if (mods.HasFlag(LegacyMods.NoFail))
+                yield return new OsuModNoFail();
+
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new OsuModPerfect();
+
+            if (mods.HasFlag(LegacyMods.Relax))
+                yield return new OsuModRelax();
+
+            if (mods.HasFlag(LegacyMods.SpunOut))
+                yield return new OsuModSpunOut();
+
+            if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new OsuModSuddenDeath();
+
+            if (mods.HasFlag(LegacyMods.Target))
+                yield return new OsuModTarget();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
