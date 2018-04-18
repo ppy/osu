@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
+using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
@@ -23,6 +24,7 @@ namespace osu.Game.Tests.Visual
             typeof(UserProfileOverlay),
             typeof(RankGraph),
             typeof(LineGraph),
+            typeof(BadgeContainer)
         };
 
         public TestCaseUserProfile()
@@ -53,6 +55,15 @@ namespace osu.Game.Tests.Visual
                 {
                     Mode = @"osu",
                     Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                },
+                Badges = new[]
+                {
+                    new Badge
+                    {
+                        AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
+                        Description = "Outstanding help by being a voluntary test subject.",
+                        ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
+                    }
                 }
             }, false));
 
