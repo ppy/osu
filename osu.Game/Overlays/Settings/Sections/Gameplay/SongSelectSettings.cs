@@ -19,8 +19,8 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Right click to scroll",
-                    Bindable = config.GetBindable<bool>(OsuSetting.SelectScrollRightClick),
+                    LabelText = "Right mouse drag to absolute scroll",
+                    Bindable = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
                 },
                 new SettingsCheckbox
                 {
