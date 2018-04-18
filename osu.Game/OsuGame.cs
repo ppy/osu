@@ -202,6 +202,7 @@ namespace osu.Game
             }
 
             Beatmap.Value = BeatmapManager.GetWorkingBeatmap(s.Beatmap);
+            Beatmap.Value.Mods.Value = s.Mods;
 
             menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
         }
