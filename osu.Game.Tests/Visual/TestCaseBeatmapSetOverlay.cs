@@ -8,6 +8,9 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Overlays.BeatmapSet;
+using osu.Game.Overlays.BeatmapSet.Buttons;
+using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 
@@ -17,6 +20,26 @@ namespace osu.Game.Tests.Visual
     public class TestCaseBeatmapSetOverlay : OsuTestCase
     {
         private readonly BeatmapSetOverlay overlay;
+
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(Header),
+            typeof(ClickableUsername),
+            typeof(DrawableScore),
+            typeof(DrawableTopScore),
+            typeof(ScoresContainer),
+            typeof(AuthorInfo),
+            typeof(BasicStats),
+            typeof(BeatmapPicker),
+            typeof(Details),
+            typeof(DownloadButton),
+            typeof(FavouriteButton),
+            typeof(Header),
+            typeof(HeaderButton),
+            typeof(Info),
+            typeof(PreviewButton),
+            typeof(SuccessRate),
+        };
 
         public TestCaseBeatmapSetOverlay()
         {
@@ -28,6 +51,10 @@ namespace osu.Game.Tests.Visual
         {
             var mania = rulesets.GetRuleset(3);
             var taiko = rulesets.GetRuleset(1);
+
+            AddStep(@"show loading", () => overlay.ShowBeatmapSet(null));
+
+            AddStep(@"show online", () => overlay.FetchAndShowBeatmapSet(55));
 
             AddStep(@"show first", () =>
             {
