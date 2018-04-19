@@ -158,7 +158,7 @@ namespace osu.Game
         /// Show a beatmap set as an overlay.
         /// </summary>
         /// <param name="setId">The set to display.</param>
-        public void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
+        public void ShowBeatmapSet(int setId) => beatmapSetOverlay.FetchAndShowBeatmapSet(setId);
 
         /// <summary>
         /// Show a user's profile as an overlay.
