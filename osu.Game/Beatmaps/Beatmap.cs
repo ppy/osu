@@ -17,7 +17,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// This beatmap's info.
         /// </summary>
-        BeatmapInfo BeatmapInfo { get; }
+        BeatmapInfo BeatmapInfo { get; set; }
 
         /// <summary>
         /// This beatmap's metadata.

@@ -57,9 +57,9 @@ namespace osu.Game.Rulesets
         /// <returns></returns>
         public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset);
 
-        public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null);
+        public abstract DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null);
 
-        public virtual PerformanceCalculator CreatePerformanceCalculator(Beatmap beatmap, Score score) => null;
+        public virtual PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => null;
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
