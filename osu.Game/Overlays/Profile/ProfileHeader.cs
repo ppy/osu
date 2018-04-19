@@ -350,7 +350,7 @@ namespace osu.Game.Overlays.Profile
 
             if (user.Country != null)
             {
-                infoTextLeft.AddText("from ", lightText);
+                infoTextLeft.AddText("From ", lightText);
                 infoTextLeft.AddText(user.Country.FullName, boldItalic);
                 countryFlag.Country = user.Country;
             }
@@ -378,6 +378,10 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText(string.Join(", ", user.PlayStyle), boldItalic);
             }
 
+            infoTextLeft.NewLine();
+            infoTextLeft.AddText("Contributed ", lightText);
+            infoTextLeft.AddText($@"{user.PostCount} forum posts", boldItalic);
+
             string websiteWithoutProtcol = user.Website;
             if (!string.IsNullOrEmpty(websiteWithoutProtcol))
             {
@@ -392,8 +396,10 @@ namespace osu.Game.Overlays.Profile
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))
                 tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
-            tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
+            tryAddInfoRightLine(FontAwesome.fa_question, user.Discord);
             tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
+            tryAddInfoRightLine(FontAwesome.fa_lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
+            tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
 
             if (user.Statistics != null)
             {
