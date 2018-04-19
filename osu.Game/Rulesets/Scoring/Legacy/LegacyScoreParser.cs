@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Scoring.Legacy
                 /* score.FileChecksum = */
                 var beatmapHash = sr.ReadString();
                 score.Beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == beatmapHash);
-                currentBeatmap = beatmaps.GetWorkingBeatmap(score.Beatmap).Beatmap;
+                currentBeatmap = beatmaps.GetWorkingBeatmap(score.Beatmap).OriginalBeatmap;
 
                 /* score.PlayerName = */
                 score.User = new User { Username = sr.ReadString() };

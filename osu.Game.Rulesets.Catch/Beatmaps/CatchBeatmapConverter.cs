@@ -13,6 +13,11 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 {
     public class CatchBeatmapConverter : BeatmapConverter<CatchHitObject>
     {
+        public CatchBeatmapConverter(IBeatmap beatmap)
+            : base(beatmap)
+        {
+        }
+        
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
         protected override IEnumerable<CatchHitObject> ConvertHitObject(HitObject obj, IBeatmap beatmap)

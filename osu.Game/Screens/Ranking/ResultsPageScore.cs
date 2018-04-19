@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Ranking
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Alpha = 0.5f,
-                                    Objects = Beatmap.Beatmap.HitObjects,
+                                    Objects = Beatmap.OriginalBeatmap.HitObjects,
                                 },
                                 scoreCounter = new SlowScoreCounter(6)
                                 {

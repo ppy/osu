@@ -274,13 +274,13 @@ namespace osu.Game.Tests.Beatmaps.IO
             foreach (BeatmapInfo b in set.Beatmaps)
                 Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineBeatmapID == b.OnlineBeatmapID));
             Assert.IsTrue(set.Beatmaps.Count > 0);
-            var beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
+            var beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.OriginalBeatmap;
             Assert.IsTrue(beatmap?.HitObjects.Any() == true);
-            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 1))?.Beatmap;
+            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 1))?.OriginalBeatmap;
             Assert.IsTrue(beatmap?.HitObjects.Any() == true);
-            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 2))?.Beatmap;
+            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 2))?.OriginalBeatmap;
             Assert.IsTrue(beatmap?.HitObjects.Any() == true);
-            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 3))?.Beatmap;
+            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 3))?.OriginalBeatmap;
             Assert.IsTrue(beatmap?.HitObjects.Any() == true);
         }
 

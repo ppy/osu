@@ -13,12 +13,14 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Taiko.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new TaikoRulesetContainer(this, beatmap, isForCurrentRuleset);
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {

@@ -14,6 +14,11 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 {
     internal class OsuBeatmapConverter : BeatmapConverter<OsuHitObject>
     {
+        public OsuBeatmapConverter(IBeatmap beatmap)
+            : base(beatmap)
+        {
+        }
+
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasPosition) };
 
         protected override IEnumerable<OsuHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)

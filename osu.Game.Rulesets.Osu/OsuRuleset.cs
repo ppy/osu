@@ -22,12 +22,15 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Osu.Beatmaps;
 
 namespace osu.Game.Rulesets.Osu
 {
     public class OsuRuleset : Ruleset
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new OsuRulesetContainer(this, beatmap, isForCurrentRuleset);
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
+        public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -39,7 +42,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap)
         {
-            IEnumerable<HitObject> hitObjects = beatmap.Beatmap.HitObjects;
+            IEnumerable<HitObject> hitObjects = beatmap.OriginalBeatmap.HitObjects;
             IEnumerable<HitObject> circles = hitObjects.Where(c => !(c is IHasEndTime));
             IEnumerable<HitObject> sliders = hitObjects.Where(s => s is IHasCurve);
             IEnumerable<HitObject> spinners = hitObjects.Where(s => s is IHasEndTime && !(s is IHasCurve));

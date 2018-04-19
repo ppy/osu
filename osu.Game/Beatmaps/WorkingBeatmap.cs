@@ -14,6 +14,8 @@ using osu.Framework.IO.File;
 using System.IO;
 using osu.Game.IO.Serialization;
 using System.Diagnostics;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Beatmaps
@@ -36,7 +38,7 @@ namespace osu.Game.Beatmaps
 
             Mods.ValueChanged += mods => applyRateAdjustments();
 
-            beatmap = new AsyncLazy<IBeatmap>(populateBeatmap);
+            originalBeatmap = new AsyncLazy<IBeatmap>(populateOriginalBeatmap);
             background = new AsyncLazy<Texture>(populateBackground, b => b == null || !b.IsDisposed);
             track = new AsyncLazy<Track>(populateTrack);
             waveform = new AsyncLazy<Waveform>(populateWaveform);
@@ -51,31 +53,65 @@ namespace osu.Game.Beatmaps
         {
             var path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
             using (var sw = new StreamWriter(path))
-                sw.WriteLine(Beatmap.Serialize());
+                sw.WriteLine(OriginalBeatmap.Serialize());
             Process.Start(path);
         }
 
-        protected abstract IBeatmap GetBeatmap();
+        protected abstract IBeatmap GetOriginalBeatmap();
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
         protected virtual Skin GetSkin() => new DefaultSkin();
         protected virtual Waveform GetWaveform() => new Waveform();
         protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
 
-        public bool BeatmapLoaded => beatmap.IsResultAvailable;
-        public IBeatmap Beatmap => beatmap.Value.Result;
-        public async Task<IBeatmap> GetBeatmapAsync() => await beatmap.Value;
+        public bool BeatmapLoaded => originalBeatmap.IsResultAvailable;
+        public IBeatmap OriginalBeatmap => originalBeatmap.Value.Result;
+        public async Task<IBeatmap> GetOriginalBeatmapAsync() => await originalBeatmap.Value;
+        private readonly AsyncLazy<IBeatmap> originalBeatmap;
 
-        private readonly AsyncLazy<IBeatmap> beatmap;
-
-        private IBeatmap populateBeatmap()
+        private IBeatmap populateOriginalBeatmap()
         {
-            var b = GetBeatmap() ?? new Beatmap();
+            var b = GetOriginalBeatmap() ?? new Beatmap();
 
             // use the database-backed info.
             b.BeatmapInfo = BeatmapInfo;
 
             return b;
+        }
+
+        public IBeatmap GetBeatmap(RulesetInfo ruleset)
+        {
+            var rulesetInstance = ruleset.CreateInstance();
+
+            IBeatmapConverter converter = rulesetInstance.CreateBeatmapConverter(OriginalBeatmap);
+
+            // Check if the beatmap can be converted
+            if (!converter.CanConvert)
+                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can not be converted for the current ruleset (converter: {converter}).");
+
+            // Apply conversion mods
+            foreach (var mod in Mods.Value.OfType<IApplicableToBeatmapConverter>())
+                mod.ApplyToBeatmapConverter(converter);
+
+            // Convert
+            IBeatmap converted = converter.Convert();
+
+            // Apply difficulty mods
+            foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+
+            // Post-process
+            rulesetInstance.CreateBeatmapProcessor(converted)?.PostProcess();
+
+            // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
+            foreach (var obj in converted.HitObjects)
+                obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
+
+            foreach (var mod in Mods.Value.OfType<IApplicableToHitObject>())
+            foreach (var obj in converted.HitObjects)
+                mod.ApplyToHitObject(obj);
+
+            return converted;
         }
 
         public bool BackgroundLoaded => background.IsResultAvailable;

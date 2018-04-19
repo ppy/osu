@@ -33,18 +33,19 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private ManiaBeatmap beatmap;
 
-        public ManiaBeatmapConverter(bool isForCurrentRuleset, IBeatmap original)
+        public ManiaBeatmapConverter(IBeatmap beatmap)
+            : base(beatmap)
         {
-            IsForCurrentRuleset = isForCurrentRuleset;
+            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(new ManiaRuleset().RulesetInfo);
+            
+            var roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
+            var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
-            var roundedCircleSize = Math.Round(original.BeatmapInfo.BaseDifficulty.CircleSize);
-            var roundedOverallDifficulty = Math.Round(original.BeatmapInfo.BaseDifficulty.OverallDifficulty);
-
-            if (isForCurrentRuleset)
+            if (beatmap.BeatmapInfo.Ruleset == new ManiaRuleset().RulesetInfo)
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
             else
             {
-                float percentSliderOrSpinner = (float)original.HitObjects.Count(h => h is IHasEndTime) / original.HitObjects.Count();
+                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasEndTime) / beatmap.HitObjects.Count();
                 if (percentSliderOrSpinner < 0.2)
                     TargetColumns = 7;
                 else if (percentSliderOrSpinner < 0.3 || roundedCircleSize >= 5)
@@ -58,6 +59,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
         {
+
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
             int seed = (int)Math.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)Math.Round(difficulty.ApproachRate);

@@ -5,14 +5,13 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.OsuDifficulty.Skills;
 
 namespace osu.Game.Rulesets.Osu.OsuDifficulty
 {
-    public class OsuDifficultyCalculator : DifficultyCalculator<OsuHitObject>
+    public class OsuDifficultyCalculator : DifficultyCalculator
     {
         private const int section_length = 400;
         private const double difficulty_multiplier = 0.0675;
@@ -27,14 +26,9 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
         {
         }
 
-        protected override void PreprocessHitObjects()
-        {
-            new OsuBeatmapProcessor().PostProcess(Beatmap);
-        }
-
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
-            OsuDifficultyBeatmap beatmap = new OsuDifficultyBeatmap(Beatmap.HitObjects, TimeRate);
+            OsuDifficultyBeatmap beatmap = new OsuDifficultyBeatmap((List<OsuHitObject>)Beatmap.HitObjects, TimeRate);
             Skill[] skills =
             {
                 new Aim(),
@@ -72,7 +66,5 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
 
             return starRating;
         }
-
-        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter();
     }
 }

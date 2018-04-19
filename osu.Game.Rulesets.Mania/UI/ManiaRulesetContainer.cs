@@ -85,8 +85,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
-        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter(IsForCurrentRuleset, WorkingBeatmap.Beatmap);
-
         protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
             ManiaAction action = Playfield.Columns.ElementAt(h.Column).Action;

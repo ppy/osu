@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual
                 };
             }
 
-            private SortedList<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints;
+            private SortedList<TimingControlPoint> timingPoints => Beatmap.Value.OriginalBeatmap.ControlPointInfo.TimingPoints;
             private TimingControlPoint getNextTimingPoint(TimingControlPoint current)
             {
                 if (timingPoints[timingPoints.Count - 1] == current)

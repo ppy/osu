@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         private readonly IBeatmap beatmap;
-        protected override IBeatmap GetBeatmap() => beatmap;
+        protected override IBeatmap GetOriginalBeatmap() => beatmap;
         protected override Texture GetBackground() => null;
 
         protected override Track GetTrack()

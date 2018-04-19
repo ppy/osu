@@ -18,14 +18,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
 
-        private bool isForCurrentRuleset;
-
         [NonParallelizable]
         [TestCase("basic", false), Ignore("See: https://github.com/ppy/osu/issues/2152")]
         [TestCase("slider-generating-drumroll", false)]
-        public void Test(string name, bool isForCurrentRuleset)
+        public new void Test(string name)
         {
-            this.isForCurrentRuleset = isForCurrentRuleset;
             base.Test(name);
         }
 
@@ -43,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             };
         }
 
-        protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(isForCurrentRuleset);
+        protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
