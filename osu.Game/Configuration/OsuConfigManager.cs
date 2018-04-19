@@ -85,6 +85,8 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
             Set(OsuSetting.ScreenshotCaptureMenuCursor, false);
+
+            Set(OsuSetting.SongSelectRightMouseScroll, false);
         }
 
         public OsuConfigManager(Storage storage) : base(storage)
@@ -130,6 +132,7 @@ namespace osu.Game.Configuration
         SpeedChangeVisualisation,
         Skin,
         ScreenshotFormat,
-        ScreenshotCaptureMenuCursor
+        ScreenshotCaptureMenuCursor,
+        SongSelectRightMouseScroll
     }
 }
