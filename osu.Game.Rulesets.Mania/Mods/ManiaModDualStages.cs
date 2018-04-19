@@ -11,14 +11,14 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModDualStages : Mod, IPlayfieldTypeMod, IApplicableToBeatmapConverter<ManiaHitObject>, IApplicableToRulesetContainer<ManiaHitObject>
+    public class ManiaModDualStages : Mod, IPlayfieldTypeMod, IApplicableToBeatmapConverter, IApplicableToRulesetContainer<ManiaHitObject>
     {
         public override string Name => "Dual Stages";
         public override string ShortenedName => "DS";
         public override string Description => @"Double the stages, double the fun!";
         public override double ScoreMultiplier => 0;
 
-        public void ApplyToBeatmapConverter(BeatmapConverter<ManiaHitObject> beatmapConverter)
+        public void ApplyToBeatmapConverter(IBeatmapConverter beatmapConverter)
         {
             var mbc = (ManiaBeatmapConverter)beatmapConverter;
 

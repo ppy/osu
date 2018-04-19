@@ -57,6 +57,10 @@ namespace osu.Game.Rulesets
         /// <returns></returns>
         public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset);
 
+        public abstract IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap);
+
+        public virtual IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => null;
+
         public abstract DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null);
 
         public virtual PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => null;

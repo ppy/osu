@@ -250,7 +250,7 @@ namespace osu.Game.Tests.Visual
                     return;
 
                 lastRequest = new GetScoresRequest(newBeatmap.BeatmapInfo, newBeatmap.BeatmapInfo.Ruleset);
-                lastRequest.Success += res => res.Scores.ForEach(s => scores.Add(new PerformanceDisplay(s, newBeatmap.Beatmap)));
+                lastRequest.Success += res => res.Scores.ForEach(s => scores.Add(new PerformanceDisplay(s, newBeatmap.OriginalBeatmap)));
                 api.Queue(lastRequest);
             }
 
@@ -381,7 +381,7 @@ namespace osu.Game.Tests.Visual
                     var allMods = ruleset.GetAllMods().ToList();
                     Mod[] activeMods = modFlow.Where(c => c.Current.Value).Select(c => allMods.First(m => m.ShortenedName == c.LabelText)).ToArray();
 
-                    var diffCalc = ruleset.CreateDifficultyCalculator(beatmap.Beatmap, activeMods);
+                    var diffCalc = ruleset.CreateDifficultyCalculator(beatmap.OriginalBeatmap, activeMods);
                     if (diffCalc != null)
                     {
                         var categories = new Dictionary<string, double>();

@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Beatmaps
                 result.Mappings.Add(mapping);
             };
 
-            converter.Convert(beatmap);
+            converter.Convert();
 
             return result;
         }

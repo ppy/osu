@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps
                 this.audioManager = audioManager;
             }
 
-            protected override IBeatmap GetBeatmap()
+            protected override IBeatmap GetOriginalBeatmap()
             {
                 try
                 {

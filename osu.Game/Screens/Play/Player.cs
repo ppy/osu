@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                beatmap = working.Beatmap;
+                beatmap = working.OriginalBeatmap;
 
                 if (beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
