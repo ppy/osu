@@ -22,7 +22,7 @@ namespace osu.Game.Beatmaps
         protected readonly Beatmap<T> Beatmap;
         protected readonly Mod[] Mods;
 
-        protected DifficultyCalculator(Beatmap beatmap, Mod[] mods = null)
+        protected DifficultyCalculator(IBeatmap beatmap, Mod[] mods = null)
         {
             Mods = mods ?? new Mod[0];
 
@@ -59,6 +59,6 @@ namespace osu.Game.Beatmaps
         {
         }
 
-        protected abstract BeatmapConverter<T> CreateBeatmapConverter(Beatmap beatmap);
+        protected abstract BeatmapConverter<T> CreateBeatmapConverter(IBeatmap beatmap);
     }
 }

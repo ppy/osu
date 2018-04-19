@@ -27,27 +27,27 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmap">The Beatmap to check.</param>
         /// <returns>Whether the Beatmap can be converted using this Beatmap Converter.</returns>
-        public bool CanConvert(Beatmap beatmap) => ValidConversionTypes.All(t => beatmap.HitObjects.Any(t.IsInstanceOfType));
+        public bool CanConvert(IBeatmap beatmap) => ValidConversionTypes.All(t => beatmap.HitObjects.Any(t.IsInstanceOfType));
 
         /// <summary>
         /// Converts a Beatmap using this Beatmap Converter.
         /// </summary>
         /// <param name="original">The un-converted Beatmap.</param>
         /// <returns>The converted Beatmap.</returns>
-        public Beatmap<T> Convert(Beatmap original)
+        public Beatmap<T> Convert(IBeatmap original)
         {
             // We always operate on a clone of the original beatmap, to not modify it game-wide
             return ConvertBeatmap(original.Clone());
         }
 
-        void IBeatmapConverter.Convert(Beatmap original) => Convert(original);
+        void IBeatmapConverter.Convert(IBeatmap original) => Convert(original);
 
         /// <summary>
         /// Performs the conversion of a Beatmap using this Beatmap Converter.
         /// </summary>
         /// <param name="original">The un-converted Beatmap.</param>
         /// <returns>The converted Beatmap.</returns>
-        protected virtual Beatmap<T> ConvertBeatmap(Beatmap original)
+        protected virtual Beatmap<T> ConvertBeatmap(IBeatmap original)
         {
             var beatmap = CreateBeatmap();
 
@@ -67,7 +67,7 @@ namespace osu.Game.Beatmaps
         /// <param name="original">The hit object to convert.</param>
         /// <param name="beatmap">The un-converted Beatmap.</param>
         /// <returns>The converted hit object.</returns>
-        private IEnumerable<T> convert(HitObject original, Beatmap beatmap)
+        private IEnumerable<T> convert(HitObject original, IBeatmap beatmap)
         {
             // Check if the hitobject is already the converted type
             T tObject = original as T;
@@ -107,6 +107,6 @@ namespace osu.Game.Beatmaps
         /// <param name="original">The hit object to convert.</param>
         /// <param name="beatmap">The un-converted Beatmap.</param>
         /// <returns>The converted hit object.</returns>
-        protected abstract IEnumerable<T> ConvertHitObject(HitObject original, Beatmap beatmap);
+        protected abstract IEnumerable<T> ConvertHitObject(HitObject original, IBeatmap beatmap);
     }
 }
