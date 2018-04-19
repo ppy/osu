@@ -37,7 +37,7 @@ namespace osu.Game.Beatmaps
         public Beatmap<T> Convert(Beatmap original)
         {
             // We always operate on a clone of the original beatmap, to not modify it game-wide
-            return ConvertBeatmap(new Beatmap(original));
+            return ConvertBeatmap(original.Clone());
         }
 
         void IBeatmapConverter.Convert(Beatmap original) => Convert(original);

@@ -8,14 +8,5 @@ namespace osu.Game.Beatmaps.Legacy
     /// </summary>
     public class LegacyBeatmap : Beatmap
     {
-        /// <summary>
-        /// Constructs a new beatmap.
-        /// </summary>
-        /// <param name="original">The original beatmap to use the parameters of.</param>
-        internal LegacyBeatmap(Beatmap original = null)
-            : base(original)
-        {
-            HitObjects = original?.HitObjects;
-        }
     }
 }

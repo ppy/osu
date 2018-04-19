@@ -12,24 +12,69 @@ using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
 {
+    public interface IBeatmap : IJsonSerializable
+    {
+        /// <summary>
+        /// This beatmap's info.
+        /// </summary>
+        BeatmapInfo BeatmapInfo { get; }
+
+        /// <summary>
+        /// This beatmap's metadata.
+        /// </summary>
+        BeatmapMetadata Metadata { get; }
+
+        /// <summary>
+        /// The control points in this beatmap.
+        /// </summary>
+        ControlPointInfo ControlPointInfo { get; }
+
+        /// <summary>
+        /// The breaks in this beatmap.
+        /// </summary>
+        List<BreakPeriod> Breaks { get; }
+
+        /// <summary>
+        /// Total amount of break time in the beatmap.
+        /// </summary>
+        double TotalBreakTime { get; }
+
+        /// <summary>
+        /// The hitobjects contained by this beatmap.
+        /// </summary>
+        IEnumerable<HitObject> HitObjects { get; }
+
+        /// <summary>
+        /// Creates a shallow-clone of this beatmap and returns it.
+        /// </summary>
+        /// <returns>The shallow-cloned beatmap.</returns>
+        IBeatmap Clone();
+    }
+
     /// <summary>
     /// A Beatmap containing converted HitObjects.
     /// </summary>
-    public class Beatmap<T> : IJsonSerializable
+    public class Beatmap<T> : IBeatmap
         where T : HitObject
     {
-        public BeatmapInfo BeatmapInfo = new BeatmapInfo();
-        public ControlPointInfo ControlPointInfo = new ControlPointInfo();
-        public List<BreakPeriod> Breaks = new List<BreakPeriod>();
+        public BeatmapInfo BeatmapInfo { get; set; } = new BeatmapInfo
+        {
+            Metadata = new BeatmapMetadata
+            {
+                Artist = @"Unknown",
+                Title = @"Unknown",
+                AuthorString = @"Unknown Creator",
+            },
+            Version = @"Normal",
+            BaseDifficulty = new BeatmapDifficulty()
+        };
 
         [JsonIgnore]
         public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
 
-        /// <summary>
-        /// The HitObjects this Beatmap contains.
-        /// </summary>
-        [JsonConverter(typeof(TypedListConverter<HitObject>))]
-        public List<T> HitObjects = new List<T>();
+        public ControlPointInfo ControlPointInfo { get; set; } = new ControlPointInfo();
+
+        public List<BreakPeriod> Breaks { get; set; } = new List<BreakPeriod>();
 
         /// <summary>
         /// Total amount of break time in the beatmap.
@@ -38,51 +83,26 @@ namespace osu.Game.Beatmaps
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
 
         /// <summary>
-        /// Constructs a new beatmap.
+        /// The HitObjects this Beatmap contains.
         /// </summary>
-        /// <param name="original">The original beatmap to use the parameters of.</param>
-        public Beatmap(Beatmap<T> original = null)
-        {
-            BeatmapInfo = original?.BeatmapInfo.DeepClone() ?? BeatmapInfo;
-            ControlPointInfo = original?.ControlPointInfo ?? ControlPointInfo;
-            Breaks = original?.Breaks ?? Breaks;
-            HitObjects = original?.HitObjects ?? HitObjects;
+        [JsonConverter(typeof(TypedListConverter<HitObject>))]
+        public List<T> HitObjects = new List<T>();
 
-            if (original == null && Metadata == null)
-            {
-                // we may have no metadata in cases we weren't sourced from the database.
-                // let's fill it (and other related fields) so we don't need to null-check it in future usages.
-                BeatmapInfo = new BeatmapInfo
-                {
-                    Metadata = new BeatmapMetadata
-                    {
-                        Artist = @"Unknown",
-                        Title = @"Unknown",
-                        AuthorString = @"Unknown Creator",
-                    },
-                    Version = @"Normal",
-                    BaseDifficulty = new BeatmapDifficulty()
-                };
-            }
-        }
+        IEnumerable<HitObject> IBeatmap.HitObjects => HitObjects;
+
+        public Beatmap<T> Clone() => new Beatmap<T>
+        {
+            BeatmapInfo = BeatmapInfo.DeepClone(),
+            ControlPointInfo = ControlPointInfo,
+            Breaks = Breaks,
+            HitObjects = HitObjects
+        };
+
+        IBeatmap IBeatmap.Clone() => Clone();
     }
 
-    /// <summary>
-    /// A Beatmap containing un-converted HitObjects.
-    /// </summary>
     public class Beatmap : Beatmap<HitObject>
     {
-        /// <summary>
-        /// Constructs a new beatmap.
-        /// </summary>
-        /// <param name="original">The original beatmap to use the parameters of.</param>
-        public Beatmap(Beatmap original)
-            : base(original)
-        {
-        }
-
-        public Beatmap()
-        {
-        }
+        public new Beatmap Clone() => (Beatmap)base.Clone();
     }
 }
