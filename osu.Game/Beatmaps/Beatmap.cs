@@ -90,19 +90,19 @@ namespace osu.Game.Beatmaps
 
         IEnumerable<HitObject> IBeatmap.HitObjects => HitObjects;
 
-        public Beatmap<T> Clone() => new Beatmap<T>
-        {
-            BeatmapInfo = BeatmapInfo.DeepClone(),
-            ControlPointInfo = ControlPointInfo,
-            Breaks = Breaks,
-            HitObjects = HitObjects
-        };
-
         IBeatmap IBeatmap.Clone() => Clone();
+
+        public Beatmap<T> Clone()
+        {
+            var newInstance = (Beatmap<T>)MemberwiseClone();
+            newInstance.BeatmapInfo = BeatmapInfo.DeepClone();
+
+            return newInstance;
+        }
     }
 
     public class Beatmap : Beatmap<HitObject>
     {
-        public new Beatmap Clone() => (Beatmap)base.Clone();
+        public Beatmap Clone() => (Beatmap)base.Clone();
     }
 }
