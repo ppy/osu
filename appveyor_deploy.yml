@@ -26,3 +26,5 @@ environment:
     secure: i67IC2xj6DjjxmA6Oj2jing3+MwzLkq6CbGsjfZ7rdY=
   code_signing_password:
     secure: 34tLNqvjmmZEi97MLKfrnQ==
+artifacts:
+  - path: 'Releases\*'
