@@ -18,11 +18,11 @@ namespace osu.Game.Screens.Play
         private const float remaining_time_container_max_size = 0.3f;
         private const int vertical_margin = 25;
 
-        private IReadOnlyList<BreakPeriod> breaks;
+        private List<BreakPeriod> breaks;
 
         private readonly Container fadeContainer;
 
-        public IReadOnlyList<BreakPeriod> Breaks
+        public List<BreakPeriod> Breaks
         {
             get => breaks;
             set
