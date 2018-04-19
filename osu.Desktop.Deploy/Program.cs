@@ -57,8 +57,12 @@ namespace osu.Desktop.Deploy
 
         private static string codeSigningPassword;
 
+        private static bool interactive;
+
         public static void Main(string[] args)
         {
+            interactive = args.Length == 0;
+
             displayHeader();
 
             findSolutionPath();
@@ -82,15 +86,15 @@ namespace osu.Desktop.Deploy
             string version = $"{verBase}{increment}";
 
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Write($"Ready to deploy {version}: ");
-            Console.ReadLine();
+            Console.Write($"Ready to deploy {version}!");
+            pauseIfInteractive();
 
             sw.Start();
 
             if (!string.IsNullOrEmpty(CodeSigningCertificate))
             {
                 Console.Write("Enter code signing password: ");
-                codeSigningPassword = readLineMasked();
+                codeSigningPassword = args.Length > 0 ? args[0] : readLineMasked();
             }
 
             write("Updating AssemblyInfo...");
@@ -124,7 +128,7 @@ namespace osu.Desktop.Deploy
             updateCsprojVersion("0.0.0");
 
             write("Done!", ConsoleColor.White);
-            Console.ReadLine();
+            pauseIfInteractive();
         }
 
         private static void displayHeader()
@@ -388,8 +392,16 @@ namespace osu.Desktop.Deploy
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"FATAL ERROR: {message}");
 
-            Console.ReadLine();
+            pauseIfInteractive();
             Environment.Exit(-1);
+        }
+
+        private static void pauseIfInteractive()
+        {
+            if (interactive)
+                Console.ReadLine();
+            else
+                Console.WriteLine();
         }
 
         private static void write(string message, ConsoleColor col = ConsoleColor.Gray)
