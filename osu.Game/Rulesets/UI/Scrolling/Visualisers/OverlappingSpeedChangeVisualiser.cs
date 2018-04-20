@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Lists;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 using OpenTK;
 
@@ -22,24 +23,45 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         {
             foreach (var obj in hitObjects)
             {
-                var controlPoint = controlPointAt(obj.HitObject.StartTime);
-                obj.LifetimeStart = obj.HitObject.StartTime - timeRange / controlPoint.Multiplier;
+                // The total amount of time that the hitobject will remain visible within the timeRange, which decreases as the speed multiplier increases
+                double visibleDuration = timeRange / controlPointAt(obj.HitObject.StartTime).Multiplier;
+
+                obj.LifetimeStart = obj.HitObject.StartTime - visibleDuration;
+
+                if (obj.HitObject is IHasEndTime endTime)
+                {
+                    // At the hitobject's end time, the hitobject will be positioned such that its end rests at the origin.
+                    // This results in a negative-position value, and the absolute of it indicates the length of the hitobject.
+                    var hitObjectLength = -hitObjectPositionAt(obj, endTime.EndTime, timeRange);
+
+                    switch (direction)
+                    {
+                        case ScrollingDirection.Up:
+                        case ScrollingDirection.Down:
+                            obj.Height = (float)(hitObjectLength * length.Y);
+                            break;
+                        case ScrollingDirection.Left:
+                        case ScrollingDirection.Right:
+                            obj.Width = (float)(hitObjectLength * length.X);
+                            break;
+                    }
+                }
 
                 if (obj.HasNestedHitObjects)
                 {
                     ComputeInitialStates(obj.NestedHitObjects, direction, timeRange, length);
-                    ComputePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
+
+                    // Nested hitobjects don't need to scroll, but they do need accurate positions
+                    UpdatePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
                 }
             }
         }
 
-        public void ComputePositions(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction, double currentTime, double timeRange, Vector2 length)
+        public void UpdatePositions(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction, double currentTime, double timeRange, Vector2 length)
         {
             foreach (var obj in hitObjects)
             {
-                var controlPoint = controlPointAt(obj.HitObject.StartTime);
-
-                var position = (obj.HitObject.StartTime - currentTime) * controlPoint.Multiplier / timeRange;
+                var position = hitObjectPositionAt(obj, currentTime, timeRange);
 
                 switch (direction)
                 {
@@ -59,7 +81,28 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
             }
         }
 
+        /// <summary>
+        /// Computes the position of a <see cref="DrawableHitObject"/> at a point in time.
+        /// <para>
+        /// At t &lt; startTime, position &gt; 0. <br />
+        /// At t = startTime, position = 0. <br />
+        /// At t &gt; startTime, position &lt; 0.
+        /// </para>
+        /// </summary>
+        /// <param name="obj">The <see cref="DrawableHitObject"/>.</param>
+        /// <param name="time">The time to find the position of <paramref name="obj"/> at.</param>
+        /// <param name="timeRange">The amount of time visualised by the scrolling area.</param>
+        /// <returns>The position of <paramref name="obj"/> in the scrolling area at time = <paramref name="time"/>.</returns>
+        private double hitObjectPositionAt(DrawableHitObject obj, double time, double timeRange)
+            => (obj.HitObject.StartTime - time) / timeRange * controlPointAt(obj.HitObject.StartTime).Multiplier;
+
         private readonly MultiplierControlPoint searchPoint = new MultiplierControlPoint();
+
+        /// <summary>
+        /// Finds the <see cref="MultiplierControlPoint"/> which affects the speed of hitobjects at a specific time.
+        /// </summary>
+        /// <param name="time">The time which the <see cref="MultiplierControlPoint"/> should affect.</param>
+        /// <returns>The <see cref="MultiplierControlPoint"/>.</returns>
         private MultiplierControlPoint controlPointAt(double time)
         {
             if (controlPoints.Count == 0)
