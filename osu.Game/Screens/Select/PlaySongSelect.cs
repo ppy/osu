@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Select
                 var mods = modSelect.SelectedMods.Value;
                 if (mods.All(m => m.GetType() != autoType))
                 {
-                    modSelect.SelectedMods.Value = mods.Concat(new[] { auto });
+                    modSelect.SelectedMods.Value = mods.Append(auto);
                     removeAutoModOnResume = true;
                 }
             }

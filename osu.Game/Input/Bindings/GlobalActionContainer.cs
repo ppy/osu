@@ -45,7 +45,7 @@ namespace osu.Game.Input.Bindings
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
-            handler == null ? base.KeyBindingInputQueue : new[] { handler }.Concat(base.KeyBindingInputQueue);
+            handler == null ? base.KeyBindingInputQueue : base.KeyBindingInputQueue.Prepend(handler);
     }
 
     public enum GlobalAction
