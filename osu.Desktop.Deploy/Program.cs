@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management.Automation;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using FileWebRequest = osu.Framework.IO.Network.FileWebRequest;
@@ -99,6 +100,7 @@ namespace osu.Desktop.Deploy
 
             write("Updating AssemblyInfo...");
             updateCsprojVersion(version);
+            updateAppveyorVersion(version);
 
             write("Running build process...");
             foreach (string targetName in TargetNames.Split(','))
@@ -402,6 +404,25 @@ namespace osu.Desktop.Deploy
                 Console.ReadLine();
             else
                 Console.WriteLine();
+        }
+
+        private static bool updateAppveyorVersion(string version)
+        {
+            try
+            {
+                using (PowerShell ps = PowerShell.Create())
+                {
+                    ps.AddScript($"Update-AppveyorBuild -Version \"{version}\"");
+                    ps.Invoke();
+                }
+                return true;
+            }
+            catch
+            {
+                // we don't have appveyor and don't care
+            }
+
+            return false;
         }
 
         private static void write(string message, ConsoleColor col = ConsoleColor.Gray)
