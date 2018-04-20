@@ -52,12 +52,12 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
                     ComputeInitialStates(obj.NestedHitObjects, direction, timeRange, length);
 
                     // Nested hitobjects don't need to scroll, but they do need accurate positions
-                    ComputePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
+                    UpdatePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
                 }
             }
         }
 
-        public void ComputePositions(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction, double currentTime, double timeRange, Vector2 length)
+        public void UpdatePositions(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction, double currentTime, double timeRange, Vector2 length)
         {
             foreach (var obj in hitObjects)
             {
