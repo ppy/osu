@@ -12,7 +12,7 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected override void ParseLine(SkinConfiguration output, Section section, string line)
+        protected override void ParseLine(SkinConfiguration skin, Section section, string line)
         {
             switch (section)
             {
@@ -22,17 +22,17 @@ namespace osu.Game.Skinning
                     switch (pair.Key)
                     {
                         case @"Name":
-                            output.SkinInfo.Name = pair.Value;
+                            skin.SkinInfo.Name = pair.Value;
                             break;
                         case @"Author":
-                            output.SkinInfo.Creator = pair.Value;
+                            skin.SkinInfo.Creator = pair.Value;
                             break;
                     }
 
                     break;
             }
 
-            base.ParseLine(output, section, line);
+            base.ParseLine(skin, section, line);
         }
     }
 }
