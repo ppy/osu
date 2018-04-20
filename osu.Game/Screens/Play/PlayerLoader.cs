@@ -163,7 +163,10 @@ namespace osu.Game.Screens.Play
                         //Note that this may change if the player we load requested a re-run.
                         ValidForResume = false;
 
-                        Push(player);
+                        if (player.LoadedBeatmapSuccessfully)
+                            Push(player);
+                        else
+                            Exit();
                     });
                 }, 500);
             }
