@@ -17,20 +17,38 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Overlays.BeatmapSet.Scores;
+using System.Linq;
 
 namespace osu.Game.Overlays
 {
     public class BeatmapSetOverlay : WaveOverlayContainer
     {
+        private const int fade_duration = 300;
+
         public const float X_PADDING = 40;
         public const float RIGHT_WIDTH = 275;
 
         private readonly Header header;
         private readonly Info info;
+
         private APIAccess api;
         private RulesetStore rulesets;
 
         private readonly ScrollContainer scroll;
+
+        private BeatmapSetInfo beatmapSet;
+
+        public BeatmapSetInfo BeatmapSet
+        {
+            get => beatmapSet;
+            set
+            {
+                if (value == beatmapSet)
+                    return;
+
+                header.BeatmapSet = info.BeatmapSet = beatmapSet = value;
+            }
+        }
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
@@ -107,7 +125,8 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
             header.Details.StopPreview();
-            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
+
+            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out).OnComplete(_ => BeatmapSet = null);
         }
 
         protected override bool OnClick(InputState state)
@@ -116,17 +135,31 @@ namespace osu.Game.Overlays
             return true;
         }
 
+        public void FetchAndShowBeatmap(int beatmapId)
+        {
+            BeatmapSet = null;
+            var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
+            req.Success += res =>
+            {
+                ShowBeatmapSet(res.ToBeatmapSet(rulesets));
+                header.Picker.Beatmap.Value = header.BeatmapSet.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+            };
+            api.Queue(req);
+            Show();
+        }
+
         public void FetchAndShowBeatmapSet(int beatmapSetId)
         {
-            // todo: display the overlay while we are loading here. we need to support setting BeatmapSet to null for this to work.
+            BeatmapSet = null;
             var req = new GetBeatmapSetRequest(beatmapSetId);
             req.Success += res => ShowBeatmapSet(res.ToBeatmapSet(rulesets));
             api.Queue(req);
+            Show();
         }
 
         public void ShowBeatmapSet(BeatmapSetInfo set)
         {
-            header.BeatmapSet = info.BeatmapSet = set;
+            BeatmapSet = set;
             Show();
             scroll.ScrollTo(0);
         }
