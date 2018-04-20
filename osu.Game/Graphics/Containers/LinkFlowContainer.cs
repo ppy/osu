@@ -61,9 +61,9 @@ namespace osu.Game.Graphics.Containers
             AddText(text.Substring(previousLinkEnd));
         }
 
-        public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
         {
-            AddInternal(new DrawableLinkCompiler(AddText(text).ToList())
+            AddInternal(new DrawableLinkCompiler(AddText(text, creationParameters).ToList())
             {
                 TooltipText = tooltipText ?? (url != text ? url : string.Empty),
                 Action = () =>

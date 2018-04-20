@@ -17,13 +17,14 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
     public class ProfileHeader : Container
     {
-        private readonly OsuTextFlowContainer infoTextLeft;
+        private readonly LinkFlowContainer infoTextLeft;
         private readonly LinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
         private readonly RankGraph rankGraph;
@@ -35,6 +36,7 @@ namespace osu.Game.Overlays.Profile
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
         private readonly Box colourBar;
         private readonly DrawableFlag countryFlag;
+        private readonly BadgeContainer badgeContainer;
 
         private const float cover_height = 350;
         private const float info_height = 150;
@@ -42,6 +44,7 @@ namespace osu.Game.Overlays.Profile
         private const float avatar_size = 110;
         private const float level_position = 30;
         private const float level_height = 60;
+        private const float stats_width = 280;
 
         public ProfileHeader(User user)
         {
@@ -66,9 +69,9 @@ namespace osu.Game.Overlays.Profile
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            X = UserProfileOverlay.CONTENT_X_MARGIN,
-                            Y = -20,
-                            AutoSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN, Bottom = 20, Right = stats_width + UserProfileOverlay.CONTENT_X_MARGIN },
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
                             Children = new Drawable[]
                             {
                                 new UpdateableAvatar
@@ -116,7 +119,15 @@ namespace osu.Game.Overlays.Profile
                                             Height = 20
                                         }
                                     }
-                                }
+                                },
+                                badgeContainer = new BadgeContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Origin = Anchor.BottomLeft,
+                                    Margin = new MarginPadding { Bottom = 5 },
+                                    Alpha = 0,
+                                },
                             }
                         },
                         colourBar = new Box
@@ -130,7 +141,7 @@ namespace osu.Game.Overlays.Profile
                         }
                     }
                 },
-                infoTextLeft = new OsuTextFlowContainer(t => t.TextSize = 14)
+                infoTextLeft = new LinkFlowContainer(t => t.TextSize = 14)
                 {
                     X = UserProfileOverlay.CONTENT_X_MARGIN,
                     Y = cover_height + 20,
@@ -156,7 +167,7 @@ namespace osu.Game.Overlays.Profile
                 {
                     X = -UserProfileOverlay.CONTENT_X_MARGIN,
                     RelativeSizeAxes = Axes.Y,
-                    Width = 280,
+                    Width = stats_width,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Children = new Drawable[]
@@ -339,7 +350,7 @@ namespace osu.Game.Overlays.Profile
 
             if (user.Country != null)
             {
-                infoTextLeft.AddText("from ", lightText);
+                infoTextLeft.AddText("From ", lightText);
                 infoTextLeft.AddText(user.Country.FullName, boldItalic);
                 countryFlag.Country = user.Country;
             }
@@ -367,6 +378,10 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText(string.Join(", ", user.PlayStyle), boldItalic);
             }
 
+            infoTextLeft.NewLine();
+            infoTextLeft.AddText("Contributed ", lightText);
+            infoTextLeft.AddLink($@"{user.PostCount} forum posts", url: $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: boldItalic);
+
             string websiteWithoutProtcol = user.Website;
             if (!string.IsNullOrEmpty(websiteWithoutProtcol))
             {
@@ -381,8 +396,10 @@ namespace osu.Game.Overlays.Profile
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))
                 tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
-            tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
+            tryAddInfoRightLine(FontAwesome.fa_gamepad, user.Discord);
             tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
+            tryAddInfoRightLine(FontAwesome.fa_lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
+            tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
 
             if (user.Statistics != null)
             {
@@ -417,6 +434,8 @@ namespace osu.Game.Overlays.Profile
 
                 rankGraph.User.Value = user;
             }
+
+            badgeContainer.ShowBadges(user.Badges);
         }
 
         private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
