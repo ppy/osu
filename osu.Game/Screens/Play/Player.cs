@@ -218,6 +218,8 @@ namespace osu.Game.Screens.Play
                 }
             };
 
+            hudOverlay.PlayerSettingsOverlay.PlaybackSettings.EndReplayButton.Action = Exit;
+
             if (ShowStoryboard)
                 initializeStoryboard(false);
 
