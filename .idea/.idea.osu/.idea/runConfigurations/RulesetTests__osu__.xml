@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="RulesetTests (osu!)" type="DotNetProject" factoryName=".NET Project">
-    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Game.Rulesets.Osu.Tests/bin/Debug/netcoreapp2.0/osu.Game.Rulesets.Osu.Tests.dll" />
+    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Game.Rulesets.Osu.Tests/bin/Debug/net471/osu.Game.Rulesets.Osu.Tests.exe" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Game.Rulesets.Osu.Tests" />
     <option name="PASS_PARENT_ENVS" value="1" />
@@ -15,7 +15,7 @@
     <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
     <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
     <option name="PROJECT_KIND" value="DotNetCore" />
-    <option name="PROJECT_TFM" value=".NETCoreApp,Version=v2.0" />
+    <option name="PROJECT_TFM" value=".NETFramework,Version=v4.7.1" />
     <browser url="http://localhost:5000" />
     <method />
   </configuration>
