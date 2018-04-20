@@ -15,6 +15,7 @@ namespace osu.Game.Configuration
             // UI/selection defaults
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
             Set(OsuSetting.Skin, 0, 0, int.MaxValue);
+            Set(OsuSetting.IgnoreBeatmapSkin, false);
 
             Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
@@ -133,6 +134,7 @@ namespace osu.Game.Configuration
         Skin,
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
-        SongSelectRightMouseScroll
+        SongSelectRightMouseScroll,
+        IgnoreBeatmapSkin
     }
 }
