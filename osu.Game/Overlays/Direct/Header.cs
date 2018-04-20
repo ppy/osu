@@ -13,7 +13,6 @@ namespace osu.Game.Overlays.Direct
     public class Header : SearchableListHeader<DirectTab>
     {
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"252f3a");
-        protected override float TabStripWidth => 298;
 
         protected override DirectTab DefaultTab => DirectTab.Search;
         protected override Drawable CreateHeaderText() => new OsuSpriteText { Text = @"osu!direct", TextSize = 25 };
