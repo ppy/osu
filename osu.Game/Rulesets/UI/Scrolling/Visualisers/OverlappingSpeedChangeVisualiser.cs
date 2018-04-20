@@ -23,21 +23,24 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         {
             foreach (var obj in hitObjects)
             {
+                // For optimal lifetimes, the speed of the hitobject is factored into the time range
                 obj.LifetimeStart = obj.HitObject.StartTime - timeRange / controlPointAt(obj.HitObject.StartTime).Multiplier;
 
                 if (obj.HitObject is IHasEndTime endTime)
                 {
-                    var diff = -positionAt(endTime.EndTime, obj, timeRange);
+                    // At the hitobject's end time, the hitobject will be positioned such that its end rests at the origin.
+                    // This results in a negative-position value, and the absolute of it indicates the length of the hitobject.
+                    var hitObjectLength = -hitObjectPositionAt(obj, endTime.EndTime, timeRange);
 
                     switch (direction)
                     {
                         case ScrollingDirection.Up:
                         case ScrollingDirection.Down:
-                            obj.Height = (float)(diff * length.Y);
+                            obj.Height = (float)(hitObjectLength * length.Y);
                             break;
                         case ScrollingDirection.Left:
                         case ScrollingDirection.Right:
-                            obj.Width = (float)(diff * length.X);
+                            obj.Width = (float)(hitObjectLength * length.X);
                             break;
                     }
                 }
@@ -45,6 +48,8 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
                 if (obj.HasNestedHitObjects)
                 {
                     ComputeInitialStates(obj.NestedHitObjects, direction, timeRange, length);
+
+                    // Nested hitobjects don't need to scroll, but they do need accurate positions
                     ComputePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
                 }
             }
@@ -54,7 +59,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         {
             foreach (var obj in hitObjects)
             {
-                var position = positionAt(currentTime, obj, timeRange);
+                var position = hitObjectPositionAt(obj, currentTime, timeRange);
 
                 switch (direction)
                 {
@@ -74,10 +79,26 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
             }
         }
 
-        private double positionAt(double time, DrawableHitObject obj, double timeRange)
+        /// <summary>
+        /// Computes the position of a <see cref="DrawableHitObject"/> at a point in time. <br />
+        /// At t &lt; startTime, position &gt; 0. <br />
+        /// At t = startTime, position = 0. <br />
+        /// At t &gt; startTime, position &lt; 0.
+        /// </summary>
+        /// <param name="obj">The <see cref="DrawableHitObject"/>.</param>
+        /// <param name="time">The time to find the position of <paramref name="obj"/> at.</param>
+        /// <param name="timeRange">The amount of time visualised by the scrolling area.</param>
+        /// <returns>The position of <paramref name="obj"/> in the scrolling area at time = <paramref name="time"/>.</returns>
+        private double hitObjectPositionAt(DrawableHitObject obj, double time, double timeRange)
             => (obj.HitObject.StartTime - time) * controlPointAt(obj.HitObject.StartTime).Multiplier / timeRange;
 
         private readonly MultiplierControlPoint searchPoint = new MultiplierControlPoint();
+
+        /// <summary>
+        /// Finds the <see cref="MultiplierControlPoint"/> which affects the speed of hitobjects at a specific time.
+        /// </summary>
+        /// <param name="time">The time which the <see cref="MultiplierControlPoint"/> should affect.</param>
+        /// <returns>The <see cref="MultiplierControlPoint"/>.</returns>
         private MultiplierControlPoint controlPointAt(double time)
         {
             if (controlPoints.Count == 0)
