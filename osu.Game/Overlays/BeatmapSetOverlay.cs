@@ -126,8 +126,7 @@ namespace osu.Game.Overlays
             base.PopOut();
             header.Details.StopPreview();
 
-            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
-            BeatmapSet = null;
+            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out).OnComplete(_ => BeatmapSet = null);
         }
 
         protected override bool OnClick(InputState state)
