@@ -80,10 +80,12 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         }
 
         /// <summary>
-        /// Computes the position of a <see cref="DrawableHitObject"/> at a point in time. <br />
+        /// Computes the position of a <see cref="DrawableHitObject"/> at a point in time.
+        /// <para>
         /// At t &lt; startTime, position &gt; 0. <br />
         /// At t = startTime, position = 0. <br />
         /// At t &gt; startTime, position &lt; 0.
+        /// </para>
         /// </summary>
         /// <param name="obj">The <see cref="DrawableHitObject"/>.</param>
         /// <param name="time">The time to find the position of <paramref name="obj"/> at.</param>
