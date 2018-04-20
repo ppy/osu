@@ -97,6 +97,9 @@ namespace osu.Game.Screens.Select
 
         private readonly Container<DrawableCarouselItem> scrollableContent;
 
+
+        public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
+
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
@@ -122,6 +125,10 @@ namespace osu.Game.Screens.Select
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
+            config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
+
+            RightClickScrollingEnabled.ValueChanged += v => RightMouseScrollbar = v;
+            RightClickScrollingEnabled.TriggerChange();
         }
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)

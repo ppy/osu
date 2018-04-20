@@ -14,6 +14,7 @@ App.config text eol=crlf
 *.bat text eol=crlf
 *.cmd text eol=crlf
 *.snippet text eol=crlf
+*.manifest text eol=crlf
 
 # Check out with lf (UNIX) line endings
 *.sh text eol=lf

@@ -1,0 +1,30 @@
+# 2017-09-14
+clone_depth: 1
+version: '{branch}-{build}'
+image: Visual Studio 2017
+configuration: Debug
+cache:
+  - packages -> **\packages.config
+install:
+  - cmd: git submodule update --init --recursive --depth=5
+before_build:
+  - cmd: nuget restore -verbosity quiet
+build:
+  project: osu.Desktop.Deploy/osu.Desktop.Deploy.csproj
+  verbosity: minimal
+after_build:
+  - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
+  - appveyor DownloadFile https://puu.sh/A6g5K/4d08705438.enc # signing certificate
+  - cmd: appveyor-tools\secure-file -decrypt 4d08705438.enc -secret %decode_secret% -out %HOMEPATH%\deanherbert.pfx
+  - appveyor DownloadFile https://puu.sh/A6g75/fdc6f19b04.enc # deploy configuration
+  - cmd: appveyor-tools\secure-file -decrypt fdc6f19b04.enc -secret %decode_secret% -out osu.Desktop.Deploy\bin\Debug\net461\osu.Desktop.Deploy.exe.config
+  - cd osu.Desktop.Deploy\bin\Debug\net461\
+  - osu.Desktop.Deploy.exe %code_signing_password%
+environment:
+  TargetFramework: net461
+  decode_secret:
+    secure: i67IC2xj6DjjxmA6Oj2jing3+MwzLkq6CbGsjfZ7rdY=
+  code_signing_password:
+    secure: 34tLNqvjmmZEi97MLKfrnQ==
+artifacts:
+  - path: 'Releases\*'
