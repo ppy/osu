@@ -401,7 +401,6 @@ namespace osu.Game.Tests.Visual
 
             AddStep(@"hide", overlay.Hide);
             AddStep(@"show without reload", overlay.Show);
-            AddStep(@"show loading", () => overlay.BeatmapSet = null);
         }
     }
 }
