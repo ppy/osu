@@ -32,7 +32,13 @@ namespace osu.Game.Skinning
             return fallbackSource.GetTexture(componentName);
         }
 
-        public SampleChannel GetSample(string sampleName) => source.GetSample(sampleName) ?? fallbackSource?.GetSample(sampleName);
+        public SampleChannel GetSample(string sampleName)
+        {
+            SampleChannel sourceChannel;
+            if (!ignoreBeatmapHitsounds && (sourceChannel = source.GetSample(sampleName)) != null)
+                return sourceChannel;
+            return fallbackSource?.GetSample(sampleName);
+        }
 
         public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
         {
@@ -75,6 +81,7 @@ namespace osu.Game.Skinning
         }
 
         private Bindable<bool> ignoreBeatmapSkin = new Bindable<bool>();
+        private Bindable<bool> ignoreBeatmapHitsounds = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -82,6 +89,10 @@ namespace osu.Game.Skinning
             ignoreBeatmapSkin = config.GetBindable<bool>(OsuSetting.IgnoreBeatmapSkin);
             ignoreBeatmapSkin.ValueChanged += val => onSourceChanged();
             ignoreBeatmapSkin.TriggerChange();
+
+            ignoreBeatmapHitsounds = config.GetBindable<bool>(OsuSetting.IgnoreBeatmapHitsounds);
+            ignoreBeatmapHitsounds.ValueChanged += val => onSourceChanged();
+            ignoreBeatmapHitsounds.TriggerChange();
         }
 
         protected override void LoadComplete()

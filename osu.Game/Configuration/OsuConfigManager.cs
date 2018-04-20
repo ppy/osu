@@ -16,6 +16,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
             Set(OsuSetting.Skin, 0, 0, int.MaxValue);
             Set(OsuSetting.IgnoreBeatmapSkin, false);
+            Set(OsuSetting.IgnoreBeatmapHitsounds, false);
 
             Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
@@ -135,6 +136,7 @@ namespace osu.Game.Configuration
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
         SongSelectRightMouseScroll,
-        IgnoreBeatmapSkin
+        IgnoreBeatmapSkin,
+        IgnoreBeatmapHitsounds
     }
 }
