@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         /// <param name="timeRange">The amount of time visualised by the scrolling area.</param>
         /// <returns>The position of <paramref name="obj"/> in the scrolling area at time = <paramref name="time"/>.</returns>
         private double hitObjectPositionAt(DrawableHitObject obj, double time, double timeRange)
-            => (obj.HitObject.StartTime - time) * controlPointAt(obj.HitObject.StartTime).Multiplier / timeRange;
+            => (obj.HitObject.StartTime - time) / timeRange * controlPointAt(obj.HitObject.StartTime).Multiplier;
 
         private readonly MultiplierControlPoint searchPoint = new MultiplierControlPoint();
 
