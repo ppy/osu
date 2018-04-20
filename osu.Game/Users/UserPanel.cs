@@ -17,7 +17,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.Profile;
+using osu.Game.Overlays.Profile.Header;
 
 namespace osu.Game.Users
 {
