@@ -23,8 +23,10 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         {
             foreach (var obj in hitObjects)
             {
-                // For optimal lifetimes, the speed of the hitobject is factored into the time range
-                obj.LifetimeStart = obj.HitObject.StartTime - timeRange / controlPointAt(obj.HitObject.StartTime).Multiplier;
+                // The total amount of time that the hitobject will remain visible within the timeRange, which decreases as the speed multiplier increases
+                double visibleDuration = timeRange / controlPointAt(obj.HitObject.StartTime).Multiplier;
+
+                obj.LifetimeStart = obj.HitObject.StartTime - visibleDuration;
 
                 if (obj.HitObject is IHasEndTime endTime)
                 {
