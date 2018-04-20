@@ -1,4 +1,8 @@
-# 2017-09-14
+branches:
+  only:
+  - release
+skip_tags: true
+skip_branch_with_pr: true
 clone_depth: 1
 version: '{branch}-{build}'
 image: Visual Studio 2017
