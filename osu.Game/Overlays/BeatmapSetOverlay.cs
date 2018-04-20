@@ -27,11 +27,8 @@ namespace osu.Game.Overlays
 
         private readonly Header header;
         private readonly Info info;
-        private readonly ScoresContainer scores;
-
         private APIAccess api;
         private RulesetStore rulesets;
-        private GetScoresRequest getScoresRequest;
 
         private readonly ScrollContainer scroll;
 
@@ -40,10 +37,11 @@ namespace osu.Game.Overlays
 
         public BeatmapSetOverlay()
         {
-            FirstWaveColour = OsuColour.Gray(0.4f);
-            SecondWaveColour = OsuColour.Gray(0.3f);
-            ThirdWaveColour = OsuColour.Gray(0.2f);
-            FourthWaveColour = OsuColour.Gray(0.1f);
+            ScoresContainer scores;
+            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
+            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
+            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
+            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
 
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
@@ -88,29 +86,8 @@ namespace osu.Game.Overlays
             header.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b;
-                updateScores(b);
+                scores.Beatmap = b;
             };
-        }
-
-        private void updateScores(BeatmapInfo beatmap)
-        {
-            getScoresRequest?.Cancel();
-
-            if (!beatmap.OnlineBeatmapID.HasValue)
-            {
-                scores.CleanAllScores();
-                return;
-            }
-
-            scores.IsLoading = true;
-
-            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-            getScoresRequest.Success += r =>
-            {
-                scores.Scores = r.Scores;
-                scores.IsLoading = false;
-            };
-            api.Queue(getScoresRequest);
         }
 
         [BackgroundDependencyLoader]
@@ -123,14 +100,14 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-            FadeEdgeEffectTo(0.25f, APPEAR_DURATION, Easing.In);
+            FadeEdgeEffectTo(0.25f, WaveContainer.APPEAR_DURATION, Easing.In);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
             header.Details.StopPreview();
-            FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
+            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
         }
 
         protected override bool OnClick(InputState state)
@@ -139,7 +116,7 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        public void ShowBeatmapSet(int beatmapSetId)
+        public void FetchAndShowBeatmapSet(int beatmapSetId)
         {
             // todo: display the overlay while we are loading here. we need to support setting BeatmapSet to null for this to work.
             var req = new GetBeatmapSetRequest(beatmapSetId);

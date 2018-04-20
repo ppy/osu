@@ -14,12 +14,9 @@ namespace osu.Game.Overlays.SearchableList
 {
     public abstract class SearchableListHeader<T> : Container
     {
-        private readonly Box tabStrip;
-
         public readonly HeaderTabControl<T> Tabs;
 
         protected abstract Color4 BackgroundColour { get; }
-        protected abstract float TabStripWidth { get; } //can be removed once (if?) TabControl support auto sizing
         protected abstract T DefaultTab { get; }
         protected abstract Drawable CreateHeaderText();
         protected abstract FontAwesome Icon { get; }
@@ -63,13 +60,6 @@ namespace osu.Game.Overlays.SearchableList
                                 CreateHeaderText(),
                             },
                         },
-                        tabStrip = new Box
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Width = TabStripWidth,
-                            Height = 1,
-                        },
                         Tabs = new HeaderTabControl<T>
                         {
                             Anchor = Anchor.BottomLeft,
@@ -87,7 +77,7 @@ namespace osu.Game.Overlays.SearchableList
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            tabStrip.Colour = colours.Green;
+            Tabs.StripColour = colours.Green;
         }
     }
 }
