@@ -14,6 +14,8 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Tests.Visual
 {
@@ -50,6 +52,8 @@ namespace osu.Game.Tests.Visual
             AddStep("remove scores", () => scoresContainer.Scores = null);
             AddStep("resize to big", () => container.ResizeWidthTo(1, 300));
             AddStep("resize to normal", () => container.ResizeWidthTo(0.8f, 300));
+            AddStep("online scores", () => scoresContainer.Beatmap = new BeatmapInfo { OnlineBeatmapSetID = 1, OnlineBeatmapID = 75, Ruleset = new OsuRuleset().RulesetInfo });
+
 
             scores = new[]
             {
