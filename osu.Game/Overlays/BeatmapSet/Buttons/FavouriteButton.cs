@@ -10,7 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using OpenTK;
 
-namespace osu.Game.Overlays.BeatmapSet
+namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class FavouriteButton : HeaderButton
     {
