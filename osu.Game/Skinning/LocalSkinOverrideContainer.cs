@@ -4,9 +4,11 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Configuration;
 
 namespace osu.Game.Skinning
 {
@@ -14,9 +16,21 @@ namespace osu.Game.Skinning
     {
         public event Action SourceChanged;
 
-        public Drawable GetDrawableComponent(string componentName) => source.GetDrawableComponent(componentName) ?? fallbackSource?.GetDrawableComponent(componentName);
+        public Drawable GetDrawableComponent(string componentName)
+        {
+            Drawable sourceDrawable;
+            if (!ignoreBeatmapSkin && (sourceDrawable = source.GetDrawableComponent(componentName)) != null)
+                return sourceDrawable;
+            return fallbackSource?.GetDrawableComponent(componentName);
+        }
 
-        public Texture GetTexture(string componentName) => source.GetTexture(componentName) ?? fallbackSource.GetTexture(componentName);
+        public Texture GetTexture(string componentName)
+        {
+            Texture sourceTexture;
+            if (!ignoreBeatmapSkin && (sourceTexture = source.GetTexture(componentName)) != null)
+                return sourceTexture;
+            return fallbackSource.GetTexture(componentName);
+        }
 
         public SampleChannel GetSample(string sampleName) => source.GetSample(sampleName) ?? fallbackSource?.GetSample(sampleName);
 
@@ -58,6 +72,16 @@ namespace osu.Game.Skinning
             dependencies.CacheAs<ISkinSource>(this);
 
             return dependencies;
+        }
+
+        private Bindable<bool> ignoreBeatmapSkin = new Bindable<bool>();
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            ignoreBeatmapSkin = config.GetBindable<bool>(OsuSetting.IgnoreBeatmapSkin);
+            ignoreBeatmapSkin.ValueChanged += val => onSourceChanged();
+            ignoreBeatmapSkin.TriggerChange();
         }
 
         protected override void LoadComplete()
