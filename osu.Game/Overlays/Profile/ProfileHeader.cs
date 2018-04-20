@@ -396,7 +396,7 @@ namespace osu.Game.Overlays.Profile
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))
                 tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
-            tryAddInfoRightLine(FontAwesome.fa_question, user.Discord);
+            tryAddInfoRightLine(FontAwesome.fa_gamepad, user.Discord);
             tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
             tryAddInfoRightLine(FontAwesome.fa_lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
             tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
