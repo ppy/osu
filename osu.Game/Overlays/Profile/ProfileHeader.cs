@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Profile
 {
     public class ProfileHeader : Container
     {
-        private readonly OsuTextFlowContainer infoTextLeft;
+        private readonly LinkFlowContainer infoTextLeft;
         private readonly LinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
         private readonly RankGraph rankGraph;
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Profile
                         }
                     }
                 },
-                infoTextLeft = new OsuTextFlowContainer(t => t.TextSize = 14)
+                infoTextLeft = new LinkFlowContainer(t => t.TextSize = 14)
                 {
                     X = UserProfileOverlay.CONTENT_X_MARGIN,
                     Y = cover_height + 20,
@@ -380,7 +380,7 @@ namespace osu.Game.Overlays.Profile
 
             infoTextLeft.NewLine();
             infoTextLeft.AddText("Contributed ", lightText);
-            infoTextLeft.AddText($@"{user.PostCount} forum posts", boldItalic);
+            infoTextLeft.AddLink($@"{user.PostCount} forum posts", url: $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: boldItalic);
 
             string websiteWithoutProtcol = user.Website;
             if (!string.IsNullOrEmpty(websiteWithoutProtcol))
