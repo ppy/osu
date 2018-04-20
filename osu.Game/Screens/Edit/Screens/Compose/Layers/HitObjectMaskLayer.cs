@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             var dragLayer = new DragLayer(maskContainer.Select);
             dragLayer.DragEnd += () => maskSelection.UpdateVisibility();
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 dragLayer,
                 maskSelection,
