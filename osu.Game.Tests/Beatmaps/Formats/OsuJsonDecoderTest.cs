@@ -116,8 +116,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
         // [TestCase(with_sb)]
         public void TestParity(string beatmap)
         {
-            var beatmaps = decode(beatmap);
-            beatmaps.jsonDecoded.ShouldDeepEqual(beatmaps.legacyDecoded);
+            var legacy = decode(beatmap, out Beatmap json);
+            json.ShouldDeepEqual(legacy);
         }
 
         /// <summary>
@@ -126,15 +126,20 @@ namespace osu.Game.Tests.Beatmaps.Formats
         /// </summary>
         /// <param name="filename">The .osu file to decode.</param>
         /// <returns>The <see cref="Beatmap"/> after being decoded by an <see cref="LegacyBeatmapDecoder"/>.</returns>
-        private Beatmap decodeAsJson(string filename) => decode(filename).jsonDecoded;
+        private Beatmap decodeAsJson(string filename)
+        {
+            decode(filename, out Beatmap jsonDecoded);
+            return jsonDecoded;
+        }
 
         /// <summary>
         /// Reads a .osu file first with a <see cref="LegacyBeatmapDecoder"/>, serializes the resulting <see cref="Beatmap"/> to JSON
         /// and then deserializes the result back into a <see cref="Beatmap"/> through an <see cref="JsonBeatmapDecoder"/>.
         /// </summary>
         /// <param name="filename">The .osu file to decode.</param>
+        /// <param name="jsonDecoded">The <see cref="Beatmap"/> after being decoded by an <see cref="JsonBeatmapDecoder"/>.</param>
         /// <returns>The <see cref="Beatmap"/> after being decoded by an <see cref="LegacyBeatmapDecoder"/>.</returns>
-        private (Beatmap legacyDecoded, Beatmap jsonDecoded) decode(string filename)
+        private Beatmap decode(string filename, out Beatmap jsonDecoded)
         {
             using (var stream = Resource.OpenResource(filename))
             using (var sr = new StreamReader(stream))
@@ -149,7 +154,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     sw.Flush();
 
                     ms.Position = 0;
-                    return (legacyDecoded, new JsonBeatmapDecoder().Decode(sr2));
+
+                    jsonDecoded = new JsonBeatmapDecoder().Decode(sr2);
+                    return legacyDecoded;
                 }
             }
         }
