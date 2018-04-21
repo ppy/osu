@@ -11,6 +11,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Input;
 
 namespace osu.Game.Screens.Select.Options
 {
@@ -107,11 +108,27 @@ namespace osu.Game.Screens.Select.Options
                     Hide();
                     action?.Invoke();
                 },
-                HotKey = hotkey
+                HotKey = hotkey,
             };
 
             buttonsContainer.Add(button);
             buttonsContainer.SetLayoutPosition(button, depth);
         }
+
+        protected override bool OnHover(InputState state)
+        {
+            return true;
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+        }
+    }
+
+    public enum ButtonState
+    {
+        Contracted,
+        Expanded,
+        Exploded
     }
 }
