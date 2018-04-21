@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Threading;
+using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
@@ -47,21 +48,23 @@ namespace osu.Game.Screens.Play.HUD
             private CircularProgress progress;
 
             private Action exitAction;
-            private readonly Scheduler scheduler;
             private ScheduledDelegate scheduledExitAction;
 
+            private readonly Scheduler scheduler;
+            private readonly StopwatchClock stopwatchClock;
+
             private const int fade_duration = 200;
+            private const int text_display_time = 5000;
 
             public HoldToQuitButton(OsuSpriteText text)
             {
                 this.text = text;
                 scheduler = new Scheduler();
+                stopwatchClock = new StopwatchClock();
 
                 // TODO provide action
                 exitAction = () => Thread.Sleep(1);
             }
-
-            private void hideText() => scheduler.AddDelayed(() => text.FadeOut(fade_duration), 5000);
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -83,34 +86,42 @@ namespace osu.Game.Screens.Play.HUD
                         Size = new Vector2(15),
                         Icon = FontAwesome.fa_close
                     },
-                    progress = new CircularProgress { RelativeSizeAxes = Axes.Both, InnerRadius = 0.1f, Current = { Value = 1 } }
+                    progress = new CircularProgress { RelativeSizeAxes = Axes.Both, InnerRadius = 0.1f }
                 });
-                progress.Hide();
-                hideText();
+                scheduler.AddDelayed(() => text.FadeOut(fade_duration), text_display_time);
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
                 icon.ScaleTo(1.5f);
                 text.FadeIn(fade_duration);
-                progress.FadeIn(1000);
+                stopwatchClock.Restart();
                 scheduledExitAction = scheduler.AddDelayed(exitAction, 1000);
+
                 return base.OnMouseDown(state, args);
             }
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
                 icon.ScaleTo(1f);
-                hideText();
+                scheduler.AddDelayed(() => text.FadeOut(fade_duration), text_display_time);
+                stopwatchClock.Stop();
                 if (scheduledExitAction != null && !scheduledExitAction.Completed)
                     scheduledExitAction.Cancel();
-                progress.FadeOut(fade_duration);
+                progress.Current.SetDefault();
+
                 return base.OnMouseUp(state, args);
             }
 
             protected override void Update()
             {
                 scheduler.Update();
+                if (stopwatchClock.IsRunning)
+                {
+                    var clampedTime = MathHelper.Clamp(stopwatchClock.CurrentTime, 0, 1000);
+                    progress.Current.Value = clampedTime / 1000;
+                }
+
                 base.Update();
             }
         }
