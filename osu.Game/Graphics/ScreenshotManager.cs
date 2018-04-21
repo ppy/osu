@@ -4,6 +4,8 @@
 using System;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -12,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -21,7 +24,17 @@ namespace osu.Game.Graphics
 {
     public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalInput
     {
+        private readonly BindableBool cursorVisibility = new BindableBool(true);
+
+        /// <summary>
+        /// Changed when screenshots are being or have finished being taken, to control whether cursors should be visible.
+        /// If cursors should not be visible, cursors have 3 frames to hide themselves.
+        /// </summary>
+        public IBindable<bool> CursorVisibility => cursorVisibility;
+
         private Bindable<ScreenshotFormat> screenshotFormat;
+        private Bindable<bool> captureMenuCursor;
+
         private GameHost host;
         private Storage storage;
         private NotificationOverlay notificationOverlay;
@@ -36,6 +49,7 @@ namespace osu.Game.Graphics
             this.notificationOverlay = notificationOverlay;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
+            captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
             shutter = audio.Sample.Get("UI/shutter");
         }
@@ -55,10 +69,31 @@ namespace osu.Game.Graphics
 
         public bool OnReleased(GlobalAction action) => false;
 
-        public async void TakeScreenshotAsync()
+        private volatile int screenShotTasks;
+
+        public async Task TakeScreenshotAsync() => await Task.Run(async () =>
         {
+            Interlocked.Increment(ref screenShotTasks);
+
+            if (!captureMenuCursor.Value)
+            {
+                cursorVisibility.Value = false;
+
+                // We need to wait for at most 3 draw nodes to be drawn, following which we can be assured at least one DrawNode has been generated/drawn with the set value
+                const int frames_to_wait = 3;
+
+                int framesWaited = 0;
+                ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() => framesWaited++, 0, true);
+                while (framesWaited < frames_to_wait)
+                    Thread.Sleep(10);
+
+                waitDelegate.Cancel();
+            }
+
             using (var bitmap = await host.TakeScreenshotAsync())
             {
+                Interlocked.Decrement(ref screenShotTasks);
+
                 var fileName = getFileName();
                 if (fileName == null) return;
 
@@ -86,6 +121,14 @@ namespace osu.Game.Graphics
                     }
                 });
             }
+        });
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (cursorVisibility == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
+                cursorVisibility.Value = true;
         }
 
         private string getFileName()

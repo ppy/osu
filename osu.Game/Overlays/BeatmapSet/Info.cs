@@ -34,9 +34,14 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                source.Text = BeatmapSet.Metadata.Source;
-                tags.Text = BeatmapSet.Metadata.Tags;
+                updateDisplay();
             }
+        }
+
+        private void updateDisplay()
+        {
+            source.Text = BeatmapSet?.Metadata.Source ?? string.Empty;
+            tags.Text = BeatmapSet?.Metadata.Tags ?? string.Empty;
         }
 
         public BeatmapInfo Beatmap
@@ -132,6 +137,8 @@ namespace osu.Game.Overlays.BeatmapSet
             successRateBackground.Colour = colours.GrayE;
             source.TextColour = description.TextColour = colours.Gray5;
             tags.TextColour = colours.BlueDark;
+
+            updateDisplay();
         }
 
         private class MetadataSection : FillFlowContainer

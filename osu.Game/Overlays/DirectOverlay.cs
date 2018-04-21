@@ -22,7 +22,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCriteria, RankStatus>
+    public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCriteria, BeatmapSearchCategory>
     {
         private const float panel_padding = 10f;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
 
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
-        protected override SearchableListFilterControl<DirectSortCriteria, RankStatus> CreateFilterControl() => new FilterControl();
+        protected override SearchableListFilterControl<DirectSortCriteria, BeatmapSearchCategory> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<BeatmapSetInfo> beatmapSets;
 
@@ -89,10 +89,10 @@ namespace osu.Game.Overlays
 
             // osu!direct colours are not part of the standard palette
 
-            FirstWaveColour = OsuColour.FromHex(@"19b0e2");
-            SecondWaveColour = OsuColour.FromHex(@"2280a2");
-            ThirdWaveColour = OsuColour.FromHex(@"005774");
-            FourthWaveColour = OsuColour.FromHex(@"003a4e");
+            Waves.FirstWaveColour = OsuColour.FromHex(@"19b0e2");
+            Waves.SecondWaveColour = OsuColour.FromHex(@"2280a2");
+            Waves.ThirdWaveColour = OsuColour.FromHex(@"005774");
+            Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
             ScrollFlow.Children = new Drawable[]
             {

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.IO;
 using System.Reflection;
 using osu.Framework.Testing;
@@ -10,28 +9,27 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class OsuTestCase : TestCase
     {
-        public override void RunTest()
-        {
-            using (var host = new CleanRunHeadlessGameHost($"test-{Guid.NewGuid()}", realtime: false))
-                host.Run(new OsuTestCaseTestRunner(this));
-        }
+        protected override ITestCaseTestRunner CreateRunner() => new OsuTestCaseTestRunner();
 
-        public class OsuTestCaseTestRunner : OsuGameBase
+        public class OsuTestCaseTestRunner : OsuGameBase, ITestCaseTestRunner
         {
-            private readonly OsuTestCase testCase;
-
             protected override string MainResourceFile => File.Exists(base.MainResourceFile) ? base.MainResourceFile : Assembly.GetExecutingAssembly().Location;
 
-            public OsuTestCaseTestRunner(OsuTestCase testCase)
+            private readonly TestCaseTestRunner.TestRunner runner;
+
+            public OsuTestCaseTestRunner()
             {
-                this.testCase = testCase;
+                runner = new TestCaseTestRunner.TestRunner();
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Add(new TestCaseTestRunner.TestRunner(testCase));
+
+                Add(runner);
             }
+
+            public void RunTestBlocking(TestCase test) => runner.RunTestBlocking(test);
         }
     }
 }

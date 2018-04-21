@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -35,6 +36,8 @@ namespace osu.Game.Screens.Select.Carousel
         private Triangles triangles;
         private StarCounter starCounter;
 
+        private BeatmapSetOverlay beatmapOverlay;
+
         public DrawableCarouselBeatmap(CarouselBeatmap panel) : base(panel)
         {
             beatmap = panel.Beatmap;
@@ -42,8 +45,10 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(SongSelect songSelect, BeatmapManager manager)
+        private void load(SongSelect songSelect, BeatmapManager manager, BeatmapSetOverlay beatmapOverlay)
         {
+            this.beatmapOverlay = beatmapOverlay;
+
             if (songSelect != null)
             {
                 startRequested = songSelect.FinaliseSelection;
@@ -171,6 +176,10 @@ namespace osu.Game.Screens.Select.Carousel
             new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested?.Invoke(beatmap)),
             new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)),
             new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)),
+            new OsuMenuItem("Details", MenuItemType.Standard, () =>
+            {
+                if (beatmap.OnlineBeatmapID.HasValue) beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value);
+            }),
         };
     }
 }
