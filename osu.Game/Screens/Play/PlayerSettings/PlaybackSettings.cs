@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
@@ -19,7 +18,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         public IAdjustableClock AdjustableClock { set; get; }
 
         private readonly PlayerSliderBar<double> sliderbar;
-        public readonly SettingsButton EndReplayButton;
 
         public PlaybackSettings()
         {
@@ -57,10 +55,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         MaxValue = 2,
                         Precision = 0.1,
                     },
-                },
-                EndReplayButton = new SettingsButton
-                {
-                    Text = "End replay"
                 }
             };
 
