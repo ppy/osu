@@ -18,11 +18,11 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class HoldToQuit : FillFlowContainer
     {
-        private readonly OsuSpriteText text;
         public readonly HoldToQuitButton Button;
 
         public HoldToQuit()
         {
+            OsuSpriteText text;
             Direction = FillDirection.Horizontal;
             Spacing = new Vector2(20, 0);
             Children = new Drawable[]
