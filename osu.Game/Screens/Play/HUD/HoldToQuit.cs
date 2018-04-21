@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,37 +16,36 @@ using OpenTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class HoldToQuit : Container
+    public class HoldToQuit : FillFlowContainer
     {
         private readonly OsuSpriteText text;
-        private readonly HoldToQuitButton button;
+        public readonly HoldToQuitButton Button;
 
         public HoldToQuit()
         {
+            Direction = FillDirection.Horizontal;
+            Spacing = new Vector2(20, 0);
             Children = new Drawable[]
             {
                 text = new OsuSpriteText
                 {
                     Text = "Hold to Quit",
+                    Font = @"Exo2.0-Bold",
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
-                button = new HoldToQuitButton(text)
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight
-                }
+                Button = new HoldToQuitButton(text)
             };
             AutoSizeAxes = Axes.Both;
         }
 
-        private class HoldToQuitButton : CircularContainer
+        public class HoldToQuitButton : CircularContainer
         {
             private readonly OsuSpriteText text;
             private SpriteIcon icon;
             private CircularProgress progress;
 
-            private Action exitAction;
+            public Action ExitAction { get; set; }
             private ScheduledDelegate scheduledExitAction;
 
             private readonly Scheduler scheduler;
@@ -61,9 +59,6 @@ namespace osu.Game.Screens.Play.HUD
                 this.text = text;
                 scheduler = new Scheduler();
                 stopwatchClock = new StopwatchClock();
-
-                // TODO provide action
-                exitAction = () => Thread.Sleep(1);
             }
 
             [BackgroundDependencyLoader]
@@ -96,7 +91,7 @@ namespace osu.Game.Screens.Play.HUD
                 icon.ScaleTo(1.5f);
                 text.FadeIn(fade_duration);
                 stopwatchClock.Restart();
-                scheduledExitAction = scheduler.AddDelayed(exitAction, 1000);
+                scheduledExitAction = scheduler.AddDelayed(ExitAction, 1000);
 
                 return base.OnMouseDown(state, args);
             }
