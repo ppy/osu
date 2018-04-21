@@ -19,14 +19,7 @@ namespace osu.Game.Tests.Visual
 
             public OsuTestCaseTestRunner()
             {
-                runner = new TestCaseTestRunner.TestRunner();
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                Add(runner);
+                Add(runner = new TestCaseTestRunner.TestRunner());
             }
 
             public void RunTestBlocking(TestCase test) => runner.RunTestBlocking(test);
