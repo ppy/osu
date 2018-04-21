@@ -188,6 +188,20 @@ namespace osu.Game
             FileStore.Cleanup();
 
             AddInternal(api);
+
+            GlobalActionContainer globalBinding;
+
+            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
+            CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both }
+            };
+
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
+
+            KeyBindingStore.Register(globalBinding);
+            dependencies.Cache(globalBinding);
         }
 
         private void runMigrations()
@@ -216,20 +230,6 @@ namespace osu.Game
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            GlobalActionContainer globalBinding;
-
-            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
-            CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both }
-            };
-
-            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
-
-            KeyBindingStore.Register(globalBinding);
-            dependencies.Cache(globalBinding);
 
             // TODO: This is temporary until we reimplement the local FPS display.
             // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
