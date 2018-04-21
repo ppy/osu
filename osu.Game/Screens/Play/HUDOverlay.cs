@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
+        public readonly HoldToQuit HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         private Bindable<bool> showHud;
@@ -57,6 +58,7 @@ namespace osu.Game.Screens.Play
                     AccuracyCounter = CreateAccuracyCounter(),
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
+                    HoldToQuit = CreateHoldToQuit(),
                     ModDisplay = CreateModsContainer(),
                     PlayerSettingsOverlay = CreatePlayerSettingsOverlay()
                 }
@@ -203,6 +205,13 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
             RelativeSizeAxes = Axes.X,
+        };
+
+        protected virtual HoldToQuit CreateHoldToQuit() => new HoldToQuit
+        {
+            Anchor = Anchor.BottomRight,
+            Origin = Anchor.BottomRight,
+            Margin = new MarginPadding { Bottom = Progress.Size.Y * 1.25f, Right = 5 }
         };
 
         protected virtual ModDisplay CreateModsContainer() => new ModDisplay
