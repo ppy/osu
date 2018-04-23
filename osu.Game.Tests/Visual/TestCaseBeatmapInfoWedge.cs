@@ -110,11 +110,13 @@ namespace osu.Game.Tests.Visual
 
         private void selectBeatmap(string name)
         {
-            var infoBefore = infoWedge.Info;
+            BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
 
             AddStep($"select {name} beatmap", () =>
             {
-                beatmap.Value = new TestWorkingBeatmap(beatmaps.First(b => b.BeatmapInfo.Ruleset.ShortName == name));
+                infoBefore = infoWedge.Info;
+                WorkingBeatmap bm = new TestWorkingBeatmap(beatmaps.First(b => b.BeatmapInfo.Ruleset.ShortName == name));
+                beatmap.Value = bm;
                 infoWedge.UpdateBeatmap(beatmap);
             });
 
