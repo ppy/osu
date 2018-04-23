@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
+        private int creationOrder;
+
         protected CarouselItem()
         {
             drawableRepresentation = new Lazy<DrawableCarouselItem>(CreateDrawableRepresentation);
@@ -44,13 +46,18 @@ namespace osu.Game.Screens.Select.Carousel
 
         private readonly Lazy<DrawableCarouselItem> drawableRepresentation;
 
+        /// <summary>
+        /// Used as a default sort method for <see cref="CarouselItem"/>s of differing types.
+        /// </summary>
+        internal ulong ChildID;
+
         protected abstract DrawableCarouselItem CreateDrawableRepresentation();
 
         public virtual void Filter(FilterCriteria criteria)
         {
         }
 
-        public virtual int CompareTo(FilterCriteria criteria, CarouselItem other) => GetHashCode().CompareTo(other.GetHashCode());
+        public virtual int CompareTo(FilterCriteria criteria, CarouselItem other) => ChildID.CompareTo(other.ChildID);
     }
 
     public enum CarouselItemState
