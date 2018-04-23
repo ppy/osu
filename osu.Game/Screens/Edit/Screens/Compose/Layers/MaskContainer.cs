@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -44,8 +44,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         public override void Add(HitObjectMask drawable)
         {
-            // Rider 2018.1 requires this (roslyn analyser issue?)
-            Debug.Assert(drawable != null);
+            if (drawable == null) throw new ArgumentNullException(nameof(drawable));
 
             base.Add(drawable);
 
@@ -55,10 +54,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             drawable.DragRequested += onDragRequested;
         }
 
-        public override bool Remove(HitObjectMask drawable)
+        public override bool Remove([NotNull] HitObjectMask drawable)
         {
-            // Rider 2018.1 requires this (roslyn analyser issue?)
-            Debug.Assert(drawable != null);
+            if (drawable == null) throw new ArgumentNullException(nameof(drawable));
 
             var result = base.Remove(drawable);
 
