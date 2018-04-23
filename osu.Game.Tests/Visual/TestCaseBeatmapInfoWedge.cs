@@ -66,11 +66,11 @@ namespace osu.Game.Tests.Visual
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
                 var ruleset = rulesetInfo.CreateInstance();
-                var beatmap = createTestBeatmap(rulesetInfo);
+                var testBeatmap = createTestBeatmap(rulesetInfo);
 
-                beatmaps.Add(beatmap);
+                beatmaps.Add(testBeatmap);
 
-                selectBeatmap(beatmap);
+                selectBeatmap(testBeatmap);
 
                 // TODO: adjust cases once more info is shown for other gamemodes
                 switch (ruleset)
