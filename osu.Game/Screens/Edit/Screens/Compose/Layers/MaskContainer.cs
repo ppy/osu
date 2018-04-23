@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -43,6 +44,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         public override void Add(HitObjectMask drawable)
         {
+            if (drawable == null) throw new ArgumentNullException(nameof(drawable));
+
             base.Add(drawable);
 
             drawable.Selected += onMaskSelected;
@@ -51,8 +54,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             drawable.DragRequested += onDragRequested;
         }
 
-        public override bool Remove(HitObjectMask drawable)
+        public override bool Remove([NotNull] HitObjectMask drawable)
         {
+            if (drawable == null) throw new ArgumentNullException(nameof(drawable));
+
             var result = base.Remove(drawable);
 
             if (result)
