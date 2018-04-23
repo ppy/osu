@@ -21,7 +21,7 @@ namespace osu.Game.Beatmaps.Formats
             return output;
         }
 
-        protected abstract void ParseStreamInto(StreamReader stream, TOutput beatmap);
+        protected abstract void ParseStreamInto(StreamReader stream, TOutput output);
     }
 
     public abstract class Decoder
