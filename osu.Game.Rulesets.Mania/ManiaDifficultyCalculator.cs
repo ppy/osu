@@ -40,33 +40,33 @@ namespace osu.Game.Rulesets.Mania
         /// <summary>
         /// Strain over AverageStrain factor threshold for applying a stability penalty
         /// </summary>
-        private const double overweightFactor = 1.4;
+        private const double overweight_factor = 1.4;
 
         /// <summary>
         /// Strain over AverageStrain factor minimum for noot applying a stability penalty
         /// </summary>
-        private const double underweightFactor = 0.7;
+        private const double underweight_factor = 0.7;
 
 
         /// <summary>
         /// The highest stability strain factor that can be applied
         /// </summary>
-        private const double maxStability = 1.12;
+        private const double max_stability = 1.12;
 
         /// <summary>
         /// The lowest stability strain factor that can be applied
         /// </summary>
-        private const double minStability = 0.9;
+        private const double min_stability = 0.9;
 
         /// <summary>
         /// The pace at which stability will decrease when on an over/underweighted part of the map
         /// </summary>
-        private const double stabilityStepDecrease = 0.04;
+        private const double stability_step_decrease = 0.04;
 
         /// <summary>
         /// The pace at which stability will increase when on an normally weighted part of the map
         /// </summary>
-        private const double stabilityStepIncrease = 0.01;
+        private const double stability_step_increase = 0.01;
 
         public ManiaDifficultyCalculator(Beatmap beatmap)
             : base(beatmap)
@@ -191,23 +191,23 @@ namespace osu.Game.Rulesets.Mania
                 double factor = strain / averageStrain;
 
                 // Move the stability according to our constants
-                if (factor > overweightFactor)
+                if (factor > overweight_factor)
                 {
-                    stability -= stabilityStepDecrease;
+                    stability -= stability_step_decrease;
                 }
                 else
-                if (factor < underweightFactor)
+                if (factor < underweight_factor)
                 {
-                    stability -= stabilityStepDecrease;
+                    stability -= stability_step_decrease;
                 }
                 else
                 {
-                    stability += stabilityStepIncrease;
+                    stability += stability_step_increase;
                 }
 
                 // The stability is capped
-                if (stability > maxStability) { stability = maxStability; }
-                if (stability < minStability) { stability = minStability; }
+                if (stability > max_stability) { stability = max_stability; }
+                if (stability < min_stability) { stability = min_stability; }
 
                 // Add difficulty according to strain and stability
                 factors.Add(stability);
