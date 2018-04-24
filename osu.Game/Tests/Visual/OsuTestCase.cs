@@ -15,18 +15,14 @@ namespace osu.Game.Tests.Visual
         {
             protected override string MainResourceFile => File.Exists(base.MainResourceFile) ? base.MainResourceFile : Assembly.GetExecutingAssembly().Location;
 
-            private readonly TestCaseTestRunner.TestRunner runner;
+            private TestCaseTestRunner.TestRunner runner;
 
-            public OsuTestCaseTestRunner()
+            protected override void LoadAsyncComplete()
             {
-                runner = new TestCaseTestRunner.TestRunner();
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                Add(runner);
+                // this has to be run here rather than LoadComplete because
+                // TestCase.cs is checking the IsLoaded state (on another thread) and expects
+                // the runner to be loaded at that point.
+                Add(runner = new TestCaseTestRunner.TestRunner());
             }
 
             public void RunTestBlocking(TestCase test) => runner.RunTestBlocking(test);
