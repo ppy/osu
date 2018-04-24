@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Mania
             double weight = 1;
 
             // Averages the map strain, can be used instead of the moving average but needs commenting some code
-            //double averageStrain = highestStrains.Average(strain => strain); 
+            //double averageStrain = highestStrains.Average(strain => strain);
 
             Queue<double> currentStrains = new Queue<double>();
 
