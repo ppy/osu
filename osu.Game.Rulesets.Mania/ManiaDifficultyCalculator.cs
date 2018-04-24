@@ -32,6 +32,42 @@ namespace osu.Game.Rulesets.Mania
         /// </summary>
         private readonly List<ManiaHitObjectDifficulty> difficultyHitObjects = new List<ManiaHitObjectDifficulty>();
 
+        /// <summary>
+        /// Number of sections to keep in memory for calculating average strain. 1 = 400ms
+        /// </summary>
+        private const int memory = 150;
+
+        /// <summary>
+        /// Strain over AverageStrain factor threshold for applying a stability penalty
+        /// </summary>
+        private const double overweightFactor = 1.4;
+
+        /// <summary>
+        /// Strain over AverageStrain factor minimum for noot applying a stability penalty
+        /// </summary>
+        private const double underweightFactor = 0.7;
+
+
+        /// <summary>
+        /// The highest stability strain factor that can be applied
+        /// </summary>
+        private const double maxStability = 1.12;
+
+        /// <summary>
+        /// The lowest stability strain factor that can be applied
+        /// </summary>
+        private const double minStability = 0.9;
+
+        /// <summary>
+        /// The pace at which stability will decrease when on an over/underweighted part of the map
+        /// </summary>
+        private const double stabilityStepDecrease = 0.04;
+
+        /// <summary>
+        /// The pace at which stability will increase when on an normally weighted part of the map
+        /// </summary>
+        private const double stabilityStepIncrease = 0.01;
+
         public ManiaDifficultyCalculator(Beatmap beatmap)
             : base(beatmap)
         {
@@ -137,23 +173,9 @@ namespace osu.Game.Rulesets.Mania
 
             Queue<double> currentStrains = new Queue<double>();
 
-            int memory = 150; // number * 400ms = seconds memory | Here, a minute
-
-            // Stability reward system
-            double overweightFactor = 1.4; // When should we consider that stability is dropping because of higher strain
-            double underweightFactor = 0.7; // or lower strain
-
-            double stability = 1; // Stability base
-
-            double maxStability = 1.12; // Maximum difficulty bonus for stable difficulty
-            double minStability = 0.9;  // Maximum difficulty malus for unstable difficulty
-
-            double stabilityStepDecrease = 0.04; // Punishment growth rate for unstable parts
-            double stabilityStepIncrease = 0.01; // Reward growth rate for stable parts
-
-
             List<double> factors = new List<double>();
 
+            double stability = 1; // Stability base
             // Weight strains according to the stability to avoid burst overrating
             foreach (double strain in highestStrains)
             {
