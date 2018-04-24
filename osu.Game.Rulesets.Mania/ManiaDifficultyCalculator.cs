@@ -34,37 +34,46 @@ namespace osu.Game.Rulesets.Mania
 
         /// <summary>
         /// Number of sections to keep in memory for calculating average strain. 1 = 400ms
+        /// 150 = 60 seconds
         /// </summary>
         private const int memory = 150;
 
         /// <summary>
         /// Strain over AverageStrain factor threshold for applying a stability penalty
+        /// Increasing this value will add more leniency towards harder than normal patterns
         /// </summary>
         private const double overweight_factor = 1.4;
 
         /// <summary>
-        /// Strain over AverageStrain factor minimum for noot applying a stability penalty
+        /// Strain over AverageStrain factor minimum for not applying a stability penalty
+        /// Increasing this value will give more penalty for easier than normal patterns
         /// </summary>
         private const double underweight_factor = 0.7;
 
 
         /// <summary>
         /// The highest stability strain factor that can be applied
+        /// Increasing this value will encourage stable parts of the map
         /// </summary>
         private const double max_stability = 1.12;
 
         /// <summary>
         /// The lowest stability strain factor that can be applied
+        /// Increasing this value will encourage difficulty variation
         /// </summary>
         private const double min_stability = 0.9;
 
         /// <summary>
         /// The pace at which stability will decrease when on an over/underweighted part of the map
+        /// Increasing this value will result in quicker reaction to stability drop
+        /// The step is applied after each 400ms section
         /// </summary>
         private const double stability_step_decrease = 0.04;
 
         /// <summary>
         /// The pace at which stability will increase when on an normally weighted part of the map
+        /// Increasing this value will result in quicker reaction to stability recovery
+        /// The step is applied after each 400ms section
         /// </summary>
         private const double stability_step_increase = 0.01;
 
