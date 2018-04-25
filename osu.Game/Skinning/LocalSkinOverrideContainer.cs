@@ -46,8 +46,7 @@ namespace osu.Game.Skinning
         public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
         {
             TValue? val = null;
-            var conf = (source as Skin)?.Configuration as TConfiguration;
-            if (conf != null)
+            if ((source as Skin)?.Configuration is TConfiguration conf)
                 val = query?.Invoke(conf);
 
             return val ?? fallbackSource?.GetValue(query);
@@ -56,8 +55,7 @@ namespace osu.Game.Skinning
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
         {
             TValue val = null;
-            var conf = (source as Skin)?.Configuration as TConfiguration;
-            if (conf != null)
+            if ((source as Skin)?.Configuration is TConfiguration conf)
                 val = query?.Invoke(conf);
 
             return val ?? fallbackSource?.GetValue(query);
