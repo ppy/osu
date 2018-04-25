@@ -4,9 +4,11 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Configuration;
 
 namespace osu.Game.Skinning
 {
@@ -14,17 +16,37 @@ namespace osu.Game.Skinning
     {
         public event Action SourceChanged;
 
-        public Drawable GetDrawableComponent(string componentName) => source.GetDrawableComponent(componentName) ?? fallbackSource?.GetDrawableComponent(componentName);
+        private Bindable<bool> beatmapSkins = new Bindable<bool>();
+        private Bindable<bool> beatmapHitsounds = new Bindable<bool>();
 
-        public Texture GetTexture(string componentName) => source.GetTexture(componentName) ?? fallbackSource.GetTexture(componentName);
+        public Drawable GetDrawableComponent(string componentName)
+        {
+            Drawable sourceDrawable;
+            if (beatmapSkins && (sourceDrawable = source.GetDrawableComponent(componentName)) != null)
+                return sourceDrawable;
+            return fallbackSource?.GetDrawableComponent(componentName);
+        }
 
-        public SampleChannel GetSample(string sampleName) => source.GetSample(sampleName) ?? fallbackSource?.GetSample(sampleName);
+        public Texture GetTexture(string componentName)
+        {
+            Texture sourceTexture;
+            if (beatmapSkins && (sourceTexture = source.GetTexture(componentName)) != null)
+                return sourceTexture;
+            return fallbackSource.GetTexture(componentName);
+        }
+
+        public SampleChannel GetSample(string sampleName)
+        {
+            SampleChannel sourceChannel;
+            if (beatmapHitsounds && (sourceChannel = source.GetSample(sampleName)) != null)
+                return sourceChannel;
+            return fallbackSource?.GetSample(sampleName);
+        }
 
         public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
         {
             TValue? val = null;
-            var conf = (source as Skin)?.Configuration as TConfiguration;
-            if (conf != null)
+            if ((source as Skin)?.Configuration is TConfiguration conf)
                 val = query?.Invoke(conf);
 
             return val ?? fallbackSource?.GetValue(query);
@@ -33,8 +55,7 @@ namespace osu.Game.Skinning
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
         {
             TValue val = null;
-            var conf = (source as Skin)?.Configuration as TConfiguration;
-            if (conf != null)
+            if ((source as Skin)?.Configuration is TConfiguration conf)
                 val = query?.Invoke(conf);
 
             return val ?? fallbackSource?.GetValue(query);
@@ -58,6 +79,18 @@ namespace osu.Game.Skinning
             dependencies.CacheAs<ISkinSource>(this);
 
             return dependencies;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            beatmapSkins = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
+            beatmapSkins.ValueChanged += val => onSourceChanged();
+            beatmapSkins.TriggerChange();
+
+            beatmapHitsounds = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
+            beatmapHitsounds.ValueChanged += val => onSourceChanged();
+            beatmapHitsounds.TriggerChange();
         }
 
         protected override void LoadComplete()
