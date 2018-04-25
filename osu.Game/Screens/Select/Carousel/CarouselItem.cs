@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 var items = new List<DrawableCarouselItem>();
 
-                var self = drawableRepresentation.Value;
+                var self = DrawableRepresentation.Value;
                 if (self?.IsPresent == true) items.Add(self);
 
                 return items;
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected CarouselItem()
         {
-            drawableRepresentation = new Lazy<DrawableCarouselItem>(CreateDrawableRepresentation);
+            DrawableRepresentation = new Lazy<DrawableCarouselItem>(CreateDrawableRepresentation);
 
             Filtered.ValueChanged += v =>
             {
@@ -44,13 +44,16 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
-        private readonly Lazy<DrawableCarouselItem> drawableRepresentation;
+        protected readonly Lazy<DrawableCarouselItem> DrawableRepresentation;
 
         /// <summary>
         /// Used as a default sort method for <see cref="CarouselItem"/>s of differing types.
         /// </summary>
         internal ulong ChildID;
 
+        /// <summary>
+        /// Create a fresh drawable version of this item. If you wish to consume the current representation, use <see cref="DrawableRepresentation"/> instead.
+        /// </summary>
         protected abstract DrawableCarouselItem CreateDrawableRepresentation();
 
         public virtual void Filter(FilterCriteria criteria)
