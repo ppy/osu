@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModNoFail : Mod, IApplicableFailOverride
     {
-        public override string Name => "NoFail";
+        public override string Name => "No Fail";
         public override string ShortenedName => "NF";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_nofail;
         public override ModType Type => ModType.DifficultyReduction;

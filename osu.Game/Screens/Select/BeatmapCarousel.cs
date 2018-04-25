@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
             get { return beatmapSets.Select(g => g.BeatmapSet); }
             set
             {
-                CarouselGroup newRoot = new CarouselGroupEagerSelect();
+                CarouselRoot newRoot = new CarouselRoot(this);
 
                 Task.Run(() =>
                 {
@@ -97,15 +97,19 @@ namespace osu.Game.Screens.Select
 
         private readonly Container<DrawableCarouselItem> scrollableContent;
 
+
+        public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
+
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
 
         protected List<DrawableCarouselItem> Items = new List<DrawableCarouselItem>();
-        private CarouselGroup root = new CarouselGroupEagerSelect();
+        private CarouselRoot root;
 
         public BeatmapCarousel()
         {
+            root = new CarouselRoot(this);
             Child = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -121,6 +125,10 @@ namespace osu.Game.Screens.Select
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
+            config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
+
+            RightClickScrollingEnabled.ValueChanged += v => RightMouseScrollbar = v;
+            RightClickScrollingEnabled.TriggerChange();
         }
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -169,20 +177,43 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public void SelectBeatmap(BeatmapInfo beatmap)
+        /// <summary>
+        /// Selects a given beatmap on the carousel.
+        ///
+        /// If bypassFilters is false, we will try to select another unfiltered beatmap in the same set. If the
+        /// entire set is filtered, no selection is made.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to select.</param>
+        /// <param name="bypassFilters">Whether to select the beatmap even if it is filtered (i.e., not visible on carousel).</param>
+        /// <returns>True if a selection was made, False if it wasn't.</returns>
+        public bool SelectBeatmap(BeatmapInfo beatmap, bool bypassFilters = true)
         {
             if (beatmap?.Hidden != false)
-                return;
+                return false;
 
-            foreach (CarouselBeatmapSet group in beatmapSets)
+            foreach (CarouselBeatmapSet set in beatmapSets)
             {
-                var item = group.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
+                if (!bypassFilters && set.Filtered)
+                    continue;
+
+                var item = set.Beatmaps.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
+
+                if (item == null)
+                    // The beatmap that needs to be selected doesn't exist in this set
+                    continue;
+
+                if (!bypassFilters && item.Filtered)
+                    // The beatmap exists in this set but is filtered, so look for the first unfiltered map in the set
+                    item = set.Beatmaps.FirstOrDefault(b => !b.Filtered);
+
                 if (item != null)
                 {
                     select(item);
-                    return;
+                    return true;
                 }
             }
+
+            return false;
         }
 
         /// <summary>
@@ -305,7 +336,10 @@ namespace osu.Game.Screens.Select
         public void FlushPendingFilterOperations()
         {
             if (FilterTask?.Completed == false)
+            {
                 applyActiveCriteria(false, false);
+                Update();
+            }
         }
 
         public void Filter(FilterCriteria newCriteria, bool debounce = true)
@@ -521,6 +555,7 @@ namespace osu.Game.Screens.Select
 
                             float? setY = null;
                             if (!d.IsLoaded || beatmap.Alpha == 0) // can't use IsPresent due to DrawableCarouselItem override.
+                                // ReSharper disable once PossibleNullReferenceException (resharper broken?)
                                 setY = lastSet.Y + lastSet.DrawHeight + 5;
 
                             if (d.IsLoaded)
@@ -599,6 +634,24 @@ namespace osu.Game.Screens.Select
             // additional container and setting that container's alpha) such that we can
             // layer transformations on top, with a similar reasoning to the previous comment.
             p.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
+        }
+
+        private class CarouselRoot : CarouselGroupEagerSelect
+        {
+            private readonly BeatmapCarousel carousel;
+
+            public CarouselRoot(BeatmapCarousel carousel)
+            {
+                this.carousel = carousel;
+            }
+
+            protected override void PerformSelection()
+            {
+                if (LastSelected == null)
+                    carousel.SelectNextRandom();
+                else
+                    base.PerformSelection();
+            }
         }
     }
 }

@@ -36,6 +36,10 @@ using osu.Game.Overlays.Volume;
 
 namespace osu.Game
 {
+    /// <summary>
+    /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
+    /// for initial components that are generally retrieved via DI.
+    /// </summary>
     public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     {
         public Toolbar Toolbar;
@@ -55,6 +59,8 @@ namespace osu.Game
         private UserProfileOverlay userProfile;
 
         private BeatmapSetOverlay beatmapSetOverlay;
+
+        private ScreenshotManager screenshotManager;
 
         public virtual Storage GetStorageForStableInstall() => null;
 
@@ -133,7 +139,6 @@ namespace osu.Game
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
-
             SkinManager.CurrentSkinInfo.ValueChanged += s => configSkin.Value = s.ID;
             configSkin.ValueChanged += id => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == id) ?? SkinInfo.Default;
             configSkin.TriggerChange();
@@ -153,13 +158,19 @@ namespace osu.Game
         /// Show a beatmap set as an overlay.
         /// </summary>
         /// <param name="setId">The set to display.</param>
-        public void ShowBeatmapSet(int setId) => beatmapSetOverlay.ShowBeatmapSet(setId);
+        public void ShowBeatmapSet(int setId) => beatmapSetOverlay.FetchAndShowBeatmapSet(setId);
 
         /// <summary>
         /// Show a user's profile as an overlay.
         /// </summary>
         /// <param name="userId">The user to display.</param>
         public void ShowUser(long userId) => userProfile.ShowUser(userId);
+
+        /// <summary>
+        /// Show a beatmap's set as an overlay, displaying the given beatmap.
+        /// </summary>
+        /// <param name="beatmapId">The beatmap to show.</param>
+        public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
         protected void LoadScore(Score s)
         {
@@ -191,12 +202,16 @@ namespace osu.Game
             }
 
             Beatmap.Value = BeatmapManager.GetWorkingBeatmap(s.Beatmap);
+            Beatmap.Value.Mods.Value = s.Mods;
 
             menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
         }
 
         protected override void LoadComplete()
         {
+            // this needs to be cached before base.LoadComplete as it is used by CursorOverrideContainer.
+            dependencies.Cache(screenshotManager = new ScreenshotManager());
+
             base.LoadComplete();
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
@@ -240,6 +255,8 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
+
+            loadComponentSingleFile(screenshotManager, Add);
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
@@ -295,6 +312,21 @@ namespace osu.Game
                     if (state == Visibility.Hidden) return;
 
                     foreach (var c in singleDisplayOverlays)
+                    {
+                        if (c == overlay) continue;
+                        c.State = Visibility.Hidden;
+                    }
+                };
+            }
+
+            var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
+            foreach (var overlay in singleDisplaySideOverlays)
+            {
+                overlay.StateChanged += state =>
+                {
+                    if (state == Visibility.Hidden) return;
+
+                    foreach (var c in singleDisplaySideOverlays)
                     {
                         if (c == overlay) continue;
                         c.State = Visibility.Hidden;
@@ -420,7 +452,7 @@ namespace osu.Game
                     sensitivity.Value = 1;
                     sensitivity.Disabled = true;
 
-                    frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
+                    frameworkConfig.Set(FrameworkSetting.IgnoredInputHandlers, string.Empty);
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
                 case GlobalAction.ToggleToolbar:

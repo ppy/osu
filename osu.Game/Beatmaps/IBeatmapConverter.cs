@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Converts a Beatmap using this Beatmap Converter.
         /// </summary>
-        /// <param name="original">The un-converted Beatmap.</param>
+        /// <param name="beatmap">The un-converted Beatmap.</param>
         void Convert(Beatmap beatmap);
     }
 }

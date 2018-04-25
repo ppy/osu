@@ -11,9 +11,6 @@ namespace osu.Game.Database
     {
         protected readonly Storage Storage;
 
-        /// <summary>
-        /// Create a new <see cref="OsuDbContext"/> instance (separate from the shared context via <see cref="GetContext"/> for performing isolated operations.
-        /// </summary>
         protected readonly IDatabaseContextFactory ContextFactory;
 
         /// <summary>

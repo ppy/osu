@@ -24,5 +24,7 @@ namespace osu.Game.Skinning
         public static SkinInfo Default { get; } = new SkinInfo { Name = "osu!lazer", Creator = "team osu!" };
 
         public bool Equals(SkinInfo other) => other != null && ID == other.ID;
+
+        public override string ToString() => $"\"{Name}\" by {Creator}";
     }
 }

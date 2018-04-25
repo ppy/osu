@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets
                 var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
 
                 //add all legacy modes in correct order
-                foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
+                foreach (var r in instances.Where(r => r.LegacyID != null).OrderBy(r => r.LegacyID))
                 {
                     if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == r.RulesetInfo.ID) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets
                 context.SaveChanges();
 
                 //add any other modes
-                foreach (var r in instances.Where(r => r.LegacyID < 0))
+                foreach (var r in instances.Where(r => r.LegacyID == null))
                     if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
 

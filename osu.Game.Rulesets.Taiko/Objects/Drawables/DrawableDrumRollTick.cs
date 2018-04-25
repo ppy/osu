@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Hit:
-                    Content.ScaleTo(0, 100, Easing.OutQuint).Expire();
+                    this.ScaleTo(0, 100, Easing.OutQuint).Expire();
                     break;
             }
         }

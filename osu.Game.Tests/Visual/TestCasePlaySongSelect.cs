@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual
             IDatabaseContextFactory factory = new SingletonContextFactory(new OsuDbContext());
 
             dependencies.Cache(rulesets = new RulesetStore(factory));
-            dependencies.Cache(manager = new BeatmapManager(storage, factory, rulesets, null)
+            dependencies.Cache(manager = new BeatmapManager(storage, factory, rulesets, null, null)
             {
                 DefaultBeatmap = defaultBeatmap = game.Beatmap.Default
             });

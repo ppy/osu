@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Origin = Anchor.BottomLeft;
             X = 0;
 
-            Child = bananaContainer = new Container { RelativeSizeAxes = Axes.Both };
+            InternalChild = bananaContainer = new Container { RelativeSizeAxes = Axes.Both };
 
             foreach (var b in s.NestedHitObjects.Cast<BananaShower.Banana>())
                 AddNested(getVisualRepresentation?.Invoke(b));

@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RelativeSizeAxes = Axes.Both;
             Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
 
-            Add(MainPiece = CreateMainPiece());
+            InternalChild = MainPiece = CreateMainPiece();
             MainPiece.KiaiMode = HitObject.Kiai;
         }
 

@@ -14,6 +14,7 @@ using osu.Framework.IO.File;
 using System.IO;
 using osu.Game.IO.Serialization;
 using System.Diagnostics;
+using osu.Game.Skinning;
 
 namespace osu.Game.Beatmaps
 {
@@ -40,6 +41,7 @@ namespace osu.Game.Beatmaps
             track = new AsyncLazy<Track>(populateTrack);
             waveform = new AsyncLazy<Waveform>(populateWaveform);
             storyboard = new AsyncLazy<Storyboard>(populateStoryboard);
+            skin = new AsyncLazy<Skin>(populateSkin);
         }
 
         /// <summary>
@@ -56,6 +58,7 @@ namespace osu.Game.Beatmaps
         protected abstract Beatmap GetBeatmap();
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
+        protected virtual Skin GetSkin() => new DefaultSkin();
         protected virtual Waveform GetWaveform() => new Waveform();
         protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
 
@@ -109,6 +112,13 @@ namespace osu.Game.Beatmaps
 
         private Storyboard populateStoryboard() => GetStoryboard();
 
+        public bool SkinLoaded => skin.IsResultAvailable;
+        public Skin Skin => skin.Value.Result;
+        public async Task<Skin> GetSkinAsync() => await skin.Value;
+        private readonly AsyncLazy<Skin> skin;
+
+        private Skin populateSkin() => GetSkin();
+
         public void TransferTo(WorkingBeatmap other)
         {
             if (track.IsResultAvailable && Track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
@@ -123,6 +133,7 @@ namespace osu.Game.Beatmaps
             if (BackgroundLoaded) Background?.Dispose();
             if (WaveformLoaded) Waveform?.Dispose();
             if (StoryboardLoaded) Storyboard?.Dispose();
+            if (SkinLoaded) Skin?.Dispose();
         }
 
         /// <summary>

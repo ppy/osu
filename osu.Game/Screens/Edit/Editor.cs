@@ -12,6 +12,8 @@ using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
+using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Screens.Compose;
@@ -26,13 +28,32 @@ namespace osu.Game.Screens.Edit
 
         public override bool ShowOverlaysOnEnter => false;
 
-        private readonly Box bottomBackground;
-        private readonly Container screenContainer;
+        private Box bottomBackground;
+        private Container screenContainer;
 
         private EditorScreen currentScreen;
 
-        public Editor()
+        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
+
+        private EditorClock clock;
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
+            // TODO: should probably be done at a RulesetContainer level to share logic with Player.
+            var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
+            clock = new EditorClock(Beatmap.Value.Beatmap.ControlPointInfo, beatDivisor) { IsCoupled = false };
+            clock.ChangeSource(sourceClock);
+
+            dependencies.CacheAs<IFrameBasedClock>(clock);
+            dependencies.CacheAs<IAdjustableClock>(clock);
+            dependencies.Cache(beatDivisor);
+
             EditorMenuBar menuBar;
             TimeInfoContainer timeInfo;
             SummaryTimeline timeline;
@@ -130,11 +151,7 @@ namespace osu.Game.Screens.Edit
             timeline.Beatmap.BindTo(Beatmap);
             playback.Beatmap.BindTo(Beatmap);
             menuBar.Mode.ValueChanged += onModeChanged;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
             bottomBackground.Colour = colours.Gray2;
         }
 
@@ -161,7 +178,16 @@ namespace osu.Game.Screens.Edit
             }
 
             currentScreen.Beatmap.BindTo(Beatmap);
-            screenContainer.Add(currentScreen);
+            LoadComponentAsync(currentScreen, screenContainer.Add);
+        }
+
+        protected override bool OnWheel(InputState state)
+        {
+            if (state.Mouse.WheelDelta > 0)
+                clock.SeekBackward(true);
+            else
+                clock.SeekForward(true);
+            return true;
         }
 
         protected override void OnResuming(Screen last)

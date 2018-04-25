@@ -25,14 +25,20 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// </summary>
         protected readonly FastRandom Random;
 
-        protected PatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern)
+        /// <summary>
+        /// The beatmap which <see cref="HitObject"/> is being converted from.
+        /// </summary>
+        protected readonly Beatmap OriginalBeatmap;
+
+        protected PatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, Beatmap originalBeatmap)
             : base(hitObject, beatmap, previousPattern)
         {
             if (random == null) throw new ArgumentNullException(nameof(random));
-            if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
-            if (previousPattern == null) throw new ArgumentNullException(nameof(previousPattern));
+            if (originalBeatmap == null) throw new ArgumentNullException(nameof(originalBeatmap));
 
             Random = random;
+            OriginalBeatmap = originalBeatmap;
+
             RandomStart = TotalColumns == 8 ? 1 : 0;
         }
 
@@ -94,17 +100,20 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 if (conversionDifficulty != null)
                     return conversionDifficulty.Value;
 
-                HitObject lastObject = Beatmap.HitObjects.LastOrDefault();
-                HitObject firstObject = Beatmap.HitObjects.FirstOrDefault();
+                HitObject lastObject = OriginalBeatmap.HitObjects.LastOrDefault();
+                HitObject firstObject = OriginalBeatmap.HitObjects.FirstOrDefault();
 
                 double drainTime = (lastObject?.StartTime ?? 0) - (firstObject?.StartTime ?? 0);
-                drainTime -= Beatmap.TotalBreakTime;
+                drainTime -= OriginalBeatmap.TotalBreakTime;
 
                 if (drainTime == 0)
-                    drainTime = 10000;
+                    drainTime = 10000000;
 
-                BeatmapDifficulty difficulty = Beatmap.BeatmapInfo.BaseDifficulty;
-                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + Beatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
+                // We need this in seconds
+                drainTime /= 1000;
+
+                BeatmapDifficulty difficulty = OriginalBeatmap.BeatmapInfo.BaseDifficulty;
+                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + OriginalBeatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
                 conversionDifficulty = Math.Min(conversionDifficulty.Value, 12);
 
                 return conversionDifficulty.Value;

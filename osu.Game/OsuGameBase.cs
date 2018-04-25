@@ -34,7 +34,12 @@ using osu.Game.Skinning;
 
 namespace osu.Game
 {
-    public class OsuGameBase : Framework.Game, IOnlineComponent, ICanAcceptFiles
+    /// <summary>
+    /// The most basic <see cref="Game"/> that can be used to host osu! components and systems.
+    /// Unlike <see cref="OsuGame"/>, this class will not load any kind of UI, allowing it to be used
+    /// for provide dependencies to test cases without interfering with them.
+    /// </summary>
+    public class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
         protected OsuConfigManager LocalConfig;
 
@@ -55,8 +60,6 @@ namespace osu.Game
         protected CursorOverrideContainer CursorOverrideContainer;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
-
-        public APIAccess API;
 
         private Container content;
 
@@ -107,17 +110,16 @@ namespace osu.Game
             runMigrations();
 
             dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
+            dependencies.CacheAs<ISkinSource>(SkinManager);
 
-            dependencies.Cache(API = new APIAccess
-            {
-                Username = LocalConfig.Get<string>(OsuSetting.Username),
-                Token = LocalConfig.Get<string>(OsuSetting.Token)
-            });
-            dependencies.CacheAs<IAPIProvider>(API);
+            var api = new APIAccess(LocalConfig);
+
+            dependencies.Cache(api);
+            dependencies.CacheAs<IAPIProvider>(api);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Host));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, api, Audio, Host));
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
@@ -183,9 +185,23 @@ namespace osu.Game
                 lastBeatmap = b;
             };
 
-            API.Register(this);
-
             FileStore.Cleanup();
+
+            AddInternal(api);
+
+            GlobalActionContainer globalBinding;
+
+            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
+            CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both }
+            };
+
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
+
+            KeyBindingStore.Register(globalBinding);
+            dependencies.Cache(globalBinding);
         }
 
         private void runMigrations()
@@ -211,33 +227,9 @@ namespace osu.Game
 
         private WorkingBeatmap lastBeatmap;
 
-        public void APIStateChanged(APIAccess api, APIState state)
-        {
-            switch (state)
-            {
-                case APIState.Online:
-                    LocalConfig.Set(OsuSetting.Username, LocalConfig.Get<bool>(OsuSetting.SaveUsername) ? API.Username : string.Empty);
-                    break;
-            }
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            GlobalActionContainer globalBinding;
-
-            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
-            CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both }
-            };
-
-            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
-
-            KeyBindingStore.Register(globalBinding);
-            dependencies.Cache(globalBinding);
 
             // TODO: This is temporary until we reimplement the local FPS display.
             // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
@@ -251,24 +243,6 @@ namespace osu.Game
             if (LocalConfig == null)
                 LocalConfig = new OsuConfigManager(host.Storage);
             base.SetHost(host);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            API.Update();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            //refresh token may have changed.
-            if (LocalConfig != null && API != null)
-            {
-                LocalConfig.Set(OsuSetting.Token, LocalConfig.Get<bool>(OsuSetting.SavePassword) ? API.Token : string.Empty);
-                LocalConfig.Save();
-            }
-
-            base.Dispose(isDisposing);
         }
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();

@@ -10,10 +10,9 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -38,11 +37,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Container<DrawableSliderTick> ticks;
             Container<DrawableRepeatPoint> repeatPoints;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 Body = new SliderBody(s)
                 {
-                    AccentColour = AccentColour,
                     PathWidth = s.Scale * 64,
                 },
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
@@ -51,12 +49,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
-                    AccentColour = AccentColour,
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableHitCircle(s.HeadCircle) { Position = s.TailCircle.Position - s.Position },
-                TailCircle = new DrawableSliderTail(s.TailCircle) { Position = s.TailCircle.Position - s.Position }
+                HeadCircle = new DrawableSliderHead(s, s.HeadCircle),
+                TailCircle = new DrawableSliderTail(s, s.TailCircle)
             };
 
             components.Add(Body);
@@ -84,6 +81,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 components.Add(drawableRepeatPoint);
                 AddNested(drawableRepeatPoint);
             }
+
+            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+        }
+
+        public override Color4 AccentColour
+        {
+            get { return base.AccentColour; }
+            set
+            {
+                base.AccentColour = value;
+                Body.AccentColour = AccentColour;
+                Ball.AccentColour = AccentColour;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -102,10 +112,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Tracking = Ball.Tracking;
 
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
-
-            //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (!HeadCircle.IsHit)
-                HeadCircle.Position = slider.CurvePositionAt(completionProgress);
 
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
             foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
@@ -170,8 +176,5 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public Drawable ProxiedLayer => HeadCircle.ApproachCircle;
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Body.ReceiveMouseInputAt(screenSpacePos);
-
-        public override Vector2 SelectionPoint => ToScreenSpace(OriginPosition);
-        public override Quad SelectionQuad => Body.PathDrawQuad;
     }
 }

@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Replays.Types
         /// Populates this <see cref="ReplayFrame"/> using values from a <see cref="LegacyReplayFrame"/>.
         /// </summary>
         /// <param name="legacyFrame">The <see cref="LegacyReplayFrame"/> to extract values from.</param>
-        /// <param name="score">The score.</param>
         /// <param name="beatmap">The beatmap.</param>
         void ConvertFrom(LegacyReplayFrame legacyFrame, Beatmap beatmap);
     }

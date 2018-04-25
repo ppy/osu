@@ -95,22 +95,22 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createSliderEnds()
         {
-            HeadCircle = new HitCircle
+            HeadCircle = new SliderCircle(this)
             {
                 StartTime = StartTime,
                 Position = Position,
-                IndexInCurrentCombo = IndexInCurrentCombo,
-                ComboColour = ComboColour,
                 Samples = Samples,
-                SampleControlPoint = SampleControlPoint
+                SampleControlPoint = SampleControlPoint,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboIndex = ComboIndex,
             };
 
-            TailCircle = new HitCircle
+            TailCircle = new SliderCircle(this)
             {
                 StartTime = EndTime,
                 Position = EndPosition,
                 IndexInCurrentCombo = IndexInCurrentCombo,
-                ComboColour = ComboColour
+                ComboIndex = ComboIndex,
             };
 
             AddNested(HeadCircle);
@@ -160,7 +160,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                         Position = Position + Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
                         Scale = Scale,
-                        ComboColour = ComboColour,
                         Samples = sampleList
                     });
                 }
@@ -179,7 +178,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                     Position = Position + Curve.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
-                    ComboColour = ComboColour,
                     Samples = new List<SampleInfo>(RepeatSamples[repeatIndex])
                 });
             }

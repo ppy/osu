@@ -4,9 +4,6 @@
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -30,7 +27,6 @@ namespace osu.Game.Overlays.Mods
         private ModIcon backgroundIcon;
         private readonly SpriteText text;
         private readonly Container<ModIcon> iconsContainer;
-        private SampleChannel sampleOn, sampleOff;
 
         /// <summary>
         /// Fired when the selection changes.
@@ -100,7 +96,6 @@ namespace osu.Game.Overlays.Mods
 
             foregroundIcon.Highlighted = Selected;
 
-            (selectedIndex == -1 ? sampleOff : sampleOn).Play();
             SelectionChanged?.Invoke(SelectedMod);
             return true;
         }
@@ -151,13 +146,6 @@ namespace osu.Game.Overlays.Mods
         public Mod[] Mods { get; private set; }
 
         public virtual Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            sampleOn = audio.Sample.Get(@"UI/check-on");
-            sampleOff = audio.Sample.Get(@"UI/check-off");
-        }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {

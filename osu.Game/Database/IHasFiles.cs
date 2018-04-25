@@ -10,6 +10,8 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TFile">The model representing a file.</typeparam>
     public interface IHasFiles<TFile>
+        where TFile : INamedFileInfo
+
     {
         List<TFile> Files { get; set; }
     }
