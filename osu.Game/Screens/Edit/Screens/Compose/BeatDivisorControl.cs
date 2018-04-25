@@ -137,12 +137,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                             {
                                                 new Drawable[]
                                                 {
-                                                    //new DivisorButton
-                                                    //{
-                                                    //    Icon = FontAwesome.fa_chevron_left,
-                                                    //    Action = beatDivisor.PreviousPanel,
-                                                    //    //Anchor = Anchor.BottomRight
-                                                    //},
                                                     new TextFlowContainer(s => s.TextSize = 11)
                                                     {
                                                         Padding = new MarginPadding { Horizontal = 0 },
@@ -150,19 +144,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                                         RelativeSizeAxes = Axes.Both,
                                                         TextAnchor = Anchor.TopCentre
                                                     },
-                                                    //new DivisorButton
-                                                    //{
-                                                    //    Icon = FontAwesome.fa_chevron_right,
-                                                    //    Action = beatDivisor.NextPanel,
-                                                    //    //Anchor = Anchor.BottomRight
-                                                    //},
                                                 },
                                             },
                                             ColumnDimensions = new[]
                                             {
-                                                //new Dimension(GridSizeMode.Absolute, 60),
                                                 new Dimension(),
-                                                //new Dimension(GridSizeMode.Absolute, 20)
                                             }
                                         }
                                     }
@@ -194,7 +180,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                                         Action = beatDivisor.PreviousPanel,
                                                         //Anchor = Anchor.BottomRight
                                                     },
-                                                    panelText = new DivisorPanelText(beatDivisor), // This does not update
+                                                    panelText = new DivisorPanelText(beatDivisor),
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.fa_chevron_right,
@@ -224,22 +210,22 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     }
                 }
             };
-            this.beatDivisor.ValueChanged += UpdateDivisorsText; //updateText => { divisorText.Text = $"1/{beatDivisor.Value}"; };
-            this.beatDivisor.ValidDivisorsChanged += UpdatePanelText; //() => { panelText.Text = $"{beatDivisor.Panel}"; };
-            UpdateDivisorsText(0);
-            UpdatePanelText();
+            beatDivisor.ValueChanged += updateDivisorsText;
+            beatDivisor.ValidDivisorsChanged += updatePanelText;
+            updateDivisorsText(0);
+            updatePanelText();
         }
 
-        void UpdateDivisorsText(int a) => divisorText.Text = $"1/{beatDivisor.Value}";
-        void UpdatePanelText() => panelText.Text = $"{beatDivisor.Panel}";
+        private void updateDivisorsText(int a) => divisorText.Text = $"1/{beatDivisor.Value}";
+        private void updatePanelText() => panelText.Text = $"{beatDivisor.Panel}";
 
         private class DivisorPanelText : SpriteText
         {
             private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
-            public DivisorPanelText(BindableBeatDivisor beatDivisor)
+            public DivisorPanelText(BindableBeatDivisor bd)
             {
-                this.beatDivisor.BindTo(beatDivisor);
+                beatDivisor.BindTo(bd);
 
                 TextSize = 12;
                 Anchor = Anchor.Centre;
@@ -251,24 +237,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             {
                 Colour = colours.BlueLighter;
             }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                //beatDivisor.ValidDivisorsChanged += updateText;
-                //updateText();
-            }
-
-            //private void updateText() => Text = $"{beatDivisor.Panel}"; // Someone tell me why this does not get triggered when changing the divisors
         }
         private class DivisorText : SpriteText
         {
             private readonly Bindable<int> beatDivisor = new Bindable<int>();
 
-            public DivisorText(BindableBeatDivisor beatDivisor)
+            public DivisorText(BindableBeatDivisor bd)
             {
-                this.beatDivisor.BindTo(beatDivisor);
+                beatDivisor.BindTo(bd);
 
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
@@ -279,16 +255,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             {
                 Colour = colours.BlueLighter;
             }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                //beatDivisor.ValueChanged += v => updateText();
-                //updateText();
-            }
-
-            //private void updateText() => Text = $"1/{beatDivisor.Value}";
         }
 
         private class DivisorButton : IconButton
@@ -319,12 +285,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             private Marker marker;
 
             private readonly BindableBeatDivisor beatDivisor;
-            // Removed local property, using object reference for the available divisors property
 
-            public TickSliderBar(BindableBeatDivisor beatDivisor)
+            public TickSliderBar(BindableBeatDivisor bd)
             {
-                CurrentNumber.BindTo(this.beatDivisor = beatDivisor);
-                //availableDivisors = beatDivisor.ValidDivisors;
+                CurrentNumber.BindTo(beatDivisor = bd);
 
                 Padding = new MarginPadding { Horizontal = 5 };
             }
@@ -446,9 +410,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             {
                 private readonly int divisor;
 
-                public Tick(int divisor)
+                public Tick(int d)
                 {
-                    this.divisor = divisor;
+                    divisor = d;
                     Size = new Vector2(2.5f, 10);
 
                     InternalChild = new Box { RelativeSizeAxes = Axes.Both };
