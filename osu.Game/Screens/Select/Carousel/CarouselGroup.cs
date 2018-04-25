@@ -16,11 +16,22 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected List<CarouselItem> InternalChildren = new List<CarouselItem>();
 
+        /// <summary>
+        /// Used to assign a monotonically increasing ID to children as they are added. This member is
+        /// incremented whenever a child is added.
+        /// </summary>
+        private ulong currentChildID;
+
         public override List<DrawableCarouselItem> Drawables
         {
             get
             {
                 var drawables = base.Drawables;
+
+                // if we are explicitly not present, don't ever present children.
+                // without this check, children drawables can potentially be presented without their group header.
+                if (DrawableRepresentation.Value?.IsPresent == false) return drawables;
+
                 foreach (var c in InternalChildren)
                     drawables.AddRange(c.Drawables);
                 return drawables;
@@ -39,6 +50,7 @@ namespace osu.Game.Screens.Select.Carousel
         public virtual void AddChild(CarouselItem i)
         {
             i.State.ValueChanged += v => ChildItemStateChanged(i, v);
+            i.ChildID = ++currentChildID;
             InternalChildren.Add(i);
         }
 

@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management.Automation;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using FileWebRequest = osu.Framework.IO.Network.FileWebRequest;
@@ -57,8 +58,12 @@ namespace osu.Desktop.Deploy
 
         private static string codeSigningPassword;
 
+        private static bool interactive;
+
         public static void Main(string[] args)
         {
+            interactive = args.Length == 0;
+
             displayHeader();
 
             findSolutionPath();
@@ -82,19 +87,20 @@ namespace osu.Desktop.Deploy
             string version = $"{verBase}{increment}";
 
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Write($"Ready to deploy {version}: ");
-            Console.ReadLine();
+            Console.Write($"Ready to deploy {version}!");
+            pauseIfInteractive();
 
             sw.Start();
 
             if (!string.IsNullOrEmpty(CodeSigningCertificate))
             {
                 Console.Write("Enter code signing password: ");
-                codeSigningPassword = readLineMasked();
+                codeSigningPassword = args.Length > 0 ? args[0] : readLineMasked();
             }
 
             write("Updating AssemblyInfo...");
             updateCsprojVersion(version);
+            updateAppveyorVersion(version);
 
             write("Running build process...");
             foreach (string targetName in TargetNames.Split(','))
@@ -124,7 +130,7 @@ namespace osu.Desktop.Deploy
             updateCsprojVersion("0.0.0");
 
             write("Done!", ConsoleColor.White);
-            Console.ReadLine();
+            pauseIfInteractive();
         }
 
         private static void displayHeader()
@@ -388,8 +394,35 @@ namespace osu.Desktop.Deploy
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"FATAL ERROR: {message}");
 
-            Console.ReadLine();
+            pauseIfInteractive();
             Environment.Exit(-1);
+        }
+
+        private static void pauseIfInteractive()
+        {
+            if (interactive)
+                Console.ReadLine();
+            else
+                Console.WriteLine();
+        }
+
+        private static bool updateAppveyorVersion(string version)
+        {
+            try
+            {
+                using (PowerShell ps = PowerShell.Create())
+                {
+                    ps.AddScript($"Update-AppveyorBuild -Version \"{version}\"");
+                    ps.Invoke();
+                }
+                return true;
+            }
+            catch
+            {
+                // we don't have appveyor and don't care
+            }
+
+            return false;
         }
 
         private static void write(string message, ConsoleColor col = ConsoleColor.Gray)

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Diagnostics;
+using osu.Framework.Configuration;
 using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API
@@ -12,7 +13,13 @@ namespace osu.Game.Online.API
         private readonly string clientSecret;
         private readonly string endpoint;
 
-        public OAuthToken Token;
+        public readonly Bindable<OAuthToken> Token = new Bindable<OAuthToken>();
+
+        public string TokenString
+        {
+            get => Token.Value?.ToString();
+            set => Token.Value = string.IsNullOrEmpty(value) ? null : OAuthToken.Parse(value);
+        }
 
         internal OAuth(string clientId, string clientSecret, string endpoint)
         {
@@ -47,7 +54,7 @@ namespace osu.Game.Online.API
                     return false;
                 }
 
-                Token = req.ResponseObject;
+                Token.Value = req.ResponseObject;
                 return true;
             }
         }
@@ -66,14 +73,14 @@ namespace osu.Game.Online.API
                 {
                     req.Perform();
 
-                    Token = req.ResponseObject;
+                    Token.Value = req.ResponseObject;
                     return true;
                 }
             }
             catch
             {
                 //todo: potentially only kill the refresh token on certain exception types.
-                Token = null;
+                Token.Value = null;
                 return false;
             }
         }
@@ -95,15 +102,15 @@ namespace osu.Game.Online.API
                 if (accessTokenValid) return true;
 
                 // if not, let's try using our refresh token to request a new access token.
-                if (!string.IsNullOrEmpty(Token?.RefreshToken))
+                if (!string.IsNullOrEmpty(Token.Value?.RefreshToken))
                     // ReSharper disable once PossibleNullReferenceException
-                    AuthenticateWithRefresh(Token.RefreshToken);
+                    AuthenticateWithRefresh(Token.Value.RefreshToken);
 
                 return accessTokenValid;
             }
         }
 
-        private bool accessTokenValid => Token?.IsValid ?? false;
+        private bool accessTokenValid => Token.Value?.IsValid ?? false;
 
         internal bool HasValidAccessToken => RequestAccessToken() != null;
 
@@ -111,12 +118,12 @@ namespace osu.Game.Online.API
         {
             if (!ensureAccessToken()) return null;
 
-            return Token.AccessToken;
+            return Token.Value.AccessToken;
         }
 
         internal void Clear()
         {
-            Token = null;
+            Token.Value = null;
         }
 
         private class AccessTokenRequestRefresh : AccessTokenRequest
