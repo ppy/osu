@@ -60,6 +60,7 @@ namespace osu.Game.Rulesets.Timing
             DifficultyPoint = other.DifficultyPoint;
         }
 
+        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         public int CompareTo(MultiplierControlPoint other) => StartTime.CompareTo(other?.StartTime);
     }
 }

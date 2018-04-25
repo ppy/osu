@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
         public override string ShortenedName => "SD";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_suddendeath;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override string Description => "Miss a note and fail.";
+        public override string Description => "Miss and fail.";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };

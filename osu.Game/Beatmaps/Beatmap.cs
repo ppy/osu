@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
@@ -22,13 +21,6 @@ namespace osu.Game.Beatmaps
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
         public ControlPointInfo ControlPointInfo = new ControlPointInfo();
         public List<BreakPeriod> Breaks = new List<BreakPeriod>();
-        public List<Color4> ComboColors = new List<Color4>
-        {
-            new Color4(17, 136, 170, 255),
-            new Color4(102, 136, 0, 255),
-            new Color4(204, 102, 0, 255),
-            new Color4(121, 9, 13, 255)
-        };
 
         [JsonIgnore]
         public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
@@ -54,7 +46,6 @@ namespace osu.Game.Beatmaps
             BeatmapInfo = original?.BeatmapInfo.DeepClone() ?? BeatmapInfo;
             ControlPointInfo = original?.ControlPointInfo ?? ControlPointInfo;
             Breaks = original?.Breaks ?? Breaks;
-            ComboColors = original?.ComboColors ?? ComboColors;
             HitObjects = original?.HitObjects ?? HitObjects;
 
             if (original == null && Metadata == null)
@@ -85,8 +76,12 @@ namespace osu.Game.Beatmaps
         /// Constructs a new beatmap.
         /// </summary>
         /// <param name="original">The original beatmap to use the parameters of.</param>
-        public Beatmap(Beatmap original = null)
+        public Beatmap(Beatmap original)
             : base(original)
+        {
+        }
+
+        public Beatmap()
         {
         }
     }

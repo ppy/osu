@@ -337,12 +337,10 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private bool interactive => Action != null && Alpha > 0.2f;
+        public override bool HandleMouseInput => base.HandleMouseInput && Action != null && Alpha > 0.2f;
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (!interactive) return false;
-
             logoBounceContainer.ScaleTo(0.9f, 1000, Easing.Out);
             return true;
         }
@@ -355,8 +353,6 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnClick(InputState state)
         {
-            if (!interactive) return false;
-
             if (Action?.Invoke() ?? true)
                 sampleClick.Play();
 
@@ -368,8 +364,6 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnHover(InputState state)
         {
-            if (!interactive) return false;
-
             logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
             return true;
         }

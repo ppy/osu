@@ -25,8 +25,8 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play.BreaksOverlay;
 using osu.Game.Screens.Ranking;
+using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Screens.Play
@@ -77,18 +77,22 @@ namespace osu.Game.Screens.Play
         private DrawableStoryboard storyboard;
         private Container storyboardContainer;
 
-        private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
+        public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, APIAccess api, OsuConfigManager config)
         {
             this.api = api;
+
+            WorkingBeatmap working = Beatmap.Value;
+            if (working is DummyWorkingBeatmap)
+                return;
+
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
 
-            WorkingBeatmap working = Beatmap.Value;
             Beatmap beatmap;
 
             try
@@ -115,14 +119,15 @@ namespace osu.Game.Screens.Play
                 }
 
                 if (!RulesetContainer.Objects.Any())
-                    throw new InvalidOperationException("Beatmap contains no hit objects!");
+                {
+                    Logger.Error(new InvalidOperationException("Beatmap contains no hit objects!"), "Beatmap contains no hit objects!");
+                    return;
+                }
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Could not load beatmap sucessfully!");
-
                 //couldn't load, hard abort!
-                Exit();
                 return;
             }
 
@@ -164,8 +169,12 @@ namespace osu.Game.Screens.Play
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
                         },
-                        RulesetContainer,
-                        new SkipButton(firstObjectTime)
+                        new LocalSkinOverrideContainer(working.Skin)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = RulesetContainer
+                        },
+                        new SkipOverlay(firstObjectTime)
                         {
                             Clock = Clock, // skip button doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
@@ -282,7 +291,7 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            if (!loadedSuccessfully)
+            if (!LoadedBeatmapSuccessfully)
                 return;
 
             Content.Alpha = 0;
@@ -332,7 +341,7 @@ namespace osu.Game.Screens.Play
                 return base.OnExiting(next);
             }
 
-            if (loadedSuccessfully)
+            if (LoadedBeatmapSuccessfully)
                 pauseContainer?.Pause();
 
             return true;

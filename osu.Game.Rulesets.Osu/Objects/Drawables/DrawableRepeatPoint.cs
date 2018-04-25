@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new SpriteIcon
                 {

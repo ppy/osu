@@ -188,8 +188,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             string[] split = str.Split(':');
 
-            var bank = (LegacyDecoder.LegacySampleBank)Convert.ToInt32(split[0]);
-            var addbank = (LegacyDecoder.LegacySampleBank)Convert.ToInt32(split[1]);
+            var bank = (LegacyBeatmapDecoder.LegacySampleBank)Convert.ToInt32(split[0]);
+            var addbank = (LegacyBeatmapDecoder.LegacySampleBank)Convert.ToInt32(split[1]);
 
             // Let's not implement this for now, because this doesn't fit nicely into the bank structure
             //string sampleFile = split2.Length > 4 ? split2[4] : string.Empty;

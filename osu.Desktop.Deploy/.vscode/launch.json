@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [{
+            "name": "Deploy (Debug)",
+            "request": "launch",
+            "type": "mono",
+            "program": "${workspaceRoot}/bin/Debug/net471/osu.Desktop.Deploy.exe",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Debug)",
+            "runtimeExecutable": null,
+            "env": {},
+            "console": "internalConsole"
+        },
+        {
+            "name": "Deploy (Release)",
+            "request": "launch",
+            "type": "clr",
+            "program": "${workspaceRoot}/bin/Release/net471/osu.Desktop.Deploy.exe",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Release)",
+            "runtimeExecutable": null,
+            "env": {},
+            "console": "internalConsole"
+        }
+    ]
+}

@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => string.Empty;
         public override string ShortenedName => string.Empty;
         public override string Description => string.Empty;
-        public override double ScoreMultiplier => 0.0;
+        public override double ScoreMultiplier => 0;
 
         public Mod[] Mods;
     }

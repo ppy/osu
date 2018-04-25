@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual
         {
             base.LoadComplete();
 
-            Add(new SkipButton(Clock.CurrentTime + 5000));
+            Add(new SkipOverlay(Clock.CurrentTime + 5000));
         }
     }
 }

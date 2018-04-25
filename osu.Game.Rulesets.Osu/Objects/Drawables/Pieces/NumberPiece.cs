@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                         Colour = Color4.White.Opacity(0.5f),
                     },
                     Child = new Box()
-                }, false),
+                }, s => s.GetTexture("Play/osu/hitcircle") == null),
                 number = new OsuSpriteText
                 {
                     Text = @"1",

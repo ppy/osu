@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Mods
 
         public DifficultyReductionSection()
         {
-            Header = @"Gameplay Difficulty Reduction";
+            Header = @"Difficulty Reduction";
         }
     }
 }

@@ -16,8 +16,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Name => "Dual Stages";
         public override string ShortenedName => "DS";
         public override string Description => @"Double the stages, double the fun!";
-        public override double ScoreMultiplier => 1;
-        public override bool Ranked => false;
+        public override double ScoreMultiplier => 0;
 
         public void ApplyToBeatmapConverter(BeatmapConverter<ManiaHitObject> beatmapConverter)
         {

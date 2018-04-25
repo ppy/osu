@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Beatmaps.IO
     [TestFixture]
     public class ImportBeatmapTest
     {
-        private const string osz_path = @"../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
+        private const string osz_path = @"../../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
 
         [Test]
         public void TestImportWhenClosed()

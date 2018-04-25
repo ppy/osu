@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -29,11 +30,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private PatternType convertType;
 
-        public DistanceObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern)
-            : base(random, hitObject, beatmap, previousPattern)
+        public DistanceObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, Beatmap originalBeatmap)
+            : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
         {
             convertType = PatternType.None;
-            if (Beatmap.ControlPointInfo.EffectPointAt(hitObject.StartTime).KiaiMode)
+            if (!Beatmap.ControlPointInfo.EffectPointAt(hitObject.StartTime).KiaiMode)
                 convertType = PatternType.LowProbability;
 
             var distanceData = hitObject as IHasDistance;
@@ -305,19 +306,19 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     p4 = 0;
                     break;
                 case 3:
-                    p2 = Math.Max(p2, 0.1);
+                    p2 = Math.Min(p2, 0.1);
                     p3 = 0;
                     p4 = 0;
                     break;
                 case 4:
-                    p2 = Math.Max(p2, 0.3);
-                    p3 = Math.Max(p3, 0.04);
+                    p2 = Math.Min(p2, 0.3);
+                    p3 = Math.Min(p3, 0.04);
                     p4 = 0;
                     break;
                 case 5:
-                    p2 = Math.Max(p2, 0.34);
-                    p3 = Math.Max(p3, 0.1);
-                    p4 = Math.Max(p4, 0.03);
+                    p2 = Math.Min(p2, 0.34);
+                    p3 = Math.Min(p3, 0.1);
+                    p4 = Math.Min(p4, 0.03);
                     break;
             }
 
@@ -396,17 +397,19 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             // Create the hold note
             addToPattern(pattern, holdColumn, startTime, endTime);
 
-            int noteCount = 1;
+            int nextColumn = Random.Next(RandomStart, TotalColumns);
+            int noteCount;
             if (ConversionDifficulty > 6.5)
                 noteCount = GetRandomNoteCount(0.63, 0);
             else if (ConversionDifficulty > 4)
                 noteCount = GetRandomNoteCount(TotalColumns < 6 ? 0.12 : 0.45, 0);
             else if (ConversionDifficulty > 2.5)
                 noteCount = GetRandomNoteCount(TotalColumns < 6 ? 0 : 0.24, 0);
+            else
+                noteCount = 0;
             noteCount = Math.Min(TotalColumns - 1, noteCount);
 
             bool ignoreHead = !sampleInfoListAt(startTime).Any(s => s.Name == SampleInfo.HIT_WHISTLE || s.Name == SampleInfo.HIT_FINISH || s.Name == SampleInfo.HIT_CLAP);
-            int nextColumn = Random.Next(RandomStart, TotalColumns);
 
             var rowPattern = new Pattern();
             for (int i = 0; i <= spanCount; i++)

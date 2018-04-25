@@ -1,16 +1,19 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 
@@ -21,10 +24,11 @@ namespace osu.Game.Screens.Play
         private Player player;
 
         private BeatmapMetadataDisplay info;
-        private VisualSettings visualSettings;
 
         private bool showOverlays = true;
         public override bool ShowOverlaysOnEnter => showOverlays;
+
+        private Task loadTask;
 
         public PlayerLoader(Player player)
         {
@@ -46,14 +50,15 @@ namespace osu.Game.Screens.Play
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
-            Add(visualSettings = new VisualSettings
+
+            Add(new VisualSettings
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Margin = new MarginPadding(25)
             });
 
-            LoadComponentAsync(player);
+            loadTask = LoadComponentAsync(player);
         }
 
         protected override void OnResuming(Screen last)
@@ -63,7 +68,7 @@ namespace osu.Game.Screens.Play
             contentIn();
 
             //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
-            LoadComponentAsync(player = new Player
+            loadTask = LoadComponentAsync(player = new Player
             {
                 RestartCount = player.RestartCount + 1,
                 RestartRequested = player.RestartRequested,
@@ -93,7 +98,7 @@ namespace osu.Game.Screens.Play
             contentIn();
 
             info.Delay(750).FadeIn(500);
-            this.Delay(2150).Schedule(pushWhenLoaded);
+            this.Delay(1800).Schedule(pushWhenLoaded);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -109,37 +114,95 @@ namespace osu.Game.Screens.Play
             logo.Delay(resuming ? 0 : 500).MoveToOffset(new Vector2(0, -0.24f), 500, Easing.InOutExpo);
         }
 
+        private bool weHandledMouseDown;
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            weHandledMouseDown = true;
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            weHandledMouseDown = false;
+            return base.OnMouseUp(state, args);
+        }
+
+        private ScheduledDelegate pushDebounce;
+
+        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && (!GetContainingInputManager().CurrentState.Mouse.HasAnyButtonPressed || weHandledMouseDown);
+
         private void pushWhenLoaded()
         {
-            if (player.LoadState != LoadState.Ready || visualSettings.IsHovered)
+            if (!IsCurrentScreen) return;
+
+            try
+            {
+                if (!readyForPush)
+                {
+                    // as the pushDebounce below has a delay, we need to keep checking and cancel a future debounce
+                    // if we become unready for push during the delay.
+                    cancelLoad();
+                    return;
+                }
+
+                if (pushDebounce != null)
+                    return;
+
+                pushDebounce = Scheduler.AddDelayed(() =>
+                {
+                    contentOut();
+
+                    this.Delay(250).Schedule(() =>
+                    {
+                        if (!IsCurrentScreen) return;
+
+                        loadTask = null;
+
+                        //By default, we want to load the player and never be returned to.
+                        //Note that this may change if the player we load requested a re-run.
+                        ValidForResume = false;
+
+                        if (player.LoadedBeatmapSuccessfully)
+                            Push(player);
+                        else
+                            Exit();
+                    });
+                }, 500);
+            }
+            finally
             {
                 Schedule(pushWhenLoaded);
-                return;
             }
+        }
 
-            contentOut();
+        private void cancelLoad()
+        {
+            pushDebounce?.Cancel();
+            pushDebounce = null;
+        }
 
-            this.Delay(250).Schedule(() =>
-            {
-                if (!IsCurrentScreen) return;
-
-                if (!Push(player))
-                    Exit();
-                else
-                {
-                    //By default, we want to load the player and never be returned to.
-                    //Note that this may change if the player we load requested a re-run.
-                    ValidForResume = false;
-                }
-            });
+        protected override void OnSuspending(Screen next)
+        {
+            base.OnSuspending(next);
+            cancelLoad();
         }
 
         protected override bool OnExiting(Screen next)
         {
             Content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
+            cancelLoad();
 
             return base.OnExiting(next);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // if the player never got pushed, we should explicitly dispose it.
+            loadTask?.ContinueWith(_ => player.Dispose());
         }
 
         private class BeatmapMetadataDisplay : Container
@@ -242,11 +305,6 @@ namespace osu.Game.Screens.Play
                                 },
                             },
                             new MetadataLine("Source", metadata.Source)
-                            {
-                                Origin = Anchor.TopCentre,
-                                Anchor = Anchor.TopCentre,
-                            },
-                            new MetadataLine("Composer", string.Empty)
                             {
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,

@@ -30,6 +30,9 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty(@"video")]
         private bool hasVideo { get; set; }
 
+        [JsonProperty(@"status")]
+        private BeatmapSetOnlineStatus status { get; set; }
+
         [JsonProperty(@"submitted_date")]
         private DateTimeOffset submitted { get; set; }
 
@@ -60,6 +63,7 @@ namespace osu.Game.Online.API.Requests
                     PlayCount = playCount,
                     FavouriteCount = favouriteCount,
                     BPM = bpm,
+                    Status = status,
                     HasVideo = hasVideo,
                     Submitted = submitted,
                     Ranked = ranked,

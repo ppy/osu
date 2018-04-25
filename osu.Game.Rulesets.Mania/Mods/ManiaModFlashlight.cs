@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModFlashlight : ModFlashlight
     {
-        public override double ScoreMultiplier => 1.0;
+        public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
     }
 }

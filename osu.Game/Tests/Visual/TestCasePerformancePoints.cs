@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual
             private void load(BeatmapManager beatmaps)
             {
                 var sets = beatmaps.GetAllUsableBeatmapSets();
-                var allBeatmaps = sets.SelectMany(s => s.Beatmaps).Where(b => ruleset.LegacyID < 0 || b.RulesetID == ruleset.LegacyID);
+                var allBeatmaps = sets.SelectMany(s => s.Beatmaps).Where(b => ruleset.LegacyID == null || b.RulesetID == ruleset.LegacyID);
 
                 allBeatmaps.ForEach(b => beatmapDisplays.Add(new BeatmapDisplay(b)));
             }

@@ -5,15 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Edit.Layers;
-using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
 
 namespace osu.Game.Rulesets.Edit
@@ -27,30 +28,30 @@ namespace osu.Game.Rulesets.Edit
         private RulesetContainer rulesetContainer;
         private readonly List<Container> layerContainers = new List<Container>();
 
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
         protected HitObjectComposer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
+
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        private void load(OsuGameBase osuGame, IFrameBasedClock framedClock)
         {
+            beatmap.BindTo(osuGame.Beatmap);
+
             try
             {
-                rulesetContainer = CreateRulesetContainer(ruleset, osuGame.Beatmap.Value);
-
-                // TODO: should probably be done at a RulesetContainer level to share logic with Player.
-                rulesetContainer.Clock = new InterpolatingFramedClock((IAdjustableClock)osuGame.Beatmap.Value.Track ?? new StopwatchClock());
+                rulesetContainer = CreateRulesetContainer(ruleset, beatmap.Value);
+                rulesetContainer.Clock = framedClock;
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Could not load beatmap sucessfully!");
                 return;
             }
-
-            HitObjectOverlayLayer hitObjectOverlayLayer = CreateHitObjectOverlayLayer();
-            SelectionLayer selectionLayer = new SelectionLayer(rulesetContainer.Playfield);
 
             var layerBelowRuleset = new BorderLayer
             {
@@ -59,12 +60,7 @@ namespace osu.Game.Rulesets.Edit
             };
 
             var layerAboveRuleset = CreateLayerContainer();
-            layerAboveRuleset.Children = new Drawable[]
-            {
-                selectionLayer, // Below object overlays for input
-                hitObjectOverlayLayer,
-                selectionLayer.CreateProxy() // Proxy above object overlays for selections
-            };
+            layerAboveRuleset.Child = new HitObjectMaskLayer(rulesetContainer.Playfield, this);
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -106,14 +102,9 @@ namespace osu.Game.Rulesets.Edit
                 }
             };
 
-            selectionLayer.ObjectSelected += hitObjectOverlayLayer.AddOverlay;
-            selectionLayer.ObjectDeselected += hitObjectOverlayLayer.RemoveOverlay;
-
             toolboxCollection.Items =
-                new[] { new RadioButton("Select", () => setCompositionTool(null)) }
-                .Concat(
-                    CompositionTools.Select(t => new RadioButton(t.Name, () => setCompositionTool(t)))
-                )
+                CompositionTools.Select(t => new RadioButton(t.Name, () => setCompositionTool(t)))
+                .Prepend(new RadioButton("Select", () => setCompositionTool(null)))
                 .ToList();
 
             toolboxCollection.Items[0].Select();
@@ -139,13 +130,20 @@ namespace osu.Game.Rulesets.Edit
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
 
         /// <summary>
+        /// Creates a <see cref="HitObjectMask"/> for a specific <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
+        public virtual HitObjectMask CreateMaskFor(DrawableHitObject hitObject) => null;
+
+        /// <summary>
+        /// Creates a <see cref="MaskSelection"/> which outlines <see cref="DrawableHitObject"/>s
+        /// and handles hitobject pattern adjustments.
+        /// </summary>
+        public virtual MaskSelection CreateMaskSelection() => new MaskSelection();
+
+        /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
         /// </summary>
         protected virtual ScalableContainer CreateLayerContainer() => new ScalableContainer { RelativeSizeAxes = Axes.Both };
-
-        /// <summary>
-        /// Creates the <see cref="HitObjectOverlayLayer"/> which overlays selected <see cref="DrawableHitObject"/>s.
-        /// </summary>
-        protected virtual HitObjectOverlayLayer CreateHitObjectOverlayLayer() => new HitObjectOverlayLayer();
     }
 }

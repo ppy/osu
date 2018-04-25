@@ -20,11 +20,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     public class DrawableDrumRoll : DrawableTaikoHitObject<DrumRoll>
     {
         /// <summary>
-        /// Number of rolling hits required to reach the dark/final accent colour.
+        /// Number of rolling hits required to reach the dark/final colour.
         /// </summary>
-        private const int rolling_hits_for_dark_accent = 5;
-
-        private Color4 accentDarkColour;
+        private const int rolling_hits_for_engaged_colour = 5;
 
         /// <summary>
         /// Rolling number of tick hits. This increases for hits and decreases for misses.
@@ -53,11 +51,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(TaikoAction action) => false;
 
+        private Color4 colourIdle;
+        private Color4 colourEngaged;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            MainPiece.AccentColour = AccentColour = colours.YellowDark;
-            accentDarkColour = colours.YellowDarker;
+            MainPiece.AccentColour = colourIdle = colours.YellowDark;
+            colourEngaged = colours.YellowDarker;
         }
 
         private void onTickJudgement(DrawableHitObject obj, Judgement judgement)
@@ -67,10 +68,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             else
                 rollingHits--;
 
-            rollingHits = MathHelper.Clamp(rollingHits, 0, rolling_hits_for_dark_accent);
+            rollingHits = MathHelper.Clamp(rollingHits, 0, rolling_hits_for_engaged_colour);
 
-            Color4 newAccent = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_dark_accent, AccentColour, accentDarkColour, 0, 1);
-            MainPiece.FadeAccent(newAccent, 100);
+            Color4 newColour = Interpolation.ValueAt((float)rollingHits / rolling_hits_for_engaged_colour, colourIdle, colourEngaged, 0, 1);
+            MainPiece.FadeAccent(newColour, 100);
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)

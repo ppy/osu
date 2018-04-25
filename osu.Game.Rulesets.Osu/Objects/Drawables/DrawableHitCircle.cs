@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -21,22 +22,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
-        public DrawableHitCircle(HitCircle h) : base(h)
+        public DrawableHitCircle(HitCircle h)
+            : base(h)
         {
             Origin = Anchor.Centre;
 
             Position = HitObject.StackedPosition;
             Scale = new Vector2(h.Scale);
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
-                glow = new GlowPiece
-                {
-                    Colour = AccentColour
-                },
+                glow = new GlowPiece(),
                 circle = new CirclePiece
                 {
-                    Colour = AccentColour,
                     Hit = () =>
                     {
                         if (AllJudged)
@@ -52,20 +50,31 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
-                explode = new ExplodePiece
-                {
-                    Colour = AccentColour,
-                },
+                explode = new ExplodePiece(),
                 ApproachCircle = new ApproachCircle
                 {
                     Alpha = 0,
                     Scale = new Vector2(4),
-                    Colour = AccentColour,
                 }
             };
 
             //may not be so correct
             Size = circle.DrawSize;
+
+            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+        }
+
+        public override Color4 AccentColour
+        {
+            get { return base.AccentColour; }
+            set
+            {
+                base.AccentColour = value;
+                explode.Colour = AccentColour;
+                glow.Colour = AccentColour;
+                circle.Colour = AccentColour;
+                ApproachCircle.Colour = AccentColour;
+            }
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)

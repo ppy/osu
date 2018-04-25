@@ -11,6 +11,7 @@ using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -24,7 +25,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var beatmap = decoder.DecodeBeatmap(stream);
+                var beatmap = decoder.Decode(stream);
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmap.Metadata;
 
@@ -47,7 +48,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var beatmapInfo = decoder.DecodeBeatmap(stream).BeatmapInfo;
+                var beatmapInfo = decoder.Decode(stream).BeatmapInfo;
 
                 int[] expectedBookmarks =
                 {
@@ -72,7 +73,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var beatmap = decoder.DecodeBeatmap(stream);
+                var beatmap = decoder.Decode(stream);
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmap.Metadata;
 
@@ -96,7 +97,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var difficulty = decoder.DecodeBeatmap(stream).BeatmapInfo.BaseDifficulty;
+                var difficulty = decoder.Decode(stream).BeatmapInfo.BaseDifficulty;
 
                 Assert.AreEqual(6.5f, difficulty.DrainRate);
                 Assert.AreEqual(4, difficulty.CircleSize);
@@ -114,7 +115,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var beatmap = decoder.DecodeBeatmap(stream);
+                var beatmap = decoder.Decode(stream);
                 var metadata = beatmap.Metadata;
                 var breakPoint = beatmap.Breaks[0];
 
@@ -132,7 +133,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var beatmap = decoder.DecodeBeatmap(stream);
+                var beatmap = decoder.Decode(stream);
                 var controlPoints = beatmap.ControlPointInfo;
 
                 Assert.AreEqual(4, controlPoints.TimingPoints.Count);
@@ -163,11 +164,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapColors()
         {
-            var decoder = new LegacyBeatmapDecoder();
+            var decoder = new LegacySkinDecoder();
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var comboColors = decoder.DecodeBeatmap(stream).ComboColors;
+                var comboColors = decoder.Decode(stream).ComboColours;
 
                 Color4[] expectedColors =
                 {
@@ -191,7 +192,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new StreamReader(resStream))
             {
-                var hitObjects = decoder.DecodeBeatmap(stream).HitObjects;
+                var hitObjects = decoder.Decode(stream).HitObjects;
 
                 var curveData = hitObjects[0] as IHasCurve;
                 var positionData = hitObjects[0] as IHasPosition;
