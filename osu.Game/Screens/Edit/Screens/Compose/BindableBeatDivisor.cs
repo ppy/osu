@@ -10,6 +10,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose
     public class BindableBeatDivisor : BindableNumber<int>
     {
         private DivisorPanelType panel = DivisorPanelType.Normal;
+        public int LastNormalDivisor = 1;
+        public int LastTripletDivisor = 1;
+        public int LastOtherDivisor = 1;
         public static readonly int[] VALID_DIVISORS = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 16, 18, 24, 32 };
         public static readonly int[] VALID_NORMAL_DIVISORS = { 1, 2, 4, 8, 16, 32 };
         public static readonly int[] VALID_TRIPLET_DIVISORS = { 1, 3, 6, 9, 12, 18, 24 };
@@ -32,39 +35,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         public void NextPanel()
         {
             Panel = (DivisorPanelType)((int)(panel + 1) % 3);
-            //switch (panel) // Should I use a normal if-else statement?
-            //{
-            //    case DivisorPanelType.Normal:
-            //        Panel = DivisorPanelType.Triplets;
-            //        return;
-            //    case DivisorPanelType.Triplets:
-            //        Panel = DivisorPanelType.Other;
-            //        return;
-            //    case DivisorPanelType.Other:
-            //        Panel = DivisorPanelType.Normal;
-            //        return;
-            //    default:
-            //        return;
-            //}
         }
 
         public void PreviousPanel()
         {
             Panel = (DivisorPanelType)((int)(panel + 2) % 3);
-            //switch (panel) // Should I use a normal if-else statement?
-            //{
-            //    case DivisorPanelType.Normal:
-            //        Panel = DivisorPanelType.Other;
-            //        return;
-            //    case DivisorPanelType.Triplets:
-            //        Panel = DivisorPanelType.Normal;
-            //        return;
-            //    case DivisorPanelType.Other:
-            //        Panel = DivisorPanelType.Triplets;
-            //        return;
-            //    default:
-            //        return;
-            //}
         }
 
         public void NextDivisor()
@@ -132,24 +107,40 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             get => panel;
             set
             {
+                switch (panel)
+                {
+                    case DivisorPanelType.Normal:
+                        LastNormalDivisor = Value;
+                        goto default;
+                    case DivisorPanelType.Triplets:
+                        LastTripletDivisor = Value;
+                        goto default;
+                    case DivisorPanelType.Other:
+                        LastOtherDivisor = Value;
+                        goto default;
+                    default:
+                        TriggerValidDivisorsChanged();
+                        break;
+                }
                 panel = value;
-                base.Value = 1; // Reset the value
                 switch (panel)
                 {
                     case DivisorPanelType.Normal:
                         ValidDivisors = VALID_NORMAL_DIVISORS;
+                        base.Value = LastNormalDivisor;
                         goto default;
                     case DivisorPanelType.Triplets:
                         ValidDivisors = VALID_TRIPLET_DIVISORS;
+                        base.Value = LastTripletDivisor;
                         goto default;
                     case DivisorPanelType.Other:
                         ValidDivisors = VALID_OTHER_DIVISORS;
+                        base.Value = LastOtherDivisor;
                         goto default;
                     default:
                         TriggerValidDivisorsChanged();
                         return;
                 }
-                //Panel = value;
             }
         }
 

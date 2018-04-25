@@ -23,6 +23,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 {
     public class BeatDivisorControl : CompositeDrawable
     {
+        private DivisorPanelText panelText;
+        private DivisorText divisorText;
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
         public BeatDivisorControl(BindableBeatDivisor beatDivisor)
@@ -49,7 +51,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     RelativeSizeAxes = Axes.Both,
                     Content = new[]
                     {
-                        new Drawable[] // Row containing tick slider bar
+                        new Drawable[]
                         {
                             new Container
                             {
@@ -69,7 +71,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                 }
                             }
                         },
-                        new Drawable[] // Row containing left/right buttons and beat snap divisor
+                        new Drawable[]
                         {
                             new Container
                             {
@@ -97,7 +99,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                                         Icon = FontAwesome.fa_chevron_left,
                                                         Action = beatDivisor.PreviousDivisor
                                                     },
-                                                    new DivisorText(beatDivisor),
+                                                    divisorText = new DivisorText(beatDivisor),
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.fa_chevron_right,
@@ -116,7 +118,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                 }
                             }
                         },
-                        new Drawable[] // Row containing only the beat snap divisor text
+                        new Drawable[]
                         {
                             new Container
                             {
@@ -167,7 +169,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                 }
                             }
                         },
-                        new Drawable[] // Row containing text and button for swapping between snap divisor panels
+                        new Drawable[]
                         {
                             new Container
                             {
@@ -192,7 +194,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                                         Action = beatDivisor.PreviousPanel,
                                                         //Anchor = Anchor.BottomRight
                                                     },
-                                                    new DivisorPanelText(beatDivisor), // This does not update
+                                                    panelText = new DivisorPanelText(beatDivisor), // This does not update
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.fa_chevron_right,
@@ -222,7 +224,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     }
                 }
             };
+            this.beatDivisor.ValueChanged += UpdateDivisorsText; //updateText => { divisorText.Text = $"1/{beatDivisor.Value}"; };
+            this.beatDivisor.ValidDivisorsChanged += UpdatePanelText; //() => { panelText.Text = $"{beatDivisor.Panel}"; };
+            UpdateDivisorsText(0);
+            UpdatePanelText();
         }
+
+        void UpdateDivisorsText(int a) => divisorText.Text = $"1/{beatDivisor.Value}";
+        void UpdatePanelText() => panelText.Text = $"{beatDivisor.Panel}";
 
         private class DivisorPanelText : SpriteText
         {
@@ -247,11 +256,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             {
                 base.LoadComplete();
 
-                beatDivisor.ValidDivisorsChanged += updateText;
-                updateText();
+                //beatDivisor.ValidDivisorsChanged += updateText;
+                //updateText();
             }
 
-            private void updateText() => Text = $"{beatDivisor.Panel}"; // Someone tell me why this does not get triggered when changing the divisors
+            //private void updateText() => Text = $"{beatDivisor.Panel}"; // Someone tell me why this does not get triggered when changing the divisors
         }
         private class DivisorText : SpriteText
         {
@@ -275,11 +284,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             {
                 base.LoadComplete();
 
-                beatDivisor.ValueChanged += v => updateText();
-                updateText();
+                //beatDivisor.ValueChanged += v => updateText();
+                //updateText();
             }
 
-            private void updateText() => Text = $"1/{beatDivisor.Value}";
+            //private void updateText() => Text = $"1/{beatDivisor.Value}";
         }
 
         private class DivisorButton : IconButton
@@ -365,11 +374,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                     });
                 }
                 AddInternal(marker = new Marker());
-                CurrentNumber.ValueChanged += v =>
-                {
-                    marker.MoveToX(getMappedPosition(v), 100, Easing.OutQuint);
-                    marker.Flash();
-                };
+                CurrentNumber.ValueChanged += moveMarker;
+                moveMarker(CurrentNumber.Value);
+            }
+
+            private void moveMarker(int v)
+            {
+                marker.MoveToX(getMappedPosition(v), 100, Easing.OutQuint);
+                marker.Flash();
             }
 
             protected override void UpdateValue(float value)
