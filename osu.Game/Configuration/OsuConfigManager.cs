@@ -15,8 +15,6 @@ namespace osu.Game.Configuration
             // UI/selection defaults
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
             Set(OsuSetting.Skin, 0, 0, int.MaxValue);
-            Set(OsuSetting.IgnoreBeatmapSkin, false);
-            Set(OsuSetting.IgnoreBeatmapHitsounds, false);
 
             Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
@@ -62,6 +60,9 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowFpsDisplay, false);
 
             Set(OsuSetting.ShowStoryboard, true);
+            Set(OsuSetting.BeatmapSkins, true);
+            Set(OsuSetting.BeatmapHitsounds, true);
+
             Set(OsuSetting.CursorRotation, true);
 
             Set(OsuSetting.MenuParallax, true);
@@ -136,7 +137,7 @@ namespace osu.Game.Configuration
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
         SongSelectRightMouseScroll,
-        IgnoreBeatmapSkin,
-        IgnoreBeatmapHitsounds
+        BeatmapSkins,
+        BeatmapHitsounds
     }
 }

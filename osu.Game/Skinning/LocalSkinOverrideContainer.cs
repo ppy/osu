@@ -16,10 +16,13 @@ namespace osu.Game.Skinning
     {
         public event Action SourceChanged;
 
+        private Bindable<bool> beatmapSkins = new Bindable<bool>();
+        private Bindable<bool> beatmapHitsounds = new Bindable<bool>();
+
         public Drawable GetDrawableComponent(string componentName)
         {
             Drawable sourceDrawable;
-            if (!ignoreBeatmapSkin && (sourceDrawable = source.GetDrawableComponent(componentName)) != null)
+            if (beatmapSkins && (sourceDrawable = source.GetDrawableComponent(componentName)) != null)
                 return sourceDrawable;
             return fallbackSource?.GetDrawableComponent(componentName);
         }
@@ -27,7 +30,7 @@ namespace osu.Game.Skinning
         public Texture GetTexture(string componentName)
         {
             Texture sourceTexture;
-            if (!ignoreBeatmapSkin && (sourceTexture = source.GetTexture(componentName)) != null)
+            if (beatmapSkins && (sourceTexture = source.GetTexture(componentName)) != null)
                 return sourceTexture;
             return fallbackSource.GetTexture(componentName);
         }
@@ -35,7 +38,7 @@ namespace osu.Game.Skinning
         public SampleChannel GetSample(string sampleName)
         {
             SampleChannel sourceChannel;
-            if (!ignoreBeatmapHitsounds && (sourceChannel = source.GetSample(sampleName)) != null)
+            if (beatmapHitsounds && (sourceChannel = source.GetSample(sampleName)) != null)
                 return sourceChannel;
             return fallbackSource?.GetSample(sampleName);
         }
@@ -80,19 +83,16 @@ namespace osu.Game.Skinning
             return dependencies;
         }
 
-        private Bindable<bool> ignoreBeatmapSkin = new Bindable<bool>();
-        private Bindable<bool> ignoreBeatmapHitsounds = new Bindable<bool>();
-
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            ignoreBeatmapSkin = config.GetBindable<bool>(OsuSetting.IgnoreBeatmapSkin);
-            ignoreBeatmapSkin.ValueChanged += val => onSourceChanged();
-            ignoreBeatmapSkin.TriggerChange();
+            beatmapSkins = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
+            beatmapSkins.ValueChanged += val => onSourceChanged();
+            beatmapSkins.TriggerChange();
 
-            ignoreBeatmapHitsounds = config.GetBindable<bool>(OsuSetting.IgnoreBeatmapHitsounds);
-            ignoreBeatmapHitsounds.ValueChanged += val => onSourceChanged();
-            ignoreBeatmapHitsounds.TriggerChange();
+            beatmapHitsounds = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
+            beatmapHitsounds.ValueChanged += val => onSourceChanged();
+            beatmapHitsounds.TriggerChange();
         }
 
         protected override void LoadComplete()
