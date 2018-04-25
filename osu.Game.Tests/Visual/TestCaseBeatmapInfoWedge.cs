@@ -52,6 +52,9 @@ namespace osu.Game.Tests.Visual
                 infoWedge.UpdateBeatmap(beatmap);
             });
 
+            // select part is redundant, but wait for load isn't
+            selectBeatmap(beatmap.Value.Beatmap);
+
             AddWaitStep(3);
 
             AddStep("hide", () => { infoWedge.State = Visibility.Hidden; });
@@ -63,10 +66,11 @@ namespace osu.Game.Tests.Visual
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
                 var ruleset = rulesetInfo.CreateInstance();
-                beatmaps.Add(createTestBeatmap(rulesetInfo));
+                var testBeatmap = createTestBeatmap(rulesetInfo);
 
-                var name = rulesetInfo.ShortName;
-                selectBeatmap(name);
+                beatmaps.Add(testBeatmap);
+
+                selectBeatmap(testBeatmap);
 
                 // TODO: adjust cases once more info is shown for other gamemodes
                 switch (ruleset)
@@ -108,16 +112,14 @@ namespace osu.Game.Tests.Visual
             AddAssert("check no infolabels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
-        private void selectBeatmap(string name)
+        private void selectBeatmap(Beatmap b)
         {
             BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
 
-            AddStep($"select {name} beatmap", () =>
+            AddStep($"select {b.Metadata.Title} beatmap", () =>
             {
                 infoBefore = infoWedge.Info;
-                WorkingBeatmap bm = new TestWorkingBeatmap(beatmaps.First(b => b.BeatmapInfo.Ruleset.ShortName == name));
-                beatmap.Value = bm;
-                infoWedge.UpdateBeatmap(beatmap);
+                infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(b));
             });
 
             AddUntilStep(() => infoWedge.Info != infoBefore, "wait for async load");
