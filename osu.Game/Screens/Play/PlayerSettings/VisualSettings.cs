@@ -15,8 +15,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
         private readonly PlayerCheckbox showStoryboardToggle;
-        private readonly PlayerCheckbox ignoreBeatmapSkinToggle;
-        private readonly PlayerCheckbox ignoreBeatmapHitsoundsToggle;
+        private readonly PlayerCheckbox beatmapSkinsToggle;
+        private readonly PlayerCheckbox beatmapHitsoundsToggle;
 
         public VisualSettings()
         {
@@ -37,8 +37,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     Text = "Toggles:"
                 },
                 showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboards" },
-                ignoreBeatmapSkinToggle = new PlayerCheckbox { LabelText = "Ignore beatmap skin" },
-                ignoreBeatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Ignore beatmap hitsounds" }
+                beatmapSkinsToggle = new PlayerCheckbox { LabelText = "Beatmap skins" },
+                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" }
             };
         }
 
@@ -48,8 +48,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
             dimSliderBar.Bindable = config.GetBindable<double>(OsuSetting.DimLevel);
             blurSliderBar.Bindable = config.GetBindable<double>(OsuSetting.BlurLevel);
             showStoryboardToggle.Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-            ignoreBeatmapSkinToggle.Bindable = config.GetBindable<bool>(OsuSetting.IgnoreBeatmapSkin);
-            ignoreBeatmapHitsoundsToggle.Bindable = config.GetBindable<bool>(OsuSetting.IgnoreBeatmapHitsounds);
+            beatmapSkinsToggle.Bindable = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
+            beatmapHitsoundsToggle.Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
         }
     }
 }
