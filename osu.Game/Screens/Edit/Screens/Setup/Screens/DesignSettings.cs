@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             Children = new Drawable[]
             {
                 CreateSettingCheckBox("Display Epilepsy Warning"),
-                CreateSettingLabelText("Beatman Skin"),
+                CreateSettingLabelText("Beatmap Skin"),
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
