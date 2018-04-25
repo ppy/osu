@@ -15,11 +15,6 @@ namespace osu.Desktop
 {
     public static class Program
     {
-        public class UserStatusOffline
-        {
-            public string Message => @"Offline";
-            public OpenTK.Graphics.Color4 GetAppropriateColour(Game.Graphics.OsuColour colours) => colours.Gray7;
-        }
 
         [STAThread]
         public static int Main(string[] args)
