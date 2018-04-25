@@ -26,6 +26,13 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1);
 
+            // Editor - Haven't made use of them, is it needed?
+            Set(OsuSetting.HPDrainRate, 5, 0, 10, 1);
+            Set(OsuSetting.CircleSize, 5, 2, 7, 1);
+            Set(OsuSetting.ApproachRate, 5, 0, 10, 1);
+            Set(OsuSetting.OverallDifficulty, 5, 0, 10, 1);
+            Set(OsuSetting.KeyCount, 4, 1, 9);
+
             // Online settings
             Set(OsuSetting.Username, string.Empty);
             Set(OsuSetting.Token, string.Empty);
@@ -128,6 +135,11 @@ namespace osu.Game.Configuration
         ShowConvertedBeatmaps,
         SpeedChangeVisualisation,
         Skin,
-        ScreenshotFormat
+        ScreenshotFormat,
+        HPDrainRate,
+        CircleSize,
+        ApproachRate,
+        OverallDifficulty,
+        KeyCount
     }
 }

@@ -1,0 +1,105 @@
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
+using OpenTK;
+using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Skinning;
+using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Edit.Screens.Setup.Screens;
+
+namespace osu.Game.Screens.Edit.Screens.Setup
+{
+    public class Setup : EditorScreen
+    {
+        public readonly GeneralSettings GeneralSettings;
+        public readonly DifficultySettings DifficultySettings;
+        public readonly ModeSettings ModeSettings;
+        public readonly AudioSettings AudioSettings;
+        public readonly DesignSettings DesignSettings;
+        public readonly ColoursSettings ColoursSettings;
+        public readonly AdvancedSettings AdvancedSettings;
+        public SkinManager Skins;
+
+        public Setup()
+        {
+            AlwaysPresent = true;
+
+            //Skins = skins;
+            Child = new FillFlowContainer
+            {
+                // TODO: Make sure the container is using the entire screen and all children's size is adjusted according to the window size
+                // Might not even need to happen before the PR is accepted /shrug
+                // Probably wanna remove that comment
+                Anchor = Anchor.TopLeft,
+                Origin = Anchor.TopLeft,
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(20, 0),
+                Padding = new MarginPadding { Top = 20, Left = 20 },
+                Children = new FillFlowContainer<EditorSettingsGroup>[]
+                {
+                    new FillFlowContainer<EditorSettingsGroup>
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
+                        Children = new EditorSettingsGroup[]
+                        {
+                            GeneralSettings = new GeneralSettings(),
+                        }
+                    },
+                    new FillFlowContainer<EditorSettingsGroup>
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
+                        Children = new EditorSettingsGroup[]
+                        {
+                            DifficultySettings = new DifficultySettings(),
+                            ModeSettings = new ModeSettings(),
+                        }
+                    },
+                    new FillFlowContainer<EditorSettingsGroup>
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
+                        Children = new EditorSettingsGroup[]
+                        {
+                            ColoursSettings = new ColoursSettings(),
+                            AdvancedSettings = new AdvancedSettings(),
+                        }
+                    },
+                    new FillFlowContainer<EditorSettingsGroup>
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
+                        Children = new EditorSettingsGroup[]
+                        {
+                            AudioSettings = new AudioSettings(),
+                        }
+                    },
+                    new FillFlowContainer<EditorSettingsGroup>
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
+                        Children = new EditorSettingsGroup[]
+                        {
+                            DesignSettings = new DesignSettings(Skins),
+                        }
+                    },
+                }
+            };
+        }
+    }
+}
