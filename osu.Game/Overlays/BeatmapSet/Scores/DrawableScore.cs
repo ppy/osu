@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     RelativeSizeAxes = Axes.X,
                     Width = 0.06f,
                     RelativePositionAxes = Axes.X,
-                    X = 0.42f
+                    X = 0.35f
                 },
                 new DrawableRank(score.Rank)
                 {
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Size = new Vector2(30, 20),
                     FillMode = FillMode.Fit,
                     RelativePositionAxes = Axes.X,
-                    X = 0.55f
+                    X = 0.50f
                 },
                 new OsuSpriteText
                 {
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Text = $@"{score.TotalScore:N0}",
                     Font = @"Venera",
                     RelativePositionAxes = Axes.X,
-                    X = 0.75f,
+                    X = 0.70f,
                     FixedWidth = true,
                 },
                 new OsuSpriteText
@@ -99,13 +99,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Text = $@"{score.Accuracy:P2}",
                     Font = @"Exo2.0-RegularItalic",
                     RelativePositionAxes = Axes.X,
-                    X = 0.85f
+                    X = 0.80f
                 },
                 new OsuSpriteText
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Text = $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Meh]}",
+                    Text = score.Statistics.ContainsKey(HitResult.Perfect) ? $"{score.Statistics[HitResult.Perfect]}/{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Ok]}/{score.Statistics[HitResult.Meh]}/{score.Statistics[HitResult.Miss]}"
+                                                                           : $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Meh]}/{score.Statistics[HitResult.Miss]}", // Long
                     Font = @"Exo2.0-RegularItalic",
                     Margin = new MarginPadding { Right = side_margin }
                 },

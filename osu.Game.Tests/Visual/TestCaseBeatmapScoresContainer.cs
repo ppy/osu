@@ -22,6 +22,7 @@ namespace osu.Game.Tests.Visual
     {
         private readonly IEnumerable<OnlineScore> scores;
         private readonly IEnumerable<OnlineScore> anotherScores;
+        private readonly IEnumerable<OnlineScore> maniaScores;
         private readonly OnlineScore topScore;
         private readonly Box background;
 
@@ -52,6 +53,7 @@ namespace osu.Game.Tests.Visual
             AddStep("turn off loading", () => scoresContainer.IsLoading = false);
             AddStep("resize to big", () => container.ResizeWidthTo(1, 300));
             AddStep("resize to normal", () => container.ResizeWidthTo(0.8f, 300));
+            AddStep("mania scores", () => scoresContainer.Scores = maniaScores);
 
             scores = new[]
             {
@@ -163,6 +165,7 @@ namespace osu.Game.Tests.Visual
                 s.Statistics.Add(HitResult.Great, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Good, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Miss, RNG.Next(2000));
             }
 
             anotherScores = new[]
@@ -275,6 +278,7 @@ namespace osu.Game.Tests.Visual
                 s.Statistics.Add(HitResult.Great, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Good, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Miss, RNG.Next(2000));
             }
 
             topScore = new OnlineScore
@@ -302,6 +306,135 @@ namespace osu.Game.Tests.Visual
             topScore.Statistics.Add(HitResult.Great, RNG.Next(2000));
             topScore.Statistics.Add(HitResult.Good, RNG.Next(2000));
             topScore.Statistics.Add(HitResult.Meh, RNG.Next(2000));
+            topScore.Statistics.Add(HitResult.Miss, RNG.Next(2000));
+
+            maniaScores = new[]
+            {
+                new OnlineScore
+                {
+                    User = new User
+                    {
+                        Id = 4608074,
+                        Username = @"Majesty",
+                        Country = new Country
+                        {
+                            FullName = @"South Korea",
+                            FlagName = @"KR",
+                        },
+                    },
+                    Mods = new Mod[]
+                    {
+                        new OsuModNightcore(),
+                        new OsuModHidden(),
+                        new OsuModFlashlight(),
+                        new OsuModHardRock(),
+                    },
+                    Rank = ScoreRank.X,
+                    TotalScore = 1000000,
+                    Accuracy = 1,
+                },
+                new OnlineScore
+                {
+                    User = new User
+                    {
+                        Id = 6602580,
+                        Username = @"jakads",
+                        Country = new Country
+                        {
+                            FullName = @"South Korea",
+                            FlagName = @"KR",
+                        },
+                    },
+                    Mods = new Mod[]
+                    {
+                        new OsuModDoubleTime(),
+                        new OsuModHidden(),
+                        new OsuModFlashlight(),
+                        new OsuModHardRock(),
+                    },
+                    Rank = ScoreRank.XH,
+                    TotalScore = 999999,
+                    Accuracy = 0.9999,
+                },
+                new OnlineScore
+                {
+                    User = new User
+                    {
+                        Id = 7151382,
+                        Username = @"cheewee10",
+                        Country = new Country
+                        {
+                            FullName = @"Malaysia",
+                            FlagName = @"MY",
+                        },
+                    },
+                    Rank = ScoreRank.D,
+                    TotalScore = 123456,
+                    Accuracy = 0.6543,
+                },
+                new OnlineScore
+                {
+                    User = new User
+                    {
+                        Id = 1014222,
+                        Username = @"snoverpk",
+                        Country = new Country
+                        {
+                            FullName = @"Finland",
+                            FlagName = @"FI",
+                        },
+                    },
+                    Mods = new Mod[]
+                    {
+                        new OsuModDoubleTime(),
+                        new OsuModHidden(),
+                    },
+                    Rank = ScoreRank.B,
+                    TotalScore = 654321,
+                    Accuracy = 0.8765,
+                },
+                new OnlineScore
+                {
+                    User = new User
+                    {
+                        Id = 1541390,
+                        Username = @"batzourgias",
+                        Country = new Country
+                        {
+                            FullName = @"Greece",
+                            FlagName = @"GR",
+                        },
+                    },
+                    Mods = new Mod[]
+                    {
+                        new OsuModDoubleTime(),
+                    },
+                    Rank = ScoreRank.C,
+                    TotalScore = 513024,
+                    Accuracy = 0.7765,
+                },
+            };
+            foreach (var s in maniaScores)
+            {
+                if (s.User.Username == "Majesty")
+                {
+                    s.Statistics.Add(HitResult.Perfect, 9999);
+                    s.Statistics.Add(HitResult.Great, -1);
+                    s.Statistics.Add(HitResult.Good, -2);
+                    s.Statistics.Add(HitResult.Ok, -4);
+                    s.Statistics.Add(HitResult.Meh, -8);
+                    s.Statistics.Add(HitResult.Miss, -16); // Majestic
+                }
+                else
+                {
+                    s.Statistics.Add(HitResult.Perfect, RNG.Next(2000));
+                    s.Statistics.Add(HitResult.Great, RNG.Next(2000));
+                    s.Statistics.Add(HitResult.Good, RNG.Next(2000));
+                    s.Statistics.Add(HitResult.Ok, RNG.Next(2000));
+                    s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
+                    s.Statistics.Add(HitResult.Miss, RNG.Next(2000));
+                }
+            }
         }
 
         [BackgroundDependencyLoader]
