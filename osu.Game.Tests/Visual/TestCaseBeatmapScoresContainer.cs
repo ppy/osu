@@ -53,6 +53,7 @@ namespace osu.Game.Tests.Visual
             AddStep("turn off loading", () => scoresContainer.IsLoading = false);
             AddStep("resize to big", () => container.ResizeWidthTo(1, 300));
             AddStep("resize to normal", () => container.ResizeWidthTo(0.8f, 300));
+            AddStep("online scores", () => scoresContainer.Beatmap = new BeatmapInfo { OnlineBeatmapSetID = 1, OnlineBeatmapID = 75, Ruleset = new OsuRuleset().RulesetInfo });
             AddStep("mania scores", () => scoresContainer.Scores = maniaScores);
 
             scores = new[]
