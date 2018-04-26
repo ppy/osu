@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit.Components
         protected abstract string Title { get; }
 
         private const float transition_duration = 250;
-        private const int container_width = 270;
+        private const int container_width = 260;
         private const int border_thickness = 2;
         private const int header_height = 30;
         private const int corner_radius = 5;

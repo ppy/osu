@@ -19,7 +19,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Screens;
-using osu.Game.Screens.Play.PlayerSettings;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -30,8 +29,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly EditorSliderBar<float> keyCountSliderBar;
         private readonly OsuSpriteText keyCountLabel;
         private readonly OsuSpriteText keyCountText;
-        private readonly PlayerCheckbox coOpModeCheckbox;
-        private readonly PlayerCheckbox specialKeyStyleCheckbox;
+        private readonly EditorCheckbox coOpModeCheckbox;
+        private readonly EditorCheckbox specialKeyStyleCheckbox;
         private readonly OsuEnumDropdown<AvailableModes> modeDropdown;
 
         protected override string Title => @"mode";
@@ -94,20 +93,20 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             base.LoadComplete();
         }
 
-        PlayerCheckbox CreateSettingCheckBox(string text) => new PlayerCheckbox
+        EditorCheckbox CreateSettingCheckBox(string text) => new EditorCheckbox
         {
             //Anchor = Anchor.CentreLeft,
             //Origin = Anchor.CentreLeft,
             LabelText = text,
         };
-        PlayerCheckbox CreateSettingCheckBox(string text, float alpha) => new PlayerCheckbox
+        EditorCheckbox CreateSettingCheckBox(string text, float alpha) => new EditorCheckbox
         {
             //Anchor = Anchor.CentreLeft,
             //Origin = Anchor.CentreLeft,
             LabelText = text,
             Alpha = alpha,
         };
-        PlayerCheckbox CreateSettingCheckBox(string text, bool defaultValue) => new PlayerCheckbox
+        EditorCheckbox CreateSettingCheckBox(string text, bool defaultValue) => new EditorCheckbox
         {
             //Anchor = Anchor.CentreLeft,
             //Origin = Anchor.CentreLeft,

@@ -19,7 +19,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Components;
-using osu.Game.Screens.Play.PlayerSettings;
 using OpenTK;
 using OpenTK.Graphics;
 

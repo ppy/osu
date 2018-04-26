@@ -21,7 +21,6 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Components;
-using osu.Game.Screens.Play.PlayerSettings;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -29,7 +28,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class DesignSettings : EditorSettingsGroup
     {
-        private PlayerCheckbox enableCountdownCheckbox;
+        private EditorCheckbox enableCountdownCheckbox;
         private EditorSliderBar<int> countdownOffsetSlider;
         private EditorSliderBar<int> countdownSpeedSlider;
         private OsuSpriteText countdownOffsetLabel;
@@ -124,13 +123,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     throw new ArgumentException("The speed value that was provided is not a valid countdown speed value.");
             }
         }
-        PlayerCheckbox CreateSettingCheckBox(string text) => new PlayerCheckbox
+        EditorCheckbox CreateSettingCheckBox(string text) => new EditorCheckbox
         {
             //Anchor = Anchor.CentreLeft,
             //Origin = Anchor.CentreLeft,
             LabelText = text,
         };
-        PlayerCheckbox CreateSettingCheckBox(string text, bool defaultValue) => new PlayerCheckbox
+        EditorCheckbox CreateSettingCheckBox(string text, bool defaultValue) => new EditorCheckbox
         {
             //Anchor = Anchor.CentreLeft,
             //Origin = Anchor.CentreLeft,

@@ -19,7 +19,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Screens;
-using osu.Game.Screens.Play.PlayerSettings;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -133,13 +132,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             Alpha = 1,
             Action = () => { PlaySound(new Audio.SampleInfo()); },
         };
-        PlayerCheckbox CreateSettingCheckBox(string text) => new PlayerCheckbox
+        EditorCheckbox CreateSettingCheckBox(string text) => new EditorCheckbox
         {
             //Anchor = Anchor.CentreLeft,
             //Origin = Anchor.CentreLeft,
             LabelText = text,
         };
-        PlayerCheckbox CreateSettingCheckBox(string text, bool defaultValue) => new PlayerCheckbox
+        EditorCheckbox CreateSettingCheckBox(string text, bool defaultValue) => new EditorCheckbox
         {
             //Anchor = Anchor.CentreLeft,
             //Origin = Anchor.CentreLeft,
