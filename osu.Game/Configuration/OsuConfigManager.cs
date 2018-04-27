@@ -139,11 +139,11 @@ namespace osu.Game.Configuration
         ScreenshotCaptureMenuCursor,
         SongSelectRightMouseScroll,
         BeatmapSkins,
-        BeatmapHitsounds,
         HPDrainRate,
         CircleSize,
         ApproachRate,
         OverallDifficulty,
-        KeyCount
+        KeyCount,
+        BeatmapHitsounds
     }
 }
