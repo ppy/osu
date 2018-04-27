@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly OsuSpriteText keyCountText;
         private readonly EditorCheckbox coOpModeCheckbox;
         private readonly EditorCheckbox specialKeyStyleCheckbox;
-        private readonly OsuEnumDropdown<AvailableModes> modeDropdown;
+        private readonly EditorEnumDropdown<AvailableModes> modeDropdown;
 
         protected override string Title => @"mode";
 
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        modeDropdown = new OsuEnumDropdown<AvailableModes>
+                        modeDropdown = new EditorEnumDropdown<AvailableModes>
                         {
                             RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.TopLeft,

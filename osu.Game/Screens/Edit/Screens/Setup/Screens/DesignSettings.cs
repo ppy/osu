@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private OsuSpriteText countdownOffsetText;
         private OsuSpriteText countdownSpeedLabel;
         private OsuSpriteText countdownSpeedText;
-        private OsuDropdown<int> skinsDropdown;
+        private EditorDropdown<int> skinsDropdown;
         public SkinManager Skins;
 
         protected override string Title => @"design";
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        skinsDropdown = new OsuDropdown<int>
+                        skinsDropdown = new EditorDropdown<int>
                         {
                             RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.TopLeft,

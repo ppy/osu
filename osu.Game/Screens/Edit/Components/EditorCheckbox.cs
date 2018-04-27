@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Edit.Components
 {
@@ -12,7 +13,7 @@ namespace osu.Game.Screens.Edit.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Nub.Margin = new Framework.Graphics.MarginPadding() { };
+            Nub.Margin = new MarginPadding { };
             Nub.AccentColour = colours.Yellow;
             Nub.GlowingAccentColour = colours.YellowLighter;
             Nub.GlowColour = colours.YellowDarker;

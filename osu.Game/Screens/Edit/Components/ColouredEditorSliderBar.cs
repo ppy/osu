@@ -5,6 +5,10 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -83,8 +87,6 @@ namespace osu.Game.Screens.Edit.Components
             private Color4 midColour;
             private Color4 maxColour;
             private Color4 mainColour;
-            private Color4 darkerColour;
-            private Color4 lighterColour;
 
             public Color4 MinColour
             {
@@ -120,42 +122,15 @@ namespace osu.Game.Screens.Edit.Components
                 set
                 {
                     mainColour = value;
+                    this.FadeColour(mainColour, 500, Easing.OutQuint);
                     AccentColour = mainColour;
-                    Colour = mainColour;
-                    DarkerColour = mainColour.Darken(0.1f);
-                    LighterColour = mainColour.Lighten(0.1f);
-                    if (Nub != null)
-                    {
-                        Nub.AccentColour = midColour;
-                        Nub.Colour = midColour;
-                    }
-                }
-            }
-            public Color4 DarkerColour
-            {
-                get => darkerColour;
-                set
-                {
-                    darkerColour = value;
                     if (Nub != null)
                     {
                         bool mustGlow = Nub.Glowing;
-                        Nub.GlowingAccentColour = darkerColour;
-                        Nub.Glowing = mustGlow; // Basically preventing the nub from glowing when changing the colour if it's not supposed to be glowing
-                    }
-                }
-            }
-            // TODO: Make glow less vibrant
-            public Color4 LighterColour
-            {
-                get => lighterColour;
-                set
-                {
-                    lighterColour = value;
-                    if (Nub != null)
-                    {
-                        bool mustGlow = Nub.Glowing;
-                        Nub.GlowColour = lighterColour;
+                        Nub.FadeColour(mainColour, 500, Easing.OutQuint);
+                        Nub.AccentColour = mainColour;
+                        Nub.GlowColour = mainColour.Darken(0.8f);
+                        Nub.GlowingAccentColour = mainColour.Lighten(0.8f);
                         Nub.Glowing = mustGlow;
                     }
                 }
@@ -174,11 +149,6 @@ namespace osu.Game.Screens.Edit.Components
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                // TODO: Remove these four lines and make the slider bar instantly begin with the colour of the default value (the colours will only update as soon as the mouse hovers over the nub)
-                AccentColour = colours.Yellow;
-                Nub.AccentColour = colours.Yellow;
-                Nub.GlowingAccentColour = colours.YellowLighter;
-                Nub.GlowColour = colours.YellowDarker;
                 Current.ValueChanged += TriggerValueChanged;
                 ValueChanged += SetValueColour;
                 MinColourChanged += SetValueColour;

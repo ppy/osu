@@ -16,11 +16,6 @@ namespace osu.Game.Screens.Edit.Components
     public class EditorSliderBar<T> : SettingsSlider<T>
         where T : struct, IEquatable<T>, IComparable, IConvertible
     {
-        public EditorSliderBar()
-        {
-
-        }
-
         public Sliderbar Bar => (Sliderbar)Control;
 
         protected override Drawable CreateControl()
@@ -35,43 +30,6 @@ namespace osu.Game.Screens.Edit.Components
         
         public class Sliderbar : OsuSliderBar<T>
         {
-            // Do something for showing a more proper tool tip
-            private Color4 mainColour;
-            private Color4 darkerColour;
-            private Color4 lighterColour;
-            
-            public Color4 MainColour
-            {
-                get => mainColour;
-                set
-                {
-                    mainColour = value;
-                    AccentColour = mainColour;
-                    DarkerColour = mainColour.Darken(0.1f);
-                    LighterColour = mainColour.Lighten(0.1f);
-                }
-            }
-            public Color4 DarkerColour
-            {
-                get => darkerColour;
-                set
-                {
-                    darkerColour = value;
-                    if (Nub != null)
-                        Nub.GlowingAccentColour = darkerColour;
-                }
-            }
-            public Color4 LighterColour
-            {
-                get => lighterColour;
-                set
-                {
-                    lighterColour = value;
-                    if (Nub != null)
-                        Nub.GlowingAccentColour = darkerColour;
-                }
-            }
-            
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {

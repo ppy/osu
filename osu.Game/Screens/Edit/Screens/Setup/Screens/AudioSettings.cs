@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly TriangleButton whistleSampleSoundButton;
         private readonly TriangleButton finishSampleSoundButton;
         private readonly TriangleButton clapSampleSoundButton;
-        private readonly OsuEnumDropdown<SampleSet> modeDropdown;
+        private readonly EditorEnumDropdown<SampleSet> modeDropdown;
 
         protected override string Title => @"audio";
 
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        modeDropdown = new OsuEnumDropdown<SampleSet>
+                        modeDropdown = new EditorEnumDropdown<SampleSet>
                         {
                             RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.TopLeft,
