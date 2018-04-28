@@ -84,6 +84,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                         },
                         keyCountSliderBar = new EditorSliderBar<float>
                         {
+                            NormalPrecision = 1,
+                            AlternatePrecision = 1,
                             Bindable = CreateBindable(4, 4, 1, 9, 1),
                             Alpha = 0,
                         },
@@ -103,21 +105,15 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         EditorCheckbox CreateSettingCheckBox(string text) => new EditorCheckbox
         {
-            //Anchor = Anchor.CentreLeft,
-            //Origin = Anchor.CentreLeft,
             LabelText = text,
         };
         EditorCheckbox CreateSettingCheckBox(string text, float alpha) => new EditorCheckbox
         {
-            //Anchor = Anchor.CentreLeft,
-            //Origin = Anchor.CentreLeft,
             LabelText = text,
             Alpha = alpha,
         };
         EditorCheckbox CreateSettingCheckBox(string text, bool defaultValue) => new EditorCheckbox
         {
-            //Anchor = Anchor.CentreLeft,
-            //Origin = Anchor.CentreLeft,
             LabelText = text,
             Bindable = new BindableBool(defaultValue)
         };
@@ -154,18 +150,5 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             MaxValue = max,
             Precision = precision,
         };
-    }
-
-    public enum AvailableModes
-    {
-        // Avoid adding a using to prevent collisions for Containers
-        [System.ComponentModel.Description(@"All")]
-        All = 0,
-        [System.ComponentModel.Description(@"osu!taiko")]
-        Taiko = 1,
-        [System.ComponentModel.Description(@"osu!catch")]
-        Catch = 2,
-        [System.ComponentModel.Description(@"osu!mania")]
-        Mania = 3,
     }
 }

@@ -135,14 +135,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         }
         EditorCheckbox CreateSettingCheckBox(string text) => new EditorCheckbox
         {
-            //Anchor = Anchor.CentreLeft,
-            //Origin = Anchor.CentreLeft,
             LabelText = text,
         };
         EditorCheckbox CreateSettingCheckBox(string text, bool defaultValue) => new EditorCheckbox
         {
-            //Anchor = Anchor.CentreLeft,
-            //Origin = Anchor.CentreLeft,
             LabelText = text,
             Bindable = new BindableBool(defaultValue)
         };
@@ -160,6 +156,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         };
         EditorSliderBar<int> CreateSliderBar(int value, int defaultValue, int min, int max, int precision) => new EditorSliderBar<int>
         {
+            NormalPrecision = precision,
+            AlternatePrecision = precision,
             Bindable = CreateBindable(value, defaultValue, min, max, precision),
         };
         Bindable<int> CreateBindable(int value, int defaultValue, int min, int max, int precision) => new BindableInt(value)

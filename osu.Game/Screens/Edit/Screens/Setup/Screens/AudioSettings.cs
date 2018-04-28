@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class AudioSettings : EditorSettingsGroup
     {
-        private readonly EditorSliderBar<double> volumeSliderBar;
+        private readonly EditorSliderBar<float> volumeSliderBar;
         private readonly OsuSpriteText volumeLabel;
         private readonly OsuSpriteText volumeText;
         private readonly TriangleButton normalSampleSoundButton;
@@ -41,7 +41,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         {
             Children = new Drawable[]
             {
-                // DropDown to select default sample category
                 CreateSettingLabelText("Default Sample Set"),
                 new Container
                 {
@@ -76,8 +75,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                         volumeText = CreateSettingLabelTextBold(),
                     },
                 },
-                volumeSliderBar = new EditorSliderBar<double>
+                volumeSliderBar = new EditorSliderBar<float>
                 {
+                    NormalPrecision = 1,
+                    AlternatePrecision = 1,
                     Bindable = CreateBindable(100, 100, 0, 100, 1),
                 },
                 new FillFlowContainer
@@ -134,14 +135,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         };
         EditorCheckbox CreateSettingCheckBox(string text) => new EditorCheckbox
         {
-            //Anchor = Anchor.CentreLeft,
-            //Origin = Anchor.CentreLeft,
             LabelText = text,
         };
         EditorCheckbox CreateSettingCheckBox(string text, bool defaultValue) => new EditorCheckbox
         {
-            //Anchor = Anchor.CentreLeft,
-            //Origin = Anchor.CentreLeft,
             LabelText = text,
             Bindable = new BindableBool(defaultValue)
         };
@@ -157,22 +154,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             Origin = Anchor.CentreRight,
             Font = @"Exo2.0-Bold",
         };
-        Bindable<double> CreateBindable(double value, double defaultValue, double min, double max, double precision) => new BindableDouble(value)
+        Bindable<float> CreateBindable(float value, float defaultValue, float min, float max, float precision) => new BindableFloat(value)
         {
             Default = defaultValue,
             MinValue = min,
             MaxValue = max,
             Precision = precision,
         };
-    }
-    public enum SampleSet
-    {
-        // Avoid adding a using to prevent collisions for Containers
-        [System.ComponentModel.Description(@"Normal")]
-        Normal = 0,
-        [System.ComponentModel.Description(@"Soft")]
-        Soft = 1,
-        [System.ComponentModel.Description(@"Drum")]
-        Drum = 2,
     }
 }

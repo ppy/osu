@@ -17,8 +17,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Edit.Screens;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -47,6 +47,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 },
                 stackLeniencySliderBar = new EditorSliderBar<float>
                 {
+                    NormalPrecision = 1,
+                    AlternatePrecision = 1,
                     Bindable = CreateBindable(7, 7, 2, 10, 1),
                 },
             };

@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Edit.Components
         private const int corner_radius = 5;
 
         private readonly FillFlowContainer content;
+        // The commented code should be removed if we do not want an expansion button like the one in the PlayerSettingsGroup, we just need to decide.
+        // I'm leaving it here in case it's needed to avoid further complications.
         //private readonly IconButton button;
 
         //private bool expanded = true;

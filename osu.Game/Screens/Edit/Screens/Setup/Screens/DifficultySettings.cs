@@ -26,10 +26,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class DifficultySettings : EditorSettingsGroup
     {
-        private readonly ColouredEditorSliderBar<double> hpDrainRateSliderBar;
-        private readonly ColouredEditorSliderBar<double> circleSizeSliderBar;
-        private readonly ColouredEditorSliderBar<double> approachRateSliderBar;
-        private readonly ColouredEditorSliderBar<double> overallDifficultySliderBar;
+        private readonly ColouredEditorSliderBar<float> hpDrainRateSliderBar;
+        private readonly ColouredEditorSliderBar<float> circleSizeSliderBar;
+        private readonly ColouredEditorSliderBar<float> approachRateSliderBar;
+        private readonly ColouredEditorSliderBar<float> overallDifficultySliderBar;
         private readonly OsuSpriteText hpDrainText;
         private readonly OsuSpriteText circleSizeText;
         private readonly OsuSpriteText approachRateText;
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                         overallDifficultyText = CreateSettingLabelTextBold(),
                     },
                 },
-                overallDifficultySliderBar = CreateSliderBar(5, 5, 0, 10, 1),
+                overallDifficultySliderBar = CreateSliderBar(5, 5, 0, 10),
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                         hpDrainText = CreateSettingLabelTextBold(),
                     },
                 },
-                hpDrainRateSliderBar = CreateSliderBar(5, 5, 0, 10, 1),
+                hpDrainRateSliderBar = CreateSliderBar(5, 5, 0, 10),
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                         approachRateText = CreateSettingLabelTextBold(),
                     },
                 },
-                approachRateSliderBar = CreateSliderBar(5, 5, 0, 10, 1),
+                approachRateSliderBar = CreateSliderBar(5, 5, 0, 10),
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                         circleSizeText = CreateSettingLabelTextBold(),
                     },
                 },
-                circleSizeSliderBar = CreateSliderBar(5, 5, 2, 7, 1),
+                circleSizeSliderBar = CreateSliderBar(5, 5, 2, 7),
             };
 
             hpDrainRateSliderBar.Bindable.ValueChanged += showValue => hpDrainText.Text = $"{hpDrainRateSliderBar.Bar.TooltipText}";
@@ -115,11 +115,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             Origin = Anchor.CentreRight,
             Font = @"Exo2.0-Bold",
         };
-        ColouredEditorSliderBar<double> CreateSliderBar(double value, double defaultValue, double min, double max, double precision) => new ColouredEditorSliderBar<double>
+        ColouredEditorSliderBar<float> CreateSliderBar(float value, float defaultValue, float min, float max) => new ColouredEditorSliderBar<float>
         {
-            Bindable = CreateBindable(value, defaultValue, min, max, precision),
+            NormalPrecision = 1,
+            AlternatePrecision = 0.1f,
+            Bindable = CreateBindable(value, defaultValue, min, max, 1),
         };
-        Bindable<double> CreateBindable(double value, double defaultValue, double min, double max, double precision) => new BindableDouble(value)
+        Bindable<float> CreateBindable(float value, float defaultValue, float min, float max, float precision) => new BindableFloat(value)
         {
             Default = defaultValue,
             MinValue = min,
