@@ -1,4 +1,8 @@
-# 2017-09-14
+branches:
+  only:
+  - release
+skip_tags: true
+skip_branch_with_pr: true
 clone_depth: 1
 version: '{branch}-{build}'
 image: Visual Studio 2017
@@ -17,11 +21,11 @@ after_build:
   - appveyor DownloadFile https://puu.sh/A6g5K/4d08705438.enc # signing certificate
   - cmd: appveyor-tools\secure-file -decrypt 4d08705438.enc -secret %decode_secret% -out %HOMEPATH%\deanherbert.pfx
   - appveyor DownloadFile https://puu.sh/A6g75/fdc6f19b04.enc # deploy configuration
-  - cmd: appveyor-tools\secure-file -decrypt fdc6f19b04.enc -secret %decode_secret% -out osu.Desktop.Deploy\bin\Debug\net461\osu.Desktop.Deploy.exe.config
-  - cd osu.Desktop.Deploy\bin\Debug\net461\
+  - cmd: appveyor-tools\secure-file -decrypt fdc6f19b04.enc -secret %decode_secret% -out osu.Desktop.Deploy\bin\Debug\net471\osu.Desktop.Deploy.exe.config
+  - cd osu.Desktop.Deploy\bin\Debug\net471\
   - osu.Desktop.Deploy.exe %code_signing_password%
 environment:
-  TargetFramework: net461
+  TargetFramework: net471
   decode_secret:
     secure: i67IC2xj6DjjxmA6Oj2jing3+MwzLkq6CbGsjfZ7rdY=
   code_signing_password:
