@@ -39,48 +39,56 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         {
             Children = new Drawable[]
             {
-                // DropDown to select mode
-                // Upon changing its value, the next controls become transparent if the gamemode is not mania
-                CreateSettingLabelText("Available Modes"),
-                new Container
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 15),
                     Children = new Drawable[]
                     {
-                        modeDropdown = new EditorEnumDropdown<AvailableModes>
+                        CreateSettingLabelText("Available Modes"),
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Items = new KeyValuePair<string, AvailableModes>[]
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
                             {
-                                new KeyValuePair<string, AvailableModes>("All", AvailableModes.All),
-                                new KeyValuePair<string, AvailableModes>("osu!taiko", AvailableModes.Taiko),
-                                new KeyValuePair<string, AvailableModes>("osu!catch", AvailableModes.Catch),
-                                new KeyValuePair<string, AvailableModes>("osu!mania", AvailableModes.Mania),
+                                modeDropdown = new EditorEnumDropdown<AvailableModes>
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Items = new KeyValuePair<string, AvailableModes>[]
+                                    {
+                                        new KeyValuePair<string, AvailableModes>("All", AvailableModes.All),
+                                        new KeyValuePair<string, AvailableModes>("osu!taiko", AvailableModes.Taiko),
+                                        new KeyValuePair<string, AvailableModes>("osu!catch", AvailableModes.Catch),
+                                        new KeyValuePair<string, AvailableModes>("osu!mania", AvailableModes.Mania),
+                                    },
+                                    Alpha = 1,
+                                },
                             },
-                            Alpha = 1,
                         },
-                    },
-                },
-                coOpModeCheckbox = CreateSettingCheckBox("Co-Op Mode", 0),
-                specialKeyStyleCheckbox = CreateSettingCheckBox("Use Special Key Style", 0),
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
-                    {
-                        keyCountLabel = CreateSettingLabelText("Key Count", 0),
-                        keyCountText = CreateSettingLabelTextBold(0),
-                    },
-                },
-                keyCountSliderBar = new EditorSliderBar<float>
-                {
-                    Bindable = CreateBindable(4, 4, 1, 9, 1),
-                    Alpha = 0,
-                },
+                        coOpModeCheckbox = CreateSettingCheckBox("Co-Op Mode", 0),
+                        specialKeyStyleCheckbox = CreateSettingCheckBox("Use Special Key Style", 0),
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
+                            {
+                                keyCountLabel = CreateSettingLabelText("Key Count", 0),
+                                keyCountText = CreateSettingLabelTextBold(0),
+                            },
+                        },
+                        keyCountSliderBar = new EditorSliderBar<float>
+                        {
+                            Bindable = CreateBindable(4, 4, 1, 9, 1),
+                            Alpha = 0,
+                        },
+                    }
+                }
             };
             modeDropdown.Current.ValueChanged += a => { coOpModeCheckbox.Alpha = specialKeyStyleCheckbox.Alpha = keyCountLabel.Alpha = keyCountText.Alpha = keyCountSliderBar.Alpha = (modeDropdown.Current.Value == AvailableModes.Mania) ? 1 : 0; };
             modeDropdown.Current.TriggerChange();

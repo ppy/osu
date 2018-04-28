@@ -45,50 +45,60 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             Skins = skins;
             Children = new Drawable[]
             {
-                CreateSettingCheckBox("Display Epilepsy Warning"),
-                CreateSettingLabelText("Beatmap Skin"),
-                new Container
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 15),
                     Children = new Drawable[]
                     {
-                        skinsDropdown = new EditorDropdown<int>
+                        CreateSettingCheckBox("Display Epilepsy Warning"),
+                        CreateSettingLabelText("Beatmap Skin"),
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Items = new KeyValuePair<string, int>[]
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
                             {
-                                new KeyValuePair<string, int>("No Custom Skin", -1),
+                                skinsDropdown = new EditorDropdown<int>
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Items = new KeyValuePair<string, int>[]
+                                    {
+                                        new KeyValuePair<string, int>("No Custom Skin", -1),
+                                    },
+                                    Alpha = 1,
+                                },
                             },
-                            Alpha = 1,
                         },
-                    },
-                },
-                enableCountdownCheckbox = CreateSettingCheckBox("Enable Countdown", true),
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
-                    {
-                        countdownSpeedLabel = CreateSettingLabelText("Countdown Speed"),
-                        countdownSpeedText = CreateSettingLabelTextBold(),
-                    },
-                },
-                countdownSpeedSlider = CreateSliderBar(1, 1, 0, 2, 1),
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
-                    {
-                        countdownOffsetLabel = CreateSettingLabelText("Countdown Beat Offset"),
-                        countdownOffsetText = CreateSettingLabelTextBold(),
-                    },
-                },
-                countdownOffsetSlider = CreateSliderBar(0, 0, 0, 3, 1),
+                        enableCountdownCheckbox = CreateSettingCheckBox("Enable Countdown", true),
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
+                            {
+                                countdownSpeedLabel = CreateSettingLabelText("Countdown Speed"),
+                                countdownSpeedText = CreateSettingLabelTextBold(),
+                            },
+                        },
+                        countdownSpeedSlider = CreateSliderBar(1, 1, 0, 2, 1),
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
+                            {
+                                countdownOffsetLabel = CreateSettingLabelText("Countdown Beat Offset"),
+                                countdownOffsetText = CreateSettingLabelTextBold(),
+                            },
+                        },
+                        countdownOffsetSlider = CreateSliderBar(0, 0, 0, 3, 1),
+                    }
+                }
             };
 
             //var s = Skins.GetAllUsableSkins();
