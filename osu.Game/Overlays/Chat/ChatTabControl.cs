@@ -307,6 +307,8 @@ namespace osu.Game.Overlays.Chat
             {
                 public override bool IsRemovable => false;
 
+                public override bool IsSwitchable => false;
+
                 public ChannelSelectorTabItem(Channel value) : base(value)
                 {
                     Depth = float.MaxValue;

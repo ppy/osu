@@ -13,15 +13,15 @@ namespace osu.Game.Beatmaps.Formats
             AddDecoder<Beatmap>("{", m => new JsonBeatmapDecoder());
         }
 
-        protected override void ParseStreamInto(StreamReader stream, Beatmap beatmap)
+        protected override void ParseStreamInto(StreamReader stream, Beatmap output)
         {
             stream.BaseStream.Position = 0;
             stream.DiscardBufferedData();
 
-            stream.ReadToEnd().DeserializeInto(beatmap);
+            stream.ReadToEnd().DeserializeInto(output);
 
-            foreach (var hitObject in beatmap.HitObjects)
-                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
+            foreach (var hitObject in output.HitObjects)
+                hitObject.ApplyDefaults(output.ControlPointInfo, output.BeatmapInfo.BaseDifficulty);
         }
     }
 }
