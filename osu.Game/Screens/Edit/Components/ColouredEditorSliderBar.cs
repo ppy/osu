@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit.Components
         }
 
         private bool isUsingAlternatePrecision;
-        private bool IsUsingAlternatePrecision
+        public bool IsUsingAlternatePrecision
         {
             get => isUsingAlternatePrecision;
             set

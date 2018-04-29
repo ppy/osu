@@ -32,6 +32,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly EditorCheckbox coOpModeCheckbox;
         private readonly EditorCheckbox specialKeyStyleCheckbox;
         private readonly EditorEnumDropdown<AvailableModes> modeDropdown;
+        private readonly FillFlowContainer ffc;
 
         protected override string Title => @"mode";
 
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         {
             Children = new Drawable[]
             {
-                new FillFlowContainer
+                ffc = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -47,28 +48,38 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     Spacing = new Vector2(0, 15),
                     Children = new Drawable[]
                     {
-                        CreateSettingLabelText("Available Modes"),
-                        new Container
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 5),
                             Children = new Drawable[]
                             {
-                                modeDropdown = new EditorEnumDropdown<AvailableModes>
+                                CreateSettingLabelText("Available Modes"),
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Anchor = Anchor.TopLeft,
-                                    Origin = Anchor.TopLeft,
-                                    Items = new KeyValuePair<string, AvailableModes>[]
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
                                     {
-                                        new KeyValuePair<string, AvailableModes>("All", AvailableModes.All),
-                                        new KeyValuePair<string, AvailableModes>("osu!taiko", AvailableModes.Taiko),
-                                        new KeyValuePair<string, AvailableModes>("osu!catch", AvailableModes.Catch),
-                                        new KeyValuePair<string, AvailableModes>("osu!mania", AvailableModes.Mania),
+                                        modeDropdown = new EditorEnumDropdown<AvailableModes>
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Anchor = Anchor.TopLeft,
+                                            Origin = Anchor.TopLeft,
+                                            Items = new KeyValuePair<string, AvailableModes>[]
+                                            {
+                                                new KeyValuePair<string, AvailableModes>("All", AvailableModes.All),
+                                                new KeyValuePair<string, AvailableModes>("osu!taiko", AvailableModes.Taiko),
+                                                new KeyValuePair<string, AvailableModes>("osu!catch", AvailableModes.Catch),
+                                                new KeyValuePair<string, AvailableModes>("osu!mania", AvailableModes.Mania),
+                                            },
+                                            Alpha = 1,
+                                        },
                                     },
-                                    Alpha = 1,
                                 },
-                            },
+                            }
                         },
                         coOpModeCheckbox = CreateSettingCheckBox("Co-Op Mode", 0),
                         specialKeyStyleCheckbox = CreateSettingCheckBox("Use Special Key Style", 0),
@@ -92,7 +103,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     }
                 }
             };
-            modeDropdown.Current.ValueChanged += a => { coOpModeCheckbox.Alpha = specialKeyStyleCheckbox.Alpha = keyCountLabel.Alpha = keyCountText.Alpha = keyCountSliderBar.Alpha = (modeDropdown.Current.Value == AvailableModes.Mania) ? 1 : 0; };
+            modeDropdown.Current.ValueChanged += UpdateStatus;
             modeDropdown.Current.TriggerChange();
             keyCountSliderBar.Bindable.ValueChanged += showValue => keyCountText.Text = $"{keyCountSliderBar.Bar.TooltipText}";
             keyCountSliderBar.Bindable.TriggerChange();
@@ -101,6 +112,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         protected override void LoadComplete()
         {
             base.LoadComplete();
+        }
+
+        void UpdateStatus(AvailableModes a)
+        {
+            coOpModeCheckbox.Alpha = specialKeyStyleCheckbox.Alpha = keyCountLabel.Alpha = keyCountText.Alpha = keyCountSliderBar.Alpha = (modeDropdown.Current.Value == AvailableModes.Mania) ? 1 : 0;
+            ffc.Spacing = new Vector2(0, modeDropdown.Current.Value == AvailableModes.Mania ? 15 : 0);
         }
 
         EditorCheckbox CreateSettingCheckBox(string text) => new EditorCheckbox

@@ -36,6 +36,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private OsuSpriteText countdownSpeedLabel;
         private OsuSpriteText countdownSpeedText;
         private EditorDropdown<int> skinsDropdown;
+        private FillFlowContainer ffc;
         public SkinManager Skins;
 
         protected override string Title => @"design";
@@ -45,15 +46,15 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             Skins = skins;
             Children = new Drawable[]
             {
+                CreateSettingCheckBox("Display Epilepsy Warning"),
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 15),
+                    Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        CreateSettingCheckBox("Display Epilepsy Warning"),
                         CreateSettingLabelText("Beatmap Skin"),
                         new Container
                         {
@@ -74,6 +75,16 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                             },
                         },
+                    }
+                },
+                ffc = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 15),
+                    Children = new Drawable[]
+                    {
                         enableCountdownCheckbox = CreateSettingCheckBox("Enable Countdown", true),
                         new Container
                         {
@@ -106,7 +117,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             //{
             //    skinsDropdown.AddDropdownItem(s[i].Name, i);
             //}
-            enableCountdownCheckbox.Current.ValueChanged += updateValue => { countdownSpeedLabel.Alpha = countdownSpeedText.Alpha = countdownSpeedSlider.Alpha = countdownOffsetLabel.Alpha = countdownOffsetText.Alpha = countdownOffsetSlider.Alpha = (enableCountdownCheckbox.Current.Value ? 1 : 0); };
+            enableCountdownCheckbox.Current.ValueChanged += UpdateStatus;
             enableCountdownCheckbox.Current.TriggerChange();
             countdownOffsetSlider.Bindable.ValueChanged += showValue => countdownOffsetText.Text = $"{countdownOffsetSlider.Bar.TooltipText}";
             countdownOffsetSlider.Bindable.TriggerChange();
@@ -117,6 +128,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         protected override void LoadComplete()
         {
             base.LoadComplete();
+        }
+
+        void UpdateStatus(bool a)
+        {
+            countdownSpeedLabel.Alpha = countdownSpeedText.Alpha = countdownSpeedSlider.Alpha = countdownOffsetLabel.Alpha = countdownOffsetText.Alpha = countdownOffsetSlider.Alpha = (enableCountdownCheckbox.Current.Value ? 1 : 0);
+            ffc.Spacing = new Vector2(0, enableCountdownCheckbox.Current.Value ? 15 : 0);
         }
 
         string GetCountdownSpeedString(int speed)

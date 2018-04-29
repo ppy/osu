@@ -41,27 +41,37 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         {
             Children = new Drawable[]
             {
-                CreateSettingLabelText("Default Sample Set"),
-                new Container
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        modeDropdown = new EditorEnumDropdown<SampleSet>
+                        CreateSettingLabelText("Default Sample Set"),
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Items = new KeyValuePair<string, SampleSet>[]
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
                             {
-                                new KeyValuePair<string, SampleSet>("Normal", SampleSet.Normal),
-                                new KeyValuePair<string, SampleSet>("Soft", SampleSet.Soft),
-                                new KeyValuePair<string, SampleSet>("Drum", SampleSet.Drum),
+                                modeDropdown = new EditorEnumDropdown<SampleSet>
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Items = new KeyValuePair<string, SampleSet>[]
+                                    {
+                                        new KeyValuePair<string, SampleSet>("Normal", SampleSet.Normal),
+                                        new KeyValuePair<string, SampleSet>("Soft", SampleSet.Soft),
+                                        new KeyValuePair<string, SampleSet>("Drum", SampleSet.Drum),
+                                    },
+                                    Alpha = 1,
+                                },
                             },
-                            Alpha = 1,
                         },
-                    },
+                    }
                 },
                 CreateSettingCheckBox("Enable Custom Overrides"),
                 CreateSettingCheckBox("Samples Match Playback Rate"),
