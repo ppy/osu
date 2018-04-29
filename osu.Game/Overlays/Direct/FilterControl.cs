@@ -49,14 +49,14 @@ namespace osu.Game.Overlays.Direct
         {
             private Drawable icon
             {
-                get { return iconContainer.Icon; }
-                set { iconContainer.Icon = value; }
+                get => iconContainer.Icon;
+                set => iconContainer.Icon = value;
             }
 
             private RulesetInfo ruleset;
             public RulesetInfo Ruleset
             {
-                get { return ruleset; }
+                get => ruleset;
                 set
                 {
                     ruleset = value;
@@ -72,6 +72,9 @@ namespace osu.Game.Overlays.Direct
             {
                 iconContainer.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
             }
+
+            public override bool HandleKeyboardInput => !bindable.Disabled && base.HandleKeyboardInput;
+            public override bool HandleMouseInput => !bindable.Disabled && base.HandleMouseInput;
 
             public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
             {
@@ -90,6 +93,7 @@ namespace osu.Game.Overlays.Direct
 
                 Ruleset = ruleset;
                 bindable.ValueChanged += Bindable_ValueChanged;
+                bindable.DisabledChanged += isDisabled => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
                 Bindable_ValueChanged(bindable.Value);
                 Action = () => bindable.Value = Ruleset;
             }
