@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.Direct
 {
     public class PlayButton : Container
     {
+        private static PlayButton activeBeatmapPreview;
         public readonly Bindable<bool> Playing = new Bindable<bool>();
         public Track Preview { get; private set; }
 
@@ -131,6 +132,9 @@ namespace osu.Game.Overlays.Direct
 
             if (playing)
             {
+                if (activeBeatmapPreview != null)
+                    activeBeatmapPreview.Playing.Value = false;
+
                 if (Preview == null)
                 {
                     beginAudioLoad();
@@ -140,6 +144,7 @@ namespace osu.Game.Overlays.Direct
                 Preview.Restart();
 
                 audio.Track.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+                activeBeatmapPreview = this;
             }
             else
             {
