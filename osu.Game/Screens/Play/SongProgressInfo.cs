@@ -85,8 +85,8 @@ namespace osu.Game.Screens.Play
 
             if (currentSecond != previousSecond && songCurrentTime < songLength)
             {
-                timeCurrent.Text = TimeSpan.FromSeconds(currentSecond).ToString(songCurrentTime < 0 ? @"\-m\:ss" : @"m\:ss");
-                timeLeft.Text = TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"\-m\:ss");
+                timeCurrent.Text = TimeSpan.FromSeconds(currentSecond).ToString(songCurrentTime < 0 ? @"\-h\:mm\:ss" : @"h\:mm\:ss");
+                timeLeft.Text = TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"\-h\:mm\:ss");
 
                 previousSecond = currentSecond;
             }
