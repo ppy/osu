@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             comboColours[6].ColourChanged += a => { };
             comboColours[7].ColourChanged += a => { };
         }
-        
+
         private static TriangleButton createSettingButton(string text) => new TriangleButton
         {
             Anchor = Anchor.CentreLeft,
@@ -161,5 +161,5 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             // Implement a feature to bring a colour picker dialog
             return Color4.Blue;
         }
-    }   
+    }
 }
