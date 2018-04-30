@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         public ColoursSettings()
         {
             ComboColourButton backgroundColour;
-        
+
             Children = new Drawable[]
             {
                 new FillFlowContainer
