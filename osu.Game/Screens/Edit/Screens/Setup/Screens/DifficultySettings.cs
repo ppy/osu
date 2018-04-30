@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -26,14 +27,19 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class DifficultySettings : EditorSettingsGroup
     {
-        private readonly ColouredEditorSliderBar<float> hpDrainRateSliderBar;
-        private readonly ColouredEditorSliderBar<float> circleSizeSliderBar;
-        private readonly ColouredEditorSliderBar<float> approachRateSliderBar;
         private readonly ColouredEditorSliderBar<float> overallDifficultySliderBar;
-        private readonly OsuSpriteText hpDrainText;
-        private readonly OsuSpriteText circleSizeText;
-        private readonly OsuSpriteText approachRateText;
+        private readonly ColouredEditorSliderBar<float> hpDrainRateSliderBar;
+        private readonly ColouredEditorSliderBar<float> approachRateSliderBar;
+        private readonly ColouredEditorSliderBar<float> circleSizeSliderBar;
         private readonly OsuSpriteText overallDifficultyText;
+        private readonly OsuSpriteText hpDrainText;
+        private readonly OsuSpriteText approachRateText;
+        private readonly OsuSpriteText circleSizeText;
+        private readonly OsuSpriteText overallDifficultyLabel;
+        private readonly OsuSpriteText hpDrainLabel;
+        private readonly OsuSpriteText approachRateLabel;
+        private readonly OsuSpriteText circleSizeLabel;
+        private readonly FillFlowContainer ffc;
 
         protected override string Title => @"difficulty";
 
@@ -41,60 +47,100 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         {
             Children = new Drawable[]
             {
-                // Also add support for changing precision when shift is held down
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        CreateSettingLabelText("Overall Difficulty"),
+                        overallDifficultyLabel = CreateSettingLabelText("Overall Difficulty"),
                         overallDifficultyText = CreateSettingLabelTextBold(),
                     },
                 },
                 overallDifficultySliderBar = CreateSliderBar(5, 5, 0, 10),
-                new Container
+                ffc = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 15),
                     Children = new Drawable[]
                     {
-                        CreateSettingLabelText("HP Drain Rate"),
-                        hpDrainText = CreateSettingLabelTextBold(),
-                    },
-                },
-                hpDrainRateSliderBar = CreateSliderBar(5, 5, 0, 10),
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
-                    {
-                        CreateSettingLabelText("Approach Rate"),
-                        approachRateText = CreateSettingLabelTextBold(),
-                    },
-                },
-                approachRateSliderBar = CreateSliderBar(5, 5, 0, 10),
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
-                    {
-                        CreateSettingLabelText("Circle Size"),
-                        circleSizeText = CreateSettingLabelTextBold(),
-                    },
-                },
-                circleSizeSliderBar = CreateSliderBar(5, 5, 2, 7),
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 15),
+                            Children = new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
+                                    {
+                                        hpDrainLabel = CreateSettingLabelText("HP Drain Rate"),
+                                        hpDrainText = CreateSettingLabelTextBold(),
+                                    },
+                                },
+                                hpDrainRateSliderBar = CreateSliderBar(5, 5, 0, 10),
+                            }
+                        },
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 15),
+                            Children = new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
+                                    {
+                                        approachRateLabel = CreateSettingLabelText("Approach Rate"),
+                                        approachRateText = CreateSettingLabelTextBold(),
+                                    },
+                                },
+                                approachRateSliderBar = CreateSliderBar(5, 5, 0, 10),
+                            }
+                        },
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 15),
+                            Children = new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
+                                    {
+                                        circleSizeLabel = CreateSettingLabelText("Circle Size"),
+                                        circleSizeText = CreateSettingLabelTextBold(),
+                                    },
+                                },
+                                circleSizeSliderBar = CreateSliderBar(5, 5, 2, 7),
+                            }
+                        }
+                    }
+                }
             };
 
-            hpDrainRateSliderBar.Bindable.ValueChanged += showValue => hpDrainText.Text = $"{hpDrainRateSliderBar.Bar.TooltipText}";
+            // I am really sorry for your eyes
+            hpDrainRateSliderBar.Bindable.ValueChanged += showValue => hpDrainText.Text = $"{TrimUnnecessaryDecimalPart(hpDrainRateSliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
             hpDrainRateSliderBar.Bindable.TriggerChange();
-            circleSizeSliderBar.Bindable.ValueChanged += showValue => circleSizeText.Text = $"{circleSizeSliderBar.Bar.TooltipText}";
+            circleSizeSliderBar.Bindable.ValueChanged += showValue => circleSizeText.Text = $"{TrimUnnecessaryDecimalPart(circleSizeSliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
             circleSizeSliderBar.Bindable.TriggerChange();
-            approachRateSliderBar.Bindable.ValueChanged += showValue => approachRateText.Text = $"{approachRateSliderBar.Bar.TooltipText}";
+            approachRateSliderBar.Bindable.ValueChanged += showValue => approachRateText.Text = $"{TrimUnnecessaryDecimalPart(approachRateSliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
             approachRateSliderBar.Bindable.TriggerChange();
-            overallDifficultySliderBar.Bindable.ValueChanged += showValue => overallDifficultyText.Text = $"{overallDifficultySliderBar.Bar.TooltipText}";
+            overallDifficultySliderBar.Bindable.ValueChanged += showValue => overallDifficultyText.Text = $"{TrimUnnecessaryDecimalPart(overallDifficultySliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
             overallDifficultySliderBar.Bindable.TriggerChange();
         }
 
@@ -102,7 +148,40 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         {
             base.LoadComplete();
         }
-        
+
+        string TrimUnnecessaryDecimalPart(string s)
+        {
+            int index = -1;
+            for (int i = 0; i < s.Length && index < 0; i++)
+                if (s[i] == '.')
+                    index = i;
+            if (index > -1) // Number contains decimal part
+            {
+                int finalLength = s.Length;
+                while (s[finalLength - 1] == '0')
+                    finalLength--;
+                if (s[finalLength - 1] == '.')
+                    finalLength--;
+                return s.Substring(0, finalLength);
+            }
+            else return s;
+        }
+
+        public void HideApproachRateAndCircleSize()
+        {
+            ffc.Spacing = new Vector2(0, 0);
+            ChangeApproachRateAlpha(0);
+            ChangeCircleSizeAlpha(0);
+        }
+        public void ShowApproachRateAndCircleSize()
+        {
+            ffc.Spacing = new Vector2(0, 15);
+            ChangeApproachRateAlpha(1);
+            ChangeCircleSizeAlpha(1);
+        }
+        public void ChangeApproachRateAlpha(float alpha) => approachRateSliderBar.Alpha = approachRateText.Alpha = approachRateLabel.Alpha = alpha;
+        public void ChangeCircleSizeAlpha(float alpha) => circleSizeSliderBar.Alpha = circleSizeText.Alpha = circleSizeLabel.Alpha = alpha;
+
         OsuSpriteText CreateSettingLabelText(string text) => new OsuSpriteText
         {
             Anchor = Anchor.CentreLeft,

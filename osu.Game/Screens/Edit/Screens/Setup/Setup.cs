@@ -36,8 +36,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup
             Child = new FillFlowContainer
             {
                 // TODO: Make sure the container is using the entire screen and all children's size is adjusted according to the window size
-                // Might not even need to happen before the PR is accepted /shrug
-                // Probably wanna remove that comment
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
                 AutoSizeAxes = Axes.Both,
@@ -63,8 +61,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                         Spacing = new Vector2(0, 20),
                         Children = new EditorSettingsGroup[]
                         {
-                            DifficultySettings = new DifficultySettings(),
                             ModeSettings = new ModeSettings(),
+                            DifficultySettings = new DifficultySettings(),
                         }
                     },
                     new FillFlowContainer<EditorSettingsGroup>
@@ -75,7 +73,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                         Children = new EditorSettingsGroup[]
                         {
                             ColoursSettings = new ColoursSettings(),
-                            AdvancedSettings = new AdvancedSettings(),
                         }
                     },
                     new FillFlowContainer<EditorSettingsGroup>
@@ -95,10 +92,18 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                         Spacing = new Vector2(0, 20),
                         Children = new EditorSettingsGroup[]
                         {
+                            AdvancedSettings = new AdvancedSettings(),
                             DesignSettings = new DesignSettings(Skins),
                         }
                     },
                 }
+            };
+            ModeSettings.AvailableModesChanged += a =>
+            {
+                if (a == AvailableModes.Mania || a == AvailableModes.Taiko)
+                    DifficultySettings.HideApproachRateAndCircleSize();
+                else
+                    DifficultySettings.ShowApproachRateAndCircleSize();
             };
         }
     }

@@ -34,6 +34,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly EditorEnumDropdown<AvailableModes> modeDropdown;
         private readonly FillFlowContainer ffc;
 
+        /// <summary>Triggers when the available modes changes</summary>
+        public event Action<AvailableModes> AvailableModesChanged;
+
         protected override string Title => @"mode";
 
         public ModeSettings()
@@ -103,7 +106,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     }
                 }
             };
-            modeDropdown.Current.ValueChanged += UpdateStatus;
+            modeDropdown.Current.ValueChanged += TriggerAvailableModesChanged;
             modeDropdown.Current.TriggerChange();
             keyCountSliderBar.Bindable.ValueChanged += showValue => keyCountText.Text = $"{keyCountSliderBar.Bar.TooltipText}";
             keyCountSliderBar.Bindable.TriggerChange();
@@ -114,7 +117,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             base.LoadComplete();
         }
 
-        void UpdateStatus(AvailableModes a)
+        void TriggerAvailableModesChanged(AvailableModes a)
+        {
+            UpdateModes(a);
+            AvailableModesChanged?.Invoke(a);
+        }
+        void UpdateModes(AvailableModes a)
         {
             coOpModeCheckbox.Alpha = specialKeyStyleCheckbox.Alpha = keyCountLabel.Alpha = keyCountText.Alpha = keyCountSliderBar.Alpha = (modeDropdown.Current.Value == AvailableModes.Mania) ? 1 : 0;
             ffc.Spacing = new Vector2(0, modeDropdown.Current.Value == AvailableModes.Mania ? 15 : 0);
