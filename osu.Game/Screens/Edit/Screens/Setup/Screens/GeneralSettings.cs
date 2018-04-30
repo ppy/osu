@@ -26,20 +26,20 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class GeneralSettings : EditorSettingsGroup
     {
+        private readonly FillFlowContainer settingsContainer;
+        private readonly FocusedTextBox originalArtistName;
+        private readonly FocusedTextBox romanisedArtistName;
+        private readonly FocusedTextBox originalSongTitle;
+        private readonly FocusedTextBox romanisedSongTitle;
+        private readonly FocusedTextBox beatmapCreator;
+        private readonly FocusedTextBox difficulty;
+        private readonly FocusedTextBox source;
+        private readonly FocusedTextBox tags;
+
         protected override string Title => @"general";
 
         public GeneralSettings()
         {
-            FillFlowContainer settingsContainer;
-            
-            FocusedTextBox originalArtistName;
-            FocusedTextBox romanisedArtistName;
-            FocusedTextBox originalSongTitle;
-            FocusedTextBox romanisedSongTitle;
-            FocusedTextBox beatmapCreator;
-            FocusedTextBox difficulty;
-            FocusedTextBox source;
-            FocusedTextBox tags;
 
             Children = new Drawable[]
             {

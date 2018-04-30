@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual
     public class TestCaseEditorSetup : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Setup), typeof(AudioSettings), typeof(DesignSettings), typeof(DifficultySettings), typeof(ModeSettings), typeof(GeneralSettings), typeof(AdvancedSettings), typeof(ColoursSettings), typeof(ColouredEditorSliderBar<>) };
-        
+
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame, SkinManager skins)
         {

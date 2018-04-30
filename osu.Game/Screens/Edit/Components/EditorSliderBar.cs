@@ -73,13 +73,11 @@ namespace osu.Game.Screens.Edit.Components
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             IsUsingAlternatePrecision = state.Keyboard.ShiftPressed;
-            
             return base.OnKeyDown(state, args);
         }
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
             IsUsingAlternatePrecision = state.Keyboard.ShiftPressed;
-
             return base.OnKeyUp(state, args);
         }
 

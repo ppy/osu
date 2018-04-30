@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Edit.Components
                 alternatePrecision = value;
             }
         }
-        
+
         public ColouredEditorSliderBar()
         {
             // Default values for sliders
