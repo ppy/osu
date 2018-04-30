@@ -24,7 +24,6 @@ namespace osu.Game.Tests.Visual
             osuGame.Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             Setup setup = new Setup();
-            //setup.DesignSettings.Skins = skins;
 
             // This needs fixing for more proper testing
             osuGame.Beatmap.Value.Metadata.Artist = "Test artist";

@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         }
         private readonly TriangleButton addComboColour;
         private readonly TriangleButton removeComboColour;
-        private readonly ComboColourButton[] comboColours = 
+        private readonly ComboColourButton[] comboColours =
         {
             createComboColourSettingButton(1, Color4.Magenta, 1),
             createComboColourSettingButton(2, Color4.Blue, 1),

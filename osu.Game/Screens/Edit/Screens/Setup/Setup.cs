@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
         public Setup()
         {
             AlwaysPresent = true;
-            
+
             Child = new FillFlowContainer
             {
                 // TODO: Make sure the container is using the entire screen and all children's size is adjusted according to the window size
