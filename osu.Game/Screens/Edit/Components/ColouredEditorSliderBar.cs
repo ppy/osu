@@ -7,10 +7,8 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components
@@ -196,8 +194,9 @@ namespace osu.Game.Screens.Edit.Components
             public void TriggerMinColourChanged() => MinColourChanged?.Invoke();
             public void TriggerMidColourChanged() => MidColourChanged?.Invoke();
             public void TriggerMaxColourChanged() => MaxColourChanged?.Invoke();
+
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
                 Current.ValueChanged += TriggerValueChanged;
                 ValueChanged += SetValueColour;

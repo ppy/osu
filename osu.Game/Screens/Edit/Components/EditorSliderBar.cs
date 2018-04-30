@@ -4,14 +4,11 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
-using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components
 {
@@ -19,7 +16,7 @@ namespace osu.Game.Screens.Edit.Components
         where T : struct, IEquatable<T>, IComparable, IConvertible
     {
         private bool isUsingAlternatePrecision;
-        private bool IsUsingAlternatePrecision
+        public bool IsUsingAlternatePrecision
         {
             get => isUsingAlternatePrecision;
             set

@@ -3,13 +3,10 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Screens.Setup;
 using osu.Game.Screens.Edit.Screens.Setup.Screens;
-using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
 using System;
 using System.Collections.Generic;
@@ -22,11 +19,12 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Setup), typeof(AudioSettings), typeof(DesignSettings), typeof(DifficultySettings), typeof(ModeSettings), typeof(GeneralSettings), typeof(AdvancedSettings), typeof(ColoursSettings), typeof(ColouredEditorSliderBar<>) };
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, SkinManager skins)
+        private void load(OsuGameBase osuGame)
         {
             osuGame.Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             Setup setup = new Setup();
+            //setup.DesignSettings.Skins = skins;
 
             // This needs fixing for more proper testing
             osuGame.Beatmap.Value.Metadata.Artist = "Test artist";

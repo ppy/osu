@@ -2,23 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
-using osu.Framework.Screens;
-using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components;
-using osu.Game.Screens.Edit.Screens;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -54,25 +42,26 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 usedComboColours = value;
             }
         }
-        private readonly ComboColourButton backgroundColour;
         private readonly TriangleButton addComboColour;
         private readonly TriangleButton removeComboColour;
-        private readonly ComboColourButton[] comboColours = new ComboColourButton[]
+        private readonly ComboColourButton[] comboColours = 
         {
-            CreateComboColourSettingButton(1, Color4.Magenta, 1),
-            CreateComboColourSettingButton(2, Color4.Blue, 1),
-            CreateComboColourSettingButton(3, Color4.LimeGreen, 1),
-            CreateComboColourSettingButton(4, Color4.Red, 1),
-            CreateComboColourSettingButton(5, Color4.DarkBlue, 1),
-            CreateComboColourSettingButton(6, Color4.Orange, 0),
-            CreateComboColourSettingButton(7, Color4.GreenYellow, 0),
-            CreateComboColourSettingButton(8, Color4.Pink, 0),
+            createComboColourSettingButton(1, Color4.Magenta, 1),
+            createComboColourSettingButton(2, Color4.Blue, 1),
+            createComboColourSettingButton(3, Color4.LimeGreen, 1),
+            createComboColourSettingButton(4, Color4.Red, 1),
+            createComboColourSettingButton(5, Color4.DarkBlue, 1),
+            createComboColourSettingButton(6, Color4.Orange, 0),
+            createComboColourSettingButton(7, Color4.GreenYellow, 0),
+            createComboColourSettingButton(8, Color4.Pink, 0),
         };
 
         protected override string Title => @"colours";
 
         public ColoursSettings()
         {
+            ComboColourButton backgroundColour;
+        
             Children = new Drawable[]
             {
                 new FillFlowContainer
@@ -83,7 +72,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        backgroundColour = CreateComboColourSettingButton("Background Colour", Color4.LightBlue, 1),
+                        backgroundColour = createComboColourSettingButton("Background Colour", Color4.LightBlue, 1),
                         comboColours[0],
                         comboColours[1],
                         comboColours[2],
@@ -92,26 +81,31 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                         comboColours[5],
                         comboColours[6],
                         comboColours[7],
-                        addComboColour = CreateComboColourManagementButton("Add Combo Colour", Color4.LightBlue, () => { UsedComboColours++; }),
-                        removeComboColour = CreateComboColourManagementButton("Remove Combo Colour", Color4.LightBlue, () => { UsedComboColours--; }),
+                        addComboColour = createComboColourManagementButton("Add Combo Colour", Color4.LightBlue, () => { UsedComboColours++; }),
+                        removeComboColour = createComboColourManagementButton("Remove Combo Colour", Color4.LightBlue, () => { UsedComboColours--; }),
                     },
                 }
             };
+            // Currently only assigned for AppVeyor to not complain for it being unused
+            backgroundColour.ColourChanged += a => { };
+            comboColours[0].ColourChanged += a => { };
+            comboColours[1].ColourChanged += a => { };
+            comboColours[2].ColourChanged += a => { };
+            comboColours[3].ColourChanged += a => { };
+            comboColours[4].ColourChanged += a => { };
+            comboColours[5].ColourChanged += a => { };
+            comboColours[6].ColourChanged += a => { };
+            comboColours[7].ColourChanged += a => { };
         }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-        }
-
-        static TriangleButton CreateSettingButton(string text) => new TriangleButton
+        
+        private static TriangleButton createSettingButton(string text) => new TriangleButton
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,
             Text = text,
             Height = 20,
         };
-        static ComboColourButton CreateComboColourSettingButton(string text, Color4 backgroundColour, float alpha)
+        private static ComboColourButton createComboColourSettingButton(string text, Color4 backgroundColour, float alpha)
         {
             ComboColourButton a = new ComboColourButton(backgroundColour)
             {
@@ -122,10 +116,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 Height = 30,
                 Alpha = alpha,
             };
-            a.Action = () => a.MainColour = ShowColourPickerDialog();
+            a.Action = () => a.MainColour = showColourPickerDialog();
             return a;
         }
-        static ComboColourButton CreateComboColourSettingButton(int colourIndex, Color4 backgroundColour, float alpha)
+        private static ComboColourButton createComboColourSettingButton(int colourIndex, Color4 backgroundColour, float alpha)
         {
             ComboColourButton a = new ComboColourButton(backgroundColour)
             {
@@ -136,10 +130,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 Height = 30,
                 Alpha = alpha
             };
-            a.Action = () => a.MainColour = ShowColourPickerDialog();
+            a.Action = () => a.MainColour = showColourPickerDialog();
             return a;
         }
-        static TriangleButton CreateComboColourManagementButton(string text, Color4 backgroundColour, Action action) => new TriangleButton
+        private static TriangleButton createComboColourManagementButton(string text, Color4 backgroundColour, Action action) => new TriangleButton
         {
             RelativeSizeAxes = Axes.X,
             Anchor = Anchor.CentreLeft,
@@ -149,23 +143,23 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             Height = 30,
             Action = action
         };
-        static OsuSpriteText CreateSettingLabelText(string text) => new OsuSpriteText
+        private static OsuSpriteText createSettingLabelText(string text) => new OsuSpriteText
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,
             Text = text,
         };
-        static OsuSpriteText CreateSettingLabelTextBold() => new OsuSpriteText
+        private static OsuSpriteText createSettingLabelTextBold() => new OsuSpriteText
         {
             Anchor = Anchor.CentreRight,
             Origin = Anchor.CentreRight,
             Font = @"Exo2.0-Bold",
         };
 
-        static Color4 ShowColourPickerDialog()
+        private static Color4 showColourPickerDialog()
         {
             // Implement a feature to bring a colour picker dialog
             return Color4.Blue;
         }
-    }
+    }   
 }

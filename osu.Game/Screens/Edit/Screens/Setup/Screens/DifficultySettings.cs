@@ -1,42 +1,24 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
-using osu.Framework.Screens;
-using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Components;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class DifficultySettings : EditorSettingsGroup
     {
-        private readonly ColouredEditorSliderBar<float> overallDifficultySliderBar;
-        private readonly ColouredEditorSliderBar<float> hpDrainRateSliderBar;
         private readonly ColouredEditorSliderBar<float> approachRateSliderBar;
         private readonly ColouredEditorSliderBar<float> circleSizeSliderBar;
-        private readonly OsuSpriteText overallDifficultyText;
-        private readonly OsuSpriteText hpDrainText;
         private readonly OsuSpriteText approachRateText;
         private readonly OsuSpriteText circleSizeText;
-        private readonly OsuSpriteText overallDifficultyLabel;
-        private readonly OsuSpriteText hpDrainLabel;
+        //private readonly OsuSpriteText overallDifficultyLabel;
+        //private readonly OsuSpriteText hpDrainLabel;
         private readonly OsuSpriteText approachRateLabel;
         private readonly OsuSpriteText circleSizeLabel;
         private readonly FillFlowContainer ffc;
@@ -45,6 +27,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         public DifficultySettings()
         {
+            ColouredEditorSliderBar<float> overallDifficultySliderBar;
+            ColouredEditorSliderBar<float> hpDrainRateSliderBar;
+            OsuSpriteText overallDifficultyText;
+            OsuSpriteText hpDrainText;
+
             Children = new Drawable[]
             {
                 new Container
@@ -53,11 +40,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        overallDifficultyLabel = CreateSettingLabelText("Overall Difficulty"),
-                        overallDifficultyText = CreateSettingLabelTextBold(),
+                        createSettingLabelText("Overall Difficulty"),
+                        overallDifficultyText = createSettingLabelTextBold(),
                     },
                 },
-                overallDifficultySliderBar = CreateSliderBar(5, 5, 0, 10),
+                overallDifficultySliderBar = createSliderBar(5, 5, 0, 10),
                 ffc = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -80,11 +67,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     AutoSizeAxes = Axes.Y,
                                     Children = new Drawable[]
                                     {
-                                        hpDrainLabel = CreateSettingLabelText("HP Drain Rate"),
-                                        hpDrainText = CreateSettingLabelTextBold(),
+                                        createSettingLabelText("HP Drain Rate"),
+                                        hpDrainText = createSettingLabelTextBold(),
                                     },
                                 },
-                                hpDrainRateSliderBar = CreateSliderBar(5, 5, 0, 10),
+                                hpDrainRateSliderBar = createSliderBar(5, 5, 0, 10),
                             }
                         },
                         new FillFlowContainer
@@ -101,11 +88,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     AutoSizeAxes = Axes.Y,
                                     Children = new Drawable[]
                                     {
-                                        approachRateLabel = CreateSettingLabelText("Approach Rate"),
-                                        approachRateText = CreateSettingLabelTextBold(),
+                                        approachRateLabel = createSettingLabelText("Approach Rate"),
+                                        approachRateText = createSettingLabelTextBold(),
                                     },
                                 },
-                                approachRateSliderBar = CreateSliderBar(5, 5, 0, 10),
+                                approachRateSliderBar = createSliderBar(5, 5, 0, 10),
                             }
                         },
                         new FillFlowContainer
@@ -122,11 +109,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     AutoSizeAxes = Axes.Y,
                                     Children = new Drawable[]
                                     {
-                                        circleSizeLabel = CreateSettingLabelText("Circle Size"),
-                                        circleSizeText = CreateSettingLabelTextBold(),
+                                        circleSizeLabel = createSettingLabelText("Circle Size"),
+                                        circleSizeText = createSettingLabelTextBold(),
                                     },
                                 },
-                                circleSizeSliderBar = CreateSliderBar(5, 5, 2, 7),
+                                circleSizeSliderBar = createSliderBar(5, 5, 2, 7),
                             }
                         }
                     }
@@ -134,22 +121,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             };
 
             // I am really sorry for your eyes
-            hpDrainRateSliderBar.Bindable.ValueChanged += showValue => hpDrainText.Text = $"{TrimUnnecessaryDecimalPart(hpDrainRateSliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
+            hpDrainRateSliderBar.Bindable.ValueChanged += showValue => hpDrainText.Text = $"{trimUnnecessaryDecimalPart(hpDrainRateSliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
             hpDrainRateSliderBar.Bindable.TriggerChange();
-            circleSizeSliderBar.Bindable.ValueChanged += showValue => circleSizeText.Text = $"{TrimUnnecessaryDecimalPart(circleSizeSliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
+            circleSizeSliderBar.Bindable.ValueChanged += showValue => circleSizeText.Text = $"{trimUnnecessaryDecimalPart(circleSizeSliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
             circleSizeSliderBar.Bindable.TriggerChange();
-            approachRateSliderBar.Bindable.ValueChanged += showValue => approachRateText.Text = $"{TrimUnnecessaryDecimalPart(approachRateSliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
+            approachRateSliderBar.Bindable.ValueChanged += showValue => approachRateText.Text = $"{trimUnnecessaryDecimalPart(approachRateSliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
             approachRateSliderBar.Bindable.TriggerChange();
-            overallDifficultySliderBar.Bindable.ValueChanged += showValue => overallDifficultyText.Text = $"{TrimUnnecessaryDecimalPart(overallDifficultySliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
+            overallDifficultySliderBar.Bindable.ValueChanged += showValue => overallDifficultyText.Text = $"{trimUnnecessaryDecimalPart(overallDifficultySliderBar.Bar.Current.Value.ToString("N1", CultureInfo.InvariantCulture))}";
             overallDifficultySliderBar.Bindable.TriggerChange();
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-        }
-
-        string TrimUnnecessaryDecimalPart(string s)
+        private string trimUnnecessaryDecimalPart(string s)
         {
             int index = -1;
             for (int i = 0; i < s.Length && index < 0; i++)
@@ -182,25 +164,25 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         public void ChangeApproachRateAlpha(float alpha) => approachRateSliderBar.Alpha = approachRateText.Alpha = approachRateLabel.Alpha = alpha;
         public void ChangeCircleSizeAlpha(float alpha) => circleSizeSliderBar.Alpha = circleSizeText.Alpha = circleSizeLabel.Alpha = alpha;
 
-        OsuSpriteText CreateSettingLabelText(string text) => new OsuSpriteText
+        private OsuSpriteText createSettingLabelText(string text) => new OsuSpriteText
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,
             Text = text,
         };
-        OsuSpriteText CreateSettingLabelTextBold() => new OsuSpriteText
+        private OsuSpriteText createSettingLabelTextBold() => new OsuSpriteText
         {
             Anchor = Anchor.CentreRight,
             Origin = Anchor.CentreRight,
             Font = @"Exo2.0-Bold",
         };
-        ColouredEditorSliderBar<float> CreateSliderBar(float value, float defaultValue, float min, float max) => new ColouredEditorSliderBar<float>
+        private ColouredEditorSliderBar<float> createSliderBar(float value, float defaultValue, float min, float max) => new ColouredEditorSliderBar<float>
         {
             NormalPrecision = 1,
             AlternatePrecision = 0.1f,
-            Bindable = CreateBindable(value, defaultValue, min, max, 1),
+            Bindable = createBindable(value, defaultValue, min, max, 1),
         };
-        Bindable<float> CreateBindable(float value, float defaultValue, float min, float max, float precision) => new BindableFloat(value)
+        private Bindable<float> createBindable(float value, float defaultValue, float min, float max, float precision) => new BindableFloat(value)
         {
             Default = defaultValue,
             MinValue = min,

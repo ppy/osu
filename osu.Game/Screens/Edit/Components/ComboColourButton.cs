@@ -1,22 +1,22 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Edit
+namespace osu.Game.Screens.Edit.Components
 {
     /// <summary>
     /// A <see cref="TriangleButton"/> with customisable colours for showing a combo colour in a map.
     /// </summary>
     public class ComboColourButton : TriangleButton
     {
-        public Color4 backgroundColour;
-        public Color4 triangleDark;
-        public Color4 triangleLight;
+        private Color4 backgroundColour;
+        private Color4 triangleDark;
+        private Color4 triangleLight;
         public Color4 MainColour
         {
             get => backgroundColour;
@@ -26,6 +26,7 @@ namespace osu.Game.Screens.Edit
                 BackgroundColour = backgroundColour;
                 TriangleDark = backgroundColour.Darken(0.1f);
                 TriangleLight = backgroundColour.Lighten(0.1f);
+                TriggerColourChanged(value);
             }
         }
         public Color4 TriangleDark // The colours of the triangles that are already being shown do not change, maybe need to either create a new class or edit the Triangle class to update the colours of the currently shown triangles appropriately
@@ -49,13 +50,21 @@ namespace osu.Game.Screens.Edit
             }
         }
 
+        /// <summary>This is raised upon changing the colour of the button.</summary>
+        public event Action<Color4> ColourChanged;
+
         public ComboColourButton(Color4 mainColour)
         {
             MainColour = mainColour;
         }
 
+        public void TriggerColourChanged(Color4 c)
+        {
+            ColourChanged?.Invoke(c);
+        }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             BackgroundColour = MainColour;
             Triangles.ColourDark = TriangleDark;

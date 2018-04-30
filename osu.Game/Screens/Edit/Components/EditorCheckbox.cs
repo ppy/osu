@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Nub.Margin = new MarginPadding { };
+            Nub.Margin = new MarginPadding();
             Nub.AccentColour = colours.Yellow;
             Nub.GlowingAccentColour = colours.YellowLighter;
             Nub.GlowColour = colours.YellowDarker;

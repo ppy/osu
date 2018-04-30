@@ -1,17 +1,9 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using JetBrains.Annotations;
-using osu.Framework.Allocation;
 using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Logging;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Skinning;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Screens.Setup.Screens;
 
@@ -26,13 +18,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup
         public readonly DesignSettings DesignSettings;
         public readonly ColoursSettings ColoursSettings;
         public readonly AdvancedSettings AdvancedSettings;
-        public SkinManager Skins;
 
         public Setup()
         {
             AlwaysPresent = true;
-
-            //Skins = skins;
+            
             Child = new FillFlowContainer
             {
                 // TODO: Make sure the container is using the entire screen and all children's size is adjusted according to the window size
@@ -42,7 +32,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                 Direction = FillDirection.Horizontal,
                 Spacing = new Vector2(20, 0),
                 Padding = new MarginPadding { Top = 20, Left = 20 },
-                Children = new FillFlowContainer<EditorSettingsGroup>[]
+                Children = new Drawable[]
                 {
                     new FillFlowContainer<EditorSettingsGroup>
                     {
@@ -93,7 +83,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                         Children = new EditorSettingsGroup[]
                         {
                             AdvancedSettings = new AdvancedSettings(),
-                            DesignSettings = new DesignSettings(Skins),
+                            DesignSettings = new DesignSettings(),
                         }
                     },
                 }

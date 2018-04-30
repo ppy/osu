@@ -1,45 +1,30 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
-using osu.Framework.Screens;
-using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components;
-using osu.Game.Screens.Edit.Screens;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class GeneralSettings : EditorSettingsGroup
     {
-        private readonly FillFlowContainer settingsContainer;
-        private readonly FocusedTextBox originalArtistName;
-        private readonly FocusedTextBox romanisedArtistName;
-        private readonly FocusedTextBox originalSongTitle;
-        private readonly FocusedTextBox romanisedSongTitle;
-        private readonly FocusedTextBox beatmapCreator;
-        private readonly FocusedTextBox difficulty;
-        private readonly FocusedTextBox source;
-        private readonly FocusedTextBox tags;
-
         protected override string Title => @"general";
 
         public GeneralSettings()
         {
+            FillFlowContainer settingsContainer;
+            FocusedTextBox originalArtistName;
+            FocusedTextBox romanisedArtistName;
+            FocusedTextBox originalSongTitle;
+            FocusedTextBox romanisedSongTitle;
+            FocusedTextBox beatmapCreator;
+            FocusedTextBox difficulty;
+            FocusedTextBox source;
+            FocusedTextBox tags;
 
             Children = new Drawable[]
             {
@@ -50,44 +35,48 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        CreateSettingLabelText("Artist"),
-                        originalArtistName = CreateSettingTextBox("Test artist"),
-                        CreateSettingLabelText("Romanised Artist"),
-                        romanisedArtistName = CreateSettingTextBox("Test romanised artist"),
-                        CreateSettingLabelText("Title"),
-                        originalSongTitle = CreateSettingTextBox("Test title"),
-                        CreateSettingLabelText("Romanised Title"),
-                        romanisedSongTitle = CreateSettingTextBox("Test romanised title"),
-                        CreateSettingLabelText("Beatmap Creator"),
-                        beatmapCreator = CreateSettingTextBox("Test username"),
-                        CreateSettingLabelText("Difficulty"),
-                        difficulty = CreateSettingTextBox(/*Beatmap.Value.Metadata.Beatmaps[0].Version*/ "Test version"), // Somehow get the current version of the beatmapset
-                        CreateSettingLabelText("Source"),
-                        source = CreateSettingTextBox("Test source"),
-                        CreateSettingLabelText("Tags"),
-                        tags = CreateSettingTextBox("Test tag list"),
+                        createSettingLabelText("Artist"),
+                        originalArtistName = createSettingTextBox("Test artist"),
+                        createSettingLabelText("Romanised Artist"),
+                        romanisedArtistName = createSettingTextBox("Test romanised artist"),
+                        createSettingLabelText("Title"),
+                        originalSongTitle = createSettingTextBox("Test title"),
+                        createSettingLabelText("Romanised Title"),
+                        romanisedSongTitle = createSettingTextBox("Test romanised title"),
+                        createSettingLabelText("Beatmap Creator"),
+                        beatmapCreator = createSettingTextBox("Test username"),
+                        createSettingLabelText("Difficulty"),
+                        difficulty = createSettingTextBox(/*Beatmap.Value.Metadata.Beatmaps[0].Version*/ "Test version"), // Somehow get the current version of the beatmapset
+                        createSettingLabelText("Source"),
+                        source = createSettingTextBox("Test source"),
+                        createSettingLabelText("Tags"),
+                        tags = createSettingTextBox("Test tag list"),
                     }
                 }
             };
+            // Currently only assigned for AppVeyor to not complain for it being unused
+            originalArtistName.Current.ValueChanged += a => { };
+            romanisedArtistName.Current.ValueChanged += a => { };
+            originalSongTitle.Current.ValueChanged += a => { };
+            romanisedSongTitle.Current.ValueChanged += a => { };
+            beatmapCreator.Current.ValueChanged += a => { };
+            difficulty.Current.ValueChanged += a => { };
+            source.Current.ValueChanged += a => { };
+            tags.Current.ValueChanged += a => { };
         }
 
-        FocusedTextBox CreateSettingTextBox(string text) => CreateSettingTextBox(text, "test");
-        FocusedTextBox CreateSettingTextBox(string text, string placeholderText) => new FocusedTextBox
+        private FocusedTextBox createSettingTextBox(string text) => createSettingTextBox(text, "test");
+        private FocusedTextBox createSettingTextBox(string text, string placeholderText) => new FocusedTextBox
         {
             Height = 30,
             RelativeSizeAxes = Axes.X,
             Text = text,
             PlaceholderText = placeholderText,
         };
-        OsuSpriteText CreateSettingLabelText(string text) => new OsuSpriteText
+        private OsuSpriteText createSettingLabelText(string text) => new OsuSpriteText
         {
             Text = text,
             TextSize = 16,
         };
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-        }
     }
 }

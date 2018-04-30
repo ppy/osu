@@ -3,24 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
-using osu.Framework.Screens;
-using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components;
-using osu.Game.Screens.Edit.Screens;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
@@ -31,7 +19,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly OsuSpriteText keyCountText;
         private readonly EditorCheckbox coOpModeCheckbox;
         private readonly EditorCheckbox specialKeyStyleCheckbox;
-        private readonly EditorEnumDropdown<AvailableModes> modeDropdown;
         private readonly FillFlowContainer ffc;
 
         /// <summary>Triggers when the available modes changes</summary>
@@ -41,6 +28,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         public ModeSettings()
         {
+            EditorEnumDropdown<AvailableModes> modeDropdown;
+
             Children = new Drawable[]
             {
                 ffc = new FillFlowContainer
@@ -59,7 +48,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                             Spacing = new Vector2(0, 5),
                             Children = new Drawable[]
                             {
-                                CreateSettingLabelText("Available Modes"),
+                                createSettingLabelText("Available Modes"),
                                 new Container
                                 {
                                     RelativeSizeAxes = Axes.X,
@@ -71,7 +60,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                             RelativeSizeAxes = Axes.X,
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
-                                            Items = new KeyValuePair<string, AvailableModes>[]
+                                            Items = new List<KeyValuePair<string, AvailableModes>>
                                             {
                                                 new KeyValuePair<string, AvailableModes>("All", AvailableModes.All),
                                                 new KeyValuePair<string, AvailableModes>("osu!taiko", AvailableModes.Taiko),
@@ -84,23 +73,23 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                             }
                         },
-                        coOpModeCheckbox = CreateSettingCheckBox("Co-Op Mode", 0),
-                        specialKeyStyleCheckbox = CreateSettingCheckBox("Use Special Key Style", 0),
+                        coOpModeCheckbox = createSettingCheckBox("Co-Op Mode", 0),
+                        specialKeyStyleCheckbox = createSettingCheckBox("Use Special Key Style", 0),
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                keyCountLabel = CreateSettingLabelText("Key Count", 0),
-                                keyCountText = CreateSettingLabelTextBold(0),
+                                keyCountLabel = createSettingLabelText("Key Count", 0),
+                                keyCountText = createSettingLabelTextBold(0),
                             },
                         },
                         keyCountSliderBar = new EditorSliderBar<float>
                         {
                             NormalPrecision = 1,
                             AlternatePrecision = 1,
-                            Bindable = CreateBindable(4, 4, 1, 9, 1),
+                            Bindable = createBindable(4, 4, 1, 9, 1),
                             Alpha = 0,
                         },
                     }
@@ -112,63 +101,58 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             keyCountSliderBar.Bindable.TriggerChange();
         }
 
-        protected override void LoadComplete()
+        public void TriggerAvailableModesChanged(AvailableModes a)
         {
-            base.LoadComplete();
-        }
-
-        void TriggerAvailableModesChanged(AvailableModes a)
-        {
-            UpdateModes(a);
+            updateModes(a);
             AvailableModesChanged?.Invoke(a);
         }
-        void UpdateModes(AvailableModes a)
+        private void updateModes(AvailableModes a)
         {
-            coOpModeCheckbox.Alpha = specialKeyStyleCheckbox.Alpha = keyCountLabel.Alpha = keyCountText.Alpha = keyCountSliderBar.Alpha = (modeDropdown.Current.Value == AvailableModes.Mania) ? 1 : 0;
-            ffc.Spacing = new Vector2(0, modeDropdown.Current.Value == AvailableModes.Mania ? 15 : 0);
+            coOpModeCheckbox.Alpha = specialKeyStyleCheckbox.Alpha = keyCountLabel.Alpha = keyCountText.Alpha = keyCountSliderBar.Alpha = a == AvailableModes.Mania ? 1 : 0;
+            ffc.Spacing = new Vector2(0, a == AvailableModes.Mania ? 15 : 0);
         }
 
-        EditorCheckbox CreateSettingCheckBox(string text) => new EditorCheckbox
+        private EditorCheckbox createSettingCheckBox(string text) => new EditorCheckbox
         {
             LabelText = text,
         };
-        EditorCheckbox CreateSettingCheckBox(string text, float alpha) => new EditorCheckbox
+        private EditorCheckbox createSettingCheckBox(string text, float alpha) => new EditorCheckbox
         {
             LabelText = text,
             Alpha = alpha,
         };
-        EditorCheckbox CreateSettingCheckBox(string text, bool defaultValue) => new EditorCheckbox
+        private EditorCheckbox createSettingCheckBox(string text, bool defaultValue) => new EditorCheckbox
         {
             LabelText = text,
             Bindable = new BindableBool(defaultValue)
         };
-        OsuSpriteText CreateSettingLabelText(string text) => new OsuSpriteText
+        private OsuSpriteText createSettingLabelText(string text) => new OsuSpriteText
         {
             Anchor = Anchor.TopLeft,
             Origin = Anchor.TopLeft,
             Text = text,
         };
-        OsuSpriteText CreateSettingLabelText(string text, float alpha) => new OsuSpriteText
+        private OsuSpriteText createSettingLabelText(string text, float alpha) => new OsuSpriteText
         {
             Anchor = Anchor.TopLeft,
             Origin = Anchor.TopLeft,
             Text = text,
             Alpha = alpha,
         };
-        OsuSpriteText CreateSettingLabelTextBold() => new OsuSpriteText
+        private OsuSpriteText createSettingLabelTextBold() => new OsuSpriteText
         {
             Anchor = Anchor.CentreRight,
             Origin = Anchor.CentreRight,
             Font = @"Exo2.0-Bold",
         };
-        OsuSpriteText CreateSettingLabelTextBold(float alpha) => new OsuSpriteText
+        private OsuSpriteText createSettingLabelTextBold(float alpha) => new OsuSpriteText
         {
             Anchor = Anchor.CentreRight,
             Origin = Anchor.CentreRight,
             Font = @"Exo2.0-Bold",
             Alpha = alpha,
         };
-        Bindable<float> CreateBindable(float value, float defaultValue, float min, float max, float precision) => new BindableFloat(value)
+        private Bindable<float> createBindable(float value, float defaultValue, float min, float max, float precision) => new BindableFloat(value)
         {
             Default = defaultValue,
             MinValue = min,

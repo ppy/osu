@@ -5,24 +5,12 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
-using osu.Framework.Screens;
 using osu.Game.Skinning;
-using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.Settings;
-using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Components;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
@@ -41,12 +29,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         protected override string Title => @"design";
 
-        public DesignSettings(SkinManager skins)
+        [BackgroundDependencyLoader]
+        private void load(SkinManager skins)
         {
             Skins = skins;
             Children = new Drawable[]
             {
-                CreateSettingCheckBox("Display Epilepsy Warning"),
+                createSettingCheckBox("Display Epilepsy Warning"),
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -55,7 +44,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        CreateSettingLabelText("Beatmap Skin"),
+                        createSettingLabelText("Beatmap Skin"),
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
@@ -67,7 +56,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     RelativeSizeAxes = Axes.X,
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
-                                    Items = new KeyValuePair<string, int>[]
+                                    Items = new List<KeyValuePair<string, int>>
                                     {
                                         new KeyValuePair<string, int>("No Custom Skin", -1),
                                     },
@@ -85,58 +74,54 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     Spacing = new Vector2(0, 15),
                     Children = new Drawable[]
                     {
-                        enableCountdownCheckbox = CreateSettingCheckBox("Enable Countdown", true),
+                        enableCountdownCheckbox = createSettingCheckBox("Enable Countdown", true),
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                countdownSpeedLabel = CreateSettingLabelText("Countdown Speed"),
-                                countdownSpeedText = CreateSettingLabelTextBold(),
+                                countdownSpeedLabel = createSettingLabelText("Countdown Speed"),
+                                countdownSpeedText = createSettingLabelTextBold(),
                             },
                         },
-                        countdownSpeedSlider = CreateSliderBar(1, 1, 0, 2, 1),
+                        countdownSpeedSlider = createSliderBar(1, 1, 0, 2, 1),
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                countdownOffsetLabel = CreateSettingLabelText("Countdown Beat Offset"),
-                                countdownOffsetText = CreateSettingLabelTextBold(),
+                                countdownOffsetLabel = createSettingLabelText("Countdown Beat Offset"),
+                                countdownOffsetText = createSettingLabelTextBold(),
                             },
                         },
-                        countdownOffsetSlider = CreateSliderBar(0, 0, 0, 3, 1),
+                        countdownOffsetSlider = createSliderBar(0, 0, 0, 3, 1),
                     }
                 }
             };
 
-            //var s = Skins.GetAllUsableSkins();
-            //for (int i = 0; i < s.Length; i++)
-            //{
-            //    skinsDropdown.AddDropdownItem(s[i].Name, i);
-            //}
-            enableCountdownCheckbox.Current.ValueChanged += UpdateStatus;
+            var s = Skins.GetAllUsableSkins();
+            for (int i = 0; i < s.Count; i++)
+            {
+                skinsDropdown.AddDropdownItem(s[i].Name, i);
+            }
+            skinsDropdown.Current.ValueChanged += a => { }; // Change the skin used in the beatmap
+            enableCountdownCheckbox.Current.ValueChanged += updateStatus;
             enableCountdownCheckbox.Current.TriggerChange();
             countdownOffsetSlider.Bindable.ValueChanged += showValue => countdownOffsetText.Text = $"{countdownOffsetSlider.Bar.TooltipText}";
             countdownOffsetSlider.Bindable.TriggerChange();
-            countdownSpeedSlider.Bindable.ValueChanged += showValue => countdownSpeedText.Text = $"{GetCountdownSpeedString(countdownSpeedSlider.Bindable.Value)}";
+            countdownSpeedSlider.Bindable.ValueChanged += showValue => countdownSpeedText.Text = $"{getCountdownSpeedString(countdownSpeedSlider.Bindable.Value)}";
             countdownSpeedSlider.Bindable.TriggerChange();
         }
 
-        protected override void LoadComplete()
+        private void updateStatus(bool a)
         {
-            base.LoadComplete();
-        }
-
-        void UpdateStatus(bool a)
-        {
-            countdownSpeedLabel.Alpha = countdownSpeedText.Alpha = countdownSpeedSlider.Alpha = countdownOffsetLabel.Alpha = countdownOffsetText.Alpha = countdownOffsetSlider.Alpha = (enableCountdownCheckbox.Current.Value ? 1 : 0);
+            countdownSpeedLabel.Alpha = countdownSpeedText.Alpha = countdownSpeedSlider.Alpha = countdownOffsetLabel.Alpha = countdownOffsetText.Alpha = countdownOffsetSlider.Alpha = enableCountdownCheckbox.Current.Value ? 1 : 0;
             ffc.Spacing = new Vector2(0, enableCountdownCheckbox.Current.Value ? 15 : 0);
         }
 
-        string GetCountdownSpeedString(int speed)
+        private string getCountdownSpeedString(int speed)
         {
             switch (speed)
             {
@@ -150,34 +135,34 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     throw new ArgumentException("The speed value that was provided is not a valid countdown speed value.");
             }
         }
-        EditorCheckbox CreateSettingCheckBox(string text) => new EditorCheckbox
+        private EditorCheckbox createSettingCheckBox(string text) => new EditorCheckbox
         {
             LabelText = text,
         };
-        EditorCheckbox CreateSettingCheckBox(string text, bool defaultValue) => new EditorCheckbox
+        private EditorCheckbox createSettingCheckBox(string text, bool defaultValue) => new EditorCheckbox
         {
             LabelText = text,
             Bindable = new BindableBool(defaultValue)
         };
-        OsuSpriteText CreateSettingLabelText(string text) => new OsuSpriteText
+        private OsuSpriteText createSettingLabelText(string text) => new OsuSpriteText
         {
             Anchor = Anchor.TopLeft,
             Origin = Anchor.TopLeft,
             Text = text,
         };
-        OsuSpriteText CreateSettingLabelTextBold() => new OsuSpriteText
+        private OsuSpriteText createSettingLabelTextBold() => new OsuSpriteText
         {
             Anchor = Anchor.CentreRight,
             Origin = Anchor.CentreRight,
             Font = @"Exo2.0-Bold",
         };
-        EditorSliderBar<int> CreateSliderBar(int value, int defaultValue, int min, int max, int precision) => new EditorSliderBar<int>
+        private EditorSliderBar<int> createSliderBar(int value, int defaultValue, int min, int max, int precision) => new EditorSliderBar<int>
         {
             NormalPrecision = precision,
             AlternatePrecision = precision,
-            Bindable = CreateBindable(value, defaultValue, min, max, precision),
+            Bindable = createBindable(value, defaultValue, min, max, precision),
         };
-        Bindable<int> CreateBindable(int value, int defaultValue, int min, int max, int precision) => new BindableInt(value)
+        private Bindable<int> createBindable(int value, int defaultValue, int min, int max, int precision) => new BindableInt(value)
         {
             Default = defaultValue,
             MinValue = min,
