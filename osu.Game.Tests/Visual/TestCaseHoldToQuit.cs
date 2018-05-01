@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual
 
             var text = holdToQuit.Children.OfType<SpriteText>().Single();
 
-            AddStep("Text fade in", () =>
+            AddStep("Trigger text fade in/out", () =>
             {
                 exitAction = false;
                 holdToQuit.Button.TriggerOnMouseDown();
@@ -34,14 +34,6 @@ namespace osu.Game.Tests.Visual
             });
 
             AddUntilStep(() => text.IsPresent && !exitAction, "Text visible");
-
-            AddStep("Text fade out", () =>
-            {
-                exitAction = false;
-                holdToQuit.Button.TriggerOnMouseDown();
-                holdToQuit.Button.TriggerOnMouseUp();
-            });
-
             AddUntilStep(() => !text.IsPresent && !exitAction, "Text is not visible");
 
             AddStep("Trigger exit action", () =>
