@@ -87,6 +87,21 @@ namespace osu.Game.Overlays
             Clear();
             lastSection = null;
 
+            if (fetchOnline)
+            {
+                userReq = new GetUserRequest(user.Id);
+                userReq.Success += showUser;
+                api.Queue(userReq);
+            }
+            else
+            {
+                userReq = null;
+                showUser(user);
+            }
+        }
+
+        private void showUser(User user)
+        {
             sections = new ProfileSection[]
             {
                 //new AboutSection(),
@@ -149,26 +164,6 @@ namespace osu.Game.Overlays
                 }
             };
 
-            if (fetchOnline)
-            {
-                userReq = new GetUserRequest(user.Id);
-                userReq.Success += userLoadComplete;
-                api.Queue(userReq);
-            }
-            else
-            {
-                userReq = null;
-                userLoadComplete(user);
-            }
-
-            Show();
-            sectionsContainer.ScrollToTop();
-        }
-
-        private void userLoadComplete(User user)
-        {
-            Header.User = user;
-
             if (user.ProfileOrder != null)
             {
                 foreach (string id in user.ProfileOrder)
@@ -183,6 +178,9 @@ namespace osu.Game.Overlays
                     }
                 }
             }
+
+            Show();
+            sectionsContainer.ScrollToTop();
         }
 
         private class ProfileTabControl : PageTabControl<ProfileSection>
