@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Screens.Setup.Screens;
 
 namespace osu.Game.Screens.Edit.Screens.Setup

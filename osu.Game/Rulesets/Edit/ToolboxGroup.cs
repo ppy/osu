@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Rulesets.Edit
 {

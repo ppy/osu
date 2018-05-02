@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         public DifficultySettings()
         {
+            AllowCollapsing = false;
+
             EditorSliderBar<float> overallDifficultySliderBar;
             EditorSliderBar<float> hpDrainRateSliderBar;
             OsuSpriteText overallDifficultyText;
