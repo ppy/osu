@@ -147,18 +147,21 @@ namespace osu.Game.Overlays.Mods
 
         public virtual Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            switch (args.Button)
+            // only trigger the event if we are inside the area of the button
+            if (Contains(ToScreenSpace(state.Mouse.Position - Position)))
             {
-                case MouseButton.Left:
-                    SelectNext(1);
-                    break;
-                case MouseButton.Right:
-                    SelectNext(-1);
-                    break;
+                switch (args.Button)
+                {
+                    case MouseButton.Left:
+                        SelectNext(1);
+                        break;
+                    case MouseButton.Right:
+                        SelectNext(-1);
+                        break;
+                }
             }
-
             return true;
         }
 
