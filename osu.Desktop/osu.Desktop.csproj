@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.Game.props" />
   <PropertyGroup Label="Project">
     <TargetFrameworks>net471;netcoreapp2.0</TargetFrameworks>
@@ -10,8 +10,8 @@
     <Title>osu!lazer</Title>
     <Product>osu!lazer</Product>
     <ApplicationIcon>lazer.ico</ApplicationIcon>
-    <Version>0.0.0.0</Version>
-    <FileVersion>0.0.0.0</FileVersion>
+    <Version>0.0.0</Version>
+    <FileVersion>0.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Label="Defines">
     <DefineConstants Condition="'$(TargetFramework)' == 'net471'">$(DefineConstants);NET_FRAMEWORK</DefineConstants>
