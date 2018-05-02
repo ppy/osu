@@ -466,6 +466,16 @@ namespace osu.Game
                 case GlobalAction.ToggleDirect:
                     direct.ToggleVisibility();
                     return true;
+                case GlobalAction.ToggleMouseButtons:
+                    var currentState = LocalConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+                    string newStateString = currentState ? @"enabled" : @"disabled";
+                    notifications.Post(new SimpleNotification
+                    {
+                        Text = $"In-Game mouse buttons have been {newStateString}.",
+                        Icon = currentState ? FontAwesome.fa_osu_playstyle_mouse : FontAwesome.fa_osu_playstyle_keyboard,
+                    });
+                    LocalConfig.Set(OsuSetting.MouseDisableButtons, !currentState);
+                    return true;
             }
 
             return false;
