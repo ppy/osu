@@ -115,7 +115,7 @@ namespace osu.Desktop.Deploy
             checkReleaseFiles();
 
             write("Running squirrel build...");
-            runCommand(squirrelPath, $"--releasify {stagingPath}\\{nupkgFilename(version)} --setupIcon {iconPath} --icon {iconPath} {codeSigningCmd} --no-msi");
+            runCommand(squirrelPath, $"--releasify {stagingPath}\\{nupkgFilename(version)} --framework-version=net471 --setupIcon {iconPath} --icon {iconPath} {codeSigningCmd} --no-msi");
 
             //prune again to clean up before upload.
             pruneReleases();
