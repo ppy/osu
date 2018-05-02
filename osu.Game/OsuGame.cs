@@ -466,7 +466,7 @@ namespace osu.Game
                 case GlobalAction.ToggleDirect:
                     direct.ToggleVisibility();
                     return true;
-                case GlobalAction.ToggleMouseButtons:
+                case GlobalAction.ToggleGameplayMouseButtons:
                     LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
                     return true;
             }
