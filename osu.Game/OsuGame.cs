@@ -201,6 +201,8 @@ namespace osu.Game
                 return;
             }
 
+            Ruleset.Value = s.Ruleset;
+
             Beatmap.Value = BeatmapManager.GetWorkingBeatmap(s.Beatmap);
             Beatmap.Value.Mods.Value = s.Mods;
 
