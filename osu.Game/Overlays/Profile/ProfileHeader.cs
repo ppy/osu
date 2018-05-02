@@ -3,8 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -19,6 +17,10 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
+using OpenTK;
+using OpenTK.Graphics;
+
+// ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
 
 namespace osu.Game.Overlays.Profile
 {
@@ -51,6 +53,7 @@ namespace osu.Game.Overlays.Profile
             RelativeSizeAxes = Axes.X;
             Height = cover_height + info_height;
 
+            User = user;
             Children = new Drawable[]
             {
                 coverContainer = new Container
@@ -284,37 +287,6 @@ namespace osu.Game.Overlays.Profile
                     }
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            levelBadge.Texture = textures.Get(@"Profile/levelbadge");
-        }
-
-        private User user;
-
-        public User User
-        {
-            get { return user; }
-            set
-            {
-                user = value;
-                loadUser();
-            }
-        }
-
-        private void loadUser()
-        {
-            LoadComponentAsync(new UserCoverBackground(user)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                FillMode = FillMode.Fill,
-                OnLoadComplete = d => d.FadeInFromZero(200),
-                Depth = float.MaxValue,
-            }, coverContainer.Add);
 
             if (user.IsSupporter)
                 SupporterTag.Show();
@@ -434,8 +406,31 @@ namespace osu.Game.Overlays.Profile
 
                 rankGraph.User.Value = user;
             }
+        }
 
-            badgeContainer.ShowBadges(user.Badges);
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
+        {
+            levelBadge.Texture = textures.Get(@"Profile/levelbadge");
+
+            LoadComponentAsync(new UserCoverBackground(User)
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                FillMode = FillMode.Fill,
+                OnLoadComplete = d => d.FadeInFromZero(200),
+                Depth = float.MaxValue,
+            }, coverContainer.Add);
+            badgeContainer.ShowBadges(User.Badges);
+        }
+
+        private User user;
+
+        public User User
+        {
+            get => user;
+            set => user = value;
         }
 
         private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
@@ -486,7 +481,7 @@ namespace osu.Game.Overlays.Profile
 
             public int DisplayCount
             {
-                set { numberText.Text = value.ToString(@"#,0"); }
+                set => numberText.Text = value.ToString(@"#,0");
             }
 
             public GradeBadge(string grade)
