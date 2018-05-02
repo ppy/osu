@@ -1,27 +1,27 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.OsuDifficulty;
-using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Osu.Scoring;
-using osu.Game.Rulesets.Osu.Edit;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu.Replays;
-using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Graphics;
+using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Edit;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.OsuDifficulty;
+using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -46,6 +46,12 @@ namespace osu.Game.Rulesets.Osu
 
             return new[]
             {
+                new BeatmapStatistic
+                {
+                    Name = @"Object Count",
+                    Content = hitObjects.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                },
                 new BeatmapStatistic
                 {
                     Name = @"Circle Count",

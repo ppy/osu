@@ -1,18 +1,21 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Taiko.Mods;
-using osu.Game.Rulesets.Taiko.UI;
-using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.Taiko.Replays;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Rulesets.Taiko.Mods;
+using osu.Game.Rulesets.Taiko.Replays;
+using osu.Game.Rulesets.Taiko.UI;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -31,6 +34,42 @@ namespace osu.Game.Rulesets.Taiko
             new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
             new KeyBinding(InputKey.MouseRight, TaikoAction.RightRim),
         };
+
+        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap)
+        {
+            IEnumerable<HitObject> hitObjects = beatmap.Beatmap.HitObjects;
+            IEnumerable<HitObject> notes = hitObjects.Where(c => !(c is IHasEndTime));
+            IEnumerable<HitObject> drumrolls = hitObjects.Where(s => s is IHasCurve);
+            IEnumerable<HitObject> shakers = hitObjects.Where(s => s is IHasEndTime && !(s is IHasCurve));
+
+            return new[]
+            {
+                new BeatmapStatistic
+                {
+                    Name = @"Object Count",
+                    Content = hitObjects.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Note Count",
+                    Content = notes.Count().ToString(),
+                    Icon = FontAwesome.fa_circle_o
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Drumroll Count",
+                    Content = drumrolls.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Shaker Count",
+                    Content = shakers.Count().ToString(),
+                    Icon = FontAwesome.fa_circle
+                }
+            };
+        }
 
         public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
         {
