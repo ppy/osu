@@ -71,7 +71,6 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
             FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
-            cleanup();
         }
 
         public void ShowUser(long userId)
@@ -84,7 +83,9 @@ namespace osu.Game.Overlays
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
-            cleanup();
+            userReq?.Cancel();
+            Clear();
+            lastSection = null;
 
             sections = new ProfileSection[]
             {
@@ -162,13 +163,6 @@ namespace osu.Game.Overlays
 
             Show();
             sectionsContainer.ScrollToTop();
-        }
-
-        private void cleanup()
-        {
-            userReq?.Cancel();
-            Clear();
-            lastSection = null;
         }
 
         private void userLoadComplete(User user)
