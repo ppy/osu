@@ -191,7 +191,7 @@ namespace osu.Game.Users
             }
 
             Status.ValueChanged += displayStatus;
-            Status.ValueChanged += status => statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
+            Status.ValueChanged += status => statusBg.FadeColour(status.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
 
             base.Action = ViewProfile = () =>
             {
@@ -222,7 +222,7 @@ namespace osu.Game.Users
                 statusBar.FadeIn(transition_duration, Easing.OutQuint);
                 this.ResizeHeightTo(height, transition_duration, Easing.OutQuint);
 
-                statusMessage.Text = status.Message;
+                statusMessage.Text = status.GetMessage();
             }
         }
 

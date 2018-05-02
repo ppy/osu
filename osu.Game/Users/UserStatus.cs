@@ -6,62 +6,82 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Users
 {
-    public abstract class UserStatus
+    public enum UserStatus
     {
-        public abstract string Message { get; }
-        public abstract Color4 GetAppropriateColour(OsuColour colours);
+        DND,
+        AVAILABLE,
+        BUSY,
+        OFFLINE,
+        ONLINE,
+        INLOBBY,
+        SPECTATING,
+        INSOLO,
+        MULTIPLAYING,
+        MODDING
     }
-
-    public abstract class UserStatusAvailable : UserStatus
+    static class UserStatusMethods
     {
-        public override Color4 GetAppropriateColour(OsuColour colours) => colours.BlueDarker;
-    }
+        private static Color4 AvailableColor(OsuColour colours) => colours.BlueDarker;
+        private static Color4 BusyColor(OsuColour colours) => colours.YellowDark;
 
-    public abstract class UserStatusBusy : UserStatus
-    {
-        public override Color4 GetAppropriateColour(OsuColour colours) => colours.YellowDark;
-    }
+        public static Color4? GetAppropriateColour(this UserStatus status, OsuColour colours) {
+            switch (status) {
+                case UserStatus.ONLINE:
+                    return AvailableColor(colours);
+                    break;
+                case UserStatus.OFFLINE:
+                    return colours.Gray7;
+                    break;
+                case UserStatus.MODDING:
+                    return colours.PurpleDark;
+                    break;
+                case UserStatus.INSOLO:
+                    return BusyColor(colours);
+                    break;
+                case UserStatus.SPECTATING:
+                    return AvailableColor(colours);
+                    break;
+                case UserStatus.INLOBBY:
+                    return AvailableColor(colours);
+                    break;
+                case UserStatus.DND:
+                    return colours.RedDark;
+                    break;
+                case UserStatus.MULTIPLAYING:
+                    return BusyColor(colours);
+                    break;
+            }
+            return null;
+        }
 
-    public class UserStatusOffline : UserStatus
-    {
-        public override string Message => @"Offline";
-        public override Color4 GetAppropriateColour(OsuColour colours) => colours.Gray7;
-    }
-
-    public class UserStatusOnline : UserStatusAvailable
-    {
-        public override string Message => @"Online";
-    }
-
-    public class UserStatusSpectating : UserStatusAvailable
-    {
-        public override string Message => @"Spectating a game";
-    }
-
-    public class UserStatusInLobby : UserStatusAvailable
-    {
-        public override string Message => @"in Multiplayer Lobby";
-    }
-
-    public class UserStatusSoloGame :  UserStatusBusy
-    {
-        public override string Message => @"Solo Game";
-    }
-
-    public class UserStatusMultiplayerGame : UserStatusBusy
-    {
-        public override string Message => @"Multiplaying";
-    }
-
-    public class UserStatusModding : UserStatus
-    {
-        public override string Message => @"Modding a map";
-        public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
-    }
-
-    public class UserStatusDoNotDisturb : UserStatus
-    {
-        public override string Message => @"Do not disturb";
-        public override Color4 GetAppropriateColour(OsuColour colours) => colours.RedDark;
+        public static string GetMessage(this UserStatus status) {
+            switch (status) {
+                case UserStatus.ONLINE:
+                    return "Online";
+                    break;
+                case UserStatus.OFFLINE:
+                    return "Offline";
+                    break;
+                case UserStatus.MODDING:
+                    return "Modding A Map";
+                    break;
+                case UserStatus.INSOLO:
+                    return "Solo Game";
+                    break;
+                case UserStatus.SPECTATING:
+                    return "Spectating a game";
+                    break;
+                case UserStatus.INLOBBY:
+                    return "in Multiplayer Lobby";
+                    break;
+                case UserStatus.DND:
+                    return "Do not disturb";
+                    break;
+                case UserStatus.MULTIPLAYING:
+                    return "Multiplaying";
+                    break;
+            }
+            return "Invalid Status";
+        }
     }
 }

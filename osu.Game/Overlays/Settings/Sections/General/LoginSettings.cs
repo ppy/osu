@@ -149,15 +149,15 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         switch (newValue)
                         {
                             case UserAction.Online:
-                                api.LocalUser.Value.Status.Value = new UserStatusOnline();
+                                api.LocalUser.Value.Status.Value = UserStatus.ONLINE;
                                 dropdown.StatusColour = colours.Green;
                                 break;
                             case UserAction.DoNotDisturb:
-                                api.LocalUser.Value.Status.Value = new UserStatusDoNotDisturb();
+                                api.LocalUser.Value.Status.Value = UserStatus.DND;
                                 dropdown.StatusColour = colours.Red;
                                 break;
                             case UserAction.AppearOffline:
-                                api.LocalUser.Value.Status.Value = new UserStatusOffline();
+                                api.LocalUser.Value.Status.Value = UserStatus.OFFLINE;
                                 dropdown.StatusColour = colours.Gray7;
                                 break;
                             case UserAction.SignOut:
