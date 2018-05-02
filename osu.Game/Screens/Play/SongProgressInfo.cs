@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Play
             {
                 timeCurrent.Text = TimeSpan.FromSeconds(currentSecond).ToString(songCurrentTime < 0 ? @"\-m\:ss" : songCurrentTime > 3600000 ? @"h\:mm\:ss" : songCurrentTime > 600000 ? @"mm\:ss" : @"m\:ss");
                 var TimeRemain = endTime - AudioClock.CurrentTime;
-                timeLeft.Text = TimeSpan.FromMilliseconds(TimeRemain).ToString(TimeRemain > 3600000 ? @"\-h\:mm\:ss" : TimeRemain > 600000 ? @"\-mm\:ss" : @"\-m\:ss");        
+                timeLeft.Text = TimeSpan.FromMilliseconds(TimeRemain).ToString(TimeRemain > 3600000 ? @"\-h\:mm\:ss" : TimeRemain > 600000 ? @"\-mm\:ss" : @"\-m\:ss");
                 previousSecond = currentSecond;
             }
         }
