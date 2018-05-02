@@ -10,12 +10,14 @@ using OpenTK;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
-    public class GeneralSettings : EditorSettingsGroup
+    public class GeneralSettings : SettingsGroup
     {
         protected override string Title => @"general";
 
         public GeneralSettings()
         {
+            AllowCollapsing = false;
+
             FillFlowContainer settingsContainer;
             FocusedTextBox originalArtistName;
             FocusedTextBox romanisedArtistName;

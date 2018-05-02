@@ -14,12 +14,14 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
-    public class AudioSettings : EditorSettingsGroup
+    public class AudioSettings : SettingsGroup
     {
         protected override string Title => @"audio";
 
         public AudioSettings()
         {
+            AllowCollapsing = false;
+
             EditorEnumDropdown<SampleSet> sampleSetDropdown;
             EditorSliderBar<float> volumeSliderBar;
             OsuSpriteText volumeText;

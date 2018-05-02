@@ -12,7 +12,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
-    public class ColoursSettings : EditorSettingsGroup
+    public class ColoursSettings : SettingsGroup
     {
         private int usedComboColours = 5;
         public int UsedComboColours
@@ -23,28 +23,22 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 if (value > usedComboColours)
                 {
                     for (int i = usedComboColours; i < value; i++)
-                        comboColours[i].Alpha = 1;
+                        comboColourButtons[i].Alpha = 1;
                 }
                 else
                 {
                     for (int i = usedComboColours - 1; i >= value; i--)
-                        comboColours[i].Alpha = 0;
+                        comboColourButtons[i].Alpha = 0;
                 }
-                // Cannot use lambda expressions and a null at the same time in a conditional statement using ?:
-                if (value == 8)
-                    addComboColour.Action = null;
-                else
-                    addComboColour.Action = () => { UsedComboColours++; };
-                if (value == 2)
-                    removeComboColour.Action = null;
-                else
-                    removeComboColour.Action = () => { UsedComboColours--; };
+                // I don't know how "healthy" this statement is
+                addComboColourButton.Action = value == 8 ? null as Action : addComboColour;
+                removeComboColourButton.Action = value == 2 ? null as Action : removeComboColour;
                 usedComboColours = value;
             }
         }
-        private readonly TriangleButton addComboColour;
-        private readonly TriangleButton removeComboColour;
-        private readonly ComboColourButton[] comboColours =
+        private readonly TriangleButton addComboColourButton;
+        private readonly TriangleButton removeComboColourButton;
+        private readonly ComboColourButton[] comboColourButtons =
         {
             createComboColourSettingButton(1, Color4.Magenta, 1),
             createComboColourSettingButton(2, Color4.Blue, 1),
@@ -60,6 +54,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         public ColoursSettings()
         {
+            AllowCollapsing = false;
+
             ComboColourButton backgroundColour;
 
             Children = new Drawable[]
@@ -73,31 +69,33 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     Children = new Drawable[]
                     {
                         backgroundColour = createComboColourSettingButton("Background Colour", Color4.LightBlue, 1),
-                        comboColours[0],
-                        comboColours[1],
-                        comboColours[2],
-                        comboColours[3],
-                        comboColours[4],
-                        comboColours[5],
-                        comboColours[6],
-                        comboColours[7],
-                        addComboColour = createComboColourManagementButton("Add Combo Colour", Color4.LightBlue, () => { UsedComboColours++; }),
-                        removeComboColour = createComboColourManagementButton("Remove Combo Colour", Color4.LightBlue, () => { UsedComboColours--; }),
+                        comboColourButtons[0],
+                        comboColourButtons[1],
+                        comboColourButtons[2],
+                        comboColourButtons[3],
+                        comboColourButtons[4],
+                        comboColourButtons[5],
+                        comboColourButtons[6],
+                        comboColourButtons[7],
+                        addComboColourButton = createComboColourManagementButton("Add Combo Colour", Color4.LightBlue, () => { UsedComboColours++; }),
+                        removeComboColourButton = createComboColourManagementButton("Remove Combo Colour", Color4.LightBlue, () => { UsedComboColours--; }),
                     },
                 }
             };
             // Currently only assigned for AppVeyor to not complain for it being unused
             backgroundColour.ColourChanged += a => { };
-            comboColours[0].ColourChanged += a => { };
-            comboColours[1].ColourChanged += a => { };
-            comboColours[2].ColourChanged += a => { };
-            comboColours[3].ColourChanged += a => { };
-            comboColours[4].ColourChanged += a => { };
-            comboColours[5].ColourChanged += a => { };
-            comboColours[6].ColourChanged += a => { };
-            comboColours[7].ColourChanged += a => { };
+            comboColourButtons[0].ColourChanged += a => { };
+            comboColourButtons[1].ColourChanged += a => { };
+            comboColourButtons[2].ColourChanged += a => { };
+            comboColourButtons[3].ColourChanged += a => { };
+            comboColourButtons[4].ColourChanged += a => { };
+            comboColourButtons[5].ColourChanged += a => { };
+            comboColourButtons[6].ColourChanged += a => { };
+            comboColourButtons[7].ColourChanged += a => { };
         }
 
+        private void addComboColour() => UsedComboColours++;
+        private void removeComboColour() => UsedComboColours--;
         private static TriangleButton createSettingButton(string text) => new TriangleButton
         {
             Anchor = Anchor.CentreLeft,

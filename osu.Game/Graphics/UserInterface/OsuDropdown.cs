@@ -243,6 +243,34 @@ namespace osu.Game.Graphics.UserInterface
 
                 AddInternal(new HoverClickSounds());
             }
+            public OsuDropdownHeader(float height) // I hope it's okay to have a new constructor for the specification of the height
+            {
+                Foreground.Padding = new MarginPadding(4);
+
+                AutoSizeAxes = Axes.None;
+                Margin = new MarginPadding { Bottom = 4 };
+                CornerRadius = 4;
+                Height = height;
+
+                Foreground.Children = new Drawable[]
+                {
+                    Text = new OsuSpriteText
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    },
+                    Icon = new SpriteIcon
+                    {
+                        Icon = FontAwesome.fa_chevron_down,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Margin = new MarginPadding { Right = 4 },
+                        Size = new Vector2(20),
+                    },
+                };
+
+                AddInternal(new HoverClickSounds());
+            }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)

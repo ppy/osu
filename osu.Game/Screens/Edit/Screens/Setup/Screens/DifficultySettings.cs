@@ -6,15 +6,16 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
 using OpenTK;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
-    public class DifficultySettings : EditorSettingsGroup
+    public class DifficultySettings : SettingsGroup
     {
-        private readonly ColouredEditorSliderBar<float> approachRateSliderBar;
-        private readonly ColouredEditorSliderBar<float> circleSizeSliderBar;
+        private readonly EditorSliderBar<float> approachRateSliderBar;
+        private readonly EditorSliderBar<float> circleSizeSliderBar;
         private readonly OsuSpriteText approachRateText;
         private readonly OsuSpriteText circleSizeText;
         //private readonly OsuSpriteText overallDifficultyLabel;
@@ -27,8 +28,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         public DifficultySettings()
         {
-            ColouredEditorSliderBar<float> overallDifficultySliderBar;
-            ColouredEditorSliderBar<float> hpDrainRateSliderBar;
+            EditorSliderBar<float> overallDifficultySliderBar;
+            EditorSliderBar<float> hpDrainRateSliderBar;
             OsuSpriteText overallDifficultyText;
             OsuSpriteText hpDrainText;
 
@@ -176,7 +177,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             Origin = Anchor.CentreRight,
             Font = @"Exo2.0-Bold",
         };
-        private ColouredEditorSliderBar<float> createSliderBar(float value, float defaultValue, float min, float max) => new ColouredEditorSliderBar<float>
+        private EditorSliderBar<float> createSliderBar(float value, float defaultValue, float min, float max) => new EditorSliderBar<float>
         {
             NormalPrecision = 1,
             AlternatePrecision = 0.1f,

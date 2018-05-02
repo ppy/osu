@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual
             }));
         }
 
-        private class ExampleContainer : PlayerSettingsGroup
+        private class ExampleContainer : SettingsGroup
         {
             protected override string Title => @"example";
         }

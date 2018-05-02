@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -9,12 +10,16 @@ using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Edit.Components
 {
     public class EditorSliderBar<T> : SettingsSlider<T>
         where T : struct, IEquatable<T>, IComparable, IConvertible
     {
+        private bool isShiftLeftPressed = false;
+        private bool isShiftRightPressed = false;
+
         private bool isUsingAlternatePrecision;
         public bool IsUsingAlternatePrecision
         {
@@ -67,14 +72,19 @@ namespace osu.Game.Screens.Edit.Components
             return s;
         }
 
+        // TODO: Ensure that double shift won't break it
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            IsUsingAlternatePrecision = state.Keyboard.ShiftPressed;
+            isShiftLeftPressed = args.Key == Key.ShiftLeft ? true : isShiftLeftPressed;
+            isShiftRightPressed = args.Key == Key.ShiftRight ? true : isShiftRightPressed;
+            IsUsingAlternatePrecision = isShiftLeftPressed || isShiftRightPressed;
             return base.OnKeyDown(state, args);
         }
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
-            IsUsingAlternatePrecision = state.Keyboard.ShiftPressed;
+            isShiftLeftPressed = args.Key == Key.ShiftLeft ? false : isShiftLeftPressed;
+            isShiftRightPressed = args.Key == Key.ShiftRight ? false : isShiftRightPressed;
+            IsUsingAlternatePrecision = isShiftLeftPressed || isShiftRightPressed;
             return base.OnKeyUp(state, args);
         }
 

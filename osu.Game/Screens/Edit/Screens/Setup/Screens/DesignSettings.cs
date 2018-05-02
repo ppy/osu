@@ -9,12 +9,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Skinning;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
 using OpenTK;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
-    public class DesignSettings : EditorSettingsGroup
+    public class DesignSettings : SettingsGroup
     {
         private EditorCheckbox enableCountdownCheckbox;
         private EditorSliderBar<int> countdownOffsetSlider;
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         [BackgroundDependencyLoader]
         private void load(SkinManager skins)
         {
+            AllowCollapsing = false;
+
             Skins = skins;
             Children = new Drawable[]
             {

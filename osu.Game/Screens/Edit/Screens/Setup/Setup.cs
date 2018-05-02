@@ -4,6 +4,7 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Screens.Setup.Screens;
 
@@ -34,53 +35,53 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                 Padding = new MarginPadding { Top = 20, Left = 20 },
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer<EditorSettingsGroup>
+                    new FillFlowContainer<SettingsGroup>
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, 20),
-                        Children = new EditorSettingsGroup[]
+                        Children = new SettingsGroup[]
                         {
                             GeneralSettings = new GeneralSettings(),
                         }
                     },
-                    new FillFlowContainer<EditorSettingsGroup>
+                    new FillFlowContainer<SettingsGroup>
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, 20),
-                        Children = new EditorSettingsGroup[]
+                        Children = new SettingsGroup[]
                         {
                             ModeSettings = new ModeSettings(),
                             DifficultySettings = new DifficultySettings(),
                         }
                     },
-                    new FillFlowContainer<EditorSettingsGroup>
+                    new FillFlowContainer<SettingsGroup>
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, 20),
-                        Children = new EditorSettingsGroup[]
+                        Children = new SettingsGroup[]
                         {
                             ColoursSettings = new ColoursSettings(),
                         }
                     },
-                    new FillFlowContainer<EditorSettingsGroup>
+                    new FillFlowContainer<SettingsGroup>
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, 20),
-                        Children = new EditorSettingsGroup[]
+                        Children = new SettingsGroup[]
                         {
                             AudioSettings = new AudioSettings(),
                         }
                     },
-                    new FillFlowContainer<EditorSettingsGroup>
+                    new FillFlowContainer<SettingsGroup>
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(0, 20),
-                        Children = new EditorSettingsGroup[]
+                        Children = new SettingsGroup[]
                         {
                             AdvancedSettings = new AdvancedSettings(),
                             DesignSettings = new DesignSettings(),

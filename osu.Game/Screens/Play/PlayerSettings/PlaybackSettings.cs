@@ -6,10 +6,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class PlaybackSettings : PlayerSettingsGroup
+    public class PlaybackSettings : SettingsGroup
     {
         private const int padding = 10;
 

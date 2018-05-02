@@ -7,12 +7,13 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
 using OpenTK;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
-    public class ModeSettings : EditorSettingsGroup
+    public class ModeSettings : SettingsGroup
     {
         private readonly EditorSliderBar<float> keyCountSliderBar;
         private readonly OsuSpriteText keyCountLabel;
@@ -28,6 +29,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         public ModeSettings()
         {
+            AllowCollapsing = false;
+
             EditorEnumDropdown<AvailableModes> modeDropdown;
 
             Children = new Drawable[]

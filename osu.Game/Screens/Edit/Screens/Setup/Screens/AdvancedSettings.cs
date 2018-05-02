@@ -5,16 +5,19 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
-    public class AdvancedSettings : EditorSettingsGroup
+    public class AdvancedSettings : SettingsGroup
     {
         protected override string Title => @"advanced";
 
         public AdvancedSettings()
         {
+            AllowCollapsing = false;
+
             EditorSliderBar<float> stackLeniencySliderBar;
             OsuSpriteText stackLeniencyText;
 
