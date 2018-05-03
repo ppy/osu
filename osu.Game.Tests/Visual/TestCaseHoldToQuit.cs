@@ -16,8 +16,8 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseHoldToQuit()
         {
-            HoldToQuit holdToQuit;
-            Add(holdToQuit = new HoldToQuit
+            QuitButton holdToQuit;
+            Add(holdToQuit = new QuitButton
             {
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,

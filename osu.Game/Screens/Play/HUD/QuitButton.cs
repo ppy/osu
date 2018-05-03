@@ -14,16 +14,16 @@ using OpenTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class HoldToQuit : FillFlowContainer
+    public class QuitButton : FillFlowContainer
     {
-        private readonly HoldToQuitButton button;
+        private readonly Button button;
         public Action ExitAction
         {
             get => button.ExitAction;
             set => button.ExitAction = value;
         }
 
-        public HoldToQuit()
+        public QuitButton()
         {
             OsuSpriteText text;
             Direction = FillDirection.Horizontal;
@@ -37,12 +37,12 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
-                button = new HoldToQuitButton(text)
+                button = new Button(text)
             };
             AutoSizeAxes = Axes.Both;
         }
 
-        public class HoldToQuitButton : CircularContainer
+        private class Button : CircularContainer
         {
             private readonly OsuSpriteText text;
             private SpriteIcon icon;
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play.HUD
             private const int progress_duration = 1000;
             private const int text_display_time = 5000;
 
-            public HoldToQuitButton(OsuSpriteText text) => this.text = text;
+            public Button(OsuSpriteText text) => this.text = text;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
