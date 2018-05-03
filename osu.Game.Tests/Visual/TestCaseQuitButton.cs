@@ -4,33 +4,36 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual
 {
     [Description("'Hold to Quit' UI element")]
-    public class TestCaseHoldToQuit : OsuTestCase
+    public class TestCaseQuitButton : OsuTestCase
     {
+        private readonly QuitButton quitButton;
+        private Drawable innerButton => quitButton.Children.Single(child => child is CircularContainer);
         private bool exitAction;
 
-        public TestCaseHoldToQuit()
+        public TestCaseQuitButton()
         {
-            QuitButton holdToQuit;
-            Add(holdToQuit = new QuitButton
+            Add(quitButton = new QuitButton
             {
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,
             });
-            holdToQuit.ExitAction = () => exitAction = true;
+            quitButton.ExitAction = () => exitAction = true;
 
-            var text = holdToQuit.Children.OfType<SpriteText>().Single();
+            var text = quitButton.Children.OfType<SpriteText>().Single();
 
             AddStep("Trigger text fade in/out", () =>
             {
                 exitAction = false;
-                holdToQuit.TriggerOnMouseDown();
-                holdToQuit.TriggerOnMouseUp();
+
+                innerButton.TriggerOnMouseDown();
+                innerButton.TriggerOnMouseUp();
             });
 
             AddUntilStep(() => text.IsPresent && !exitAction, "Text visible");
@@ -39,10 +42,10 @@ namespace osu.Game.Tests.Visual
             AddStep("Trigger exit action", () =>
             {
                 exitAction = false;
-                holdToQuit.TriggerOnMouseDown();
+                innerButton.TriggerOnMouseDown();
             });
 
-            AddUntilStep(() => exitAction, $"{nameof(holdToQuit.ExitAction)} was triggered");
+            AddUntilStep(() => exitAction, $"{nameof(quitButton.ExitAction)} was triggered");
         }
     }
 }
