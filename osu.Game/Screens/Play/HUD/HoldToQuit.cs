@@ -16,7 +16,12 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class HoldToQuit : FillFlowContainer
     {
-        public readonly HoldToQuitButton Button;
+        private readonly HoldToQuitButton button;
+        public Action ExitAction
+        {
+            get => button.ExitAction;
+            set => button.ExitAction = value;
+        }
 
         public HoldToQuit()
         {
@@ -32,7 +37,7 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
-                Button = new HoldToQuitButton(text)
+                button = new HoldToQuitButton(text)
             };
             AutoSizeAxes = Axes.Both;
         }
