@@ -22,15 +22,15 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,
             });
-            holdToQuit.Button.ExitAction = () => exitAction = true;
+            holdToQuit.ExitAction = () => exitAction = true;
 
             var text = holdToQuit.Children.OfType<SpriteText>().Single();
 
             AddStep("Trigger text fade in/out", () =>
             {
                 exitAction = false;
-                holdToQuit.Button.TriggerOnMouseDown();
-                holdToQuit.Button.TriggerOnMouseUp();
+                holdToQuit.TriggerOnMouseDown();
+                holdToQuit.TriggerOnMouseUp();
             });
 
             AddUntilStep(() => text.IsPresent && !exitAction, "Text visible");
@@ -39,10 +39,10 @@ namespace osu.Game.Tests.Visual
             AddStep("Trigger exit action", () =>
             {
                 exitAction = false;
-                holdToQuit.Button.TriggerOnMouseDown();
+                holdToQuit.TriggerOnMouseDown();
             });
 
-            AddUntilStep(() => exitAction, $"{nameof(holdToQuit.Button.ExitAction)} was triggered");
+            AddUntilStep(() => exitAction, $"{nameof(holdToQuit.ExitAction)} was triggered");
         }
     }
 }
