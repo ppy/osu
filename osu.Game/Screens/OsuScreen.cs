@@ -22,6 +22,8 @@ namespace osu.Game.Screens
     {
         public BackgroundScreen Background { get; private set; }
 
+        protected virtual bool AllowBackButton => true;
+
         /// <summary>
         /// Override to create a BackgroundMode for the current screen.
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
@@ -92,26 +94,16 @@ namespace osu.Game.Screens
 
         public bool OnPressed(GlobalAction action)
         {
-            switch (action)
+            if (action == GlobalAction.Back && AllowBackButton)
             {
-                case GlobalAction.Back:
-                    Exit();
-                    return true;
-                default:
-                    return false;
+                Exit();
+                return true;
             }
+
+            return false;
         }
 
-        public bool OnReleased(GlobalAction action)
-        {
-            switch (action)
-            {
-                case GlobalAction.Back:
-                    return true;
-                default:
-                    return false;
-            }
-        }
+        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back && AllowBackButton;
 
         protected override void OnResuming(Screen last)
         {
