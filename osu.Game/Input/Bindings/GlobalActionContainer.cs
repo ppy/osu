@@ -41,7 +41,8 @@ namespace osu.Game.Input.Bindings
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
         {
             new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene),
-            new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry)
+            new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry),
+            new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.QuickRetry)
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
