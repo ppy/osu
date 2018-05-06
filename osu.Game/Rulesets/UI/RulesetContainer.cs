@@ -289,7 +289,7 @@ namespace osu.Game.Rulesets.UI
 
             foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);
-            
+
                 foreach (var mod in mods.OfType<IReadFromConfig>())
                     mod.ReadFromConfig(config);
         }
