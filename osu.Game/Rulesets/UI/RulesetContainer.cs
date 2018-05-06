@@ -66,6 +66,7 @@ namespace osu.Game.Rulesets.UI
         /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
         /// </summary>
         public readonly CursorContainer Cursor;
+       
 
         protected readonly Ruleset Ruleset;
 
@@ -88,12 +89,11 @@ namespace osu.Game.Rulesets.UI
 
             Cursor = CreateCursor();
         }
-
+        
         [BackgroundDependencyLoader(true)]
         private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
         {
             this.onScreenDisplay = onScreenDisplay;
-
             rulesetConfig = CreateConfig(Ruleset, settings);
 
             if (rulesetConfig != null)
@@ -101,6 +101,7 @@ namespace osu.Game.Rulesets.UI
                 dependencies.Cache(rulesetConfig);
                 onScreenDisplay?.BeginTracking(this, rulesetConfig);
             }
+            
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -129,7 +130,6 @@ namespace osu.Game.Rulesets.UI
 
             HasReplayLoaded.Value = ReplayInputManager.ReplayInputHandler != null;
         }
-
 
         /// <summary>
         /// Creates the cursor. May be null if the <see cref="RulesetContainer"/> doesn't provide a custom cursor.
@@ -167,6 +167,7 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetContainer<TObject> : RulesetContainer
         where TObject : HitObject
     {
+        
         public event Action<Judgement> OnJudgement;
         public event Action<Judgement> OnJudgementRemoved;
 
@@ -194,7 +195,7 @@ namespace osu.Game.Rulesets.UI
         /// Whether the specified beatmap is assumed to be specific to the current ruleset.
         /// </summary>
         public readonly bool IsForCurrentRuleset;
-
+   
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
         protected override Container<Drawable> Content => content;
@@ -202,11 +203,8 @@ namespace osu.Game.Rulesets.UI
         private IEnumerable<Mod> mods;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager osuConfig)
+        private void load(OsuConfigManager config)
         {
-            // Apply mods
-            applyMods(Mods, osuConfig);
-
             KeyBindingInputManager.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -218,7 +216,11 @@ namespace osu.Game.Rulesets.UI
             if (Cursor != null)
                 KeyBindingInputManager.Add(Cursor);
 
+            // Apply mods
+            applyMods(Mods, config);
+
             loadObjects();
+
         }
 
         /// <summary>
@@ -235,7 +237,6 @@ namespace osu.Game.Rulesets.UI
 
             WorkingBeatmap = workingBeatmap;
             IsForCurrentRuleset = isForCurrentRuleset;
-            // ReSharper disable once PossibleNullReferenceException
             Mods = workingBeatmap.Mods.Value;
 
             RelativeSizeAxes = Axes.Both;
@@ -269,12 +270,9 @@ namespace osu.Game.Rulesets.UI
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
 
             // Add mods, should always be the last thing applied to give full control to mods
-            // Mods are now added in the load() method because we need the OsuConfigManager
-            // for the IReadFromConfig implementations. This method is still executed after the constructor,
-            // so the mods are still added in last
+            // Mods are now added in the load() method, this method is still executed after the constructor
+            // so they are still added in last
         }
-
-
 
         /// <summary>
         /// Applies the active mods to this RulesetContainer.
@@ -282,18 +280,19 @@ namespace osu.Game.Rulesets.UI
         /// <param name="mods"></param>
         private void applyMods(IEnumerable<Mod> mods, OsuConfigManager config)
         {
-            if (mods == null)
+            if(mods == null)
+            {
                 return;
-
-            foreach (var mod in mods.OfType<IReadFromConfig>())
-                mod.ReadFromConfig(config);
-
+            }
             foreach (var mod in mods.OfType<IApplicableToHitObject<TObject>>())
                 foreach (var obj in Beatmap.HitObjects)
                     mod.ApplyToHitObject(obj);
 
             foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);
+            
+                foreach (var mod in mods.OfType<IReadFromConfig>())
+                    mod.ReadFromConfig(config);
         }
 
         public override void SetReplay(Replay replay)
@@ -301,7 +300,7 @@ namespace osu.Game.Rulesets.UI
             base.SetReplay(replay);
 
             if (ReplayInputManager?.ReplayInputHandler != null)
-                ReplayInputManager.ReplayInputHandler.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
+                ReplayInputManager.ReplayInputHandler.ToScreenSpace = input => Playfield.ScaledContent.ToScreenSpace(input);
         }
 
         /// <summary>
