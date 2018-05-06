@@ -92,22 +92,18 @@ namespace osu.Game.Overlays.Profile.Header
 
         public void ShowBadges(Badge[] badges)
         {
-            switch (badges.Length)
+            if (badges == null || badges.Length == 0)
             {
-                case 0:
-                    Hide();
-                    return;
-                case 1:
-                    badgeCountText.Hide();
-                    break;
-                default:
-                    badgeCountText.Show();
-                    badgeCountText.Text = $"{badges.Length} badges";
-                    break;
+                Hide();
+                return;
             }
 
-            Show();
             badgeCount = badges.Length;
+
+            badgeCountText.FadeTo(badgeCount > 1 ? 1 : 0);
+            badgeCountText.Text = $"{badges.Length} badges";
+
+            Show();
             visibleBadge = 0;
 
             badgeFlowContainer.Clear();

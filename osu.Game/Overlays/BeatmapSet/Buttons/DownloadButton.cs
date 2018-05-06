@@ -7,7 +7,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 
-namespace osu.Game.Overlays.BeatmapSet
+namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class DownloadButton : HeaderButton
     {
