@@ -66,7 +66,6 @@ namespace osu.Game.Rulesets.UI
         /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
         /// </summary>
         public readonly CursorContainer Cursor;
-       
 
         protected readonly Ruleset Ruleset;
 
@@ -101,7 +100,6 @@ namespace osu.Game.Rulesets.UI
                 dependencies.Cache(rulesetConfig);
                 onScreenDisplay?.BeginTracking(this, rulesetConfig);
             }
-            
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -220,7 +218,6 @@ namespace osu.Game.Rulesets.UI
             applyMods(Mods, config);
 
             loadObjects();
-
         }
 
         /// <summary>
