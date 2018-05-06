@@ -61,9 +61,9 @@ namespace osu.Game.Graphics.Containers
             AddText(text.Substring(previousLinkEnd));
         }
 
-        public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
         {
-            AddInternal(new DrawableLinkCompiler(AddText(text).ToList())
+            AddInternal(new DrawableLinkCompiler(AddText(text, creationParameters).ToList())
             {
                 TooltipText = tooltipText ?? (url != text ? url : string.Empty),
                 Action = () =>
@@ -71,9 +71,9 @@ namespace osu.Game.Graphics.Containers
                     switch (linkType)
                     {
                         case LinkAction.OpenBeatmap:
-                            // todo: replace this with overlay.ShowBeatmap(id) once an appropriate API call is implemented.
-                            if (int.TryParse(linkArgument, out int beatmapId))
-                                Process.Start($"https://osu.ppy.sh/b/{beatmapId}");
+                            // TODO: proper query params handling
+                            if (linkArgument != null && int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
+                                game?.ShowBeatmap(beatmapId);
                             break;
                         case LinkAction.OpenBeatmapSet:
                             if (int.TryParse(linkArgument, out int setId))

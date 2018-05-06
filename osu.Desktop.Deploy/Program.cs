@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management.Automation;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using FileWebRequest = osu.Framework.IO.Network.FileWebRequest;
@@ -18,7 +19,7 @@ namespace osu.Desktop.Deploy
     {
         private static string packages => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
         private static string nugetPath => Path.Combine(packages, @"nuget.commandline\4.5.1\tools\NuGet.exe");
-        private static string squirrelPath => Path.Combine(packages, @"squirrel.windows\1.7.8\tools\Squirrel.exe");
+        private static string squirrelPath => Path.Combine(packages, @"squirrel.windows\1.8.0\tools\Squirrel.exe");
         private const string msbuild_path = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe";
 
         public static string StagingFolder = ConfigurationManager.AppSettings["StagingFolder"];
@@ -57,8 +58,12 @@ namespace osu.Desktop.Deploy
 
         private static string codeSigningPassword;
 
+        private static bool interactive;
+
         public static void Main(string[] args)
         {
+            interactive = args.Length == 0;
+
             displayHeader();
 
             findSolutionPath();
@@ -82,19 +87,20 @@ namespace osu.Desktop.Deploy
             string version = $"{verBase}{increment}";
 
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Write($"Ready to deploy {version}: ");
-            Console.ReadLine();
+            Console.Write($"Ready to deploy {version}!");
+            pauseIfInteractive();
 
             sw.Start();
 
             if (!string.IsNullOrEmpty(CodeSigningCertificate))
             {
                 Console.Write("Enter code signing password: ");
-                codeSigningPassword = readLineMasked();
+                codeSigningPassword = args.Length > 0 ? args[0] : readLineMasked();
             }
 
             write("Updating AssemblyInfo...");
             updateCsprojVersion(version);
+            updateAppveyorVersion(version);
 
             write("Running build process...");
             foreach (string targetName in TargetNames.Split(','))
@@ -109,7 +115,7 @@ namespace osu.Desktop.Deploy
             checkReleaseFiles();
 
             write("Running squirrel build...");
-            runCommand(squirrelPath, $"--releasify {stagingPath}\\{nupkgFilename(version)} --setupIcon {iconPath} --icon {iconPath} {codeSigningCmd} --no-msi");
+            runCommand(squirrelPath, $"--releasify {stagingPath}\\{nupkgFilename(version)} --framework-version=net471 --setupIcon {iconPath} --icon {iconPath} {codeSigningCmd} --no-msi");
 
             //prune again to clean up before upload.
             pruneReleases();
@@ -124,7 +130,7 @@ namespace osu.Desktop.Deploy
             updateCsprojVersion("0.0.0");
 
             write("Done!", ConsoleColor.White);
-            Console.ReadLine();
+            pauseIfInteractive();
         }
 
         private static void displayHeader()
@@ -388,8 +394,35 @@ namespace osu.Desktop.Deploy
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"FATAL ERROR: {message}");
 
-            Console.ReadLine();
+            pauseIfInteractive();
             Environment.Exit(-1);
+        }
+
+        private static void pauseIfInteractive()
+        {
+            if (interactive)
+                Console.ReadLine();
+            else
+                Console.WriteLine();
+        }
+
+        private static bool updateAppveyorVersion(string version)
+        {
+            try
+            {
+                using (PowerShell ps = PowerShell.Create())
+                {
+                    ps.AddScript($"Update-AppveyorBuild -Version \"{version}\"");
+                    ps.Invoke();
+                }
+                return true;
+            }
+            catch
+            {
+                // we don't have appveyor and don't care
+            }
+
+            return false;
         }
 
         private static void write(string message, ConsoleColor col = ConsoleColor.Gray)
