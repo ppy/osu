@@ -15,34 +15,14 @@ using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModHidden : ModHidden, IApplicableToDrawableHitObjects, IReadFromConfig
+    public class OsuModHidden : ModHidden, IApplicableToDrawableHitObjects
     {
         public override string Description => @"Play with no approach circles and fading circles/sliders.";
         public override double ScoreMultiplier => 1.06;
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
-        private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
 
-        public void ReadFromConfig(OsuConfigManager config)
-        {
-            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
-        }
-
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
-        {
-            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
-            {
-                //Don't hide the first object if the increaseFirstObjectVisibility is true ("drawables" are in a reverse order -> Last() )
-                if (d == drawables.Last() && increaseFirstObjectVisibility) continue;
-                d.ApplyCustomUpdateState += ApplyHiddenState;
-
-                d.HitObject.TimeFadein = d.HitObject.TimePreempt * fade_in_duration_multiplier;
-                foreach (var h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
-                    h.TimeFadein = h.TimePreempt * fade_in_duration_multiplier;
-            }
-        }
-
-        protected void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
+        protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
         {
             if (!(drawable is DrawableOsuHitObject d))
                 return;
