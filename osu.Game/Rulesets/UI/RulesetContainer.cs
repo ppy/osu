@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.UI
 
             Cursor = CreateCursor();
         }
-        
+
         [BackgroundDependencyLoader(true)]
         private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
         {
