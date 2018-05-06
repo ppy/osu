@@ -1,4 +1,3 @@
-# 2017-09-14
 clone_depth: 1
 version: '{branch}-{build}'
 image: Visual Studio 2017
@@ -17,7 +16,7 @@ before_build:
   - cmd: CodeFileSanity.exe
   - cmd: nuget restore -verbosity quiet
 environment:
-  TargetFramework: net461
+  TargetFramework: net471
 build:
   project: osu.sln
   parallel: true
