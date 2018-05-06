@@ -9,7 +9,7 @@ namespace osu.Game.Online.API
 {
     public abstract class APIMessagesRequest : APIRequest<List<Message>>
     {
-        private long? sinceId;
+        private readonly long? sinceId;
 
         protected APIMessagesRequest(long? sinceId)
         {
