@@ -67,6 +67,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly CursorContainer Cursor;
 
+
         protected readonly Ruleset Ruleset;
 
         private IRulesetConfigManager rulesetConfig;
@@ -165,7 +166,7 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetContainer<TObject> : RulesetContainer
         where TObject : HitObject
     {
-        
+
         public event Action<Judgement> OnJudgement;
         public event Action<Judgement> OnJudgementRemoved;
 
@@ -193,7 +194,7 @@ namespace osu.Game.Rulesets.UI
         /// Whether the specified beatmap is assumed to be specific to the current ruleset.
         /// </summary>
         public readonly bool IsForCurrentRuleset;
-   
+
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
         protected override Container<Drawable> Content => content;
@@ -218,6 +219,7 @@ namespace osu.Game.Rulesets.UI
             applyMods(Mods, config);
 
             loadObjects();
+
         }
 
         /// <summary>
