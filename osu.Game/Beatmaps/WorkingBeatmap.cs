@@ -79,6 +79,13 @@ namespace osu.Game.Beatmaps
             return b;
         }
 
+        /// <summary>
+        /// Retrieves the resulting <see cref="IBeatmap"/> from the conversion of <see cref="OriginalBeatmap"/> to a specific <see cref="RulesetInfo"/>.
+        /// All mods have been applied to the returned <see cref="IBeatmap"/>.
+        /// </summary>
+        /// <param name="ruleset">The <see cref="RulesetInfo"/> to convert <see cref="OriginalBeatmap"/> to.</param>
+        /// <returns>The converted <see cref="IBeatmap"/>.</returns>
+        /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="OriginalBeatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
         public IBeatmap GetBeatmap(RulesetInfo ruleset)
         {
             var rulesetInstance = ruleset.CreateInstance();
