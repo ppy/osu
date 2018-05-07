@@ -1,11 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Select.Details;
 using OpenTK;
 using OpenTK.Graphics;
@@ -20,6 +22,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly UserRatings ratings;
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
             get { return beatmapSet; }
@@ -33,17 +36,22 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
             get { return beatmap; }
             set
             {
                 if (value == beatmap) return;
-                beatmap = value;
 
-                basic.Beatmap = advanced.Beatmap = Beatmap;
-                ratings.Metrics = Beatmap.Metrics;
+                basic.Beatmap = advanced.Beatmap = beatmap = value;
+                updateDisplay();
             }
+        }
+
+        private void updateDisplay()
+        {
+            ratings.Metrics = Beatmap?.Metrics;
         }
 
         public Details()
@@ -86,6 +94,12 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            updateDisplay();
         }
 
         public void StopPreview() => preview.Playing.Value = false;

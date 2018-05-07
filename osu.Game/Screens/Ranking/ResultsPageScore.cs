@@ -223,11 +223,11 @@ namespace osu.Game.Screens.Ranking
 
         private class DateTimeDisplay : Container
         {
-            private DateTime datetime;
+            private readonly DateTime date;
 
-            public DateTimeDisplay(DateTime datetime)
+            public DateTimeDisplay(DateTime date)
             {
-                this.datetime = datetime;
+                this.date = date;
 
                 AutoSizeAxes = Axes.Y;
 
@@ -251,7 +251,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         Origin = Anchor.CentreLeft,
                         Anchor = Anchor.CentreLeft,
-                        Text = datetime.ToShortDateString(),
+                        Text = date.ToShortDateString(),
                         Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                         Colour = Color4.White,
                     },
@@ -259,7 +259,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         Origin = Anchor.CentreRight,
                         Anchor = Anchor.CentreRight,
-                        Text = datetime.ToShortTimeString(),
+                        Text = date.ToShortTimeString(),
                         Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                         Colour = Color4.White,
                     }
