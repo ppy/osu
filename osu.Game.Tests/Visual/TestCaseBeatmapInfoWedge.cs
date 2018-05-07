@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("check no infolabels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
-        private void selectBeatmap(Beatmap b)
+        private void selectBeatmap(IBeatmap b)
         {
             BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
 
