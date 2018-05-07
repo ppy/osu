@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
@@ -14,28 +13,28 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
     {
         public override IEnumerable<BeatmapStatistic> GetStatistics()
         {
-            IEnumerable<HitObject> circles = HitObjects.Where(c => c is HitCircle);
-            IEnumerable<HitObject> sliders = HitObjects.Where(s => s is Slider);
-            IEnumerable<HitObject> spinners = HitObjects.Where(s => s is Spinner);
+            int circles = HitObjects.Count(c => c is HitCircle);
+            int sliders = HitObjects.Count(s => s is Slider);
+            int spinners = HitObjects.Count(s => s is Spinner);
 
             return new[]
             {
                 new BeatmapStatistic
                 {
                     Name = @"Circle Count",
-                    Content = circles.Count().ToString(),
+                    Content = circles.ToString(),
                     Icon = FontAwesome.fa_circle_o
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Slider Count",
-                    Content = sliders.Count().ToString(),
+                    Content = sliders.ToString(),
                     Icon = FontAwesome.fa_circle
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Spinner Count",
-                    Content = spinners.Count().ToString(),
+                    Content = spinners.ToString(),
                     Icon = FontAwesome.fa_circle
                 }
             };
