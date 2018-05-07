@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             : base(beatmap)
         {
             IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(new ManiaRuleset().RulesetInfo);
-            
+
             var roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
             var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
