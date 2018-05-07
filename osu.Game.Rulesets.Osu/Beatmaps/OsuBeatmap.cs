@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
@@ -15,9 +14,9 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
     {
         public override IEnumerable<BeatmapStatistic> GetStatistics()
         {
-            IEnumerable<HitObject> circles = HitObjects.Where(c => !(c is IHasEndTime));
-            IEnumerable<HitObject> sliders = HitObjects.Where(s => s is IHasCurve);
-            IEnumerable<HitObject> spinners = HitObjects.Where(s => s is IHasEndTime && !(s is IHasCurve));
+            IEnumerable<HitObject> circles = HitObjects.Where(c => c is HitCircle);
+            IEnumerable<HitObject> sliders = HitObjects.Where(s => s is Slider);
+            IEnumerable<HitObject> spinners = HitObjects.Where(s => s is Spinner);
 
             return new[]
             {
