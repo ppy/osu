@@ -13,17 +13,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
-using osu.Game.Input.Bindings;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
-    public class ButtonSystem : Container, IStateful<MenuState>, IKeyBindingHandler<GlobalAction>
+    public class ButtonSystem : Container, IStateful<MenuState>
     {
         public event Action<MenuState> StateChanged;
 
@@ -148,43 +146,35 @@ namespace osu.Game.Screens.Menu
                 case Key.Space:
                     logo?.TriggerOnClick(state);
                     return true;
+                case Key.Escape:
+                    return handleBack();
             }
 
             return false;
         }
 
-        public bool OnPressed(GlobalAction action)
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            switch (action)
-            {
-                case GlobalAction.Back:
-                    switch (State)
-                    {
-                        case MenuState.TopLevel:
-                            State = MenuState.Initial;
-                            return true;
-                        case MenuState.Play:
-                            backButton.TriggerOnClick();
-                            return true;
-                        default:
-                            return false;
-                    }
-                default:
-                    return false;
-            }
+            if (state.Mouse.IsPressed(MouseButton.Button1))
+                return handleBack();
+
+            return base.OnMouseDown(state, args);
         }
 
-        public bool OnReleased(GlobalAction action)
+        private bool handleBack()
         {
-            switch (action)
+            switch (State)
             {
-                case GlobalAction.Back:
+                case MenuState.TopLevel:
+                    State = MenuState.Initial;
                     return true;
-                default:
-                    return false;
+                case MenuState.Play:
+                    backButton.TriggerOnClick();
+                    return true;
             }
-        }
 
+            return false;
+        }
 
         private void onPlay()
         {
