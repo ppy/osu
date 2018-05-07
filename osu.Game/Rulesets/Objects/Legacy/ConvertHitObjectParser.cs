@@ -20,6 +20,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
     {
         public override HitObject Parse(string text)
         {
+            return Parse(text, 0);
+        }
+
+        public HitObject Parse(string text, double offset)
+        {
             try
             {
                 string[] split = text.Split(',');
@@ -146,7 +151,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
                 else if ((type & ConvertHitObjectType.Spinner) > 0)
                 {
-                    result = CreateSpinner(new Vector2(512, 384) / 2, Convert.ToDouble(split[5], CultureInfo.InvariantCulture));
+                    result = CreateSpinner(new Vector2(512, 384) / 2, Convert.ToDouble(split[5], CultureInfo.InvariantCulture) + offset);
 
                     if (split.Length > 6)
                         readCustomSampleBanks(split[6], bankInfo);
@@ -164,13 +169,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
                     }
 
-                    result = CreateHold(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, endTime);
+                    result = CreateHold(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, endTime + offset);
                 }
 
                 if (result == null)
                     throw new InvalidOperationException($@"Unknown hit object type {type}.");
 
-                result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
+                result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture) + offset;
                 result.Samples = convertSoundType(soundType, bankInfo);
 
                 return result;

@@ -8,7 +8,7 @@ This is still heavily under development and is not intended for end-user use. Th
 
 # Requirements
 
-- A desktop platform that can compile .NET 4.6.1. We recommend using [Visual Studio Community Edition](https://www.visualstudio.com/) (Windows), [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac/) (macOS) or [MonoDevelop](http://www.monodevelop.com/download/) (Linux), all of which are free. [Visual Studio Code](https://code.visualstudio.com/) may also be used but requires further setup steps which are not covered here.
+- A desktop platform that can compile .NET 4.7.1. We recommend using [Visual Studio Community Edition](https://www.visualstudio.com/) (Windows), [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac/) (macOS) or [MonoDevelop](http://www.monodevelop.com/download/) (Linux), all of which are free. [Visual Studio Code](https://code.visualstudio.com/) may also be used but requires further setup steps which are not covered here.
 
 # Getting Started
 - Clone the repository including submodules (`git clone --recurse-submodules https://github.com/ppy/osu`)

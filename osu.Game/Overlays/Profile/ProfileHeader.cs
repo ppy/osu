@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Profile
 {
     public class ProfileHeader : Container
     {
-        private readonly OsuTextFlowContainer infoTextLeft;
+        private readonly LinkFlowContainer infoTextLeft;
         private readonly LinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
         private readonly RankGraph rankGraph;
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Profile
                         }
                     }
                 },
-                infoTextLeft = new OsuTextFlowContainer(t => t.TextSize = 14)
+                infoTextLeft = new LinkFlowContainer(t => t.TextSize = 14)
                 {
                     X = UserProfileOverlay.CONTENT_X_MARGIN,
                     Y = cover_height + 20,
@@ -350,7 +350,7 @@ namespace osu.Game.Overlays.Profile
 
             if (user.Country != null)
             {
-                infoTextLeft.AddText("from ", lightText);
+                infoTextLeft.AddText("From ", lightText);
                 infoTextLeft.AddText(user.Country.FullName, boldItalic);
                 countryFlag.Country = user.Country;
             }
@@ -378,6 +378,10 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText(string.Join(", ", user.PlayStyle), boldItalic);
             }
 
+            infoTextLeft.NewLine();
+            infoTextLeft.AddText("Contributed ", lightText);
+            infoTextLeft.AddLink($@"{user.PostCount} forum posts", url: $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: boldItalic);
+
             string websiteWithoutProtcol = user.Website;
             if (!string.IsNullOrEmpty(websiteWithoutProtcol))
             {
@@ -392,8 +396,10 @@ namespace osu.Game.Overlays.Profile
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))
                 tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
-            tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
+            tryAddInfoRightLine(FontAwesome.fa_gamepad, user.Discord);
             tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
+            tryAddInfoRightLine(FontAwesome.fa_lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
+            tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
 
             if (user.Statistics != null)
             {
