@@ -12,9 +12,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps;
 
@@ -73,12 +76,22 @@ namespace osu.Game.Tests.Visual
 
                 selectBeatmap(testBeatmap);
 
+                testBeatmapLabels(ruleset);
+
                 // TODO: adjust cases once more info is shown for other gamemodes
                 switch (ruleset)
                 {
-                    case OsuRuleset osu:
-                        testOsuBeatmap(osu);
+                    case OsuRuleset _:
                         testInfoLabels(5);
+                        break;
+                    case TaikoRuleset _:
+                        testInfoLabels(5);
+                        break;
+                    case CatchRuleset _:
+                        testInfoLabels(5);
+                        break;
+                    case ManiaRuleset _:
+                        testInfoLabels(4);
                         break;
                     default:
                         testInfoLabels(2);
@@ -89,7 +102,7 @@ namespace osu.Game.Tests.Visual
             testNullBeatmap();
         }
 
-        private void testOsuBeatmap(OsuRuleset ruleset)
+        private void testBeatmapLabels(Ruleset ruleset)
         {
             AddAssert("check version", () => infoWedge.Info.VersionLabel.Text == $"{ruleset.ShortName}Version");
             AddAssert("check title", () => infoWedge.Info.TitleLabel.Text == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
