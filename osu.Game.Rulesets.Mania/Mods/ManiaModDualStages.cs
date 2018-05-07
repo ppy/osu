@@ -18,12 +18,16 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Description => @"Double the stages, double the fun!";
         public override double ScoreMultiplier => 0;
 
+        private bool isForCurrentRuleset;
+
         public void ApplyToBeatmapConverter(IBeatmapConverter beatmapConverter)
         {
             var mbc = (ManiaBeatmapConverter)beatmapConverter;
 
+            isForCurrentRuleset = mbc.IsForCurrentRuleset;
+
             // Although this can work, for now let's not allow keymods for mania-specific beatmaps
-            if (mbc.IsForCurrentRuleset)
+            if (isForCurrentRuleset)
                 return;
 
             mbc.TargetColumns *= 2;
@@ -34,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             var mrc = (ManiaRulesetContainer)rulesetContainer;
 
             // Although this can work, for now let's not allow keymods for mania-specific beatmaps
-            if (mrc.IsForCurrentRuleset)
+            if (isForCurrentRuleset)
                 return;
 
             var newDefinitions = new List<StageDefinition>();

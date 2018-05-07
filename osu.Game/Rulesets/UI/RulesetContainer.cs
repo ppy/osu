@@ -190,11 +190,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected readonly WorkingBeatmap WorkingBeatmap;
 
-        /// <summary>
-        /// Whether the specified beatmap is assumed to be specific to the current ruleset.
-        /// </summary>
-        public readonly bool IsForCurrentRuleset;
-
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
         protected override Container<Drawable> Content => content;
@@ -206,14 +201,12 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
-        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap, bool isForCurrentRuleset)
+        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap)
             : base(ruleset)
         {
             Debug.Assert(workingBeatmap != null, "RulesetContainer initialized with a null beatmap.");
 
             WorkingBeatmap = workingBeatmap;
-            IsForCurrentRuleset = isForCurrentRuleset;
             // ReSharper disable once PossibleNullReferenceException
             Mods = workingBeatmap.Mods.Value;
 
@@ -337,9 +330,8 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
-        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
+        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
     }

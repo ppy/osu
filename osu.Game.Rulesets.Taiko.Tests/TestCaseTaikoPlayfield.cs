@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 RelativeSizeAxes = Axes.X,
                 Height = 768,
                 Clock = new FramedClock(rateAdjustClock),
-                Children = new[] { rulesetContainer = new TaikoRulesetContainer(rulesets.GetRuleset(1).CreateInstance(), beatmap, true) }
+                Children = new[] { rulesetContainer = new TaikoRulesetContainer(rulesets.GetRuleset(1).CreateInstance(), beatmap) }
             });
         }
 

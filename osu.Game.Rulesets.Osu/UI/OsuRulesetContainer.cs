@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuRulesetContainer : RulesetContainer<OsuHitObject>
     {
-        public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
+        public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
 

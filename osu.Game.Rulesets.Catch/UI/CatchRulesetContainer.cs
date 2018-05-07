@@ -19,8 +19,8 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchRulesetContainer : ScrollingRulesetContainer<CatchPlayfield, CatchHitObject>
     {
-        public CatchRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
+        public CatchRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
 
