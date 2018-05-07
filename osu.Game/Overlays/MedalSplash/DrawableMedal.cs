@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.MedalSplash
 
             medalContainer.OnLoadComplete = d =>
             {
-                unlocked.Position = new Vector2(0f, medalContainer.DrawSize.Y / 2 + 10);
+                unlocked.Position = new Vector2(0f, medalContainer.DrawSize.Y / 2 + 110);
                 infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);
             };
         }
