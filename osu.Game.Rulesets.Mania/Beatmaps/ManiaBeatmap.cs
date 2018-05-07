@@ -33,17 +33,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         public override IEnumerable<BeatmapStatistic> GetStatistics()
         {
+            int notes = HitObjects.Count(s => s is Note);
             int holdnotes = HitObjects.Count(s => s is HoldNote);
-            int notes = HitObjects.Count - holdnotes;
 
             return new[]
             {
-                new BeatmapStatistic
-                {
-                    Name = @"Object Count",
-                    Content = HitObjects.Count.ToString(),
-                    Icon = FontAwesome.fa_circle
-                },
                 new BeatmapStatistic
                 {
                     Name = @"Note Count",

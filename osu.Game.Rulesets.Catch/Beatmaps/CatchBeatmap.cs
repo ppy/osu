@@ -13,18 +13,12 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
     {
         public override IEnumerable<BeatmapStatistic> GetStatistics()
         {
+            int fruits = HitObjects.Count(s => s is Fruit);
             int juiceStreams = HitObjects.Count(s => s is JuiceStream);
             int bananaShowers = HitObjects.Count(s => s is BananaShower);
-            int fruits = HitObjects.Count - juiceStreams - bananaShowers;
 
             return new[]
             {
-                new BeatmapStatistic
-                {
-                    Name = @"Object Count",
-                    Content = HitObjects.Count.ToString(),
-                    Icon = FontAwesome.fa_circle
-                },
                 new BeatmapStatistic
                 {
                     Name = @"Fruit Count",
