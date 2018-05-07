@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual
             });
 
             // select part is redundant, but wait for load isn't
-            selectBeatmap(beatmap.Value.Beatmap);
+            selectBeatmap(beatmap.Value.OriginalBeatmap);
 
             AddWaitStep(3);
 
