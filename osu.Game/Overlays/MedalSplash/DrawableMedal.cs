@@ -16,27 +16,27 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.MedalSplash
 {
-    public class DrawableMedal : Container, IStateful<DisplayState>
+  public class DrawableMedal : Container, IStateful<DisplayState>
+  {
+    private const float scale_when_unlocked = 0.76f;
+    private const float scale_when_full = 0.6f;
+
+    public event Action<DisplayState> StateChanged;
+
+    private readonly Medal medal;
+    private readonly Container medalContainer;
+    private readonly Sprite medalSprite, medalGlow;
+    private readonly OsuSpriteText unlocked, name;
+    private readonly TextFlowContainer description;
+    private DisplayState state;
+    public DrawableMedal(Medal medal)
     {
-        private const float scale_when_unlocked = 0.76f;
-        private const float scale_when_full = 0.6f;
+      this.medal = medal;
+      Position = new Vector2(0f, MedalOverlay.DISC_SIZE / 2);
 
-        public event Action<DisplayState> StateChanged;
-
-        private readonly Medal medal;
-        private readonly Container medalContainer;
-        private readonly Sprite medalSprite, medalGlow;
-        private readonly OsuSpriteText unlocked, name;
-        private readonly TextFlowContainer description;
-        private DisplayState state;
-        public DrawableMedal(Medal medal)
-        {
-            this.medal = medal;
-            Position = new Vector2(0f, MedalOverlay.DISC_SIZE / 2);
-
-            FillFlowContainer infoFlow;
-            Children = new Drawable[]
-            {
+      FillFlowContainer infoFlow;
+      Children = new Drawable[]
+      {
                 medalContainer = new Container
                 {
                     Anchor = Anchor.TopCentre,
@@ -101,96 +101,96 @@ namespace osu.Game.Overlays.MedalSplash
                         },
                     },
                 },
-            };
+      };
 
-            description.AddText(medal.Description, s =>
-            {
-                s.Anchor = Anchor.TopCentre;
-                s.Origin = Anchor.TopCentre;
-                s.TextSize = 16;
-            });
+      description.AddText(medal.Description, s =>
+      {
+        s.Anchor = Anchor.TopCentre;
+        s.Origin = Anchor.TopCentre;
+        s.TextSize = 16;
+      });
 
-            medalContainer.OnLoadComplete = d =>
-            {
-                unlocked.Position = new Vector2(0f, medalContainer.DrawSize.Y / 2 + 10);
-                infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures)
-        {
-            medalSprite.Texture = textures.Get(medal.ImageUrl);
-            medalGlow.Texture = textures.Get(@"MedalSplash/medal-glow");
-            description.Colour = colours.BlueLight;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            updateState();
-        }
-
-        public DisplayState State
-        {
-            get { return state; }
-            set
-            {
-                if (state == value) return;
-
-                state = value;
-                updateState();
-
-                StateChanged?.Invoke(State);
-            }
-        }
-
-        private void updateState()
-        {
-            if (!IsLoaded) return;
-
-            const double duration = 900;
-
-            switch (state)
-            {
-                case DisplayState.None:
-                    medalContainer.ScaleTo(0);
-                    break;
-                case DisplayState.Icon:
-                    medalContainer
-                        .FadeIn(duration)
-                        .ScaleTo(1, duration, Easing.OutElastic);
-                    break;
-                case DisplayState.MedalUnlocked:
-                    medalContainer
-                        .FadeTo(1)
-                        .ScaleTo(1);
-
-                    this.ScaleTo(scale_when_unlocked, duration, Easing.OutExpo);
-                    this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 30, duration, Easing.OutExpo);
-                    unlocked.FadeInFromZero(duration);
-                    break;
-                case DisplayState.Full:
-                    medalContainer
-                        .FadeTo(1)
-                        .ScaleTo(1);
-
-                    this.ScaleTo(scale_when_full, duration, Easing.OutExpo);
-                    this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 60, duration, Easing.OutExpo);
-                    unlocked.Show();
-                    name.FadeInFromZero(duration + 100);
-                    description.FadeInFromZero(duration * 2);
-                    break;
-            }
-        }
+      medalContainer.OnLoadComplete = d =>
+      {
+        unlocked.Position = new Vector2(0f, medalContainer.DrawSize.Y / 2 + 110);
+        infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);
+      };
     }
 
-    public enum DisplayState
+    [BackgroundDependencyLoader]
+    private void load(OsuColour colours, TextureStore textures)
     {
-        None,
-        Icon,
-        MedalUnlocked,
-        Full,
+      medalSprite.Texture = textures.Get(medal.ImageUrl);
+      medalGlow.Texture = textures.Get(@"MedalSplash/medal-glow");
+      description.Colour = colours.BlueLight;
     }
+
+    protected override void LoadComplete()
+    {
+      base.LoadComplete();
+
+      updateState();
+    }
+
+    public DisplayState State
+    {
+      get { return state; }
+      set
+      {
+        if (state == value) return;
+
+        state = value;
+        updateState();
+
+        StateChanged?.Invoke(State);
+      }
+    }
+
+    private void updateState()
+    {
+      if (!IsLoaded) return;
+
+      const double duration = 900;
+
+      switch (state)
+      {
+        case DisplayState.None:
+          medalContainer.ScaleTo(0);
+          break;
+        case DisplayState.Icon:
+          medalContainer
+              .FadeIn(duration)
+              .ScaleTo(1, duration, Easing.OutElastic);
+          break;
+        case DisplayState.MedalUnlocked:
+          medalContainer
+              .FadeTo(1)
+              .ScaleTo(1);
+
+          this.ScaleTo(scale_when_unlocked, duration, Easing.OutExpo);
+          this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 30, duration, Easing.OutExpo);
+          unlocked.FadeInFromZero(duration);
+          break;
+        case DisplayState.Full:
+          medalContainer
+              .FadeTo(1)
+              .ScaleTo(1);
+
+          this.ScaleTo(scale_when_full, duration, Easing.OutExpo);
+          this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 60, duration, Easing.OutExpo);
+          unlocked.Show();
+          name.FadeInFromZero(duration + 100);
+          description.FadeInFromZero(duration * 2);
+          break;
+      }
+    }
+  }
+
+  public enum DisplayState
+  {
+    None,
+    Icon,
+    MedalUnlocked,
+    Full,
+  }
 }
