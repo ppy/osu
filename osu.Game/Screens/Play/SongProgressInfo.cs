@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Play
             {
                 //since TimeSpan to string doesnt support minutes above 60, we have to do something else.
                 var timeRemain = endTime - AudioClock.CurrentTime;
-                string minutes = songCurrentTime < 0 ? "-0" : Math.Floor(TimeSpan.FromSeconds(currentSecond).TotalMinutes).ToString();
+                string minutes = songCurrentTime < 0 ? "-0" : Math.Floor(TimeSpan.FromSeconds(currentSecond).TotalMinutes).ToString("");
                 timeCurrent.Text = minutes + ':' + TimeSpan.FromSeconds(currentSecond).ToString(@"ss");
                 timeLeft.Text = "-" + Math.Floor(TimeSpan.FromMilliseconds(timeRemain).TotalMinutes) + ':' + TimeSpan.FromMilliseconds(timeRemain).ToString(@"ss");
                 previousSecond = currentSecond;
