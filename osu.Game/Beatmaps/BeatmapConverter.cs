@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Whether <see cref="Beatmap"/> can be converted by this <see cref="BeatmapConverter{T}"/>.
         /// </summary>
-        public bool CanConvert => ValidConversionTypes.All(t => Beatmap.HitObjects.Any(t.IsInstanceOfType));
+        public bool CanConvert => !Beatmap.HitObjects.Any() || ValidConversionTypes.All(t => Beatmap.HitObjects.Any(t.IsInstanceOfType));
 
         /// <summary>
         /// Converts <see cref="Beatmap"/>.
