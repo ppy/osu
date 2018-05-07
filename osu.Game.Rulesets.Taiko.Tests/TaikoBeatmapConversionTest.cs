@@ -14,7 +14,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TaikoBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    public class TaikoBeatmapConversionTest : BeatmapConversionTest<TestTaikoRuleset, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
 
@@ -66,5 +66,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
                && IsDrumRoll == other.IsDrumRoll
                && IsSwell == other.IsSwell
                && IsStrong == other.IsStrong;
+    }
+
+    public class TestTaikoRuleset : TaikoRuleset
+    {
     }
 }

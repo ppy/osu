@@ -10,12 +10,14 @@ using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Tests.Beatmaps
 {
     [TestFixture]
-    public abstract class BeatmapConversionTest<TConvertValue>
+    public abstract class BeatmapConversionTest<TRuleset, TConvertValue>
+        where TRuleset : Ruleset, new()
         where TConvertValue : IEquatable<TConvertValue>
     {
         private const string resource_namespace = "Testing.Beatmaps";
@@ -78,6 +80,9 @@ namespace osu.Game.Tests.Beatmaps
         private ConvertResult convert(string name)
         {
             var beatmap = getBeatmap(name);
+
+            var rulesetInstance = new TRuleset();
+            beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
 
             var result = new ConvertResult();
 
