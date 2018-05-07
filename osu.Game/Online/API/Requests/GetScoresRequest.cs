@@ -39,7 +39,48 @@ namespace osu.Game.Online.API.Requests
         private void onSuccess(GetScoresResponse r)
         {
             foreach (OnlineScore score in r.Scores)
+            {
+                // Process scores after retrieving data from server, ensuring the ruleset is assigned
+                foreach (var kvp in score.JsonStats)
+                {
+                    HitResult newKey;
+                    switch (kvp.Key)
+                    {
+                        case @"count_geki":
+                            if (ruleset.ID == 3) // Currently only accounting for osu!mania; will need evaluation for osu!catch
+                                newKey = HitResult.Perfect;
+                            else
+                                newKey = HitResult.Great;
+                            break;
+                        case @"count_300":
+                            newKey = HitResult.Great;
+                            break;
+                        case @"count_katu":
+                            newKey = HitResult.Good;
+                            break;
+                        case @"count_100":
+                            if (ruleset.ID == 3)
+                                newKey = HitResult.Ok;
+                            else
+                                newKey = HitResult.Good;
+                            break;
+                        case @"count_50":
+                            newKey = ruleset.ID != 1 ? HitResult.Meh : HitResult.Miss; // Do not create a new key if score is about osu!taiko
+                            break;
+                        case @"count_miss":
+                            newKey = HitResult.Miss;
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    if (!score.Statistics.ContainsKey(newKey))
+                        score.Statistics.Add(newKey, kvp.Value);
+                    else
+                        score.Statistics[newKey] = (long)score.Statistics[newKey] + (long)kvp.Value;
+                }
                 score.ApplyBeatmap(beatmap);
+            }
         }
 
         protected override WebRequest CreateWebRequest()
@@ -116,35 +157,7 @@ namespace osu.Game.Online.API.Requests
         }
 
         [JsonProperty(@"statistics")]
-        private Dictionary<string, object> jsonStats
-        {
-            set
-            {
-                foreach (var kvp in value)
-                {
-                    HitResult newKey;
-                    switch (kvp.Key)
-                    {
-                        case @"count_300":
-                            newKey = HitResult.Great;
-                            break;
-                        case @"count_100":
-                            newKey = HitResult.Good;
-                            break;
-                        case @"count_50":
-                            newKey = HitResult.Meh;
-                            break;
-                        case @"count_miss":
-                            newKey = HitResult.Miss;
-                            break;
-                        default:
-                            continue;
-                    }
-
-                    Statistics.Add(newKey, kvp.Value);
-                }
-            }
-        }
+        public Dictionary<string, object> JsonStats { get; set; }
 
         [JsonProperty(@"mods")]
         private string[] modStrings { get; set; }

@@ -58,7 +58,21 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 totalScore.Value = $@"{score.TotalScore:N0}";
                 accuracy.Value = $@"{score.Accuracy:P2}";
-                statistics.Value = $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Meh]}";
+                if (score.Statistics.ContainsKey(HitResult.Perfect)) // Only osu!mania contains this judgement type currently
+                {
+                    statistics.HeaderText = "MAX/300/200/100/50/Miss";
+                    statistics.Value = $"{score.Statistics[HitResult.Perfect]}/{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Ok]}/{score.Statistics[HitResult.Meh]}/{score.Statistics[HitResult.Miss]}";
+                }
+                else if (score.Statistics.ContainsKey(HitResult.Meh)) // Only osu!taiko does not contain this judgement type
+                {
+                    statistics.HeaderText = "300/100/50/Miss";
+                    statistics.Value = $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Meh]}/{score.Statistics[HitResult.Miss]}";
+                }
+                else
+                {
+                    statistics.HeaderText = "300/100/Miss";
+                    statistics.Value = $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Miss]}";
+                }
 
                 modsContainer.Clear();
                 foreach (Mod mod in score.Mods)
@@ -201,6 +215,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             private readonly OsuSpriteText headerText;
             private readonly OsuSpriteText valueText;
 
+            public string HeaderText
+            {
+                set
+                {
+                    if (headerText.Text == value)
+                        return;
+                    headerText.Text = value;
+                }
+                get { return headerText.Text; }
+            }
             public string Value
             {
                 set
