@@ -7,18 +7,18 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using OpenTK;
+using OpenTK.Input;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen, IKeyBindingHandler<GlobalAction>
+    public abstract class OsuScreen : Screen
     {
         public BackgroundScreen Background { get; private set; }
 
@@ -92,18 +92,30 @@ namespace osu.Game.Screens
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
 
-        public bool OnPressed(GlobalAction action)
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (action == GlobalAction.Back && AllowBackButton)
+            if (args.Repeat || !IsCurrentScreen) return false;
+
+            switch (args.Key)
+            {
+                case Key.Escape:
+                    Exit();
+                    return true;
+            }
+
+            return base.OnKeyDown(state, args);
+        }
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            if (AllowBackButton && state.Mouse.IsPressed(MouseButton.Button1))
             {
                 Exit();
                 return true;
             }
 
-            return false;
+            return base.OnMouseDown(state, args);
         }
-
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back && AllowBackButton;
 
         protected override void OnResuming(Screen last)
         {
