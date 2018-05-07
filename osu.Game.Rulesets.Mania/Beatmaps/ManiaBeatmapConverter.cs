@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
             var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
-            if (beatmap.BeatmapInfo.Ruleset == new ManiaRuleset().RulesetInfo)
+            if (IsForCurrentRuleset)
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
             else
             {
