@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps
             Process.Start(path);
         }
 
-        protected abstract IBeatmap GetBeatmap();
+        protected abstract IBeatmap GetPlayableBeatmap();
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
         protected virtual Skin GetSkin() => new DefaultSkin();
@@ -71,7 +71,7 @@ namespace osu.Game.Beatmaps
 
         private IBeatmap populateBeatmap()
         {
-            var b = GetBeatmap() ?? new Beatmap();
+            var b = GetPlayableBeatmap() ?? new Beatmap();
 
             // use the database-backed info.
             b.BeatmapInfo = BeatmapInfo;
@@ -80,13 +80,16 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Retrieves the resulting <see cref="IBeatmap"/> from the conversion of <see cref="Beatmap"/> to a specific <see cref="RulesetInfo"/>.
-        /// All mods have been applied to the returned <see cref="IBeatmap"/>.
+        /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
+        /// <para>
+        /// The returned <see cref="IBeatmap"/> is in a playable state - all <see cref="HitObject"/> and <see cref="BeatmapDifficulty"/> <see cref="Mod"/>s
+        /// have been applied, and <see cref="HitObject"/>s have been fully constructed.
+        /// </para>
         /// </summary>
-        /// <param name="ruleset">The <see cref="RulesetInfo"/> to convert <see cref="Beatmap"/> to.</param>
+        /// <param name="ruleset">The <see cref="RulesetInfo"/> to create a playable <see cref="IBeatmap"/> for.</param>
         /// <returns>The converted <see cref="IBeatmap"/>.</returns>
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
-        public IBeatmap GetBeatmap(RulesetInfo ruleset)
+        public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset)
         {
             var rulesetInstance = ruleset.CreateInstance();
 
