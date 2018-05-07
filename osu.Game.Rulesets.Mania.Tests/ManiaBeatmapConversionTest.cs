@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
         [NonParallelizable]
-        [TestCase("basic", false)]
+        [TestCase("basic")]
         public new void Test(string name)
         {
             base.Test(name);
