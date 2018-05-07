@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.UI
 
             RelativeSizeAxes = Axes.Both;
 
-            Beatmap = (Beatmap<TObject>)workingBeatmap.GetBeatmap(ruleset.RulesetInfo);
+            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
 
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
