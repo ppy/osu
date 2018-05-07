@@ -76,9 +76,9 @@ namespace osu.Game.Input.Bindings
         [Description("Quick Retry (Hold)")]
         QuickRetry,
 
+        [Description("Take screenshot")]
+        TakeScreenshot,
         [Description("Toggle gameplay mouse buttons")]
         ToggleGameplayMouseButtons,
-        [Description("Take screenshot")]
-        TakeScreenshot
     }
 }
