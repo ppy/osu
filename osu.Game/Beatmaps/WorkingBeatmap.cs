@@ -38,7 +38,7 @@ namespace osu.Game.Beatmaps
 
             Mods.ValueChanged += mods => applyRateAdjustments();
 
-            originalBeatmap = new AsyncLazy<IBeatmap>(populateOriginalBeatmap);
+            beatmap = new AsyncLazy<IBeatmap>(populateBeatmap);
             background = new AsyncLazy<Texture>(populateBackground, b => b == null || !b.IsDisposed);
             track = new AsyncLazy<Track>(populateTrack);
             waveform = new AsyncLazy<Waveform>(populateWaveform);
@@ -47,31 +47,31 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Saves the <see cref="Beatmap"/>.
+        /// Saves the <see cref="Beatmaps.Beatmap"/>.
         /// </summary>
         public void Save()
         {
             var path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
             using (var sw = new StreamWriter(path))
-                sw.WriteLine(OriginalBeatmap.Serialize());
+                sw.WriteLine(Beatmap.Serialize());
             Process.Start(path);
         }
 
-        protected abstract IBeatmap GetOriginalBeatmap();
+        protected abstract IBeatmap GetBeatmap();
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
         protected virtual Skin GetSkin() => new DefaultSkin();
         protected virtual Waveform GetWaveform() => new Waveform();
         protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
 
-        public bool BeatmapLoaded => originalBeatmap.IsResultAvailable;
-        public IBeatmap OriginalBeatmap => originalBeatmap.Value.Result;
-        public async Task<IBeatmap> GetOriginalBeatmapAsync() => await originalBeatmap.Value;
-        private readonly AsyncLazy<IBeatmap> originalBeatmap;
+        public bool BeatmapLoaded => beatmap.IsResultAvailable;
+        public IBeatmap Beatmap => beatmap.Value.Result;
+        public async Task<IBeatmap> GetBeatmapAsync() => await beatmap.Value;
+        private readonly AsyncLazy<IBeatmap> beatmap;
 
-        private IBeatmap populateOriginalBeatmap()
+        private IBeatmap populateBeatmap()
         {
-            var b = GetOriginalBeatmap() ?? new Beatmap();
+            var b = GetBeatmap() ?? new Beatmap();
 
             // use the database-backed info.
             b.BeatmapInfo = BeatmapInfo;
@@ -80,21 +80,21 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Retrieves the resulting <see cref="IBeatmap"/> from the conversion of <see cref="OriginalBeatmap"/> to a specific <see cref="RulesetInfo"/>.
+        /// Retrieves the resulting <see cref="IBeatmap"/> from the conversion of <see cref="Beatmap"/> to a specific <see cref="RulesetInfo"/>.
         /// All mods have been applied to the returned <see cref="IBeatmap"/>.
         /// </summary>
-        /// <param name="ruleset">The <see cref="RulesetInfo"/> to convert <see cref="OriginalBeatmap"/> to.</param>
+        /// <param name="ruleset">The <see cref="RulesetInfo"/> to convert <see cref="Beatmap"/> to.</param>
         /// <returns>The converted <see cref="IBeatmap"/>.</returns>
-        /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="OriginalBeatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
+        /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
         public IBeatmap GetBeatmap(RulesetInfo ruleset)
         {
             var rulesetInstance = ruleset.CreateInstance();
 
-            IBeatmapConverter converter = rulesetInstance.CreateBeatmapConverter(OriginalBeatmap);
+            IBeatmapConverter converter = rulesetInstance.CreateBeatmapConverter(Beatmap);
 
             // Check if the beatmap can be converted
             if (!converter.CanConvert)
-                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can not be converted for the ruleset (ruleset: {ruleset}, converter: {converter}).");
+                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset}, converter: {converter}).");
 
             // Apply conversion mods
             foreach (var mod in Mods.Value.OfType<IApplicableToBeatmapConverter>())

@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Select
 
             private InfoLabel[] getInfoLabels()
             {
-                var beatmap = working.OriginalBeatmap;
+                var beatmap = working.Beatmap;
                 var info = working.BeatmapInfo;
 
                 List<InfoLabel> labels = new List<InfoLabel>();

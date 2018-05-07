@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             base.LoadBeatmap(beatmap);
 
-            ControlPointInfo cpi = beatmap.OriginalBeatmap.ControlPointInfo;
+            ControlPointInfo cpi = beatmap.Beatmap.ControlPointInfo;
 
             cpi.TimingPoints.ForEach(addTimingPoint);
 
