@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps
             Process.Start(path);
         }
 
-        protected abstract IBeatmap GetPlayableBeatmap();
+        protected abstract IBeatmap GetBeatmap();
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
         protected virtual Skin GetSkin() => new DefaultSkin();
@@ -71,7 +71,7 @@ namespace osu.Game.Beatmaps
 
         private IBeatmap populateBeatmap()
         {
-            var b = GetPlayableBeatmap() ?? new Beatmap();
+            var b = GetBeatmap() ?? new Beatmap();
 
             // use the database-backed info.
             b.BeatmapInfo = BeatmapInfo;

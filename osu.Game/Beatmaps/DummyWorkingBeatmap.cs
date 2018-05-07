@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps
             this.game = game;
         }
 
-        protected override IBeatmap GetPlayableBeatmap() => new Beatmap();
+        protected override IBeatmap GetBeatmap() => new Beatmap();
 
         protected override Texture GetBackground() => game.Textures.Get(@"Backgrounds/bg4");
 
