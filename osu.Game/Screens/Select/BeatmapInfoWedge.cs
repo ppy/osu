@@ -234,8 +234,8 @@ namespace osu.Game.Screens.Select
                         Content = getBPMRange(beatmap),
                     }));
 
-                    //get statistics from the current ruleset.
-                    labels.AddRange(info.Ruleset.CreateInstance().GetBeatmapStatistics(working).Select(s => new InfoLabel(s)));
+                    //get statistics for the current ruleset.
+                    labels.AddRange(working.GetPlayableBeatmap(info.Ruleset).GetStatistics().Select(s => new InfoLabel(s)));
                 }
 
                 return labels.ToArray();

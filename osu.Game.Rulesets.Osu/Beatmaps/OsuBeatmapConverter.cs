@@ -65,5 +65,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 };
             }
         }
+
+        protected override Beatmap<OsuHitObject> CreateBeatmap() => new OsuBeatmap();
     }
 }
