@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps.Formats
             FormatVersion = version;
         }
 
-        protected override void ParseStreamInto(StreamReader stream, T beatmap)
+        protected override void ParseStreamInto(StreamReader stream, T output)
         {
             Section section = Section.None;
 
@@ -33,14 +33,21 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
                     {
-                        Logger.Log($"Unknown section \"{line}\" in {beatmap}");
+                        Logger.Log($"Unknown section \"{line}\" in {output}");
                         section = Section.None;
                     }
 
                     continue;
                 }
 
-                ParseLine(beatmap, section, line);
+                try
+                {
+                    ParseLine(output, section, line);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"Failed to process line \"{line}\" into {output}");
+                }
             }
         }
 
