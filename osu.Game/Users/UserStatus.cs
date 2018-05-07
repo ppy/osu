@@ -12,12 +12,13 @@ namespace osu.Game.Users
         public abstract Color4 GetAppropriateColour(OsuColour colours);
     }
 
-    public abstract class UserStatusAvailable : UserStatus
+    public class UserStatusOnline : UserStatus
     {
+        public override string Message => @"Online";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.BlueDarker;
     }
 
-    public abstract class UserStatusBusy : UserStatus
+    public abstract class UserStatusBusy : UserStatusOnline
     {
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.YellowDark;
     }
@@ -28,17 +29,12 @@ namespace osu.Game.Users
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.Gray7;
     }
 
-    public class UserStatusOnline : UserStatusAvailable
-    {
-        public override string Message => @"Online";
-    }
-
-    public class UserStatusSpectating : UserStatusAvailable
+    public class UserStatusSpectating : UserStatusOnline
     {
         public override string Message => @"Spectating a game";
     }
 
-    public class UserStatusInLobby : UserStatusAvailable
+    public class UserStatusInLobby : UserStatusOnline
     {
         public override string Message => @"in Multiplayer Lobby";
     }
@@ -53,13 +49,13 @@ namespace osu.Game.Users
         public override string Message => @"Multiplaying";
     }
 
-    public class UserStatusModding : UserStatus
+    public class UserStatusModding : UserStatusOnline
     {
         public override string Message => @"Modding a map";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
     }
 
-    public class UserStatusDoNotDisturb : UserStatus
+    public class UserStatusDoNotDisturb : UserStatusBusy
     {
         public override string Message => @"Do not disturb";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.RedDark;
