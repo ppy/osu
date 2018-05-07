@@ -40,10 +40,10 @@ namespace osu.Game.Screens.Select.Details
                     firstValue.Value = Beatmap?.BaseDifficulty?.CircleSize ?? 0;
                 }
 
-                hpDrain.Value = beatmap.BaseDifficulty?.DrainRate ?? 0;
-                accuracy.Value = beatmap.BaseDifficulty?.OverallDifficulty ?? 0;
-                approachRate.Value = beatmap.BaseDifficulty?.ApproachRate ?? 0;
-                starDifficulty.Value = (float)beatmap.StarDifficulty;
+                hpDrain.Value = Beatmap?.BaseDifficulty?.DrainRate ?? 0;
+                accuracy.Value = Beatmap?.BaseDifficulty?.OverallDifficulty ?? 0;
+                approachRate.Value = Beatmap?.BaseDifficulty?.ApproachRate ?? 0;
+                starDifficulty.Value = (float)(Beatmap?.StarDifficulty ?? 0);
             }
         }
 

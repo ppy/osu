@@ -373,16 +373,17 @@ namespace osu.Game.Beatmaps.Formats
             if (parser == null)
                 parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser();
 
-            var obj = parser.Parse(line);
+            var obj = parser.Parse(line, getOffsetTime());
 
             if (obj != null)
             {
-                obj.StartTime = getOffsetTime(obj.StartTime);
                 beatmap.HitObjects.Add(obj);
             }
         }
 
         private int getOffsetTime(int time) => time + (ApplyOffsets ? offset : 0);
+
+        private double getOffsetTime() => ApplyOffsets ? offset : 0;
 
         private double getOffsetTime(double time) => time + (ApplyOffsets ? offset : 0);
     }

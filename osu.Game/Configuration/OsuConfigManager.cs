@@ -60,6 +60,9 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowFpsDisplay, false);
 
             Set(OsuSetting.ShowStoryboard, true);
+            Set(OsuSetting.BeatmapSkins, true);
+            Set(OsuSetting.BeatmapHitsounds, true);
+
             Set(OsuSetting.CursorRotation, true);
 
             Set(OsuSetting.MenuParallax, true);
@@ -133,6 +136,8 @@ namespace osu.Game.Configuration
         Skin,
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
-        SongSelectRightMouseScroll
+        SongSelectRightMouseScroll,
+        BeatmapSkins,
+        BeatmapHitsounds
     }
 }

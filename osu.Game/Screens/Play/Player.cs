@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play
         private DrawableStoryboard storyboard;
         private Container storyboardContainer;
 
-        private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
+        public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, APIAccess api, OsuConfigManager config)
@@ -86,10 +86,7 @@ namespace osu.Game.Screens.Play
 
             WorkingBeatmap working = Beatmap.Value;
             if (working is DummyWorkingBeatmap)
-            {
-                Exit();
                 return;
-            }
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
@@ -122,14 +119,15 @@ namespace osu.Game.Screens.Play
                 }
 
                 if (!RulesetContainer.Objects.Any())
-                    throw new InvalidOperationException("Beatmap contains no hit objects!");
+                {
+                    Logger.Error(new InvalidOperationException("Beatmap contains no hit objects!"), "Beatmap contains no hit objects!");
+                    return;
+                }
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Could not load beatmap sucessfully!");
-
                 //couldn't load, hard abort!
-                Exit();
                 return;
             }
 
@@ -293,7 +291,7 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            if (!loadedSuccessfully)
+            if (!LoadedBeatmapSuccessfully)
                 return;
 
             Content.Alpha = 0;
@@ -343,7 +341,7 @@ namespace osu.Game.Screens.Play
                 return base.OnExiting(next);
             }
 
-            if (loadedSuccessfully)
+            if (LoadedBeatmapSuccessfully)
                 pauseContainer?.Pause();
 
             return true;
