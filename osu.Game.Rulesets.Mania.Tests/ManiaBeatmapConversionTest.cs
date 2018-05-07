@@ -14,7 +14,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class ManiaBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    public class ManiaBeatmapConversionTest : BeatmapConversionTest<TestManiaRuleset, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
@@ -53,5 +53,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
                && Precision.AlmostEquals(EndTime, other.EndTime, conversion_lenience)
                && Column == other.Column;
+    }
+
+    public class TestManiaRuleset : ManiaRuleset
+    {
     }
 }
