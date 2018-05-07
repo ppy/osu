@@ -18,13 +18,10 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
-        private bool isForCurrentRuleset;
-
         [NonParallelizable]
         [TestCase("basic", false)]
-        public void Test(string name, bool isForCurrentRuleset)
+        public new void Test(string name)
         {
-            this.isForCurrentRuleset = isForCurrentRuleset;
             base.Test(name);
         }
 
