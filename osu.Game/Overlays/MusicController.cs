@@ -343,7 +343,7 @@ namespace osu.Game.Overlays
                 // todo: this can likely be replaced with WorkingBeatmap.GetBeatmapAsync()
                 Task.Run(() =>
                 {
-                    if (beatmap?.OriginalBeatmap == null) //this is not needed if a placeholder exists
+                    if (beatmap?.Beatmap == null) //this is not needed if a placeholder exists
                     {
                         title.Current = null;
                         title.Text = @"Nothing to play";

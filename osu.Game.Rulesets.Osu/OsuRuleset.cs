@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap)
         {
-            IEnumerable<HitObject> hitObjects = beatmap.OriginalBeatmap.HitObjects;
+            IEnumerable<HitObject> hitObjects = beatmap.Beatmap.HitObjects;
             IEnumerable<HitObject> circles = hitObjects.Where(c => !(c is IHasEndTime));
             IEnumerable<HitObject> sliders = hitObjects.Where(s => s is IHasCurve);
             IEnumerable<HitObject> spinners = hitObjects.Where(s => s is IHasEndTime && !(s is IHasCurve));
