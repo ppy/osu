@@ -47,10 +47,7 @@ namespace osu.Game.Online.API.Requests
                     switch (kvp.Key)
                     {
                         case @"count_geki":
-                            if (ruleset.ID == 3) // Currently only accounting for osu!mania; will need evaluation for osu!catch
-                                newKey = HitResult.Perfect;
-                            else
-                                newKey = HitResult.Great;
+                            newKey = ruleset.ID == 3 ? HitResult.Perfect : HitResult.Great; // Currently only accounting for osu!mania; will need evaluation for osu!catch
                             break;
                         case @"count_300":
                             newKey = HitResult.Great;
@@ -59,10 +56,7 @@ namespace osu.Game.Online.API.Requests
                             newKey = HitResult.Good;
                             break;
                         case @"count_100":
-                            if (ruleset.ID == 3)
-                                newKey = HitResult.Ok;
-                            else
-                                newKey = HitResult.Good;
+                            newKey = ruleset.ID == 3 ? HitResult.Ok : HitResult.Good;
                             break;
                         case @"count_50":
                             newKey = ruleset.ID != 1 ? HitResult.Meh : HitResult.Miss; // Do not create a new key if score is about osu!taiko
