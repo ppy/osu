@@ -17,7 +17,9 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorClock : DecoupleableInterpolatingFramedClock
     {
-        public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        //public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+        public double TrackLength;
 
         public ControlPointInfo ControlPointInfo;
 
@@ -27,15 +29,15 @@ namespace osu.Game.Screens.Edit
         {
             this.beatDivisor = beatDivisor;
 
-            Beatmap.BindTo(beatmap);
-
-            ControlPointInfo = Beatmap.Value.Beatmap.ControlPointInfo;
+            ControlPointInfo = beatmap.Value.Beatmap.ControlPointInfo;
+            TrackLength = beatmap.Value.Track.Length;
         }
-        public EditorClock(ControlPointInfo controlPointInfo, BindableBeatDivisor beatDivisor)
+        public EditorClock(ControlPointInfo controlPointInfo, double trackLength, BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor = beatDivisor;
 
             ControlPointInfo = controlPointInfo;
+            TrackLength = trackLength;
         }
 
         /// <summary>
@@ -123,7 +125,8 @@ namespace osu.Game.Screens.Edit
             if (seekTime > nextTimingPoint?.Time)
                 seekTime = nextTimingPoint.Time;
 
-            seekTime = Math.Min(Math.Max(0, seekTime), Beatmap.Value.Track.Length); // Ensure the sought point is within the song's length
+            // Ensure the sought point is within the boundaries
+            seekTime = Math.Min(Math.Max(0, seekTime), TrackLength);
             Seek(seekTime);
         }
     }
