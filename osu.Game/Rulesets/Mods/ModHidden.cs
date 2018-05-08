@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -19,18 +18,18 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override bool Ranked => true;
 
-        protected Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
+        protected Bindable<bool> IncreaseFirstObjectVisibility = new Bindable<bool>();
 
         public void ReadFromConfig(OsuConfigManager config)
         {
-            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
+            IncreaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
         }
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var d in drawables.OfType<DrawableHitObject>())
+            foreach (var d in drawables)
             {
-                if (d == drawables.Last() && increaseFirstObjectVisibility)
+                if (d == drawables.Last() && IncreaseFirstObjectVisibility)
                     return;
 
                 d.ApplyCustomUpdateState += ApplyHiddenState;
