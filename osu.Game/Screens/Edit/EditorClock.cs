@@ -3,8 +3,10 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Configuration;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Screens.Edit.Screens.Compose;
 
@@ -15,10 +17,20 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorClock : DecoupleableInterpolatingFramedClock
     {
+        public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
         public ControlPointInfo ControlPointInfo;
 
         private readonly BindableBeatDivisor beatDivisor;
 
+        public EditorClock(Bindable<WorkingBeatmap> beatmap, BindableBeatDivisor beatDivisor)
+        {
+            this.beatDivisor = beatDivisor;
+
+            Beatmap.BindTo(beatmap);
+
+            ControlPointInfo = Beatmap.Value.Beatmap.ControlPointInfo;
+        }
         public EditorClock(ControlPointInfo controlPointInfo, BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor = beatDivisor;
@@ -111,6 +123,7 @@ namespace osu.Game.Screens.Edit
             if (seekTime > nextTimingPoint?.Time)
                 seekTime = nextTimingPoint.Time;
 
+            seekTime = Math.Min(Math.Max(0, seekTime), Beatmap.Value.Track.Length); // Ensure the sought point is within the song's length
             Seek(seekTime);
         }
     }
