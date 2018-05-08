@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania
@@ -30,6 +31,51 @@ namespace osu.Game.Rulesets.Mania
         /// HitObjects are stored as a member variable.
         /// </summary>
         private readonly List<ManiaHitObjectDifficulty> difficultyHitObjects = new List<ManiaHitObjectDifficulty>();
+
+        /// <summary>
+        /// Number of sections to keep in memory for calculating average strain. 1 = 400ms
+        /// 150 = 60 seconds
+        /// </summary>
+        private const int memory = 150;
+
+        /// <summary>
+        /// Strain over AverageStrain factor threshold for applying a stability penalty
+        /// Increasing this value will add more leniency towards harder than normal patterns
+        /// </summary>
+        private const double overweight_factor = 1.4;
+
+        /// <summary>
+        /// Strain over AverageStrain factor minimum for not applying a stability penalty
+        /// Increasing this value will give more penalty for easier than normal patterns
+        /// </summary>
+        private const double underweight_factor = 0.7;
+
+
+        /// <summary>
+        /// The highest stability strain factor that can be applied
+        /// Increasing this value will encourage stable parts of the map
+        /// </summary>
+        private const double max_stability = 1.12;
+
+        /// <summary>
+        /// The lowest stability strain factor that can be applied
+        /// Increasing this value will encourage difficulty variation
+        /// </summary>
+        private const double min_stability = 0.9;
+
+        /// <summary>
+        /// The pace at which stability will decrease when on an over/underweighted part of the map
+        /// Increasing this value will result in quicker reaction to stability drop
+        /// The step is applied after each 400ms section
+        /// </summary>
+        private const double stability_step_decrease = 0.04;
+
+        /// <summary>
+        /// The pace at which stability will increase when on an normally weighted part of the map
+        /// Increasing this value will result in quicker reaction to stability recovery
+        /// The step is applied after each 400ms section
+        /// </summary>
+        private const double stability_step_increase = 0.01;
 
         public ManiaDifficultyCalculator(Beatmap beatmap)
             : base(beatmap)
@@ -130,13 +176,70 @@ namespace osu.Game.Rulesets.Mania
             // Build the weighted sum over the highest strains for each interval
             double difficulty = 0;
             double weight = 1;
+
+            // Averages the map strain, can be used instead of the moving average but needs commenting some code
+            //double averageStrain = highestStrains.Average(strain => strain);
+
+            Queue<double> currentStrains = new Queue<double>();
+
+            List<double> factors = new List<double>();
+
+            double stability = 1; // Stability base
+            // Weight strains according to the stability to avoid burst overrating
+            foreach (double strain in highestStrains)
+            {
+                // Use a queue tu keep "memory" seconds of strain
+                currentStrains.Enqueue(strain);
+                if (currentStrains.Count > memory)
+                {
+                    currentStrains.Dequeue();
+                }
+                // Average those
+                double averageStrain = currentStrains.Average();
+
+                double factor = strain / averageStrain;
+
+                // Move the stability according to our constants
+                if (factor > overweight_factor)
+                {
+                    stability -= stability_step_decrease;
+                }
+                else
+                if (factor < underweight_factor)
+                {
+                    stability -= stability_step_decrease;
+                }
+                else
+                {
+                    stability += stability_step_increase;
+                }
+
+                // The stability is capped
+                if (stability > max_stability) { stability = max_stability; }
+                if (stability < min_stability) { stability = min_stability; }
+
+                // Add difficulty according to strain and stability
+                factors.Add(stability);
+            }
+
+            // Apply stability to each strains - CAN be improved I'm sure
+            // The best would be applying it while going though the previous block
+            int index = 0;
+            foreach (double stabilityFactor in factors)
+            {
+                highestStrains[index] *= stabilityFactor;
+                index++;
+            }
+
             highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
 
+            // Weighted sum
             foreach (double strain in highestStrains)
             {
                 difficulty += weight * strain;
                 weight *= decay_weight;
             }
+
 
             return difficulty;
         }
