@@ -36,6 +36,11 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Down, GlobalAction.DecreaseVolume),
             new KeyBinding(InputKey.MouseWheelDown, GlobalAction.DecreaseVolume),
             new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
+
+            new KeyBinding(new[] { InputKey.Control, InputKey.Number1 }, GlobalAction.GameModeStandard),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Number2 }, GlobalAction.GameModeTaiko),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Number3 }, GlobalAction.GameModeCatch),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Number4 }, GlobalAction.GameModeMania)
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -76,6 +81,16 @@ namespace osu.Game.Input.Bindings
         QuickRetry,
 
         [Description("Take screenshot")]
-        TakeScreenshot
+        TakeScreenshot,
+
+        // Game Modes 
+        [Description("osu!standard")]
+        GameModeStandard,
+        [Description("osu!taiko")]
+        GameModeTaiko,
+        [Description("osu!catch")]
+        GameModeCatch,
+        [Description("osu!mania")]
+        GameModeMania
     }
 }

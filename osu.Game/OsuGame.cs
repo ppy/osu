@@ -466,6 +466,19 @@ namespace osu.Game
                 case GlobalAction.ToggleDirect:
                     direct.ToggleVisibility();
                     return true;
+
+                case GlobalAction.GameModeStandard:
+                    Ruleset.Value = RulesetStore.GetRuleset(0) ?? RulesetStore.AvailableRulesets.First();
+                    return true;
+                case GlobalAction.GameModeTaiko:
+                    Ruleset.Value = RulesetStore.GetRuleset(1) ?? RulesetStore.AvailableRulesets.First();
+                    return true;
+                case GlobalAction.GameModeCatch:
+                    Ruleset.Value = RulesetStore.GetRuleset(2) ?? RulesetStore.AvailableRulesets.First();
+                    return true;
+                case GlobalAction.GameModeMania:
+                    Ruleset.Value = RulesetStore.GetRuleset(3) ?? RulesetStore.AvailableRulesets.First();
+                    return true;
             }
 
             return false;
