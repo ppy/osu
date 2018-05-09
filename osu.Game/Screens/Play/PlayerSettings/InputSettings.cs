@@ -20,11 +20,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
             {
                 mouseWheelCheckbox = new PlayerCheckbox
                 {
-                    LabelText = "Disable mouse wheel during gameplay"
+                    LabelText = "Disable mouse wheel"
                 },
                 mouseButtonsCheckbox = new PlayerCheckbox
                 {
-                    LabelText = "Disable mouse buttons during gameplay"
+                    LabelText = "Disable mouse buttons"
                 }
             };
         }
