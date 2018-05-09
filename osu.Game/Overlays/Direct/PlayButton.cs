@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
@@ -126,9 +127,17 @@ namespace osu.Game.Overlays.Direct
             {
                 if (Preview == null)
                 {
-                    loading = true;
-                    Preview = previewTrackManager.Get(beatmapSet);
-                    loading = false;
+                    Task.Run(() =>
+                        {
+                            loading = true;
+                            return Preview = previewTrackManager.Get(beatmapSet);
+                        })
+                        .ContinueWith(t =>
+                        {
+                            playingStateChanged(true);
+                            loading = false;
+                        });
+                    return;
                 }
 
                 previewTrackManager.Play(Preview);
