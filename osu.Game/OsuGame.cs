@@ -3,36 +3,36 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Configuration;
-using osu.Framework.Screens;
-using osu.Game.Configuration;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays;
-using osu.Framework.Logging;
-using osu.Framework.Allocation;
-using osu.Game.Overlays.Toolbar;
-using osu.Game.Screens;
-using osu.Game.Screens.Menu;
-using OpenTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Configuration;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Overlays.Notifications;
-using osu.Game.Rulesets;
-using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Skinning;
-using OpenTK.Graphics;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens;
+using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
+using osu.Game.Skinning;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game
 {
@@ -442,11 +442,9 @@ namespace osu.Game
             switch (action)
             {
                 case GlobalAction.ToggleChat:
-                    chat.ToggleVisibility();
-                    return true;
+                    return toggleOverlay(chat);
                 case GlobalAction.ToggleSocial:
-                    social.ToggleVisibility();
-                    return true;
+                    return toggleOverlay(social);
                 case GlobalAction.ResetInputSettings:
                     var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
 
@@ -458,14 +456,22 @@ namespace osu.Game
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
                 case GlobalAction.ToggleToolbar:
-                    Toolbar.ToggleVisibility();
-                    return true;
+                    return toggleOverlay(Toolbar);
                 case GlobalAction.ToggleSettings:
-                    settings.ToggleVisibility();
-                    return true;
+                    return toggleOverlay(settings);
                 case GlobalAction.ToggleDirect:
-                    direct.ToggleVisibility();
-                    return true;
+                    return toggleOverlay(direct);
+            }
+
+            return false;
+        }
+
+        private bool toggleOverlay(OverlayContainer overlay)
+        {
+            if (ShowOverlays || overlay.State == Visibility.Visible)
+            {
+                overlay.ToggleVisibility();
+                return true;
             }
 
             return false;
