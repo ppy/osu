@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -20,7 +21,7 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class PauseContainer : Container
     {
-        public bool IsPaused { get; private set; }
+        public Bindable<bool> IsPaused { get; private set; }
 
         public Func<bool> CheckCanPause;
 
@@ -49,6 +50,8 @@ namespace osu.Game.Screens.Play
 
         public PauseContainer(FramedClock framedClock, IAdjustableClock adjustableClock)
         {
+            IsPaused = new Bindable<bool>();
+
             this.framedClock = framedClock;
             this.adjustableClock = adjustableClock;
 
@@ -81,7 +84,7 @@ namespace osu.Game.Screens.Play
 
             // stop the seekable clock (stops the audio eventually)
             adjustableClock.Stop();
-            IsPaused = true;
+            IsPaused.Value = true;
 
             OnPause?.Invoke();
             pauseOverlay.Show();
@@ -93,7 +96,7 @@ namespace osu.Game.Screens.Play
         {
             if (!IsPaused) return;
 
-            IsPaused = false;
+            IsPaused.Value = false;
             IsResuming = false;
             lastPauseActionTime = Time.Current;
 
