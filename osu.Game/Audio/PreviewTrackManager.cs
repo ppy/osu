@@ -1,60 +1,66 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Audio
 {
-    public class PreviewTrackManager : TrackManager
+    public class PreviewTrackManager : Component
     {
-        private AudioManager audio;
-        private Track currentTrack;
-        private readonly BindableDouble muteBindable;
+        public event Action PlaybackStarted;
+        public event Action PlaybackStopped;
 
-        public PreviewTrackManager()
-            : base(new OnlineStore())
-        {
-            muteBindable = new BindableDouble();
-        }
+        private TrackManager trackManager;
+        private BindableDouble muteBindable;
+
+        public Track CurrentTrack { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, FrameworkConfigManager config)
         {
-            this.audio = audio;
+            trackManager = new TrackManager(new OnlineStore());
 
-            audio.AddItem(this);
+            muteBindable = new BindableDouble();
 
-            config.BindWith(FrameworkSetting.VolumeMusic, Volume);
+            audio.AddItem(trackManager);
+            config.BindWith(FrameworkSetting.VolumeMusic, trackManager.Volume);
+
+            PlaybackStarted += () => audio.Track.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+            PlaybackStopped += () => audio.Track.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
         }
 
-        protected override void UpdateState()
-        {
-            if (currentTrack?.HasCompleted ?? false)
-                onStop();
+        public Track Get(BeatmapSetInfo beatmapSetInfo) => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo.OnlineBeatmapSetID}.mp3");
 
-            base.UpdateState();
+        protected override void Update()
+        {
+            if (CurrentTrack?.HasCompleted ?? false)
+                PlaybackStopped?.Invoke();
+
+            base.Update();
         }
 
         public void Play(Track track)
         {
-            currentTrack?.Stop();
-            currentTrack = track;
-            currentTrack.Restart();
-            onPlay();
+            Stop();
+            CurrentTrack = track;
+            track.Restart();
+            PlaybackStarted?.Invoke();
         }
-
-        private void onPlay() => audio.Track.AddAdjustment(AdjustableProperty.Volume, muteBindable);
 
         public void Stop()
         {
-            currentTrack?.Stop();
-            onStop();
+            if (CurrentTrack?.IsRunning ?? false)
+            {
+                CurrentTrack?.Stop();
+                PlaybackStopped?.Invoke();
+            }
         }
-
-        private void onStop() => audio.Track.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
     }
 }
