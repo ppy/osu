@@ -102,12 +102,12 @@ namespace osu.Game.Overlays
                                 },
                                 textLine3 = new OsuSpriteText
                                 {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
                                     Padding = new MarginPadding { Bottom = 15 },
                                     Font = @"Exo2.0-Bold",
                                     TextSize = 12,
                                     Alpha = 0.3f,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
                                 },
                             }
                         }
@@ -177,13 +177,7 @@ namespace osu.Game.Overlays
                 textLine2.Text = description.Value;
                 textLine3.Text = description.Shortcut.ToUpper();
 
-                box.Animate(
-                    b => b.FadeIn(500, Easing.OutQuint),
-                    b => b.ResizeHeightTo(height, 500, Easing.OutQuint)
-                ).Then(
-                    b => b.FadeOutFromOne(1500, Easing.InQuint),
-                    b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint)
-                );
+                Display(box);
 
                 int optionCount = 0;
                 int selectedOption = -1;
@@ -213,6 +207,17 @@ namespace osu.Game.Overlays
                 for (int i = 0; i < optionCount; i++)
                     optionLights.Children[i].Glowing = i == selectedOption;
             });
+        }
+
+        protected virtual void Display(Drawable toDisplay)
+        {
+            toDisplay.Animate(
+                b => b.FadeIn(500, Easing.OutQuint),
+                b => b.ResizeHeightTo(height, 500, Easing.OutQuint)
+            ).Then(
+                b => b.FadeOutFromOne(1500, Easing.InQuint),
+                b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint)
+            );
         }
 
         private class OptionLight : Container
