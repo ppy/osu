@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Scoring.Legacy
             this.beatmaps = beatmaps;
         }
 
-        private Beatmap currentBeatmap;
+        private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
 
         public Score Parse(Stream stream)

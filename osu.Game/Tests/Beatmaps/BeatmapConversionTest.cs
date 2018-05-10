@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Beatmaps
             }
         }
 
-        private Beatmap getBeatmap(string name)
+        private IBeatmap getBeatmap(string name)
         {
             using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new StreamReader(resStream))
@@ -125,7 +125,7 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         protected abstract IEnumerable<TConvertValue> CreateConvertValue(HitObject hitObject);
-        protected abstract IBeatmapConverter CreateConverter(Beatmap beatmap);
+        protected abstract IBeatmapConverter CreateConverter(IBeatmap beatmap);
 
         private class ConvertMapping
         {

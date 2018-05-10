@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
     {
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
-        protected override IEnumerable<CatchHitObject> ConvertHitObject(HitObject obj, Beatmap beatmap)
+        protected override IEnumerable<CatchHitObject> ConvertHitObject(HitObject obj, IBeatmap beatmap)
         {
             var curveData = obj as IHasCurve;
             var positionData = obj as IHasXPosition;

@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
         }
 
-        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new ManiaBeatmapConverter(isForCurrentRuleset, beatmap);
+        protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(isForCurrentRuleset, beatmap);
     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
