@@ -25,6 +25,11 @@ namespace osu.Game.Overlays
 
         private bool fired;
 
+        /// <summary>
+        /// Whether the overlay should be allowed to return from a fired state.
+        /// </summary>
+        protected virtual bool AllowMultipleFires => false;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -42,18 +47,20 @@ namespace osu.Game.Overlays
             };
         }
 
-        protected void BeginConfirm() => overlay.FadeIn(activate_delay, Easing.Out);
-
-        protected void AbortConfirm() => overlay.FadeOut(fadeout_delay, Easing.Out);
-
-        protected override void Update()
+        protected void BeginConfirm()
         {
-            base.Update();
-            if (!fired && overlay.Alpha == 1)
+            if (!AllowMultipleFires && fired) return;
+            overlay.FadeIn(activate_delay * (1 - overlay.Alpha), Easing.Out).OnComplete(_ =>
             {
-                fired = true;
                 Action?.Invoke();
-            }
+                fired = true;
+            });
+        }
+
+        protected void AbortConfirm()
+        {
+            if (!AllowMultipleFires && fired) return;
+            overlay.FadeOut(fadeout_delay, Easing.Out);
         }
     }
 }
