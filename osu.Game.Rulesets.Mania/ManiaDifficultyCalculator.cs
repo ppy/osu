@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania
 {
-    internal class ManiaDifficultyCalculator : DifficultyCalculator<ManiaHitObject>
+    internal class ManiaDifficultyCalculator : DifficultyCalculator
     {
         private const double star_scaling_factor = 0.018;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania
             int columnCount = (Beatmap as ManiaBeatmap)?.TotalColumns ?? 7;
 
             foreach (var hitObject in Beatmap.HitObjects)
-                difficultyHitObjects.Add(new ManiaHitObjectDifficulty(hitObject, columnCount));
+                difficultyHitObjects.Add(new ManiaHitObjectDifficulty((ManiaHitObject)hitObject, columnCount));
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
@@ -140,7 +140,5 @@ namespace osu.Game.Rulesets.Mania
 
             return difficulty;
         }
-
-        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(true, beatmap);
     }
 }
