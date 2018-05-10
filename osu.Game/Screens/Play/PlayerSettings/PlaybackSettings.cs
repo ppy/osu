@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
             };
 
-            sliderbar.Bindable.ValueChanged += rateMultiplier => multiplierText.Text = $"{sliderbar.Bar.TooltipText}x";
+            sliderbar.Bindable.ValueChanged += rateMultiplier => Schedule(() => multiplierText.Text = $"{sliderbar.Bar.TooltipText}x");
             sliderbar.Bindable.TriggerChange();
         }
 
