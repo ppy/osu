@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 
-namespace osu.Game.Screens.Multiplayer
+namespace osu.Game.Screens.Multi
 {
     public class DrawableGameType : CircularContainer, IHasTooltip
     {

@@ -10,7 +10,7 @@ using OpenTK.Graphics;
 using osu.Game.Screens.Select;
 using osu.Framework.Graphics;
 
-namespace osu.Game.Screens.Multiplayer
+namespace osu.Game.Screens.Multi
 {
     public class Match : ScreenWhiteBox
     {
