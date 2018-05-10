@@ -39,6 +39,10 @@ namespace osu.Game.Screens.Menu
 
             Children = new Drawable[]
             {
+                new ExitConfirmOverlay
+                {
+                    Action = Exit,
+                },
                 new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
