@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace osu.Game.Screens.Multiplayer
+namespace osu.Game.Screens.Multi
 {
     public class Lobby : ScreenWhiteBox
     {
