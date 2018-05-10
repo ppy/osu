@@ -206,7 +206,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Height = progress_height,
                                     FillColour = colours.Yellow,
-                                    OnSeek = progress => current?.Track.Seek(progress)
+                                    OnSeek = progress => ConditionalSeek(progress)
                                 }
                             },
                         },
@@ -217,6 +217,13 @@ namespace osu.Game.Overlays
             beatmapBacking.BindTo(game.Beatmap);
 
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
+        }
+
+        private bool? ConditionalSeek(double progress)
+        {
+            if (current.Track.Looping)
+                return current?.Track.Seek(progress);
+            return false;
         }
 
         protected override void LoadComplete()
