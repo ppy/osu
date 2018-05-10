@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private int count50;
         private int countMiss;
 
-        public OsuPerformanceCalculator(Ruleset ruleset, Beatmap beatmap, Score score)
+        public OsuPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);

@@ -181,9 +181,9 @@ namespace osu.Game.Rulesets.Osu
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_osu_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new OsuDifficultyCalculator(beatmap, mods);
+        public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => new OsuDifficultyCalculator(beatmap, mods);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(Beatmap beatmap, Score score) => new OsuPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => new OsuPerformanceCalculator(this, beatmap, score);
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 

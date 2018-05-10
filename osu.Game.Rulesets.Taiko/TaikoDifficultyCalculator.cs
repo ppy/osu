@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko
         /// </summary>
         private readonly List<TaikoHitObjectDifficulty> difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
 
-        public TaikoDifficultyCalculator(Beatmap beatmap)
+        public TaikoDifficultyCalculator(IBeatmap beatmap)
             : base(beatmap)
         {
         }
@@ -133,6 +133,6 @@ namespace osu.Game.Rulesets.Taiko
             return difficulty;
         }
 
-        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter(Beatmap beatmap) => new TaikoBeatmapConverter(true);
+        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(true);
     }
 }
