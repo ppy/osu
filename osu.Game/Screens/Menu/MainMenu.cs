@@ -99,7 +99,10 @@ namespace osu.Game.Screens.Menu
                 double progress = (Time.Current - escPressedTime.Value) / esc_threshold;
                 exitProgress.SetProgress(progress);
                 if (progress >= 1)
+                {
+                    escPressedTime = null;
                     Exit();
+                }
             }
         }
 
