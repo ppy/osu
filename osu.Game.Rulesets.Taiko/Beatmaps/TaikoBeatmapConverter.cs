@@ -42,9 +42,10 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
 
-        public TaikoBeatmapConverter(bool isForCurrentRuleset)
+        public TaikoBeatmapConverter(IBeatmap beatmap)
+            : base(beatmap)
         {
-            this.isForCurrentRuleset = isForCurrentRuleset;
+            isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(new TaikoRuleset().RulesetInfo);
         }
 
         protected override Beatmap<TaikoHitObject> ConvertBeatmap(IBeatmap original)
