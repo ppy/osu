@@ -17,6 +17,8 @@ namespace osu.Game.Screens.Play
 
         public override bool AllowBeatmapRulesetChange => false;
 
+        public override bool AllowUserSeek => false;
+
         protected const float BACKGROUND_FADE_DURATION = 800;
 
         protected float BackgroundOpacity => 1 - (float)DimLevel;

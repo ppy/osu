@@ -221,9 +221,7 @@ namespace osu.Game.Overlays
 
         private bool? conditionalSeek(double progress)
         {
-            if (current.Track.Looping)
-                return current?.Track.Seek(progress);
-            return false;
+            return DisableSeek ? false : current?.Track.Seek(progress);
         }
 
         protected override void LoadComplete()
@@ -234,6 +232,8 @@ namespace osu.Game.Overlays
 
             base.LoadComplete();
         }
+
+        public bool DisableSeek { get; set; }
 
         private void beatmapDisabledChanged(bool disabled)
         {
