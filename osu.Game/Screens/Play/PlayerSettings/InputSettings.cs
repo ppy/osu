@@ -11,17 +11,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         protected override string Title => "Input settings";
 
-        private readonly PlayerCheckbox mouseWheelCheckbox;
         private readonly PlayerCheckbox mouseButtonsCheckbox;
 
         public InputSettings()
         {
             Children = new Drawable[]
             {
-                mouseWheelCheckbox = new PlayerCheckbox
-                {
-                    LabelText = "Disable mouse wheel"
-                },
                 mouseButtonsCheckbox = new PlayerCheckbox
                 {
                     LabelText = "Disable mouse buttons"
@@ -30,10 +25,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            mouseWheelCheckbox.Bindable = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
-            mouseButtonsCheckbox.Bindable = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
-        }
+        private void load(OsuConfigManager config) => mouseButtonsCheckbox.Bindable = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
     }
 }
