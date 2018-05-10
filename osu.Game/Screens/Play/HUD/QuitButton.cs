@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play.HUD
     public class QuitButton : FillFlowContainer
     {
         private readonly Button button;
+
         public Action ExitAction
         {
             get => button.ExitAction;
@@ -85,7 +86,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 icon.ScaleTo(1.5f);
                 text.FadeIn(fade_duration);
-                progress.FillTo(1, progress_duration).OnComplete(cp => ExitAction());
+                progress.FillTo(progress.Current, 1, progress_duration).OnComplete(cp => ExitAction());
 
                 return base.OnMouseDown(state, args);
             }
@@ -94,7 +95,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 icon.ScaleTo(1f);
                 Scheduler.AddDelayed(() => text.FadeOut(fade_duration), text_display_time);
-                progress.FillTo(0, progress_duration / 4).OnComplete(cp => progress.Current.SetDefault());
+                progress.FillTo(progress.Current, 0, progress_duration / 4).OnComplete(cp => progress.Current.SetDefault());
 
                 return base.OnMouseUp(state, args);
             }
