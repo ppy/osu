@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Mania.UI
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
 
+        protected virtual bool DisplayJudgements => true;
+
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
             : base(ScrollingDirection.Up)
         {
@@ -88,6 +90,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
+            if (!judgedObject.DisplayJudgement | !DisplayJudgements)
+                return;
+
             getStageByColumn(((ManiaHitObject)judgedObject.HitObject).Column).OnJudgement(judgedObject, judgement);
         }
     }
