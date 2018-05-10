@@ -333,7 +333,7 @@ namespace osu.Game.Beatmaps
                     ms.Position = 0;
 
                     var decoder = Decoder.GetDecoder<Beatmap>(sr);
-                    Beatmap beatmap = decoder.Decode(sr);
+                    IBeatmap beatmap = decoder.Decode(sr);
 
                     beatmap.BeatmapInfo.Path = name;
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();

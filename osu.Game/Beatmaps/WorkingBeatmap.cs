@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps
 
             Mods.ValueChanged += mods => applyRateAdjustments();
 
-            beatmap = new AsyncLazy<Beatmap>(populateBeatmap);
+            beatmap = new AsyncLazy<IBeatmap>(populateBeatmap);
             background = new AsyncLazy<Texture>(populateBackground, b => b == null || !b.IsDisposed);
             track = new AsyncLazy<Track>(populateTrack);
             waveform = new AsyncLazy<Waveform>(populateWaveform);
@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps
             Process.Start(path);
         }
 
-        protected abstract Beatmap GetBeatmap();
+        protected abstract IBeatmap GetBeatmap();
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
         protected virtual Skin GetSkin() => new DefaultSkin();
@@ -63,12 +63,12 @@ namespace osu.Game.Beatmaps
         protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
 
         public bool BeatmapLoaded => beatmap.IsResultAvailable;
-        public Beatmap Beatmap => beatmap.Value.Result;
-        public async Task<Beatmap> GetBeatmapAsync() => await beatmap.Value;
+        public IBeatmap Beatmap => beatmap.Value.Result;
+        public async Task<IBeatmap> GetBeatmapAsync() => await beatmap.Value;
 
-        private readonly AsyncLazy<Beatmap> beatmap;
+        private readonly AsyncLazy<IBeatmap> beatmap;
 
-        private Beatmap populateBeatmap()
+        private IBeatmap populateBeatmap()
         {
             var b = GetBeatmap() ?? new Beatmap();
 

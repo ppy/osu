@@ -31,12 +31,12 @@ namespace osu.Game.Rulesets.Mania
         /// </summary>
         private readonly List<ManiaHitObjectDifficulty> difficultyHitObjects = new List<ManiaHitObjectDifficulty>();
 
-        public ManiaDifficultyCalculator(Beatmap beatmap)
+        public ManiaDifficultyCalculator(IBeatmap beatmap)
             : base(beatmap)
         {
         }
 
-        public ManiaDifficultyCalculator(Beatmap beatmap, Mod[] mods)
+        public ManiaDifficultyCalculator(IBeatmap beatmap, Mod[] mods)
             : base(beatmap, mods)
         {
         }
@@ -141,6 +141,6 @@ namespace osu.Game.Rulesets.Mania
             return difficulty;
         }
 
-        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter(Beatmap beatmap) => new ManiaBeatmapConverter(true, beatmap);
+        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(true, beatmap);
     }
 }

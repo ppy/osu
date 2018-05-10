@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
     {
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasPosition) };
 
-        protected override IEnumerable<OsuHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
+        protected override IEnumerable<OsuHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
         {
             var curveData = original as IHasCurve;
             var endTimeData = original as IHasEndTime;
