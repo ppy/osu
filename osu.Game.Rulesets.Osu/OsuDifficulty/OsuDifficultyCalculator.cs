@@ -17,12 +17,12 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
         private const int section_length = 400;
         private const double difficulty_multiplier = 0.0675;
 
-        public OsuDifficultyCalculator(Beatmap beatmap)
+        public OsuDifficultyCalculator(IBeatmap beatmap)
             : base(beatmap)
         {
         }
 
-        public OsuDifficultyCalculator(Beatmap beatmap, Mod[] mods)
+        public OsuDifficultyCalculator(IBeatmap beatmap, Mod[] mods)
             : base(beatmap, mods)
         {
         }
@@ -73,6 +73,6 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
             return starRating;
         }
 
-        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter(Beatmap beatmap) => new OsuBeatmapConverter();
+        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter();
     }
 }

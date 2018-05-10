@@ -10,12 +10,12 @@ namespace osu.Game.Rulesets.Catch
 {
     public class CatchDifficultyCalculator : DifficultyCalculator<CatchHitObject>
     {
-        public CatchDifficultyCalculator(Beatmap beatmap) : base(beatmap)
+        public CatchDifficultyCalculator(IBeatmap beatmap) : base(beatmap)
         {
         }
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null) => 0;
 
-        protected override BeatmapConverter<CatchHitObject> CreateBeatmapConverter(Beatmap beatmap) => new CatchBeatmapConverter();
+        protected override BeatmapConverter<CatchHitObject> CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter();
     }
 }

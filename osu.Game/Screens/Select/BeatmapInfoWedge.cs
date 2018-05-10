@@ -215,7 +215,7 @@ namespace osu.Game.Screens.Select
 
                 List<InfoLabel> labels = new List<InfoLabel>();
 
-                if (beatmap?.HitObjects?.Count > 0)
+                if (beatmap?.HitObjects?.Any() == true)
                 {
                     HitObject lastObject = beatmap.HitObjects.LastOrDefault();
                     double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
@@ -224,7 +224,7 @@ namespace osu.Game.Screens.Select
                     {
                         Name = "Length",
                         Icon = FontAwesome.fa_clock_o,
-                        Content = beatmap.HitObjects.Count == 0 ? "-" : TimeSpan.FromMilliseconds(endTime - beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                        Content = TimeSpan.FromMilliseconds(endTime - beatmap.HitObjects.First().StartTime).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
@@ -241,7 +241,7 @@ namespace osu.Game.Screens.Select
                 return labels.ToArray();
             }
 
-            private string getBPMRange(Beatmap beatmap)
+            private string getBPMRange(IBeatmap beatmap)
             {
                 double bpmMax = beatmap.ControlPointInfo.BPMMaximum;
                 double bpmMin = beatmap.ControlPointInfo.BPMMinimum;

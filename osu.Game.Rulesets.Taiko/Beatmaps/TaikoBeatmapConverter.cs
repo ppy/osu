@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             this.isForCurrentRuleset = isForCurrentRuleset;
         }
 
-        protected override Beatmap<TaikoHitObject> ConvertBeatmap(Beatmap original)
+        protected override Beatmap<TaikoHitObject> ConvertBeatmap(IBeatmap original)
         {
             // Rewrite the beatmap info to add the slider velocity multiplier
             BeatmapInfo info = original.BeatmapInfo.DeepClone();
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             return converted;
         }
 
-        protected override IEnumerable<TaikoHitObject> ConvertHitObject(HitObject obj, Beatmap beatmap)
+        protected override IEnumerable<TaikoHitObject> ConvertHitObject(HitObject obj, IBeatmap beatmap)
         {
             var distanceData = obj as IHasDistance;
             var repeatsData = obj as IHasRepeats;
