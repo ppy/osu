@@ -31,6 +31,7 @@ namespace osu.Game.Overlays
         private readonly SpriteText textLine3;
 
         private const float height = 110;
+        private const float height_notext = 98;
         private const float height_contracted = height * 0.9f;
 
         private readonly FillFlowContainer<OptionLight> optionLights;
@@ -100,15 +101,20 @@ namespace osu.Game.Overlays
                                     Origin = Anchor.TopCentre,
                                     AutoSizeAxes = Axes.Both
                                 },
-                                textLine3 = new OsuSpriteText
+                                new Container
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Padding = new MarginPadding { Bottom = 15 },
-                                    Font = @"Exo2.0-Bold",
-                                    TextSize = 12,
+                                    AutoSizeAxes = Axes.Both,
+                                    Margin = new MarginPadding { Bottom = 15 },
                                     Alpha = 0.3f,
-                                },
+                                    Child = textLine3 = new OsuSpriteText
+                                    {
+                                        Font = @"Exo2.0-Bold",
+                                        TextSize = 12,
+                                        AlwaysPresent = true
+                                    },
+                                }
                             }
                         }
                     }
