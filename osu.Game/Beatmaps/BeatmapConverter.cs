@@ -22,25 +22,27 @@ namespace osu.Game.Beatmaps
             remove => ObjectConverted -= value;
         }
 
-        /// <summary>
-        /// Checks if a Beatmap can be converted using this Beatmap Converter.
-        /// </summary>
-        /// <param name="beatmap">The Beatmap to check.</param>
-        /// <returns>Whether the Beatmap can be converted using this Beatmap Converter.</returns>
-        public bool CanConvert(IBeatmap beatmap) => ValidConversionTypes.All(t => beatmap.HitObjects.Any(t.IsInstanceOfType));
+        public IBeatmap Beatmap { get; }
 
-        /// <summary>
-        /// Converts a Beatmap using this Beatmap Converter.
-        /// </summary>
-        /// <param name="original">The un-converted Beatmap.</param>
-        /// <returns>The converted Beatmap.</returns>
-        public Beatmap<T> Convert(IBeatmap original)
+        protected BeatmapConverter(IBeatmap beatmap)
         {
-            // We always operate on a clone of the original beatmap, to not modify it game-wide
-            return ConvertBeatmap(original.Clone());
+            Beatmap = beatmap;
         }
 
-        void IBeatmapConverter.Convert(IBeatmap original) => Convert(original);
+        /// <summary>
+        /// Whether <see cref="Beatmap"/> can be converted by this <see cref="BeatmapConverter{T}"/>.
+        /// </summary>
+        public bool CanConvert => !Beatmap.HitObjects.Any() || ValidConversionTypes.All(t => Beatmap.HitObjects.Any(t.IsInstanceOfType));
+
+        /// <summary>
+        /// Converts <see cref="Beatmap"/>.
+        /// </summary>
+        /// <returns>The converted Beatmap.</returns>
+        public IBeatmap Convert()
+        {
+            // We always operate on a clone of the original beatmap, to not modify it game-wide
+            return ConvertBeatmap(Beatmap.Clone());
+        }
 
         /// <summary>
         /// Performs the conversion of a Beatmap using this Beatmap Converter.
