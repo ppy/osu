@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual
     {
         private RulesetStore rulesets;
         private TestBeatmapInfoWedge infoWedge;
-        private readonly List<Beatmap> beatmaps = new List<Beatmap>();
+        private readonly List<IBeatmap> beatmaps = new List<IBeatmap>();
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         [BackgroundDependencyLoader]
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("check no infolabels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
-        private void selectBeatmap(Beatmap b)
+        private void selectBeatmap(IBeatmap b)
         {
             BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
 
@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        private Beatmap createTestBeatmap(RulesetInfo ruleset)
+        private IBeatmap createTestBeatmap(RulesetInfo ruleset)
         {
             List<HitObject> objects = new List<HitObject>();
             for (double i = 0; i < 50000; i += 1000)

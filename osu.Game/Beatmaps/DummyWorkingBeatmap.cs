@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps
             this.game = game;
         }
 
-        protected override Beatmap GetBeatmap() => new Beatmap();
+        protected override IBeatmap GetBeatmap() => new Beatmap();
 
         protected override Texture GetBackground() => game.Textures.Get(@"Backgrounds/bg4");
 
@@ -58,7 +58,7 @@ namespace osu.Game.Beatmaps
                     throw new NotImplementedException();
                 }
 
-                public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => null;
+                public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => null;
 
                 public override string Description => "dummy";
 

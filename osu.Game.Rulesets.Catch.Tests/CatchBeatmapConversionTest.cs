@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
         }
 
-        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new CatchBeatmapConverter();
+        protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new CatchBeatmapConverter();
     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
