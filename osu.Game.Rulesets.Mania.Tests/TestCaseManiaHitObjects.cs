@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Tests.Visual;
 using OpenTK;
 using OpenTK.Graphics;
@@ -17,6 +18,9 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         public TestCaseManiaHitObjects()
         {
+            var hitWindows = new HitWindows();
+            hitWindows.SetDifficulty(5);
+
             Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
@@ -43,14 +47,14 @@ namespace osu.Game.Rulesets.Mania.Tests
                                 RelativeChildSize = new Vector2(1, 10000),
                                 Children = new[]
                                 {
-                                    new DrawableNote(new Note(), ManiaAction.Key1)
+                                    new DrawableNote(new Note { HitWindows = hitWindows }, ManiaAction.Key1)
                                     {
                                         Y = 5000,
                                         LifetimeStart = double.MinValue,
                                         LifetimeEnd = double.MaxValue,
                                         AccentColour = Color4.Red
                                     },
-                                    new DrawableNote(new Note(), ManiaAction.Key1)
+                                    new DrawableNote(new Note { HitWindows = hitWindows }, ManiaAction.Key1)
                                     {
                                         Y = 6000,
                                         LifetimeStart = double.MinValue,
@@ -77,13 +81,17 @@ namespace osu.Game.Rulesets.Mania.Tests
                                 RelativeChildSize = new Vector2(1, 10000),
                                 Children = new[]
                                 {
-                                    new DrawableHoldNote(new HoldNote { Duration = 1000 } , ManiaAction.Key1)
+                                    new DrawableHoldNote(new HoldNote
+                                    {
+                                        Duration = 1000,
+                                        HitWindows = hitWindows
+                                    } , ManiaAction.Key1)
                                     {
                                         Y = 5000,
                                         Height = 1000,
                                         LifetimeStart = double.MinValue,
                                         LifetimeEnd = double.MaxValue,
-                                        AccentColour = Color4.Red
+                                        AccentColour = Color4.Red,
                                     }
                                 }
                             }
