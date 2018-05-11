@@ -11,19 +11,23 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModDualStages : Mod, IPlayfieldTypeMod, IApplicableToBeatmapConverter<ManiaHitObject>, IApplicableToRulesetContainer<ManiaHitObject>
+    public class ManiaModDualStages : Mod, IPlayfieldTypeMod, IApplicableToBeatmapConverter, IApplicableToRulesetContainer<ManiaHitObject>
     {
         public override string Name => "Dual Stages";
         public override string ShortenedName => "DS";
         public override string Description => @"Double the stages, double the fun!";
         public override double ScoreMultiplier => 0;
 
-        public void ApplyToBeatmapConverter(BeatmapConverter<ManiaHitObject> beatmapConverter)
+        private bool isForCurrentRuleset;
+
+        public void ApplyToBeatmapConverter(IBeatmapConverter beatmapConverter)
         {
             var mbc = (ManiaBeatmapConverter)beatmapConverter;
 
+            isForCurrentRuleset = mbc.IsForCurrentRuleset;
+
             // Although this can work, for now let's not allow keymods for mania-specific beatmaps
-            if (mbc.IsForCurrentRuleset)
+            if (isForCurrentRuleset)
                 return;
 
             mbc.TargetColumns *= 2;
@@ -34,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             var mrc = (ManiaRulesetContainer)rulesetContainer;
 
             // Although this can work, for now let's not allow keymods for mania-specific beatmaps
-            if (mrc.IsForCurrentRuleset)
+            if (isForCurrentRuleset)
                 return;
 
             var newDefinitions = new List<StageDefinition>();
