@@ -123,8 +123,8 @@ namespace osu.Game.Screens.Select
                 ruleset = userRuleset ?? working.BeatmapInfo.Ruleset;
             }
 
-            [BackgroundDependencyLoader(true)]
-            private void load([NotNull] LocalisationEngine localisation)
+            [BackgroundDependencyLoader]
+            private void load(LocalisationEngine localisation)
             {
                 var beatmapInfo = working.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata ?? working.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
