@@ -7,7 +7,6 @@ using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
@@ -21,16 +20,12 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuRulesetContainer : RulesetContainer<OsuHitObject>
     {
-        public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
+        public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor(this);
-
-        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
-
-        protected override BeatmapProcessor<OsuHitObject> CreateBeatmapProcessor() => new OsuBeatmapProcessor();
 
         protected override Playfield CreatePlayfield() => new OsuPlayfield();
 

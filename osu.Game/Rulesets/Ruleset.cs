@@ -52,14 +52,17 @@ namespace osu.Game.Rulesets
         /// Attempt to create a hit renderer for a beatmap
         /// </summary>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
-        /// <param name="isForCurrentRuleset">Whether the hit renderer should assume the beatmap is for the current ruleset.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
         /// <returns></returns>
-        public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset);
+        public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap);
 
-        public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null);
+        public abstract IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap);
 
-        public virtual PerformanceCalculator CreatePerformanceCalculator(Beatmap beatmap, Score score) => null;
+        public virtual IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => null;
+
+        public abstract DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null);
+
+        public virtual PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => null;
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
@@ -114,7 +117,8 @@ namespace osu.Game.Rulesets
             Name = Description,
             ShortName = ShortName,
             InstantiationInfo = GetType().AssemblyQualifiedName,
-            ID = LegacyID
+            ID = LegacyID,
+            Available = true
         };
     }
 }
