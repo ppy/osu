@@ -116,6 +116,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         private Mod mod;
+        private Container scaleContainer;
 
         public Mod Mod
         {
@@ -147,8 +148,16 @@ namespace osu.Game.Overlays.Mods
 
         public virtual Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
 
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            scaleContainer.ScaleTo(0.9f, 800, Easing.Out);
+            return base.OnMouseDown(state, args);
+        }
+
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
+            scaleContainer.ScaleTo(1, 500, Easing.OutElastic);
+
             // only trigger the event if we are inside the area of the button
             if (Contains(ToScreenSpace(state.Mouse.Position - Position)))
             {
@@ -162,6 +171,7 @@ namespace osu.Game.Overlays.Mods
                         break;
                 }
             }
+
             return true;
         }
 
@@ -179,7 +189,8 @@ namespace osu.Game.Overlays.Mods
                 start = Mods.Length - 1;
 
             for (int i = start; i < Mods.Length && i >= 0; i += direction)
-                if (SelectAt(i)) return;
+                if (SelectAt(i))
+                    return;
 
             Deselect();
         }
@@ -245,8 +256,14 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.TopCentre,
                     Children = new Drawable[]
                     {
-                        iconsContainer = new Container<ModIcon>
+                        scaleContainer = new Container
                         {
+                            Child = iconsContainer = new Container<ModIcon>
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                            },
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
