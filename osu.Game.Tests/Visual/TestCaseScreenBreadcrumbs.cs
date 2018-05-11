@@ -17,6 +17,7 @@ namespace osu.Game.Tests.Visual
     public class TestCaseScreenBreadcrumbs : OsuTestCase
     {
         private readonly ScreenBreadcrumbControl<TestScreen> breadcrumbs;
+        private TestScreen currentScreen, changedScreen = null;
 
         public TestCaseScreenBreadcrumbs()
         {
@@ -40,11 +41,29 @@ namespace osu.Game.Tests.Visual
                         titleText = new OsuSpriteText(),
                     },
                 },
-                startScreen = new TestScreenOne(),
+                currentScreen = startScreen = new TestScreenOne(),
             };
 
-            breadcrumbs.OnScreenChanged += s => titleText.Text = $"Changed to {s.ToString()}";
-            breadcrumbs.CurrentScreen = startScreen;
+            breadcrumbs.OnScreenChanged += s =>
+            {
+                titleText.Text = $"Changed to {s.ToString()}";
+                changedScreen = s;
+            };
+
+            AddStep(@"make start current", () => breadcrumbs.CurrentScreen = startScreen);
+            assertCurrent();
+            pushNext();
+            assertCurrent();
+            pushNext();
+            assertCurrent();
+
+            AddStep(@"make start current", () =>
+            {
+                startScreen.MakeCurrent();
+                currentScreen = startScreen;
+            });
+
+            assertCurrent();
         }
 
         [BackgroundDependencyLoader]
@@ -53,6 +72,9 @@ namespace osu.Game.Tests.Visual
             breadcrumbs.StripColour = colours.Blue;
         }
 
+        private void pushNext() => AddStep(@"push next screen", () => currentScreen = currentScreen.PushNext());
+        private void assertCurrent() => AddAssert(@"assert the current screen is correct", () => currentScreen == changedScreen);
+
         private abstract class TestScreen : OsuScreen
         {
             protected abstract string Title { get; }
@@ -60,6 +82,14 @@ namespace osu.Game.Tests.Visual
             protected abstract TestScreen CreateNextScreen();
 
             public override string ToString() => Title;
+
+            public TestScreen PushNext()
+            {
+                TestScreen screen = CreateNextScreen();
+                Push(screen);
+
+                return screen;
+            }
 
             protected TestScreen()
             {
@@ -84,7 +114,7 @@ namespace osu.Game.Tests.Visual
                             Origin = Anchor.TopCentre,
                             Width = 100,
                             Text = $"Push {NextTitle}",
-                            Action = () => Push(CreateNextScreen()),
+                            Action = () => PushNext(),
                         },
                     },
                 };
