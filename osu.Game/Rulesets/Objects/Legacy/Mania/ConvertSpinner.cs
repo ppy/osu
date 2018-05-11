@@ -16,6 +16,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
 
         public float X { get; set; }
 
-        protected override HitWindows CreateHitWindows() => new ConvertManiaHitWindows();
+        protected override HitWindows CreateHitWindows() => new ConvertHitWindows();
     }
 }

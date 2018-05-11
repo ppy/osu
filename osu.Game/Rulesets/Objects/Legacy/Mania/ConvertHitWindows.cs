@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Mania
 {
-    public class ConvertManiaHitWindows : HitWindows
+    public class ConvertHitWindows : HitWindows
     {
         private static readonly IReadOnlyDictionary<HitResult, (double od0, double od5, double od10)> base_ranges = new Dictionary<HitResult, (double, double, double)>
         {
