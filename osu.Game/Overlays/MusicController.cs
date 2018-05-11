@@ -219,9 +219,11 @@ namespace osu.Game.Overlays
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
-        private bool? conditionalSeek(double progress)
+        private void conditionalSeek(double progress)
         {
-            return DisableSeek ? false : current?.Track.Seek(progress);
+            if (DisableSeek)
+                return;
+            current?.Track.Seek(progress);
         }
 
         protected override void LoadComplete()
