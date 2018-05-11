@@ -4,17 +4,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace osu.Game.Screens.Multiplayer
+namespace osu.Game.Screens.Multi.Screens
 {
-    public class MatchCreate : ScreenWhiteBox
+    public class Lobby : ScreenWhiteBox
     {
         protected override IEnumerable<Type> PossibleChildren => new[] {
+                typeof(MatchCreate),
                 typeof(Match)
         };
-
-        public MatchCreate()
-        {
-            ValidForResume = false;
-        }
     }
 }
