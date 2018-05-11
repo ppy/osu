@@ -12,50 +12,49 @@ using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
 {
-    public interface IBeatmap : IJsonSerializable
-    {
-        /// <summary>
-        /// This beatmap's info.
-        /// </summary>
-        BeatmapInfo BeatmapInfo { get; set; }
 
-        /// <summary>
-        /// This beatmap's metadata.
-        /// </summary>
-        BeatmapMetadata Metadata { get; }
 
-        /// <summary>
-        /// The control points in this beatmap.
-        /// </summary>
-        ControlPointInfo ControlPointInfo { get; }
 
-        /// <summary>
-        /// The breaks in this beatmap.
-        /// </summary>
-        List<BreakPeriod> Breaks { get; }
 
-        /// <summary>
-        /// Total amount of break time in the beatmap.
-        /// </summary>
-        double TotalBreakTime { get; }
 
-        /// <summary>
-        /// The hitobjects contained by this beatmap.
-        /// </summary>
-        IEnumerable<HitObject> HitObjects { get; }
 
-        /// <summary>
-        /// Returns statistics of the <see cref="HitObjects"/> contained in this beatmap.
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<BeatmapStatistic> GetStatistics();
 
-        /// <summary>
-        /// Creates a shallow-clone of this beatmap and returns it.
-        /// </summary>
-        /// <returns>The shallow-cloned beatmap.</returns>
-        IBeatmap Clone();
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /// <summary>
     /// A Beatmap containing converted HitObjects.
