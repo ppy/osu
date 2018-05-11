@@ -84,6 +84,34 @@ namespace osu.Game.Rulesets.Scoring.Legacy
                     /*OnlineId =*/
                     sr.ReadInt32();
 
+                switch (score.Ruleset.ID)
+                {
+                    case 0:
+                    {
+                        int totalHits = count50 + count100 + count300 + countMiss;
+                        score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + count300 * 300) / (totalHits * 300) : 1;
+                        break;
+                    }
+                    case 1:
+                    {
+                        int totalHits = count50 + count100 + count300 + countMiss;
+                        score.Accuracy = totalHits > 0 ? (double)(count100 * 150 + count300 * 300) / (totalHits * 300) : 1;
+                        break;
+                    }
+                    case 2:
+                    {
+                        int totalHits = count50 + count100 + count300 + countMiss + countKatu;
+                        score.Accuracy = totalHits > 0 ? (double)(count50 + count100 + count300 ) / totalHits : 1;
+                        break;
+                    }
+                    case 3:
+                    {
+                        int totalHits = count50 + count100 + count300 + countMiss + countGeki + countKatu;
+                        score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + countKatu * 200 + (count300 + countGeki) * 300) / (totalHits * 300) : 1;
+                        break;
+                    }
+                }
+
                 using (var replayInStream = new MemoryStream(compressedReplay))
                 {
                     byte[] properties = new byte[5];
