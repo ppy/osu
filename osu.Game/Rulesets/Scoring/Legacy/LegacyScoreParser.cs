@@ -49,18 +49,21 @@ namespace osu.Game.Rulesets.Scoring.Legacy
                 score.User = new User { Username = sr.ReadString() };
                 /* var localScoreChecksum = */
                 sr.ReadString();
-                /* score.Count300 = */
-                sr.ReadUInt16();
-                /* score.Count100 = */
-                sr.ReadUInt16();
-                /* score.Count50 = */
-                sr.ReadUInt16();
-                /* score.CountGeki = */
-                sr.ReadUInt16();
-                /* score.CountKatu = */
-                sr.ReadUInt16();
-                /* score.CountMiss = */
-                sr.ReadUInt16();
+
+                var count300 = sr.ReadUInt16();
+                var count100 = sr.ReadUInt16();
+                var count50 = sr.ReadUInt16();
+                var countGeki = sr.ReadUInt16();
+                var countKatu = sr.ReadUInt16();
+                var countMiss = sr.ReadUInt16();
+
+                score.Statistics[HitResult.Great] = count300;
+                score.Statistics[HitResult.Good] = count100;
+                score.Statistics[HitResult.Meh] = count50;
+                score.Statistics[HitResult.Perfect] = countGeki;
+                score.Statistics[HitResult.Ok] = countKatu;
+                score.Statistics[HitResult.Miss] = countMiss;
+
                 score.TotalScore = sr.ReadInt32();
                 score.MaxCombo = sr.ReadUInt16();
                 /* score.Perfect = */
