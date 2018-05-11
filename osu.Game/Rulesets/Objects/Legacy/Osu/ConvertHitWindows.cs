@@ -5,15 +5,15 @@ using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Objects.Legacy.Taiko
+namespace osu.Game.Rulesets.Objects.Legacy.Osu
 {
-    public class ConvertTaikoHitWindows : HitWindows
+    public class ConvertHitWindows : HitWindows
     {
         private static readonly IReadOnlyDictionary<HitResult, (double od0, double od5, double od10)> base_ranges = new Dictionary<HitResult, (double, double, double)>
         {
-            { HitResult.Great, (100, 70, 40) },
-            { HitResult.Good, (240, 160, 100) },
-            { HitResult.Meh, (270, 190, 140) },
+            { HitResult.Great, (160, 100, 40) },
+            { HitResult.Good, (280, 200, 120) },
+            { HitResult.Meh, (400, 300, 200) },
             { HitResult.Miss, (400, 400, 400) },
         };
 
