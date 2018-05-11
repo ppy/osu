@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Select
 
         private void loadBeatmap()
         {
-            LoadComponentAsync(new BufferedWedgeInfo(beatmap)
+            LoadComponentAsync(new BufferedWedgeInfo(beatmap, ruleset.Value)
             {
                 Shear = -Shear,
                 Depth = Info?.Depth + 1 ?? 0,
@@ -114,18 +114,18 @@ namespace osu.Game.Screens.Select
             private UnicodeBindableString titleBinding;
             private UnicodeBindableString artistBinding;
 
-            private RulesetInfo ruleset;
+            private readonly RulesetInfo ruleset;
 
-            public BufferedWedgeInfo(WorkingBeatmap working)
+            public BufferedWedgeInfo(WorkingBeatmap working, RulesetInfo userRuleset)
             {
                 this.working = working;
+
+                ruleset = userRuleset ?? working.BeatmapInfo.Ruleset;
             }
 
             [BackgroundDependencyLoader(true)]
-            private void load([NotNull] LocalisationEngine localisation, [CanBeNull] OsuGame osuGame)
+            private void load([NotNull] LocalisationEngine localisation)
             {
-                ruleset = osuGame?.Ruleset.Value ?? working.BeatmapInfo.Ruleset;
-
                 var beatmapInfo = working.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata ?? working.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
