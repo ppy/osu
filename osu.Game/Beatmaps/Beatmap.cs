@@ -12,50 +12,6 @@ using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
 {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /// <summary>
     /// A Beatmap containing converted HitObjects.
     /// </summary>
