@@ -45,7 +45,6 @@ namespace osu.Game.Screens.Multiplayer
         public readonly Room Room;
 
         private SelectionState state;
-
         public SelectionState State
         {
             get { return state; }
