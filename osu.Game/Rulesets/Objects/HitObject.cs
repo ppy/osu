@@ -51,16 +51,10 @@ namespace osu.Game.Rulesets.Objects
 
         private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
 
-        private HitWindows hitWindows;
-
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
-        public HitWindows HitWindows
-        {
-            get => hitWindows ?? (hitWindows = new HitWindows(overallDifficulty));
-            protected set => hitWindows = value;
-        }
+        public HitWindows HitWindows { get; set; }
 
         private readonly SortedList<HitObject> nestedHitObjects = new SortedList<HitObject>((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
@@ -78,7 +72,11 @@ namespace osu.Game.Rulesets.Objects
 
             nestedHitObjects.Clear();
             CreateNestedHitObjects();
-            nestedHitObjects.ForEach(h => h.ApplyDefaults(controlPointInfo, difficulty));
+            nestedHitObjects.ForEach(h =>
+            {
+                h.HitWindows = HitWindows;
+                h.ApplyDefaults(controlPointInfo, difficulty);
+            });
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
@@ -89,8 +87,9 @@ namespace osu.Game.Rulesets.Objects
             Kiai = effectPoint.KiaiMode;
             SampleControlPoint = samplePoint;
 
-            overallDifficulty = difficulty.OverallDifficulty;
-            hitWindows = null;
+            if (HitWindows == null)
+                HitWindows = CreateHitWindows();
+            HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
 
         protected virtual void CreateNestedHitObjects()
@@ -98,5 +97,11 @@ namespace osu.Game.Rulesets.Objects
         }
 
         protected void AddNested(HitObject hitObject) => nestedHitObjects.Add(hitObject);
+
+        /// <summary>
+        /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual HitWindows CreateHitWindows() => null;
     }
 }
