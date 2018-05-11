@@ -29,11 +29,10 @@ namespace osu.Game.Screens.Multiplayer
         private const float cover_width = 145;
 
         private readonly Box sideStrip;
-        private readonly Container coverContainer;
-        private readonly OsuSpriteText name, status, beatmapTitle, beatmapDash, beatmapArtist;
-        private readonly FillFlowContainer<OsuSpriteText> beatmapInfoFlow;
-        private readonly ParticipantInfo participantInfo;
-        private readonly ModeTypeInfo modeTypeInfo;
+        private Container coverContainer;
+        private OsuSpriteText name, status, beatmapTitle, beatmapDash, beatmapArtist;
+        private ParticipantInfo participantInfo;
+        private ModeTypeInfo modeTypeInfo;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
         private readonly Bindable<User> hostBind = new Bindable<User>();
@@ -62,6 +61,19 @@ namespace osu.Game.Screens.Multiplayer
                 Radius = 5,
             };
 
+            sideStrip = new Box
+            {
+                RelativeSizeAxes = Axes.Y,
+                Width = side_strip_width,
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, LocalisationEngine localisation)
+        {
+            this.localisation = localisation;
+            this.colours = colours;
+
             Children = new Drawable[]
             {
                 new Box
@@ -69,11 +81,7 @@ namespace osu.Game.Screens.Multiplayer
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.FromHex(@"212121"),
                 },
-                sideStrip = new Box
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = side_strip_width,
-                },
+                sideStrip,
                 new Container
                 {
                     Width = cover_width,
@@ -133,10 +141,11 @@ namespace osu.Game.Screens.Multiplayer
                                     TextSize = 14,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                beatmapInfoFlow = new FillFlowContainer<OsuSpriteText>
+                                new FillFlowContainer<OsuSpriteText>
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
+                                    Colour = colours.Gray9,
                                     Direction = FillDirection.Horizontal,
                                     Children = new[]
                                     {
@@ -170,7 +179,9 @@ namespace osu.Game.Screens.Multiplayer
 
             nameBind.ValueChanged += displayName;
             hostBind.ValueChanged += displayUser;
+            statusBind.ValueChanged += displayStatus;
             typeBind.ValueChanged += displayGameType;
+            beatmapBind.ValueChanged += displayBeatmap;
             participantsBind.ValueChanged += displayParticipants;
 
             nameBind.BindTo(Room.Name);
@@ -179,22 +190,6 @@ namespace osu.Game.Screens.Multiplayer
             typeBind.BindTo(Room.Type);
             beatmapBind.BindTo(Room.Beatmap);
             participantsBind.BindTo(Room.Participants);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
-        {
-            this.localisation = localisation;
-            this.colours = colours;
-
-            beatmapInfoFlow.Colour = colours.Gray9;
-
-            //binded here instead of ctor because dependencies are needed
-            statusBind.ValueChanged += displayStatus;
-            beatmapBind.ValueChanged += displayBeatmap;
-
-            statusBind.TriggerChange();
-            beatmapBind.TriggerChange();
         }
 
         private void displayName(string value)
