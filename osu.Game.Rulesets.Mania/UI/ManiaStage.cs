@@ -34,6 +34,8 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
+        public bool DisplayJudgements = true;
+
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
 
@@ -50,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly int firstColumnIndex;
 
-        public ManiaStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
+        public ManiaStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction, bool displayJudgements = true)
             : base(ScrollingDirection.Up)
         {
             this.firstColumnIndex = firstColumnIndex;
@@ -140,6 +142,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 AddColumn(column);
             }
 
+            DisplayJudgements = displayJudgements;
+
             Inverted.ValueChanged += invertedChanged;
             Inverted.TriggerChange();
         }
@@ -171,6 +175,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
+            if (!judgedObject.DisplayJudgement || !DisplayJudgements)
+                return;
+
             judgements.Clear();
             judgements.Add(new DrawableManiaJudgement(judgement, judgedObject)
             {

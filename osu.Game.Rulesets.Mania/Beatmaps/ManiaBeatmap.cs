@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public ManiaBeatmap(StageDefinition defaultStage)
         {
             Stages.Add(defaultStage);
+            BeatmapInfo.Ruleset = new ManiaRuleset().RulesetInfo;
         }
     }
 }

@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.UI
             int firstColumnIndex = 0;
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction, DisplayJudgements);
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
                 newStage.Inverted.BindTo(Inverted);
 
@@ -65,7 +65,11 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void Add(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
+        public override void Add(DrawableHitObject h)
+        {
+            h.OnJudgement += OnJudgement;
+            getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
+        }
 
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
 
@@ -90,7 +94,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            if (!judgedObject.DisplayJudgement | !DisplayJudgements)
+            if (!judgedObject.DisplayJudgement || !DisplayJudgements)
                 return;
 
             getStageByColumn(((ManiaHitObject)judgedObject.HitObject).Column).OnJudgement(judgedObject, judgement);

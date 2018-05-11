@@ -39,7 +39,9 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {
-            // This shit breaks the framework
+            // This shit does not work and needs a fix
+            // Probably the fact that every map needs to be converted in order to return its playable version
+            // isn't the best idea ever, maybe change it?
             osuGame.Beatmap.Value = new TestWorkingBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 })
             {
                 HitObjects = new List<ManiaHitObject>
