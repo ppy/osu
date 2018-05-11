@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         private Mod mod;
-        private Container scaleContainer;
+        private readonly Container scaleContainer;
 
         public Mod Mod
         {
