@@ -22,8 +22,6 @@ namespace osu.Game.Rulesets
     {
         public readonly RulesetInfo RulesetInfo;
 
-        public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
-
         public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
                                                     // Confine all mods of each mod type into a single IEnumerable<Mod>
                                                     .SelectMany(GetModsFor)

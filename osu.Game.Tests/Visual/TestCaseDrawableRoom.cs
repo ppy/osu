@@ -9,7 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Multiplayer;
+using osu.Game.Screens.Multi.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
