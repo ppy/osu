@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
 
             beatmapMaxCombo = Beatmap.HitObjects.Count();
-            beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count) + 1;
+            beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Count();
         }
 
         public override double Calculate(Dictionary<string, double> categoryRatings = null)
