@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -79,6 +80,8 @@ namespace osu.Game.Screens.Multi.Components
                 RelativeSizeAxes = Axes.Both,
                 Alpha = 0f,
             };
+
+            Action += () => State = SelectionState.Selected;
         }
 
         [BackgroundDependencyLoader]
