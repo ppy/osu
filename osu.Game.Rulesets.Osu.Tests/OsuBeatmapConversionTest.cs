@@ -15,7 +15,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    public class OsuBeatmapConversionTest : BeatmapConversionTest<TestOsuRuleset, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
         }
 
-        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new OsuBeatmapConverter();
+        protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
@@ -66,5 +66,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                && Precision.AlmostEquals(StartY, other.StartY, conversion_lenience)
                && Precision.AlmostEquals(EndX, other.EndX, conversion_lenience)
                && Precision.AlmostEquals(EndY, other.EndY, conversion_lenience);
+    }
+
+    public class TestOsuRuleset : OsuRuleset
+    {
     }
 }
