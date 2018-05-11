@@ -3,14 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
-using OpenTK.Graphics;
 using osu.Game.Screens.Select;
-using osu.Framework.Graphics;
+using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Multiplayer
+namespace osu.Game.Screens.Multi.Screens
 {
     public class Match : ScreenWhiteBox
     {
