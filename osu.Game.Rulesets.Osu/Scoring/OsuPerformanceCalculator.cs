@@ -6,14 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    public class OsuPerformanceCalculator : PerformanceCalculator<OsuHitObject>
+    public class OsuPerformanceCalculator : PerformanceCalculator
     {
         private readonly int countHitCircles;
         private readonly int beatmapMaxCombo;
@@ -27,12 +26,12 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private int count50;
         private int countMiss;
 
-        public OsuPerformanceCalculator(Ruleset ruleset, Beatmap beatmap, Score score)
+        public OsuPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
 
-            beatmapMaxCombo = Beatmap.HitObjects.Count;
+            beatmapMaxCombo = Beatmap.HitObjects.Count();
             beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count) + 1;
         }
 
@@ -193,7 +192,5 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private double totalHits => count300 + count100 + count50 + countMiss;
         private double totalSuccessfulHits => count300 + count100 + count50;
-
-        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
     }
 }

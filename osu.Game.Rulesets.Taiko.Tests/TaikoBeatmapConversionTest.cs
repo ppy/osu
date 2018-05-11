@@ -14,18 +14,15 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TaikoBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    public class TaikoBeatmapConversionTest : BeatmapConversionTest<TestTaikoRuleset, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
-
-        private bool isForCurrentRuleset;
 
         [NonParallelizable]
         [TestCase("basic", false), Ignore("See: https://github.com/ppy/osu/issues/2152")]
         [TestCase("slider-generating-drumroll", false)]
-        public void Test(string name, bool isForCurrentRuleset)
+        public new void Test(string name)
         {
-            this.isForCurrentRuleset = isForCurrentRuleset;
             base.Test(name);
         }
 
@@ -43,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             };
         }
 
-        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new TaikoBeatmapConverter(isForCurrentRuleset);
+        protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
@@ -69,5 +66,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
                && IsDrumRoll == other.IsDrumRoll
                && IsSwell == other.IsSwell
                && IsStrong == other.IsStrong;
+    }
+
+    public class TestTaikoRuleset : TaikoRuleset
+    {
     }
 }
