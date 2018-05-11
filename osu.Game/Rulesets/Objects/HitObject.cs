@@ -100,8 +100,11 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.
+        /// This can be null to indicate that the <see cref="HitObject"/> has no <see cref="HitWindows"/>.
+        /// <para>
         /// This will only be invoked if <see cref="HitWindows"/> hasn't been set externally (e.g. from a <see cref="BeatmapConverter"/>.
+        /// </para>
         /// </summary>
-        protected virtual HitWindows CreateHitWindows() => null;
+        protected virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 }
