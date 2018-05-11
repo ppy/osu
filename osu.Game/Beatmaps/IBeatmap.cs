@@ -42,6 +42,12 @@ namespace osu.Game.Beatmaps
         IEnumerable<HitObject> HitObjects { get; }
 
         /// <summary>
+        /// Returns statistics for the <see cref="HitObjects"/> contained in this beatmap.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<BeatmapStatistic> GetStatistics();
+
+        /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>
         /// <returns>The shallow-cloned beatmap.</returns>
