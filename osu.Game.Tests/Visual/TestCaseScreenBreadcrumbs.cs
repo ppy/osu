@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual
     public class TestCaseScreenBreadcrumbs : OsuTestCase
     {
         private readonly ScreenBreadcrumbControl<TestScreen> breadcrumbs;
-        private TestScreen currentScreen, changedScreen = null;
+        private TestScreen currentScreen, changedScreen;
 
         public TestCaseScreenBreadcrumbs()
         {
