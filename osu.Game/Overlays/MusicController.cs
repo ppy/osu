@@ -206,7 +206,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Height = progress_height,
                                     FillColour = colours.Yellow,
-                                    OnSeek = progress => conditionalSeek(progress)
+                                    OnSeek = conditionalSeek
                                 }
                             },
                         },
