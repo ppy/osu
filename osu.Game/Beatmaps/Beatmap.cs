@@ -51,6 +51,8 @@ namespace osu.Game.Beatmaps
 
         IEnumerable<HitObject> IBeatmap.HitObjects => HitObjects;
 
+        public virtual IEnumerable<BeatmapStatistic> GetStatistics() => Enumerable.Empty<BeatmapStatistic>();
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone()
