@@ -47,6 +47,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public override bool HandleKeyboardInput => State == Visibility.Visible;
             public override bool HandleMouseInput => State == Visibility.Visible;
+            public override bool IsRemovable => true;
 
             private Visibility state;
 
