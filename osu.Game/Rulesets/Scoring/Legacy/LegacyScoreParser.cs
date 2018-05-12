@@ -49,18 +49,21 @@ namespace osu.Game.Rulesets.Scoring.Legacy
                 score.User = new User { Username = sr.ReadString() };
                 /* var localScoreChecksum = */
                 sr.ReadString();
-                /* score.Count300 = */
-                sr.ReadUInt16();
-                /* score.Count100 = */
-                sr.ReadUInt16();
-                /* score.Count50 = */
-                sr.ReadUInt16();
-                /* score.CountGeki = */
-                sr.ReadUInt16();
-                /* score.CountKatu = */
-                sr.ReadUInt16();
-                /* score.CountMiss = */
-                sr.ReadUInt16();
+
+                var count300 = sr.ReadUInt16();
+                var count100 = sr.ReadUInt16();
+                var count50 = sr.ReadUInt16();
+                var countGeki = sr.ReadUInt16();
+                var countKatu = sr.ReadUInt16();
+                var countMiss = sr.ReadUInt16();
+
+                score.Statistics[HitResult.Great] = count300;
+                score.Statistics[HitResult.Good] = count100;
+                score.Statistics[HitResult.Meh] = count50;
+                score.Statistics[HitResult.Perfect] = countGeki;
+                score.Statistics[HitResult.Ok] = countKatu;
+                score.Statistics[HitResult.Miss] = countMiss;
+
                 score.TotalScore = sr.ReadInt32();
                 score.MaxCombo = sr.ReadUInt16();
                 /* score.Perfect = */
@@ -80,6 +83,34 @@ namespace osu.Game.Rulesets.Scoring.Legacy
                 else if (version >= 20121008)
                     /*OnlineId =*/
                     sr.ReadInt32();
+
+                switch (score.Ruleset.ID)
+                {
+                    case 0:
+                    {
+                        int totalHits = count50 + count100 + count300 + countMiss;
+                        score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + count300 * 300) / (totalHits * 300) : 1;
+                        break;
+                    }
+                    case 1:
+                    {
+                        int totalHits = count50 + count100 + count300 + countMiss;
+                        score.Accuracy = totalHits > 0 ? (double)(count100 * 150 + count300 * 300) / (totalHits * 300) : 1;
+                        break;
+                    }
+                    case 2:
+                    {
+                        int totalHits = count50 + count100 + count300 + countMiss + countKatu;
+                        score.Accuracy = totalHits > 0 ? (double)(count50 + count100 + count300 ) / totalHits : 1;
+                        break;
+                    }
+                    case 3:
+                    {
+                        int totalHits = count50 + count100 + count300 + countMiss + countGeki + countKatu;
+                        score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + countKatu * 200 + (count300 + countGeki) * 300) / (totalHits * 300) : 1;
+                        break;
+                    }
+                }
 
                 using (var replayInStream = new MemoryStream(compressedReplay))
                 {
