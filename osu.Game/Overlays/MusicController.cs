@@ -221,9 +221,8 @@ namespace osu.Game.Overlays
 
         private void conditionalSeek(double progress)
         {
-            if (DisableSeek)
-                return;
-            current?.Track.Seek(progress);
+            if (EnableSeek)
+                current?.Track.Seek(progress);
         }
 
         protected override void LoadComplete()
@@ -235,16 +234,18 @@ namespace osu.Game.Overlays
             base.LoadComplete();
         }
 
-        public bool DisableSeek { get; set; }
+        private bool EnableSeek { get; set; }
 
         private void beatmapDisabledChanged(bool disabled)
         {
             if (disabled)
                 playlist.Hide();
 
+            playButton.Enabled.Value = !disabled;
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;
+            EnableSeek = !disabled;
         }
 
         protected override void UpdateAfterChildren()

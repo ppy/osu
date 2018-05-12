@@ -538,12 +538,9 @@ namespace osu.Game
             // we only want to apply these restrictions when we are inside a screen stack.
             // the use case for not applying is in visual/unit tests.
             bool applyBeatmapRulesetRestrictions = !currentScreen?.AllowBeatmapRulesetChange ?? false;
-            bool applyUserSeekRestrictions = !currentScreen?.AllowUserSeek ?? false;
 
             Ruleset.Disabled = applyBeatmapRulesetRestrictions;
             Beatmap.Disabled = applyBeatmapRulesetRestrictions;
-
-            musicController.DisableSeek = applyUserSeekRestrictions;
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
