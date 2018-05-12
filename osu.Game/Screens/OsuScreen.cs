@@ -50,8 +50,6 @@ namespace osu.Game.Screens
         /// </summary>
         public virtual bool AllowBeatmapRulesetChange => true;
 
-        public virtual bool AllowUserSeek => true;
-
         protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         protected virtual float BackgroundParallaxAmount => 1;

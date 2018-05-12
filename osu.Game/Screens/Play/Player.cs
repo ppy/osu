@@ -45,8 +45,6 @@ namespace osu.Game.Screens.Play
         public bool AllowLeadIn { get; set; } = true;
         public bool AllowResults { get; set; } = true;
 
-        public override bool AllowUserSeek => false;
-
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
 
