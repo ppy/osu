@@ -35,10 +35,10 @@ namespace osu.Game.Overlays
 
         public UserProfileOverlay()
         {
-            FirstWaveColour = OsuColour.Gray(0.4f);
-            SecondWaveColour = OsuColour.Gray(0.3f);
-            ThirdWaveColour = OsuColour.Gray(0.2f);
-            FourthWaveColour = OsuColour.Gray(0.1f);
+            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
+            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
+            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
+            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
 
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
@@ -64,13 +64,13 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-            FadeEdgeEffectTo(0.5f, APPEAR_DURATION, Easing.In);
+            FadeEdgeEffectTo(0.5f, WaveContainer.APPEAR_DURATION, Easing.In);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
+            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
         }
 
         public void ShowUser(long userId)

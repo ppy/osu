@@ -36,8 +36,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
-        public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
+        public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
             // Generate the bar lines
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
@@ -84,8 +84,6 @@ namespace osu.Game.Rulesets.Mania.UI
         public override int Variant => (int)(Mods.OfType<IPlayfieldTypeMod>().FirstOrDefault()?.PlayfieldType ?? PlayfieldType.Single) + Beatmap.TotalColumns;
 
         public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
-
-        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter(IsForCurrentRuleset, WorkingBeatmap.Beatmap);
 
         protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {

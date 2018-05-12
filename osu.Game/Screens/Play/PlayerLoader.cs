@@ -159,14 +159,14 @@ namespace osu.Game.Screens.Play
 
                         loadTask = null;
 
-                        if (!Push(player))
-                            Exit();
+                        //By default, we want to load the player and never be returned to.
+                        //Note that this may change if the player we load requested a re-run.
+                        ValidForResume = false;
+
+                        if (player.LoadedBeatmapSuccessfully)
+                            Push(player);
                         else
-                        {
-                            //By default, we want to load the player and never be returned to.
-                            //Note that this may change if the player we load requested a re-run.
-                            ValidForResume = false;
-                        }
+                            Exit();
                     });
                 }, 500);
             }
@@ -305,11 +305,6 @@ namespace osu.Game.Screens.Play
                                 },
                             },
                             new MetadataLine("Source", metadata.Source)
-                            {
-                                Origin = Anchor.TopCentre,
-                                Anchor = Anchor.TopCentre,
-                            },
-                            new MetadataLine("Composer", string.Empty)
                             {
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
