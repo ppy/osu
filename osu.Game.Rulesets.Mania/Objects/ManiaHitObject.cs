@@ -8,9 +8,11 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
-    public abstract class ManiaHitObject : HitObject, IHasColumn
+    public abstract class ManiaHitObject : HitObject, IHasColumn, IHasLayer
     {
         public virtual int Column { get; set; }
+
+        public virtual int Layer { get; set; }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
