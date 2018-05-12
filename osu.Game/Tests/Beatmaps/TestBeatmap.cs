@@ -12,8 +12,14 @@ namespace osu.Game.Tests.Beatmaps
     public class TestBeatmap : Beatmap
     {
         public TestBeatmap(RulesetInfo ruleset)
-        : base(createTestBeatmap())
         {
+            var baseBeatmap = createTestBeatmap();
+
+            BeatmapInfo = baseBeatmap.BeatmapInfo;
+            ControlPointInfo = baseBeatmap.ControlPointInfo;
+            Breaks = baseBeatmap.Breaks;
+            HitObjects = baseBeatmap.HitObjects;
+
             BeatmapInfo.Ruleset = ruleset;
         }
 

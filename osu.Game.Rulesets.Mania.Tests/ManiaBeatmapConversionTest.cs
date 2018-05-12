@@ -14,17 +14,14 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class ManiaBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    public class ManiaBeatmapConversionTest : BeatmapConversionTest<TestManiaRuleset, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
-        private bool isForCurrentRuleset;
-
         [NonParallelizable]
-        [TestCase("basic", false)]
-        public void Test(string name, bool isForCurrentRuleset)
+        [TestCase("basic")]
+        public new void Test(string name)
         {
-            this.isForCurrentRuleset = isForCurrentRuleset;
             base.Test(name);
         }
 
@@ -38,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
         }
 
-        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new ManiaBeatmapConverter(isForCurrentRuleset, beatmap);
+        protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
@@ -56,5 +53,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
                && Precision.AlmostEquals(EndTime, other.EndTime, conversion_lenience)
                && Column == other.Column;
+    }
+
+    public class TestManiaRuleset : ManiaRuleset
+    {
     }
 }

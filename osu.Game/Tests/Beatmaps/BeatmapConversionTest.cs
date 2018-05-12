@@ -10,12 +10,14 @@ using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Tests.Beatmaps
 {
     [TestFixture]
-    public abstract class BeatmapConversionTest<TConvertValue>
+    public abstract class BeatmapConversionTest<TRuleset, TConvertValue>
+        where TRuleset : Ruleset, new()
         where TConvertValue : IEquatable<TConvertValue>
     {
         private const string resource_namespace = "Testing.Beatmaps";
@@ -79,6 +81,9 @@ namespace osu.Game.Tests.Beatmaps
         {
             var beatmap = getBeatmap(name);
 
+            var rulesetInstance = new TRuleset();
+            beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
+
             var result = new ConvertResult();
 
             var converter = CreateConverter(beatmap);
@@ -92,7 +97,7 @@ namespace osu.Game.Tests.Beatmaps
                 result.Mappings.Add(mapping);
             };
 
-            converter.Convert(beatmap);
+            converter.Convert();
 
             return result;
         }
@@ -107,7 +112,7 @@ namespace osu.Game.Tests.Beatmaps
             }
         }
 
-        private Beatmap getBeatmap(string name)
+        private IBeatmap getBeatmap(string name)
         {
             using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new StreamReader(resStream))
@@ -125,7 +130,7 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         protected abstract IEnumerable<TConvertValue> CreateConvertValue(HitObject hitObject);
-        protected abstract IBeatmapConverter CreateConverter(Beatmap beatmap);
+        protected abstract IBeatmapConverter CreateConverter(IBeatmap beatmap);
 
         private class ConvertMapping
         {

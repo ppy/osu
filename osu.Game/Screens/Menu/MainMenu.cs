@@ -14,7 +14,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Multiplayer;
+using osu.Game.Screens.Multi.Screens;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
 
