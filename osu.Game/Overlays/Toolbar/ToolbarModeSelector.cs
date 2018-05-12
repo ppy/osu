@@ -1,11 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
@@ -14,7 +17,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarModeSelector : Container
+    public class ToolbarModeSelector : KeyBindingContainer<int>
     {
         private const float padding = 10;
 
@@ -22,6 +25,7 @@ namespace osu.Game.Overlays.Toolbar
         private readonly Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
+        private int rulesetCount;
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public ToolbarModeSelector()
@@ -64,9 +68,50 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
+        public override IEnumerable<osu.Framework.Input.Bindings.KeyBinding> DefaultKeyBindings
+        {
+            get
+            {
+                var keybinds = new List<osu.Framework.Input.Bindings.KeyBinding>();
+                for (int i = 0; i < Math.Min(rulesetCount, 10); i++)
+                {
+                    InputKey numberKey;
+                    if (i == 9)
+                        numberKey = InputKey.Number0;
+                    else
+                        numberKey = (InputKey)i + 110;
+
+                    keybinds.Add(new osu.Framework.Input.Bindings.KeyBinding(new[] { InputKey.Control, numberKey }, i));
+                }
+                return keybinds;
+            }
+        }
+
+        private class RulesetSwitcherInputHandler : Container, IKeyBindingHandler<int>
+        {
+            private Bindable<RulesetInfo> ruleset;
+            private RulesetStore rulesets;
+
+            public RulesetSwitcherInputHandler(Bindable<RulesetInfo> ruleset, RulesetStore rulesets)
+            {
+                this.ruleset = ruleset;
+                this.rulesets = rulesets;
+            }
+
+            public bool OnPressed(int action)
+            {
+                ruleset.Value = rulesets.GetRuleset(action);
+
+                return true;
+            }
+
+            public bool OnReleased(int action) => false;
+        }
+
         [BackgroundDependencyLoader(true)]
         private void load(RulesetStore rulesets, OsuGame game)
         {
+            this.rulesetCount = rulesets.AvailableRulesets.Count();
             foreach (var r in rulesets.AvailableRulesets)
             {
                 modeButtons.Add(new ToolbarModeButton
@@ -85,6 +130,8 @@ namespace osu.Game.Overlays.Toolbar
                 ruleset.BindTo(game.Ruleset);
             else
                 ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault();
+
+            Add(new RulesetSwitcherInputHandler(ruleset, rulesets));
         }
 
         public override bool HandleKeyboardInput => !ruleset.Disabled && base.HandleKeyboardInput;
