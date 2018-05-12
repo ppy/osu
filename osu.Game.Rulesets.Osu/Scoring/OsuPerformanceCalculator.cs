@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             aimValue *= approachRateFactor;
 
             if (mods.Any(h => h is OsuModHidden))
-                aimValue *= 1.18f;
+                aimValue *= 1.03f;
 
             if (mods.Any(h => h is OsuModFlashlight))
             {
@@ -152,6 +152,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
             // Combo scaling
             if (beatmapMaxCombo > 0)
                 speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
+
+            if (mods.Any(m => m is OsuModHidden))
+                speedValue *= 1.18f;
 
             // Scale the speed value with accuracy _slightly_
             speedValue *= 0.5f + accuracy / 2.0f;
