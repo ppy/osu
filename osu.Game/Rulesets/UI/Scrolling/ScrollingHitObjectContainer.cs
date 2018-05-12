@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             base.UpdateAfterChildrenLife();
 
             // We need to calculate this as soon as possible after lifetimes so that hitobjects get the final say in their positions
-            speedChangeVisualiser.ComputePositions(AliveObjects, direction, Time.Current, TimeRange, DrawSize);
+            speedChangeVisualiser.UpdatePositions(AliveObjects, direction, Time.Current, TimeRange, DrawSize);
         }
     }
 }

@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
-using osu.Framework.Testing.Input;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
@@ -18,72 +17,66 @@ using OpenTK.Graphics;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseCursors : OsuTestCase
+    public class TestCaseCursors : ManualInputManagerTestCase
     {
-        private readonly ManualInputManager inputManager;
         private readonly CursorOverrideContainer cursorOverrideContainer;
         private readonly CustomCursorBox[] cursorBoxes = new CustomCursorBox[6];
 
         public TestCaseCursors()
         {
-            Child = inputManager = new ManualInputManager
+            Child = cursorOverrideContainer = new CursorOverrideContainer
             {
-                Child = cursorOverrideContainer = new CursorOverrideContainer
+                RelativeSizeAxes = Axes.Both,
+                Children = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
+                    // Middle user
+                    cursorBoxes[0] = new CustomCursorBox(Color4.Green)
                     {
-                        // Middle user
-                        cursorBoxes[0] = new CustomCursorBox(Color4.Green)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.5f),
-                        },
-                        // Top-left user
-                        cursorBoxes[1] = new CustomCursorBox(Color4.Blue)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.4f)
-                        },
-                        // Bottom-right user
-                        cursorBoxes[2] = new CustomCursorBox(Color4.Red)
-                        {
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.4f)
-                        },
-                        // Bottom-left local
-                        cursorBoxes[3] = new CustomCursorBox(Color4.Magenta, false)
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.4f)
-                        },
-                        // Top-right local
-                        cursorBoxes[4] = new CustomCursorBox(Color4.Cyan, false)
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.4f)
-                        },
-                        // Left-local
-                        cursorBoxes[5] = new CustomCursorBox(Color4.Yellow, false)
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(0.2f, 1),
-                        },
-                    }
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0.5f),
+                    },
+                    // Top-left user
+                    cursorBoxes[1] = new CustomCursorBox(Color4.Blue)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0.4f)
+                    },
+                    // Bottom-right user
+                    cursorBoxes[2] = new CustomCursorBox(Color4.Red)
+                    {
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0.4f)
+                    },
+                    // Bottom-left local
+                    cursorBoxes[3] = new CustomCursorBox(Color4.Magenta, false)
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0.4f)
+                    },
+                    // Top-right local
+                    cursorBoxes[4] = new CustomCursorBox(Color4.Cyan, false)
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0.4f)
+                    },
+                    // Left-local
+                    cursorBoxes[5] = new CustomCursorBox(Color4.Yellow, false)
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(0.2f, 1),
+                    },
                 }
             };
-
-            returnUserInput();
 
             AddToggleStep("Smooth transitions", b => cursorBoxes.ForEach(box => box.SmoothTransition = b));
 
@@ -91,15 +84,7 @@ namespace osu.Game.Tests.Visual
             testLocalCursor();
             testUserCursorOverride();
             testMultipleLocalCursors();
-            returnUserInput();
-        }
-
-        /// <summary>
-        /// Returns input back to the user.
-        /// </summary>
-        private void returnUserInput()
-        {
-            AddStep("Return user input", () => inputManager.UseParentState = true);
+            ReturnUserInput();
         }
 
         /// <summary>
@@ -109,7 +94,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         private void testUserCursor()
         {
-            AddStep("Move to green area", () => inputManager.MoveMouseTo(cursorBoxes[0]));
+            AddStep("Move to green area", () => InputManager.MoveMouseTo(cursorBoxes[0]));
             AddAssert("Check green cursor visible", () => checkVisible(cursorBoxes[0].Cursor));
             AddAssert("Check green cursor at mouse", () => checkAtMouse(cursorBoxes[0].Cursor));
             AddStep("Move out", moveOut);
@@ -124,7 +109,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         private void testLocalCursor()
         {
-            AddStep("Move to purple area", () => inputManager.MoveMouseTo(cursorBoxes[3]));
+            AddStep("Move to purple area", () => InputManager.MoveMouseTo(cursorBoxes[3]));
             AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].Cursor));
             AddAssert("Check purple cursor at mouse", () => checkAtMouse(cursorBoxes[3].Cursor));
             AddAssert("Check global cursor visible", () => checkVisible(cursorOverrideContainer.Cursor));
@@ -141,7 +126,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         private void testUserCursorOverride()
         {
-            AddStep("Move to blue-green boundary", () => inputManager.MoveMouseTo(cursorBoxes[1].ScreenSpaceDrawQuad.BottomRight - new Vector2(10)));
+            AddStep("Move to blue-green boundary", () => InputManager.MoveMouseTo(cursorBoxes[1].ScreenSpaceDrawQuad.BottomRight - new Vector2(10)));
             AddAssert("Check blue cursor visible", () => checkVisible(cursorBoxes[1].Cursor));
             AddAssert("Check green cursor invisible", () => !checkVisible(cursorBoxes[0].Cursor));
             AddAssert("Check blue cursor at mouse", () => checkAtMouse(cursorBoxes[1].Cursor));
@@ -156,7 +141,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         private void testMultipleLocalCursors()
         {
-            AddStep("Move to yellow-purple boundary", () => inputManager.MoveMouseTo(cursorBoxes[5].ScreenSpaceDrawQuad.BottomRight - new Vector2(10)));
+            AddStep("Move to yellow-purple boundary", () => InputManager.MoveMouseTo(cursorBoxes[5].ScreenSpaceDrawQuad.BottomRight - new Vector2(10)));
             AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].Cursor));
             AddAssert("Check purple cursor at mouse", () => checkAtMouse(cursorBoxes[3].Cursor));
             AddAssert("Check yellow cursor visible", () => checkVisible(cursorBoxes[5].Cursor));
@@ -172,7 +157,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         private void testUserOverrideWithLocal()
         {
-            AddStep("Move to yellow-blue boundary", () => inputManager.MoveMouseTo(cursorBoxes[5].ScreenSpaceDrawQuad.TopRight - new Vector2(10)));
+            AddStep("Move to yellow-blue boundary", () => InputManager.MoveMouseTo(cursorBoxes[5].ScreenSpaceDrawQuad.TopRight - new Vector2(10)));
             AddAssert("Check blue cursor visible", () => checkVisible(cursorBoxes[1].Cursor));
             AddAssert("Check blue cursor at mouse", () => checkAtMouse(cursorBoxes[1].Cursor));
             AddAssert("Check yellow cursor visible", () => checkVisible(cursorBoxes[5].Cursor));
@@ -186,7 +171,7 @@ namespace osu.Game.Tests.Visual
         /// Moves the cursor to a point not covered by any cursor containers.
         /// </summary>
         private void moveOut()
-            => inputManager.MoveMouseTo(new Vector2(inputManager.ScreenSpaceDrawQuad.Centre.X, inputManager.ScreenSpaceDrawQuad.TopLeft.Y));
+            => InputManager.MoveMouseTo(new Vector2(InputManager.ScreenSpaceDrawQuad.Centre.X, InputManager.ScreenSpaceDrawQuad.TopLeft.Y));
 
         /// <summary>
         /// Checks if a cursor is visible.
@@ -199,7 +184,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         /// <param name="cursorContainer">The cursor to check.</param>
         private bool checkAtMouse(CursorContainer cursorContainer)
-            => Precision.AlmostEquals(inputManager.CurrentState.Mouse.NativeState.Position, cursorContainer.ToScreenSpace(cursorContainer.ActiveCursor.DrawPosition));
+            => Precision.AlmostEquals(InputManager.CurrentState.Mouse.NativeState.Position, cursorContainer.ToScreenSpace(cursorContainer.ActiveCursor.DrawPosition));
 
         private class CustomCursorBox : Container, IProvideCursor
         {

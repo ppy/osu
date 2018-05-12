@@ -2,14 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 using System.Collections.Generic;
 using System;
 
 namespace osu.Game.Rulesets.Taiko
 {
-    internal class TaikoDifficultyCalculator : DifficultyCalculator<TaikoHitObject>
+    internal class TaikoDifficultyCalculator : DifficultyCalculator
     {
         private const double star_scaling_factor = 0.04125;
 
@@ -30,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko
         /// </summary>
         private readonly List<TaikoHitObjectDifficulty> difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
 
-        public TaikoDifficultyCalculator(Beatmap beatmap)
+        public TaikoDifficultyCalculator(IBeatmap beatmap)
             : base(beatmap)
         {
         }
@@ -41,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko
             difficultyHitObjects.Clear();
 
             foreach (var hitObject in Beatmap.HitObjects)
-                difficultyHitObjects.Add(new TaikoHitObjectDifficulty(hitObject));
+                difficultyHitObjects.Add(new TaikoHitObjectDifficulty((TaikoHitObject)hitObject));
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
@@ -132,7 +131,5 @@ namespace osu.Game.Rulesets.Taiko
 
             return difficulty;
         }
-
-        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter(Beatmap beatmap) => new TaikoBeatmapConverter(true);
     }
 }

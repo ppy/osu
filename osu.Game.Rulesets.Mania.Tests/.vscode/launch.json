@@ -2,13 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "VisualTests (Debug, net461)",
+            "name": "VisualTests (Debug, net471)",
             "windows": {
                 "type": "clr"
             },
             "type": "mono",
             "request": "launch",
-            "program": "${workspaceRoot}/bin/Debug/net461/osu.Game.Rulesets.Mania.Tests.exe",
+            "program": "${workspaceRoot}/bin/Debug/net471/osu.Game.Rulesets.Mania.Tests.exe",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Debug, msbuild)",
             "runtimeExecutable": null,
@@ -16,13 +16,13 @@
             "console": "internalConsole"
         },
         {
-            "name": "VisualTests (Release, net461)",
+            "name": "VisualTests (Release, net471)",
             "windows": {
                 "type": "clr"
             },
             "type": "mono",
             "request": "launch",
-            "program": "${workspaceRoot}/bin/Debug/net461/osu.Game.Rulesets.Mania.Tests.exe",
+            "program": "${workspaceRoot}/bin/Debug/net471/osu.Game.Rulesets.Mania.Tests.exe",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Release, msbuild)",
             "runtimeExecutable": null,
