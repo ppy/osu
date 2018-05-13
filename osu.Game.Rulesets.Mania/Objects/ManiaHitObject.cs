@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public virtual float X
         {
-            get => Column; // Somehow has to get the maximum number of columns in the beatmap
+            get => Column; // Somehow has to get the maximum number of columns in the beatmap?
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
