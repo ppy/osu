@@ -8,6 +8,15 @@ namespace osu.Game.Rulesets.Edit.Tools
     public class HitObjectCompositionTool<T> : ICompositionTool
         where T : HitObject
     {
-        public string Name => typeof(T).Name;
+        public string Name { get; } = typeof(T).Name;
+
+        public HitObjectCompositionTool()
+        {
+        }
+
+        public HitObjectCompositionTool(string name)
+        {
+            Name = name;
+        }
     }
 }

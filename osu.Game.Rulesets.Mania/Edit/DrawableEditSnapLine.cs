@@ -31,11 +31,11 @@ namespace osu.Game.Rulesets.Mania.Edit
                 Colour = snapLine.Colour
             });
 
-            bool isMajor = snapLine.BeatIndex % (int)snapLine.ControlPoint.TimeSignature == 0;
+            bool isMajor = snapLine.BeatIndex % snapLine.BeatDivisor.Value == 0 && snapLine.BeatIndex / snapLine.BeatDivisor.Value % (int)snapLine.ControlPoint.TimeSignature == 0;
 
             if (isMajor)
             {
-
+                Height = 2;
             }
         }
 

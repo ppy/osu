@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
 
         public void Add(EditSnapLine editSnapLine) => stages.ForEach(s => s.Add(editSnapLine));
-        public void ClearEditSnapLines() => stages.ForEach(s => s.ClearEditSnapLines()); // Why the fuck does this not work?
+        public void ClearEditSnapLines() => stages.ForEach(s => s.ClearEditSnapLines());
 
         private ManiaStage getStageByColumn(int column)
         {

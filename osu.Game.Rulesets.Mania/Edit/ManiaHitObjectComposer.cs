@@ -2,15 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
-using osu.Game.Rulesets.Objects.Drawables;
-//using osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Screens.Compose;
 
@@ -29,8 +24,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override IReadOnlyList<ICompositionTool> CompositionTools => new ICompositionTool[]
         {
-            new HitObjectCompositionTool<Note>(),
-            new HitObjectCompositionTool<HoldNote>(),
+            new HitObjectCompositionTool<Note>("Note"),
+            new HitObjectCompositionTool<HoldNote>("Hold"),
         };
 
         // TODO: According to another proposal, extend this to support multiple layers for mania maps
