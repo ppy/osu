@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -76,18 +76,18 @@ namespace osu.Game.Screens.Play
             double songCurrentTime = AudioClock.CurrentTime - startTime;
             int currentPercent = Math.Max(0, Math.Min(100, (int)(songCurrentTime / songLength * 100)));
             int currentSecond = (int)Math.Floor(songCurrentTime / 1000.0);
-
             if (currentPercent != previousPercent)
             {
                 progress.Text = currentPercent.ToString() + @"%";
                 previousPercent = currentPercent;
             }
-
             if (currentSecond != previousSecond && songCurrentTime < songLength)
             {
-                timeCurrent.Text = TimeSpan.FromSeconds(currentSecond).ToString(songCurrentTime < 0 ? @"\-m\:ss" : @"m\:ss");
-                timeLeft.Text = TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"\-m\:ss");
-
+                //since TimeSpan to string doesnt support minutes above 60, we have to do something else.
+                var timeRemain = endTime - AudioClock.CurrentTime;
+                string minutes = songCurrentTime < 0 ? "-0" : Math.Floor(TimeSpan.FromSeconds(currentSecond).TotalMinutes).ToString("");
+                timeCurrent.Text = minutes + ':' + TimeSpan.FromSeconds(currentSecond).ToString(@"ss");
+                timeLeft.Text = "-" + Math.Floor(TimeSpan.FromMilliseconds(timeRemain).TotalMinutes) + ':' + TimeSpan.FromMilliseconds(timeRemain).ToString(@"ss");
                 previousSecond = currentSecond;
             }
         }
