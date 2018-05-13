@@ -12,17 +12,20 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
     public class ManiaHitObjectComposer : HitObjectComposer
     {
-        public ManiaHitObjectComposer(Ruleset ruleset)
+        public BindableBeatDivisor BeatDivisor;
+        public ManiaHitObjectComposer(Ruleset ruleset, BindableBeatDivisor beatDivisor)
             : base(ruleset)
         {
+            BeatDivisor = beatDivisor;
         }
 
-        protected override RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new ManiaEditRulesetContainer(ruleset, beatmap);
+        protected override RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new ManiaEditRulesetContainer(ruleset, beatmap, BeatDivisor);
 
         protected override IReadOnlyList<ICompositionTool> CompositionTools => new ICompositionTool[]
         {

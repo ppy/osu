@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Rulesets.Mania.Edit;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -28,6 +29,9 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
 
         protected virtual bool DisplayJudgements => true;
+
+        // TODO: Implement this
+        protected virtual bool AcceptKeyInput => true;
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
             : base(ScrollingDirection.Up)
@@ -72,6 +76,9 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
+
+        public void Add(EditSnapLine editSnapLine) => stages.ForEach(s => s.Add(editSnapLine));
+        public void ClearEditSnapLines() => stages.ForEach(s => s.ClearEditSnapLines()); // Why the fuck does this not work?
 
         private ManiaStage getStageByColumn(int column)
         {

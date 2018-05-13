@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Mania.Edit
     {
         protected override bool DisplayJudgements => false;
 
+        protected override bool AcceptKeyInput => false;
+
         public ManiaEditPlayfield(List<StageDefinition> stages)
             : base(stages)
         {

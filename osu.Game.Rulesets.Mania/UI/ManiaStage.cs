@@ -19,6 +19,8 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Rulesets.Mania.Edit;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -172,6 +174,16 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
+
+        public void Add(EditSnapLine editSnapLine) => base.Add(new DrawableEditSnapLine(editSnapLine));
+        public void Remove(DrawableEditSnapLine editSnapLine) => base.Remove(editSnapLine);
+        public void ClearEditSnapLines()
+        {
+            var o = HitObjects.Objects;
+            for (int i = o.Count() - 1; i >= 0; i--)
+                if (o.ElementAt(i) is DrawableEditSnapLine e)
+                    Remove(e);
+        }
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {

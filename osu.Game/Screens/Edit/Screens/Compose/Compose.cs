@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 return;
             }
 
-            var composer = ruleset.CreateHitObjectComposer();
+            var composer = ruleset.CreateHitObjectComposer(beatDivisor);
             if (composer == null)
             {
                 Logger.Log($"Ruleset {ruleset.Description} doesn't support hitobject composition.");

@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -188,7 +189,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => new OsuPerformanceCalculator(this, beatmap, score);
 
-        public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
+        public override HitObjectComposer CreateHitObjectComposer(BindableBeatDivisor beatDivisor) => new OsuHitObjectComposer(this);
 
         public override string Description => "osu!";
 
