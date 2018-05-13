@@ -89,8 +89,8 @@ namespace osu.Game.Overlays.Toolbar
 
         private class RulesetSwitcherInputHandler : Container, IKeyBindingHandler<int>
         {
-            private Bindable<RulesetInfo> ruleset;
-            private RulesetStore rulesets;
+            private readonly Bindable<RulesetInfo> ruleset;
+            private readonly RulesetStore rulesets;
 
             public RulesetSwitcherInputHandler(Bindable<RulesetInfo> ruleset, RulesetStore rulesets)
             {
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader(true)]
         private void load(RulesetStore rulesets, OsuGame game)
         {
-            this.rulesetCount = rulesets.AvailableRulesets.Count();
+            rulesetCount = rulesets.AvailableRulesets.Count();
             foreach (var r in rulesets.AvailableRulesets)
             {
                 modeButtons.Add(new ToolbarModeButton
