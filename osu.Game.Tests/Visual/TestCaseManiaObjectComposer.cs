@@ -1,25 +1,19 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
-using OpenTK;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.UI;
-using osu.Game.Screens.Edit.Screens.Compose.Layers;
-using osu.Game.Tests.Beatmaps;
 using osu.Game.Screens.Edit.Screens.Compose;
+using osu.Game.Tests.Beatmaps;
+using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Tests.Visual
 {
@@ -56,10 +50,7 @@ namespace osu.Game.Tests.Visual
                         Duration = 1,
                     }
                 },
-                ControlPointInfo = new Game.Beatmaps.ControlPoints.ControlPointInfo()
-                {
-                    
-                }
+                ControlPointInfo = new ControlPointInfo()
             });
 
             var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };

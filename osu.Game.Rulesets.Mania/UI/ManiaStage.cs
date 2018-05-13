@@ -1,9 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -12,15 +11,15 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Game.Rulesets.Mania.Edit;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -36,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
-        public bool DisplayJudgements = true;
+        public bool DisplayJudgements;
 
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;

@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Screens.Edit.Screens.Compose;
 using OpenTK.Graphics;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Screens.Edit.Screens.Compose;
 using System;
 
 namespace osu.Game.Rulesets.Mania.Edit
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 int t = BeatDivisor.Value % 3 == 0 ? 3 : 1;
                 int i = beatIndex / t;
                 int b = BeatDivisor.Value / t;
-                int d = (i * Math.Max(8, b) / b) % Math.Max(8, b);
+                int d = i * Math.Max(8, b) / b % Math.Max(8, b);
                 if (d == 0)
                     Colour = Color4.White;
                 else if (d % 4 == 0)
