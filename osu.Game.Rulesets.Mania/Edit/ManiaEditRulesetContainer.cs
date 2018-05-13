@@ -44,8 +44,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
             generateEditSnapLines(newDivisor);
         }
-
-        // TODO: Fix this shit
+        
         private void generateEditSnapLines(int newDivisor)
         {
             // Generate the edit lines

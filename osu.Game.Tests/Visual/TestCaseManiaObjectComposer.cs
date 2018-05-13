@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Tests.Visual
 {
@@ -40,8 +41,8 @@ namespace osu.Game.Tests.Visual
         private void load(OsuGameBase osuGame)
         {
             // This shit does not work and needs a fix
-            // Probably the fact that every map needs to be converted in order to return its playable version
-            // isn't the best idea ever, maybe change it?
+            // Probably the fact that every map needs to be converted is breaking it
+            // Let's ignore that for now for as long as it does not throw any exceptions
             osuGame.Beatmap.Value = new TestWorkingBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 })
             {
                 HitObjects = new List<ManiaHitObject>
@@ -55,13 +56,17 @@ namespace osu.Game.Tests.Visual
                         Duration = 1,
                     }
                 },
+                ControlPointInfo = new Game.Beatmaps.ControlPoints.ControlPointInfo()
+                {
+                    
+                }
             });
 
             var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
             dependencies.CacheAs<IAdjustableClock>(clock);
             dependencies.CacheAs<IFrameBasedClock>(clock);
 
-            Child = new ManiaHitObjectComposer(new ManiaRuleset());
+            Child = new ManiaHitObjectComposer(new ManiaRuleset(), new BindableBeatDivisor());
         }
     }
 }

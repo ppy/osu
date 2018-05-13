@@ -9,11 +9,16 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
-    public abstract class ManiaHitObject : HitObject, IHasColumn, IHasLayer
+    public abstract class ManiaHitObject : HitObject, IHasColumn, IHasLayer, IHasXPosition
     {
         public virtual int Column { get; set; }
 
         public virtual int Layer { get; set; }
+
+        public virtual float X
+        {
+            get => Column; // Somehow has to get the maximum number of columns in the beatmap
+        }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
