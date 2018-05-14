@@ -7,6 +7,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -15,6 +16,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using OpenTK;
+using OpenTK.Input;
 
 namespace osu.Game.Screens
 {
@@ -104,6 +106,20 @@ namespace osu.Game.Screens
         }
 
         public bool OnReleased(GlobalAction action) => action == GlobalAction.Back && AllowBackButton;
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat || !IsCurrentScreen) return false;
+
+            switch (args.Key)
+            {
+                case Key.Escape:
+                    Exit();
+                    return true;
+            }
+
+            return base.OnKeyDown(state, args);
+        }
 
         protected override void OnResuming(Screen last)
         {
