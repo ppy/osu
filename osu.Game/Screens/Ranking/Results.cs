@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Ranking
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ParallaxAmount = 0.01f,
-                                    Scale = new Vector2(1 / circle_outer_scale / overscan),
+                                    Scale = new Vector2(1 / circle_outer_scale),
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Children = new Drawable[]
