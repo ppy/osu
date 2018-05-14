@@ -18,7 +18,7 @@ using System.Collections.Generic;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseManiaObjectComposer : OsuTestCase
+    public class TestCaseManiaHitObjectComposer : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -34,30 +34,44 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {
-            // This shit does not work and needs a fix
-            // Probably the fact that every map needs to be converted is breaking it
-            // Let's ignore that for now for as long as it does not throw any exceptions
             osuGame.Beatmap.Value = new TestWorkingBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 })
             {
                 HitObjects = new List<ManiaHitObject>
                 {
-                    new Note { Column = 2, StartTime = 0.5 },
-                    new Note { Column = 3, StartTime = 1.74 },
+                    new Note { Column = 2, StartTime = 100 },
+                    new Note { Column = 3, StartTime = 150 },
                     new HoldNote
                     {
                         Column = 1,
-                        StartTime = 2.42,
-                        Duration = 1,
+                        StartTime = 200,
+                        Duration = 150,
                     }
                 },
-                ControlPointInfo = new ControlPointInfo()
+                ControlPointInfo = new ControlPointInfo
+                {
+                    TimingPoints =
+                    {
+                        new TimingControlPoint { Time = 0, BeatLength = 400 }
+                    }
+                },
             });
 
             var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
             dependencies.CacheAs<IAdjustableClock>(clock);
             dependencies.CacheAs<IFrameBasedClock>(clock);
 
-            Child = new ManiaHitObjectComposer(new ManiaRuleset(), new BindableBeatDivisor());
+            var m = new ManiaHitObjectComposer(new ManiaRuleset(), new BindableBeatDivisor() { Value = 1 });
+
+            AddStep("change beat snap divisor to 1/1", () => m.BeatDivisor.Value = 1);
+            AddStep("change beat snap divisor to 1/2", () => m.BeatDivisor.Value = 2);
+            AddStep("change beat snap divisor to 1/4", () => m.BeatDivisor.Value = 4);
+            AddStep("change beat snap divisor to 1/8", () => m.BeatDivisor.Value = 8);
+            AddStep("change beat snap divisor to 1/16", () => m.BeatDivisor.Value = 16);
+            AddStep("change beat snap divisor to 1/3", () => m.BeatDivisor.Value = 3);
+            AddStep("change beat snap divisor to 1/6", () => m.BeatDivisor.Value = 6);
+            AddStep("change beat snap divisor to 1/12", () => m.BeatDivisor.Value = 12);
+
+            Child = m;
         }
     }
 }

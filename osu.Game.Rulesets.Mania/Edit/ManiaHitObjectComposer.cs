@@ -34,7 +34,6 @@ namespace osu.Game.Rulesets.Mania.Edit
         // between 0.25f to 0.5f for notes that are in other layers (and may be also not selected)
         // Will also need a tool to navigate through layers
         // Please ignore the comment above, I just wanted to write my thoughts down so that I do not forget in 2 months when I get around to it
-        // Uncomment?
         //protected override ScalableContainer CreateLayerContainer() => new ScalableContainer(1) { RelativeSizeAxes = Axes.Both };
 
         //public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)

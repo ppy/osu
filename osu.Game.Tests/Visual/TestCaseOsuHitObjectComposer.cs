@@ -20,7 +20,7 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseHitObjectComposer : OsuTestCase
+    public class TestCaseOsuHitObjectComposer : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {

@@ -19,25 +19,21 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public class ManiaEditRulesetContainer : ManiaRulesetContainer
     {
-        private bool isLoaded;
-
         public BindableBeatDivisor BeatDivisor;
 
-        public IEnumerable<EditSnapLine> EditSnapLines;
+        public List<EditSnapLine> EditSnapLines;
 
         public ManiaEditRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
             : base(ruleset, beatmap)
         {
             BeatDivisor = beatDivisor;
-            beatDivisor.ValueChanged += OnBeatSnapDivisorChange;
-            OnBeatSnapDivisorChange(beatDivisor.Value);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            isLoaded = true;
-            EditSnapLines.ForEach(Playfield.Add);
+            BeatDivisor.ValueChanged += OnBeatSnapDivisorChange;
+            OnBeatSnapDivisorChange(BeatDivisor.Value);
         }
 
         public void OnBeatSnapDivisorChange(int newDivisor)
@@ -51,20 +47,21 @@ namespace osu.Game.Rulesets.Mania.Edit
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
 
             var timingPoints = Beatmap.ControlPointInfo.TimingPoints;
-            var editSnapLines = new List<EditSnapLine>();
+            EditSnapLines = new List<EditSnapLine>();
 
             for (int i = 0; i < timingPoints.Count; i++)
             {
                 TimingControlPoint point = timingPoints[i];
 
                 // Stop on the beat before the next timing point, or if there is no next timing point stop slightly past the last object
+                // Needs fixing
                 double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time - point.BeatLength : lastObjectTime + point.BeatLength * (int)point.TimeSignature;
 
                 int index = 0;
                 double step = point.BeatLength / newDivisor;
                 for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += step, index++)
                 {
-                    editSnapLines.Add(new EditSnapLine
+                    EditSnapLines.Add(new EditSnapLine
                     {
                         StartTime = t,
                         ControlPoint = point,
@@ -73,13 +70,9 @@ namespace osu.Game.Rulesets.Mania.Edit
                     });
                 }
             }
-
-            EditSnapLines = editSnapLines;
-            if (isLoaded)
-            {
-                Playfield.ClearEditSnapLines();
-                EditSnapLines.ForEach(Playfield.Add);
-            }
+            
+            Playfield.ClearEditSnapLines();
+            EditSnapLines.ForEach(Playfield.Add);
         }
 
         protected override Playfield CreatePlayfield() => new ManiaEditPlayfield(Beatmap.Stages);

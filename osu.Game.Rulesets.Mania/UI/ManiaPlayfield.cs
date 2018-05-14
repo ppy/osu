@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.UI
             int firstColumnIndex = 0;
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction, DisplayJudgements);
+                var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction) { DisplayJudgements = DisplayJudgements };
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
                 newStage.Inverted.BindTo(Inverted);
 
