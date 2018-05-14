@@ -12,8 +12,6 @@ namespace osu.Game.Overlays
 {
     public class KeyBindingOverlay : SettingsOverlay
     {
-        protected const float WIDTH = 430;
-
         protected override Drawable CreateHeader() => new SettingsHeader("key configuration", "Customise your keys!");
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -23,8 +21,6 @@ namespace osu.Game.Overlays
 
             foreach (var ruleset in rulesets.AvailableRulesets)
                 AddSection(new RulesetBindingsSection(ruleset));
-
-            ContentContainer.Width = WIDTH;
         }
 
         public KeyBindingOverlay()
