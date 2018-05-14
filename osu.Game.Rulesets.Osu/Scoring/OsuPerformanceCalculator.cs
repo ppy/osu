@@ -99,6 +99,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 categoryRatings.Add("Aim", aimValue);
                 categoryRatings.Add("Speed", speedValue);
                 categoryRatings.Add("Accuracy", accuracyValue);
+                categoryRatings.Add("OD", realOverallDifficulty);
+                categoryRatings.Add("AR", realApproachRate);
+                categoryRatings.Add("Max Combo", beatmapMaxCombo);
             }
 
             return totalValue;
