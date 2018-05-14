@@ -26,7 +26,7 @@ namespace osu.Game.Input.Bindings
         {
             new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
             new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
-            new KeyBinding(InputKey.F12,GlobalAction.TakeScreenshot),
+            new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
 
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
@@ -36,6 +36,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Down, GlobalAction.DecreaseVolume),
             new KeyBinding(InputKey.MouseWheelDown, GlobalAction.DecreaseVolume),
             new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
+
+            new KeyBinding(InputKey.Escape, GlobalAction.Back),
+            new KeyBinding(InputKey.MouseButton1, GlobalAction.Back)
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -76,6 +79,9 @@ namespace osu.Game.Input.Bindings
         QuickRetry,
 
         [Description("Take screenshot")]
-        TakeScreenshot
+        TakeScreenshot,
+
+        [Description("Go back")]
+        Back
     }
 }
