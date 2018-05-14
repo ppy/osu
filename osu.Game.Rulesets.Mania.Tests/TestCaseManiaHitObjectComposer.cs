@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
@@ -25,36 +24,6 @@ namespace osu.Game.Tests.Visual
             typeof(HitObjectComposer),
             typeof(ManiaHitObjectComposer),
         };
-        
-        //[BackgroundDependencyLoader]
-        //private void load(OsuGameBase osuGame)
-        //{
-        //    osuGame.Beatmap.Value = new TestWorkingBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 })
-        //    {
-        //        HitObjects = new List<ManiaHitObject>
-        //        {
-        //            new Note { Column = 2, StartTime = 100 },
-        //            new Note { Column = 3, StartTime = 150 },
-        //            new HoldNote
-        //            {
-        //                Column = 1,
-        //                StartTime = 200,
-        //                Duration = 150,
-        //            }
-        //        },
-        //        ControlPointInfo = new ControlPointInfo
-        //        {
-        //            TimingPoints =
-        //            {
-        //                new TimingControlPoint { Time = 0, BeatLength = 400 }
-        //            }
-        //        },
-        //    });
-
-        //    var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-        //    dependencies.CacheAs<IAdjustableClock>(clock);
-        //    dependencies.CacheAs<IFrameBasedClock>(clock);
-        //}
 
         protected override HitObjectComposer CreateComposer()
         {

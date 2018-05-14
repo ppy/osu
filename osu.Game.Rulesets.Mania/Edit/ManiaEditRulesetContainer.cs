@@ -3,7 +3,6 @@
 
 using OpenTK;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -70,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                     });
                 }
             }
-            
+
             Playfield.ClearEditSnapLines();
             EditSnapLines.ForEach(Playfield.Add);
         }
