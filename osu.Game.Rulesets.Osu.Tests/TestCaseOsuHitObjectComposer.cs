@@ -9,13 +9,12 @@ using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Tests.Edit;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
     public class TestCaseOsuHitObjectComposer : HitObjectComposerTestCase

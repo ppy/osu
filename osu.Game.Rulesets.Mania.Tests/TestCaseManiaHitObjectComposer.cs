@@ -5,7 +5,6 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Objects;
@@ -14,7 +13,7 @@ using osu.Game.Tests.Edit;
 using System;
 using System.Collections.Generic;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
     public class TestCaseManiaHitObjectComposer : HitObjectComposerTestCase
