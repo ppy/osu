@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Ranking
                                 backgroundParallax = new ParallaxContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    ParallaxAmount = 0.02f,
+                                    ParallaxAmount = 0.01f,
                                     //Compensate for the Toolbar
                                     Scale = new Vector2(1.06f / circle_outer_scale / overscan),
                                     //Offset the background to account for the toolbar.
