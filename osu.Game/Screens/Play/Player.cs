@@ -149,8 +149,6 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = RulesetContainer.CreateScoreProcessor();
 
-            Drawable rulesetCursor = RulesetContainer.Cursor?.CreateProxy() ?? new Container();
-
             Children = new Drawable[]
             {
                 pauseContainer = new PauseContainer(offsetClock, adjustableClock)
@@ -190,7 +188,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        rulesetCursor,
+                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
                         new SkipOverlay(firstObjectTime)
                         {
                             Clock = Clock, // skip button doesn't want to use the audio clock directly
