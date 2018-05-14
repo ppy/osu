@@ -159,8 +159,11 @@ namespace osu.Game.Screens.Ranking
                                 backgroundParallax = new ParallaxContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    ParallaxAmount = 0.01f,
-                                    Scale = new Vector2(1 / circle_outer_scale),
+                                    ParallaxAmount = 0.02f,
+                                    //Compensate for the Toolbar
+                                    Scale = new Vector2(1.06f / circle_outer_scale / overscan),
+                                    //Offset the background to account for the toolbar.
+                                    Position = new Vector2(0, -20),
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Children = new Drawable[]
