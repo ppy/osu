@@ -332,7 +332,7 @@ namespace osu.Game.Tests.Visual
 
             private readonly Drawable tracker;
 
-            public TimingPointVisualiser(Beatmap beatmap, double length)
+            public TimingPointVisualiser(IBeatmap beatmap, double length)
             {
                 this.length = length;
 

@@ -13,9 +13,14 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 {
     public class CatchBeatmapConverter : BeatmapConverter<CatchHitObject>
     {
+        public CatchBeatmapConverter(IBeatmap beatmap)
+            : base(beatmap)
+        {
+        }
+
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
-        protected override IEnumerable<CatchHitObject> ConvertHitObject(HitObject obj, Beatmap beatmap)
+        protected override IEnumerable<CatchHitObject> ConvertHitObject(HitObject obj, IBeatmap beatmap)
         {
             var curveData = obj as IHasCurve;
             var positionData = obj as IHasXPosition;
@@ -64,5 +69,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 X = positionData.X / CatchPlayfield.BASE_WIDTH
             };
         }
+
+        protected override Beatmap<CatchHitObject> CreateBeatmap() => new CatchBeatmap();
     }
 }

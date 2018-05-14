@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        protected virtual Beatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
+        protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
 
         private Player loadPlayerFor(RulesetInfo ri) => loadPlayerFor(ri.CreateInstance());
 

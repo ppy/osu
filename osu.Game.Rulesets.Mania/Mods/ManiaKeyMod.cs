@@ -3,19 +3,18 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public abstract class ManiaKeyMod : Mod, IApplicableToBeatmapConverter<ManiaHitObject>
+    public abstract class ManiaKeyMod : Mod, IApplicableToBeatmapConverter
     {
         public override string ShortenedName => Name;
         public abstract int KeyCount { get; }
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier
         public override bool Ranked => true;
 
-        public void ApplyToBeatmapConverter(BeatmapConverter<ManiaHitObject> beatmapConverter)
+        public void ApplyToBeatmapConverter(IBeatmapConverter beatmapConverter)
         {
             var mbc = (ManiaBeatmapConverter)beatmapConverter;
 
