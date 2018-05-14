@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Osu.OsuDifficulty;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
@@ -17,8 +16,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
@@ -39,36 +36,6 @@ namespace osu.Game.Rulesets.Osu
             new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
-
-        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap)
-        {
-            IEnumerable<HitObject> hitObjects = beatmap.Beatmap.HitObjects;
-            IEnumerable<HitObject> circles = hitObjects.Where(c => !(c is IHasEndTime));
-            IEnumerable<HitObject> sliders = hitObjects.Where(s => s is IHasCurve);
-            IEnumerable<HitObject> spinners = hitObjects.Where(s => s is IHasEndTime && !(s is IHasCurve));
-
-            return new[]
-            {
-                new BeatmapStatistic
-                {
-                    Name = @"Circle Count",
-                    Content = circles.Count().ToString(),
-                    Icon = FontAwesome.fa_circle_o
-                },
-                new BeatmapStatistic
-                {
-                    Name = @"Slider Count",
-                    Content = sliders.Count().ToString(),
-                    Icon = FontAwesome.fa_circle
-                },
-                new BeatmapStatistic
-                {
-                    Name = @"Spinner Count",
-                    Content = spinners.Count().ToString(),
-                    Icon = FontAwesome.fa_circle
-                }
-            };
-        }
 
         public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
         {
