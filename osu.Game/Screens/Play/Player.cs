@@ -149,6 +149,8 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = RulesetContainer.CreateScoreProcessor();
 
+            Drawable rulesetCursor = RulesetContainer.Cursor?.CreateProxy() ?? new Container();
+
             Children = new Drawable[]
             {
                 pauseContainer = new PauseContainer(offsetClock, adjustableClock)
@@ -162,7 +164,7 @@ namespace osu.Game.Screens.Play
                         hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
                     },
                     OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         storyboardContainer = new Container
                         {
@@ -181,6 +183,7 @@ namespace osu.Game.Screens.Play
                             ProcessCustomClock = false,
                             Breaks = beatmap.Breaks
                         },
+                        rulesetCursor,
                         new SkipOverlay(firstObjectTime)
                         {
                             Clock = Clock, // skip button doesn't want to use the audio clock directly
