@@ -217,6 +217,8 @@ namespace osu.Game.Screens.Play
                 }
             };
 
+            ShowOverlays.BindTo(pauseContainer.IsPaused);
+
             if (ShowStoryboard)
                 initializeStoryboard(false);
 
