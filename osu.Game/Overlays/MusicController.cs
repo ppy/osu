@@ -306,7 +306,10 @@ namespace osu.Game.Overlays
 
             var playable = beatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? beatmapSets.LastOrDefault();
             if (playable != null)
-                playSpecified(playable.Beatmaps.First());
+            {
+                beatmapBacking.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmapBacking);
+                beatmapBacking.Value.Track.Restart();
+            }
         }
 
         private void next(bool instant = false)
@@ -315,13 +318,10 @@ namespace osu.Game.Overlays
 
             var playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
             if (playable != null)
-                playSpecified(playable.Beatmaps.First());
-        }
-
-        private void playSpecified(BeatmapInfo info)
-        {
-            beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
-            beatmapBacking.Value.Track.Restart();
+            {
+                beatmapBacking.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmapBacking);
+                beatmapBacking.Value.Track.Restart();
+            }
         }
 
         private WorkingBeatmap current;
