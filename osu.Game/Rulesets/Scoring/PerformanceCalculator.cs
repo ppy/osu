@@ -3,41 +3,42 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Scoring
 {
     public abstract class PerformanceCalculator
     {
-        public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);
-    }
-
-    public abstract class PerformanceCalculator<TObject> : PerformanceCalculator
-        where TObject : HitObject
-    {
         private readonly Dictionary<string, double> attributes = new Dictionary<string, double>();
         protected IDictionary<string, double> Attributes => attributes;
 
-        protected readonly Beatmap<TObject> Beatmap;
+        protected readonly IBeatmap Beatmap;
         protected readonly Score Score;
 
-        protected PerformanceCalculator(Ruleset ruleset, Beatmap beatmap, Score score)
+        protected double TimeRate { get; private set; } = 1;
+
+        protected PerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
         {
             Score = score;
 
-            var converter = CreateBeatmapConverter();
-
-            foreach (var mod in score.Mods.OfType<IApplicableToBeatmapConverter<TObject>>())
-                mod.ApplyToBeatmapConverter(converter);
-
-            Beatmap = converter.Convert(beatmap);
+            Beatmap = beatmap;
 
             var diffCalc = ruleset.CreateDifficultyCalculator(beatmap, score.Mods);
             diffCalc.Calculate(attributes);
+
+            ApplyMods(score.Mods);
         }
 
-        protected abstract BeatmapConverter<TObject> CreateBeatmapConverter();
+        protected virtual void ApplyMods(Mod[] mods)
+        {
+            var clock = new StopwatchClock();
+            mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
+            TimeRate = clock.Rate;
+        }
+
+        public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);
     }
 }
