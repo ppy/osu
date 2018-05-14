@@ -183,6 +183,13 @@ namespace osu.Game.Screens.Play
                             ProcessCustomClock = false,
                             Breaks = beatmap.Breaks
                         },
+                        hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
+                        {
+                            Clock = Clock, // hud overlay doesn't want to use the audio clock directly
+                            ProcessCustomClock = false,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre
+                        },
                         rulesetCursor,
                         new SkipOverlay(firstObjectTime)
                         {
@@ -191,13 +198,6 @@ namespace osu.Game.Screens.Play
                             AdjustableClock = adjustableClock,
                             FramedClock = offsetClock,
                         },
-                        hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
-                        {
-                            Clock = Clock, // hud overlay doesn't want to use the audio clock directly
-                            ProcessCustomClock = false,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre
-                        }
                     }
                 },
                 failOverlay = new FailOverlay
