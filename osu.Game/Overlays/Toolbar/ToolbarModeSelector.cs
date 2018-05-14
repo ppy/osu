@@ -4,12 +4,14 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Bindings;
+using osu.Framework.Input;
 using OpenTK;
+using OpenTK.Input;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Shapes;
@@ -17,7 +19,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarModeSelector : KeyBindingContainer<int>
+    public class ToolbarModeSelector : Container
     {
         private const float padding = 10;
 
@@ -25,7 +27,7 @@ namespace osu.Game.Overlays.Toolbar
         private readonly Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
-        private int rulesetCount;
+        private RulesetStore rulesets;
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public ToolbarModeSelector()
@@ -68,50 +70,10 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        public override IEnumerable<osu.Framework.Input.Bindings.KeyBinding> DefaultKeyBindings
-        {
-            get
-            {
-                var keybinds = new List<osu.Framework.Input.Bindings.KeyBinding>();
-                for (int i = 0; i < Math.Min(rulesetCount, 10); i++)
-                {
-                    InputKey numberKey;
-                    if (i == 9)
-                        numberKey = InputKey.Number0;
-                    else
-                        numberKey = (InputKey)i + 110;
-
-                    keybinds.Add(new osu.Framework.Input.Bindings.KeyBinding(new[] { InputKey.Control, numberKey }, i));
-                }
-                return keybinds;
-            }
-        }
-
-        private class RulesetSwitcherInputHandler : Container, IKeyBindingHandler<int>
-        {
-            private readonly Bindable<RulesetInfo> ruleset;
-            private readonly RulesetStore rulesets;
-
-            public RulesetSwitcherInputHandler(Bindable<RulesetInfo> ruleset, RulesetStore rulesets)
-            {
-                this.ruleset = ruleset;
-                this.rulesets = rulesets;
-            }
-
-            public bool OnPressed(int action)
-            {
-                ruleset.Value = rulesets.GetRuleset(action);
-
-                return true;
-            }
-
-            public bool OnReleased(int action) => false;
-        }
-
         [BackgroundDependencyLoader(true)]
         private void load(RulesetStore rulesets, OsuGame game)
         {
-            rulesetCount = rulesets.AvailableRulesets.Count();
+            this.rulesets = rulesets;
             foreach (var r in rulesets.AvailableRulesets)
             {
                 modeButtons.Add(new ToolbarModeButton
@@ -130,8 +92,22 @@ namespace osu.Game.Overlays.Toolbar
                 ruleset.BindTo(game.Ruleset);
             else
                 ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault();
+        }
 
-            Add(new RulesetSwitcherInputHandler(ruleset, rulesets));
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            base.OnKeyDown(state, args);
+            if (!state.Keyboard.ControlPressed || args.Repeat || (int)args.Key < 109 ||  (int)args.Key > 118) {
+                return false;
+            }
+
+            RulesetInfo targetRuleset = rulesets.GetRuleset(args.Key == Key.Number0 ? 9 : (int)args.Key - 110);
+            if (targetRuleset == null || targetRuleset == ruleset.Value) {
+                return false;
+            }
+
+            ruleset.Value = targetRuleset;
+            return true;
         }
 
         public override bool HandleKeyboardInput => !ruleset.Disabled && base.HandleKeyboardInput;
