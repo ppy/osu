@@ -17,11 +17,11 @@ namespace osu.Game.Tests.Visual
         {
             bool fired = false;
 
-            var abortText = new OsuSpriteText
+            var firedText = new OsuSpriteText
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Text = "Aborted!",
+                Text = "Fired!",
                 TextSize = 50,
                 Alpha = 0,
             };
@@ -31,14 +31,14 @@ namespace osu.Game.Tests.Visual
                 Action = () =>
                 {
                     fired = true;
-                    abortText.FadeTo(1).Then().FadeOut(1000);
+                    firedText.FadeTo(1).Then().FadeOut(1000);
                 }
             };
 
             Children = new Drawable[]
             {
                 overlay,
-                abortText
+                firedText
             };
 
             AddStep("start confirming", () => overlay.Begin());
