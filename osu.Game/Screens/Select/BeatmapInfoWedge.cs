@@ -88,17 +88,27 @@ namespace osu.Game.Screens.Select
 
         private void loadBeatmap()
         {
+            void updateState()
+            {
+                State = beatmap == null ? Visibility.Hidden : Visibility.Visible;
+
+                Info?.FadeOut(250);
+                Info?.Expire();
+            }
+
+            if (beatmap == null)
+            {
+                updateState();
+                return;
+            }
+
             LoadComponentAsync(new BufferedWedgeInfo(beatmap, ruleset.Value)
             {
                 Shear = -Shear,
                 Depth = Info?.Depth + 1 ?? 0,
             }, newInfo =>
             {
-                State = beatmap == null ? Visibility.Hidden : Visibility.Visible;
-
-                Info?.FadeOut(250);
-                Info?.Expire();
-
+                updateState();
                 Add(Info = newInfo);
             });
         }
