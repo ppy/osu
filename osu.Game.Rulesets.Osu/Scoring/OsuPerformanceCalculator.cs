@@ -18,17 +18,17 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private readonly int beatmapMaxCombo;
 
         private Mod[] mods;
-        
+
         /// <summary>
         /// Approach rate adjusted by mods.
         /// </summary>
         private double realApproachRate;
-        
+
         /// <summary>
         /// Overall difficulty adjusted by mods.
         /// </summary>
         private double realOverallDifficulty;
-        
+
         private double accuracy;
         private int scoreMaxCombo;
         private int count300;
@@ -70,11 +70,11 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 ar = Math.Max(0, ar / 2);
 
             double preEmpt = BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450) / TimeRate;
-            double hitWindow300 = (Beatmap.HitObjects.First().HitWindows.Great / 2 - 0.5) / TimeRate; 
-            
+            double hitWindow300 = (Beatmap.HitObjects.First().HitWindows.Great / 2 - 0.5) / TimeRate;
+
             realApproachRate = preEmpt > 1200 ? (1800 - preEmpt) / 120 : (1200 - preEmpt) / 150 + 5;
             realOverallDifficulty = (80 - 0.5 - hitWindow300) / 6;
-            
+
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.12f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 

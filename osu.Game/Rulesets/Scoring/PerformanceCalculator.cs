@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Scoring
 
             ApplyMods(score.Mods);
         }
-        
+
         protected virtual void ApplyMods(Mod[] mods)
         {
             var clock = new StopwatchClock();
