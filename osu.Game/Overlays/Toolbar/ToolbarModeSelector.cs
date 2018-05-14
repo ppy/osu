@@ -1,10 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Linq;
-using System.Collections.Generic;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
