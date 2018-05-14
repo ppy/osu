@@ -18,7 +18,17 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private readonly int beatmapMaxCombo;
 
         private Mod[] mods;
+
+        /// <summary>
+        /// Approach rate adjusted by mods.
+        /// </summary>
         private double realApproachRate;
+
+        /// <summary>
+        /// Overall difficulty adjusted by mods.
+        /// </summary>
+        private double realOverallDifficulty;
+
         private double accuracy;
         private int scoreMaxCombo;
         private int count300;
@@ -58,8 +68,12 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 ar = Math.Min(10, ar * 1.4);
             if (mods.Any(m => m is OsuModEasy))
                 ar = Math.Max(0, ar / 2);
-            double preEmpt = BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450);
+
+            double preEmpt = BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450) / TimeRate;
+            double hitWindow300 = (Beatmap.HitObjects.First().HitWindows.Great / 2 - 0.5) / TimeRate;
+
             realApproachRate = preEmpt > 1200 ? (1800 - preEmpt) / 120 : (1200 - preEmpt) / 150 + 5;
+            realOverallDifficulty = (80 - 0.5 - hitWindow300) / 6;
 
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.12f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
@@ -85,6 +99,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 categoryRatings.Add("Aim", aimValue);
                 categoryRatings.Add("Speed", speedValue);
                 categoryRatings.Add("Accuracy", accuracyValue);
+                categoryRatings.Add("OD", realOverallDifficulty);
+                categoryRatings.Add("AR", realApproachRate);
+                categoryRatings.Add("Max Combo", beatmapMaxCombo);
             }
 
             return totalValue;
@@ -133,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             // Scale the aim value with accuracy _slightly_
             aimValue *= 0.5f + accuracy / 2.0f;
             // It is important to also consider accuracy difficulty when doing that
-            aimValue *= 0.98f + Math.Pow(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 2) / 2500;
+            aimValue *= 0.98f + Math.Pow(realOverallDifficulty, 2) / 2500;
 
             return aimValue;
         }
@@ -159,7 +176,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             // Scale the speed value with accuracy _slightly_
             speedValue *= 0.5f + accuracy / 2.0f;
             // It is important to also consider accuracy difficulty when doing that
-            speedValue *= 0.98f + Math.Pow(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, 2) / 2500;
+            speedValue *= 0.98f + Math.Pow(realOverallDifficulty, 2) / 2500;
 
             return speedValue;
         }
@@ -181,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accuracyValue = Math.Pow(1.52163f, Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83f;
+            double accuracyValue = Math.Pow(1.52163f, realOverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83f;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             accuracyValue *= Math.Min(1.15f, Math.Pow(amountHitObjectsWithAccuracy / 1000.0f, 0.3f));
