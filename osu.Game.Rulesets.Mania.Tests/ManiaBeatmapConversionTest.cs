@@ -14,7 +14,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class ManiaBeatmapConversionTest : BeatmapConversionTest<TestManiaRuleset, ConvertValue>
+    internal class ManiaBeatmapConversionTest : BeatmapConversionTest<TestManiaRuleset, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
     }
 
-    public struct ConvertValue : IEquatable<ConvertValue>
+    internal struct ConvertValue : IEquatable<ConvertValue>
     {
         /// <summary>
         /// A sane value to account for osu!stable using ints everwhere.
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                && Column == other.Column;
     }
 
-    public class TestManiaRuleset : ManiaRuleset
+    internal class TestManiaRuleset : ManiaRuleset
     {
     }
 }
