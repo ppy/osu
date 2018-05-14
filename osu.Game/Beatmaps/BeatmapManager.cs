@@ -9,7 +9,9 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
@@ -333,7 +335,7 @@ namespace osu.Game.Beatmaps
                     ms.Position = 0;
 
                     var decoder = Decoder.GetDecoder<Beatmap>(sr);
-                    Beatmap beatmap = decoder.Decode(sr);
+                    IBeatmap beatmap = decoder.Decode(sr);
 
                     beatmap.BeatmapInfo.Path = name;
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
@@ -341,15 +343,40 @@ namespace osu.Game.Beatmaps
 
                     RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
 
-                    // TODO: this should be done in a better place once we actually need to dynamically update it.
                     beatmap.BeatmapInfo.Ruleset = ruleset;
-                    beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance()?.CreateDifficultyCalculator(beatmap).Calculate() ?? 0;
+
+                    if (ruleset != null)
+                    {
+                        // TODO: this should be done in a better place once we actually need to dynamically update it.
+                        var converted = new DummyConversionBeatmap(beatmap).GetPlayableBeatmap(ruleset);
+                        beatmap.BeatmapInfo.StarDifficulty = ruleset.CreateInstance().CreateDifficultyCalculator(converted).Calculate();
+                    }
+                    else
+                        beatmap.BeatmapInfo.StarDifficulty = 0;
 
                     beatmapInfos.Add(beatmap.BeatmapInfo);
                 }
             }
 
             return beatmapInfos;
+        }
+
+        /// <summary>
+        /// A dummy WorkingBeatmap for the purpose of retrieving a beatmap for star difficulty calculation.
+        /// </summary>
+        private class DummyConversionBeatmap : WorkingBeatmap
+        {
+            private readonly IBeatmap beatmap;
+
+            public DummyConversionBeatmap(IBeatmap beatmap)
+                : base(beatmap.BeatmapInfo)
+            {
+                this.beatmap = beatmap;
+            }
+
+            protected override IBeatmap GetBeatmap() => beatmap;
+            protected override Texture GetBackground() => null;
+            protected override Track GetTrack() => null;
         }
     }
 }

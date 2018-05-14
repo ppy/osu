@@ -6,14 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    public class OsuPerformanceCalculator : PerformanceCalculator<OsuHitObject>
+    public class OsuPerformanceCalculator : PerformanceCalculator
     {
         private readonly int countHitCircles;
         private readonly int beatmapMaxCombo;
@@ -27,13 +26,14 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private int count50;
         private int countMiss;
 
-        public OsuPerformanceCalculator(Ruleset ruleset, Beatmap beatmap, Score score)
+        public OsuPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
 
-            beatmapMaxCombo = Beatmap.HitObjects.Count;
-            beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count) + 1;
+            beatmapMaxCombo = Beatmap.HitObjects.Count();
+            // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
+            beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
         }
 
         public override double Calculate(Dictionary<string, double> categoryRatings = null)
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             aimValue *= approachRateFactor;
 
             if (mods.Any(h => h is OsuModHidden))
-                aimValue *= 1.18f;
+                aimValue *= 1.03f;
 
             if (mods.Any(h => h is OsuModFlashlight))
             {
@@ -152,6 +152,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
             // Combo scaling
             if (beatmapMaxCombo > 0)
                 speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
+
+            if (mods.Any(m => m is OsuModHidden))
+                speedValue *= 1.18f;
 
             // Scale the speed value with accuracy _slightly_
             speedValue *= 0.5f + accuracy / 2.0f;
@@ -193,7 +196,5 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private double totalHits => count300 + count100 + count50 + countMiss;
         private double totalSuccessfulHits => count300 + count100 + count50;
-
-        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
     }
 }
