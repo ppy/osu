@@ -314,7 +314,8 @@ namespace osu.Game.Overlays
 
         private void next(bool instant = false)
         {
-            queuedDirection = TransformDirection.Next;
+            if (!instant)
+                queuedDirection = TransformDirection.Next;
 
             var playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
             if (playable != null)
