@@ -101,20 +101,15 @@ namespace osu.Game.Overlays
                                     Origin = Anchor.TopCentre,
                                     AutoSizeAxes = Axes.Both
                                 },
-                                new Container
+                                textLine3 = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    AutoSizeAxes = Axes.Both,
                                     Margin = new MarginPadding { Bottom = 15 },
+                                    Font = @"Exo2.0-Bold",
+                                    TextSize = 12,
                                     Alpha = 0.3f,
-                                    Child = textLine3 = new OsuSpriteText
-                                    {
-                                        Font = @"Exo2.0-Bold",
-                                        TextSize = 12,
-                                        AlwaysPresent = true
-                                    },
-                                }
+                                },
                             }
                         }
                     }
@@ -182,6 +177,9 @@ namespace osu.Game.Overlays
                 textLine1.Text = description.Name.ToUpper();
                 textLine2.Text = description.Value;
                 textLine3.Text = description.Shortcut.ToUpper();
+
+                if (string.IsNullOrEmpty(textLine3.Text))
+                    textLine3.Text = "NO KEY BOUND";
 
                 Display(box);
 
