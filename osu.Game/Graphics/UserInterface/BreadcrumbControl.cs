@@ -14,14 +14,18 @@ namespace osu.Game.Graphics.UserInterface
     public class BreadcrumbControl<T> : OsuTabControl<T>
     {
         private const float padding = 10;
+        private const float item_chevron_size = 10;
 
-        protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value);
+        protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value)
+        {
+            AccentColour = AccentColour,
+        };
 
-        protected override float StripWidth() => base.StripWidth() - (padding + 8);
+        protected override float StripWidth() => base.StripWidth() - (padding + item_chevron_size);
 
         public BreadcrumbControl()
         {
-            Height = 26;
+            Height = 32;
             TabContainer.Spacing = new Vector2(padding, 0f);
             Current.ValueChanged += tab =>
             {
@@ -47,6 +51,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public override bool HandleKeyboardInput => State == Visibility.Visible;
             public override bool HandleMouseInput => State == Visibility.Visible;
+            public override bool IsRemovable => true;
 
             private Visibility state;
 
@@ -77,13 +82,14 @@ namespace osu.Game.Graphics.UserInterface
 
             public BreadcrumbTabItem(T value) : base(value)
             {
-                Text.TextSize = 16;
-                Padding = new MarginPadding { Right = padding + 8 }; //padding + chevron width
+                Text.TextSize = 18;
+                Text.Margin = new MarginPadding { Vertical = 8 };
+                Padding = new MarginPadding { Right = padding + item_chevron_size };
                 Add(Chevron = new SpriteIcon
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
-                    Size = new Vector2(12),
+                    Size = new Vector2(item_chevron_size),
                     Icon = FontAwesome.fa_chevron_right,
                     Margin = new MarginPadding { Left = padding },
                     Alpha = 0f,

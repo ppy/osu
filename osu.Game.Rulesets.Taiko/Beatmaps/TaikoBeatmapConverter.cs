@@ -203,5 +203,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 }
             }
         }
+
+        protected override Beatmap<TaikoHitObject> CreateBeatmap() => new TaikoBeatmap();
     }
 }
