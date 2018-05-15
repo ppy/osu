@@ -31,9 +31,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected virtual bool DisplayJudgements => true;
 
-        // TODO: Implement this
-        //protected virtual bool AcceptKeyInput => true;
-
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
             : base(ScrollingDirection.Up)
         {

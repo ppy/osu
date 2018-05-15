@@ -2,7 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Screens.Edit.Screens.Compose;
 using System;
@@ -61,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 else if (d % 4 == 0)
                     Colour = Color4.Red;
                 else if (d % 2 == 0)
-                    Colour = Color4.Blue;
+                    Colour = new Color4(0, 96, 192, 255); // More eye-friendly
                 else
                     Colour = Color4.Yellow;
                 // In case the divisor refers to triplets and the index is within the split areas, override the previous calculation

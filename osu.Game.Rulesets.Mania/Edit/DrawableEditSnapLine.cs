@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             : base(snapLine)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 1;
+            Height = 2;
 
             AddInternal(new Box
             {
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             if (isMajor)
             {
-                Height = 2;
+                Height = 4;
             }
         }
 

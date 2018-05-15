@@ -48,17 +48,37 @@ namespace osu.Game.Rulesets.Mania.Edit
             var timingPoints = Beatmap.ControlPointInfo.TimingPoints;
             EditSnapLines = new List<EditSnapLine>();
 
+            // Create lines before the beginning of the first timing point
+            if (timingPoints.Any())
+            {
+                double step = timingPoints[0].BeatLength / newDivisor;
+                int index = (int)(timingPoints[0].Time / step);
+                index += newDivisor - (index % newDivisor);
+                // As long as the snap lines are symmetrical, this will work
+                // That means it should change if 1/5, 1/7, 1/11 are added
+                for (double t = timingPoints[0].Time; t >= 0; t -= step, index--)
+                {
+                    EditSnapLines.Add(new EditSnapLine
+                    {
+                        StartTime = t,
+                        ControlPoint = timingPoints[0],
+                        BeatDivisor = BeatDivisor,
+                        BeatIndex = index,
+                    });
+                }
+            }
+
             for (int i = 0; i < timingPoints.Count; i++)
             {
                 TimingControlPoint point = timingPoints[i];
 
-                // Stop on the beat before the next timing point, or if there is no next timing point stop slightly past the last object
-                // Needs fixing
-                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time - point.BeatLength : lastObjectTime + point.BeatLength * (int)point.TimeSignature;
+                // Stop at the end of the timing point before the next one if any, otherwise stop at the last object's time
+                // This might lead to creating the same snap line twice if the next timing point begins on a beat of the current one
+                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastObjectTime + point.BeatLength * (int)point.TimeSignature;
 
                 int index = 0;
                 double step = point.BeatLength / newDivisor;
-                for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += step, index++)
+                for (double t = timingPoints[i].Time; t <= endTime; t += step, index++)
                 {
                     EditSnapLines.Add(new EditSnapLine
                     {
