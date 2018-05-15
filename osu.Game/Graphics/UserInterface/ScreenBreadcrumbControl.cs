@@ -8,10 +8,6 @@ using osu.Framework.Screens;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ScreenBreadcrumbControl : ScreenBreadcrumbControl<Screen>
-    {
-    }
-
     public class ScreenBreadcrumbControl<T> : BreadcrumbControl<T> where T : Screen
     {
         private T currentScreen;
