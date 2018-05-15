@@ -60,7 +60,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             double starRating = calculateDifficulty() * star_scaling_factor;
 
-            categoryDifficulty?.Add("Strain", starRating);
+            if (categoryDifficulty != null)
+                categoryDifficulty["Strain"] = starRating;
 
             return starRating;
         }
