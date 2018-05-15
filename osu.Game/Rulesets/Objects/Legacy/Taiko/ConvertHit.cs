@@ -11,5 +11,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
     internal sealed class ConvertHit : HitObject, IHasCombo
     {
         public bool NewCombo { get; set; }
+
+        protected override HitWindows CreateHitWindows() => new ConvertHitWindows();
     }
 }

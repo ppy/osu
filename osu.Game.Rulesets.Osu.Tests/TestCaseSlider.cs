@@ -93,11 +93,35 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("Big Single, Large StackOffset", () => testSimpleBigLargeStackOffset());
             AddStep("Big 1 Repeat, Large StackOffset", () => testSimpleBigLargeStackOffset(1));
+
+            AddStep("Distance Overflow", () => testDistanceOverflow());
+            AddStep("Distance Overflow 1 Repeat", () => testDistanceOverflow(1));
         }
 
         private void testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
 
         private void testSimpleBigLargeStackOffset(int repeats = 0) => createSlider(2, repeats: repeats, stackHeight: 10);
+
+        private void testDistanceOverflow(int repeats = 0)
+        {
+            var slider = new Slider
+            {
+                StartTime = Time.Current + 1000,
+                Position = new Vector2(239, 176),
+                ControlPoints = new List<Vector2>
+                {
+                    Vector2.Zero,
+                    new Vector2(154, 28),
+                    new Vector2(52, -34)
+                },
+                Distance = 700,
+                RepeatCount = repeats,
+                RepeatSamples = createEmptySamples(repeats),
+                StackHeight = 10
+            };
+
+            addSlider(slider, 2, 2);
+        }
 
         private void testSimpleMedium(int repeats = 0) => createSlider(5, repeats: repeats);
 

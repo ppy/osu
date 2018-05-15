@@ -12,5 +12,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
         public double EndTime { get; set; }
 
         public double Duration => EndTime - StartTime;
+
+        protected override HitWindows CreateHitWindows() => new ConvertHitWindows();
     }
 }
