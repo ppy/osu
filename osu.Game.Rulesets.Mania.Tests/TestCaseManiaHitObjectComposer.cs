@@ -9,9 +9,9 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Screens.Edit.Screens.Compose;
-using osu.Game.Tests.Edit;
 using System;
 using System.Collections.Generic;
+using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {

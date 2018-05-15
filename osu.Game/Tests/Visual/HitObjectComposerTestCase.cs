@@ -6,9 +6,8 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Tests.Visual;
 
-namespace osu.Game.Tests.Edit
+namespace osu.Game.Tests.Visual
 {
     public abstract class HitObjectComposerTestCase : OsuTestCase
     {
