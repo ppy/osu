@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Mods
             const float ratio = 1.4f;
             difficulty.CircleSize *= 1.3f; // CS uses a custom 1.3 ratio.
             difficulty.ApproachRate = Math.Min(difficulty.ApproachRate * ratio, 10.0f);
-            difficulty.DrainRate *= ratio;
-            difficulty.OverallDifficulty *= ratio;
+            difficulty.DrainRate = Math.Min(difficulty.DrainRate * ratio, 10.0f);
+            difficulty.OverallDifficulty = Math.Min(difficulty.OverallDifficulty * ratio, 10.0f);
         }
     }
 }
