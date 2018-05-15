@@ -1,20 +1,22 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Taiko.Objects;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mods;
 
-namespace osu.Game.Rulesets.Taiko
+namespace osu.Game.Rulesets.Mania.Difficulty
 {
-    internal class TaikoDifficultyCalculator : DifficultyCalculator
+    internal class ManiaDifficultyCalculator : DifficultyCalculator
     {
-        private const double star_scaling_factor = 0.04125;
+        private const double star_scaling_factor = 0.018;
 
         /// <summary>
-        /// In milliseconds. For difficulty calculation we will only look at the highest strain value in each time interval of size STRAIN_STEP.
+        /// In milliseconds. For difficulty calculation we will only look at the highest strain value in each time interval of size strain_step.
         /// This is to eliminate higher influence of stream over aim by simply having more HitObjects with high strain.
         /// The higher this value, the less strains there will be, indirectly giving long beatmaps an advantage.
         /// </summary>
@@ -28,10 +30,15 @@ namespace osu.Game.Rulesets.Taiko
         /// <summary>
         /// HitObjects are stored as a member variable.
         /// </summary>
-        private readonly List<TaikoHitObjectDifficulty> difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
+        private readonly List<ManiaHitObjectDifficulty> difficultyHitObjects = new List<ManiaHitObjectDifficulty>();
 
-        public TaikoDifficultyCalculator(IBeatmap beatmap)
+        public ManiaDifficultyCalculator(IBeatmap beatmap)
             : base(beatmap)
+        {
+        }
+
+        public ManiaDifficultyCalculator(IBeatmap beatmap, Mod[] mods)
+            : base(beatmap, mods)
         {
         }
 
@@ -40,21 +47,20 @@ namespace osu.Game.Rulesets.Taiko
             // Fill our custom DifficultyHitObject class, that carries additional information
             difficultyHitObjects.Clear();
 
+            int columnCount = (Beatmap as ManiaBeatmap)?.TotalColumns ?? 7;
+
             foreach (var hitObject in Beatmap.HitObjects)
-                difficultyHitObjects.Add(new TaikoHitObjectDifficulty((TaikoHitObject)hitObject));
+                difficultyHitObjects.Add(new ManiaHitObjectDifficulty((ManiaHitObject)hitObject, columnCount));
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
 
-            if (!calculateStrainValues()) return 0;
+            if (!calculateStrainValues())
+                return 0;
 
             double starRating = calculateDifficulty() * star_scaling_factor;
 
-            if (categoryDifficulty != null)
-            {
-                categoryDifficulty.Add("Strain", starRating);
-                categoryDifficulty.Add("Hit window 300", 35 /*HitObjectManager.HitWindow300*/ / TimeRate);
-            }
+            categoryDifficulty?.Add("Strain", starRating);
 
             return starRating;
         }
@@ -62,11 +68,12 @@ namespace osu.Game.Rulesets.Taiko
         private bool calculateStrainValues()
         {
             // Traverse hitObjects in pairs to calculate the strain value of NextHitObject from the strain value of CurrentHitObject and environment.
-            using (List<TaikoHitObjectDifficulty>.Enumerator hitObjectsEnumerator = difficultyHitObjects.GetEnumerator())
+            using (List<ManiaHitObjectDifficulty>.Enumerator hitObjectsEnumerator = difficultyHitObjects.GetEnumerator())
             {
-                if (!hitObjectsEnumerator.MoveNext()) return false;
+                if (!hitObjectsEnumerator.MoveNext())
+                    return false;
 
-                TaikoHitObjectDifficulty current = hitObjectsEnumerator.Current;
+                ManiaHitObjectDifficulty current = hitObjectsEnumerator.Current;
 
                 // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
                 while (hitObjectsEnumerator.MoveNext())
@@ -89,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko
             double intervalEndTime = actualStrainStep;
             double maximumStrain = 0; // We need to keep track of the maximum strain in the current interval
 
-            TaikoHitObjectDifficulty previousHitObject = null;
+            ManiaHitObjectDifficulty previousHitObject = null;
             foreach (var hitObject in difficultyHitObjects)
             {
                 // While we are beyond the current interval push the currently available maximum to our strain list
@@ -105,8 +112,9 @@ namespace osu.Game.Rulesets.Taiko
                     }
                     else
                     {
-                        double decay = Math.Pow(TaikoHitObjectDifficulty.DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
-                        maximumStrain = previousHitObject.Strain * decay;
+                        double individualDecay = Math.Pow(ManiaHitObjectDifficulty.INDIVIDUAL_DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
+                        double overallDecay = Math.Pow(ManiaHitObjectDifficulty.OVERALL_DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
+                        maximumStrain = previousHitObject.IndividualStrain * individualDecay + previousHitObject.OverallStrain * overallDecay;
                     }
 
                     // Go to the next time interval
@@ -114,7 +122,8 @@ namespace osu.Game.Rulesets.Taiko
                 }
 
                 // Obtain maximum strain
-                maximumStrain = Math.Max(hitObject.Strain, maximumStrain);
+                double strain = hitObject.IndividualStrain + hitObject.OverallStrain;
+                maximumStrain = Math.Max(strain, maximumStrain);
 
                 previousHitObject = hitObject;
             }

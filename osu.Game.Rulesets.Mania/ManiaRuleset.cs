@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Difficulty;
 
 namespace osu.Game.Rulesets.Mania
 {
