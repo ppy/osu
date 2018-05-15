@@ -28,26 +28,22 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         /// </summary>
         public double DeltaTime { get; private set; }
 
-        /// <summary>
-        /// Number of milliseconds until the <see cref="OsuDifficultyHitObject"/> has to be hit.
-        /// </summary>
-        public double TimeUntilHit { get; set; }
 
         private const int normalized_radius = 52;
 
+        private readonly OsuHitObject lastObject;
         private readonly double timeRate;
-
-        private readonly OsuHitObject[] t;
 
         /// <summary>
         /// Initializes the object calculating extra data required for difficulty calculation.
         /// </summary>
-        public OsuDifficultyHitObject(OsuHitObject[] triangle, double timeRate)
+        public OsuDifficultyHitObject(OsuHitObject currentObject, OsuHitObject lastObject, double timeRate)
         {
+            this.lastObject = lastObject;
             this.timeRate = timeRate;
 
-            t = triangle;
-            BaseObject = t[0];
+            BaseObject = currentObject;
+
             setDistances();
             setTimingValues();
             // Calculate angle here
@@ -63,10 +59,10 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
-            Vector2 lastCursorPosition = t[1].StackedPosition;
+            Vector2 lastCursorPosition = lastObject.StackedPosition;
             float lastTravelDistance = 0;
 
-            var lastSlider = t[1] as Slider;
+            var lastSlider = lastObject as Slider;
             if (lastSlider != null)
             {
                 computeSliderCursorPosition(lastSlider);
@@ -81,7 +77,6 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         {
             // Every timing inverval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure.
             DeltaTime = Math.Max(40, (t[0].StartTime - t[1].StartTime) / timeRate);
-            TimeUntilHit = 450; // BaseObject.PreEmpt;
         }
 
         private void computeSliderCursorPosition(Slider slider)
