@@ -7,6 +7,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public class SnapLinePlayfield : ScrollingPlayfield
     {
+        public override bool HandleKeyboardInput => false;
+        public override bool HandleMouseInput => false;
+
         public SnapLinePlayfield()
             : base(ScrollingDirection.Up)
         {
