@@ -25,6 +25,10 @@ namespace osu.Game.Rulesets.Scoring.Legacy
             this.beatmaps = beatmaps;
         }
 
+        protected LegacyScoreParser()
+        {
+        }
+
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
 
@@ -34,16 +38,15 @@ namespace osu.Game.Rulesets.Scoring.Legacy
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
-                score = new Score { Ruleset = rulesets.GetRuleset(sr.ReadByte()) };
-                currentRuleset = score.Ruleset.CreateInstance();
+                currentRuleset = GetRuleset(sr.ReadByte());
+                score = new Score { Ruleset = currentRuleset.RulesetInfo };
 
                 /* score.Pass = true;*/
                 var version = sr.ReadInt32();
 
                 /* score.FileChecksum = */
-                var beatmapHash = sr.ReadString();
-                score.Beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == beatmapHash);
-                currentBeatmap = beatmaps.GetWorkingBeatmap(score.Beatmap).Beatmap;
+                currentBeatmap = GetBeatmap(sr.ReadString()).Beatmap;
+                score.Beatmap = currentBeatmap.BeatmapInfo;
 
                 /* score.PlayerName = */
                 score.User = new User { Username = sr.ReadString() };
@@ -181,5 +184,8 @@ namespace osu.Game.Rulesets.Scoring.Legacy
 
             return frame;
         }
+
+        protected virtual Ruleset GetRuleset(int rulesetId) => rulesets.GetRuleset(rulesetId).CreateInstance();
+        protected virtual WorkingBeatmap GetBeatmap(string md5Hash) => beatmaps.GetWorkingBeatmap(beatmaps.QueryBeatmap(b => b.MD5Hash == md5Hash));
     }
 }
