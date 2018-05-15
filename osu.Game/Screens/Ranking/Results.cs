@@ -160,8 +160,11 @@ namespace osu.Game.Screens.Ranking
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ParallaxAmount = 0.01f,
-                                    Scale = new Vector2(1 / circle_outer_scale / overscan),
+                                    //Compensate for the Toolbar
+                                    Scale = new Vector2(1.06f / circle_outer_scale / overscan),
+                                    //Offset the background to account for the toolbar.
                                     Anchor = Anchor.Centre,
+                                    Position = new Vector2(0, -20),
                                     Origin = Anchor.Centre,
                                     Children = new Drawable[]
                                     {
