@@ -27,6 +27,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private void screenChanged(Screen newScreen)
         {
+            if (newScreen == null) return;
+
             if (last != null)
             {
                 last.Exited -= screenChanged;
