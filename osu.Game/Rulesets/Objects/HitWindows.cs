@@ -63,10 +63,10 @@ namespace osu.Game.Rulesets.Objects
         public bool AllowsOk;
 
         /// <summary>
-        /// Constructs hit windows by fitting a parameter to a 2-part piecewise linear function for each hit window.
+        /// Sets hit windows with values that correspond to a difficulty parameter.
         /// </summary>
         /// <param name="difficulty">The parameter.</param>
-        public HitWindows(double difficulty)
+        public virtual void SetDifficulty(double difficulty)
         {
             Perfect = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Perfect]);
             Great = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Great]);

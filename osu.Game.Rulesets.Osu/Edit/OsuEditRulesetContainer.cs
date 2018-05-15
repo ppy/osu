@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuEditRulesetContainer : OsuRulesetContainer
     {
-        public OsuEditRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
+        public OsuEditRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
 
