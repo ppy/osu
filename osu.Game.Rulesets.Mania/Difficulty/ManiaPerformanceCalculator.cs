@@ -74,7 +74,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             {
                 categoryDifficulty["Strain"] = strainValue;
                 categoryDifficulty["Accuracy"] = accValue;
-
             }
 
             return totalValue;
