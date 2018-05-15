@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Catch
 {

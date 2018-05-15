@@ -5,6 +5,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 using System.Collections.Generic;
 using System;
+using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Taiko
 {

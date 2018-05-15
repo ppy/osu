@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Difficulty;
 
