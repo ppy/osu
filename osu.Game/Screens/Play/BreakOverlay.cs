@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -14,6 +15,8 @@ namespace osu.Game.Screens.Play
 {
     public class BreakOverlay : Container
     {
+        public BindableFloat BackgroundOpacityOffset;
+
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
         private const float remaining_time_container_max_size = 0.3f;
         private const int vertical_margin = 25;
@@ -122,6 +125,8 @@ namespace osu.Game.Screens.Play
 
                 using (BeginAbsoluteSequence(b.StartTime, true))
                 {
+                    if (BackgroundOpacityOffset != null)
+                        this.TransformBindableTo(BackgroundOpacityOffset, 1, fade_duration, Easing.OutQuint);
                     fadeContainer.FadeIn(fade_duration);
                     breakArrows.Show(fade_duration);
 
@@ -139,6 +144,8 @@ namespace osu.Game.Screens.Play
 
                     using (BeginDelayedSequence(b.Duration - fade_duration, true))
                     {
+                        if (BackgroundOpacityOffset != null)
+                            this.TransformBindableTo(BackgroundOpacityOffset, 0, fade_duration, Easing.OutQuint);
                         fadeContainer.FadeOut(fade_duration);
                         breakArrows.Hide(fade_duration);
                     }
