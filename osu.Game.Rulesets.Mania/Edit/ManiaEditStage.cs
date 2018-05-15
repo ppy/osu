@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
             Add(snapLinePlayfield = new SnapLinePlayfield());
             AddNested(snapLinePlayfield);
+
+            snapLinePlayfield.VisibleTimeRange.BindTo(VisibleTimeRange);
         }
 
         public void Add(EditSnapLine editSnapLine) => snapLinePlayfield.Add(new DrawableEditSnapLine(editSnapLine));
