@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play
 
         protected float BackgroundOpacity => 1 - (float)DimLevel + BackgroundOpacityOffset.Value;
 
-        protected BindableFloat BackgroundOpacityOffset = new BindableFloat(0);
+        protected BindableFloat BackgroundOpacityOffset;
 
         #region User Settings
 
