@@ -59,7 +59,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
         {
-
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
             int seed = (int)Math.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)Math.Round(difficulty.ApproachRate);
@@ -85,7 +84,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield break;
 
             foreach (ManiaHitObject obj in objects)
+            {
+                obj.HitWindows = original.HitWindows;
                 yield return obj;
+            }
         }
 
         private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
