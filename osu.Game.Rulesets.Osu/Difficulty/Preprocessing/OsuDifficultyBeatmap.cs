@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Osu.Objects;
 
-namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
+namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
     /// <summary>
     /// An enumerable container wrapping <see cref="OsuHitObject"/> input as <see cref="OsuDifficultyHitObject"/>
