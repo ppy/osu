@@ -14,7 +14,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class CatchBeatmapConversionTest : BeatmapConversionTest<TestCatchRuleset, ConvertValue>
+    internal class CatchBeatmapConversionTest : BeatmapConversionTest<TestCatchRuleset, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap);
     }
 
-    public struct ConvertValue : IEquatable<ConvertValue>
+    internal struct ConvertValue : IEquatable<ConvertValue>
     {
         /// <summary>
         /// A sane value to account for osu!stable using ints everwhere.
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                && Precision.AlmostEquals(Position, other.Position, conversion_lenience);
     }
 
-    public class TestCatchRuleset : CatchRuleset
+    internal class TestCatchRuleset : CatchRuleset
     {
     }
 }
