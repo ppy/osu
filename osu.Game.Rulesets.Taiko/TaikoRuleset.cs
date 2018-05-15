@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Taiko.Beatmaps;
+using osu.Game.Rulesets.Taiko.Difficulty;
 
 namespace osu.Game.Rulesets.Taiko
 {
