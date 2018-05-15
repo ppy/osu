@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.Containers
                 if (!parallaxEnabled)
                 {
                     content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, Easing.OutQuint);
-                    content.Scale = new Vector2(1 + System.Math.Abs(ParallaxAmount));
+                    content.Scale = new Vector2(1 + ParallaxAmount);
                 }
             };
         }
@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.Containers
                 double elapsed = MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000);
 
                 content.Position = Interpolation.ValueAt(elapsed, content.Position, offset, 0, 1000, Easing.OutQuint);
-                content.Scale = Interpolation.ValueAt(elapsed, content.Scale, new Vector2(1 + System.Math.Abs(ParallaxAmount)), 0, 1000, Easing.OutQuint);
+                content.Scale = Interpolation.ValueAt(elapsed, content.Scale, new Vector2(1 + ParallaxAmount), 0, 1000, Easing.OutQuint);
             }
 
             firstUpdate = false;
