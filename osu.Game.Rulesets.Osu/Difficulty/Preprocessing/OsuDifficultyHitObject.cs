@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
     /// </summary>
     public class OsuDifficultyHitObject
     {
+        private const int normalized_radius = 52;
+
         /// <summary>
         /// The <see cref="OsuHitObject"/> this <see cref="OsuDifficultyHitObject"/> refers to.
         /// </summary>
@@ -27,9 +29,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Milliseconds elapsed since the StartTime of the previous <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         public double DeltaTime { get; private set; }
-
-
-        private const int normalized_radius = 52;
 
         private readonly OsuHitObject lastObject;
         private readonly double timeRate;
