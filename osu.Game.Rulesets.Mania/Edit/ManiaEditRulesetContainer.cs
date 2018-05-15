@@ -70,8 +70,10 @@ namespace osu.Game.Rulesets.Mania.Edit
                 }
             }
 
-            Playfield.ClearEditSnapLines();
-            EditSnapLines.ForEach(Playfield.Add);
+            var editPlayfield = (ManiaEditPlayfield)Playfield;
+
+            editPlayfield.ClearEditSnapLines();
+            EditSnapLines.ForEach(editPlayfield.Add);
         }
 
         protected override Playfield CreatePlayfield() => new ManiaEditPlayfield(Beatmap.Stages);

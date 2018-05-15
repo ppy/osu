@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
-using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -26,7 +25,9 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
+
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
+        protected IReadOnlyList<ManiaStage> Stages => stages;
 
         protected virtual bool DisplayJudgements => true;
 
@@ -56,7 +57,8 @@ namespace osu.Game.Rulesets.Mania.UI
             int firstColumnIndex = 0;
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction) { DisplayJudgements = DisplayJudgements };
+                var newStage = CreateStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                newStage.DisplayJudgements = DisplayJudgements;
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
                 newStage.Inverted.BindTo(Inverted);
 
@@ -76,9 +78,6 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
-
-        public void Add(EditSnapLine editSnapLine) => stages.ForEach(s => s.Add(editSnapLine));
-        public void ClearEditSnapLines() => stages.ForEach(s => s.ClearEditSnapLines());
 
         private ManiaStage getStageByColumn(int column)
         {
@@ -106,5 +105,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             getStageByColumn(((ManiaHitObject)judgedObject.HitObject).Column).OnJudgement(judgedObject, judgement);
         }
+
+        protected virtual ManiaStage CreateStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
+            => new ManiaStage(firstColumnIndex, definition, ref normalColumnStartAction, ref specialColumnStartAction);
     }
 }

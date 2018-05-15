@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -26,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    internal class ManiaStage : ScrollingPlayfield
+    public class ManiaStage : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
 
@@ -171,16 +170,6 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
-
-        public void Add(EditSnapLine editSnapLine) => base.Add(new DrawableEditSnapLine(editSnapLine));
-        public void Remove(DrawableEditSnapLine editSnapLine) => base.Remove(editSnapLine);
-        public void ClearEditSnapLines()
-        {
-            var o = HitObjects.Objects;
-            for (int i = o.Count() - 1; i >= 0; i--)
-                if (o.ElementAt(i) is DrawableEditSnapLine e)
-                    Remove(e);
-        }
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
