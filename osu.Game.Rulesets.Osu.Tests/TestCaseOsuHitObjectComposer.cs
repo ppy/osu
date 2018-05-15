@@ -51,6 +51,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         Scale = 0.5f,
                     }
                 },
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo }
             };
         }
 

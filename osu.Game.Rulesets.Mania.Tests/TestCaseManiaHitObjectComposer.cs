@@ -55,13 +55,14 @@ namespace osu.Game.Rulesets.Mania.Tests
                         Duration = 150,
                     }
                 },
-                ControlPointInfo = new ControlPointInfo
+                ControlPointInfo =
                 {
                     TimingPoints =
                     {
                         new TimingControlPoint { Time = 0, BeatLength = 400 }
                     }
                 },
+                BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo }
             };
         }
     }
