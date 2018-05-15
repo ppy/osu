@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual
 
             Children = new Drawable[]
             {
-                changedScreen = currentScreen = startScreen = new TestScreenOne(),
+                currentScreen = startScreen = new TestScreenOne(),
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -51,6 +51,8 @@ namespace osu.Game.Tests.Visual
                 titleText.Text = $"Changed to {s.ToString()}";
                 changedScreen = s;
             };
+
+            breadcrumbs.Current.TriggerChange();
 
             assertCurrent();
             pushNext();
@@ -78,7 +80,7 @@ namespace osu.Game.Tests.Visual
         }
 
         private void pushNext() => AddStep(@"push next screen", () => currentScreen = ((TestScreen)currentScreen).PushNext());
-        private void assertCurrent() => AddAssert(@"current screen is correct", () => currentScreen == changedScreen);
+        private void assertCurrent() => AddAssert(@"changedScreen correct", () => currentScreen == changedScreen);
 
         private abstract class TestScreen : OsuScreen
         {
