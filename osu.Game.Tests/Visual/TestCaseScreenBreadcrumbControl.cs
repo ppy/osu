@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -15,18 +16,19 @@ using OpenTK;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseScreenBreadcrumbs : OsuTestCase
+    public class TestCaseScreenBreadcrumbControl : OsuTestCase
     {
-        private readonly ScreenBreadcrumbControl<TestScreen> breadcrumbs;
-        private TestScreen currentScreen, changedScreen;
+        private readonly ScreenBreadcrumbControl breadcrumbs;
+        private Screen currentScreen, changedScreen;
 
-        public TestCaseScreenBreadcrumbs()
+        public TestCaseScreenBreadcrumbControl()
         {
             TestScreen startScreen;
             OsuSpriteText titleText;
 
             Children = new Drawable[]
             {
+                changedScreen = currentScreen = startScreen = new TestScreenOne(),
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -35,23 +37,21 @@ namespace osu.Game.Tests.Visual
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
-                        breadcrumbs = new ScreenBreadcrumbControl<TestScreen>
+                        breadcrumbs = new ScreenBreadcrumbControl(startScreen)
                         {
                             RelativeSizeAxes = Axes.X,
                         },
                         titleText = new OsuSpriteText(),
                     },
                 },
-                currentScreen = startScreen = new TestScreenOne(),
             };
 
-            breadcrumbs.OnScreenChanged += s =>
+            breadcrumbs.Current.ValueChanged += s =>
             {
                 titleText.Text = $"Changed to {s.ToString()}";
                 changedScreen = s;
             };
 
-            AddStep(@"make start current", () => breadcrumbs.CurrentScreen = startScreen);
             assertCurrent();
             pushNext();
             assertCurrent();
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual
             breadcrumbs.StripColour = colours.Blue;
         }
 
-        private void pushNext() => AddStep(@"push next screen", () => currentScreen = currentScreen.PushNext());
+        private void pushNext() => AddStep(@"push next screen", () => currentScreen = ((TestScreen)currentScreen).PushNext());
         private void assertCurrent() => AddAssert(@"assert the current screen is correct", () => currentScreen == changedScreen);
 
         private abstract class TestScreen : OsuScreen
