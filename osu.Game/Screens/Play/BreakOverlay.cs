@@ -2,12 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.Break;
 
@@ -22,6 +24,8 @@ namespace osu.Game.Screens.Play
         private const int vertical_margin = 25;
 
         private List<BreakPeriod> breaks;
+
+        private Bindable<bool> dimDuringBreaks;
 
         private readonly Container fadeContainer;
 
@@ -108,6 +112,11 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
             initializeBreaks();
         }
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            dimDuringBreaks = config.GetBindable<bool>(OsuSetting.KeepDimDuringBreaks);
+        }
 
         private void initializeBreaks()
         {
@@ -125,7 +134,7 @@ namespace osu.Game.Screens.Play
 
                 using (BeginAbsoluteSequence(b.StartTime, true))
                 {
-                    if (BackgroundOpacityOffset != null)
+                    if (!dimDuringBreaks.Value && BackgroundOpacityOffset != null)
                         this.TransformBindableTo(BackgroundOpacityOffset, 1, fade_duration, Easing.OutQuint);
                     fadeContainer.FadeIn(fade_duration);
                     breakArrows.Show(fade_duration);
@@ -144,7 +153,7 @@ namespace osu.Game.Screens.Play
 
                     using (BeginDelayedSequence(b.Duration - fade_duration, true))
                     {
-                        if (BackgroundOpacityOffset != null)
+                        if (!dimDuringBreaks.Value && BackgroundOpacityOffset != null)
                             this.TransformBindableTo(BackgroundOpacityOffset, 0, fade_duration, Easing.OutQuint);
                         fadeContainer.FadeOut(fade_duration);
                         breakArrows.Hide(fade_duration);

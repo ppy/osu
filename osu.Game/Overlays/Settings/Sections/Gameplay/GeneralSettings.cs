@@ -30,6 +30,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Don't change dim level during breaks",
+                    Bindable = config.GetBindable<bool>(OsuSetting.KeepDimDuringBreaks)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Show score overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowInterface)
                 },
