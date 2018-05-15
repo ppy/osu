@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Mania
 {

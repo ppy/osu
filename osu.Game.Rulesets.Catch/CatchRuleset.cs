@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Catch.Beatmaps;
+using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Catch
 {
