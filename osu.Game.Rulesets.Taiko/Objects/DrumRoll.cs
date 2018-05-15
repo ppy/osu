@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         private double tickSpacing = 100;
 
+        private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
@@ -47,9 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
             tickSpacing = timingPoint.BeatLength / TickRate;
-
-            RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * difficulty.OverallDifficulty);
-            RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * difficulty.OverallDifficulty);
+            overallDifficulty = difficulty.OverallDifficulty;
         }
 
         protected override void CreateNestedHitObjects()
@@ -57,6 +57,9 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.CreateNestedHitObjects();
 
             createTicks();
+
+            RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
+            RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
         }
 
         private void createTicks()

@@ -69,5 +69,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 X = positionData.X / CatchPlayfield.BASE_WIDTH
             };
         }
+
+        protected override Beatmap<CatchHitObject> CreateBeatmap() => new CatchBeatmap();
     }
 }
