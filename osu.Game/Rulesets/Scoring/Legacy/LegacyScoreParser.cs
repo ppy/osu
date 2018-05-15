@@ -14,21 +14,8 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Scoring.Legacy
 {
-    public class LegacyScoreParser
+    public abstract class LegacyScoreParser
     {
-        private readonly RulesetStore rulesets;
-        private readonly BeatmapManager beatmaps;
-
-        public LegacyScoreParser(RulesetStore rulesets, BeatmapManager beatmaps)
-        {
-            this.rulesets = rulesets;
-            this.beatmaps = beatmaps;
-        }
-
-        protected LegacyScoreParser()
-        {
-        }
-
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
 
@@ -185,7 +172,18 @@ namespace osu.Game.Rulesets.Scoring.Legacy
             return frame;
         }
 
-        protected virtual Ruleset GetRuleset(int rulesetId) => rulesets.GetRuleset(rulesetId).CreateInstance();
-        protected virtual WorkingBeatmap GetBeatmap(string md5Hash) => beatmaps.GetWorkingBeatmap(beatmaps.QueryBeatmap(b => b.MD5Hash == md5Hash));
+        /// <summary>
+        /// Retrieves the <see cref="Ruleset"/> for a specific id.
+        /// </summary>
+        /// <param name="rulesetId">The id.</param>
+        /// <returns>The <see cref="Ruleset"/>.</returns>
+        protected abstract Ruleset GetRuleset(int rulesetId);
+
+        /// <summary>
+        /// Retrieves the <see cref="WorkingBeatmap"/> corresponding to an MD5 hash.
+        /// </summary>
+        /// <param name="md5Hash">The MD5 hash.</param>
+        /// <returns>The <see cref="WorkingBeatmap"/>.</returns>
+        protected abstract WorkingBeatmap GetBeatmap(string md5Hash);
     }
 }
