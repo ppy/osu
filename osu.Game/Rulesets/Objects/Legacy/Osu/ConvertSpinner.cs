@@ -20,5 +20,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
         public float X => Position.X;
 
         public float Y => Position.Y;
+
+        protected override HitWindows CreateHitWindows() => new ConvertHitWindows();
     }
 }

@@ -14,7 +14,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    public class TaikoBeatmapConversionTest : BeatmapConversionTest<TestTaikoRuleset, ConvertValue>
+    internal class TaikoBeatmapConversionTest : BeatmapConversionTest<TestTaikoRuleset, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
 
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
     }
 
-    public struct ConvertValue : IEquatable<ConvertValue>
+    internal struct ConvertValue : IEquatable<ConvertValue>
     {
         /// <summary>
         /// A sane value to account for osu!stable using ints everwhere.
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                && IsStrong == other.IsStrong;
     }
 
-    public class TestTaikoRuleset : TaikoRuleset
+    internal class TestTaikoRuleset : TaikoRuleset
     {
     }
 }

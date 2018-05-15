@@ -1,14 +1,15 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
-using System;
-using System.Collections.Generic;
 
-namespace osu.Game.Rulesets.Mania
+namespace osu.Game.Rulesets.Mania.Difficulty
 {
     internal class ManiaDifficultyCalculator : DifficultyCalculator
     {
