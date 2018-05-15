@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps
         protected readonly IBeatmap Beatmap;
         protected readonly Mod[] Mods;
 
-        protected double TimeRate = 1;
+        protected double TimeRate { get; private set; } = 1;
 
         protected DifficultyCalculator(IBeatmap beatmap, Mod[] mods = null)
         {
