@@ -2,12 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Game.Rulesets.Mods;
-using osu.Framework.Timing;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mods;
 
-namespace osu.Game.Beatmaps
+namespace osu.Game.Rulesets.Difficulty
 {
     public abstract class DifficultyCalculator
     {
