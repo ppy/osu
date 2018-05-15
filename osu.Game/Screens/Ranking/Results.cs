@@ -160,17 +160,14 @@ namespace osu.Game.Screens.Ranking
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ParallaxAmount = 0.01f,
-                                    //Compensate for the Toolbar
-                                    Scale = new Vector2(1.06f / circle_outer_scale / overscan),
-                                    //Offset the background to account for the toolbar.
+                                    Scale = new Vector2(1 / circle_outer_scale / overscan),
                                     Anchor = Anchor.Centre,
-                                    Position = new Vector2(0, -20),
                                     Origin = Anchor.Centre,
                                     Children = new Drawable[]
                                     {
                                         new Sprite
                                         {
-                                            RelativeSizeAxes = Axes.Both,
+                                            RelativeSsizeAxes = Axes.Both,
                                             Alpha = 0.2f,
                                             Texture = Beatmap.Value.Background,
                                             Anchor = Anchor.Centre,
