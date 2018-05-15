@@ -7,8 +7,9 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Scoring
+namespace osu.Game.Rulesets.Difficulty
 {
     public abstract class PerformanceCalculator
     {

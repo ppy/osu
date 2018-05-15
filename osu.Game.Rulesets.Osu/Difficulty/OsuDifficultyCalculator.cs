@@ -4,12 +4,13 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.OsuDifficulty.Skills;
 
-namespace osu.Game.Rulesets.Osu.OsuDifficulty
+namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
