@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (mods.Any(m => !m.Ranked))
                 return 0;
 
-            IEnumerable<Mod> scoreIncreaseMods = new ManiaRuleset().GetModsFor(ModType.DifficultyIncrease);
+            IEnumerable<Mod> scoreIncreaseMods = Ruleset.GetModsFor(ModType.DifficultyIncrease);
 
             double scoreMultiplier = 1.0;
             foreach (var m in mods.Where(m => !scoreIncreaseMods.Contains(m)))
