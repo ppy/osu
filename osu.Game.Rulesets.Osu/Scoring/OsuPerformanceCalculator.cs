@@ -138,8 +138,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             aimValue *= approachRateFactor;
 
+            // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
-                aimValue *= 1.03f;
+                aimValue *= 1.02 + (11.0f - realApproachRate) / 50.0; // Gives a 1.04 bonus for AR10, a 1.06 bonus for AR9, a 1.02 bonus for AR11.
 
             if (mods.Any(h => h is OsuModFlashlight))
             {
