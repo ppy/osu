@@ -66,7 +66,9 @@ namespace osu.Game.Tests.Visual
 
             assertCurrent();
             pushNext();
-            AddAssert(@"assert there are only 2 items", () => breadcrumbs.Items.Count() == 2);
+            AddAssert(@"only 2 items", () => breadcrumbs.Items.Count() == 2);
+            AddStep(@"exit current", () => changedScreen.Exit());
+            AddAssert(@"current screen is first", () => startScreen == changedScreen);
         }
 
         [BackgroundDependencyLoader]
@@ -76,7 +78,7 @@ namespace osu.Game.Tests.Visual
         }
 
         private void pushNext() => AddStep(@"push next screen", () => currentScreen = ((TestScreen)currentScreen).PushNext());
-        private void assertCurrent() => AddAssert(@"assert the current screen is correct", () => currentScreen == changedScreen);
+        private void assertCurrent() => AddAssert(@"current screen is correct", () => currentScreen == changedScreen);
 
         private abstract class TestScreen : OsuScreen
         {
