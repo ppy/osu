@@ -5,16 +5,14 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
-    internal class TaikoBeatmapConversionTest : BeatmapConversionTest<TestTaikoRuleset, ConvertValue>
+    internal class TaikoBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
 
@@ -40,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             };
         }
 
-        protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
+        protected override Ruleset CreateRuleset() => new TaikoRuleset();
     }
 
     internal struct ConvertValue : IEquatable<ConvertValue>
@@ -66,9 +64,5 @@ namespace osu.Game.Rulesets.Taiko.Tests
                && IsDrumRoll == other.IsDrumRoll
                && IsSwell == other.IsSwell
                && IsStrong == other.IsStrong;
-    }
-
-    internal class TestTaikoRuleset : TaikoRuleset
-    {
     }
 }

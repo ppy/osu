@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
@@ -14,7 +12,7 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    internal class CatchBeatmapConversionTest : BeatmapConversionTest<TestCatchRuleset, ConvertValue>
+    internal class CatchBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
 
@@ -47,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
         }
 
-        protected override IBeatmapConverter CreateConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap);
+        protected override Ruleset CreateRuleset() => new CatchRuleset();
     }
 
     internal struct ConvertValue : IEquatable<ConvertValue>
@@ -63,9 +61,5 @@ namespace osu.Game.Rulesets.Catch.Tests
         public bool Equals(ConvertValue other)
             => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
                && Precision.AlmostEquals(Position, other.Position, conversion_lenience);
-    }
-
-    internal class TestCatchRuleset : CatchRuleset
-    {
     }
 }
