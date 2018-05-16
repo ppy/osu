@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -50,7 +51,10 @@ namespace osu.Game.Overlays
 
         private LocalisationEngine localisation;
 
+        private BeatmapManager beatmaps;
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
+        private List<BeatmapSetInfo> beatmapSets;
+        private BeatmapSetInfo currentSet;
 
         private Container dragContainer;
         private Container playerContainer;
@@ -93,8 +97,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuGameBase game, BeatmapManager beatmaps, OsuColour colours, LocalisationEngine localisation)
         {
+            this.beatmaps = beatmaps;
             this.localisation = localisation;
 
             Children = new Drawable[]
@@ -111,6 +116,7 @@ namespace osu.Game.Overlays
                         {
                             RelativeSizeAxes = Axes.X,
                             Y = player_height + 10,
+                            OrderChanged = playlistOrderChanged
                         },
                         playerContainer = new Container
                         {
@@ -185,7 +191,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = next,
+                                                    Action = () => next(),
                                                     Icon = FontAwesome.fa_step_forward,
                                                 },
                                             }
@@ -214,10 +220,23 @@ namespace osu.Game.Overlays
                 }
             };
 
+            beatmapSets = beatmaps.GetAllUsableBeatmapSets();
+            beatmaps.ItemAdded += handleBeatmapAdded;
+            beatmaps.ItemRemoved += handleBeatmapRemoved;
+
             beatmapBacking.BindTo(game.Beatmap);
 
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
+
+        private void playlistOrderChanged(BeatmapSetInfo beatmapSetInfo, int index)
+        {
+            beatmapSets.Remove(beatmapSetInfo);
+            beatmapSets.Insert(index, beatmapSetInfo);
+        }
+
+        private void handleBeatmapAdded(BeatmapSetInfo obj) => beatmapSets.Add(obj);
+        private void handleBeatmapRemoved(BeatmapSetInfo obj) => beatmapSets.RemoveAll(s => s.ID == obj.ID);
 
         protected override void LoadComplete()
         {
@@ -257,7 +276,7 @@ namespace osu.Game.Overlays
 
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping && !beatmapBacking.Disabled && playlist.BeatmapSets.Any())
+                if (track.HasCompleted && !track.Looping && !beatmapBacking.Disabled && beatmapSets.Any())
                     next();
             }
             else
@@ -271,7 +290,7 @@ namespace osu.Game.Overlays
             if (track == null)
             {
                 if (!beatmapBacking.Disabled)
-                    playlist.PlayNext();
+                    next(true);
                 return;
             }
 
@@ -284,13 +303,26 @@ namespace osu.Game.Overlays
         private void prev()
         {
             queuedDirection = TransformDirection.Prev;
-            playlist.PlayPrevious();
+
+            var playable = beatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? beatmapSets.LastOrDefault();
+            if (playable != null)
+            {
+                beatmapBacking.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmapBacking);
+                beatmapBacking.Value.Track.Restart();
+            }
         }
 
-        private void next()
+        private void next(bool instant = false)
         {
-            queuedDirection = TransformDirection.Next;
-            playlist.PlayNext();
+            if (!instant)
+                queuedDirection = TransformDirection.Next;
+
+            var playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
+            if (playable != null)
+            {
+                beatmapBacking.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmapBacking);
+                beatmapBacking.Value.Track.Restart();
+            }
         }
 
         private WorkingBeatmap current;
@@ -314,8 +346,8 @@ namespace osu.Game.Overlays
                 else
                 {
                     //figure out the best direction based on order in playlist.
-                    var last = playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    var next = beatmap == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmap.BeatmapSetInfo?.ID).Count();
+                    var last = beatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
+                    var next = beatmap == null ? -1 : beatmapSets.TakeWhile(b => b.ID != beatmap.BeatmapSetInfo?.ID).Count();
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }

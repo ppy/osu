@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Y,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         Background = new SpinnerBackground
                         {

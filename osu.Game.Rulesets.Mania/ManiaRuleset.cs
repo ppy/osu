@@ -14,12 +14,85 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Difficulty;
 
 namespace osu.Game.Rulesets.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new ManiaRulesetContainer(this, beatmap, isForCurrentRuleset);
+        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new ManiaRulesetContainer(this, beatmap);
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
+
+        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        {
+            if (mods.HasFlag(LegacyMods.Nightcore))
+                yield return new ManiaModNightcore();
+            else if (mods.HasFlag(LegacyMods.DoubleTime))
+                yield return new ManiaModDoubleTime();
+
+            if (mods.HasFlag(LegacyMods.Autoplay))
+                yield return new ManiaModAutoplay();
+
+            if (mods.HasFlag(LegacyMods.Easy))
+                yield return new ManiaModEasy();
+
+            if (mods.HasFlag(LegacyMods.FadeIn))
+                yield return new ManiaModFadeIn();
+
+            if (mods.HasFlag(LegacyMods.Flashlight))
+                yield return new ManiaModFlashlight();
+
+            if (mods.HasFlag(LegacyMods.HalfTime))
+                yield return new ManiaModHalfTime();
+
+            if (mods.HasFlag(LegacyMods.HardRock))
+                yield return new ManiaModHardRock();
+
+            if (mods.HasFlag(LegacyMods.Hidden))
+                yield return new ManiaModHidden();
+
+            if (mods.HasFlag(LegacyMods.Key1))
+                yield return new ManiaModKey1();
+
+            if (mods.HasFlag(LegacyMods.Key2))
+                yield return new ManiaModKey2();
+
+            if (mods.HasFlag(LegacyMods.Key3))
+                yield return new ManiaModKey3();
+
+            if (mods.HasFlag(LegacyMods.Key4))
+                yield return new ManiaModKey4();
+
+            if (mods.HasFlag(LegacyMods.Key5))
+                yield return new ManiaModKey5();
+
+            if (mods.HasFlag(LegacyMods.Key6))
+                yield return new ManiaModKey6();
+
+            if (mods.HasFlag(LegacyMods.Key7))
+                yield return new ManiaModKey7();
+
+            if (mods.HasFlag(LegacyMods.Key8))
+                yield return new ManiaModKey8();
+
+            if (mods.HasFlag(LegacyMods.Key9))
+                yield return new ManiaModKey9();
+
+            if (mods.HasFlag(LegacyMods.NoFail))
+                yield return new ManiaModNoFail();
+
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new ManiaModPerfect();
+
+            if (mods.HasFlag(LegacyMods.Random))
+                yield return new ManiaModRandom();
+
+            if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new ManiaModSuddenDeath();
+        }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
@@ -113,7 +186,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_mania_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new ManiaDifficultyCalculator(beatmap, mods);
+        public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => new ManiaDifficultyCalculator(beatmap, mods);
 
         public override int? LegacyID => 3;
 

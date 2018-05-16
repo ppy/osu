@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play
         private DrawableStoryboard storyboard;
         private Container storyboardContainer;
 
-        private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
+        public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, APIAccess api, OsuConfigManager config)
@@ -86,17 +86,14 @@ namespace osu.Game.Screens.Play
 
             WorkingBeatmap working = Beatmap.Value;
             if (working is DummyWorkingBeatmap)
-            {
-                Exit();
                 return;
-            }
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
 
-            Beatmap beatmap;
+            IBeatmap beatmap;
 
             try
             {
@@ -110,7 +107,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(working, ruleset.ID == beatmap.BeatmapInfo.Ruleset.ID);
+                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(working);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
@@ -118,18 +115,19 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap, true);
+                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap);
                 }
 
                 if (!RulesetContainer.Objects.Any())
-                    throw new InvalidOperationException("Beatmap contains no hit objects!");
+                {
+                    Logger.Error(new InvalidOperationException("Beatmap contains no hit objects!"), "Beatmap contains no hit objects!");
+                    return;
+                }
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Could not load beatmap sucessfully!");
-
                 //couldn't load, hard abort!
-                Exit();
                 return;
             }
 
@@ -164,7 +162,7 @@ namespace osu.Game.Screens.Play
                         hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
                     },
                     OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         storyboardContainer = new Container
                         {
@@ -176,12 +174,12 @@ namespace osu.Game.Screens.Play
                             RelativeSizeAxes = Axes.Both,
                             Child = RulesetContainer
                         },
-                        new SkipOverlay(firstObjectTime)
+                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, scoreProcessor)
                         {
-                            Clock = Clock, // skip button doesn't want to use the audio clock directly
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             ProcessCustomClock = false,
-                            AdjustableClock = adjustableClock,
-                            FramedClock = offsetClock,
+                            Breaks = beatmap.Breaks
                         },
                         hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
@@ -190,13 +188,14 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, scoreProcessor)
+                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
+                        new SkipOverlay(firstObjectTime)
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Clock = Clock, // skip button doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
-                            Breaks = beatmap.Breaks
-                        }
+                            AdjustableClock = adjustableClock,
+                            FramedClock = offsetClock,
+                        },
                     }
                 },
                 failOverlay = new FailOverlay
@@ -293,7 +292,7 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            if (!loadedSuccessfully)
+            if (!LoadedBeatmapSuccessfully)
                 return;
 
             Content.Alpha = 0;
@@ -343,7 +342,7 @@ namespace osu.Game.Screens.Play
                 return base.OnExiting(next);
             }
 
-            if (loadedSuccessfully)
+            if (LoadedBeatmapSuccessfully)
                 pauseContainer?.Pause();
 
             return true;
