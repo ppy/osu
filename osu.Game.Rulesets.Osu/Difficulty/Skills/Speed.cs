@@ -29,17 +29,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double speedValue;
             if (distance > single_spacing_threshold)
-                speedValue = speedBonus * 2.5;
+                speedValue = 2.5;
             else if (distance > stream_spacing_threshold)
-                speedValue = speedBonus * (1.6 + 0.9 * (distance - stream_spacing_threshold) / (single_spacing_threshold - stream_spacing_threshold));
+                speedValue = 1.6 + 0.9 * (distance - stream_spacing_threshold) / (single_spacing_threshold - stream_spacing_threshold);
             else if (distance > almost_diameter)
-                speedValue = speedBonus * (1.2 + 0.4 * (distance - almost_diameter) / (stream_spacing_threshold - almost_diameter));
+                speedValue = 1.2 + 0.4 * (distance - almost_diameter) / (stream_spacing_threshold - almost_diameter);
             else if (distance > almost_diameter / 2)
-                speedValue = speedBonus * (0.95 + 0.25 * (distance - almost_diameter / 2) / (almost_diameter / 2));
+                speedValue = 0.95 + 0.25 * (distance - almost_diameter / 2) / (almost_diameter / 2);
             else
-                speedValue = speedBonus * 0.95;
+                speedValue = 0.95;
 
-            return speedValue / current.DeltaTime;
+            return (speedValue * speedBonus) / current.DeltaTime;
         }
     }
 }
