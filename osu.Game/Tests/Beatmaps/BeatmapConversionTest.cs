@@ -16,8 +16,7 @@ using osu.Game.Rulesets.Objects;
 namespace osu.Game.Tests.Beatmaps
 {
     [TestFixture]
-    public abstract class BeatmapConversionTest<TRuleset, TConvertValue>
-        where TRuleset : Ruleset, new()
+    public abstract class BeatmapConversionTest<TConvertValue>
         where TConvertValue : IEquatable<TConvertValue>
     {
         private const string resource_namespace = "Testing.Beatmaps";
@@ -81,12 +80,12 @@ namespace osu.Game.Tests.Beatmaps
         {
             var beatmap = getBeatmap(name);
 
-            var rulesetInstance = new TRuleset();
+            var rulesetInstance = CreateRuleset();
             beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
 
             var result = new ConvertResult();
 
-            var converter = CreateConverter(beatmap);
+            var converter = rulesetInstance.CreateBeatmapConverter(beatmap);
             converter.ObjectConverted += (orig, converted) =>
             {
                 converted.ForEach(h => h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty));
@@ -130,7 +129,7 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         protected abstract IEnumerable<TConvertValue> CreateConvertValue(HitObject hitObject);
-        protected abstract IBeatmapConverter CreateConverter(IBeatmap beatmap);
+        protected abstract Ruleset CreateRuleset();
 
         private class ConvertMapping
         {
