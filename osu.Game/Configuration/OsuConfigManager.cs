@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
+using osu.Framework.Configuration.Tracking;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select;
@@ -95,6 +96,11 @@ namespace osu.Game.Configuration
         public OsuConfigManager(Storage storage) : base(storage)
         {
         }
+
+        public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
+        {
+            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled"))
+        };
     }
 
     public enum OsuSetting

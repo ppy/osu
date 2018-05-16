@@ -9,6 +9,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO.Serialization;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Resources;
 using OpenTK;
@@ -117,7 +118,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestParity(string beatmap)
         {
             var legacy = decode(beatmap, out Beatmap json);
-            json.ShouldDeepEqual(legacy);
+            json.WithDeepEqual(legacy).IgnoreProperty(r => r.DeclaringType == typeof(HitWindows)).Assert();
         }
 
         /// <summary>

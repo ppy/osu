@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Rulesets
@@ -22,8 +23,6 @@ namespace osu.Game.Rulesets
     public abstract class Ruleset
     {
         public readonly RulesetInfo RulesetInfo;
-
-        public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
         public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
                                                     // Confine all mods of each mod type into a single IEnumerable<Mod>
