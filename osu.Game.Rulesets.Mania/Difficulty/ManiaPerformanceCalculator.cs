@@ -18,11 +18,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         // Score after being scaled by non-difficulty-increasing mods
         private double scaledScore;
 
-        private int countGeki;
-        private int countKatu;
-        private int count300;
-        private int count100;
-        private int count50;
+        private int countPerfect;
+        private int countGreat;
+        private int countGood;
+        private int countOk;
+        private int countMeh;
         private int countMiss;
 
         public ManiaPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
@@ -34,11 +34,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             mods = Score.Mods;
             scaledScore = Score.TotalScore;
-            countGeki = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);
-            countKatu = Convert.ToInt32(Score.Statistics[HitResult.Ok]);
-            count300 = Convert.ToInt32(Score.Statistics[HitResult.Great]);
-            count100 = Convert.ToInt32(Score.Statistics[HitResult.Good]);
-            count50 = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
+            countPerfect = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);
+            countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
+            countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
+            countOk = Convert.ToInt32(Score.Statistics[HitResult.Ok]);
+            countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
             countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
 
             if (mods.Any(m => !m.Ranked))
@@ -105,13 +105,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeAccuracyValue(double strainValue)
         {
-            double hitWindow300 = (Beatmap.HitObjects.First().HitWindows.Great / 2 - 0.5) / TimeRate;
-            if (hitWindow300 <= 0)
+            double hitWindowGreat = (Beatmap.HitObjects.First().HitWindows.Great / 2 - 0.5) / TimeRate;
+            if (hitWindowGreat <= 0)
                 return 0;
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accuracyValue = Math.Max(0.0, 0.2 - (hitWindow300 - 34) * 0.006667)
+            double accuracyValue = Math.Max(0.0, 0.2 - (hitWindowGreat - 34) * 0.006667)
                                        * strainValue
                                        * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
 
@@ -121,6 +121,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return accuracyValue;
         }
 
-        private double totalHits => countGeki + countKatu + count300 + count100 + count50 + countMiss;
+        private double totalHits => countPerfect + countOk + countGreat + countGood + countMeh + countMiss;
     }
 }
