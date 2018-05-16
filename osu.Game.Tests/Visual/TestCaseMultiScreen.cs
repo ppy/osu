@@ -11,7 +11,11 @@ namespace osu.Game.Tests.Visual
     {
         public TestCaseMultiScreen()
         {
-            Child = new Multiplayer();
+            Multiplayer multi = new Multiplayer();
+
+            AddStep(@"show", () => Add(multi));
+            AddWaitStep(5);
+            AddStep(@"exit", multi.Exit);
         }
     }
 }
