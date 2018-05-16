@@ -20,18 +20,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueOf(OsuDifficultyHitObject current)
         {
             double distance = current.Distance;
+            double speedBonus = 1.0;
+            
+            if(current.DeltaTime < 68) // 68 = 220 BPM 1/4th snapping in MS. 
+            {
+                speedBonus = 68 / current.DeltaTime; // 1.09x for 240 BPM, 1.18x for 260 BPM, 1.36x for 300 BPM, etc.
+            }
 
             double speedValue;
             if (distance > single_spacing_threshold)
-                speedValue = 2.5;
+                speedValue = speedBonus * 2.5;
             else if (distance > stream_spacing_threshold)
-                speedValue = 1.6 + 0.9 * (distance - stream_spacing_threshold) / (single_spacing_threshold - stream_spacing_threshold);
+                speedValue = speedBonus * (1.6 + 0.9 * (distance - stream_spacing_threshold) / (single_spacing_threshold - stream_spacing_threshold));
             else if (distance > almost_diameter)
-                speedValue = 1.2 + 0.4 * (distance - almost_diameter) / (stream_spacing_threshold - almost_diameter);
+                speedValue = speedBonus * (1.2 + 0.4 * (distance - almost_diameter) / (stream_spacing_threshold - almost_diameter));
             else if (distance > almost_diameter / 2)
-                speedValue = 0.95 + 0.25 * (distance - almost_diameter / 2) / (almost_diameter / 2);
+                speedValue = speedBonus * (0.95 + 0.25 * (distance - almost_diameter / 2) / (almost_diameter / 2));
             else
-                speedValue = 0.95;
+                speedValue = speedBonus * 0.95;
 
             return speedValue / current.DeltaTime;
         }
