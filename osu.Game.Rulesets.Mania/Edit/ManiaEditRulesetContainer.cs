@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.UI;
@@ -53,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             {
                 double step = timingPoints[0].BeatLength / newDivisor;
                 int index = (int)(timingPoints[0].Time / step);
-                index += newDivisor - (index % newDivisor);
+                index += newDivisor - index % newDivisor;
                 // As long as the snap lines are symmetrical, this will work
                 // That means it should change if 1/5, 1/7, 1/11 are added
                 for (double t = timingPoints[0].Time; t >= 0; t -= step, index--)

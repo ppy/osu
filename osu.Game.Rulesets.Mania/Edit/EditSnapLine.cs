@@ -2,9 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Screens.Edit.Screens.Compose;
 using System;
