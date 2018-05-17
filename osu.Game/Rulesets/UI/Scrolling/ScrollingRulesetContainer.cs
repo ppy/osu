@@ -8,7 +8,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
@@ -30,8 +29,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <returns></returns>
         protected readonly SortedList<MultiplierControlPoint> DefaultControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
-        protected ScrollingRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
+        protected ScrollingRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
 
@@ -104,7 +103,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             if (index < 0)
                 return new MultiplierControlPoint(time);
 
-            return new MultiplierControlPoint(time, DefaultControlPoints[index].DeepClone());
+            return new MultiplierControlPoint(time, DefaultControlPoints[index]);
         }
     }
 }

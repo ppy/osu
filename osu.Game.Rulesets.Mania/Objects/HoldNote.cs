@@ -103,6 +103,7 @@ namespace osu.Game.Rulesets.Mania.Objects
             /// <summary>
             /// Lenience of release hit windows. This is to make cases where the hold note release
             /// is timed alongside presses of other hit objects less awkward.
+            /// Todo: This shouldn't exist for non-LegacyBeatmapDecoder beatmaps
             /// </summary>
             private const double release_window_lenience = 1.5;
 
