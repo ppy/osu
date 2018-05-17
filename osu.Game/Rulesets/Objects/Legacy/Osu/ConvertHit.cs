@@ -18,5 +18,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
         public float Y => Position.Y;
 
         public bool NewCombo { get; set; }
+
+        protected override HitWindows CreateHitWindows() => new ConvertHitWindows();
     }
 }
