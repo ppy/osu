@@ -259,9 +259,9 @@ namespace osu.Game.Tests.Visual
                 private readonly OsuSpriteText text;
 
                 private readonly Score score;
-                private readonly Beatmap beatmap;
+                private readonly IBeatmap beatmap;
 
-                public PerformanceDisplay(Score score, Beatmap beatmap)
+                public PerformanceDisplay(Score score, IBeatmap beatmap)
                 {
                     this.score = score;
                     this.beatmap = beatmap;
