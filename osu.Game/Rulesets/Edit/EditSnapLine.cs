@@ -3,13 +3,13 @@
 
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Screens.Compose;
 using System;
 
-namespace osu.Game.Rulesets.Mania.Edit
+namespace osu.Game.Rulesets.Edit
 {
-    public class EditSnapLine : ManiaHitObject
+    public class EditSnapLine : HitObject
     {
         /// <summary>
         /// The control point which this snap line is part of.
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 else if (d % 4 == 0)
                     Colour = Color4.Red;
                 else if (d % 2 == 0)
-                    Colour = new Color4(0, 96, 192, 255); // More eye-friendly
+                    Colour = new Color4(0, 96, 192, 255);
                 else
                     Colour = Color4.Yellow;
                 // In case the divisor refers to triplets and the index is within the split areas, override the previous calculation

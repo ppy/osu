@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
 
@@ -19,8 +20,8 @@ namespace osu.Game.Rulesets.Mania.Edit
             snapLinePlayfield.VisibleTimeRange.BindTo(VisibleTimeRange);
         }
 
-        public void Add(EditSnapLine editSnapLine) => snapLinePlayfield.Add(new DrawableEditSnapLine(editSnapLine));
-        public void Remove(DrawableEditSnapLine editSnapLine) => snapLinePlayfield.Remove(editSnapLine);
+        public void Add(EditSnapLine editSnapLine) => snapLinePlayfield.Add(new DrawableManiaEditSnapLine(editSnapLine));
+        public void Remove(DrawableManiaEditSnapLine editSnapLine) => snapLinePlayfield.Remove(editSnapLine);
         public void ClearEditSnapLines() => snapLinePlayfield.Clear();
     }
 }

@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;

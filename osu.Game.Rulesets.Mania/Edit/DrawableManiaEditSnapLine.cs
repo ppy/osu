@@ -3,18 +3,18 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
     /// <summary>
-    /// Visualises a <see cref="EditSnapLine"/>. Although this derives DrawableManiaHitObject,
+    /// Visualises an <see cref="EditSnapLine"/>. Although this derives DrawableManiaHitObject,
     /// this does not handle input/sound like a normal hit object.
     /// </summary>
-    public class DrawableEditSnapLine : DrawableManiaHitObject<EditSnapLine>
+    public class DrawableManiaEditSnapLine : DrawableEditSnapLine
     {
-        public DrawableEditSnapLine(EditSnapLine snapLine)
+        public DrawableManiaEditSnapLine(EditSnapLine snapLine)
             : base(snapLine)
         {
             RelativeSizeAxes = Axes.X;
