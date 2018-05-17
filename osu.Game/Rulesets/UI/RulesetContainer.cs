@@ -166,7 +166,6 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetContainer<TObject> : RulesetContainer
         where TObject : HitObject
     {
-
         public event Action<Judgement> OnJudgement;
         public event Action<Judgement> OnJudgementRemoved;
 
@@ -214,7 +213,6 @@ namespace osu.Game.Rulesets.UI
             applyMods(Mods, config);
 
             loadObjects();
-
         }
 
         /// <summary>
