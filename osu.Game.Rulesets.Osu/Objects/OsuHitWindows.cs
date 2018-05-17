@@ -3,11 +3,12 @@
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Objects.Legacy.Osu
+namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class ConvertHitWindows : HitWindows
+    public class OsuHitWindows : HitWindows
     {
         private static readonly IReadOnlyDictionary<HitResult, (double od0, double od5, double od10)> base_ranges = new Dictionary<HitResult, (double, double, double)>
         {

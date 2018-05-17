@@ -84,10 +84,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield break;
 
             foreach (ManiaHitObject obj in objects)
-            {
-                obj.HitWindows = original.HitWindows;
                 yield return obj;
-            }
         }
 
         private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
