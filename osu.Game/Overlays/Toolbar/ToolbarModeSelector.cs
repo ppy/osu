@@ -87,8 +87,8 @@ namespace osu.Game.Overlays.Toolbar
                 ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault();
         }
 
-        public override bool HandleKeyboardInput => !ruleset.Disabled;
-        public override bool HandleMouseInput => !ruleset.Disabled;
+        public override bool HandleKeyboardInput => !ruleset.Disabled && base.HandleKeyboardInput;
+        public override bool HandleMouseInput => !ruleset.Disabled && base.HandleMouseInput;
 
         private void disabledChanged(bool isDisabled) => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
 

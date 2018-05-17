@@ -8,12 +8,17 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {
-    internal class OsuBeatmapProcessor : BeatmapProcessor<OsuHitObject>
+    internal class OsuBeatmapProcessor : BeatmapProcessor
     {
-        public override void PostProcess(Beatmap<OsuHitObject> beatmap)
+        public OsuBeatmapProcessor(IBeatmap beatmap)
+            : base(beatmap)
         {
-            applyStacking(beatmap);
-            base.PostProcess(beatmap);
+        }
+
+        public override void PostProcess()
+        {
+            applyStacking((Beatmap<OsuHitObject>)Beatmap);
+            base.PostProcess();
         }
 
         private void applyStacking(Beatmap<OsuHitObject> beatmap)

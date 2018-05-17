@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         private Container playfieldContainer;
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        private void load()
         {
             AddStep("Hit!", () => addHitJudgement(false));
             AddStep("Kiai hit", () => addHitJudgement(true));
@@ -73,6 +73,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                         Title = @"Sample Beatmap",
                         AuthorString = @"peppy",
                     },
+                    Ruleset = new TaikoRuleset().RulesetInfo
                 },
                 ControlPointInfo = controlPointInfo
             });
@@ -86,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 RelativeSizeAxes = Axes.X,
                 Height = 768,
                 Clock = new FramedClock(rateAdjustClock),
-                Children = new[] { rulesetContainer = new TaikoRulesetContainer(rulesets.GetRuleset(1).CreateInstance(), beatmap, true) }
+                Children = new[] { rulesetContainer = new TaikoRulesetContainer(new TaikoRuleset(), beatmap) }
             });
         }
 

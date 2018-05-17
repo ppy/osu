@@ -2,30 +2,47 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
 {
+    public interface IBeatmapProcessor
+    {
+        IBeatmap Beatmap { get; }
+
+        /// <summary>
+        /// Post-processes <see cref="Beatmap"/> to add mode-specific components that aren't added during conversion.
+        /// <para>
+        /// An example of such a usage is for combo colours.
+        /// </para>
+        /// </summary>
+        void PostProcess();
+    }
+
     /// <summary>
     /// Processes a post-converted Beatmap.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained in the Beatmap.</typeparam>
-    public class BeatmapProcessor<TObject>
-        where TObject : HitObject
+    public class BeatmapProcessor : IBeatmapProcessor
     {
+        public IBeatmap Beatmap { get; }
+
+        public BeatmapProcessor(IBeatmap beatmap)
+        {
+            Beatmap = beatmap;
+        }
+
         /// <summary>
         /// Post-processes a Beatmap to add mode-specific components that aren't added during conversion.
         /// <para>
         /// An example of such a usage is for combo colours.
         /// </para>
         /// </summary>
-        /// <param name="beatmap">The Beatmap to process.</param>
-        public virtual void PostProcess(Beatmap<TObject> beatmap)
+        public virtual void PostProcess()
         {
             IHasComboInformation lastObj = null;
 
-            foreach (var obj in beatmap.HitObjects.OfType<IHasComboInformation>())
+            foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
             {
                 if (obj.NewCombo)
                 {
