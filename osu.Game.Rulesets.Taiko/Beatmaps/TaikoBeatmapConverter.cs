@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.IO.Serialization;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 
@@ -51,8 +50,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         protected override Beatmap<TaikoHitObject> ConvertBeatmap(IBeatmap original)
         {
             // Rewrite the beatmap info to add the slider velocity multiplier
-            BeatmapInfo info = original.BeatmapInfo.DeepClone();
-            info.BaseDifficulty.SliderMultiplier *= legacy_velocity_multiplier;
+            original.BeatmapInfo = original.BeatmapInfo.Clone();
+            original.BeatmapInfo.BaseDifficulty = original.BeatmapInfo.BaseDifficulty.Clone();
+            original.BeatmapInfo.BaseDifficulty.SliderMultiplier *= legacy_velocity_multiplier;
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original);
 
