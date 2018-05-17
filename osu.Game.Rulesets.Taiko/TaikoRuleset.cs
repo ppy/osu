@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_taiko_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => new TaikoDifficultyCalculator(beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => new TaikoDifficultyCalculator(beatmap, mods);
 
         public override int? LegacyID => 1;
 

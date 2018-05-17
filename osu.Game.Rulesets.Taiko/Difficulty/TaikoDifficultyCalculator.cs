@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
@@ -32,6 +33,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         public TaikoDifficultyCalculator(IBeatmap beatmap)
             : base(beatmap)
+        {
+        }
+
+        public TaikoDifficultyCalculator(IBeatmap beatmap, Mod[] mods)
+            : base(beatmap, mods)
         {
         }
 
