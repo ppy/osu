@@ -185,7 +185,6 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-
         private void onPlay()
         {
             State = MenuState.Play;
