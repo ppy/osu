@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Multi
         public const float HEIGHT = 121;
 
         private readonly OsuSpriteText screenTitle;
-        private readonly ScreenBreadcrumbControl breadcrumbs;
+        private readonly HeaderBreadcrumbControl breadcrumbs;
 
         public Header(Screen initialScreen)
         {
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Multi
                                 },
                             },
                         },
-                        breadcrumbs = new ScreenBreadcrumbControl(initialScreen)
+                        breadcrumbs = new HeaderBreadcrumbControl(initialScreen)
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
@@ -84,8 +84,6 @@ namespace osu.Game.Screens.Multi
                     },
                 },
             };
-
-            breadcrumbs.OnLoadComplete = d => breadcrumbs.AccentColour = Color4.White;
 
             breadcrumbs.Current.ValueChanged += s => screenTitle.Text = s.ToString();
             breadcrumbs.Current.TriggerChange();
@@ -96,6 +94,19 @@ namespace osu.Game.Screens.Multi
         {
             screenTitle.Colour = colours.Yellow;
             breadcrumbs.StripColour = colours.Green;
+        }
+
+        private class HeaderBreadcrumbControl : ScreenBreadcrumbControl
+        {
+            public HeaderBreadcrumbControl(Screen initialScreen) : base(initialScreen)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                AccentColour = Color4.White;
+            }
         }
     }
 }
