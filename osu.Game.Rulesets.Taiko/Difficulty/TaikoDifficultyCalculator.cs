@@ -57,10 +57,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double starRating = calculateDifficulty() * star_scaling_factor;
 
             if (categoryDifficulty != null)
-            {
-                categoryDifficulty.Add("Strain", starRating);
-                categoryDifficulty.Add("Hit window 300", 35 /*HitObjectManager.HitWindow300*/ / TimeRate);
-            }
+                categoryDifficulty["Strain"] = starRating;
 
             return starRating;
         }
