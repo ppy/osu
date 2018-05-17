@@ -14,7 +14,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Multi.Screens;
+using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Menu
                             OnDirect = delegate { Push(new OnlineListing()); },
                             OnEdit = delegate { Push(new Editor()); },
                             OnSolo = delegate { Push(consumeSongSelect()); },
-                            OnMulti = delegate { Push(new Lobby()); },
+                            OnMulti = delegate { Push(new Multiplayer()); },
                             OnExit = Exit,
                         }
                     }
