@@ -13,6 +13,7 @@ This is still heavily under development and is not intended for end-user use. Th
 # Getting Started
 - Clone the repository including submodules (`git clone --recurse-submodules https://github.com/ppy/osu`)
 - Build in your IDE of choice (recommended IDEs automatically restore nuget packages; if you are using an alternative make sure to `nuget restore`)
+- If you are using [Visual Studio Community Edition](https://www.visualstudio.com/), make sure you have .NET Framework 4.7.1 development tools and .NET Core 2.0 development tools installed. You can check this through the Visual Studio Installer.
 
 # Contributing
 
