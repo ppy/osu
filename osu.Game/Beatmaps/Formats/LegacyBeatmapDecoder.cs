@@ -54,9 +54,11 @@ namespace osu.Game.Beatmaps.Formats
 
             base.ParseStreamInto(stream, beatmap);
 
-            // objects may be out of order *only* if a user has manually edited an .osu file.
-            // unfortunately there are ranked maps in this state (example: https://osu.ppy.sh/s/594828).
-            this.beatmap.HitObjects.Sort((x, y) => x.StartTime.CompareTo(y.StartTime));
+            // Objects may be out of order *only* if a user has manually edited an .osu file.
+            // Unfortunately there are ranked maps in this state (example: https://osu.ppy.sh/s/594828).
+            // OrderBy is used to guarantee that the parsing order of hitobjects with equal start times is maintained (stably-sorted)
+            // The parsing order of hitobjects matters in mania difficulty calculation
+            this.beatmap.HitObjects = this.beatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
 
             foreach (var hitObject in this.beatmap.HitObjects)
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
