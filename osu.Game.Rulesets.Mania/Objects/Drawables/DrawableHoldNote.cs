@@ -99,6 +99,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+            switch (state)
+            {
+                case ArmedState.Hit:
+                    // Good enough for now, we just want them to have a lifetime end
+                    this.Delay(2000).Expire();
+                    break;
+            }
+        }
+
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        {
+            if (tail.AllJudged)
+                AddJudgement(new HoldNoteJudgement { Result = HitResult.Perfect });
         }
 
         protected override void Update()
