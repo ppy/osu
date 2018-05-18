@@ -16,7 +16,6 @@ namespace osu.Game.Screens.Play
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         public override bool AllowBeatmapRulesetChange => false;
-        protected override bool AllowBackButton => false;
 
         protected const float BACKGROUND_FADE_DURATION = 800;
 

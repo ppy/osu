@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Play
 
         private bool showOverlays = true;
         public override bool ShowOverlaysOnEnter => showOverlays;
-        protected override bool AllowBackButton => false;
 
         private Task loadTask;
 
