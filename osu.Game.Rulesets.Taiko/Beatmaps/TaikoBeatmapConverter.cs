@@ -132,8 +132,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                             {
                                 StartTime = j,
                                 Samples = currentSamples,
-                                IsStrong = strong,
-                                HitWindows = obj.HitWindows
+                                IsStrong = strong
                             };
                         }
                         else
@@ -142,8 +141,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                             {
                                 StartTime = j,
                                 Samples = currentSamples,
-                                IsStrong = strong,
-                                HitWindows = obj.HitWindows
+                                IsStrong = strong
                             };
                         }
 
@@ -158,8 +156,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                         Samples = obj.Samples,
                         IsStrong = strong,
                         Duration = taikoDuration,
-                        TickRate = beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate == 3 ? 3 : 4,
-                        HitWindows = obj.HitWindows
+                        TickRate = beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate == 3 ? 3 : 4
                     };
                 }
             }
@@ -173,8 +170,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     Samples = obj.Samples,
                     IsStrong = strong,
                     Duration = endTimeData.Duration,
-                    RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier),
-                    HitWindows = obj.HitWindows
+                    RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier)
                 };
             }
             else
@@ -187,8 +183,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     {
                         StartTime = obj.StartTime,
                         Samples = obj.Samples,
-                        IsStrong = strong,
-                        HitWindows = obj.HitWindows
+                        IsStrong = strong
                     };
                 }
                 else
@@ -197,8 +192,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     {
                         StartTime = obj.StartTime,
                         Samples = obj.Samples,
-                        IsStrong = strong,
-                        HitWindows = obj.HitWindows
+                        IsStrong = strong
                     };
                 }
             }
