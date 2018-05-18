@@ -50,8 +50,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     StartTime = original.StartTime,
                     Samples = original.Samples,
                     EndTime = endTimeData.EndTime,
-
-                    Position = positionData?.Position ?? OsuPlayfield.BASE_SIZE / 2,
+                    Position = positionData?.Position ?? OsuPlayfield.BASE_SIZE / 2
                 };
             }
             else
@@ -65,5 +64,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 };
             }
         }
+
+        protected override Beatmap<OsuHitObject> CreateBeatmap() => new OsuBeatmap();
     }
 }

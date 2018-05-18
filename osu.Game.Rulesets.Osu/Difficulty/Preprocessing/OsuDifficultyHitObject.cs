@@ -3,16 +3,18 @@
 
 using System;
 using System.Linq;
-using OpenTK;
 using osu.Game.Rulesets.Osu.Objects;
+using OpenTK;
 
-namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
+namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
     /// <summary>
     /// A wrapper around <see cref="OsuHitObject"/> extending it with additional data required for difficulty calculation.
     /// </summary>
     public class OsuDifficultyHitObject
     {
+        private const int normalized_radius = 52;
+
         /// <summary>
         /// The <see cref="OsuHitObject"/> this <see cref="OsuDifficultyHitObject"/> refers to.
         /// </summary>
@@ -28,26 +30,19 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         /// </summary>
         public double DeltaTime { get; private set; }
 
-        /// <summary>
-        /// Number of milliseconds until the <see cref="OsuDifficultyHitObject"/> has to be hit.
-        /// </summary>
-        public double TimeUntilHit { get; set; }
-
-        private const int normalized_radius = 52;
-
+        private readonly OsuHitObject lastObject;
         private readonly double timeRate;
-
-        private readonly OsuHitObject[] t;
 
         /// <summary>
         /// Initializes the object calculating extra data required for difficulty calculation.
         /// </summary>
-        public OsuDifficultyHitObject(OsuHitObject[] triangle, double timeRate)
+        public OsuDifficultyHitObject(OsuHitObject currentObject, OsuHitObject lastObject, double timeRate)
         {
+            this.lastObject = lastObject;
             this.timeRate = timeRate;
 
-            t = triangle;
-            BaseObject = t[0];
+            BaseObject = currentObject;
+
             setDistances();
             setTimingValues();
             // Calculate angle here
@@ -63,10 +58,10 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
-            Vector2 lastCursorPosition = t[1].StackedPosition;
+            Vector2 lastCursorPosition = lastObject.StackedPosition;
             float lastTravelDistance = 0;
 
-            var lastSlider = t[1] as Slider;
+            var lastSlider = lastObject as Slider;
             if (lastSlider != null)
             {
                 computeSliderCursorPosition(lastSlider);
@@ -80,8 +75,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         private void setTimingValues()
         {
             // Every timing inverval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure.
-            DeltaTime = Math.Max(40, (t[0].StartTime - t[1].StartTime) / timeRate);
-            TimeUntilHit = 450; // BaseObject.PreEmpt;
+            DeltaTime = Math.Max(50, (BaseObject.StartTime - lastObject.StartTime) / timeRate);
         }
 
         private void computeSliderCursorPosition(Slider slider)
@@ -107,7 +101,8 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
                 }
             });
 
-            var scoringTimes = slider.NestedHitObjects.Select(t => t.StartTime);
+            // Skip the head circle
+            var scoringTimes = slider.NestedHitObjects.Skip(1).Select(t => t.StartTime);
             foreach (var time in scoringTimes)
                 computeVertex(time);
             computeVertex(slider.EndTime);
