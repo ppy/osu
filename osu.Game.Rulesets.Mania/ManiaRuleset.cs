@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania.Difficulty;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Rulesets.Mania
@@ -28,6 +29,7 @@ namespace osu.Game.Rulesets.Mania
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new ManiaRulesetContainer(this, beatmap);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
+        public override PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => new ManiaPerformanceCalculator(this, beatmap, score);
 
         public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
         {
