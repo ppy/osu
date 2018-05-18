@@ -18,14 +18,6 @@ namespace osu.Game.Rulesets.Mania.Objects
             get => Column; // Somehow has to get the maximum number of columns in the beatmap?
         }
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
-        {
-            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
-
-            HitWindows.AllowsPerfect = true;
-            HitWindows.AllowsOk = true;
-        }
-        
         protected override HitWindows CreateHitWindows() => new ManiaHitWindows();
     }
 }
