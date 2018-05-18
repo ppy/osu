@@ -99,6 +99,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+            switch (state)
+            {
+                case ArmedState.Hit:
+                    // Good enough for now, we just want them to have a lifetime end
+                    this.Delay(2000).Expire();
+                    break;
+            }
+        }
+
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        {
+            if (tail.AllJudged)
+                AddJudgement(new HoldNoteJudgement { Result = HitResult.Perfect });
         }
 
         protected override void Update()
@@ -191,6 +204,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private class DrawableTailNote : DrawableNote
         {
+            /// <summary>
+            /// Lenience of release hit windows. This is to make cases where the hold note release
+            /// is timed alongside presses of other hit objects less awkward.
+            /// Todo: This shouldn't exist for non-LegacyBeatmapDecoder beatmaps
+            /// </summary>
+            private const double release_window_lenience = 1.5;
+
             private readonly DrawableHoldNote holdNote;
 
             public DrawableTailNote(DrawableHoldNote holdNote, ManiaAction action)
@@ -203,6 +223,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             protected override void CheckForJudgements(bool userTriggered, double timeOffset)
             {
+                // Factor in the release lenience
+                timeOffset /= release_window_lenience;
+
                 if (!userTriggered)
                 {
                     if (!HitObject.HitWindows.CanBeHit(timeOffset))
