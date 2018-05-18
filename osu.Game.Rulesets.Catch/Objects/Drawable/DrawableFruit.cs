@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     public class DrawableFruit : PalpableCatchHitObject<Fruit>
     {
         private Border border;
-        private Pulp pulp;
 
         public DrawableFruit(Fruit h)
             : base(h)
@@ -37,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             InternalChildren = new []
             {
                 createPulp(HitObject.VisualRepresentation),
-                border = new Border(4.0f, new Vector2(Height * 1.5f), 4.0f, AccentColour, !HitObject.HyperDash),
+                border = new Border(4.0f, new Vector2(Height * 1.5f), 4.0f, AccentColour, HitObject.HyperDash),
             };
 
             if (HitObject.HyperDash)
