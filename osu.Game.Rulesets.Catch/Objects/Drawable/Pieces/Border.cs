@@ -34,7 +34,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable.Pieces
                     RelativeSizeAxes = Axes.Both
                 }
             };
-        }
-        
+        }    
     }
 }
