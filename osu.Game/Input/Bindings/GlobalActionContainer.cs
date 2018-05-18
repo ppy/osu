@@ -37,6 +37,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Down, GlobalAction.DecreaseVolume),
             new KeyBinding(InputKey.MouseWheelDown, GlobalAction.DecreaseVolume),
             new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
+
+            new KeyBinding(InputKey.Escape, GlobalAction.Back),
+            new KeyBinding(InputKey.MouseButton1, GlobalAction.Back)
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -80,5 +83,8 @@ namespace osu.Game.Input.Bindings
         TakeScreenshot,
         [Description("Toggle gameplay mouse buttons")]
         ToggleGameplayMouseButtons,
+
+        [Description("Go back")]
+        Back
     }
 }
