@@ -70,9 +70,8 @@ namespace osu.Game.Rulesets.Mania.Edit
             {
                 TimingControlPoint point = timingPoints[i];
 
-                // Stop at the end of the timing point before the next one if any, otherwise stop at the last object's time
-                // This might lead to creating the same snap line twice if the next timing point begins on a beat of the current one
-                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastObjectTime + point.BeatLength * (int)point.TimeSignature;
+                // Stop 1ms before the end of the timing point before the next one if any, otherwise stop at the last object's time
+                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time - 1 : lastObjectTime + point.BeatLength * (int)point.TimeSignature;
 
                 int index = 0;
                 double step = point.BeatLength / newDivisor;
