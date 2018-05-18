@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         private const double STAR_SCALING_FACTOR = 0.145;
         private const float PLAYFIELD_WIDTH = 512;
 
-        internal List<CatchDifficultyHitObject> difficultyHitObjects;
+        private readonly List<CatchDifficultyHitObject> difficultyHitObjects = new List<CatchDifficultyHitObject>();
 
         public CatchDifficultyCalculator(IBeatmap beatmap)
             : base(beatmap)
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             difficultyHitObjects.Clear();
 
             float circleSize = Beatmap.BeatmapInfo.BaseDifficulty.CircleSize;
-            float catcherWidth = CatcherArea.CATCHER_SIZE * (1.0f - 0.7f * (circleSize - 5) / 5) / 1.5f;
+            float catcherWidth = (1.0f - 0.7f * (circleSize - 5) / 5) * 0.53166f;
             float catcherWidthHalf = catcherWidth / 2;
             catcherWidthHalf *= 0.8f;
 
@@ -57,7 +57,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             {
                 categoryDifficulty["Aim"] = starRating;
 
-                //double preEmpt = HitObjectManager.PreEmpt / TimeRate;
+                double ar = Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate;
+                double preEmpt = BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450) / TimeRate;
+
+                categoryDifficulty["AR"] = preEmpt > 1200.0 ? -(preEmpt - 1800.0) / 120.0 : -(preEmpt - 1200.0) / 150.0 + 5.0;
 
                 //categoryDifficulty.Add("AR", (preEmpt > 1200.0 ? -(preEmpt - 1800.0) / 120.0 : -(preEmpt - 1200.0) / 150.0 + 5.0).ToString("0.00", GameBase.nfi));
                 //categoryDifficulty.Add("Max combo", DifficultyHitObjects.Count.ToString(GameBase.nfi));

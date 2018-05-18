@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     addition += bonus * bonusFactor;
 
                     // Bonus for tougher direction switches and "almost" hyperdashes at this point
-                    if (previousHitCircle != null && previousHitCircle.DistanceToHyperDash <= 10)
+                    if (previousHitCircle != null && previousHitCircle.DistanceToHyperDash <= 10.0f / 512.0f)
                     {
                         additionBonus += 0.3 * bonusFactor;
                     }
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             }
 
             // Bonus for "almost" hyperdashes at corner points
-            if (previousHitCircle != null && previousHitCircle.DistanceToHyperDash <= 10)
+            if (previousHitCircle != null && previousHitCircle.DistanceToHyperDash <= 10.0f / 512.0f)
             {
                 if (!previousHitCircle.HyperDash)
                 {
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     PlayerPositionOffset = 0;
                 }
 
-                addition *= 1.0 + additionBonus * ((10 - previousHitCircle.DistanceToHyperDash) / 10);
+                addition *= 1.0 + additionBonus * ((10 - previousHitCircle.DistanceToHyperDash * 512) / 10);
             }
 
             addition *= 850.0 / Math.Max(timeElapsed, 25);
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         private static double spacingWeight(float distance)
         {
-            return Math.Pow(distance, 1.3) / 500;
+            return Math.Pow(distance * 512, 1.2) / 1000;
         }
 
         internal float DistanceTo(CatchDifficultyHitObject other)

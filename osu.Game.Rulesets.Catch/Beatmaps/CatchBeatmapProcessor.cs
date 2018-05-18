@@ -33,10 +33,14 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
         private void initialiseHyperDash(List<CatchHitObject> objects)
         {
             // todo: add difficulty adjust.
-            double halfCatcherWidth = CatcherArea.CATCHER_SIZE * (objects.FirstOrDefault()?.Scale ?? 1) / CatchPlayfield.BASE_WIDTH / 2;
+            double catcherWidth = (1.0f - 0.7f * (Beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5) / 5) * 0.53166f;
+            double halfCatcherWidth = catcherWidth / 2;
+            halfCatcherWidth *= halfCatcherWidth * 0.8;
 
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
+
+            objects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
 
             int objCount = objects.Count;
 
@@ -56,7 +60,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 // }
 
                 int thisDirection = nextObject.X > currentObject.X ? 1 : -1;
-                double timeToNext = nextObject.StartTime - ((currentObject as IHasEndTime)?.EndTime ?? currentObject.StartTime) - 4;
+                double timeToNext = nextObject.StartTime - currentObject.StartTime - 4;
                 double distanceToNext = Math.Abs(nextObject.X - currentObject.X) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
 
                 if (timeToNext * CatcherArea.Catcher.BASE_SPEED < distanceToNext)
