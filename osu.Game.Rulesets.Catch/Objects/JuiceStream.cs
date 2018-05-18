@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             {
                 var spanStartTime = StartTime + span * spanDuration;
                 var reversed = span % 2 == 1;
-                
+
                 for (double d = 0; d <= length; d += tickDistance)
                 {
                     var timeProgress = d / length;
