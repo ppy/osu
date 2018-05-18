@@ -41,6 +41,11 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public CatchHitObject HyperDashTarget;
 
+        /// <summary>
+        /// The distance for a fruit to be a valid hyper, used for edge dash calculation.
+        /// </summary>
+        public double DistanceToHyperDash { get; set; }
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);

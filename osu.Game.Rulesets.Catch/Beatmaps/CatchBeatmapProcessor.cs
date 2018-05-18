@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 }
                 else
                 {
-                    //currentObject.DistanceToHyperDash = timeToNext - distanceToNext;
+                    currentObject.DistanceToHyperDash = timeToNext - distanceToNext;
                     lastExcess = MathHelper.Clamp(timeToNext - distanceToNext, 0, halfCatcherWidth);
                 }
 
