@@ -12,26 +12,26 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable.Pieces
 {
     public class Border : Circle
     {
-        public Border(float GlowRadius, Vector2 size, float borderthickness, Color4 AccentColour, bool HyperDash)
+        public Border(float glowRadius, Vector2 size, float borderThickness, Color4 accentColour, bool hyperDash)
         {
             EdgeEffect = new EdgeEffectParameters
             {
-                Hollow = !HyperDash,
+                Hollow = !hyperDash,
                 Type = EdgeEffectType.Glow,
-                Radius = GlowRadius,
-                Colour = HyperDash ? Color4.Red : AccentColour.Darken(1).Opacity(0.6f)
+                Radius = glowRadius,
+                Colour = hyperDash ? Color4.Red : accentColour.Darken(1).Opacity(0.6f)
             };
             Size = size;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             BorderColour = Color4.White;
-            BorderThickness = borderthickness;
+            BorderThickness = borderThickness;
             Children = new Framework.Graphics.Drawable[]
             {
                 new Box
                 {
                     AlwaysPresent = true,
-                    Colour = AccentColour,
+                    Colour = accentColour,
                     Alpha = 0,
                     RelativeSizeAxes = Axes.Both
                 }
