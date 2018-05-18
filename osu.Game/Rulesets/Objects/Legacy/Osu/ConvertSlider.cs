@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
 
         public bool NewCombo { get; set; }
 
-        protected override HitWindows CreateHitWindows() => new ConvertHitWindows();
+        protected override HitWindows CreateHitWindows() => null;
     }
 }
