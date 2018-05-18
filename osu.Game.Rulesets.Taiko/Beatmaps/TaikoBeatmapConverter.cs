@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.IO.Serialization;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 
@@ -51,8 +50,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         protected override Beatmap<TaikoHitObject> ConvertBeatmap(IBeatmap original)
         {
             // Rewrite the beatmap info to add the slider velocity multiplier
-            BeatmapInfo info = original.BeatmapInfo.DeepClone();
-            info.BaseDifficulty.SliderMultiplier *= legacy_velocity_multiplier;
+            original.BeatmapInfo = original.BeatmapInfo.Clone();
+            original.BeatmapInfo.BaseDifficulty = original.BeatmapInfo.BaseDifficulty.Clone();
+            original.BeatmapInfo.BaseDifficulty.SliderMultiplier *= legacy_velocity_multiplier;
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original);
 
@@ -98,12 +98,12 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 double distance = distanceData.Distance * spans * legacy_velocity_multiplier;
 
                 // The velocity of the taiko hit object - calculated as the velocity of a drum roll
-                double taikoVelocity = taiko_base_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * legacy_velocity_multiplier / speedAdjustedBeatLength;
+                double taikoVelocity = taiko_base_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / speedAdjustedBeatLength;
                 // The duration of the taiko hit object
                 double taikoDuration = distance / taikoVelocity;
 
                 // The velocity of the osu! hit object - calculated as the velocity of a slider
-                double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * legacy_velocity_multiplier / speedAdjustedBeatLength;
+                double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / speedAdjustedBeatLength;
                 // The duration of the osu! hit object
                 double osuDuration = distance / osuVelocity;
 
