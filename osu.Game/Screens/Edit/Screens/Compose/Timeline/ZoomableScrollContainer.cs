@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
@@ -12,10 +13,21 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 {
     public class ZoomableScrollContainer : ScrollContainer
     {
+        /// <summary>
+        /// The time to zoom into/out of a point.
+        /// All user scroll input will be overwritten during the zoom transform.
+        /// </summary>
+        public double ZoomDuration;
+
+        /// <summary>
+        /// The easing with which to transform the zoom.
+        /// </summary>
+        public Easing ZoomEasing;
+
         private readonly Container zoomedContent;
         protected override Container<Drawable> Content => zoomedContent;
 
-        private float currentZoom = 10;
+        private float currentZoom = 1;
 
         public ZoomableScrollContainer()
             : base(Direction.Horizontal)
@@ -23,13 +35,59 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             base.Content.Add(zoomedContent = new Container { RelativeSizeAxes = Axes.Y });
         }
 
+        private int minZoom = 1;
+
         /// <summary>
-        /// Gets or sets the content zoom of this <see cref="Timeline"/>.
+        /// The minimum zoom level allowed.
+        /// </summary>
+        public int MinZoom
+        {
+            get => minZoom;
+            set
+            {
+                if (value < 1)
+                    throw new ArgumentException($"{nameof(MinZoom)} must be >= 1.", nameof(value));
+                minZoom = value;
+
+                if (Zoom < value)
+                    Zoom = value;
+            }
+        }
+
+        private int maxZoom = 60;
+
+        /// <summary>
+        /// The maximum zoom level allowed.
+        /// </summary>
+        public int MaxZoom
+        {
+            get => maxZoom;
+            set
+            {
+                if (value < 1)
+                    throw new ArgumentException($"{nameof(MaxZoom)} must be >= 1.", nameof(value));
+                maxZoom = value;
+
+                if (Zoom > value)
+                    Zoom = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the content zoom level of this <see cref="ZoomableScrollContainer"/>.
         /// </summary>
         public int Zoom
         {
             get => zoomTarget;
-            set => setZoomTarget(value, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
+            set
+            {
+                value = MathHelper.Clamp(value, MinZoom, MaxZoom);
+
+                if (IsLoaded)
+                    setZoomTarget(value, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
+                else
+                    currentZoom = zoomTarget = value;
+            }
         }
 
         protected override void Update()
@@ -48,11 +106,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             return true;
         }
 
-        private int zoomTarget = 10;
+        private int zoomTarget = 1;
         private void setZoomTarget(int newZoom, float focusPoint)
         {
-            zoomTarget = MathHelper.Clamp(newZoom, 1, 60);
-            transformZoomTo(zoomTarget, focusPoint, 200, Easing.OutQuint);
+            zoomTarget = MathHelper.Clamp(newZoom, MinZoom, MaxZoom);
+            transformZoomTo(zoomTarget, focusPoint, ZoomDuration, ZoomEasing);
         }
 
         private void transformZoomTo(int newZoom, float focusPoint, double duration = 0, Easing easing = Easing.None)
