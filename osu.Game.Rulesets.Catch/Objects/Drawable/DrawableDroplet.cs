@@ -3,9 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using OpenTK;
 using OpenTK.Graphics;
