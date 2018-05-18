@@ -15,6 +15,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
         public Timeline()
         {
+            ZoomDuration = 200;
+            ZoomEasing = Easing.OutQuint;
+            Zoom = 10;
+
             BeatmapWaveformGraph waveform;
             Child = waveform = new BeatmapWaveformGraph
             {
