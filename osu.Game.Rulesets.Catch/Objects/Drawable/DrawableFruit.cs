@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableFruit : PalpableCatchHitObject<Fruit>
     {
-        private Circle border;
+        private Border border;
 
         public DrawableFruit(Fruit h)
             : base(h)
@@ -35,34 +35,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             // todo: this should come from the skin.
             AccentColour = colourForRrepesentation(HitObject.VisualRepresentation);
 
-            InternalChildren = new[]
+            InternalChildren = new []
             {
                 createPulp(HitObject.VisualRepresentation),
-                border = new Circle
-                {
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Hollow = !HitObject.HyperDash,
-                        Type = EdgeEffectType.Glow,
-                        Radius = 4,
-                        Colour = HitObject.HyperDash ? Color4.Red : AccentColour.Darken(1).Opacity(0.6f)
-                    },
-                    Size = new Vector2(Height * 1.5f),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    BorderColour = Color4.White,
-                    BorderThickness = 4f,
-                    Children = new Framework.Graphics.Drawable[]
-                    {
-                        new Box
-                        {
-                            AlwaysPresent = true,
-                            Colour = AccentColour,
-                            Alpha = 0,
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    }
-                },
+                border = new Border(4.0f, new Vector2(Height * 1.5f), 4.0f, AccentColour, HitObject.HyperDash),
             };
 
             if (HitObject.HyperDash)
