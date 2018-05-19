@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             // todo: add difficulty adjust.
             double catcherWidth = (1.0f - 0.7f * (Beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5) / 5) * 0.62064f;
             double halfCatcherWidth = catcherWidth / 2;
-            //halfCatcherWidth *= halfCatcherWidth * 0.8;
+            halfCatcherWidth *= halfCatcherWidth * 0.8;
 
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
