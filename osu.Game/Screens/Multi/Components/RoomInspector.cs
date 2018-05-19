@@ -28,14 +28,6 @@ namespace osu.Game.Screens.Multi.Components
         private readonly MarginPadding contentPadding = new MarginPadding { Horizontal = 20, Vertical = 10 };
         private const float transition_duration = 100;
 
-        private readonly Box statusStrip;
-        private readonly Container coverContainer;
-        private readonly FillFlowContainer topFlow, participantsFlow;
-        private readonly ModeTypeInfo modeTypeInfo;
-        private readonly OsuSpriteText participants, participantsSlash, maxParticipants, name, status, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor;
-        private readonly ParticipantInfo participantInfo;
-        private readonly ScrollContainer participantsScroll;
-
         private readonly Bindable<string> nameBind = new Bindable<string>();
         private readonly Bindable<User> hostBind = new Bindable<User>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
@@ -44,11 +36,10 @@ namespace osu.Game.Screens.Multi.Components
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
         private readonly Bindable<User[]> participantsBind = new Bindable<User[]>();
 
-        private OsuColour colours;
-        private LocalisationEngine localisation;
+        private FillFlowContainer topFlow;
+        private ScrollContainer participantsScroll;
 
         private Room room;
-
         public Room Room
         {
             get { return room; }
@@ -71,6 +62,17 @@ namespace osu.Game.Screens.Multi.Components
         {
             Width = 520;
             RelativeSizeAxes = Axes.Y;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, LocalisationEngine localisation)
+        {
+            Box statusStrip;
+            Container coverContainer;
+            FillFlowContainer participantsFlow;
+            ModeTypeInfo modeTypeInfo;
+            OsuSpriteText participants, participantsSlash, maxParticipants, name, status, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor;
+            ParticipantInfo participantInfo;
 
             Children = new Drawable[]
             {
@@ -229,6 +231,7 @@ namespace osu.Game.Screens.Multi.Components
                                                             Anchor = Anchor.BottomLeft,
                                                             Origin = Anchor.BottomLeft,
                                                             TextSize = 14,
+                                                            Colour = colours.Gray9,
                                                         },
                                                     },
                                                 },
@@ -269,27 +272,83 @@ namespace osu.Game.Screens.Multi.Components
                 },
             };
 
-            nameBind.ValueChanged += displayName;
-            hostBind.ValueChanged += displayUser;
-            typeBind.ValueChanged += displayGameType;
-            maxParticipantsBind.ValueChanged += displayMaxParticipants;
-            participantsBind.ValueChanged += displayParticipants;
-        }
+            nameBind.ValueChanged += n => name.Text = n;
+            hostBind.ValueChanged += h => participantInfo.Host = h;
+            typeBind.ValueChanged += t => modeTypeInfo.Type = t;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
-        {
-            this.localisation = localisation;
-            this.colours = colours;
+            statusBind.ValueChanged += s =>
+            {
+                status.Text = s.Message;
 
-            beatmapAuthor.Colour = colours.Gray9;
+                foreach (Drawable d in new Drawable[] { statusStrip, status })
+                    d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
+            };
 
-            //binded here instead of ctor because dependencies are needed
-            statusBind.ValueChanged += displayStatus;
-            beatmapBind.ValueChanged += displayBeatmap;
+            beatmapBind.ValueChanged += b =>
+            {
+                modeTypeInfo.Beatmap = b;
 
+                if (b != null)
+                {
+                    coverContainer.FadeIn(transition_duration);
+
+                    LoadComponentAsync(new BeatmapSetCover(b.BeatmapSet)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            FillMode = FillMode.Fill,
+                            OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
+                        },
+                        coverContainer.Add);
+
+                    beatmapTitle.Current = localisation.GetUnicodePreference(b.Metadata.TitleUnicode, b.Metadata.Title);
+                    beatmapDash.Text = @" - ";
+                    beatmapArtist.Current = localisation.GetUnicodePreference(b.Metadata.ArtistUnicode, b.Metadata.Artist);
+                    beatmapAuthor.Text = $"mapped by {b.Metadata.Author}";
+                }
+                else
+                {
+                    coverContainer.FadeOut(transition_duration);
+
+                    beatmapTitle.Current = null;
+                    beatmapArtist.Current = null;
+
+                    beatmapTitle.Text = "Changing map";
+                    beatmapDash.Text = beatmapArtist.Text = beatmapAuthor.Text = string.Empty;
+                }
+            };
+
+            maxParticipantsBind.ValueChanged += m =>
+            {
+                if (m == null)
+                {
+                    participantsSlash.FadeOut(transition_duration);
+                    maxParticipants.FadeOut(transition_duration);
+                }
+                else
+                {
+                    participantsSlash.FadeIn(transition_duration);
+                    maxParticipants.FadeIn(transition_duration);
+                    maxParticipants.Text = m.ToString();
+                }
+            };
+
+            participantsBind.ValueChanged += p =>
+            {
+                participants.Text = p.Length.ToString();
+                participantInfo.Participants = p;
+                participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u));
+            };
+
+            // trigger incase a room was set before we were loaded
+            nameBind.TriggerChange();
+            hostBind.TriggerChange();
             statusBind.TriggerChange();
+            typeBind.TriggerChange();
             beatmapBind.TriggerChange();
+            maxParticipantsBind.TriggerChange();
+            participantsBind.TriggerChange();
         }
 
         protected override void UpdateAfterChildren()
@@ -297,86 +356,6 @@ namespace osu.Game.Screens.Multi.Components
             base.UpdateAfterChildren();
 
             participantsScroll.Height = DrawHeight - topFlow.DrawHeight;
-        }
-
-        private void displayName(string value)
-        {
-            name.Text = value;
-        }
-
-        private void displayUser(User value)
-        {
-            participantInfo.Host = value;
-        }
-
-        private void displayStatus(RoomStatus value)
-        {
-            status.Text = value.Message;
-
-            foreach (Drawable d in new Drawable[] { statusStrip, status })
-                d.FadeColour(value.GetAppropriateColour(colours), transition_duration);
-        }
-
-        private void displayGameType(GameType value)
-        {
-            modeTypeInfo.Type = value;
-        }
-
-        private void displayBeatmap(BeatmapInfo value)
-        {
-            modeTypeInfo.Beatmap = value;
-
-            if (value != null)
-            {
-                coverContainer.FadeIn(transition_duration);
-
-                LoadComponentAsync(new BeatmapSetCover(value.BeatmapSet)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    FillMode = FillMode.Fill,
-                    OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                },
-                coverContainer.Add);
-
-                beatmapTitle.Current = localisation.GetUnicodePreference(value.Metadata.TitleUnicode, value.Metadata.Title);
-                beatmapDash.Text = @" - ";
-                beatmapArtist.Current = localisation.GetUnicodePreference(value.Metadata.ArtistUnicode, value.Metadata.Artist);
-                beatmapAuthor.Text = $"mapped by {value.Metadata.Author}";
-            }
-            else
-            {
-                coverContainer.FadeOut(transition_duration);
-
-                beatmapTitle.Current = null;
-                beatmapArtist.Current = null;
-
-                beatmapTitle.Text = "Changing map";
-                beatmapDash.Text = beatmapArtist.Text = beatmapAuthor.Text = string.Empty;
-            }
-        }
-
-        private void displayMaxParticipants(int? value)
-        {
-            if (value == null)
-            {
-                participantsSlash.FadeOut(transition_duration);
-                maxParticipants.FadeOut(transition_duration);
-            }
-            else
-            {
-                participantsSlash.FadeIn(transition_duration);
-                maxParticipants.FadeIn(transition_duration);
-                maxParticipants.Text = value.ToString();
-            }
-        }
-
-        private void displayParticipants(User[] value)
-        {
-            participants.Text = value.Length.ToString();
-            participantInfo.Participants = value;
-            participantsFlow.ChildrenEnumerable = value.Select(u => new UserTile(u));
         }
 
         private class UserTile : Container, IHasTooltip
