@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.IO.Serialization;
 using Newtonsoft.Json;
 using osu.Game.IO.Serialization.Converters;
 
@@ -55,17 +54,11 @@ namespace osu.Game.Beatmaps
 
         IBeatmap IBeatmap.Clone() => Clone();
 
-        public Beatmap<T> Clone()
-        {
-            var newInstance = (Beatmap<T>)MemberwiseClone();
-            newInstance.BeatmapInfo = BeatmapInfo.DeepClone();
-
-            return newInstance;
-        }
+        public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();
     }
 
     public class Beatmap : Beatmap<HitObject>
     {
-        public Beatmap Clone() => (Beatmap)base.Clone();
+        public new Beatmap Clone() => (Beatmap)base.Clone();
     }
 }

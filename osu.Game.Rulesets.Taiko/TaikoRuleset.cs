@@ -13,7 +13,10 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Beatmaps;
+using osu.Game.Rulesets.Taiko.Difficulty;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -142,7 +145,9 @@ namespace osu.Game.Rulesets.Taiko
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_taiko_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => new TaikoDifficultyCalculator(beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => new TaikoDifficultyCalculator(beatmap, mods);
+
+        public override PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => new TaikoPerformanceCalculator(this, beatmap, score);
 
         public override int? LegacyID => 1;
 
