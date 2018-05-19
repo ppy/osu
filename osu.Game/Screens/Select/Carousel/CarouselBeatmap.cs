@@ -26,6 +26,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             bool match = criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps;
 
+            match &= Beatmap.StarDifficulty >= criteria.MinimumStarRating && Beatmap.StarDifficulty <= criteria.MaximumStarRating;
+
             if (!string.IsNullOrEmpty(criteria.SearchText))
                 match &=
                     Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteria.SearchText, StringComparison.InvariantCultureIgnoreCase) >= 0) ||

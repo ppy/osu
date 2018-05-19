@@ -16,12 +16,12 @@ namespace osu.Game.Screens.Select.Carousel
 
         public BeatmapSetInfo BeatmapSet;
 
-        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet, double minimumStars, double maximumStars)
+        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             BeatmapSet = beatmapSet ?? throw new ArgumentNullException(nameof(beatmapSet));
 
             beatmapSet.Beatmaps
-                      .Where(b => !b.Hidden && b.StarDifficulty >= minimumStars && b.StarDifficulty <= maximumStars)
+                      .Where(b => !b.Hidden)
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
         }

@@ -350,6 +350,10 @@ namespace osu.Game.Screens.Select
             if (newCriteria != null)
                 activeCriteria = newCriteria;
 
+            // set star rating criteria from the settings
+            activeCriteria.MinimumStarRating = StarsMinimum;
+            activeCriteria.MaximumStarRating = StarsMaximum;
+
             applyActiveCriteria(debounce, true);
         }
 
@@ -496,7 +500,7 @@ namespace osu.Game.Screens.Select
                     b.Metadata = beatmapSet.Metadata;
             }
 
-            var set = new CarouselBeatmapSet(beatmapSet, StarsMinimum, StarsMaximum);
+            var set = new CarouselBeatmapSet(beatmapSet);
 
             foreach (var c in set.Beatmaps)
             {
