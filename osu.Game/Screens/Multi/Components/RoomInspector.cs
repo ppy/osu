@@ -79,8 +79,6 @@ namespace osu.Game.Screens.Multi.Components
 
         public RoomInspector()
         {
-            Width = 520;
-            RelativeSizeAxes = Axes.Y;
         }
 
         [BackgroundDependencyLoader]
