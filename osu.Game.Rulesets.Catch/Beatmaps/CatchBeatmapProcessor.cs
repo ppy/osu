@@ -50,7 +50,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 if (currentObject is Fruit)
                     objectWithDroplets.Add(currentObject);
 
-                if (currentObject is JuiceStream) {
+                if (currentObject is JuiceStream)
+                {
                     IEnumerator<HitObject> nestedHitObjectsEnumerator = currentObject.NestedHitObjects.GetEnumerator();
 
                     while (nestedHitObjectsEnumerator.MoveNext())
@@ -81,7 +82,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 int thisDirection = nextObject.X > currentObject.X ? 1 : -1;
                 double timeToNext = nextObject.StartTime - currentObject.StartTime - 4;
                 double distanceToNext = Math.Abs(nextObject.X - currentObject.X) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
-                
+
 
                 if (timeToNext * CatcherArea.Catcher.BASE_SPEED < distanceToNext)
                 {

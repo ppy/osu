@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             if (curveData != null)
             {
-                JuiceStream juicestream = new JuiceStream
+                yield return new JuiceStream
                 {
                     StartTime = obj.StartTime,
                     Samples = obj.Samples,
@@ -43,9 +43,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     RepeatCount = curveData.RepeatCount,
                     X = positionData.X / CatchPlayfield.BASE_WIDTH,
                     NewCombo = comboData?.NewCombo ?? false
-                };
-                juicestream.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
-                yield return juicestream;
+                }; ;
 
                 yield break;
             }
