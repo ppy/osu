@@ -24,9 +24,8 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
-            bool match = criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps;
-
-            match &= Beatmap.StarDifficulty >= criteria.MinimumStarRating && Beatmap.StarDifficulty <= criteria.MaximumStarRating;
+            bool match = (criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps) &&
+                         Beatmap.StarDifficulty >= criteria.MinimumStarRating && Beatmap.StarDifficulty <= criteria.MaximumStarRating;
 
             if (!string.IsNullOrEmpty(criteria.SearchText))
                 match &=
