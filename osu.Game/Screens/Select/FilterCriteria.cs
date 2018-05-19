@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Select
         public string SearchText;
         public RulesetInfo Ruleset;
         public bool AllowConvertedBeatmaps;
-        public double MinimumStarRating;
-        public double MaximumStarRating;
+        public double MinimumStarDifficulty;
+        public double MaximumStarDifficulty;
     }
 }

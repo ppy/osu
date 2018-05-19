@@ -99,8 +99,6 @@ namespace osu.Game.Screens.Select
 
         public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
-        public Bindable<double> StarsMinimum = new Bindable<double>();
-        public Bindable<double> StarsMaximum = new Bindable<double>();
 
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
@@ -127,8 +125,6 @@ namespace osu.Game.Screens.Select
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
-            config.BindWith(OsuSetting.DisplayStarsMinimum, StarsMinimum);
-            config.BindWith(OsuSetting.DisplayStarsMaximum, StarsMaximum);
 
             RightClickScrollingEnabled.ValueChanged += v => RightMouseScrollbar = v;
             RightClickScrollingEnabled.TriggerChange();
@@ -349,10 +345,6 @@ namespace osu.Game.Screens.Select
         {
             if (newCriteria != null)
                 activeCriteria = newCriteria;
-
-            // set star rating criteria from the settings
-            activeCriteria.MinimumStarRating = StarsMinimum;
-            activeCriteria.MaximumStarRating = StarsMaximum;
 
             applyActiveCriteria(debounce, true);
         }
