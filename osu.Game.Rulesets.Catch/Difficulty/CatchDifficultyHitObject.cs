@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         private static double spacingWeight(float distance)
         {
-            return Math.Pow(distance * 512, 1.2) / 1000;
+            return Math.Pow(distance * 256, 1.3) / 1000;
         }
 
         internal float DistanceTo(CatchDifficultyHitObject other)

@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
@@ -37,13 +38,22 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             float catcherWidth = (1.0f - 0.7f * (circleSize - 5) / 5) * 0.61f;
             float catcherWidthHalf = catcherWidth / 2;
             catcherWidthHalf *= 0.8f;
-
+            
             foreach (var hitObject in Beatmap.HitObjects)
             {
                 // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
-                if (!(hitObject is Droplet) && !(hitObject is BananaShower))
+                if (hitObject is Fruit)
                 {
                     difficultyHitObjects.Add(new CatchDifficultyHitObject((CatchHitObject)hitObject, (float)TimeRate));
+                }
+                if (hitObject is JuiceStream)
+                {
+                    IEnumerator<HitObject> nestedHitObjectsEnumerator = hitObject.NestedHitObjects.GetEnumerator();
+                    while (nestedHitObjectsEnumerator.MoveNext())
+                    {
+                        CatchHitObject objectInJuiceStream = (CatchHitObject)nestedHitObjectsEnumerator.Current;
+                        difficultyHitObjects.Add(new CatchDifficultyHitObject(objectInJuiceStream, (float)TimeRate));
+                    }
                 }
             }
 
