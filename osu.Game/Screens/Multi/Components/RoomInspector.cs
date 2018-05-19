@@ -5,7 +5,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -75,10 +74,6 @@ namespace osu.Game.Screens.Multi.Components
 
                 updateState();
             }
-        }
-
-        public RoomInspector()
-        {
         }
 
         [BackgroundDependencyLoader]
@@ -363,23 +358,31 @@ namespace osu.Game.Screens.Multi.Components
         {
             status.Text = s.Message;
 
-            foreach (Drawable d in new Drawable[] { statusStrip, status })
-                d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
+            Color4 c = s.GetAppropriateColour(colours);
+            statusStrip.FadeColour(c, transition_duration);
+            status.FadeColour(c, transition_duration);
         }
 
         private void updateState()
         {
             if (Room == null)
             {
-                foreach (Drawable d in new Drawable[] { coverContainer, participantsFlow, participantNumbersFlow, infoPanelFlow, name, participantInfo })
-                    d.FadeOut(transition_duration);
+                coverContainer.FadeOut(transition_duration);
+                participantsFlow.FadeOut(transition_duration);
+                participantNumbersFlow.FadeOut(transition_duration);
+                infoPanelFlow.FadeOut(transition_duration);
+                name.FadeOut(transition_duration);
+                participantInfo.FadeOut(transition_duration);
 
                 displayStatus(new RoomStatusNoneSelected());
             }
             else
             {
-                foreach (Drawable d in new Drawable[] { participantsFlow, participantNumbersFlow, infoPanelFlow, name, participantInfo })
-                    d.FadeIn(transition_duration);
+                participantsFlow.FadeIn(transition_duration);
+                participantNumbersFlow.FadeIn(transition_duration);
+                infoPanelFlow.FadeIn(transition_duration);
+                name.FadeIn(transition_duration);
+                participantInfo.FadeIn(transition_duration);
 
                 statusBind.TriggerChange();
                 beatmapBind.TriggerChange();
