@@ -34,6 +34,19 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 },
                 border = new Border(4.0f, new Vector2(Height * 4.0f), 4.0f, AccentColour, false),
             };
+            if (HitObject.HyperDash)
+            {
+                AddInternal(new Pulp
+                {
+                    RelativePositionAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AccentColour = Color4.Red,
+                    Blending = BlendingMode.Additive,
+                    Alpha = 0.5f,
+                    Scale = new Vector2(1.333f)
+                });
+            }
         }
 
         protected override void Update()

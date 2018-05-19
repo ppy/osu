@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             difficultyHitObjects.Clear();
 
             float circleSize = Beatmap.BeatmapInfo.BaseDifficulty.CircleSize;
-            float catcherWidth = (1.0f - 0.7f * (circleSize - 5) / 5) * 0.53166f;
+            float catcherWidth = (1.0f - 0.7f * (circleSize - 5) / 5) * 0.61f;
             float catcherWidthHalf = catcherWidth / 2;
             catcherWidthHalf *= 0.8f;
 
