@@ -19,6 +19,8 @@ namespace osu.Game.Screens
 
         public override bool ShowOverlaysOnEnter => false;
 
+        protected override bool AllowBackButton => false;
+
         public Loader()
         {
             ValidForResume = false;
