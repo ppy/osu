@@ -82,8 +82,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 int thisDirection = nextObject.X > currentObject.X ? 1 : -1;
                 double timeToNext = nextObject.StartTime - currentObject.StartTime - 4;
                 double distanceToNext = Math.Abs(nextObject.X - currentObject.X) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
-
-
+                
                 if (timeToNext * CatcherArea.Catcher.BASE_SPEED < distanceToNext)
                 {
                     currentObject.HyperDashTarget = nextObject;
@@ -91,8 +90,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 }
                 else
                 {
-                    currentObject.DistanceToHyperDash = timeToNext - distanceToNext;
-                    lastExcess = MathHelper.Clamp(timeToNext - distanceToNext, 0, halfCatcherWidth);
+                    currentObject.DistanceToHyperDash = timeToNext * CatcherArea.Catcher.BASE_SPEED - distanceToNext;
+                    lastExcess = MathHelper.Clamp(timeToNext * CatcherArea.Catcher.BASE_SPEED - distanceToNext, 0, halfCatcherWidth);
                 }
 
                 lastDirection = thisDirection;

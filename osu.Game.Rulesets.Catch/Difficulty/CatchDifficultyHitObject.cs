@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             float scalingFactor = NORMALIZED_HITOBJECT_RADIUS / catcherWidthHalf;
 
             playerPositioningError = ABSOLUTE_PLAYER_POSITIONING_ERROR;// * scalingFactor;
-            NormalizedPosition = baseHitObject.X * scalingFactor;
+            NormalizedPosition = baseHitObject.X * 512 * scalingFactor;
         }
 
         private const double DIRECTION_CHANGE_BONUS = 12.5;
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         private static double spacingWeight(float distance)
         {
-            return Math.Pow(distance * 256, 1.3) / 1000;
+            return Math.Pow(distance, 1.3) / 500;
         }
 
         internal float DistanceTo(CatchDifficultyHitObject other)
