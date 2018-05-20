@@ -53,7 +53,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     while (nestedHitObjectsEnumerator.MoveNext())
                     {
                         CatchHitObject objectInJuiceStream = (CatchHitObject)nestedHitObjectsEnumerator.Current;
-                        difficultyHitObjects.Add(new CatchDifficultyHitObject(objectInJuiceStream, catcherWidthHalf));
+                        if (!(objectInJuiceStream is TinyDroplet))
+                            difficultyHitObjects.Add(new CatchDifficultyHitObject(objectInJuiceStream, catcherWidthHalf));
                     }
                 }
             }
