@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>, IKeyBindingHandler<ManiaAction>
     {
-        private readonly DrawableNote head;
-        private readonly DrawableNote tail;
+        public readonly DrawableNote Head;
+        public readonly DrawableNote Tail;
 
         private readonly GlowPiece glowPiece;
         private readonly BodyPiece bodyPiece;
@@ -64,12 +64,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         HoldStartTime = () => holdStartTime
                     })
                 },
-                head = new DrawableHeadNote(this, action)
+                Head = new DrawableHeadNote(this, action)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 },
-                tail = new DrawableTailNote(this, action)
+                Tail = new DrawableTailNote(this, action)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
@@ -79,8 +79,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             foreach (var tick in tickContainer)
                 AddNested(tick);
 
-            AddNested(head);
-            AddNested(tail);
+            AddNested(Head);
+            AddNested(Tail);
         }
 
         public override Color4 AccentColour
@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 glowPiece.AccentColour = value;
                 bodyPiece.AccentColour = value;
-                head.AccentColour = value;
-                tail.AccentColour = value;
+                Head.AccentColour = value;
+                Tail.AccentColour = value;
             }
         }
 
@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (tail.AllJudged)
+            if (Tail.AllJudged)
                 AddJudgement(new HoldNoteJudgement { Result = HitResult.Perfect });
         }
 
@@ -119,12 +119,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.Update();
 
             // Make the body piece not lie under the head note
-            bodyPiece.Y = head.Height;
-            bodyPiece.Height = DrawHeight - head.Height;
+            bodyPiece.Y = Head.Height;
+            bodyPiece.Height = DrawHeight - Head.Height;
 
             // Make the fullHeightContainer "contain" the height of the tail note, keeping in mind
             // that the tail note overshoots the height of this hit object
-            fullHeightContainer.Height = DrawHeight + tail.Height;
+            fullHeightContainer.Height = DrawHeight + Tail.Height;
         }
 
         public bool OnPressed(ManiaAction action)
@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             holdStartTime = null;
 
             // If the key has been released too early, the user should not receive full score for the release
-            if (!tail.IsHit)
+            if (!Tail.IsHit)
                 hasBroken = true;
 
             return true;

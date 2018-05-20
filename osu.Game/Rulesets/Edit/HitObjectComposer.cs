@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected ICompositionTool CurrentTool { get; private set; }
 
-        private RulesetContainer rulesetContainer;
+        protected RulesetContainer RulesetContainer;
         private readonly List<Container> layerContainers = new List<Container>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
@@ -44,8 +44,8 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                rulesetContainer = CreateRulesetContainer(ruleset, beatmap.Value);
-                rulesetContainer.Clock = framedClock;
+                RulesetContainer = CreateRulesetContainer(ruleset, beatmap.Value);
+                RulesetContainer.Clock = framedClock;
             }
             catch (Exception e)
             {
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Edit
             };
 
             var layerAboveRuleset = CreateLayerContainer();
-            layerAboveRuleset.Child = new HitObjectMaskLayer(rulesetContainer.Playfield, this);
+            layerAboveRuleset.Child = CreateHitObjectMaskLayer();
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Edit
                             Children = new Drawable[]
                             {
                                 layerBelowRuleset,
-                                rulesetContainer,
+                                RulesetContainer,
                                 layerAboveRuleset
                             }
                         }
@@ -116,12 +116,13 @@ namespace osu.Game.Rulesets.Edit
 
             layerContainers.ForEach(l =>
             {
-                l.Anchor = rulesetContainer.Playfield.Anchor;
-                l.Origin = rulesetContainer.Playfield.Origin;
-                l.Position = rulesetContainer.Playfield.Position;
-                l.Size = rulesetContainer.Playfield.Size;
+                l.Anchor = RulesetContainer.Playfield.Anchor;
+                l.Origin = RulesetContainer.Playfield.Origin;
+                l.Position = RulesetContainer.Playfield.Position;
+                l.Size = RulesetContainer.Playfield.Size;
             });
         }
+
 
         private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
 
@@ -140,6 +141,11 @@ namespace osu.Game.Rulesets.Edit
         /// and handles hitobject pattern adjustments.
         /// </summary>
         public virtual MaskSelection CreateMaskSelection() => new MaskSelection();
+
+        /// <summary>
+        /// Creates a <see cref="HitObjectMaskLayer"/> depending on the ruleset.
+        /// </summary>
+        protected virtual HitObjectMaskLayer CreateHitObjectMaskLayer() => new HitObjectMaskLayer(RulesetContainer.Playfield, this);
 
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
