@@ -16,9 +16,9 @@ namespace osu.Game.Graphics.Containers
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
-        protected BindableBool ShowOverlays = new BindableBool();
+        protected BindableBool ShowOverlays = new BindableBool(true);
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuGame osuGame, AudioManager audio)
         {
             samplePopIn = audio.Sample.Get(@"UI/overlay-pop-in");
@@ -26,7 +26,8 @@ namespace osu.Game.Graphics.Containers
 
             StateChanged += onStateChanged;
 
-            ShowOverlays.BindTo(osuGame.ShowOverlays);
+            if (osuGame != null)
+                ShowOverlays.BindTo(osuGame.ShowOverlays);
         }
 
         /// <summary>
@@ -52,7 +53,10 @@ namespace osu.Game.Graphics.Containers
         private void onStateChanged(Visibility visibility)
         {
             if (!ShowOverlays)
+            {
                 State = Visibility.Hidden;
+                return;
+            }
 
             switch (visibility)
             {
