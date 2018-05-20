@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
 
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
-        protected IReadOnlyList<ManiaStage> Stages => stages;
+        public IReadOnlyList<ManiaStage> Stages => stages;
 
         protected virtual bool DisplayJudgements => true;
 

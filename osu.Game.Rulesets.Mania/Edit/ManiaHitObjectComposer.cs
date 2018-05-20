@@ -1,12 +1,17 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Screens.Compose;
+using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.Edit
@@ -34,19 +39,20 @@ namespace osu.Game.Rulesets.Mania.Edit
         // between 0.25f to 0.5f for notes that are in other layers (and may be also not selected)
         // Will also need a tool to navigate through layers
         // Please ignore the comment above, I just wanted to write my thoughts down so that I do not forget in 2 months when I get around to it
-        //protected override ScalableContainer CreateLayerContainer() => new ScalableContainer(1) { RelativeSizeAxes = Axes.Both };
 
-        //public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
-        //{
-        //    switch (hitObject)
-        //    {
-        //        case DrawableNote circle:
-        //            return new NoteMask(circle);
-        //        case DrawableHoldNote slider:
-        //            return new HoldNoteMask(slider);
-        //    }
+        public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case DrawableNote note:
+                    return new NoteMask(note);
+                case DrawableHoldNote holdNote:
+                    return new HoldNoteMask(holdNote);
+            }
 
-        //    return base.CreateMaskFor(hitObject);
-        //}
+            return base.CreateMaskFor(hitObject);
+        }
+
+        protected override HitObjectMaskLayer CreateHitObjectMaskLayer() => new ManiaHitObjectMaskLayer((ManiaEditPlayfield)RulesetContainer.Playfield, this);
     }
 }
