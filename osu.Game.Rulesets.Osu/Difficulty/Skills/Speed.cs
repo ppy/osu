@@ -20,8 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainValueOf(OsuDifficultyHitObject current)
         {
             double distance = current.Distance;
-            double speedBonus = 1.0;
-            
+            double speedBonus = 1.0;            
             if(current.DeltaTime < 68) // 68 = 220 BPM 1/4th snapping in MS. 
             {
                 speedBonus = 68 / current.DeltaTime; // 1.09x for 240 BPM, 1.18x for 260 BPM, 1.36x for 300 BPM, etc.
