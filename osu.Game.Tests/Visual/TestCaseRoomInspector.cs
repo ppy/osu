@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual
         {
             base.LoadComplete();
 
-            var room = new Room
+            Room room = new Room
             {
                 Name = { Value = @"My Awesome Room" },
                 Host = { Value = new User { Username = @"flyte", Id = 3103765, Country = new Country { FlagName = @"JP" } } },
@@ -71,9 +71,13 @@ namespace osu.Game.Tests.Visual
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Room = room,
+                RelativeSizeAxes = Axes.Both,
+                Width = 0.5f,
             });
 
+            AddStep(@"set room", () => inspector.Room = room);
+            AddStep(@"null room", () => inspector.Room = null);
+            AddStep(@"set room", () => inspector.Room = room);
             AddStep(@"change title", () => room.Name.Value = @"A Better Room Than The Above");
             AddStep(@"change host", () => room.Host.Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" } });
             AddStep(@"change status", () => room.Status.Value = new RoomStatusPlaying());
@@ -88,7 +92,7 @@ namespace osu.Game.Tests.Visual
 
             AddStep(@"change room", () =>
             {
-                var newRoom = new Room
+                Room newRoom = new Room
                 {
                     Name = { Value = @"My New, Better Than Ever Room" },
                     Host = { Value = new User { Username = @"Angelsim", Id = 1777162, Country = new Country { FlagName = @"KR" } } },
