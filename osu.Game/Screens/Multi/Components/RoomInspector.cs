@@ -61,15 +61,15 @@ namespace osu.Game.Screens.Multi.Components
                 maxParticipantsBind.UnbindBindings();
                 participantsBind.UnbindBindings();
 
-                if (Room != null)
+                if (room != null)
                 {
-                    nameBind.BindTo(Room.Name);
-                    hostBind.BindTo(Room.Host);
-                    statusBind.BindTo(Room.Status);
-                    typeBind.BindTo(Room.Type);
-                    beatmapBind.BindTo(Room.Beatmap);
-                    maxParticipantsBind.BindTo(Room.MaxParticipants);
-                    participantsBind.BindTo(Room.Participants);
+                    nameBind.BindTo(room.Name);
+                    hostBind.BindTo(room.Host);
+                    statusBind.BindTo(room.Status);
+                    typeBind.BindTo(room.Type);
+                    beatmapBind.BindTo(room.Beatmap);
+                    maxParticipantsBind.BindTo(room.MaxParticipants);
+                    participantsBind.BindTo(room.Participants);
                 }
 
                 updateState();
