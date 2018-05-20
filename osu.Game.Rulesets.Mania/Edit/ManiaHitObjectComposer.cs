@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -29,9 +29,20 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override IReadOnlyList<ICompositionTool> CompositionTools => new ICompositionTool[]
         {
-            new HitObjectCompositionTool<Note>("Note"),
+            new HitObjectCompositionTool<Note>("Note", CreateNote, CreateHoldNote),
             new HitObjectCompositionTool<HoldNote>("Hold"),
         };
+
+        // TODO: Implement note creation
+        public bool CreateNote(InputState state, MouseDownEventArgs args)
+        {
+            return true;
+        }
+
+        public bool CreateHoldNote(InputState state, MouseDownEventArgs args)
+        {
+            return true;
+        }
 
         // TODO: According to another proposal, extend this to support multiple layers for mania maps
         // The logic could be moving all the layers that the beatmap has simultaneously

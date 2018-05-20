@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Edit.Tools
     {
         string Name { get; }
 
-        Action<InputState, MouseDownEventArgs, bool> OnMouseDown { get; }
-        Action<InputState, MouseDownEventArgs, bool> OnMouseUp { get; }
+        Func<InputState, MouseDownEventArgs, bool> OnMouseDown { get; }
+        Func<InputState, MouseDownEventArgs, bool> OnMouseUp { get; }
     }
 }

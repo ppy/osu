@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Edit.Tools
     {
         public string Name { get; } = typeof(T).Name;
 
-        public Action<InputState, MouseDownEventArgs, bool> OnMouseDown { get; }
-        public Action<InputState, MouseDownEventArgs, bool> OnMouseUp { get; }
+        public Func<InputState, MouseDownEventArgs, bool> OnMouseDown { get; }
+        public Func<InputState, MouseDownEventArgs, bool> OnMouseUp { get; }
 
         public HitObjectCompositionTool()
         {
@@ -22,6 +22,13 @@ namespace osu.Game.Rulesets.Edit.Tools
         public HitObjectCompositionTool(string name)
         {
             Name = name;
+        }
+
+        public HitObjectCompositionTool(string name, Func<InputState, MouseDownEventArgs, bool> onMouseDown, Func<InputState, MouseDownEventArgs, bool> onMouseUp)
+        {
+            Name = name;
+            OnMouseDown = onMouseDown;
+            OnMouseUp = onMouseUp;
         }
     }
 }
