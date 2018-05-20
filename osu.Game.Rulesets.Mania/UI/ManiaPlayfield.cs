@@ -1,19 +1,19 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Configuration;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI.Scrolling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Configuration;
-using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -25,7 +25,11 @@ namespace osu.Game.Rulesets.Mania.UI
         public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
+
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
+        public IReadOnlyList<ManiaStage> Stages => stages;
+
+        protected virtual bool DisplayJudgements => true;
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
             : base(ScrollingDirection.Up)
@@ -50,7 +54,8 @@ namespace osu.Game.Rulesets.Mania.UI
             int firstColumnIndex = 0;
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                var newStage = CreateStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                newStage.DisplayJudgements = DisplayJudgements;
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
                 newStage.Inverted.BindTo(Inverted);
 
@@ -63,7 +68,11 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void Add(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
+        public override void Add(DrawableHitObject h)
+        {
+            h.OnJudgement += OnJudgement;
+            getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
+        }
 
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
 
@@ -88,7 +97,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
+            if (!judgedObject.DisplayJudgement || !DisplayJudgements)
+                return;
+
             getStageByColumn(((ManiaHitObject)judgedObject.HitObject).Column).OnJudgement(judgedObject, judgement);
         }
+
+        protected virtual ManiaStage CreateStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
+            => new ManiaStage(firstColumnIndex, definition, ref normalColumnStartAction, ref specialColumnStartAction);
     }
 }
