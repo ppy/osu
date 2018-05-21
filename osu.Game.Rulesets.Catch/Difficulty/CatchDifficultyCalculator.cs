@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     }
                     else
                     {
-                        double decay = Math.Pow(CatchDifficultyHitObject.decay_base, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
+                        double decay = Math.Pow(CatchDifficultyHitObject.DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
                         maximumStrain = previousHitObject.Strain * decay;
                     }
 
