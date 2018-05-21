@@ -67,7 +67,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly CursorContainer Cursor;
 
-
         protected readonly Ruleset Ruleset;
 
         private IRulesetConfigManager rulesetConfig;
@@ -94,6 +93,7 @@ namespace osu.Game.Rulesets.UI
         private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
         {
             this.onScreenDisplay = onScreenDisplay;
+
             rulesetConfig = CreateConfig(Ruleset, settings);
 
             if (rulesetConfig != null)
