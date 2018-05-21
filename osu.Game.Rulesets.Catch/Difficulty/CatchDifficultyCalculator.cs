@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             difficultyHitObjects.Clear();
 
             float circleSize = Beatmap.BeatmapInfo.BaseDifficulty.CircleSize;
-            float catcherWidth = (1.0f - 0.7f * (circleSize - 5) / 5) * 0.62064f * CatcherArea.CATCHER_SIZE;
+            float catcherWidth = ((1.0f - 0.7f * (circleSize - 5) / 5) * 0.62064f) * CatcherArea.CATCHER_SIZE;
             float catcherWidthHalf = catcherWidth / 2;
             catcherWidthHalf *= 0.8f;
 
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 double ar = Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate;
                 double preEmpt = BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450) / TimeRate;
 
-                categoryDifficulty["AR"] = preEmpt > 1200.0 ? -(preEmpt - 1800.0) / 120.0 : -(preEmpt - 1200.0) / 150.0 + 5.0;
+                categoryDifficulty["AR"] = (preEmpt > 1200.0) ? -(preEmpt - 1800.0) / 120.0 : (-(preEmpt - 1200.0) / 150.0) + 5.0;
                 categoryDifficulty["Max combo"] = difficultyHitObjects.Count;
             }
 
@@ -92,7 +92,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 while (hitObjectsEnumerator.MoveNext())
                 {
                     CatchDifficultyHitObject nextHitObject = hitObjectsEnumerator.Current;
-                    nextHitObject.CalculateStrains(currentHitObject, TimeRate);
+                    if (nextHitObject != null)
+                        nextHitObject.CalculateStrains(currentHitObject, TimeRate);
                     currentHitObject = nextHitObject;
                 }
 
@@ -111,7 +112,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         /// The weighting of each strain value decays to this number * it's previous value
         /// </summary>
         private const double decay_weight = 0.94;
-
+        
         protected double CalculateDifficulty()
         {
             // The strain step needs to be adjusted for the algorithm to be considered equal with speed changing mods

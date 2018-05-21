@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     internal class CatchDifficultyHitObject
     {
-        internal static readonly double decay_base = 0.20;
+        internal static readonly double DECAY_BASE = 0.20;
         private const float normalized_hitobject_radius = 41.0f;
         private const float absolute_player_positioning_error = 16f;
         private readonly float playerPositioningError;
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Rather simple, but more specialized things are inherently inaccurate due to the big difference playstyles and opinions make.
             // See Taiko feedback thread.
             double timeElapsed = (BaseHitObject.StartTime - previousHitObject.BaseHitObject.StartTime) / timeRate;
-            double decay = Math.Pow(decay_base, timeElapsed / 1000);
+            double decay = Math.Pow(DECAY_BASE, timeElapsed / 1000);
 
             // Update new position with lazy movement.
             PlayerPositionOffset =
