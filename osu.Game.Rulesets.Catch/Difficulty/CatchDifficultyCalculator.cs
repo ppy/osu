@@ -14,8 +14,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
-        private const double STAR_SCALING_FACTOR = 0.145;
-        private const float PLAYFIELD_WIDTH = CatchPlayfield.BASE_WIDTH;
+        private const double star_scaling_factor = 0.145;
+        private const float playfield_width = CatchPlayfield.BASE_WIDTH;
 
         private readonly List<CatchDifficultyHitObject> difficultyHitObjects = new List<CatchDifficultyHitObject>();
 
@@ -54,6 +54,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                         if (!(objectInJuiceStream is TinyDroplet))
                             difficultyHitObjects.Add(new CatchDifficultyHitObject(objectInJuiceStream, catcherWidthHalf));
                     }
+                    // Dispose the enumerator after counting all fruits.
+                    nestedHitObjectsEnumerator.Dispose();
                 }
             }
 
@@ -61,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             if (!CalculateStrainValues()) return 0;
 
-            double starRating = Math.Sqrt(CalculateDifficulty()) * STAR_SCALING_FACTOR;
+            double starRating = Math.Sqrt(CalculateDifficulty()) * star_scaling_factor;
 
             if (categoryDifficulty != null)
             {
@@ -85,12 +87,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 if (!hitObjectsEnumerator.MoveNext()) return false;
 
                 CatchDifficultyHitObject currentHitObject = hitObjectsEnumerator.Current;
-                CatchDifficultyHitObject nextHitObject;
 
                 // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
                 while (hitObjectsEnumerator.MoveNext())
                 {
-                    nextHitObject = hitObjectsEnumerator.Current;
+                    CatchDifficultyHitObject nextHitObject = hitObjectsEnumerator.Current;
                     nextHitObject.CalculateStrains(currentHitObject, TimeRate);
                     currentHitObject = nextHitObject;
                 }
@@ -104,12 +105,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         /// This is to eliminate higher influence of stream over aim by simply having more HitObjects with high strain.
         /// The higher this value, the less strains there will be, indirectly giving long beatmaps an advantage.
         /// </summary>
-        protected const double strain_step = 750;
+        private const double strain_step = 750;
 
         /// <summary>
         /// The weighting of each strain value decays to this number * it's previous value
         /// </summary>
-        protected const double decay_weight = 0.94;
+        private const double decay_weight = 0.94;
 
         protected double CalculateDifficulty()
         {
@@ -137,7 +138,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     }
                     else
                     {
-                        double decay = Math.Pow(CatchDifficultyHitObject.DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
+                        double decay = Math.Pow(CatchDifficultyHitObject.decay_base, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
                         maximumStrain = previousHitObject.Strain * decay;
                     }
 
