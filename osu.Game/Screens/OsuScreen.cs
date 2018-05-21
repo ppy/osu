@@ -3,24 +3,28 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using OpenTK;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Audio;
-using osu.Framework.Graphics;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
-using osu.Framework.Input;
+using OpenTK;
 using OpenTK.Input;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen
+    public abstract class OsuScreen : Screen, IKeyBindingHandler<GlobalAction>
     {
         public BackgroundScreen Background { get; private set; }
+
+        protected virtual bool AllowBackButton => true;
 
         /// <summary>
         /// Override to create a BackgroundMode for the current screen.
@@ -89,6 +93,19 @@ namespace osu.Game.Screens
 
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back && AllowBackButton)
+            {
+                Exit();
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back && AllowBackButton;
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {

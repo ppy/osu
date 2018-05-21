@@ -21,6 +21,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
 
         public float Y => Position.Y;
 
-        protected override HitWindows CreateHitWindows() => new ConvertHitWindows();
+        protected override HitWindows CreateHitWindows() => null;
     }
 }
