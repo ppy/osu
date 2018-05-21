@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show approach circle on first \"Hidden\" object",
+                    LabelText = "Increase visibility of first object with \"Hidden\" mod",
                     Bindable = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility)
                 },
             };
