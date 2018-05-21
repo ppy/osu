@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            hudOverlay.HoldToQuit.ExitAction = Exit;
+            hudOverlay.HoldToQuit.Action = Exit;
 
             if (ShowStoryboard)
                 initializeStoryboard(false);
