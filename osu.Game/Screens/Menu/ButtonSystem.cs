@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Menu
     {
         public event Action<MenuState> StateChanged;
 
-        private readonly BindableBool showOverlays = new BindableBool();
+        private readonly BindableBool allowOverlays = new BindableBool();
 
         public Action OnEdit;
         public Action OnExit;
@@ -135,7 +135,9 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuGame game)
         {
-            if (game != null) showOverlays.BindTo(game.ShowOverlays);
+            if (game != null)
+                allowOverlays.BindTo(game.AllowOverlays);
+
             sampleBack = audio.Sample.Get(@"Menu/button-back-select");
         }
 
@@ -322,7 +324,7 @@ namespace osu.Game.Screens.Menu
 
                     logoDelayedAction = Scheduler.AddDelayed(() =>
                     {
-                        showOverlays.Value = false;
+                        allowOverlays.Value = false;
 
                         logo.ClearTransforms(targetMember: nameof(Position));
                         logo.RelativePositionAxes = Axes.Both;
@@ -351,7 +353,7 @@ namespace osu.Game.Screens.Menu
                                 logoTracking = true;
 
                                 logo.Impact();
-                                showOverlays.Value = true;
+                                allowOverlays.Value = true;
                             }, 200);
                             break;
                         default:

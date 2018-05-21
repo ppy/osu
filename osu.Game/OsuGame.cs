@@ -77,7 +77,7 @@ namespace osu.Game
 
         public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
 
-        public readonly BindableBool ShowOverlays = new BindableBool();
+        public readonly BindableBool AllowOverlays = new BindableBool();
 
         private OsuScreen screenStack;
 
@@ -367,9 +367,9 @@ namespace osu.Game
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
 
-            notifications.Enabled.BindTo(ShowOverlays);
+            notifications.Enabled.BindTo(AllowOverlays);
 
-            ShowOverlays.ValueChanged += show =>
+            AllowOverlays.ValueChanged += show =>
             {
                 //central game screen change logic.
                 if (!show)

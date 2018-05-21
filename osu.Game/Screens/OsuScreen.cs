@@ -32,12 +32,12 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
 
-        protected BindableBool ShowOverlays = new BindableBool();
+        protected BindableBool AllowOverlays = new BindableBool();
 
         /// <summary>
-        /// Whether overlays should be shown when this screen is entered or resumed.
+        /// Whether overlays should be hidden when this screen is entered or resumed.
         /// </summary>
-        public virtual bool ShowOverlaysOnEnter => true;
+        public virtual bool HideOverlaysOnEnter => false;
 
         /// <summary>
         /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.
@@ -88,7 +88,7 @@ namespace osu.Game.Screens
             if (osuGame != null)
             {
                 Ruleset.BindTo(osuGame.Ruleset);
-                ShowOverlays.BindTo(osuGame.ShowOverlays);
+                AllowOverlays.BindTo(osuGame.AllowOverlays);
             }
 
             sampleExit = audio.Sample.Get(@"UI/screen-back");
@@ -220,7 +220,7 @@ namespace osu.Game.Screens
             if (backgroundParallaxContainer != null)
                 backgroundParallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * BackgroundParallaxAmount;
 
-            ShowOverlays.Value = ShowOverlaysOnEnter;
+            AllowOverlays.Value = !HideOverlaysOnEnter;
         }
 
         private void onExitingLogo()
