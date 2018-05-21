@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
-
             difficultyHitObjects.Clear();
 
             float circleSize = Beatmap.BeatmapInfo.BaseDifficulty.CircleSize;
@@ -83,7 +82,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Traverse hitObjects in pairs to calculate the strain value of NextHitObject from the strain value of CurrentHitObject and environment.
             using (List<CatchDifficultyHitObject>.Enumerator hitObjectsEnumerator = difficultyHitObjects.GetEnumerator())
             {
-
                 if (!hitObjectsEnumerator.MoveNext()) return false;
 
                 CatchDifficultyHitObject currentHitObject = hitObjectsEnumerator.Current;
@@ -106,17 +104,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         /// This is to eliminate higher influence of stream over aim by simply having more HitObjects with high strain.
         /// The higher this value, the less strains there will be, indirectly giving long beatmaps an advantage.
         /// </summary>
-        protected const double STRAIN_STEP = 750;
+        protected const double strain_step = 750;
 
         /// <summary>
         /// The weighting of each strain value decays to this number * it's previous value
         /// </summary>
-        protected const double DECAY_WEIGHT = 0.94;
+        protected const double decay_weight = 0.94;
 
         protected double CalculateDifficulty()
         {
             // The strain step needs to be adjusted for the algorithm to be considered equal with speed changing mods
-            double actualStrainStep = STRAIN_STEP * TimeRate;
+            double actualStrainStep = strain_step * TimeRate;
 
             // Find the highest strain value within each strain step
             List<double> highestStrains = new List<double>();
@@ -153,17 +151,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 previousHitObject = hitObject;
             }
 
-
-            // Build the weighted sum over the highest strains for each interval
-            double difficulty = 0;
-            double weight = 1;
-            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
-
-            foreach (double strain in highestStrains)
-            {
-                difficulty += weight * strain;
-                weight *= DECAY_WEIGHT;
-            }
+            // calculate maximun strain difficulty
+            double difficulty = StrainCalculator(highestStrains, decay_weight);
 
             return difficulty;
         }

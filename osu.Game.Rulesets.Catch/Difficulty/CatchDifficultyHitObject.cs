@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = NORMALIZED_HITOBJECT_RADIUS / catcherWidthHalf;
 
-            playerPositioningError = ABSOLUTE_PLAYER_POSITIONING_ERROR;// * scalingFactor;
+            playerPositioningError = ABSOLUTE_PLAYER_POSITIONING_ERROR; // * scalingFactor;
             NormalizedPosition = baseHitObject.X * CatchPlayfield.BASE_WIDTH * scalingFactor;
         }
 
