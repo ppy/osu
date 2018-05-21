@@ -6,9 +6,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Screens.Ranking;
@@ -96,7 +98,7 @@ namespace osu.Game.Overlays
             });
         }
 
-        private class BackButton : OsuClickableContainer
+        private class BackButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
         {
             private AspectContainer aspect;
 
@@ -146,6 +148,20 @@ namespace osu.Game.Overlays
                 aspect.ScaleTo(1, 1000, Easing.OutElastic);
                 return base.OnMouseUp(state, args);
             }
+
+            public bool OnPressed(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        TriggerOnClick();
+                        return true;
+                }
+
+                return false;
+            }
+
+            public bool OnReleased(GlobalAction action) => false;
         }
     }
 }
