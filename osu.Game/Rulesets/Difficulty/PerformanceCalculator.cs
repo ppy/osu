@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Difficulty
         private readonly Dictionary<string, double> attributes = new Dictionary<string, double>();
         protected IDictionary<string, double> Attributes => attributes;
 
+        protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
         protected readonly Score Score;
 
@@ -23,9 +24,9 @@ namespace osu.Game.Rulesets.Difficulty
 
         protected PerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
         {
-            Score = score;
-
+            Ruleset = ruleset;
             Beatmap = beatmap;
+            Score = score;
 
             var diffCalc = ruleset.CreateDifficultyCalculator(beatmap, score.Mods);
             diffCalc.Calculate(attributes);
