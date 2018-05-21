@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     RepeatCount = curveData.RepeatCount,
                     X = positionData.X / CatchPlayfield.BASE_WIDTH,
                     NewCombo = comboData?.NewCombo ?? false
-                };
+                }; ;
 
                 yield break;
             }

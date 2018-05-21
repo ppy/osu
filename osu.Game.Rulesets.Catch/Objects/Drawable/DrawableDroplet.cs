@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
+using osu.Framework.Graphics.Shapes;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -11,6 +12,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableDroplet : PalpableCatchHitObject<Droplet>
     {
+        private Border border;
         private Pulp pulp;
 
         public DrawableDroplet(Droplet h)
@@ -24,10 +26,34 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = pulp = new Pulp
+            InternalChildren = new Circle[]
             {
-                Size = Size
+                pulp = new Pulp
+                {
+                    Size = Size,
+                },
+                border = new Border(4.0f, new Vector2(Height * 4.0f), 4.0f, AccentColour, false),
             };
+            if (HitObject.HyperDash)
+            {
+                AddInternal(new Pulp
+                {
+                    RelativePositionAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AccentColour = Color4.Red,
+                    Blending = BlendingMode.Additive,
+                    Alpha = 0.5f,
+                    Scale = new Vector2(1.333f)
+                });
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            border.Alpha = (float)MathHelper.Clamp((HitObject.StartTime - Time.Current) / 50, 0, 1);
         }
 
         public override Color4 AccentColour

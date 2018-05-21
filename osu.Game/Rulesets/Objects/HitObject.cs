@@ -59,6 +59,8 @@ namespace osu.Game.Rulesets.Objects
 
         private readonly Lazy<SortedList<HitObject>> nestedHitObjects = new Lazy<SortedList<HitObject>>(() => new SortedList<HitObject>((h1, h2) => h1.StartTime.CompareTo(h2.StartTime)));
 
+        public bool HasNestedHitObjects => nestedHitObjects.IsValueCreated && nestedHitObjects.Value.Count > 0;
+
         [JsonIgnore]
         public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects.Value;
 

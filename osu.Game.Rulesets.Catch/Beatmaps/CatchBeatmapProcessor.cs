@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
@@ -33,31 +34,47 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
         private void initialiseHyperDash(List<CatchHitObject> objects)
         {
             // todo: add difficulty adjust.
-            double halfCatcherWidth = CatcherArea.CATCHER_SIZE * (objects.FirstOrDefault()?.Scale ?? 1) / CatchPlayfield.BASE_WIDTH / 2;
+            double catcherWidth = (1.0f - 0.7f * (Beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5) / 5) * 0.62064f;
+            double halfCatcherWidth = catcherWidth / 2;
+            halfCatcherWidth *= halfCatcherWidth * 0.8;
 
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
 
-            int objCount = objects.Count;
+            List<CatchHitObject> objectWithDroplets = new List<CatchHitObject>();
 
-            for (int i = 0; i < objCount - 1; i++)
+            for (int i = 0; i < objects.Count; i++)
             {
                 CatchHitObject currentObject = objects[i];
 
-                // not needed?
-                // if (currentObject is TinyDroplet) continue;
+                if (currentObject is Fruit)
+                    objectWithDroplets.Add(currentObject);
 
-                CatchHitObject nextObject = objects[i + 1];
+                if (currentObject is JuiceStream)
+                {
+                    IEnumerator<HitObject> nestedHitObjectsEnumerator = currentObject.NestedHitObjects.GetEnumerator();
 
-                // while (nextObject is TinyDroplet)
-                // {
-                //     if (++i == objCount - 1) break;
-                //     nextObject = objects[i + 1];
-                // }
+                    while (nestedHitObjectsEnumerator.MoveNext())
+                    {
+                        CatchHitObject objectInJuiceStream = (CatchHitObject)nestedHitObjectsEnumerator.Current;
+                        if (!(objectInJuiceStream is TinyDroplet))
+                            objectWithDroplets.Add(objectInJuiceStream);
+                    }
+                }
+            }
+
+            int objCount = objectWithDroplets.Count;
+
+            for (int i = 0; i < objCount - 1; i++)
+            {
+                CatchHitObject currentObject = objectWithDroplets[i];
+
+                CatchHitObject nextObject = objectWithDroplets[i + 1];
 
                 int thisDirection = nextObject.X > currentObject.X ? 1 : -1;
-                double timeToNext = nextObject.StartTime - ((currentObject as IHasEndTime)?.EndTime ?? currentObject.StartTime) - 4;
+                double timeToNext = nextObject.StartTime - currentObject.StartTime - 4;
                 double distanceToNext = Math.Abs(nextObject.X - currentObject.X) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
+
 
                 if (timeToNext * CatcherArea.Catcher.BASE_SPEED < distanceToNext)
                 {
@@ -66,8 +83,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 }
                 else
                 {
-                    //currentObject.DistanceToHyperDash = timeToNext - distanceToNext;
-                    lastExcess = MathHelper.Clamp(timeToNext - distanceToNext, 0, halfCatcherWidth);
+                    currentObject.DistanceToHyperDash = timeToNext * CatcherArea.Catcher.BASE_SPEED - distanceToNext;
+                    lastExcess = MathHelper.Clamp(timeToNext * CatcherArea.Catcher.BASE_SPEED - distanceToNext, 0, halfCatcherWidth);
                 }
 
                 lastDirection = thisDirection;

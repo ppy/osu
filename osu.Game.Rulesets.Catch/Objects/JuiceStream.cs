@@ -71,7 +71,8 @@ namespace osu.Game.Rulesets.Catch.Objects
                 var spanStartTime = StartTime + span * spanDuration;
                 var reversed = span % 2 == 1;
 
-                for (double d = 0; d <= length; d += tickDistance)
+                // add a timing shift 5 to make sure all sliders are generated properly.
+                for (double d = 0; d <= length + 5; d += tickDistance)
                 {
                     var timeProgress = d / length;
                     var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
@@ -86,20 +87,23 @@ namespace osu.Game.Rulesets.Catch.Objects
                     {
                         double progress = reversed ? 1 - (t - spanStartTime) / spanDuration : (t - spanStartTime) / spanDuration;
 
-                        AddNested(new TinyDroplet
-                        {
-                            StartTime = t,
-                            X = X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
-                            Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                        // Prevent FruitDroplets from stacking over Fruits!
+                        if (Math.Abs(t - (spanStartTime + spanDuration)) > 5)
+                            AddNested(new TinyDroplet
                             {
-                                Bank = s.Bank,
-                                Name = @"slidertick",
-                                Volume = s.Volume
-                            }))
-                        });
+                                StartTime = t,
+                                X = X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
+                                Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                                {
+                                    Bank = s.Bank,
+                                    Name = @"slidertick",
+                                    Volume = s.Volume
+                                }))
+                            });
                     }
 
-                    if (d > minDistanceFromEnd && Math.Abs(d - length) > minDistanceFromEnd)
+                    // Prevent FruitDroplets from stacking over Fruits!
+                    if (d > minDistanceFromEnd && Math.Abs(d - length) > minDistanceFromEnd && Math.Abs(time - (spanStartTime + spanDuration)) > 5)
                     {
                         AddNested(new Droplet
                         {
