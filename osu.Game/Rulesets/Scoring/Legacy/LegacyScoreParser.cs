@@ -14,17 +14,8 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Scoring.Legacy
 {
-    public class LegacyScoreParser
+    public abstract class LegacyScoreParser
     {
-        private readonly RulesetStore rulesets;
-        private readonly BeatmapManager beatmaps;
-
-        public LegacyScoreParser(RulesetStore rulesets, BeatmapManager beatmaps)
-        {
-            this.rulesets = rulesets;
-            this.beatmaps = beatmaps;
-        }
-
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
 
@@ -34,16 +25,15 @@ namespace osu.Game.Rulesets.Scoring.Legacy
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
-                score = new Score { Ruleset = rulesets.GetRuleset(sr.ReadByte()) };
-                currentRuleset = score.Ruleset.CreateInstance();
+                currentRuleset = GetRuleset(sr.ReadByte());
+                score = new Score { Ruleset = currentRuleset.RulesetInfo };
 
                 /* score.Pass = true;*/
                 var version = sr.ReadInt32();
 
                 /* score.FileChecksum = */
-                var beatmapHash = sr.ReadString();
-                score.Beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == beatmapHash);
-                currentBeatmap = beatmaps.GetWorkingBeatmap(score.Beatmap).Beatmap;
+                currentBeatmap = GetBeatmap(sr.ReadString()).Beatmap;
+                score.Beatmap = currentBeatmap.BeatmapInfo;
 
                 /* score.PlayerName = */
                 score.User = new User { Username = sr.ReadString() };
@@ -181,5 +171,19 @@ namespace osu.Game.Rulesets.Scoring.Legacy
 
             return frame;
         }
+
+        /// <summary>
+        /// Retrieves the <see cref="Ruleset"/> for a specific id.
+        /// </summary>
+        /// <param name="rulesetId">The id.</param>
+        /// <returns>The <see cref="Ruleset"/>.</returns>
+        protected abstract Ruleset GetRuleset(int rulesetId);
+
+        /// <summary>
+        /// Retrieves the <see cref="WorkingBeatmap"/> corresponding to an MD5 hash.
+        /// </summary>
+        /// <param name="md5Hash">The MD5 hash.</param>
+        /// <returns>The <see cref="WorkingBeatmap"/>.</returns>
+        protected abstract WorkingBeatmap GetBeatmap(string md5Hash);
     }
 }

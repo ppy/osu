@@ -5,12 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Osu.Scoring
+namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
@@ -31,9 +32,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private double accuracy;
         private int scoreMaxCombo;
-        private int count300;
-        private int count100;
-        private int count50;
+        private int countGreat;
+        private int countGood;
+        private int countMeh;
         private int countMiss;
 
         public OsuPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
@@ -51,9 +52,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
             mods = Score.Mods;
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
-            count300 = Convert.ToInt32(Score.Statistics[HitResult.Great]);
-            count100 = Convert.ToInt32(Score.Statistics[HitResult.Good]);
-            count50 = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
+            countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
+            countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
+            countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
             countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
 
             // Don't count scores made with supposedly unranked mods
@@ -70,10 +71,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
                 ar = Math.Max(0, ar / 2);
 
             double preEmpt = BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450) / TimeRate;
-            double hitWindow300 = (Beatmap.HitObjects.First().HitWindows.Great / 2 - 0.5) / TimeRate;
+            double hitWindowGreat = (Beatmap.HitObjects.First().HitWindows.Great / 2 - 0.5) / TimeRate;
 
             realApproachRate = preEmpt > 1200 ? (1800 - preEmpt) / 120 : (1200 - preEmpt) / 150 + 5;
-            realOverallDifficulty = (80 - 0.5 - hitWindow300) / 6;
+            realOverallDifficulty = (80 - 0.5 - hitWindowGreat) / 6;
 
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.12f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
@@ -138,8 +139,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             aimValue *= approachRateFactor;
 
+            // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
-                aimValue *= 1.03f;
+                aimValue *= 1.02 + (11.0f - realApproachRate) / 50.0; // Gives a 1.04 bonus for AR10, a 1.06 bonus for AR9, a 1.02 bonus for AR11.
 
             if (mods.Any(h => h is OsuModFlashlight))
             {
@@ -188,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             int amountHitObjectsWithAccuracy = countHitCircles;
 
             if (amountHitObjectsWithAccuracy > 0)
-                betterAccuracyPercentage = ((count300 - (totalHits - amountHitObjectsWithAccuracy)) * 6 + count100 * 2 + count50) / (amountHitObjectsWithAccuracy * 6);
+                betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countGood * 2 + countMeh) / (amountHitObjectsWithAccuracy * 6);
             else
                 betterAccuracyPercentage = 0;
 
@@ -211,7 +213,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             return accuracyValue;
         }
 
-        private double totalHits => count300 + count100 + count50 + countMiss;
-        private double totalSuccessfulHits => count300 + count100 + count50;
+        private double totalHits => countGreat + countGood + countMeh + countMiss;
+        private double totalSuccessfulHits => countGreat + countGood + countMeh;
     }
 }

@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets
 {

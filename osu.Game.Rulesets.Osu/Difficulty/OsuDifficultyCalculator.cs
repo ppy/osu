@@ -4,12 +4,13 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.OsuDifficulty.Skills;
 
-namespace osu.Game.Rulesets.Osu.OsuDifficulty
+namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
@@ -35,18 +36,22 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
                 new Speed()
             };
 
-            double sectionEnd = section_length / TimeRate;
+            double sectionLength = section_length * TimeRate;
+
+            // The first object doesn't generate a strain, so we begin with an incremented section end
+            double currentSectionEnd = 2 * sectionLength;
+
             foreach (OsuDifficultyHitObject h in beatmap)
             {
-                while (h.BaseObject.StartTime > sectionEnd)
+                while (h.BaseObject.StartTime > currentSectionEnd)
                 {
                     foreach (Skill s in skills)
                     {
                         s.SaveCurrentPeak();
-                        s.StartNewSectionFrom(sectionEnd);
+                        s.StartNewSectionFrom(currentSectionEnd);
                     }
 
-                    sectionEnd += section_length;
+                    currentSectionEnd += sectionLength;
                 }
 
                 foreach (Skill s in skills)
