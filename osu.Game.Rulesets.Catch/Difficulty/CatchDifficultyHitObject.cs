@@ -8,12 +8,12 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
-    class CatchDifficultyHitObject
+    internal class CatchDifficultyHitObject
     {
-        internal static readonly double DECAY_BASE = 0.20;
-        private const float NORMALIZED_HITOBJECT_RADIUS = 41.0f;
-        private const float ABSOLUTE_PLAYER_POSITIONING_ERROR = 16f;
-        private float playerPositioningError;
+        internal static readonly double decay_base = 0.20;
+        private const float normalized_hitobject_radius = 41.0f;
+        private const float absolute_player_positioning_error = 16f;
+        private readonly float playerPositioningError;
 
         internal CatchHitObject BaseHitObject;
 
@@ -37,26 +37,26 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             BaseHitObject = baseHitObject;
 
             // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
-            float scalingFactor = NORMALIZED_HITOBJECT_RADIUS / catcherWidthHalf;
+            float scalingFactor = normalized_hitobject_radius / catcherWidthHalf;
 
-            playerPositioningError = ABSOLUTE_PLAYER_POSITIONING_ERROR; // * scalingFactor;
+            playerPositioningError = absolute_player_positioning_error; // * scalingFactor;
             NormalizedPosition = baseHitObject.X * CatchPlayfield.BASE_WIDTH * scalingFactor;
         }
 
-        private const double DIRECTION_CHANGE_BONUS = 12.5;
+        private const double direction_change_bonus = 12.5;
         internal void CalculateStrains(CatchDifficultyHitObject previousHitObject, double timeRate)
         {
             // Rather simple, but more specialized things are inherently inaccurate due to the big difference playstyles and opinions make.
             // See Taiko feedback thread.
             double timeElapsed = (BaseHitObject.StartTime - previousHitObject.BaseHitObject.StartTime) / timeRate;
-            double decay = Math.Pow(DECAY_BASE, timeElapsed / 1000);
+            double decay = Math.Pow(decay_base, timeElapsed / 1000);
 
             // Update new position with lazy movement.
             PlayerPositionOffset =
                 MathHelper.Clamp(
                     previousHitObject.ActualNormalizedPosition,
-                    NormalizedPosition - (NORMALIZED_HITOBJECT_RADIUS - playerPositioningError),
-                    NormalizedPosition + (NORMALIZED_HITOBJECT_RADIUS - playerPositioningError)) // Obtain new lazy position, but be stricter by allowing for an error of a certain degree of the player.
+                    NormalizedPosition - (normalized_hitobject_radius - playerPositioningError),
+                    NormalizedPosition + (normalized_hitobject_radius - playerPositioningError)) // Obtain new lazy position, but be stricter by allowing for an error of a certain degree of the player.
                 - NormalizedPosition; // Subtract HitObject position to obtain offset
 
             LastMovement = DistanceTo(previousHitObject);
@@ -77,9 +77,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             {
                 if (Math.Abs(previousHitObject.LastMovement) > 0.1 && Math.Sign(LastMovement) != Math.Sign(previousHitObject.LastMovement))
                 {
-                    double bonus = DIRECTION_CHANGE_BONUS / sqrtTime;
+                    double bonus = direction_change_bonus / sqrtTime;
 
-                    // Weight bonus by how
+                    // Weight bonus by how 
                     double bonusFactor = Math.Min(playerPositioningError, Math.Abs(LastMovement)) / playerPositioningError;
 
                     // We want time to play a role twice here!
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 }
 
                 // Base bonus for every movement, giving some weight to streams.
-                addition += 7.5 * Math.Min(Math.Abs(LastMovement), NORMALIZED_HITOBJECT_RADIUS * 2) / (NORMALIZED_HITOBJECT_RADIUS * 6) / sqrtTime;
+                addition += 7.5 * Math.Min(Math.Abs(LastMovement), normalized_hitobject_radius * 2) / (normalized_hitobject_radius * 6) / sqrtTime;
             }
 
             // Bonus for "almost" hyperdashes at corner points
