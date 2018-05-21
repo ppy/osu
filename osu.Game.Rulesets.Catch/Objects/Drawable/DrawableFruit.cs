@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             // todo: this should come from the skin.
             AccentColour = colourForRrepesentation(HitObject.VisualRepresentation);
 
-            InternalChildren = new []
+            InternalChildren = new[]
             {
                 createPulp(HitObject.VisualRepresentation),
                 border = new Border(4.0f, new Vector2(Height * 1.5f), 4.0f, AccentColour, HitObject.HyperDash),
