@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        protected override RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new OsuEditRulesetContainer(ruleset, beatmap, true);
+        protected override RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new OsuEditRulesetContainer(ruleset, beatmap);
 
         protected override IReadOnlyList<ICompositionTool> CompositionTools => new ICompositionTool[]
         {
