@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    internal class ManiaStage : ScrollingPlayfield
+    public class ManiaStage : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
 
@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Mania.UI
         /// Whether this playfield should be inverted. This flips everything inside the playfield.
         /// </summary>
         public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
+
+        public bool DisplayJudgements = true;
 
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
