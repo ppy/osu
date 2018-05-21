@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         /// The weighting of each strain value decays to this number * it's previous value
         /// </summary>
         private const double decay_weight = 0.94;
-        
+
         protected double CalculateDifficulty()
         {
             // The strain step needs to be adjusted for the algorithm to be considered equal with speed changing mods
