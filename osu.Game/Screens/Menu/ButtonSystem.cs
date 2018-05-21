@@ -6,22 +6,24 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Audio;
-using osu.Framework.Configuration;
-using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Menu
 {
-    public class ButtonSystem : Container, IStateful<MenuState>
+    public class ButtonSystem : Container, IStateful<MenuState>, IKeyBindingHandler<GlobalAction>
     {
         public event Action<MenuState> StateChanged;
 
@@ -146,7 +148,16 @@ namespace osu.Game.Screens.Menu
                 case Key.Space:
                     logo?.TriggerOnClick(state);
                     return true;
-                case Key.Escape:
+            }
+
+            return false;
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Back:
                     switch (State)
                     {
                         case MenuState.TopLevel:
@@ -155,12 +166,23 @@ namespace osu.Game.Screens.Menu
                         case MenuState.Play:
                             backButton.TriggerOnClick();
                             return true;
+                        default:
+                            return false;
                     }
-
+                default:
                     return false;
             }
+        }
 
-            return false;
+        public bool OnReleased(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Back:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         private void onPlay()
@@ -337,6 +359,7 @@ namespace osu.Game.Screens.Menu
                             logo.ScaleTo(0.5f, 200, Easing.OutQuint);
                             break;
                     }
+
                     break;
                 case MenuState.EnteringMode:
                     logoTracking = true;
