@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
         private const double STAR_SCALING_FACTOR = 0.145;
-        private const float PLAYFIELD_WIDTH = 512;
+        private const float PLAYFIELD_WIDTH = CatchPlayfield.BASE_WIDTH;
 
         private readonly List<CatchDifficultyHitObject> difficultyHitObjects = new List<CatchDifficultyHitObject>();
 

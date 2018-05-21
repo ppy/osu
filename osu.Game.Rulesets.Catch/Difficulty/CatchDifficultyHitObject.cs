@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Catch.UI;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
@@ -38,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             float scalingFactor = NORMALIZED_HITOBJECT_RADIUS / catcherWidthHalf;
 
             playerPositioningError = ABSOLUTE_PLAYER_POSITIONING_ERROR;// * scalingFactor;
-            NormalizedPosition = baseHitObject.X * 512 * scalingFactor;
+            NormalizedPosition = baseHitObject.X * CatchPlayfield.BASE_WIDTH * scalingFactor;
         }
 
         private const double DIRECTION_CHANGE_BONUS = 12.5;
@@ -84,7 +83,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     addition += bonus * bonusFactor;
 
                     // Bonus for tougher direction switches and "almost" hyperdashes at this point
-                    if (previousHitCircle != null && previousHitCircle.DistanceToHyperDash <= 10.0f / 512.0f)
+                    if (previousHitCircle != null && previousHitCircle.DistanceToHyperDash <= 10.0f / CatchPlayfield.BASE_WIDTH)
                     {
                         additionBonus += 0.3 * bonusFactor;
                     }
@@ -95,7 +94,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             }
 
             // Bonus for "almost" hyperdashes at corner points
-            if (previousHitCircle != null && previousHitCircle.DistanceToHyperDash <= 10.0f / 512.0f)
+            if (previousHitCircle != null && previousHitCircle.DistanceToHyperDash <= 10.0f / CatchPlayfield.BASE_WIDTH)
             {
                 if (!previousHitCircle.HyperDash)
                 {
@@ -107,7 +106,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     PlayerPositionOffset = 0;
                 }
 
-                addition *= 1.0 + additionBonus * ((10 - previousHitCircle.DistanceToHyperDash * 512) / 10);
+                addition *= 1.0 + additionBonus * ((10 - previousHitCircle.DistanceToHyperDash * CatchPlayfield.BASE_WIDTH) / 10);
             }
 
             addition *= 850.0 / Math.Max(timeElapsed, 25);
