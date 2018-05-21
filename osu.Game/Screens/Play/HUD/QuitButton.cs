@@ -81,8 +81,10 @@ namespace osu.Game.Screens.Play.HUD
         private class Button : HoldToCofirmContainer
         {
             private SpriteIcon icon;
-            private CircularProgress progress;
+            private CircularProgress circularProgress;
             private Circle innerCircle;
+
+            protected override bool AllowMultipleFires => true;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -101,7 +103,7 @@ namespace osu.Game.Screens.Play.HUD
                             Colour = colours.Gray1,
                             Alpha = 0.5f,
                         },
-                        progress = new CircularProgress
+                        circularProgress = new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
                             InnerRadius = 1
@@ -125,19 +127,38 @@ namespace osu.Game.Screens.Play.HUD
                     }
                 };
 
-                Progress.BindTo(progress.Current);
+                bind();
+            }
+
+            private void bind()
+            {
+                circularProgress.Current.BindTo(Progress);
                 Progress.ValueChanged += v => icon.Scale = new Vector2(1 + (float)v * 0.4f);
             }
+
+            private bool pendingAnimation;
 
             protected override void Confirm()
             {
                 base.Confirm();
-                innerCircle.ScaleTo(0, 100).Then().FadeOut().ScaleTo(1).FadeIn(500);
+
+                // temporarily unbind as to not look weird during flash animation.
+                Progress.UnbindAll();
+                pendingAnimation = true;
+
+                innerCircle.ScaleTo(0, 100)
+                           .Then().FadeOut().ScaleTo(1).FadeIn(500)
+                           .OnComplete(a => circularProgress.FadeOut(100).OnComplete(_ =>
+                           {
+                               bind();
+                               circularProgress.FadeIn();
+                               pendingAnimation = false;
+                           }));
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                if (state.Mouse.Buttons.Count == 1)
+                if (!pendingAnimation && state.Mouse.Buttons.Count == 1)
                     BeginConfirm();
                 return true;
             }
