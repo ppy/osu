@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
     {
         protected override float BackgroundParallaxAmount => 0.1f;
 
-        public override bool ShowOverlaysOnEnter => false;
+        protected override bool HideOverlaysOnEnter => true;
 
         public Action RestartRequested;
 
@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Play
         public bool AllowPause { get; set; } = true;
         public bool AllowLeadIn { get; set; } = true;
         public bool AllowResults { get; set; } = true;
+
+        protected override bool AllowBackButton => false;
 
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
@@ -93,7 +95,7 @@ namespace osu.Game.Screens.Play
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
 
-            Beatmap beatmap;
+            IBeatmap beatmap;
 
             try
             {
@@ -107,7 +109,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(working, ruleset.ID == beatmap.BeatmapInfo.Ruleset.ID);
+                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(working);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
@@ -115,7 +117,7 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap, true);
+                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap);
                 }
 
                 if (!RulesetContainer.Objects.Any())
@@ -162,7 +164,7 @@ namespace osu.Game.Screens.Play
                         hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
                     },
                     OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         storyboardContainer = new Container
                         {
@@ -174,12 +176,12 @@ namespace osu.Game.Screens.Play
                             RelativeSizeAxes = Axes.Both,
                             Child = RulesetContainer
                         },
-                        new SkipOverlay(firstObjectTime)
+                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, scoreProcessor)
                         {
-                            Clock = Clock, // skip button doesn't want to use the audio clock directly
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             ProcessCustomClock = false,
-                            AdjustableClock = adjustableClock,
-                            FramedClock = offsetClock,
+                            Breaks = beatmap.Breaks
                         },
                         hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
@@ -188,13 +190,14 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, scoreProcessor)
+                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
+                        new SkipOverlay(firstObjectTime)
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Clock = Clock, // skip button doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
-                            Breaks = beatmap.Breaks
-                        }
+                            AdjustableClock = adjustableClock,
+                            FramedClock = offsetClock,
+                        },
                     }
                 },
                 failOverlay = new FailOverlay

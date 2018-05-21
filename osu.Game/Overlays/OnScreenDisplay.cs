@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
@@ -30,6 +31,7 @@ namespace osu.Game.Overlays
         private readonly SpriteText textLine3;
 
         private const float height = 110;
+        private const float height_notext = 98;
         private const float height_contracted = height * 0.9f;
 
         private readonly FillFlowContainer<OptionLight> optionLights;
@@ -101,12 +103,12 @@ namespace osu.Game.Overlays
                                 },
                                 textLine3 = new OsuSpriteText
                                 {
-                                    Padding = new MarginPadding { Bottom = 15 },
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Margin = new MarginPadding { Bottom = 15 },
                                     Font = @"Exo2.0-Bold",
                                     TextSize = 12,
                                     Alpha = 0.3f,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
                                 },
                             }
                         }
@@ -116,9 +118,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig)
+        private void load(FrameworkConfigManager frameworkConfig, OsuConfigManager osuConfig)
         {
             BeginTracking(this, frameworkConfig);
+            BeginTracking(this, osuConfig);
         }
 
         private readonly Dictionary<(object, IConfigManager), TrackedSettings> trackedConfigManagers = new Dictionary<(object, IConfigManager), TrackedSettings>();
@@ -175,13 +178,10 @@ namespace osu.Game.Overlays
                 textLine2.Text = description.Value;
                 textLine3.Text = description.Shortcut.ToUpper();
 
-                box.Animate(
-                    b => b.FadeIn(500, Easing.OutQuint),
-                    b => b.ResizeHeightTo(height, 500, Easing.OutQuint)
-                ).Then(
-                    b => b.FadeOutFromOne(1500, Easing.InQuint),
-                    b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint)
-                );
+                if (string.IsNullOrEmpty(textLine3.Text))
+                    textLine3.Text = "NO KEY BOUND";
+
+                Display(box);
 
                 int optionCount = 0;
                 int selectedOption = -1;
@@ -211,6 +211,17 @@ namespace osu.Game.Overlays
                 for (int i = 0; i < optionCount; i++)
                     optionLights.Children[i].Glowing = i == selectedOption;
             });
+        }
+
+        protected virtual void Display(Drawable toDisplay)
+        {
+            toDisplay.Animate(
+                b => b.FadeIn(500, Easing.OutQuint),
+                b => b.ResizeHeightTo(height, 500, Easing.OutQuint)
+            ).Then(
+                b => b.FadeOutFromOne(1500, Easing.InQuint),
+                b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint)
+            );
         }
 
         private class OptionLight : Container

@@ -16,10 +16,16 @@ namespace osu.Game.Beatmaps
         /// </summary>
         event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
 
+        IBeatmap Beatmap { get; }
+
         /// <summary>
-        /// Converts a Beatmap using this Beatmap Converter.
+        /// Whether <see cref="Beatmap"/> can be converted by this <see cref="IBeatmapConverter"/>.
         /// </summary>
-        /// <param name="beatmap">The un-converted Beatmap.</param>
-        void Convert(Beatmap beatmap);
+        bool CanConvert { get; }
+
+        /// <summary>
+        /// Converts <see cref="Beatmap"/>.
+        /// </summary>
+        IBeatmap Convert();
     }
 }
