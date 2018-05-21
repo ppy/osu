@@ -18,9 +18,7 @@ namespace osu.Game.Screens.Edit
     /// </summary>
     public class EditorClock : DecoupleableInterpolatingFramedClock
     {
-        //public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
-
-        public double TrackLength;
+        public readonly double TrackLength;
 
         public ControlPointInfo ControlPointInfo;
 
@@ -33,6 +31,7 @@ namespace osu.Game.Screens.Edit
             ControlPointInfo = beatmap.Value.Beatmap.ControlPointInfo;
             TrackLength = beatmap.Value.Track.Length;
         }
+
         public EditorClock(ControlPointInfo controlPointInfo, double trackLength, BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor = beatDivisor;
