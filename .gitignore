@@ -257,3 +257,7 @@ paket-files/
 __pycache__/
 *.pyc
 Staging/
+
+# Offline CI
+CodeFileSanity.*.exe
+inspectcodereport.xml
