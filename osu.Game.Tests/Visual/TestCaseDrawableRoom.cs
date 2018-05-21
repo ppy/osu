@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Multi.Components;
@@ -111,6 +112,7 @@ namespace osu.Game.Tests.Visual
                 }
             });
 
+            AddStep(@"select", () => first.State = SelectionState.Selected);
             AddStep(@"change title", () => first.Room.Name.Value = @"I Changed Name");
             AddStep(@"change host", () => first.Room.Host.Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" } });
             AddStep(@"change status", () => first.Room.Status.Value = new RoomStatusPlaying());
@@ -121,6 +123,7 @@ namespace osu.Game.Tests.Visual
                 new User { Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 1254 } } },
                 new User { Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 123189 } } },
             });
+            AddStep(@"deselect", () => first.State = SelectionState.NotSelected);
         }
 
         [BackgroundDependencyLoader]
