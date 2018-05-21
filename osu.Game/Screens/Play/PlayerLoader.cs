@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 20),
-                Margin = new MarginPadding { Top = 100, Right = 10 },
+                Margin = new MarginPadding(25),
                 Children = new PlayerSettingsGroup[]
                 {
                     new VisualSettings(),
