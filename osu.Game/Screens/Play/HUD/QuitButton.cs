@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 text = new OsuSpriteText
                 {
-                    Text = "hold to quit",
+                    Text = "hold for menu",
                     Font = @"Exo2.0-Bold",
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
