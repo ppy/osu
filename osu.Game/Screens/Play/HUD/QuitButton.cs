@@ -16,6 +16,8 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class QuitButton : FillFlowContainer
     {
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => button.ReceiveMouseInputAt(screenSpacePos);
+
         private readonly Button button;
 
         public Action ExitAction
@@ -24,28 +26,47 @@ namespace osu.Game.Screens.Play.HUD
             set => button.ExitAction = value;
         }
 
+        OsuSpriteText text;
+
         public QuitButton()
         {
-            OsuSpriteText text;
             Direction = FillDirection.Horizontal;
             Spacing = new Vector2(20, 0);
+            Margin = new MarginPadding(10);
             Children = new Drawable[]
             {
                 text = new OsuSpriteText
                 {
-                    Text = "Hold to Quit",
+                    Text = "hold to quit",
                     Font = @"Exo2.0-Bold",
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
-                button = new Button(text)
+                button = new Button()
             };
             AutoSizeAxes = Axes.Both;
         }
 
+        protected override void LoadComplete()
+        {
+            text.FadeInFromZero(500, Easing.OutQuint).Delay(1500).FadeOut(500, Easing.OutQuint);
+            base.LoadComplete();
+        }
+
+        protected override bool OnHover(InputState state)
+        {
+            text.FadeIn(500, Easing.OutQuint);
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            text.FadeOut(500, Easing.OutQuint);
+            base.OnHoverLost(state);
+        }
+
         private class Button : CircularContainer
         {
-            private readonly OsuSpriteText text;
             private SpriteIcon icon;
             private CircularProgress progress;
 
@@ -53,9 +74,6 @@ namespace osu.Game.Screens.Play.HUD
 
             private const int fade_duration = 200;
             private const int progress_duration = 1000;
-            private const int text_display_time = 5000;
-
-            public Button(OsuSpriteText text) => this.text = text;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -79,13 +97,11 @@ namespace osu.Game.Screens.Play.HUD
                     },
                     progress = new CircularProgress { RelativeSizeAxes = Axes.Both, InnerRadius = 0.1f }
                 });
-                Scheduler.AddDelayed(() => text.FadeOut(fade_duration), text_display_time);
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
                 icon.ScaleTo(1.5f);
-                text.FadeIn(fade_duration);
                 progress.FillTo(1, progress_duration).OnComplete(cp => ExitAction());
 
                 return base.OnMouseDown(state, args);
@@ -94,7 +110,6 @@ namespace osu.Game.Screens.Play.HUD
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
                 icon.ScaleTo(1f);
-                Scheduler.AddDelayed(() => text.FadeOut(fade_duration), text_display_time);
                 progress.FillTo(0, progress_duration / 4f).OnComplete(cp => progress.Current.SetDefault());
 
                 return base.OnMouseUp(state, args);
