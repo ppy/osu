@@ -1,7 +1,7 @@
 if (!($Host.Name -eq "Package Manager Host")){
-	echo "This script will only work when run from Package Manager Console"
-	echo "That is needed to correctly install NuGet packages"
-	exit 1
+    echo "This script will only work when run from Package Manager Console"
+    echo "That is needed to correctly install NuGet packages"
+    exit 1
 }
 
 $CFSversion = "v0.2.5"
@@ -14,7 +14,7 @@ if (!(Test-Path ".\CodeFileSanity.$CFSversion.exe") -or !(Get-Command ".\CodeFil
 echo "Running CodeFileSanity"
 .\CodeFileSanity.*.exe
 if (!$?){
-	exit $LastExitCode
+    exit $LastExitCode
 }
 echo "CodeFileSanity OK"
 
