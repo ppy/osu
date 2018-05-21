@@ -328,6 +328,9 @@ namespace osu.Game.Screens.Menu
 
                     logoDelayedAction = Scheduler.AddDelayed(() =>
                     {
+                        hideOverlaysOnEnter.Value = true;
+                        allowOpeningOverlays.Value = false;
+
                         logo.ClearTransforms(targetMember: nameof(Position));
                         logo.RelativePositionAxes = Axes.Both;
 
@@ -355,6 +358,7 @@ namespace osu.Game.Screens.Menu
                                 logoTracking = true;
 
                                 logo.Impact();
+
                                 hideOverlaysOnEnter.Value = false;
                                 allowOpeningOverlays.Value = true;
                             }, 200);
