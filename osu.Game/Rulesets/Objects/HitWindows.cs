@@ -135,39 +135,5 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="timeOffset">The time offset.</param>
         /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>
         public bool CanBeHit(double timeOffset) => timeOffset <= HalfWindowFor(HitResult.Meh);
-
-        /// <summary>
-        /// Multiplies all hit windows by a value.
-        /// </summary>
-        /// <param name="windows">The hit windows to multiply.</param>
-        /// <param name="value">The value to multiply each hit window by.</param>
-        public static HitWindows operator *(HitWindows windows, double value)
-        {
-            windows.Perfect *= value;
-            windows.Great *= value;
-            windows.Good *= value;
-            windows.Ok *= value;
-            windows.Meh *= value;
-            windows.Miss *= value;
-
-            return windows;
-        }
-
-        /// <summary>
-        /// Divides all hit windows by a value.
-        /// </summary>
-        /// <param name="windows">The hit windows to divide.</param>
-        /// <param name="value">The value to divide each hit window by.</param>
-        public static HitWindows operator /(HitWindows windows, double value)
-        {
-            windows.Perfect /= value;
-            windows.Great /= value;
-            windows.Good /= value;
-            windows.Ok /= value;
-            windows.Meh /= value;
-            windows.Miss /= value;
-
-            return windows;
-        }
     }
 }
