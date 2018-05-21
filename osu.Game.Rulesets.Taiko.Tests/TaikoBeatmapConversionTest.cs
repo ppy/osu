@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
 
         [NonParallelizable]
-        [TestCase("basic", false), Ignore("See: https://github.com/ppy/osu/issues/2152")]
-        [TestCase("slider-generating-drumroll", false)]
+        [TestCase("basic")]
+        [TestCase("slider-generating-drumroll")]
         public new void Test(string name)
         {
             base.Test(name);
