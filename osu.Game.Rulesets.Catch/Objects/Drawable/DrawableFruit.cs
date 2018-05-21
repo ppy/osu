@@ -3,10 +3,8 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using OpenTK;
@@ -16,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableFruit : PalpableCatchHitObject<Fruit>
     {
-        private Circle border;
+        private Border border;
 
         public DrawableFruit(Fruit h)
             : base(h)
@@ -38,31 +36,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             InternalChildren = new[]
             {
                 createPulp(HitObject.VisualRepresentation),
-                border = new Circle
-                {
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Hollow = !HitObject.HyperDash,
-                        Type = EdgeEffectType.Glow,
-                        Radius = 4,
-                        Colour = HitObject.HyperDash ? Color4.Red : AccentColour.Darken(1).Opacity(0.6f)
-                    },
-                    Size = new Vector2(Height * 1.5f),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    BorderColour = Color4.White,
-                    BorderThickness = 4f,
-                    Children = new Framework.Graphics.Drawable[]
-                    {
-                        new Box
-                        {
-                            AlwaysPresent = true,
-                            Colour = AccentColour,
-                            Alpha = 0,
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    }
-                },
+                border = new Border(4.0f, new Vector2(Height * 1.5f), 4.0f, AccentColour, HitObject.HyperDash),
             };
 
             if (HitObject.HyperDash)
@@ -273,7 +247,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             base.Update();
 
-            border.Alpha = (float)MathHelper.Clamp((HitObject.StartTime - Time.Current) / 500, 0, 1);
+            border.Alpha = (float)MathHelper.Clamp((HitObject.StartTime - Time.Current) / 50, 0, 1);
         }
 
         private Color4 colourForRrepesentation(FruitVisualRepresentation representation)
