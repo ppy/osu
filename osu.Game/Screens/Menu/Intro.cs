@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Menu
         private SampleChannel welcome;
         private SampleChannel seeya;
 
-        public override bool ShowOverlaysOnEnter => false;
+        public override bool HideOverlaysOnEnter => true;
         public override bool CursorVisible => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();
