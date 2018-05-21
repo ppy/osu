@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    internal class DrawableManiaJudgement : DrawableJudgement
+    public class DrawableManiaJudgement : DrawableJudgement
     {
         public DrawableManiaJudgement(Judgement judgement, DrawableHitObject judgedObject)
             : base(judgement, judgedObject)
