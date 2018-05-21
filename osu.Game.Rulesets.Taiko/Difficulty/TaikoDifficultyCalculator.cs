@@ -1,12 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Taiko.Objects;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Taiko.Objects;
 
-namespace osu.Game.Rulesets.Taiko
+namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     internal class TaikoDifficultyCalculator : DifficultyCalculator
     {
@@ -34,6 +36,11 @@ namespace osu.Game.Rulesets.Taiko
         {
         }
 
+        public TaikoDifficultyCalculator(IBeatmap beatmap, Mod[] mods)
+            : base(beatmap, mods)
+        {
+        }
+
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
             // Fill our custom DifficultyHitObject class, that carries additional information
@@ -50,10 +57,7 @@ namespace osu.Game.Rulesets.Taiko
             double starRating = calculateDifficulty() * star_scaling_factor;
 
             if (categoryDifficulty != null)
-            {
-                categoryDifficulty.Add("Strain", starRating);
-                categoryDifficulty.Add("Hit window 300", 35 /*HitObjectManager.HitWindow300*/ / TimeRate);
-            }
+                categoryDifficulty["Strain"] = starRating;
 
             return starRating;
         }
