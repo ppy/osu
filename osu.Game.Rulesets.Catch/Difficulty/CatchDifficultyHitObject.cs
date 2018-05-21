@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 {
                     double bonus = direction_change_bonus / sqrtTime;
 
-                    // Weight bonus by how 
+                    // Weight bonus by how
                     double bonusFactor = Math.Min(playerPositioningError, Math.Abs(LastMovement)) / playerPositioningError;
 
                     // We want time to play a role twice here!
