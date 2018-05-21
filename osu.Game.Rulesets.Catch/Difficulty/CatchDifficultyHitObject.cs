@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using OpenTK;
@@ -76,7 +79,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 {
                     double bonus = DIRECTION_CHANGE_BONUS / sqrtTime;
 
-                    // Weight bonus by how 
+                    // Weight bonus by how
                     double bonusFactor = Math.Min(playerPositioningError, Math.Abs(LastMovement)) / playerPositioningError;
 
                     // We want time to play a role twice here!
