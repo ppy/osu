@@ -3,11 +3,12 @@
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
-namespace osu.Game.Rulesets.Objects.Legacy.Mania
+namespace osu.Game.Rulesets.Mania.Objects
 {
-    public class ConvertHitWindows : HitWindows
+    public class ManiaHitWindows : HitWindows
     {
         private static readonly IReadOnlyDictionary<HitResult, (double od0, double od5, double od10)> base_ranges = new Dictionary<HitResult, (double, double, double)>
         {
@@ -21,6 +22,9 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
 
         public override void SetDifficulty(double difficulty)
         {
+            AllowsPerfect = true;
+            AllowsOk = true;
+
             Perfect = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Perfect]);
             Great = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Great]);
             Good = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Good]);
