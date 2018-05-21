@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual
             private void load(BeatmapManager beatmaps)
             {
                 var sets = beatmaps.GetAllUsableBeatmapSets();
-                var allBeatmaps = sets.SelectMany(s => s.Beatmaps).Where(b => ruleset.LegacyID < 0 || b.RulesetID == ruleset.LegacyID);
+                var allBeatmaps = sets.SelectMany(s => s.Beatmaps).Where(b => ruleset.LegacyID == null || b.RulesetID == ruleset.LegacyID);
 
                 allBeatmaps.ForEach(b => beatmapDisplays.Add(new BeatmapDisplay(b)));
             }
@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = "Please login to see online scores",
+                        Text = "Please sign in to see online scores",
                     };
                 }
 
@@ -259,9 +259,9 @@ namespace osu.Game.Tests.Visual
                 private readonly OsuSpriteText text;
 
                 private readonly Score score;
-                private readonly Beatmap beatmap;
+                private readonly IBeatmap beatmap;
 
-                public PerformanceDisplay(Score score, Beatmap beatmap)
+                public PerformanceDisplay(Score score, IBeatmap beatmap)
                 {
                     this.score = score;
                     this.beatmap = beatmap;

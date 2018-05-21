@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -11,18 +12,23 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseBeatmapInfoWedge : OsuTestCase
     {
         private RulesetStore rulesets;
         private TestBeatmapInfoWedge infoWedge;
-        private readonly List<Beatmap> beatmaps = new List<Beatmap>();
+        private readonly List<IBeatmap> beatmaps = new List<IBeatmap>();
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         [BackgroundDependencyLoader]
@@ -50,6 +56,9 @@ namespace osu.Game.Tests.Visual
                 infoWedge.UpdateBeatmap(beatmap);
             });
 
+            // select part is redundant, but wait for load isn't
+            selectBeatmap(beatmap.Value.Beatmap);
+
             AddWaitStep(3);
 
             AddStep("hide", () => { infoWedge.State = Visibility.Hidden; });
@@ -61,17 +70,28 @@ namespace osu.Game.Tests.Visual
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
                 var ruleset = rulesetInfo.CreateInstance();
-                beatmaps.Add(createTestBeatmap(rulesetInfo));
+                var testBeatmap = createTestBeatmap(rulesetInfo);
 
-                var name = rulesetInfo.ShortName;
-                selectBeatmap(name);
+                beatmaps.Add(testBeatmap);
+
+                selectBeatmap(testBeatmap);
+
+                testBeatmapLabels(ruleset);
 
                 // TODO: adjust cases once more info is shown for other gamemodes
                 switch (ruleset)
                 {
-                    case OsuRuleset osu:
-                        testOsuBeatmap(osu);
+                    case OsuRuleset _:
                         testInfoLabels(5);
+                        break;
+                    case TaikoRuleset _:
+                        testInfoLabels(5);
+                        break;
+                    case CatchRuleset _:
+                        testInfoLabels(5);
+                        break;
+                    case ManiaRuleset _:
+                        testInfoLabels(4);
                         break;
                     default:
                         testInfoLabels(2);
@@ -82,7 +102,7 @@ namespace osu.Game.Tests.Visual
             testNullBeatmap();
         }
 
-        private void testOsuBeatmap(OsuRuleset ruleset)
+        private void testBeatmapLabels(Ruleset ruleset)
         {
             AddAssert("check version", () => infoWedge.Info.VersionLabel.Text == $"{ruleset.ShortName}Version");
             AddAssert("check title", () => infoWedge.Info.TitleLabel.Text == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
@@ -106,14 +126,14 @@ namespace osu.Game.Tests.Visual
             AddAssert("check no infolabels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
-        private void selectBeatmap(string name)
+        private void selectBeatmap(IBeatmap b)
         {
-            var infoBefore = infoWedge.Info;
+            BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
 
-            AddStep($"select {name} beatmap", () =>
+            AddStep($"select {b.Metadata.Title} beatmap", () =>
             {
-                beatmap.Value = new TestWorkingBeatmap(beatmaps.First(b => b.BeatmapInfo.Ruleset.ShortName == name));
-                infoWedge.UpdateBeatmap(beatmap);
+                infoBefore = infoWedge.Info;
+                infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(b));
             });
 
             AddUntilStep(() => infoWedge.Info != infoBefore, "wait for async load");
@@ -128,11 +148,11 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        private Beatmap createTestBeatmap(RulesetInfo ruleset)
+        private IBeatmap createTestBeatmap(RulesetInfo ruleset)
         {
             List<HitObject> objects = new List<HitObject>();
             for (double i = 0; i < 50000; i += 1000)
-                objects.Add(new HitObject { StartTime = i });
+                objects.Add(new TestHitObject { StartTime = i });
 
             return new Beatmap
             {
@@ -147,7 +167,8 @@ namespace osu.Game.Tests.Visual
                     },
                     Ruleset = ruleset,
                     StarDifficulty = 6,
-                    Version = $"{ruleset.ShortName}Version"
+                    Version = $"{ruleset.ShortName}Version",
+                    BaseDifficulty = new BeatmapDifficulty()
                 },
                 HitObjects = objects
             };
@@ -156,6 +177,13 @@ namespace osu.Game.Tests.Visual
         private class TestBeatmapInfoWedge : BeatmapInfoWedge
         {
             public new BufferedWedgeInfo Info => base.Info;
+        }
+
+        private class TestHitObject : HitObject, IHasPosition
+        {
+            public float X { get; } = 0;
+            public float Y { get; } = 0;
+            public Vector2 Position { get; } = Vector2.Zero;
         }
     }
 }

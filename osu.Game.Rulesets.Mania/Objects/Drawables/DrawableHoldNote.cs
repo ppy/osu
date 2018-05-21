@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Scoring;
 
@@ -24,7 +23,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private readonly GlowPiece glowPiece;
         private readonly BodyPiece bodyPiece;
-        private readonly Container<DrawableHoldNoteTick> tickContainer;
         private readonly Container fullHeightContainer;
 
         /// <summary>
@@ -40,9 +38,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public DrawableHoldNote(HoldNote hitObject, ManiaAction action)
             : base(hitObject, action)
         {
+            Container<DrawableHoldNoteTick> tickContainer;
             RelativeSizeAxes = Axes.X;
 
-            AddRange(new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 // The hit object itself cannot be used for various elements because the tail overshoots it
                 // So a specialized container that is updated to contain the tail height is used
@@ -57,7 +56,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                 },
-                tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
+                tickContainer = new Container<DrawableHoldNoteTick>
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    ChildrenEnumerable = HitObject.NestedHitObjects.OfType<HoldNoteTick>().Select(tick => new DrawableHoldNoteTick(tick)
+                    {
+                        HoldStartTime = () => holdStartTime
+                    })
+                },
                 head = new DrawableHeadNote(this, action)
                 {
                     Anchor = Anchor.TopCentre,
@@ -68,18 +74,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 }
-            });
+            };
 
-            foreach (var tick in HitObject.NestedHitObjects.OfType<HoldNoteTick>())
-            {
-                var drawableTick = new DrawableHoldNoteTick(tick)
-                {
-                    HoldStartTime = () => holdStartTime
-                };
-
-                tickContainer.Add(drawableTick);
-                AddNested(drawableTick);
-            }
+            foreach (var tick in tickContainer)
+                AddNested(tick);
 
             AddNested(head);
             AddNested(tail);
@@ -90,11 +88,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             get { return base.AccentColour; }
             set
             {
-                if (base.AccentColour == value)
-                    return;
                 base.AccentColour = value;
-
-                tickContainer.Children.ForEach(t => t.AccentColour = value);
 
                 glowPiece.AccentColour = value;
                 bodyPiece.AccentColour = value;
@@ -105,6 +99,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+            switch (state)
+            {
+                case ArmedState.Hit:
+                    // Good enough for now, we just want them to have a lifetime end
+                    this.Delay(2000).Expire();
+                    break;
+            }
+        }
+
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        {
+            if (tail.AllJudged)
+                AddJudgement(new HoldNoteJudgement { Result = HitResult.Perfect });
         }
 
         protected override void Update()
@@ -197,6 +204,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private class DrawableTailNote : DrawableNote
         {
+            /// <summary>
+            /// Lenience of release hit windows. This is to make cases where the hold note release
+            /// is timed alongside presses of other hit objects less awkward.
+            /// Todo: This shouldn't exist for non-LegacyBeatmapDecoder beatmaps
+            /// </summary>
+            private const double release_window_lenience = 1.5;
+
             private readonly DrawableHoldNote holdNote;
 
             public DrawableTailNote(DrawableHoldNote holdNote, ManiaAction action)
@@ -209,6 +223,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             protected override void CheckForJudgements(bool userTriggered, double timeOffset)
             {
+                // Factor in the release lenience
+                timeOffset /= release_window_lenience;
+
                 if (!userTriggered)
                 {
                     if (!HitObject.HitWindows.CanBeHit(timeOffset))

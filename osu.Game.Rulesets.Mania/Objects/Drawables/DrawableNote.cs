@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 laneGlowPiece = new LaneGlowPiece
                 {
@@ -48,13 +48,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             get { return base.AccentColour; }
             set
             {
-                if (base.AccentColour == value)
-                    return;
                 base.AccentColour = value;
-
-                laneGlowPiece.AccentColour = value;
-                GlowPiece.AccentColour = value;
-                headPiece.AccentColour = value;
+                laneGlowPiece.AccentColour = AccentColour;
+                GlowPiece.AccentColour = AccentColour;
+                headPiece.AccentColour = AccentColour;
             }
         }
 

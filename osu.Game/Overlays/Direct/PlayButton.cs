@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Direct
         public Track Preview { get; private set; }
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
             get { return beatmapSet; }
@@ -77,12 +78,7 @@ namespace osu.Game.Overlays.Direct
                 loadingAnimation = new LoadingAnimation(),
             });
 
-            Playing.ValueChanged += playing =>
-            {
-                icon.Icon = playing ? FontAwesome.fa_pause : FontAwesome.fa_play;
-                icon.FadeColour(playing || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
-                updatePreviewTrack(playing);
-            };
+            Playing.ValueChanged += updatePreviewTrack;
         }
 
         [BackgroundDependencyLoader]
@@ -124,6 +120,15 @@ namespace osu.Game.Overlays.Direct
 
         private void updatePreviewTrack(bool playing)
         {
+            if (playing && BeatmapSet == null)
+            {
+                Playing.Value = false;
+                return;
+            }
+
+            icon.Icon = playing ? FontAwesome.fa_pause : FontAwesome.fa_play;
+            icon.FadeColour(playing || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
+
             if (playing)
             {
                 if (Preview == null)
@@ -172,8 +177,9 @@ namespace osu.Game.Overlays.Direct
                     if (trackLoader != d) return;
 
                     Preview = d?.Preview;
-                    Playing.TriggerChange();
+                    updatePreviewTrack(Playing);
                     loading = false;
+
                     Add(trackLoader);
                 });
         }
@@ -199,8 +205,7 @@ namespace osu.Game.Overlays.Direct
                 // add back the user's music volume setting (since we are no longer in the global TrackManager's hierarchy).
                 config.BindWith(FrameworkSetting.VolumeMusic, trackManager.Volume);
 
-                if (!string.IsNullOrEmpty(preview))
-                    Preview = trackManager.Get(preview);
+                Preview = trackManager.Get(preview);
             }
 
             protected override void Dispose(bool isDisposing)

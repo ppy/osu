@@ -45,6 +45,11 @@ namespace osu.Game.Input.Bindings
         private void load(KeyBindingStore keyBindings)
         {
             store = keyBindings;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             store.KeyBindingChanged += ReloadMappings;
         }
 

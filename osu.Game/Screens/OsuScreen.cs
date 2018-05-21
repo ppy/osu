@@ -3,24 +3,28 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using OpenTK;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Audio;
-using osu.Framework.Graphics;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
-using osu.Framework.Input;
+using OpenTK;
 using OpenTK.Input;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen
+    public abstract class OsuScreen : Screen, IKeyBindingHandler<GlobalAction>
     {
         public BackgroundScreen Background { get; private set; }
+
+        protected virtual bool AllowBackButton => true;
 
         /// <summary>
         /// Override to create a BackgroundMode for the current screen.
@@ -51,6 +55,10 @@ namespace osu.Game.Screens
         public virtual bool AllowBeatmapRulesetChange => true;
 
         protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+        protected virtual float BackgroundParallaxAmount => 1;
+
+        private ParallaxContainer backgroundParallaxContainer;
 
         public WorkingBeatmap InitialBeatmap
         {
@@ -86,6 +94,19 @@ namespace osu.Game.Screens
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
 
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back && AllowBackButton)
+            {
+                Exit();
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back && AllowBackButton;
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat || !IsCurrentScreen) return false;
@@ -102,11 +123,10 @@ namespace osu.Game.Screens
 
         protected override void OnResuming(Screen last)
         {
-            base.OnResuming(last);
-            logo.AppendAnimatingAction(() => LogoArriving(logo, true), true);
             sampleExit?.Play();
+            applyArrivingDefaults(true);
 
-            ShowOverlays.Value = ShowOverlaysOnEnter;
+            base.OnResuming(last);
         }
 
         protected override void OnSuspending(Screen next)
@@ -123,6 +143,8 @@ namespace osu.Game.Screens
 
             if (lastOsu?.Background != null)
             {
+                backgroundParallaxContainer = lastOsu.backgroundParallaxContainer;
+
                 if (bg == null || lastOsu.Background.Equals(bg))
                     //we can keep the previous mode's background.
                     Background = lastOsu.Background;
@@ -136,7 +158,7 @@ namespace osu.Game.Screens
                 // this makes up for the fact our padding changes when the global toolbar is visible.
                 bg.Scale = new Vector2(1.06f);
 
-                AddInternal(new ParallaxContainer
+                AddInternal(backgroundParallaxContainer = new ParallaxContainer
                 {
                     Depth = float.MaxValue,
                     Children = new[]
@@ -149,11 +171,9 @@ namespace osu.Game.Screens
             if ((logo = lastOsu?.logo) == null)
                 LoadComponentAsync(logo = new OsuLogo { Alpha = 0 }, AddInternal);
 
-            logo.AppendAnimatingAction(() => LogoArriving(logo, false), true);
+            applyArrivingDefaults(false);
 
             base.OnEntering(last);
-
-            ShowOverlays.Value = ShowOverlaysOnEnter;
         }
 
         protected override bool OnExiting(Screen next)
@@ -191,6 +211,16 @@ namespace osu.Game.Screens
             logo.RelativePositionAxes = Axes.None;
             logo.Triangles = true;
             logo.Ripple = true;
+        }
+
+        private void applyArrivingDefaults(bool isResuming)
+        {
+            logo.AppendAnimatingAction(() => LogoArriving(logo, isResuming), true);
+
+            if (backgroundParallaxContainer != null)
+                backgroundParallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * BackgroundParallaxAmount;
+
+            ShowOverlays.Value = ShowOverlaysOnEnter;
         }
 
         private void onExitingLogo()

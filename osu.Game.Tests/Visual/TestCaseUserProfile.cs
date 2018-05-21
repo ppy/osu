@@ -4,16 +4,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
+using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseUserProfile : OsuTestCase
     {
         private readonly TestUserProfileOverlay profile;
+        private APIAccess api;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -21,11 +27,18 @@ namespace osu.Game.Tests.Visual
             typeof(UserProfileOverlay),
             typeof(RankGraph),
             typeof(LineGraph),
+            typeof(BadgeContainer)
         };
 
         public TestCaseUserProfile()
         {
             Add(profile = new TestUserProfileOverlay());
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api)
+        {
+            this.api = api;
         }
 
         protected override void LoadComplete()
@@ -51,18 +64,34 @@ namespace osu.Game.Tests.Visual
                 {
                     Mode = @"osu",
                     Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                },
+                Badges = new[]
+                {
+                    new Badge
+                    {
+                        AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
+                        Description = "Outstanding help by being a voluntary test subject.",
+                        ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
+                    }
                 }
             }, false));
 
             checkSupporterTag(false);
 
+            AddStep("Show null dummy", () => profile.ShowUser(new User
+            {
+                Username = @"Null",
+                Id = 1,
+            }, false));
+
             AddStep("Show ppy", () => profile.ShowUser(new User
             {
                 Username = @"peppy",
                 Id = 2,
+                IsSupporter = true,
                 Country = new Country { FullName = @"Australia", FlagName = @"AU" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
-            }));
+            }, api.IsLoggedIn));
 
             checkSupporterTag(true);
 
@@ -72,7 +101,7 @@ namespace osu.Game.Tests.Visual
                 Id = 3103765,
                 Country = new Country { FullName = @"Japan", FlagName = @"JP" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
-            }));
+            }, api.IsLoggedIn));
 
             AddStep("Hide", profile.Hide);
             AddStep("Show without reload", profile.Show);

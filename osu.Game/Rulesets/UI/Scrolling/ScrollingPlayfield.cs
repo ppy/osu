@@ -4,9 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
-using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK.Input;
 
@@ -62,9 +60,14 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// Creates a new <see cref="ScrollingPlayfield"/>.
         /// </summary>
         /// <param name="direction">The direction in which <see cref="DrawableHitObject"/>s in this container should scroll.</param>
-        /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width</param>
-        protected ScrollingPlayfield(ScrollingDirection direction, float? customWidth = null)
-            : base(customWidth)
+        /// <param name="customWidth">The width to scale the internal coordinate space to.
+        /// May be null if scaling based on <paramref name="customHeight"/> is desired. If <paramref name="customHeight"/> is also null, no scaling will occur.
+        /// </param>
+        /// <param name="customHeight">The height to scale the internal coordinate space to.
+        /// May be null if scaling based on <paramref name="customWidth"/> is desired. If <paramref name="customWidth"/> is also null, no scaling will occur.
+        /// </param>
+        protected ScrollingPlayfield(ScrollingDirection direction, float? customWidth = null, float? customHeight = null)
+            : base(customWidth, customHeight)
         {
             this.direction = direction;
         }
@@ -85,10 +88,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 switch (args.Key)
                 {
                     case Key.Minus:
-                        transformVisibleTimeRangeTo(VisibleTimeRange + time_span_step, 200, Easing.OutQuint);
+                        this.TransformBindableTo(VisibleTimeRange, VisibleTimeRange + time_span_step, 200, Easing.OutQuint);
                         break;
                     case Key.Plus:
-                        transformVisibleTimeRangeTo(VisibleTimeRange - time_span_step, 200, Easing.OutQuint);
+                        this.TransformBindableTo(VisibleTimeRange, VisibleTimeRange - time_span_step, 200, Easing.OutQuint);
                         break;
                 }
             }
@@ -96,27 +99,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return false;
         }
 
-        private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, Easing easing = Easing.None)
-        {
-            this.TransformTo(this.PopulateTransform(new TransformVisibleTimeRange(), newTimeRange, duration, easing));
-        }
-
         protected sealed override HitObjectContainer CreateHitObjectContainer() => new ScrollingHitObjectContainer(direction);
-
-        private class TransformVisibleTimeRange : Transform<double, ScrollingPlayfield>
-        {
-            private double valueAt(double time)
-            {
-                if (time < StartTime) return StartValue;
-                if (time >= EndTime) return EndValue;
-
-                return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-            }
-
-            public override string TargetMember => "VisibleTimeRange.Value";
-
-            protected override void Apply(ScrollingPlayfield d, double time) => d.VisibleTimeRange.Value = valueAt(time);
-            protected override void ReadIntoStartValue(ScrollingPlayfield d) => StartValue = d.VisibleTimeRange.Value;
-        }
     }
 }

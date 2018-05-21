@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management.Automation;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using FileWebRequest = osu.Framework.IO.Network.FileWebRequest;
@@ -16,8 +17,9 @@ namespace osu.Desktop.Deploy
 {
     internal static class Program
     {
-        private const string nuget_path = @"packages\NuGet.CommandLine.4.3.0\tools\NuGet.exe";
-        private const string squirrel_path = @"packages\squirrel.windows.1.7.8\tools\Squirrel.exe";
+        private static string packages => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+        private static string nugetPath => Path.Combine(packages, @"nuget.commandline\4.5.1\tools\NuGet.exe");
+        private static string squirrelPath => Path.Combine(packages, @"squirrel.windows\1.8.0\tools\Squirrel.exe");
         private const string msbuild_path = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe";
 
         public static string StagingFolder = ConfigurationManager.AppSettings["StagingFolder"];
@@ -39,7 +41,7 @@ namespace osu.Desktop.Deploy
         /// <summary>
         /// How many previous build deltas we want to keep when publishing.
         /// </summary>
-        private const int keep_delta_count = 3;
+        private const int keep_delta_count = 4;
 
         private static string codeSigningCmd => string.IsNullOrEmpty(codeSigningPassword) ? "" : $"-n \"/a /f {codeSigningCertPath} /p {codeSigningPassword} /t http://timestamp.comodoca.com/authenticode\"";
 
@@ -56,8 +58,12 @@ namespace osu.Desktop.Deploy
 
         private static string codeSigningPassword;
 
+        private static bool interactive;
+
         public static void Main(string[] args)
         {
+            interactive = args.Length == 0;
+
             displayHeader();
 
             findSolutionPath();
@@ -81,29 +87,27 @@ namespace osu.Desktop.Deploy
             string version = $"{verBase}{increment}";
 
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Write($"Ready to deploy {version}: ");
-            Console.ReadLine();
+            Console.Write($"Ready to deploy {version}!");
+            pauseIfInteractive();
 
             sw.Start();
 
             if (!string.IsNullOrEmpty(CodeSigningCertificate))
             {
                 Console.Write("Enter code signing password: ");
-                codeSigningPassword = readLineMasked();
+                codeSigningPassword = args.Length > 0 ? args[0] : readLineMasked();
             }
 
-            write("Restoring NuGet packages...");
-            runCommand(nuget_path, "restore " + solutionPath);
-
             write("Updating AssemblyInfo...");
-            updateAssemblyInfo(version);
+            updateCsprojVersion(version);
+            updateAppveyorVersion(version);
 
             write("Running build process...");
             foreach (string targetName in TargetNames.Split(','))
                 runCommand(msbuild_path, $"/v:quiet /m /t:{targetName.Replace('.', '_')} /p:OutputPath={stagingPath};Targets=\"Clean;Build\";Configuration=Release {SolutionName}.sln");
 
             write("Creating NuGet deployment package...");
-            runCommand(nuget_path, $"pack {NuSpecName} -Version {version} -Properties Configuration=Deploy -OutputDirectory {stagingPath} -BasePath {stagingPath}");
+            runCommand(nugetPath, $"pack {NuSpecName} -Version {version} -Properties Configuration=Deploy -OutputDirectory {stagingPath} -BasePath {stagingPath}");
 
             //prune once before checking for files so we can avoid erroring on files which aren't even needed for this build.
             pruneReleases();
@@ -111,7 +115,7 @@ namespace osu.Desktop.Deploy
             checkReleaseFiles();
 
             write("Running squirrel build...");
-            runCommand(squirrel_path, $"--releasify {stagingPath}\\{nupkgFilename(version)} --setupIcon {iconPath} --icon {iconPath} {codeSigningCmd} --no-msi");
+            runCommand(squirrelPath, $"--releasify {stagingPath}\\{nupkgFilename(version)} --framework-version=net471 --setupIcon {iconPath} --icon {iconPath} {codeSigningCmd} --no-msi");
 
             //prune again to clean up before upload.
             pruneReleases();
@@ -123,10 +127,10 @@ namespace osu.Desktop.Deploy
             uploadBuild(version);
 
             //reset assemblyinfo.
-            updateAssemblyInfo("0.0.0");
+            updateCsprojVersion("0.0.0");
 
             write("Done!", ConsoleColor.White);
-            Console.ReadLine();
+            pauseIfInteractive();
         }
 
         private static void displayHeader()
@@ -305,20 +309,29 @@ namespace osu.Desktop.Deploy
             Directory.CreateDirectory(directory);
         }
 
-        private static void updateAssemblyInfo(string version)
+        private static void updateCsprojVersion(string version)
         {
-            string file = Path.Combine(ProjectName, "Properties", "AssemblyInfo.cs");
+            var toUpdate = new[] { "<Version>", "<FileVersion>" };
+            string file = Path.Combine(ProjectName, $"{ProjectName}.csproj");
 
             var l1 = File.ReadAllLines(file);
             List<string> l2 = new List<string>();
             foreach (var l in l1)
             {
-                if (l.StartsWith("[assembly: AssemblyVersion("))
-                    l2.Add($"[assembly: AssemblyVersion(\"{version}\")]");
-                else if (l.StartsWith("[assembly: AssemblyFileVersion("))
-                    l2.Add($"[assembly: AssemblyFileVersion(\"{version}\")]");
-                else
-                    l2.Add(l);
+                string line = l;
+
+                foreach (var tag in toUpdate)
+                {
+                    int startIndex = l.IndexOf(tag, StringComparison.InvariantCulture);
+                    if (startIndex == -1)
+                        continue;
+                    startIndex += tag.Length;
+
+                    int endIndex = l.IndexOf("<", startIndex, StringComparison.InvariantCulture);
+                    line = $"{l.Substring(0, startIndex)}{version}{l.Substring(endIndex)}";
+                }
+
+                l2.Add(line);
             }
 
             File.WriteAllLines(file, l2);
@@ -335,8 +348,8 @@ namespace osu.Desktop.Deploy
                 path = Environment.CurrentDirectory;
 
             while (!File.Exists(Path.Combine(path, $"{SolutionName}.sln")))
-                path = path.Remove(path.LastIndexOf('\\'));
-            path += "\\";
+                path = path.Remove(path.LastIndexOf(Path.DirectorySeparatorChar));
+            path += Path.DirectorySeparatorChar;
 
             Environment.CurrentDirectory = path;
         }
@@ -381,8 +394,35 @@ namespace osu.Desktop.Deploy
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"FATAL ERROR: {message}");
 
-            Console.ReadLine();
+            pauseIfInteractive();
             Environment.Exit(-1);
+        }
+
+        private static void pauseIfInteractive()
+        {
+            if (interactive)
+                Console.ReadLine();
+            else
+                Console.WriteLine();
+        }
+
+        private static bool updateAppveyorVersion(string version)
+        {
+            try
+            {
+                using (PowerShell ps = PowerShell.Create())
+                {
+                    ps.AddScript($"Update-AppveyorBuild -Version \"{version}\"");
+                    ps.Invoke();
+                }
+                return true;
+            }
+            catch
+            {
+                // we don't have appveyor and don't care
+            }
+
+            return false;
         }
 
         private static void write(string message, ConsoleColor col = ConsoleColor.Gray)

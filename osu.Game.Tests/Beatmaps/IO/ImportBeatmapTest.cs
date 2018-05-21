@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Beatmaps.IO
     [TestFixture]
     public class ImportBeatmapTest
     {
-        private const string osz_path = @"../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
+        private const string osz_path = @"../../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
 
         [Test]
         public void TestImportWhenClosed()
@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var temp = prepareTempCopy(osz_path);
                     Assert.IsTrue(File.Exists(temp));
 
-                    var importer = new BeatmapIPCChannel(client);
+                    var importer = new ArchiveImportIPCChannel(client);
                     if (!importer.ImportAsync(temp).Wait(10000))
                         Assert.Fail(@"IPC took too long to send");
 
@@ -209,7 +209,11 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Assert.IsTrue(File.Exists(temp));
 
-            var imported = osu.Dependencies.Get<BeatmapManager>().Import(temp);
+            var manager = osu.Dependencies.Get<BeatmapManager>();
+
+            manager.Import(temp);
+
+            var imported = manager.GetAllUsableBeatmapSets();
 
             ensureLoaded(osu);
 
@@ -271,13 +275,13 @@ namespace osu.Game.Tests.Beatmaps.IO
                 Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineBeatmapID == b.OnlineBeatmapID));
             Assert.IsTrue(set.Beatmaps.Count > 0);
             var beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
-            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
+            Assert.IsTrue(beatmap?.HitObjects.Any() == true);
             beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 1))?.Beatmap;
-            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
+            Assert.IsTrue(beatmap?.HitObjects.Any() == true);
             beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 2))?.Beatmap;
-            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
+            Assert.IsTrue(beatmap?.HitObjects.Any() == true);
             beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 3))?.Beatmap;
-            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
+            Assert.IsTrue(beatmap?.HitObjects.Any() == true);
         }
 
         private void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
