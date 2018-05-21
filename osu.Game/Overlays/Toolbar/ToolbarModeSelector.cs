@@ -76,15 +76,13 @@ namespace osu.Game.Overlays.Toolbar
                 modeButtons.Add(new ToolbarModeButton
                 {
                     Ruleset = r,
-                    Action = delegate
-                    {
-                        ruleset.Value = r;
-                    }
+                    Action = delegate { ruleset.Value = r; }
                 });
             }
 
             ruleset.ValueChanged += rulesetChanged;
             ruleset.DisabledChanged += disabledChanged;
+
             if (game != null)
                 ruleset.BindTo(game.Ruleset);
             else
@@ -94,17 +92,18 @@ namespace osu.Game.Overlays.Toolbar
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             base.OnKeyDown(state, args);
-            if (!state.Keyboard.ControlPressed || args.Repeat || (int)args.Key < 109 ||  (int)args.Key > 118) {
-                return false;
+
+            if (state.Keyboard.ControlPressed && !args.Repeat && args.Key >= Key.Number1 && args.Key <= Key.Number9)
+            {
+                int requested = args.Key - Key.Number1;
+
+                RulesetInfo found = rulesets.AvailableRulesets.Skip(requested).FirstOrDefault();
+                if (found != null)
+                    ruleset.Value = found;
+                return true;
             }
 
-            RulesetInfo targetRuleset = rulesets.GetRuleset(args.Key == Key.Number0 ? 9 : (int)args.Key - 110);
-            if (targetRuleset == null || targetRuleset == ruleset.Value) {
-                return false;
-            }
-
-            ruleset.Value = targetRuleset;
-            return true;
+            return false;
         }
 
         public override bool HandleKeyboardInput => !ruleset.Disabled && base.HandleKeyboardInput;
