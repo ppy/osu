@@ -37,5 +37,20 @@ namespace osu.Game.Rulesets.Difficulty
         }
 
         public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);
+
+        protected double StrainCalculator(List<double> highestStrains, double decayWeight)
+        {
+            // Build the weighted sum over the highest strains for each interval
+            double difficulty = 0;
+            double weight = 1;
+            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
+
+            foreach (double strain in highestStrains)
+            {
+                difficulty += weight * strain;
+                weight *= decayWeight;
+            }
+            return difficulty;
+        }
     }
 }
