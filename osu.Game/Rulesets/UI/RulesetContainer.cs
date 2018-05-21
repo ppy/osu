@@ -195,26 +195,6 @@ namespace osu.Game.Rulesets.UI
         private Container content;
         private IEnumerable<Mod> mods;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            KeyBindingInputManager.Add(content = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-            });
-
-            AddInternal(KeyBindingInputManager);
-            KeyBindingInputManager.Add(Playfield);
-
-            if (Cursor != null)
-                KeyBindingInputManager.Add(Cursor);
-
-            // Apply mods
-            applyMods(Mods, config);
-
-            loadObjects();
-        }
-
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
         /// Creates a hit renderer for a beatmap.
@@ -236,10 +216,26 @@ namespace osu.Game.Rulesets.UI
 
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
+        }
 
-            // Add mods, should always be the last thing applied to give full control to mods
-            // Mods are now added in the load() method, this method is still executed after the constructor
-            // so they are still added in last
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            KeyBindingInputManager.Add(content = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
+
+            AddInternal(KeyBindingInputManager);
+            KeyBindingInputManager.Add(Playfield);
+
+            if (Cursor != null)
+                KeyBindingInputManager.Add(Cursor);
+
+            // Apply mods
+            applyMods(Mods, config);
+
+            loadObjects();
         }
 
         /// <summary>
