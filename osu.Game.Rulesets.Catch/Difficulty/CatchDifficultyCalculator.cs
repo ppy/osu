@@ -72,9 +72,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 double preEmpt = BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450) / TimeRate;
 
                 categoryDifficulty["AR"] = preEmpt > 1200.0 ? -(preEmpt - 1800.0) / 120.0 : -(preEmpt - 1200.0) / 150.0 + 5.0;
-
-                //categoryDifficulty.Add("AR", (preEmpt > 1200.0 ? -(preEmpt - 1800.0) / 120.0 : -(preEmpt - 1200.0) / 150.0 + 5.0).ToString("0.00", GameBase.nfi));
-                //categoryDifficulty.Add("Max combo", DifficultyHitObjects.Count.ToString(GameBase.nfi));
+                categoryDifficulty["Max combo"] = difficultyHitObjects.Count;
             }
 
             return starRating;
