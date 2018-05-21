@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD
         protected override bool OnHover(InputState state)
         {
             text.FadeIn(500, Easing.OutQuint);
-            return base.OnHover(state);
+            return true;
         }
 
         protected override void OnHoverLost(InputState state)
