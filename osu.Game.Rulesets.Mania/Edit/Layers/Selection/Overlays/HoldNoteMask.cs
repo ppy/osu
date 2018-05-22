@@ -3,13 +3,10 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
@@ -32,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
             {
                 new NoteMask(hold.Head),
                 new NoteMask(hold.Tail),
-                body = new BodyPiece()
+                body = new BodyPiece
                 {
                     AccentColour = Color4.Transparent
                 },
