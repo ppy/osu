@@ -173,34 +173,33 @@ namespace osu.Game.Tests.Visual
             filterAssert(@"no matches", LoungeTab.Public, 0);
             AddStep(@"clear rooms", () => lounge.Rooms = new Room[] {});
             AddStep(@"set rooms", () => lounge.Rooms = rooms);
-            AddAssert(@"no matches after clear", () => lounge.MatchedCount == 0);
+            AddAssert(@"no matches after clear", () => !lounge.ChildRooms.Any());
             filterAssert(string.Empty, LoungeTab.Public, 2);
             AddStep(@"exit", lounge.Exit);
         }
 
         private void clickRoom(int n)
         {
-            InputManager.MoveMouseTo(lounge.ChildRooms[n]);
+            InputManager.MoveMouseTo(lounge.ChildRooms.ElementAt(n));
             InputManager.Click(MouseButton.Left);
         }
 
         private void selectAssert(int n)
         {
             AddStep($@"select room {n}", () => clickRoom(n));
-            AddAssert($@"room {n} selected", () => lounge.SelectedRoom == lounge.ChildRooms[n].Room);
+            AddAssert($@"room {n} selected", () => lounge.SelectedRoom == lounge.ChildRooms.ElementAt(n).Room);
         }
 
         private void filterAssert(string filter, LoungeTab tab, int endCount)
         {
             AddStep($@"filter '{filter}', {tab}", () => lounge.SetFilter(filter, tab));
-            AddAssert(@"filtered correctly", () => lounge.MatchedCount == endCount);
+            AddAssert(@"filtered correctly", () => lounge.ChildRooms.Count() == endCount);
         }
 
         private class TestLounge : Lounge
         {
-            public IReadOnlyList<DrawableRoom> ChildRooms => RoomsContainer.Children;
+            public IEnumerable<DrawableRoom> ChildRooms => RoomsContainer.Children.Where(r => r.MatchingFilter);
             public Room SelectedRoom => Inspector.Room;
-            public int MatchedCount => ChildRooms.Count(r => r.MatchingFilter);
 
             public void SetFilter(string filter, LoungeTab tab)
             {
