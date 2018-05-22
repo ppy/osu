@@ -20,7 +20,8 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
     {
         private readonly FilterControl filter;
         private readonly Container content;
-        private readonly FillFlowContainer<DrawableRoom> roomsFlow;
+        private readonly SearchContainer search;
+        private readonly RoomsFilterContainer roomsFlow;
         private readonly RoomInspector roomInspector;
 
         protected override Container<Drawable> TransitionContent => content;
@@ -46,6 +47,8 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 
                 if (!enumerable.Contains(roomInspector.Room))
                     roomInspector.Room = null;
+
+                filterRooms();
             }
         }
 
@@ -68,14 +71,17 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
                                 Vertical = 35 - DrawableRoom.SELECTION_BORDER_WIDTH,
                                 Right = 20 - DrawableRoom.SELECTION_BORDER_WIDTH
                             },
-                            Child = roomsFlow = new FillFlowContainer<DrawableRoom>
+                            Child = search = new SearchContainer
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical,
-                                LayoutEasing = Easing.OutQuint,
-                                LayoutDuration = 200,
-                                Spacing = new Vector2(10 - DrawableRoom.SELECTION_BORDER_WIDTH * 2),
+                                Child = roomsFlow = new RoomsFilterContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(10 - DrawableRoom.SELECTION_BORDER_WIDTH * 2),
+                                },
                             },
                         },
                         roomInspector = new RoomInspector
@@ -89,6 +95,8 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
                 },
             };
 
+            filter.Search.Current.ValueChanged += s => filterRooms();
+            filter.Tabs.Current.ValueChanged += t => filterRooms();
             filter.Search.Exit += Exit;
         }
 
@@ -133,6 +141,17 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
             filter.Search.HoldFocus = false;
         }
 
+        private void filterRooms()
+        {
+            search.SearchTerm = filter.Search.Current.Value ?? string.Empty;
+
+            foreach (DrawableRoom r in roomsFlow.Children)
+            {
+                r.MatchingFilter = r.MatchingFilter &&
+                                   r.Room.Availability.Value == (RoomAvailability)filter.Tabs.Current.Value;
+            }
+        }
+
         private void didSelect(DrawableRoom room)
         {
             roomsFlow.Children.ForEach(c =>
@@ -146,6 +165,27 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
             // open the room if its selected and is clicked again
             if (room.State == SelectionState.Selected)
                 Push(new Match(room.Room));
+        }
+
+        private class RoomsFilterContainer : FillFlowContainer<DrawableRoom>, IHasFilterableChildren
+        {
+            public IEnumerable<string> FilterTerms => new string[] { };
+            public IEnumerable<IFilterable> FilterableChildren => Children;
+
+            public bool MatchingFilter
+            {
+                set
+                {
+                    if (value)
+                        InvalidateLayout();
+                }
+            }
+
+            public RoomsFilterContainer()
+            {
+                LayoutDuration = 200;
+                LayoutEasing = Easing.OutQuint;
+            }
         }
     }
 }
