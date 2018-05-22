@@ -144,6 +144,8 @@ namespace osu.Game.Screens.Play.HUD
 
                 // temporarily unbind as to not look weird during flash animation.
                 Progress.UnbindAll();
+
+                // avoid starting a new confirm call until we finish animating.
                 pendingAnimation = true;
 
                 innerCircle.ScaleTo(0, 100)
