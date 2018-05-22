@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             private SpriteIcon icon;
             private CircularProgress circularProgress;
-            private Circle innerCircle;
+            private Circle overlayCircle;
 
             protected override bool AllowMultipleFires => true;
 
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Play.HUD
                             RelativeSizeAxes = Axes.Both,
                             InnerRadius = 1
                         },
-                        innerCircle = new Circle
+                        overlayCircle = new Circle
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Play.HUD
                 // avoid starting a new confirm call until we finish animating.
                 pendingAnimation = true;
 
-                innerCircle.ScaleTo(0, 100)
+                overlayCircle.ScaleTo(0, 100)
                            .Then().FadeOut().ScaleTo(1).FadeIn(500)
                            .OnComplete(a => circularProgress.FadeOut(100).OnComplete(_ =>
                            {
