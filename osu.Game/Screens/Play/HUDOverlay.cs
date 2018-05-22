@@ -52,15 +52,26 @@ namespace osu.Game.Screens.Play
 
                 Children = new Drawable[]
                 {
-                    KeyCounter = CreateKeyCounter(),
                     ComboCounter = CreateComboCounter(),
                     ScoreCounter = CreateScoreCounter(),
                     AccuracyCounter = CreateAccuracyCounter(),
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
-                    HoldToQuit = CreateQuitButton(),
                     ModDisplay = CreateModsContainer(),
-                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay()
+                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
+                    new FillFlowContainer
+                    {
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                        Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            KeyCounter = CreateKeyCounter(),
+                            HoldToQuit = CreateQuitButton(),
+                        }
+                    }
                 }
             });
 
@@ -189,7 +200,6 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
-            Y = -TwoLayerButton.SIZE_RETRACTED.Y,
         };
 
         protected virtual ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
@@ -211,7 +221,6 @@ namespace osu.Game.Screens.Play
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
-            Position = new Vector2(-5, -70)
         };
 
         protected virtual ModDisplay CreateModsContainer() => new ModDisplay
