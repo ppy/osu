@@ -21,10 +21,6 @@ namespace osu.Game.Screens.Multi.Screens
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
-        public Match()
-        {
-        }
-
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
