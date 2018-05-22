@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -32,13 +31,6 @@ namespace osu.Game.Rulesets.Mania.Edit
             new HitObjectCompositionTool<Note>("Note"),
             new HitObjectCompositionTool<HoldNote>("Hold"),
         };
-
-        // TODO: According to another proposal, extend this to support multiple layers for mania maps
-        // The logic could be moving all the layers that the beatmap has simultaneously
-        // To avoid using too many resources, this could be changed to simply changing the Alpha to something
-        // between 0.25f to 0.5f for notes that are in other layers (and may be also not selected)
-        // Will also need a tool to navigate through layers
-        // Please ignore the comment above, I just wanted to write my thoughts down so that I do not forget in 2 months when I get around to it
 
         public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
         {
