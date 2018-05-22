@@ -113,7 +113,11 @@ namespace osu.Game.Overlays.Profile.Header
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                }, badgeFlowContainer.Add);
+                }, asyncBadge =>
+                {
+                    badgeFlowContainer.Add(asyncBadge);
+                    badgeFlowContainer.ChangeChildDepth(asyncBadge, Array.IndexOf(badges, asyncBadge)); //Ensure the badges are ordered correctly
+                });
             }
         }
 
