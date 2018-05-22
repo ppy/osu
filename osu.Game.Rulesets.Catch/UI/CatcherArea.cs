@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 Size = new Vector2(CATCHER_SIZE);
                 if (difficulty != null)
-                    Scale = new Vector2(1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
+                    Scale = new Vector2((1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) * 0.62064f);
             }
 
             [BackgroundDependencyLoader]
