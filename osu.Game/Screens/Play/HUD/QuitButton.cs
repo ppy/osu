@@ -151,6 +151,8 @@ namespace osu.Game.Screens.Play.HUD
                 // avoid starting a new confirm call until we finish animating.
                 pendingAnimation = true;
 
+                Progress.Value = 0;
+
                 overlayCircle.ScaleTo(0, 100)
                              .Then().FadeOut().ScaleTo(1).FadeIn(500)
                              .OnComplete(a =>
@@ -158,8 +160,6 @@ namespace osu.Game.Screens.Play.HUD
                                  icon.ScaleTo(1, 100);
                                  circularProgress.FadeOut(100).OnComplete(_ =>
                                  {
-                                     Progress.Value = 0;
-
                                      bind();
 
                                      circularProgress.FadeIn();
