@@ -1,23 +1,29 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Screens.Lounge;
 using osu.Game.Users;
+using OpenTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseLounge : OsuTestCase
+    public class TestCaseLounge : ManualInputManagerTestCase
     {
+        private TestLounge lounge;
+
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            Lounge lounge = new Lounge();
+            lounge = new TestLounge();
 
             Room[] rooms =
             {
@@ -26,6 +32,7 @@ namespace osu.Game.Tests.Visual
                     Name = { Value = @"Just Another Room" },
                     Host = { Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" } } },
                     Status = { Value = new RoomStatusPlaying() },
+                    Availability = { Value = RoomAvailability.Public },
                     Type = { Value = new GameTypeTagTeam() },
                     Beatmap =
                     {
@@ -70,6 +77,7 @@ namespace osu.Game.Tests.Visual
                     Name = { Value = @"Not Just Any Room" },
                     Host = { Value = new User { Username = @"Monstrata", Id = 2706438, Country = new Country { FlagName = @"CA" } } },
                     Status = { Value = new RoomStatusOpen() },
+                    Availability = { Value = RoomAvailability.FriendsOnly },
                     Type = { Value = new GameTypeTeamVersus() },
                     Beatmap =
                     {
@@ -110,6 +118,7 @@ namespace osu.Game.Tests.Visual
                     Name = { Value = @"room THE FINAL" },
                     Host = { Value = new User { Username = @"Delis", Id = 1603923, Country = new Country { FlagName = @"JP" } } },
                     Status = { Value = new RoomStatusPlaying() },
+                    Availability = { Value = RoomAvailability.Public },
                     Type = { Value = new GameTypeTagTeam() },
                     Beatmap =
                     {
@@ -150,9 +159,54 @@ namespace osu.Game.Tests.Visual
 
             AddStep(@"show", () => Add(lounge));
             AddStep(@"set rooms", () => lounge.Rooms = rooms);
+            selectAssert(0);
+            AddStep(@"clear rooms", () => lounge.Rooms = new Room[] {});
+            AddAssert(@"no room selected", () => lounge.SelectedRoom == null);
+            AddStep(@"set rooms", () => lounge.Rooms = rooms);
+            selectAssert(1);
+            AddStep(@"open room 1", () => clickRoom(1));
+            AddStep(@"make lounge current", lounge.MakeCurrent);
+            filterAssert(@"THE FINAL", LoungeTab.Public, 1);
+            filterAssert(string.Empty, LoungeTab.Public, 2);
+            filterAssert(string.Empty, LoungeTab.Private, 1);
+            filterAssert(string.Empty, LoungeTab.Public, 2);
+            filterAssert(@"no matches", LoungeTab.Public, 0);
             AddStep(@"clear rooms", () => lounge.Rooms = new Room[] {});
             AddStep(@"set rooms", () => lounge.Rooms = rooms);
+            AddAssert(@"no matches after clear", () => lounge.MatchedCount == 0);
+            filterAssert(string.Empty, LoungeTab.Public, 2);
             AddStep(@"exit", lounge.Exit);
+        }
+
+        private void clickRoom(int n)
+        {
+            InputManager.MoveMouseTo(lounge.ChildRooms[n]);
+            InputManager.Click(MouseButton.Left);
+        }
+
+        private void selectAssert(int n)
+        {
+            AddStep($@"select room {n}", () => clickRoom(n));
+            AddAssert($@"room {n} selected", () => lounge.SelectedRoom == lounge.ChildRooms[n].Room);
+        }
+
+        private void filterAssert(string filter, LoungeTab tab, int endCount)
+        {
+            AddStep($@"filter '{filter}', {tab}", () => lounge.SetFilter(filter, tab));
+            AddAssert(@"filtered correctly", () => lounge.MatchedCount == endCount);
+        }
+
+        private class TestLounge : Lounge
+        {
+            public IReadOnlyList<DrawableRoom> ChildRooms => RoomsContainer.Children;
+            public Room SelectedRoom => Inspector.Room;
+            public int MatchedCount => ChildRooms.Count(r => r.MatchingFilter);
+
+            public void SetFilter(string filter, LoungeTab tab)
+            {
+                Filter.Search.Current.Value = filter;
+                Filter.Tabs.Current.Value = tab;
+            }
         }
     }
 }

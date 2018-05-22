@@ -72,9 +72,7 @@ namespace osu.Game.Screens.Multi.Components
             get { return matchingFilter; }
             set
             {
-                if (value == matchingFilter) return;
                 matchingFilter = value;
-
                 this.FadeTo(MatchingFilter ? 1 : 0, 200);
             }
         }
