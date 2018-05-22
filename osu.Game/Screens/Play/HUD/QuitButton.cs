@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play.HUD
             Alpha = stayVisible ? 1 : Interpolation.ValueAt(elapsed, Alpha, MathHelper.Clamp(1 - adjust, 0.04f, 1), 0, 200, Easing.OutQuint);
         }
 
-        private class Button : HoldToCofirmContainer
+        private class Button : HoldToConfirmContainer
         {
             private SpriteIcon icon;
             private CircularProgress circularProgress;

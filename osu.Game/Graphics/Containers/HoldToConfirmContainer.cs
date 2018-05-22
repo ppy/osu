@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.Containers
 {
-    public abstract class HoldToCofirmContainer : Container
+    public abstract class HoldToConfirmContainer : Container
     {
         public Action Action;
 
