@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
     {
         protected override float BackgroundParallaxAmount => 0.1f;
 
-        public override bool ShowOverlaysOnEnter => false;
+        protected override bool HideOverlaysOnEnter => true;
 
         public Action RestartRequested;
 
@@ -183,6 +183,7 @@ namespace osu.Game.Screens.Play
                             ProcessCustomClock = false,
                             Breaks = beatmap.Breaks
                         },
+                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
                         hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
                             Clock = Clock, // hud overlay doesn't want to use the audio clock directly
@@ -190,7 +191,6 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
                         new SkipOverlay(firstObjectTime)
                         {
                             Clock = Clock, // skip button doesn't want to use the audio clock directly
@@ -218,6 +218,8 @@ namespace osu.Game.Screens.Play
                     },
                 }
             };
+
+            hudOverlay.HoldToQuit.Action = Exit;
 
             if (ShowStoryboard)
                 initializeStoryboard(false);
