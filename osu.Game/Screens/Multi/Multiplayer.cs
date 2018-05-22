@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Multi
                 RelativeSizeAxes = Axes.Both,
             };
 
-            Lobby lobby;
+            Lounge lounge;
             Children = new Drawable[]
             {
                 new Container
@@ -52,12 +52,12 @@ namespace osu.Game.Screens.Multi
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Header.HEIGHT },
-                    Child = lobby = new Lobby(),
+                    Child = lounge = new Lounge(),
                 },
-                new Header(lobby),
+                new Header(lounge),
             };
 
-            lobby.Exited += s => Exit();
+            lounge.Exited += s => Exit();
         }
 
         protected override void OnEntering(Screen last)

@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -25,8 +26,8 @@ namespace osu.Game.Screens.Multi.Components
 {
     public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>
     {
+        public const float SELECTION_BORDER_WIDTH = 4;
         private const float corner_radius = 5;
-        private const float selection_border_width = 4;
         private const float transition_duration = 100;
         private const float content_padding = 10;
         private const float height = 100;
@@ -62,6 +63,17 @@ namespace osu.Game.Screens.Multi.Components
             }
         }
 
+        private Action<DrawableRoom> action;
+        public new Action<DrawableRoom> Action
+        {
+            get { return action; }
+            set
+            {
+                action = value;
+                Enabled.Value = action != null;
+            }
+        }
+
         public event Action<SelectionState> StateChanged;
 
         public DrawableRoom(Room room)
@@ -69,8 +81,8 @@ namespace osu.Game.Screens.Multi.Components
             Room = room;
 
             RelativeSizeAxes = Axes.X;
-            Height = height + selection_border_width * 2;
-            CornerRadius = corner_radius + selection_border_width / 2;
+            Height = height + SELECTION_BORDER_WIDTH * 2;
+            CornerRadius = corner_radius + SELECTION_BORDER_WIDTH / 2;
             Masking = true;
 
             // create selectionBox here so State can be set before being loaded
@@ -79,8 +91,6 @@ namespace osu.Game.Screens.Multi.Components
                 RelativeSizeAxes = Axes.Both,
                 Alpha = 0f,
             };
-
-            Action += () => State = SelectionState.Selected;
         }
 
         [BackgroundDependencyLoader]
@@ -98,7 +108,7 @@ namespace osu.Game.Screens.Multi.Components
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(selection_border_width),
+                    Padding = new MarginPadding(SELECTION_BORDER_WIDTH),
                     Child = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -271,6 +281,17 @@ namespace osu.Game.Screens.Multi.Components
             typeBind.BindTo(Room.Type);
             beatmapBind.BindTo(Room.Beatmap);
             participantsBind.BindTo(Room.Participants);
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            if (Enabled.Value)
+            {
+                Action?.Invoke(this);
+                State = SelectionState.Selected;
+            }
+
+            return true;
         }
     }
 }
