@@ -33,7 +33,6 @@ namespace osu.Game.Rulesets.Mods
                     return;
 
                 d.ApplyCustomUpdateState += ApplyHiddenState;
-                d.HitObject.TimeFadein = d.HitObject.TimePreempt * fade_in_duration_multiplier;
             }
         }
 
