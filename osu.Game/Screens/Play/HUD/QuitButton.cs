@@ -151,13 +151,16 @@ namespace osu.Game.Screens.Play.HUD
                 pendingAnimation = true;
 
                 overlayCircle.ScaleTo(0, 100)
-                           .Then().FadeOut().ScaleTo(1).FadeIn(500)
-                           .OnComplete(a => circularProgress.FadeOut(100).OnComplete(_ =>
-                           {
-                               bind();
-                               circularProgress.FadeIn();
-                               pendingAnimation = false;
-                           }));
+                             .Then().FadeOut().ScaleTo(1).FadeIn(500)
+                             .OnComplete(a => circularProgress.FadeOut(100).OnComplete(_ =>
+                             {
+                                 Progress.Value = 0;
+
+                                 bind();
+
+                                 circularProgress.FadeIn();
+                                 pendingAnimation = false;
+                             }));
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
