@@ -42,10 +42,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             List<CatchHitObject> objectWithDroplets = new List<CatchHitObject>();
 
-            for (int i = 0; i < objects.Count; i++)
+            foreach (var currentObject in objects)
             {
-                CatchHitObject currentObject = objects[i];
-
                 if (currentObject is Fruit)
                     objectWithDroplets.Add(currentObject);
 
@@ -56,9 +54,11 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     while (nestedHitObjectsEnumerator.MoveNext())
                     {
                         CatchHitObject objectInJuiceStream = (CatchHitObject)nestedHitObjectsEnumerator.Current;
+                        // We don't want TinyDroplets for Hyper Calculating.
                         if (!(objectInJuiceStream is TinyDroplet))
                             objectWithDroplets.Add(objectInJuiceStream);
                     }
+
                     nestedHitObjectsEnumerator.Dispose();
                 }
             }
