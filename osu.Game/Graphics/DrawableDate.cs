@@ -24,10 +24,10 @@ namespace osu.Game.Graphics
             this.date = date.ToLocalTime();
             // if date's format is not specified, set it to an empty string,
             // so that later we will know to humanize it
-            this.dateFormat = "";
+            dateFormat = "";
             // if tooltip's format is not specified, set it to an empty string
             // so later we will know to default to a default time format
-            this.tooltipFormat = "";
+            tooltipFormat = "";
         }
 
         public DrawableDate(string dateFormat, DateTimeOffset date)
@@ -40,7 +40,7 @@ namespace osu.Game.Graphics
             this.dateFormat = dateFormat;
             // if tooltip's format is not specified, set it to an empty string,
             // so later we will know to default to a default time format
-            this.tooltipFormat = "";
+            tooltipFormat = "";
         }
 
         public DrawableDate(DateTimeOffset date, string tooltipFormat)
@@ -51,7 +51,7 @@ namespace osu.Game.Graphics
             this.date = date.ToLocalTime();
             // if date's format is not specified, set it to an empty string,
             // so that later we will know to humanize it
-            this.dateFormat = "";
+            dateFormat = "";
             // set a tooltip format for later from an argument
             this.tooltipFormat = tooltipFormat;
         }
@@ -105,17 +105,17 @@ namespace osu.Game.Graphics
         public override bool HandleMouseInput => true;
 
         // if date's format is specified
-        private void updateTime() => Text = (dateFormat != "") ?
+        private void updateTime() => Text = dateFormat != "" ?
             // format it as requested in a passed argument
-            (String.Format(dateFormat, date)) :
+            String.Format(dateFormat, date) :
             // otherwise, humanize it (for example: 2 hours ago)
-            (date.Humanize());
+            date.Humanize();
 
         // if we know that the tooltip format exists
-        public string TooltipText => (tooltipFormat != "") ?
+        public string TooltipText => tooltipFormat != "" ?
             // then we format the tooltip text using that format
-            (String.Format(tooltipFormat, date)) :
+            String.Format(tooltipFormat, date) :
             // but otherwise, simply convert the date to string
-            (date.ToString());
+            date.ToString();
     }
 }
