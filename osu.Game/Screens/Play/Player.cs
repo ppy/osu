@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
     {
         protected override float BackgroundParallaxAmount => 0.1f;
 
-        public override bool ShowOverlaysOnEnter => false;
+        protected override bool HideOverlaysOnEnter => true;
 
         public Action RestartRequested;
 
@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Play
         public bool AllowPause { get; set; } = true;
         public bool AllowLeadIn { get; set; } = true;
         public bool AllowResults { get; set; } = true;
+
+        protected override bool AllowBackButton => false;
 
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;

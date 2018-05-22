@@ -190,7 +190,5 @@ namespace osu.Game.Screens.Select
         protected override bool OnMouseMove(InputState state) => true;
 
         protected override bool OnClick(InputState state) => true;
-
-        protected override bool OnDragStart(InputState state) => true;
     }
 }

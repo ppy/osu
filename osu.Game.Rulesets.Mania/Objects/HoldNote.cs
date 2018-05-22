@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The tail note of the hold.
         /// </summary>
-        public readonly Note Tail = new TailNote();
+        public readonly Note Tail = new Note();
 
         /// <summary>
         /// The time between ticks of this hold.
@@ -92,26 +92,6 @@ namespace osu.Game.Rulesets.Mania.Objects
                     StartTime = t,
                     Column = Column
                 });
-            }
-        }
-
-        /// <summary>
-        /// The tail of the hold note.
-        /// </summary>
-        private class TailNote : Note
-        {
-            /// <summary>
-            /// Lenience of release hit windows. This is to make cases where the hold note release
-            /// is timed alongside presses of other hit objects less awkward.
-            /// Todo: This shouldn't exist for non-LegacyBeatmapDecoder beatmaps
-            /// </summary>
-            private const double release_window_lenience = 1.5;
-
-            protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
-            {
-                base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
-
-                HitWindows *= release_window_lenience;
             }
         }
     }
