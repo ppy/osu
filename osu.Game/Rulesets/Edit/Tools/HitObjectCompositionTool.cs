@@ -12,8 +12,11 @@ namespace osu.Game.Rulesets.Edit.Tools
     {
         public string Name { get; } = typeof(T).Name;
 
-        public Action<InputState, MouseDownEventArgs, bool> OnMouseDown { get; }
-        public Action<InputState, MouseDownEventArgs, bool> OnMouseUp { get; }
+        public Func<InputState, MouseDownEventArgs, bool> OnMouseDown;
+        public Func<InputState, MouseDownEventArgs, bool> OnMouseUp;
+        public Func<InputState, MouseDownEventArgs, bool> OnDragStart;
+        public Func<InputState, MouseDownEventArgs, bool> OnDragRequested;
+        public Func<InputState, MouseDownEventArgs, bool> OnDragEnd;
 
         public HitObjectCompositionTool()
         {
