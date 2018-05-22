@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
         }
 
-        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
+        protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
