@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual
                             Ruleset = rulesets.GetRuleset(3),
                             Metadata = new BeatmapMetadata
                             {
-                                Title = @"663098",
+                                Title = @"ONIGIRI FREEWAY",
                                 Artist = @"OISHII",
                                 AuthorString = @"Mentholzzz",
                             },
