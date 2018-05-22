@@ -10,8 +10,6 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics
 {
-    // This gives a text with a formatted absolute date and a formatted tooltip
-    // unlike DrawableDate
     public class DrawableDate : OsuSpriteText, IHasTooltip
     {
         private readonly DateTimeOffset date;
