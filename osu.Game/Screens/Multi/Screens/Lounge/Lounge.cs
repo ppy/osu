@@ -1,21 +1,24 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Components;
 using OpenTK;
 
-namespace osu.Game.Screens.Multi.Screens
+namespace osu.Game.Screens.Multi.Screens.Lounge
 {
     public class Lounge : MultiplayerScreen
     {
+        private readonly FilterControl filter;
         private readonly Container content;
         private readonly FillFlowContainer<DrawableRoom> roomsFlow;
         private readonly RoomInspector roomInspector;
@@ -50,6 +53,7 @@ namespace osu.Game.Screens.Multi.Screens
         {
             Children = new Drawable[]
             {
+                filter = new FilterControl(),
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -84,6 +88,8 @@ namespace osu.Game.Screens.Multi.Screens
                     },
                 },
             };
+
+            filter.Search.Exit += Exit;
         }
 
         protected override void UpdateAfterChildren()
@@ -92,9 +98,39 @@ namespace osu.Game.Screens.Multi.Screens
 
             content.Padding = new MarginPadding
             {
+                Top = filter.DrawHeight,
                 Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH,
                 Right = SearchableListOverlay.WIDTH_PADDING,
             };
+        }
+
+        protected override void OnFocus(InputState state)
+        {
+            GetContainingInputManager().ChangeFocus(filter.Search);
+        }
+
+        protected override void OnEntering(Screen last)
+        {
+            base.OnEntering(last);
+            filter.Search.HoldFocus = true;
+        }
+
+        protected override bool OnExiting(Screen next)
+        {
+            filter.Search.HoldFocus = false;
+            return base.OnExiting(next);
+        }
+
+        protected override void OnResuming(Screen last)
+        {
+            base.OnResuming(last);
+            filter.Search.HoldFocus = true;
+        }
+
+        protected override void OnSuspending(Screen next)
+        {
+            base.OnSuspending(next);
+            filter.Search.HoldFocus = false;
         }
 
         private void didSelect(DrawableRoom room)
