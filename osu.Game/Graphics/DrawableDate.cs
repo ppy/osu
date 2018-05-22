@@ -10,9 +10,13 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics
 {
+    // This gives a text with a formatted absolute date and a formatted tooltip
+    // unlike DrawableDate
     public class DrawableDate : OsuSpriteText, IHasTooltip
     {
         private readonly DateTimeOffset date;
+        private readonly String dateFormat;
+        private readonly String tooltipFormat;
 
         public DrawableDate(DateTimeOffset date)
         {
@@ -20,6 +24,50 @@ namespace osu.Game.Graphics
             Font = "Exo2.0-RegularItalic";
 
             this.date = date.ToLocalTime();
+            // if date's format is not specified, set it to an empty string,
+            // so that later we will know to humanize it
+            this.dateFormat = "";
+            // if tooltip's format is not specified, set it to an empty string
+            // so later we will know to default to a default time format
+            this.tooltipFormat = "";
+        }
+
+        public DrawableDate(string dateFormat, DateTimeOffset date)
+        {
+            AutoSizeAxes = Axes.Both;
+            Font = "Exo2.0-RegularItalic";
+
+            this.date = date.ToLocalTime();
+            // set a date format for later from an argument
+            this.dateFormat = dateFormat;
+            // if tooltip's format is not specified, set it to an empty string,
+            // so later we will know to default to a default time format
+            this.tooltipFormat = "";
+        }
+
+        public DrawableDate(DateTimeOffset date, string tooltipFormat)
+        {
+            AutoSizeAxes = Axes.Both;
+            Font = "Exo2.0-RegularItalic";
+
+            this.date = date.ToLocalTime();
+            // if date's format is not specified, set it to an empty string,
+            // so that later we will know to humanize it
+            this.dateFormat = "";
+            // set a tooltip format for later from an argument
+            this.tooltipFormat = tooltipFormat;
+        }
+
+        public DrawableDate(string dateFormat, DateTimeOffset date, string tooltipFormat)
+        {
+            AutoSizeAxes = Axes.Both;
+            Font = "Exo2.0-RegularItalic";
+
+            this.date = date.ToLocalTime();
+            // set a date format for text generator from an argument
+            this.dateFormat = dateFormat;
+            // set a tooltip format for tooltip generator from an argument
+            this.tooltipFormat = tooltipFormat;
         }
 
         [BackgroundDependencyLoader]
@@ -58,8 +106,18 @@ namespace osu.Game.Graphics
 
         public override bool HandleMouseInput => true;
 
-        private void updateTime() => Text = date.Humanize();
+        // if date's format is specified
+        private void updateTime() => Text = (dateFormat != "") ?
+            // format it as requested in a passed argument
+            (String.Format(dateFormat, date)) :
+            // otherwise, humanize it (for example: 2 hours ago)
+            (date.Humanize());
 
-        public string TooltipText => date.ToString();
+        // if we know that the tooltip format exists
+        public string TooltipText => (tooltipFormat != "") ?
+            // then we format the tooltip text using that format
+            (String.Format(tooltipFormat, date)) :
+            // but otherwise, simply convert the date to string
+            (date.ToString());
     }
 }
