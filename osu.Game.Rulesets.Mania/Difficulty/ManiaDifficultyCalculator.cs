@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -49,18 +50,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             int columnCount = (Beatmap as ManiaBeatmap)?.TotalColumns ?? 7;
 
-            foreach (var hitObject in Beatmap.HitObjects)
-                difficultyHitObjects.Add(new ManiaHitObjectDifficulty((ManiaHitObject)hitObject, columnCount));
-
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
-            difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
+            // Note: Stable sort is done so that the ordering of hitobjects with equal start times doesn't change
+            difficultyHitObjects.AddRange(Beatmap.HitObjects.Select(h => new ManiaHitObjectDifficulty((ManiaHitObject)h, columnCount)).OrderBy(h => h.BaseHitObject.StartTime));
 
             if (!calculateStrainValues())
                 return 0;
 
             double starRating = calculateDifficulty() * star_scaling_factor;
 
-            categoryDifficulty?.Add("Strain", starRating);
+            if (categoryDifficulty != null)
+                categoryDifficulty["Strain"] = starRating;
 
             return starRating;
         }
