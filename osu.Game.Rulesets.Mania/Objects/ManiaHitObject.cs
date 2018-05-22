@@ -8,7 +8,7 @@ using System;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
-    public abstract class ManiaHitObject : HitObject, IHasColumn, IHasXPosition, IHasEditableColumn
+    public abstract class ManiaHitObject : HitObject, IHasXPosition, IHasEditableColumn
     {
         public event Action<int> ColumnChanged;
 

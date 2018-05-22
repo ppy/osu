@@ -14,13 +14,10 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
     public class HoldNoteMask : HitObjectMask
     {
         private readonly BodyPiece body;
-        private readonly DrawableHoldNote holdNote;
 
         public HoldNoteMask(DrawableHoldNote hold)
             : base(hold)
         {
-            holdNote = hold;
-
             Position = hold.Position;
 
             var holdObject = hold.HitObject;
