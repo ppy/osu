@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class QuitButton : FillFlowContainer
     {
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => button.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         private readonly Button button;
 
@@ -43,7 +43,11 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
-                button = new Button()
+                button = new Button
+                {
+                    HoverGained = () => text.FadeIn(500, Easing.OutQuint),
+                    HoverLost = () => text.FadeOut(500, Easing.OutQuint)
+                }
             };
             AutoSizeAxes = Axes.Both;
         }
@@ -54,28 +58,24 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
         }
 
-        protected override bool OnHover(InputState state)
-        {
-            text.FadeIn(500, Easing.OutQuint);
-            return true;
-        }
+        private float positionalAdjust;
 
-        protected override void OnHoverLost(InputState state)
+        protected override bool OnMouseMove(InputState state)
         {
-            text.FadeOut(500, Easing.OutQuint);
-            base.OnHoverLost(state);
+            positionalAdjust = Vector2.Distance(state.Mouse.NativeState.Position, button.ScreenSpaceDrawQuad.Centre) / 200;
+            return base.OnMouseMove(state);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            float adjust = Vector2.Distance(GetContainingInputManager().CurrentState.Mouse.NativeState.Position, button.ScreenSpaceDrawQuad.Centre) / 200;
-            double elapsed = MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000);
-
-            bool stayVisible = text.Alpha > 0 || button.Progress.Value > 0 || IsHovered;
-
-            Alpha = stayVisible ? 1 : Interpolation.ValueAt(elapsed, Alpha, MathHelper.Clamp(1 - adjust, 0.04f, 1), 0, 200, Easing.OutQuint);
+            if (text.Alpha > 0 || button.Progress.Value > 0 || button.IsHovered)
+                Alpha = 1;
+            else
+                Alpha = Interpolation.ValueAt(
+                    MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000),
+                    Alpha, MathHelper.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
         }
 
         private class Button : HoldToConfirmContainer
@@ -85,6 +85,9 @@ namespace osu.Game.Screens.Play.HUD
             private Circle overlayCircle;
 
             protected override bool AllowMultipleFires => true;
+
+            public Action HoverGained;
+            public Action HoverLost;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -161,6 +164,18 @@ namespace osu.Game.Screens.Play.HUD
                                  circularProgress.FadeIn();
                                  pendingAnimation = false;
                              }));
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                HoverGained?.Invoke();
+                return true;
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                HoverLost?.Invoke();
+                base.OnHoverLost(state);
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
