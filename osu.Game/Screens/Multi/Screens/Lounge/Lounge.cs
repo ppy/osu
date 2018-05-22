@@ -18,16 +18,16 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 {
     public class Lounge : MultiplayerScreen
     {
-        private readonly FilterControl filter;
         private readonly Container content;
         private readonly SearchContainer search;
-        private readonly RoomsFilterContainer roomsFlow;
-        private readonly RoomInspector roomInspector;
 
-        protected override Container<Drawable> TransitionContent => content;
+        protected readonly FilterControl Filter;
+        protected readonly FillFlowContainer<DrawableRoom> RoomsContainer;
+        protected readonly RoomInspector Inspector;
 
         public override string Title => "lounge";
         public override string Name => "Lounge";
+        protected override Container<Drawable> TransitionContent => content;
 
         private IEnumerable<Room> rooms;
         public IEnumerable<Room> Rooms
@@ -40,13 +40,13 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 
                 var enumerable = rooms.ToList();
 
-                roomsFlow.Children = enumerable.Select(r => new DrawableRoom(r)
+                RoomsContainer.Children = enumerable.Select(r => new DrawableRoom(r)
                 {
                     Action = didSelect,
                 }).ToList();
 
-                if (!enumerable.Contains(roomInspector.Room))
-                    roomInspector.Room = null;
+                if (!enumerable.Contains(Inspector.Room))
+                    Inspector.Room = null;
 
                 filterRooms();
             }
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         {
             Children = new Drawable[]
             {
-                filter = new FilterControl(),
+                Filter = new FilterControl(),
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Child = roomsFlow = new RoomsFilterContainer
+                                Child = RoomsContainer = new RoomsFilterContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
                                 },
                             },
                         },
-                        roomInspector = new RoomInspector
+                        Inspector = new RoomInspector
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
@@ -95,9 +95,9 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
                 },
             };
 
-            filter.Search.Current.ValueChanged += s => filterRooms();
-            filter.Tabs.Current.ValueChanged += t => filterRooms();
-            filter.Search.Exit += Exit;
+            Filter.Search.Current.ValueChanged += s => filterRooms();
+            Filter.Tabs.Current.ValueChanged += t => filterRooms();
+            Filter.Search.Exit += Exit;
         }
 
         protected override void UpdateAfterChildren()
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 
             content.Padding = new MarginPadding
             {
-                Top = filter.DrawHeight,
+                Top = Filter.DrawHeight,
                 Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH,
                 Right = SearchableListOverlay.WIDTH_PADDING,
             };
@@ -114,53 +114,53 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 
         protected override void OnFocus(InputState state)
         {
-            GetContainingInputManager().ChangeFocus(filter.Search);
+            GetContainingInputManager().ChangeFocus(Filter.Search);
         }
 
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
-            filter.Search.HoldFocus = true;
+            Filter.Search.HoldFocus = true;
         }
 
         protected override bool OnExiting(Screen next)
         {
-            filter.Search.HoldFocus = false;
+            Filter.Search.HoldFocus = false;
             return base.OnExiting(next);
         }
 
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
-            filter.Search.HoldFocus = true;
+            Filter.Search.HoldFocus = true;
         }
 
         protected override void OnSuspending(Screen next)
         {
             base.OnSuspending(next);
-            filter.Search.HoldFocus = false;
+            Filter.Search.HoldFocus = false;
         }
 
         private void filterRooms()
         {
-            search.SearchTerm = filter.Search.Current.Value ?? string.Empty;
+            search.SearchTerm = Filter.Search.Current.Value ?? string.Empty;
 
-            foreach (DrawableRoom r in roomsFlow.Children)
+            foreach (DrawableRoom r in RoomsContainer.Children)
             {
                 r.MatchingFilter = r.MatchingFilter &&
-                                   r.Room.Availability.Value == (RoomAvailability)filter.Tabs.Current.Value;
+                                   r.Room.Availability.Value == (RoomAvailability)Filter.Tabs.Current.Value;
             }
         }
 
         private void didSelect(DrawableRoom room)
         {
-            roomsFlow.Children.ForEach(c =>
+            RoomsContainer.Children.ForEach(c =>
             {
                 if (c != room)
                     c.State = SelectionState.NotSelected;
             });
 
-            roomInspector.Room = room.Room;
+            Inspector.Room = room.Room;
 
             // open the room if its selected and is clicked again
             if (room.State == SelectionState.Selected)
