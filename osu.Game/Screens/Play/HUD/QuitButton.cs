@@ -136,9 +136,7 @@ namespace osu.Game.Screens.Play.HUD
             private void bind()
             {
                 circularProgress.Current.BindTo(Progress);
-
-                Progress.ValueChanged += v => icon.Scale = new Vector2(1 + (float)v * 0.4f);
-                Progress.TriggerChange();
+                Progress.ValueChanged += v => icon.Scale = new Vector2(1 + (float)v * 0.2f);
             }
 
             private bool pendingAnimation;
@@ -155,15 +153,19 @@ namespace osu.Game.Screens.Play.HUD
 
                 overlayCircle.ScaleTo(0, 100)
                              .Then().FadeOut().ScaleTo(1).FadeIn(500)
-                             .OnComplete(a => circularProgress.FadeOut(100).OnComplete(_ =>
+                             .OnComplete(a =>
                              {
-                                 Progress.Value = 0;
+                                 icon.ScaleTo(1, 100);
+                                 circularProgress.FadeOut(100).OnComplete(_ =>
+                                 {
+                                     Progress.Value = 0;
 
-                                 bind();
+                                     bind();
 
-                                 circularProgress.FadeIn();
-                                 pendingAnimation = false;
-                             }));
+                                     circularProgress.FadeIn();
+                                     pendingAnimation = false;
+                                 });
+                             });
             }
 
             protected override bool OnHover(InputState state)
