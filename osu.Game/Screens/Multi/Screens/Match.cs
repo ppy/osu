@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
@@ -22,7 +21,7 @@ namespace osu.Game.Screens.Multi.Screens
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
-        public Match(Room room)
+        public Match()
         {
         }
 

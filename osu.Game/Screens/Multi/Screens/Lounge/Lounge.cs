@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 
             // open the room if its selected and is clicked again
             if (room.State == SelectionState.Selected)
-                Push(new Match(room.Room));
+                Push(new Match());
         }
 
         private class RoomsFilterContainer : FillFlowContainer<DrawableRoom>, IHasFilterableChildren
