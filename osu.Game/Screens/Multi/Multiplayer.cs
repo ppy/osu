@@ -8,7 +8,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.Multi.Screens;
+using osu.Game.Screens.Multi.Screens.Lounge;
 
 namespace osu.Game.Screens.Multi
 {

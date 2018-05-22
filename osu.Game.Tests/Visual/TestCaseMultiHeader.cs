@@ -4,7 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Screens;
+using osu.Game.Screens.Multi.Screens.Lounge;
 
 namespace osu.Game.Tests.Visual
 {
