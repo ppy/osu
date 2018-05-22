@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -24,7 +25,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>
+    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable
     {
         public const float SELECTION_BORDER_WIDTH = 4;
         private const float corner_radius = 5;
@@ -60,6 +61,21 @@ namespace osu.Game.Screens.Multi.Components
                     selectionBox.FadeOut(transition_duration);
 
                 StateChanged?.Invoke(State);
+            }
+        }
+
+        public IEnumerable<string> FilterTerms => new[] { Room.Name.Value };
+
+        private bool matchingFilter;
+        public bool MatchingFilter
+        {
+            get { return matchingFilter; }
+            set
+            {
+                if (value == matchingFilter) return;
+                matchingFilter = value;
+
+                this.FadeTo(MatchingFilter ? 1 : 0, 200);
             }
         }
 
