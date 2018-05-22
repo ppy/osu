@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 base.Confirm();
 
-                // temporarily unbind as to not look weird during flash animation.
+                // temporarily unbind as to not look weird if releasing during confirm animation (can see the unwind of progress).
                 Progress.UnbindAll();
 
                 // avoid starting a new confirm call until we finish animating.
