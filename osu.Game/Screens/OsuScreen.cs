@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -61,36 +60,21 @@ namespace osu.Game.Screens
         /// </summary>
         public virtual bool AllowBeatmapRulesetChange => true;
 
-        protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         protected virtual float BackgroundParallaxAmount => 1;
 
         private ParallaxContainer backgroundParallaxContainer;
-
-        public WorkingBeatmap InitialBeatmap
-        {
-            set
-            {
-                if (IsLoaded) throw new InvalidOperationException($"Cannot set {nameof(InitialBeatmap)} post-load.");
-                Beatmap.Value = value;
-            }
-        }
 
         protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private SampleChannel sampleExit;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGameBase game, OsuGame osuGame, AudioManager audio)
+        private void load(IGameBeatmap beatmap, OsuGame osuGame, AudioManager audio)
         {
-            if (game != null)
-            {
-                //if we were given a beatmap at ctor time, we want to pass this on to the game-wide beatmap.
-                var localMap = Beatmap.Value;
-                Beatmap.BindTo(game.Beatmap);
-                if (localMap != null)
-                    Beatmap.Value = localMap;
-            }
+            if (beatmap != null)
+                Beatmap.BindTo(beatmap);
 
             if (osuGame != null)
             {

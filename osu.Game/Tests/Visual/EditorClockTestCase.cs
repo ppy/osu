@@ -25,24 +25,20 @@ namespace osu.Game.Tests.Visual
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(parent);
 
-        private OsuGameBase osuGame;
-
         protected EditorClockTestCase()
         {
             Clock = new EditorClock(new ControlPointInfo(), BeatDivisor) { IsCoupled = false };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        private void load()
         {
-            this.osuGame = osuGame;
-
             dependencies.Cache(BeatDivisor);
             dependencies.CacheAs<IFrameBasedClock>(Clock);
             dependencies.CacheAs<IAdjustableClock>(Clock);
 
-            osuGame.Beatmap.ValueChanged += beatmapChanged;
-            beatmapChanged(osuGame.Beatmap.Value);
+            Beatmap.ValueChanged += beatmapChanged;
+            beatmapChanged(Beatmap.Value);
         }
 
         private void beatmapChanged(WorkingBeatmap working)
@@ -67,13 +63,6 @@ namespace osu.Game.Tests.Visual
                 Clock.SeekForward(true);
 
             return true;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            osuGame.Beatmap.ValueChanged -= beatmapChanged;
-
-            base.Dispose(isDisposing);
         }
     }
 }

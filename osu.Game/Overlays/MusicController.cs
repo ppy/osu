@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,11 +29,8 @@ namespace osu.Game.Overlays
     public class MusicController : OsuFocusedOverlayContainer
     {
         private const float player_height = 130;
-
         private const float transition_length = 800;
-
         private const float progress_height = 10;
-
         private const float bottom_black_area_height = 55;
 
         private Drawable background;
@@ -49,15 +45,16 @@ namespace osu.Game.Overlays
 
         private PlaylistOverlay playlist;
 
+        private BeatmapManager beatmaps;
         private LocalisationEngine localisation;
 
-        private BeatmapManager beatmaps;
-        private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
         private List<BeatmapSetInfo> beatmapSets;
         private BeatmapSetInfo currentSet;
 
         private Container dragContainer;
         private Container playerContainer;
+
+        private GameBeatmap beatmap;
 
         public MusicController()
         {
@@ -97,8 +94,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, BeatmapManager beatmaps, OsuColour colours, LocalisationEngine localisation)
+        private void load(GameBeatmap beatmap, BeatmapManager beatmaps, OsuColour colours, LocalisationEngine localisation)
         {
+            this.beatmap = beatmap.GetBoundCopy();
             this.beatmaps = beatmaps;
             this.localisation = localisation;
 
@@ -224,8 +222,6 @@ namespace osu.Game.Overlays
             beatmaps.ItemAdded += handleBeatmapAdded;
             beatmaps.ItemRemoved += handleBeatmapRemoved;
 
-            beatmapBacking.BindTo(game.Beatmap);
-
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
@@ -240,9 +236,10 @@ namespace osu.Game.Overlays
 
         protected override void LoadComplete()
         {
-            beatmapBacking.ValueChanged += beatmapChanged;
-            beatmapBacking.DisabledChanged += beatmapDisabledChanged;
-            beatmapBacking.TriggerChange();
+            beatmap.ValueChanged += beatmapChanged;
+            beatmap.DisabledChanged += beatmapDisabledChanged;
+
+            beatmapChanged(beatmap.Value);
 
             base.LoadComplete();
         }
@@ -276,7 +273,7 @@ namespace osu.Game.Overlays
 
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping && !beatmapBacking.Disabled && beatmapSets.Any())
+                if (track.HasCompleted && !track.Looping && !beatmap.Disabled && beatmapSets.Any())
                     next();
             }
             else
@@ -289,7 +286,7 @@ namespace osu.Game.Overlays
 
             if (track == null)
             {
-                if (!beatmapBacking.Disabled)
+                if (!beatmap.Disabled)
                     next(true);
                 return;
             }
@@ -307,8 +304,8 @@ namespace osu.Game.Overlays
             var playable = beatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? beatmapSets.LastOrDefault();
             if (playable != null)
             {
-                beatmapBacking.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmapBacking);
-                beatmapBacking.Value.Track.Restart();
+                beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
+                beatmap.Value.Track.Restart();
             }
         }
 
@@ -320,8 +317,8 @@ namespace osu.Game.Overlays
             var playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
             if (playable != null)
             {
-                beatmapBacking.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmapBacking);
-                beatmapBacking.Value.Track.Restart();
+                beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
+                beatmap.Value.Track.Restart();
             }
         }
 

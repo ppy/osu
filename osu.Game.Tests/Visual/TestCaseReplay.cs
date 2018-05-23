@@ -26,10 +26,7 @@ namespace osu.Game.Tests.Visual
             // Reset the mods
             beatmap.Mods.Value = beatmap.Mods.Value.Where(m => !(m is ModAutoplay));
 
-            return new ReplayPlayer(replay)
-            {
-                InitialBeatmap = beatmap
-            };
+            return new ReplayPlayer(replay);
         }
     }
 }

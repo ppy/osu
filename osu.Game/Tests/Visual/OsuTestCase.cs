@@ -3,12 +3,28 @@
 
 using System.IO;
 using System.Reflection;
+using osu.Framework.Allocation;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
     public abstract class OsuTestCase : TestCase
     {
+        protected readonly GameBeatmap Beatmap = new GameBeatmap(new DummyWorkingBeatmap());
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(parent);
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            dependencies.CacheAs<IGameBeatmap>(Beatmap);
+            dependencies.Cache(Beatmap);
+        }
+
         protected override ITestCaseTestRunner CreateRunner() => new OsuTestCaseTestRunner();
 
         public class OsuTestCaseTestRunner : OsuGameBase, ITestCaseTestRunner

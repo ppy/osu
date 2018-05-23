@@ -65,7 +65,7 @@ namespace osu.Game
 
         protected override Container<Drawable> Content => content;
 
-        public IBindable<WorkingBeatmap> Beatmap { get; private set; }
+        protected GameBeatmap Beatmap;
         private WorkingBeatmap lastBeatmap;
 
         private Bindable<bool> fpsDisplayVisible;
@@ -158,7 +158,7 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
 
             var defaultBeatmap = new DummyWorkingBeatmap(this);
-            Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+            Beatmap = new GameBeatmap(defaultBeatmap);
             BeatmapManager.DefaultBeatmap = defaultBeatmap;
 
             // tracks play so loud our samples can't keep up.
@@ -185,6 +185,9 @@ namespace osu.Game
 
                 lastBeatmap = b;
             };
+
+            dependencies.Cache(Beatmap);
+            dependencies.CacheAs<IGameBeatmap>(Beatmap);
 
             FileStore.Cleanup();
 

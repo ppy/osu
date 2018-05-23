@@ -38,9 +38,9 @@ namespace osu.Game.Tests.Visual
             => dependencies = new DependencyContainer(parent);
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        private void load()
         {
-            osuGame.Beatmap.Value = new TestWorkingBeatmap(new Beatmap
+            Beatmap.Value = new TestWorkingBeatmap(new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
