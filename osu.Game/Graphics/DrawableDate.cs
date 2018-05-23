@@ -16,20 +16,20 @@ namespace osu.Game.Graphics
         private readonly string dateFormat;
         private readonly string tooltipFormat;
 
+        /// <param name="dateFormat">The string to format the date text with.
+        /// May be null if the humanized format should be used.</param>
+        /// <param name="tooltipFormat">The string to format the tooltip text with.
+        /// May be null if the default format should be used.</param>
         public DrawableDate(DateTimeOffset date, string dateFormat = null, string tooltipFormat = null)
         {
             AutoSizeAxes = Axes.Both;
             Font = "Exo2.0-RegularItalic";
 
             this.date = date.ToLocalTime();
-            // The string to format the date text with.
-            // May be null if the humanized format should be used.
             this.dateFormat = dateFormat;
-            // The string to format the tooltip text with.
-            // May be null if the default format should be used.
             this.tooltipFormat = tooltipFormat;
         }
-        
+
         [BackgroundDependencyLoader]
         private void load()
         {
