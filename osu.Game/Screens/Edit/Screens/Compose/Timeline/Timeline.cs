@@ -43,20 +43,59 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             this.adjustableClock = adjustableClock;
         }
 
-        private bool handlingUserInput;
+        /// <summary>
+        /// The track's time in the previous frame.
+        /// </summary>
+        private double lastTrackTime;
+
+        /// <summary>
+        /// Whether the user is currently dragging the timeline.
+        /// </summary>
+        private bool handlingDragInput;
+
+        /// <summary>
+        /// Whether the track was playing before a user drag event.
+        /// </summary>
         private bool trackWasPlaying;
 
         protected override void Update()
         {
             base.Update();
 
-            // We want time = 0 to be at the centre of the container when scrolled to the start
+            // The extrema of track time should be positioned at the centre of the container when scrolled to the start or end
             Content.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
 
-            if (!handlingUserInput)
-                ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
-            else
+            if (handlingDragInput)
+            {
+                // The user is dragging - the track should always follow the timeline
                 adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
+            }
+            else if (adjustableClock.IsRunning)
+            {
+                // If the user hasn't provided mouse input but the track is running, always follow the track
+                ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
+            }
+            else
+            {
+                // The track isn't playing, so we want to smooth-scroll once more, and re-enable wheel scrolling
+                // There are two cases we have to be wary of:
+                // 1) The user scrolls on this timeline: We want the track to follow us
+                // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline): We want to follow the track time
+
+                // The simplest way to cover both cases is by checking that inter-frame track times are identical
+                if (adjustableClock.CurrentTime == lastTrackTime)
+                {
+                    // The track hasn't been seeked externally
+                    adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
+                }
+                else
+                {
+                    // The track has been seeked externally
+                    ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
+                }
+            }
+
+            lastTrackTime = adjustableClock.CurrentTime;
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -78,14 +117,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
         private void beginUserInput()
         {
-            handlingUserInput = true;
+            handlingDragInput = true;
             trackWasPlaying = adjustableClock.IsRunning;
             adjustableClock.Stop();
         }
 
         private void endUserInput()
         {
-            handlingUserInput = false;
+            handlingDragInput = false;
             if (trackWasPlaying)
                 adjustableClock.Start();
         }
