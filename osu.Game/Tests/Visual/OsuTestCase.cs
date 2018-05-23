@@ -4,6 +4,7 @@
 using System.IO;
 using System.Reflection;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 
@@ -11,18 +12,32 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class OsuTestCase : TestCase
     {
-        protected readonly GameBeatmap Beatmap = new GameBeatmap(new DummyWorkingBeatmap());
+        protected GameBeatmap Beatmap { get; private set; }
 
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(parent);
-
-        [BackgroundDependencyLoader]
-        private void load()
         {
+            // The beatmap is constructed here rather than load() because our children get dependencies injected before our load() runs
+            Beatmap = new GameBeatmap(new DummyWorkingBeatmap(), parent.Get<AudioManager>());
+
+            dependencies = new DependencyContainer(parent);
+
             dependencies.CacheAs<IGameBeatmap>(Beatmap);
             dependencies.Cache(Beatmap);
+
+            return dependencies;
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            if (Beatmap != null)
+            {
+                Beatmap.Disabled = true;
+                Beatmap.Value.Track.Stop();
+            }
         }
 
         protected override ITestCaseTestRunner CreateRunner() => new OsuTestCaseTestRunner();
