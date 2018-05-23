@@ -154,6 +154,8 @@ namespace osu.Game.Screens.Menu
                 case Key.Space:
                     logo?.TriggerOnClick(state);
                     return true;
+                case Key.Escape:
+                    return goBack();
             }
 
             return false;
@@ -164,17 +166,22 @@ namespace osu.Game.Screens.Menu
             switch (action)
             {
                 case GlobalAction.Back:
-                    switch (State)
-                    {
-                        case MenuState.TopLevel:
-                            State = MenuState.Initial;
-                            return true;
-                        case MenuState.Play:
-                            backButton.TriggerOnClick();
-                            return true;
-                        default:
-                            return false;
-                    }
+                    return goBack();
+                default:
+                    return false;
+            }
+        }
+
+        private bool goBack()
+        {
+            switch (State)
+            {
+                case MenuState.TopLevel:
+                    State = MenuState.Initial;
+                    return true;
+                case MenuState.Play:
+                    backButton.TriggerOnClick();
+                    return true;
                 default:
                     return false;
             }
@@ -328,6 +335,9 @@ namespace osu.Game.Screens.Menu
 
                     logoDelayedAction = Scheduler.AddDelayed(() =>
                     {
+                        hideOverlaysOnEnter.Value = true;
+                        allowOpeningOverlays.Value = false;
+
                         logo.ClearTransforms(targetMember: nameof(Position));
                         logo.RelativePositionAxes = Axes.Both;
 
@@ -355,6 +365,7 @@ namespace osu.Game.Screens.Menu
                                 logoTracking = true;
 
                                 logo.Impact();
+
                                 hideOverlaysOnEnter.Value = false;
                                 allowOpeningOverlays.Value = true;
                             }, 200);
