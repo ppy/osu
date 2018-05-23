@@ -29,7 +29,7 @@ namespace osu.Game.Graphics
             // May be null if the default format should be used.
             this.tooltipFormat = tooltipFormat;
         }
-        
+
         [BackgroundDependencyLoader]
         private void load()
         {
