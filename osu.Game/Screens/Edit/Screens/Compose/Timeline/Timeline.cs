@@ -68,12 +68,12 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             if (handlingDragInput)
             {
                 // The user is dragging - the track should always follow the timeline
-                adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
+                seekTrackToCurrent();
             }
             else if (adjustableClock.IsRunning)
             {
                 // If the user hasn't provided mouse input but the track is running, always follow the track
-                ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
+                scrollToTrackTime();
             }
             else
             {
@@ -86,16 +86,19 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                 if (adjustableClock.CurrentTime == lastTrackTime)
                 {
                     // The track hasn't been seeked externally
-                    adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
+                    seekTrackToCurrent();
                 }
                 else
                 {
                     // The track has been seeked externally
-                    ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
+                    scrollToTrackTime();
                 }
             }
 
             lastTrackTime = adjustableClock.CurrentTime;
+
+            void seekTrackToCurrent() => adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
+            void scrollToTrackTime() => ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
