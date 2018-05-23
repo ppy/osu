@@ -65,7 +65,8 @@ namespace osu.Game
 
         protected override Container<Drawable> Content => content;
 
-        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
+        public IBindable<WorkingBeatmap> Beatmap { get; private set; }
+        private WorkingBeatmap lastBeatmap;
 
         private Bindable<bool> fpsDisplayVisible;
 
@@ -204,6 +205,17 @@ namespace osu.Game
             dependencies.Cache(globalBinding);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // TODO: This is temporary until we reimplement the local FPS display.
+            // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
+            fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
+            fpsDisplayVisible.ValueChanged += val => { FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
+            fpsDisplayVisible.TriggerChange();
+        }
+
         private void runMigrations()
         {
             try
@@ -223,19 +235,6 @@ namespace osu.Game
                 using (var db = contextFactory.GetForWrite())
                     db.Context.Migrate();
             }
-        }
-
-        private WorkingBeatmap lastBeatmap;
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // TODO: This is temporary until we reimplement the local FPS display.
-            // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
-            fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
-            fpsDisplayVisible.ValueChanged += val => { FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
-            fpsDisplayVisible.TriggerChange();
         }
 
         public override void SetHost(GameHost host)
