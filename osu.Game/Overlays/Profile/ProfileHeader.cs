@@ -364,12 +364,12 @@ namespace osu.Game.Overlays.Profile
             else
             {
                 infoTextLeft.AddText("Joined ", lightText);
-                infoTextLeft.AddText(new DrawableDate(user.JoinDate), boldItalic);
+                infoTextLeft.AddText(new DrawableDate("{0:MMMM yyyy}", user.JoinDate, "{0:d MMMM yyyy}"), boldItalic);
             }
 
             infoTextLeft.NewLine();
             infoTextLeft.AddText("Last seen ", lightText);
-            infoTextLeft.AddText(new DrawableDate(user.LastVisit), boldItalic);
+            infoTextLeft.AddText(new DrawableDate(user.LastVisit, "{0:d MMMM yyyy H:mm \"UTC\"z}"), boldItalic);
             infoTextLeft.NewParagraph();
 
             if (user.PlayStyle?.Length > 0)
