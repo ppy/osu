@@ -45,7 +45,6 @@ namespace osu.Game.Screens.Edit.Components
         private void load(IGameBeatmap beatmap, OsuColour colours)
         {
             Beatmap.BindTo(beatmap);
-            
             background.Colour = colours.Gray1;
         }
     }
