@@ -14,14 +14,15 @@ using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseEditorComposeTimeline : OsuTestCase
+    public class TestCaseEditorComposeTimeline : EditorClockTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(TimelineArea), typeof(Timeline), typeof(BeatmapWaveformGraph), typeof(TimelineButton) };
 
-        private readonly TimelineArea timelineArea;
-
-        public TestCaseEditorComposeTimeline()
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase osuGame)
         {
+            TimelineArea timelineArea;
+
             Children = new Drawable[]
             {
                 new MusicController
@@ -38,11 +39,7 @@ namespace osu.Game.Tests.Visual
                     Size = new Vector2(0.8f, 100)
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
-        {
             timelineArea.Beatmap.BindTo(osuGame.Beatmap);
         }
     }
