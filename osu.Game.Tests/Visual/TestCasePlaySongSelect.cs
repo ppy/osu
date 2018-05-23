@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load()
         {
             TestSongSelect songSelect = null;
 
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual
             dependencies.Cache(rulesets = new RulesetStore(factory));
             dependencies.Cache(manager = new BeatmapManager(storage, factory, rulesets, null, null)
             {
-                DefaultBeatmap = defaultBeatmap = game.Beatmap.Default
+                DefaultBeatmap = defaultBeatmap = Beatmap.Default
             });
 
             void loadNewSongSelect(bool deleteMaps = false) => AddStep("reload song select", () =>
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual
                 if (deleteMaps)
                 {
                     manager.Delete(manager.GetAllUsableBeatmapSets());
-                    game.Beatmap.SetDefault();
+                    Beatmap.SetDefault();
                 }
 
                 if (songSelect != null)
