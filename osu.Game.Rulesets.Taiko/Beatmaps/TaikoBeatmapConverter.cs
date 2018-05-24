@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.IO.Serialization;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 
@@ -42,16 +41,18 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
 
-        public TaikoBeatmapConverter(bool isForCurrentRuleset)
+        public TaikoBeatmapConverter(IBeatmap beatmap)
+            : base(beatmap)
         {
-            this.isForCurrentRuleset = isForCurrentRuleset;
+            isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(new TaikoRuleset().RulesetInfo);
         }
 
-        protected override Beatmap<TaikoHitObject> ConvertBeatmap(Beatmap original)
+        protected override Beatmap<TaikoHitObject> ConvertBeatmap(IBeatmap original)
         {
             // Rewrite the beatmap info to add the slider velocity multiplier
-            BeatmapInfo info = original.BeatmapInfo.DeepClone();
-            info.BaseDifficulty.SliderMultiplier *= legacy_velocity_multiplier;
+            original.BeatmapInfo = original.BeatmapInfo.Clone();
+            original.BeatmapInfo.BaseDifficulty = original.BeatmapInfo.BaseDifficulty.Clone();
+            original.BeatmapInfo.BaseDifficulty.SliderMultiplier *= legacy_velocity_multiplier;
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original);
 
@@ -70,7 +71,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             return converted;
         }
 
-        protected override IEnumerable<TaikoHitObject> ConvertHitObject(HitObject obj, Beatmap beatmap)
+        protected override IEnumerable<TaikoHitObject> ConvertHitObject(HitObject obj, IBeatmap beatmap)
         {
             var distanceData = obj as IHasDistance;
             var repeatsData = obj as IHasRepeats;
@@ -97,12 +98,12 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 double distance = distanceData.Distance * spans * legacy_velocity_multiplier;
 
                 // The velocity of the taiko hit object - calculated as the velocity of a drum roll
-                double taikoVelocity = taiko_base_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * legacy_velocity_multiplier / speedAdjustedBeatLength;
+                double taikoVelocity = taiko_base_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / speedAdjustedBeatLength;
                 // The duration of the taiko hit object
                 double taikoDuration = distance / taikoVelocity;
 
                 // The velocity of the osu! hit object - calculated as the velocity of a slider
-                double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * legacy_velocity_multiplier / speedAdjustedBeatLength;
+                double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier / speedAdjustedBeatLength;
                 // The duration of the osu! hit object
                 double osuDuration = distance / osuVelocity;
 
@@ -140,7 +141,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                             {
                                 StartTime = j,
                                 Samples = currentSamples,
-                                IsStrong = strong,
+                                IsStrong = strong
                             };
                         }
 
@@ -155,7 +156,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                         Samples = obj.Samples,
                         IsStrong = strong,
                         Duration = taikoDuration,
-                        TickRate = beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate == 3 ? 3 : 4,
+                        TickRate = beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate == 3 ? 3 : 4
                     };
                 }
             }
@@ -169,7 +170,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     Samples = obj.Samples,
                     IsStrong = strong,
                     Duration = endTimeData.Duration,
-                    RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier),
+                    RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier)
                 };
             }
             else
@@ -182,7 +183,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     {
                         StartTime = obj.StartTime,
                         Samples = obj.Samples,
-                        IsStrong = strong,
+                        IsStrong = strong
                     };
                 }
                 else
@@ -191,10 +192,12 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     {
                         StartTime = obj.StartTime,
                         Samples = obj.Samples,
-                        IsStrong = strong,
+                        IsStrong = strong
                     };
                 }
             }
         }
+
+        protected override Beatmap<TaikoHitObject> CreateBeatmap() => new TaikoBeatmap();
     }
 }

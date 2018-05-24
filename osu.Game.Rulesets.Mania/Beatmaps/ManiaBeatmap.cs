@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 
@@ -28,6 +29,28 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public ManiaBeatmap(StageDefinition defaultStage)
         {
             Stages.Add(defaultStage);
+        }
+
+        public override IEnumerable<BeatmapStatistic> GetStatistics()
+        {
+            int notes = HitObjects.Count(s => s is Note);
+            int holdnotes = HitObjects.Count(s => s is HoldNote);
+
+            return new[]
+            {
+                new BeatmapStatistic
+                {
+                    Name = @"Note Count",
+                    Content = notes.ToString(),
+                    Icon = FontAwesome.fa_circle_o
+                },
+                new BeatmapStatistic
+                {
+                    Name = @"Hold Note Count",
+                    Content = holdnotes.ToString(),
+                    Icon = FontAwesome.fa_circle
+                },
+            };
         }
     }
 }

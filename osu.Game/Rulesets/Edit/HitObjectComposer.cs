@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Edit
 
         private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
 
-        protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap, true);
+        protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap);
 
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
 
