@@ -46,7 +46,13 @@ namespace osu.Game.Beatmaps
             lastBeatmap = beatmap;
         }
 
-        public GameBeatmap GetBoundCopy()
+        IGameBeatmap IGameBeatmap.GetBoundCopy() => GetBoundCopy();
+
+        /// <summary>
+        /// Retrieve a new <see cref="GameBeatmap"/> instance weakly bound to this <see cref="GameBeatmap"/>.
+        /// If you are further binding to events of the retrieved <see cref="GameBeatmap"/>, ensure a local reference is held.
+        /// </summary>
+        public new GameBeatmap GetBoundCopy()
         {
             var copy = new GameBeatmap(Default, audioManager);
             copy.BindTo(this);
