@@ -29,9 +29,9 @@ namespace osu.Game.Tests.Visual
             return dependencies;
         }
 
-        public override void Cleanup()
+        protected override void Dispose(bool isDisposing)
         {
-            base.Cleanup();
+            base.Dispose(isDisposing);
 
             if (Beatmap != null)
             {
