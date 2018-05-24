@@ -15,7 +15,14 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseEditorComposeTimeline : EditorClockTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(TimelineArea), typeof(Timeline), typeof(TimelineButton) };
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(TimelineArea),
+            typeof(Timeline),
+            typeof(BeatmapWaveformGraph),
+            typeof(TimelineButton),
+            typeof(CentreMarker)
+        };
 
         public TestCaseEditorComposeTimeline()
         {
