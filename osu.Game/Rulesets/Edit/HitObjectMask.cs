@@ -6,6 +6,7 @@ using osu.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 
@@ -136,11 +137,5 @@ namespace osu.Game.Rulesets.Edit
         /// The screen-space quad that outlines this <see cref="HitObjectMask"/> for selections.
         /// </summary>
         public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
-    }
-
-    public enum SelectionState
-    {
-        NotSelected,
-        Selected
     }
 }

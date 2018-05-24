@@ -7,6 +7,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -15,9 +16,14 @@ namespace osu.Game.Graphics.Containers
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private readonly BindableBool allowOpeningOverlays = new BindableBool(true);
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame osuGame, AudioManager audio)
         {
+            if (osuGame != null)
+                allowOpeningOverlays.BindTo(osuGame.AllowOpeningOverlays);
+
             samplePopIn = audio.Sample.Get(@"UI/overlay-pop-in");
             samplePopOut = audio.Sample.Get(@"UI/overlay-pop-out");
 
@@ -44,30 +50,22 @@ namespace osu.Game.Graphics.Containers
             return base.OnClick(state);
         }
 
-        protected override bool OnDragStart(InputState state)
-        {
-            if (!base.ReceiveMouseInputAt(state.Mouse.NativeState.Position))
-            {
-                State = Visibility.Hidden;
-                return true;
-            }
-
-            return base.OnDragStart(state);
-        }
-
-        protected override bool OnDrag(InputState state) => State == Visibility.Hidden;
-
         private void onStateChanged(Visibility visibility)
         {
-            switch (visibility)
+            if (allowOpeningOverlays)
             {
-                case Visibility.Visible:
-                    samplePopIn?.Play();
-                    break;
-                case Visibility.Hidden:
-                    samplePopOut?.Play();
-                    break;
+                switch (visibility)
+                {
+                    case Visibility.Visible:
+                        samplePopIn?.Play();
+                        break;
+                    case Visibility.Hidden:
+                        samplePopOut?.Play();
+                        break;
+                }
             }
+            else
+                State = Visibility.Hidden;
         }
     }
 }
