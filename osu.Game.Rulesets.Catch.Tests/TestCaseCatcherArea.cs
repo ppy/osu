@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Catch.Tests
         public TestCaseCatcherArea()
         {
             AddSliderStep<float>("CircleSize", 0, 8, 5, createCatcher);
-            AddToggleStep("Hyperdash", t => catcherArea.ToggleHyperDash(t));
         }
 
         private void createCatcher(float size)
@@ -54,8 +53,6 @@ namespace osu.Game.Rulesets.Catch.Tests
                 : base(beatmapDifficulty)
             {
             }
-
-            public void ToggleHyperDash(bool status) => MovableCatcher.HyperDashModifier = status ? 2 : 1;
         }
     }
 }
