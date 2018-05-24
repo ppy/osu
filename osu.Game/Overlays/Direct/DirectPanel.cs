@@ -4,22 +4,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
-using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK.Graphics;
-using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
-using osu.Framework.Configuration;
-using osu.Framework.Audio.Track;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Direct
         private BeatmapManager beatmaps;
         private BeatmapSetOverlay beatmapSetOverlay;
 
-        public Track Preview => PlayButton.Preview;
+        public PreviewTrack Preview => PlayButton.Preview;
         public Bindable<bool> PreviewPlaying => PlayButton.Playing;
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
@@ -121,9 +121,9 @@ namespace osu.Game.Overlays.Direct
         {
             base.Update();
 
-            if (PreviewPlaying && Preview != null && Preview.IsLoaded)
+            if (PreviewPlaying && Preview != null && Preview.Track.IsLoaded)
             {
-                PreviewBar.Width = (float)(Preview.CurrentTime / Preview.Length);
+                PreviewBar.Width = (float)(Preview.Track.CurrentTime / Preview.Track.Length);
             }
         }
 

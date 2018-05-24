@@ -14,13 +14,13 @@ namespace osu.Game.Audio
 {
     public class PreviewTrackManager : Component
     {
-        public event Action PlaybackStarted;
-        public event Action PlaybackStopped;
+        private Action<PreviewTrack> onTrackStart;
+        private Action onTrackStop;
 
         private TrackManager trackManager;
         private BindableDouble muteBindable;
 
-        public Track CurrentTrack { get; private set; }
+        public PreviewTrack CurrentTrack { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, FrameworkConfigManager config)
@@ -32,35 +32,28 @@ namespace osu.Game.Audio
             audio.AddItem(trackManager);
             config.BindWith(FrameworkSetting.VolumeMusic, trackManager.Volume);
 
-            PlaybackStarted += () => audio.Track.AddAdjustment(AdjustableProperty.Volume, muteBindable);
-            PlaybackStopped += () => audio.Track.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+            onTrackStart = track =>
+            {
+                CurrentTrack?.Stop();
+                audio.Track.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+                CurrentTrack = track;
+                CurrentTrack.Stopped += () => CurrentTrack = null;
+            };
+            onTrackStop = () => audio.Track.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
         }
 
-        public Track Get(BeatmapSetInfo beatmapSetInfo) => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo.OnlineBeatmapSetID}.mp3");
+        public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo) =>
+            new PreviewTrack(
+                trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo.OnlineBeatmapSetID}.mp3"),
+                onTrackStart,
+                onTrackStop);
 
         protected override void Update()
         {
-            if (CurrentTrack?.HasCompleted ?? false)
-                PlaybackStopped?.Invoke();
+            if (CurrentTrack?.Track.HasCompleted ?? false)
+                CurrentTrack.Stop();
 
             base.Update();
-        }
-
-        public void Play(Track track)
-        {
-            Stop();
-            CurrentTrack = track;
-            track.Restart();
-            PlaybackStarted?.Invoke();
-        }
-
-        public void Stop()
-        {
-            if (CurrentTrack?.IsRunning ?? false)
-            {
-                CurrentTrack?.Stop();
-                PlaybackStopped?.Invoke();
-            }
         }
     }
 }
