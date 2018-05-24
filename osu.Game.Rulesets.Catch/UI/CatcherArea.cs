@@ -255,7 +255,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                     HyperDashing = true;
                     hyperDashModifier = Math.Abs(velocity);
-                    hyperDashDirection = (int)Math.Sign(velocity);
+                    hyperDashDirection = Math.Sign(velocity);
                     hyperDashTargetPosition = target.X;
                 }
                 else
@@ -267,9 +267,9 @@ namespace osu.Game.Rulesets.Catch.UI
             }
 
             private double hyperDashModifier = 1;
-            private int hyperDashDirection = 0;
+            private int hyperDashDirection;
             private float hyperDashTargetPosition;
-            private bool hyperDashing = false;
+            private bool hyperDashing;
 
             /// <summary>
             /// Whether we are hypderdashing or not.
@@ -361,8 +361,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 X = (float)MathHelper.Clamp(X + direction * Clock.ElapsedFrameTime * speed, 0, 1);
 
                 // Correct overshooting.
-                if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
-                    (hyperDashDirection < 0 && hyperDashTargetPosition > X))
+                if (hyperDashDirection > 0 && hyperDashTargetPosition < X ||
+                    hyperDashDirection < 0 && hyperDashTargetPosition > X)
                 {
                     X = hyperDashTargetPosition;
                     HyperDashing = false;
