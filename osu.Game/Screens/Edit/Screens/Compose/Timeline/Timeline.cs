@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -97,8 +98,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
             lastTrackTime = adjustableClock.CurrentTime;
 
-            void seekTrackToCurrent() => adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
-            void scrollToTrackTime() => ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
+            void seekTrackToCurrent()
+            {
+                if (!(Beatmap.Value.Track is TrackVirtual))
+                    adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
+            }
+
+            void scrollToTrackTime()
+            {
+                if (!(Beatmap.Value.Track is TrackVirtual))
+                    ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
+            }
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
