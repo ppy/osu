@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         {
             if (base.OnMouseDown(state, args))
             {
-                beginUserInput();
+                beginUserDrag();
                 return true;
             }
 
@@ -124,18 +124,18 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            endUserInput();
+            endUserDrag();
             return base.OnMouseUp(state, args);
         }
 
-        private void beginUserInput()
+        private void beginUserDrag()
         {
             handlingDragInput = true;
             trackWasPlaying = adjustableClock.IsRunning;
             adjustableClock.Stop();
         }
 
-        private void endUserInput()
+        private void endUserDrag()
         {
             handlingDragInput = false;
             if (trackWasPlaying)
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             {
                 if (base.OnMouseDown(state, args))
                 {
-                    timeline.beginUserInput();
+                    timeline.beginUserDrag();
                     return true;
                 }
 
@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                timeline.endUserInput();
+                timeline.endUserDrag();
                 return base.OnMouseUp(state, args);
             }
         }
