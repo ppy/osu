@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(parent);
+            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         protected EditorClockTestCase()
         {
