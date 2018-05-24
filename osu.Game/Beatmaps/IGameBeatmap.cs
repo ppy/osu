@@ -10,5 +10,10 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public interface IGameBeatmap : IBindable<WorkingBeatmap>
     {
+        /// <summary>
+        /// Retrieve a new <see cref="IGameBeatmap"/> instance weakly bound to this <see cref="IGameBeatmap"/>.
+        /// If you are further binding to events of the retrieved <see cref="IGameBeatmap"/>, ensure a local reference is held.
+        /// </summary>
+        IGameBeatmap GetBoundCopy();
     }
 }
