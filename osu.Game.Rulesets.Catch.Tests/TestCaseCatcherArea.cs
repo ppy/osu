@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Catch.Tests
     public class TestCaseCatcherArea : OsuTestCase
     {
         private RulesetInfo catchRuleset;
-        private TestCatcherArea catcherArea;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -33,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             Child = new CatchInputManager(catchRuleset)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = catcherArea = new TestCatcherArea(new BeatmapDifficulty { CircleSize = size })
+                Child = new TestCatcherArea(new BeatmapDifficulty { CircleSize = size })
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.BottomLeft
