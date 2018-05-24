@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual
             // The beatmap is constructed here rather than load() because our children get dependencies injected before our load() runs
             Beatmap = new GameBeatmap(new DummyWorkingBeatmap(), parent.Get<AudioManager>());
 
-            dependencies = new DependencyContainer(parent);
+            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
             dependencies.CacheAs<IGameBeatmap>(Beatmap);
             dependencies.Cache(Beatmap);
