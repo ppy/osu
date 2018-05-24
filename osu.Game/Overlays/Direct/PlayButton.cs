@@ -3,7 +3,6 @@
 
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,7 +18,7 @@ namespace osu.Game.Overlays.Direct
     public class PlayButton : Container
     {
         public readonly Bindable<bool> Playing = new Bindable<bool>();
-        public Track Preview { get; private set; }
+        public PreviewTrack Preview { get; private set; }
 
         private BeatmapSetInfo beatmapSet;
 
@@ -32,6 +31,8 @@ namespace osu.Game.Overlays.Direct
                 beatmapSet = value;
 
                 Playing.Value = false;
+                if (Preview != null)
+                    Preview.Stopped -= preview_Stopped;
                 Preview = null;
             }
         }
@@ -85,12 +86,6 @@ namespace osu.Game.Overlays.Direct
         {
             hoverColour = colour.Yellow;
             this.previewTrackManager = previewTrackManager;
-
-            previewTrackManager.PlaybackStopped += () =>
-            {
-                if (Preview == previewTrackManager.CurrentTrack)
-                    Playing.Value = false;
-            };
         }
 
         protected override bool OnClick(InputState state)
@@ -134,20 +129,23 @@ namespace osu.Game.Overlays.Direct
                         })
                         .ContinueWith(t =>
                         {
+                            Preview.Stopped += preview_Stopped;
                             playingStateChanged(true);
                             loading = false;
                         });
                     return;
                 }
 
-                previewTrackManager.Play(Preview);
+                Preview.Start();
             }
             else
             {
-                previewTrackManager.Stop();
+                Preview.Stop();
                 loading = false;
             }
         }
+
+        private void preview_Stopped() => Playing.Value = false;
 
         protected override void Dispose(bool isDisposing)
         {
