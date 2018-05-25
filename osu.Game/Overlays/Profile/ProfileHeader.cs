@@ -124,7 +124,6 @@ namespace osu.Game.Overlays.Profile
                                                     Anchor = Anchor.BottomLeft,
                                                     Origin = Anchor.BottomLeft,
                                                     Margin = new MarginPadding { Left = 3, Bottom = 3 }, //To better lineup with the font
-                                                    Size = new Vector2(18),
                                                 },
                                             }
                                         },
