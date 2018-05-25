@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
+using osu.Game.Rulesets.Catch.MathUtils;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -21,6 +22,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         public override void PostProcess()
         {
+            finalizePosition();
+
             initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
 
             base.PostProcess();
@@ -28,6 +31,48 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             int index = 0;
             foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
                 obj.IndexInBeatmap = index++;
+        }
+
+        public const int RNG_SEED = 1337;
+
+        private void finalizePosition()
+        {
+            var rng = new FastRandom(RNG_SEED);
+            // todo: HardRock displacement should be applied here
+
+            foreach (var obj in Beatmap.HitObjects)
+            {
+                switch (obj)
+                {
+                    case BananaShower bananaShower:
+                        foreach (var nested in bananaShower.NestedHitObjects)
+                        {
+                            ((BananaShower.Banana)nested).X = (float)rng.NextDouble();
+                            // discarding 3 times
+                            rng.Next();
+                            rng.Next();
+                            rng.Next();
+                        }
+                        break;
+                    case JuiceStream juiceStream:
+                        foreach (var nested in juiceStream.NestedHitObjects)
+                        {
+                            if (nested is TinyDroplet tinyDroplet)
+                            {
+                                tinyDroplet.X += (float)rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH;
+                            }
+                            else if (nested is Droplet)
+                            {
+                                rng.Next(); // Big droplets are not slided
+                            }
+                        }
+                        break;
+                    case Fruit fruit:
+                        break;
+                }
+                var catchHitObject = obj as CatchHitObject;
+
+            }
         }
 
         private void initialiseHyperDash(List<CatchHitObject> objects)
