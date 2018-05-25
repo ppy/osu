@@ -105,6 +105,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeAccuracyValue(double strainValue)
         {
+            // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
             double hitWindowGreat = Beatmap.HitObjects.First().HitWindows.Great / 2 / TimeRate;
             if (hitWindowGreat <= 0)
                 return 0;
