@@ -71,5 +71,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         }
 
         public virtual void OffsetPosition(Vector2 offset) => Position += offset;
+
+        protected override HitWindows CreateHitWindows() => new OsuHitWindows();
     }
 }
