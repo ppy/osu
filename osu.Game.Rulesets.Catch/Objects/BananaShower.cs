@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 {
                     Samples = Samples,
                     StartTime = i,
-                    X = RNG.NextSingle()
+                    X = 0   // The position will be set on the post processing
                 });
         }
 
