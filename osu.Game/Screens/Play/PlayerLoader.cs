@@ -25,8 +25,8 @@ namespace osu.Game.Screens.Play
 
         private BeatmapMetadataDisplay info;
 
-        private bool showOverlays = true;
-        public override bool ShowOverlaysOnEnter => showOverlays;
+        private bool hideOverlays;
+        protected override bool HideOverlaysOnEnter => hideOverlays;
 
         private Task loadTask;
 
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Play
 
             player.RestartRequested = () =>
             {
-                showOverlays = false;
+                hideOverlays = true;
                 ValidForResume = true;
             };
         }
