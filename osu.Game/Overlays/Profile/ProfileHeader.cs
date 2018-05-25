@@ -364,7 +364,7 @@ namespace osu.Game.Overlays.Profile
             else
             {
                 infoTextLeft.AddText("Joined ", lightText);
-                infoTextLeft.AddText(new DrawableDate(user.JoinDate), boldItalic);
+                infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), boldItalic);
             }
 
             infoTextLeft.NewLine();
