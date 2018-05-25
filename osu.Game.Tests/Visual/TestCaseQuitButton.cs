@@ -44,13 +44,13 @@ namespace osu.Game.Tests.Visual
             {
                 exitAction = false;
                 InputManager.MoveMouseTo(quitButton);
-                InputManager.ButtonDown(MouseButton.Left);
+                InputManager.PressButton(MouseButton.Left);
             });
 
-            AddStep("Early release", () => InputManager.ButtonUp(MouseButton.Left));
+            AddStep("Early release", () => InputManager.ReleaseButton(MouseButton.Left));
             AddAssert("action not triggered", () => !exitAction);
 
-            AddStep("Trigger exit action", () => InputManager.ButtonDown(MouseButton.Left));
+            AddStep("Trigger exit action", () => InputManager.PressButton(MouseButton.Left));
             AddUntilStep(() => exitAction, $"{nameof(quitButton.Action)} was triggered");
         }
     }
