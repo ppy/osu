@@ -13,9 +13,7 @@ namespace osu.Game.Graphics
     public class DrawableDate : OsuSpriteText, IHasTooltip
     {
         private readonly DateTimeOffset date;
-
-        /// <param name="dateFormat">The string to format the date text with.
-        /// May be null if the humanized format should be used.</param>
+        
         public DrawableDate(DateTimeOffset date)
         {
             AutoSizeAxes = Axes.Both;
