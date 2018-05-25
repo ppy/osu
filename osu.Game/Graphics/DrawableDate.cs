@@ -66,6 +66,6 @@ namespace osu.Game.Graphics
             date.Humanize() :
             string.Format(dateFormat, date);
 
-        public string TooltipText => string.Format("{0:d MMMM yyyy H:mm \"UTC\"z}", date);
+        public virtual string TooltipText => string.Format("{0:d MMMM yyyy H:mm \"UTC\"z}", date);
     }
 }
