@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeAccuracyValue(double strainValue)
         {
-            double hitWindowGreat = (Beatmap.HitObjects.First().HitWindows.Great / 2 - 0.5) / TimeRate;
+            double hitWindowGreat = Beatmap.HitObjects.First().HitWindows.Great / 2 / TimeRate;
             if (hitWindowGreat <= 0)
                 return 0;
 

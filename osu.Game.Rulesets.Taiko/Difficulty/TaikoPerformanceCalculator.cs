@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeAccuracyValue()
         {
-            double hitWindowGreat = (Beatmap.HitObjects.First().HitWindows.Great / 2 - 0.5) / TimeRate;
+            double hitWindowGreat = Beatmap.HitObjects.First().HitWindows.Great / 2 / TimeRate;
             if (hitWindowGreat <= 0)
                 return 0;
 
