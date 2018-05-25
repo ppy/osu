@@ -37,14 +37,17 @@ namespace osu.Game.Audio
                 CurrentTrack?.Stop();
                 audio.Track.AddAdjustment(AdjustableProperty.Volume, muteBindable);
                 CurrentTrack = track;
-                CurrentTrack.Stopped += () => CurrentTrack = null;
             };
-            onTrackStop = () => audio.Track.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+            onTrackStop = () =>
+            {
+                audio.Track.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+                CurrentTrack = null;
+            };
         }
 
         public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo) =>
             new PreviewTrack(
-                trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo.OnlineBeatmapSetID}.mp3"),
+                trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3"),
                 onTrackStart,
                 onTrackStop);
 

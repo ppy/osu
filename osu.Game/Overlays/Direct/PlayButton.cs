@@ -31,8 +31,6 @@ namespace osu.Game.Overlays.Direct
                 beatmapSet = value;
 
                 Playing.Value = false;
-                if (Preview != null)
-                    Preview.Stopped -= preview_Stopped;
                 Preview = null;
             }
         }
@@ -90,7 +88,30 @@ namespace osu.Game.Overlays.Direct
 
         protected override bool OnClick(InputState state)
         {
-            Playing.Value = !Playing.Value;
+            if (!Playing.Value)
+            {
+                if (Preview == null)
+                {
+                    Task.Run(() =>
+                        {
+                            loading = true;
+                            return Preview = previewTrackManager.Get(beatmapSet);
+                        })
+                        .ContinueWith(t =>
+                        {
+                            Preview.Started += () => Playing.Value = true;
+                            Preview.Stopped += () => Playing.Value = false;
+                            Preview.Start();
+                            loading = false;
+                        });
+                    return true;
+                }
+
+                Preview.Start();
+            }
+            else
+                Preview?.Stop();
+
             return true;
         }
 
@@ -118,34 +139,11 @@ namespace osu.Game.Overlays.Direct
             icon.Icon = playing ? FontAwesome.fa_pause : FontAwesome.fa_play;
             icon.FadeColour(playing || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
 
-            if (playing)
+            if (!playing)
             {
-                if (Preview == null)
-                {
-                    Task.Run(() =>
-                        {
-                            loading = true;
-                            return Preview = previewTrackManager.Get(beatmapSet);
-                        })
-                        .ContinueWith(t =>
-                        {
-                            Preview.Stopped += preview_Stopped;
-                            playingStateChanged(true);
-                            loading = false;
-                        });
-                    return;
-                }
-
-                Preview.Start();
-            }
-            else
-            {
-                Preview.Stop();
                 loading = false;
             }
         }
-
-        private void preview_Stopped() => Playing.Value = false;
 
         protected override void Dispose(bool isDisposing)
         {

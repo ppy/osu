@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 },
             };
 
-            Action = () => Playing.Value = !Playing.Value;
+            Action = () => playButton.TriggerOnClick();
             Playing.ValueChanged += newValue => progress.FadeTo(newValue ? 1 : 0, 100);
         }
 
@@ -87,12 +87,6 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             }
             else
                 progress.Width = 0;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            Playing.Value = false;
-            base.Dispose(isDisposing);
         }
 
         protected override bool OnHover(InputState state)

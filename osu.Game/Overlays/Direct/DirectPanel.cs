@@ -149,7 +149,6 @@ namespace osu.Game.Overlays.Direct
         protected override bool OnClick(InputState state)
         {
             ShowInformation();
-            PreviewPlaying.Value = false;
             return true;
         }
 
