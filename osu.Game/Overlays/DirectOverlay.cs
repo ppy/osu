@@ -4,12 +4,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -18,6 +18,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Rulesets;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
@@ -176,11 +177,12 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets, BeatmapManager beatmaps)
+        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets, BeatmapManager beatmaps, PreviewTrackManager previewTrackManager)
         {
             this.api = api;
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
+            this.previewTrackManager = previewTrackManager;
 
             resultCountsContainer.Colour = colours.Yellow;
 
@@ -254,6 +256,7 @@ namespace osu.Game.Overlays
         private readonly Bindable<string> currentQuery = new Bindable<string>();
 
         private ScheduledDelegate queryChangedDebounce;
+        private PreviewTrackManager previewTrackManager;
 
         private void updateSearch()
         {
@@ -296,6 +299,12 @@ namespace osu.Game.Overlays
         }
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
+
+        protected override void PopOut()
+        {
+            previewTrackManager.CurrentTrack?.Stop();
+            base.PopOut();
+        }
 
         protected override void Dispose(bool isDisposing)
         {
