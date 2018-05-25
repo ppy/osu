@@ -13,7 +13,6 @@ namespace osu.Game.Graphics
     public class DrawableDate : OsuSpriteText, IHasTooltip
     {
         private readonly DateTimeOffset date;
-        private readonly string dateFormat;
 
         /// <param name="dateFormat">The string to format the date text with.
         /// May be null if the humanized format should be used.</param>
@@ -23,7 +22,6 @@ namespace osu.Game.Graphics
             Font = "Exo2.0-RegularItalic";
 
             this.date = date.ToLocalTime();
-            this.dateFormat = dateFormat;
         }
 
         [BackgroundDependencyLoader]
@@ -62,9 +60,9 @@ namespace osu.Game.Graphics
 
         public override bool HandleMouseInput => true;
 
-        private void updateTime() => Text = string.IsNullOrEmpty(dateFormat) ?
-            date.Humanize() :
-            string.Format(dateFormat, date);
+        protected virtual string Format() => Text = date.Humanize();
+
+        private void updateTime() => Format();
 
         public virtual string TooltipText => string.Format("{0:d MMMM yyyy H:mm \"UTC\"z}", date);
     }
