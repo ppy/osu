@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit
         {
             // TODO: should probably be done at a RulesetContainer level to share logic with Player.
             var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
-            clock = new EditorClock(Beatmap.Value.Beatmap.ControlPointInfo, beatDivisor) { IsCoupled = false };
+            clock = new EditorClock(Beatmap, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
 
             dependencies.CacheAs<IFrameBasedClock>(clock);
