@@ -1,23 +1,24 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Allocation;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Rulesets;
 using osu.Game.Overlays.BeatmapSet.Scores;
-using System.Linq;
+using osu.Game.Rulesets;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -37,6 +38,7 @@ namespace osu.Game.Overlays
         private readonly ScrollContainer scroll;
 
         private BeatmapSetInfo beatmapSet;
+        private PreviewTrackManager previewTrackManager;
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -109,10 +111,11 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, RulesetStore rulesets)
+        private void load(APIAccess api, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
         {
             this.api = api;
             this.rulesets = rulesets;
+            this.previewTrackManager = previewTrackManager;
         }
 
         protected override void PopIn()
@@ -124,7 +127,7 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
-            header.Details.StopPreview();
+            previewTrackManager.CurrentTrack?.Stop();
 
             FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out).OnComplete(_ => BeatmapSet = null);
         }
