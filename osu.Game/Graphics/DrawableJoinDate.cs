@@ -2,8 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace osu.Game.Graphics
 {
@@ -16,8 +14,8 @@ namespace osu.Game.Graphics
             this.date = date;
         }
 
-        protected override string Format() => Text = string.Format("{0:MMMM yyyy}", date);
+        protected override string Format() => Text = string.Format($"{date:MMMM yyyy}");
 
-        public override string TooltipText => string.Format("{0:d MMMM yyyy}", date);
+        public override string TooltipText => string.Format($"{date:d MMMM yyyy}");
     }
 }
