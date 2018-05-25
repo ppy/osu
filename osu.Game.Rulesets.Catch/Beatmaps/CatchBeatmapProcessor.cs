@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         {
                             if (nested is TinyDroplet tinyDroplet)
                             {
-                                tinyDroplet.X += (float)rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH;
+                                tinyDroplet.X += rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH;
                             }
                             else if (nested is Droplet)
                             {
@@ -67,11 +67,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             }
                         }
                         break;
-                    case Fruit fruit:
-                        break;
                 }
-                var catchHitObject = obj as CatchHitObject;
-
             }
         }
 
