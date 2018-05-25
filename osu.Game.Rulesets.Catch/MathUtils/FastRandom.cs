@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
     /// <summary>
     /// A PRNG specified in http://heliosphan.org/fastrandom.html.
     /// </summary>
-    internal class FastRandom
+    public class FastRandom
     {
         private const double int_to_real = 1.0 / (int.MaxValue + 1.0);
         private const uint int_mask = 0x7FFFFFFF;
