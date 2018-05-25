@@ -7,15 +7,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using osu.Framework.Localisation;
-using osu.Framework.Threading;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
+using OpenTK;
 
 namespace osu.Game.Screens.Play
 {
@@ -51,11 +51,19 @@ namespace osu.Game.Screens.Play
                 Origin = Anchor.Centre,
             });
 
-            Add(new VisualSettings
+            Add(new FillFlowContainer<PlayerSettingsGroup>
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                Margin = new MarginPadding(25)
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 20),
+                Margin = new MarginPadding(25),
+                Children = new PlayerSettingsGroup[]
+                {
+                    new VisualSettings(),
+                    new InputSettings()
+                }
             });
 
             loadTask = LoadComponentAsync(player);
