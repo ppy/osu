@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -20,6 +21,7 @@ namespace osu.Game.Graphics.UserInterface
         public ExternalLinkButton(string link = null)
         {
             Link = link;
+            Size = new Vector2(12);
             InternalChild = new SpriteIcon
             {
                 Icon = FontAwesome.fa_external_link,
