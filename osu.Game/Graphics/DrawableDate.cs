@@ -13,7 +13,7 @@ namespace osu.Game.Graphics
     public class DrawableDate : OsuSpriteText, IHasTooltip
     {
         private readonly DateTimeOffset date;
-        
+
         public DrawableDate(DateTimeOffset date)
         {
             AutoSizeAxes = Axes.Both;
