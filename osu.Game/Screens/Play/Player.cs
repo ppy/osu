@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play
 
         private SampleChannel sampleRestart;
 
-        private ScoreProcessor scoreProcessor;
+        protected ScoreProcessor ScoreProcessor;
         protected RulesetContainer RulesetContainer;
 
         private HUDOverlay hudOverlay;
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Play
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
-            scoreProcessor = RulesetContainer.CreateScoreProcessor();
+            ScoreProcessor = RulesetContainer.CreateScoreProcessor();
 
             Children = new Drawable[]
             {
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Play
                             RelativeSizeAxes = Axes.Both,
                             Child = RulesetContainer
                         },
-                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, scoreProcessor)
+                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Play
                             Breaks = beatmap.Breaks
                         },
                         RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
-                        hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
+                        hudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
                             Clock = Clock, // hud overlay doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
@@ -225,11 +225,11 @@ namespace osu.Game.Screens.Play
                 initializeStoryboard(false);
 
             // Bind ScoreProcessor to ourselves
-            scoreProcessor.AllJudged += onCompletion;
-            scoreProcessor.Failed += onFail;
+            ScoreProcessor.AllJudged += onCompletion;
+            ScoreProcessor.Failed += onFail;
 
             foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
-                mod.ApplyToScoreProcessor(scoreProcessor);
+                mod.ApplyToScoreProcessor(ScoreProcessor);
         }
 
         private void applyRateFromMods()
@@ -254,7 +254,7 @@ namespace osu.Game.Screens.Play
         private void onCompletion()
         {
             // Only show the completion screen if the player hasn't failed
-            if (scoreProcessor.HasFailed || onCompletionEvent != null)
+            if (ScoreProcessor.HasFailed || onCompletionEvent != null)
                 return;
 
             ValidForResume = false;
@@ -272,7 +272,7 @@ namespace osu.Game.Screens.Play
                         Beatmap = Beatmap.Value.BeatmapInfo,
                         Ruleset = ruleset
                     };
-                    scoreProcessor.PopulateScore(score);
+                    ScoreProcessor.PopulateScore(score);
                     score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
                     Push(new Results(score));
                 });
