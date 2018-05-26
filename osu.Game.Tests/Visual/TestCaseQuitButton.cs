@@ -31,10 +31,6 @@ namespace osu.Game.Tests.Visual
 
             var text = quitButton.Children.OfType<SpriteText>().First();
 
-            // initial display
-            AddUntilStep(() => text.IsPresent && !exitAction, "Text visible");
-            AddUntilStep(() => !text.IsPresent && !exitAction, "Text is not visible");
-
             AddStep("Trigger text fade in", () => InputManager.MoveMouseTo(quitButton));
             AddUntilStep(() => text.IsPresent && !exitAction, "Text visible");
             AddStep("Trigger text fade out", () => InputManager.MoveMouseTo(Vector2.One));
