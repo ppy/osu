@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-            double hitWindowGreat = Beatmap.HitObjects.First().HitWindows.Great / 2 / TimeRate;
+            double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
             double preEmpt = (int)BeatmapDifficulty.DifficultyRange(Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / TimeRate;
 
             realApproachRate = preEmpt > 1200 ? (1800 - preEmpt) / 120 : (1200 - preEmpt) / 150 + 5;
