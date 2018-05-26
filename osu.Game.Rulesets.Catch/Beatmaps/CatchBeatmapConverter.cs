@@ -38,8 +38,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         Duration = endTime.Duration,
                         NewCombo = comboData?.NewCombo ?? false
                     };
-
                 }
+
                 yield break;
             }
 
