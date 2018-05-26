@@ -37,14 +37,14 @@ namespace osu.Game.Screens
         /// <summary>
         /// Whether overlays should be hidden when this screen is entered or resumed.
         /// </summary>
-        protected virtual bool HideOverlaysOnEnter => hideOverlaysOnEnter;
+        protected virtual bool HideOverlaysOnEnter => false;
 
         private readonly BindableBool allowOpeningOverlays = new BindableBool();
 
         /// <summary>
         /// Whether overlays should be able to be opened while this screen is active.
         /// </summary>
-        protected virtual bool AllowOpeningOverlays => allowOpeningOverlays;
+        protected virtual bool AllowOpeningOverlays => true;
 
         /// <summary>
         /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.

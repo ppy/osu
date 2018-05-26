@@ -19,12 +19,12 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseCursors : ManualInputManagerTestCase
     {
-        private readonly CursorOverrideContainer cursorOverrideContainer;
+        private readonly MenuCursorContainer menuCursorContainer;
         private readonly CustomCursorBox[] cursorBoxes = new CustomCursorBox[6];
 
         public TestCaseCursors()
         {
-            Child = cursorOverrideContainer = new CursorOverrideContainer
+            Child = menuCursorContainer = new MenuCursorContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("Check green cursor at mouse", () => checkAtMouse(cursorBoxes[0].Cursor));
             AddStep("Move out", moveOut);
             AddAssert("Check green cursor invisible", () => !checkVisible(cursorBoxes[0].Cursor));
-            AddAssert("Check global cursor visible", () => checkVisible(cursorOverrideContainer.Cursor));
+            AddAssert("Check global cursor visible", () => checkVisible(menuCursorContainer.Cursor));
         }
 
         /// <summary>
@@ -112,11 +112,11 @@ namespace osu.Game.Tests.Visual
             AddStep("Move to purple area", () => InputManager.MoveMouseTo(cursorBoxes[3]));
             AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].Cursor));
             AddAssert("Check purple cursor at mouse", () => checkAtMouse(cursorBoxes[3].Cursor));
-            AddAssert("Check global cursor visible", () => checkVisible(cursorOverrideContainer.Cursor));
-            AddAssert("Check global cursor at mouse", () => checkAtMouse(cursorOverrideContainer.Cursor));
+            AddAssert("Check global cursor visible", () => checkVisible(menuCursorContainer.Cursor));
+            AddAssert("Check global cursor at mouse", () => checkAtMouse(menuCursorContainer.Cursor));
             AddStep("Move out", moveOut);
             AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].Cursor));
-            AddAssert("Check global cursor visible", () => checkVisible(cursorOverrideContainer.Cursor));
+            AddAssert("Check global cursor visible", () => checkVisible(menuCursorContainer.Cursor));
         }
 
         /// <summary>
