@@ -79,7 +79,10 @@ namespace osu.Game.Overlays.Music
             {
                 BeatmapInfo beatmap = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
                 if (beatmap != null)
+                {
                     beatmapBacking.Value = beatmaps.GetWorkingBeatmap(beatmap);
+                    beatmapBacking.Value.Track.Restart();
+                }
             };
         }
 
@@ -109,6 +112,7 @@ namespace osu.Game.Overlays.Music
             }
 
             beatmapBacking.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
+            beatmapBacking.Value.Track.Restart();
         }
     }
 

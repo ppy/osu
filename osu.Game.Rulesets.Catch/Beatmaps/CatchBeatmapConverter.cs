@@ -28,7 +28,20 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             var endTime = obj as IHasEndTime;
 
             if (positionData == null)
+            {
+                if (endTime != null)
+                {
+                    yield return new BananaShower
+                    {
+                        StartTime = obj.StartTime,
+                        Samples = obj.Samples,
+                        Duration = endTime.Duration,
+                        NewCombo = comboData?.NewCombo ?? false
+                    };
+                }
+
                 yield break;
+            }
 
             if (curveData != null)
             {
@@ -42,19 +55,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     RepeatSamples = curveData.RepeatSamples,
                     RepeatCount = curveData.RepeatCount,
                     X = positionData.X / CatchPlayfield.BASE_WIDTH,
-                    NewCombo = comboData?.NewCombo ?? false
-                };
-
-                yield break;
-            }
-
-            if (endTime != null)
-            {
-                yield return new BananaShower
-                {
-                    StartTime = obj.StartTime,
-                    Samples = obj.Samples,
-                    Duration = endTime.Duration,
                     NewCombo = comboData?.NewCombo ?? false
                 };
 
