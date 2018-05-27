@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
 
                 categoryDifficulty["Strain"] = starRating;
-                categoryDifficulty["Hit window"] = hitWindowGreat;
+                categoryDifficulty["Hit window 300"] = hitWindowGreat;
             }
 
             return starRating;

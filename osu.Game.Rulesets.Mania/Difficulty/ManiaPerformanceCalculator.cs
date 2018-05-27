@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         public override double Calculate(Dictionary<string, object> categoryDifficulty = null)
         {
             strain = (double)Attributes["Strain"];
-            hitWindowGreat = (double)Attributes["Hit window"];
+            hitWindowGreat = (double)Attributes["Hit window 300"];
 
             scaledScore = Score.TotalScore;
             countPerfect = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);

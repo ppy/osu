@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             strain = (double)Attributes["Strain"];
             beatmapMaxCombo = (int)Attributes["Max combo"];
-            hitWindowGreat = (double)Attributes["Hit window"];
+            hitWindowGreat = (double)Attributes["Hit window 300"];
 
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
             countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);

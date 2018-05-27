@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
                 categoryDifficulty["Strain"] = starRating;
                 categoryDifficulty["Max combo"] = beatmapMaxCombo;
-                categoryDifficulty["Hit window"] = hitWindowGreat;
+                categoryDifficulty["Hit window 300"] = hitWindowGreat;
             }
 
             return starRating;
