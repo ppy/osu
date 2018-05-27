@@ -96,6 +96,20 @@ namespace osu.Game.Rulesets.Mania
                 yield return new ManiaModSuddenDeath();
         }
 
+        private static readonly Mod[] key_mods =
+        {
+            new MultiMod(),
+            new ManiaModKey1(),
+            new ManiaModKey2(),
+            new ManiaModKey3(),
+            new ManiaModKey4(),
+            new ManiaModKey5(),
+            new ManiaModKey6(),
+            new ManiaModKey7(),
+            new ManiaModKey8(),
+            new ManiaModKey9(),
+        };
+
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
             switch (type)
@@ -114,7 +128,6 @@ namespace osu.Game.Rulesets.Mania
                             },
                         },
                     };
-
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -145,7 +158,6 @@ namespace osu.Game.Rulesets.Mania
                         },
                         new ManiaModFlashlight(),
                     };
-
                 case ModType.Special:
                     return new Mod[]
                     {
@@ -176,7 +188,85 @@ namespace osu.Game.Rulesets.Mania
                             },
                         },
                     };
+                case ModType.DifficultyCalculation:
+                    var mods = new List<Mod>();
+                    foreach (var keyMod in key_mods)
+                    {
+                        mods.AddRange(new[]
+                        {
+                            keyMod,
+                            new MultiMod
+                            {
+                                Mods = new[]
+                                {
+                                    keyMod,
+                                    new ManiaModDoubleTime(),
+                                }
+                            },
+                            new MultiMod
+                            {
+                                Mods = new[]
+                                {
+                                    keyMod,
+                                    new ManiaModHalfTime(),
+                                }
+                            },
+                            new MultiMod
+                            {
+                                Mods = new[]
+                                {
+                                    keyMod,
+                                    new ManiaModEasy(),
+                                }
+                            },
+                            new MultiMod
+                            {
+                                Mods = new[]
+                                {
+                                    keyMod,
+                                    new ManiaModHardRock(),
+                                }
+                            },
+                            new MultiMod
+                            {
+                                Mods = new[]
+                                {
+                                    keyMod,
+                                    new ManiaModEasy(),
+                                    new ManiaModDoubleTime(),
+                                }
+                            },
+                            new MultiMod
+                            {
+                                Mods = new[]
+                                {
+                                    keyMod,
+                                    new ManiaModEasy(),
+                                    new ManiaModHalfTime(),
+                                }
+                            },
+                            new MultiMod
+                            {
+                                Mods = new[]
+                                {
+                                    keyMod,
+                                    new ManiaModHardRock(),
+                                    new ManiaModDoubleTime(),
+                                }
+                            },
+                            new MultiMod
+                            {
+                                Mods = new[]
+                                {
+                                    keyMod,
+                                    new ManiaModHardRock(),
+                                    new ManiaModHalfTime(),
+                                }
+                            },
+                        });
+                    }
 
+                    return mods.ToArray();
                 default:
                     return new Mod[] { };
             }

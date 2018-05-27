@@ -93,7 +93,6 @@ namespace osu.Game.Rulesets.Taiko
                             },
                         },
                     };
-
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -117,7 +116,6 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModHidden(),
                         new TaikoModFlashlight(),
                     };
-
                 case ModType.Special:
                     return new Mod[]
                     {
@@ -133,7 +131,47 @@ namespace osu.Game.Rulesets.Taiko
                             },
                         },
                     };
-
+                case ModType.DifficultyCalculation:
+                    return new Mod[]
+                    {
+                        new MultiMod(),
+                        new TaikoModDoubleTime(),
+                        new TaikoModHalfTime(),
+                        new TaikoModEasy(),
+                        new TaikoModHardRock(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new TaikoModEasy(),
+                                new TaikoModDoubleTime(),
+                            }
+                        },
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new TaikoModEasy(),
+                                new TaikoModHalfTime(),
+                            }
+                        },
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new TaikoModHardRock(),
+                                new TaikoModDoubleTime(),
+                            }
+                        },
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new TaikoModHardRock(),
+                                new TaikoModHalfTime(),
+                            }
+                        },
+                    };
                 default:
                     return new Mod[] { };
             }

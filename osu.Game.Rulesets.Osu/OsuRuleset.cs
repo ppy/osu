@@ -102,7 +102,6 @@ namespace osu.Game.Rulesets.Osu
                             },
                         },
                     };
-
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -126,7 +125,6 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModHidden(),
                         new OsuModFlashlight(),
                     };
-
                 case ModType.Special:
                     return new Mod[]
                     {
@@ -143,7 +141,47 @@ namespace osu.Game.Rulesets.Osu
                         },
                         new OsuModTarget(),
                     };
-
+                case ModType.DifficultyCalculation:
+                    return new Mod[]
+                    {
+                        new MultiMod(),
+                        new OsuModDoubleTime(),
+                        new OsuModHalfTime(),
+                        new OsuModEasy(),
+                        new OsuModHardRock(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModEasy(),
+                                new OsuModDoubleTime(),
+                            }
+                        },
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModEasy(),
+                                new OsuModHalfTime(),
+                            }
+                        },
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModHardRock(),
+                                new OsuModDoubleTime(),
+                            }
+                        },
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModHardRock(),
+                                new OsuModHalfTime(),
+                            }
+                        },
+                    };
                 default:
                     return new Mod[] { };
             }
