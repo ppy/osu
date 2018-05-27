@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     {
         private readonly int beatmapMaxCombo;
 
-        private Mod[] mods;
         private int countGreat;
         private int countGood;
         private int countMeh;
@@ -30,23 +29,22 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
-            mods = Score.Mods;
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
             countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
             countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
             countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
 
             // Don't count scores made with supposedly unranked mods
-            if (mods.Any(m => !m.Ranked))
+            if (Score.Mods.Any(m => !m.Ranked))
                 return 0;
 
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.1; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
-            if (mods.Any(m => m is ModNoFail))
+            if (Score.Mods.Any(m => m is ModNoFail))
                 multiplier *= 0.90;
 
-            if (mods.Any(m => m is ModHidden))
+            if (Score.Mods.Any(m => m is ModHidden))
                 multiplier *= 1.10;
 
             double strainValue = computeStrainValue();
@@ -81,10 +79,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (beatmapMaxCombo > 0)
                 strainValue *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(beatmapMaxCombo, 0.5), 1.0);
 
-            if (mods.Any(m => m is ModHidden))
+            if (Score.Mods.Any(m => m is ModHidden))
                 strainValue *= 1.025;
 
-            if (mods.Any(m => m is ModFlashlight))
+            if (Score.Mods.Any(m => m is ModFlashlight))
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
                 strainValue *= 1.05 * lengthBonus;
 

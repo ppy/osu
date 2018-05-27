@@ -13,8 +13,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
-        private Mod[] mods;
-
         // Score after being scaled by non-difficulty-increasing mods
         private double scaledScore;
 
@@ -32,7 +30,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
-            mods = Score.Mods;
             scaledScore = Score.TotalScore;
             countPerfect = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
@@ -41,13 +38,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
             countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
 
-            if (mods.Any(m => !m.Ranked))
+            if (Score.Mods.Any(m => !m.Ranked))
                 return 0;
 
             IEnumerable<Mod> scoreIncreaseMods = Ruleset.GetModsFor(ModType.DifficultyIncrease);
 
             double scoreMultiplier = 1.0;
-            foreach (var m in mods.Where(m => !scoreIncreaseMods.Contains(m)))
+            foreach (var m in Score.Mods.Where(m => !scoreIncreaseMods.Contains(m)))
                 scoreMultiplier *= m.ScoreMultiplier;
 
             // Scale score up, so it's comparable to other keymods
@@ -57,9 +54,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             // The specific number has no intrinsic meaning and can be adjusted as needed.
             double multiplier = 0.8;
 
-            if (mods.Any(m => m is ModNoFail))
+            if (Score.Mods.Any(m => m is ModNoFail))
                 multiplier *= 0.9;
-            if (mods.Any(m => m is ModEasy))
+            if (Score.Mods.Any(m => m is ModEasy))
                 multiplier *= 0.5;
 
             double strainValue = computeStrainValue();
