@@ -212,7 +212,7 @@ namespace osu.Game
 
         protected override void LoadComplete()
         {
-            // this needs to be cached before base.LoadComplete as it is used by CursorOverrideContainer.
+            // this needs to be cached before base.LoadComplete as it is used by MenuCursorContainer.
             dependencies.Cache(screenshotManager = new ScreenshotManager());
 
             base.LoadComplete();
@@ -220,7 +220,7 @@ namespace osu.Game
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
             // in the cursor being shown for a few frames during the intro.
             // This prevents the cursor from showing until we have a screen with CursorVisible = true
-            CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
+            MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
 
             // hook up notifications to components.
             SkinManager.PostNotification = n => notifications?.Post(n);
@@ -548,7 +548,7 @@ namespace osu.Game
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
-            CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
+            MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
         private void screenAdded(Screen newScreen)

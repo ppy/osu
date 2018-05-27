@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using OpenTK;
 using OpenTK.Graphics;
@@ -93,6 +94,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public Header()
         {
+            ExternalLinkButton externalLink;
             RelativeSizeAxes = Axes.X;
             Height = 400;
             Masking = true;
@@ -160,10 +162,24 @@ namespace osu.Game.Overlays.BeatmapSet
                                         Height = 113,
                                         Child = Picker = new BeatmapPicker(),
                                     },
-                                    title = new OsuSpriteText
+                                    new FillFlowContainer
                                     {
-                                        Font = @"Exo2.0-BoldItalic",
-                                        TextSize = 37,
+                                        Direction = FillDirection.Horizontal,
+                                        AutoSizeAxes = Axes.Both,
+                                        Children = new Drawable[]
+                                        {
+                                            title = new OsuSpriteText
+                                            {
+                                                Font = @"Exo2.0-BoldItalic",
+                                                TextSize = 37,
+                                            },
+                                            externalLink = new ExternalLinkButton
+                                            {
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Margin = new MarginPadding { Left = 3, Bottom = 4 }, //To better lineup with the font
+                                            },
+                                        }
                                     },
                                     artist = new OsuSpriteText
                                     {
@@ -247,6 +263,7 @@ namespace osu.Game.Overlays.BeatmapSet
             };
 
             Picker.Beatmap.ValueChanged += b => Details.Beatmap = b;
+            Picker.Beatmap.ValueChanged += b => externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
         }
 
         [BackgroundDependencyLoader]
