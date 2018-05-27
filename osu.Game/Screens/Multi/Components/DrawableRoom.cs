@@ -297,6 +297,12 @@ namespace osu.Game.Screens.Multi.Components
             participantsBind.BindTo(Room.Participants);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            this.FadeInFromZero(transition_duration);
+        }
+
         protected override bool OnClick(InputState state)
         {
             if (Enabled.Value)
