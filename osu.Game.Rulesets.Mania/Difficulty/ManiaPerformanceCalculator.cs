@@ -13,7 +13,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
+        /// <summary>
+        /// The difficulty strain of the beatmap.
+        /// </summary>
         private double strain;
+
+        /// <summary>
+        /// Hit window of <see cref="HitResult.Great"/> hits.
+        /// </summary>
+        private double hitWindowGreat;
 
         // Score after being scaled by non-difficulty-increasing mods
         private double scaledScore;
@@ -33,6 +41,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         public override double Calculate(Dictionary<string, object> categoryDifficulty = null)
         {
             strain = (double)Attributes["Strain"];
+            hitWindowGreat = (double)Attributes["Hit window"];
 
             scaledScore = Score.TotalScore;
             countPerfect = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);
@@ -107,7 +116,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double computeAccuracyValue(double strainValue)
         {
             // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-            double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
             if (hitWindowGreat <= 0)
                 return 0;
 

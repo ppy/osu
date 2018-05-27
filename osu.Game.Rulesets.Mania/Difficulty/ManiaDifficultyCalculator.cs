@@ -60,7 +60,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double starRating = calculateDifficulty() * star_scaling_factor;
 
             if (categoryDifficulty != null)
+            {
+                double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
+
                 categoryDifficulty["Strain"] = starRating;
+                categoryDifficulty["Hit window"] = hitWindowGreat;
+            }
 
             return starRating;
         }
