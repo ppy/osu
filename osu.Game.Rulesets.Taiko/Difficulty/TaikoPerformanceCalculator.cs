@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
     {
         private readonly int beatmapMaxCombo;
 
+        private double strain;
+
         private int countGreat;
         private int countGood;
         private int countMeh;
@@ -27,8 +29,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             beatmapMaxCombo = beatmap.HitObjects.Count(h => h is Hit);
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        public override double Calculate(Dictionary<string, object> categoryDifficulty = null)
         {
+            strain = (double)Attributes["Strain"];
+
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
             countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
             countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
@@ -66,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeStrainValue()
         {
-            double strainValue = Math.Pow(5.0 * Math.Max(1.0, Attributes["Strain"] / 0.0075) - 4.0, 2.0) / 100000.0;
+            double strainValue = Math.Pow(5.0 * Math.Max(1.0, strain / 0.0075) - 4.0, 2.0) / 100000.0;
 
             // Longer maps are worth more
             double lengthBonus = 1 + 0.1f * Math.Min(1.0, totalHits / 1500.0);

@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
+        private double strain;
+
         // Score after being scaled by non-difficulty-increasing mods
         private double scaledScore;
 
@@ -28,8 +30,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        public override double Calculate(Dictionary<string, object> categoryDifficulty = null)
         {
+            strain = (double)Attributes["Strain"];
+
             scaledScore = Score.TotalScore;
             countPerfect = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
@@ -79,7 +83,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double computeStrainValue()
         {
             // Obtain strain difficulty
-            double strainValue = Math.Pow(5 * Math.Max(1, Attributes["Strain"] / 0.2) - 4.0, 2.2) / 135.0;
+            double strainValue = Math.Pow(5 * Math.Max(1, strain / 0.2) - 4.0, 2.2) / 135.0;
 
             // Longer maps are worth more
             strainValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);

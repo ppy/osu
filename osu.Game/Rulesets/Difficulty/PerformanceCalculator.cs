@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public abstract class PerformanceCalculator
     {
-        private readonly Dictionary<string, double> attributes = new Dictionary<string, double>();
-        protected IDictionary<string, double> Attributes => attributes;
+        private readonly Dictionary<string, object> attributes = new Dictionary<string, object>();
+        protected IDictionary<string, object> Attributes => attributes;
 
         protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
@@ -41,6 +41,6 @@ namespace osu.Game.Rulesets.Difficulty
             TimeRate = clock.Rate;
         }
 
-        public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);
+        public abstract double Calculate(Dictionary<string, object> categoryDifficulty = null);
     }
 }

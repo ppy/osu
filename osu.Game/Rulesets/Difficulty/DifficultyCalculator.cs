@@ -32,10 +32,6 @@ namespace osu.Game.Rulesets.Difficulty
             TimeRate = clock.Rate;
         }
 
-        protected virtual void PreprocessHitObjects()
-        {
-        }
-
-        public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);
+        public abstract double Calculate(Dictionary<string, object> categoryDifficulty = null);
     }
 }

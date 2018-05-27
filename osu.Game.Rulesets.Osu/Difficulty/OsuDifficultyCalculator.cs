@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        public override double Calculate(Dictionary<string, object> categoryDifficulty = null)
         {
             OsuDifficultyBeatmap beatmap = new OsuDifficultyBeatmap((List<OsuHitObject>)Beatmap.HitObjects, TimeRate);
             Skill[] skills =
@@ -65,8 +65,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (categoryDifficulty != null)
             {
-                categoryDifficulty.Add("Aim", aimRating);
-                categoryDifficulty.Add("Speed", speedRating);
             }
 
             return starRating;

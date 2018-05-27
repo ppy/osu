@@ -17,7 +17,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private readonly int countHitCircles;
         private readonly int beatmapMaxCombo;
+        /// <summary>
+        /// Aim difficulty strain of the beatmap.
+        /// </summary>
+        private double aimStrain;
 
+        /// <summary>
+        /// Speed difficulty strain of the beatmap.
+        /// </summary>
+        private double speedStrain;
 
         /// <summary>
         /// Approach rate adjusted by mods.
@@ -46,8 +54,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
         }
 
-        public override double Calculate(Dictionary<string, double> categoryRatings = null)
+        public override double Calculate(Dictionary<string, object> categoryRatings = null)
         {
+            aimStrain = (double)Attributes["Aim"];
+            speedStrain = (double)Attributes["Speed"];
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
@@ -100,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue()
         {
-            double aimValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes["Aim"] / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double aimValue = Math.Pow(5.0f * Math.Max(1.0f, aimStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
             double lengthBonus = 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
@@ -149,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue()
         {
-            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes["Speed"] / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, speedStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
             speedValue *= 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
