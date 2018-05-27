@@ -67,6 +67,9 @@ namespace osu.Game.Tests.Visual
 
             AddStep("show", () => { infoWedge.State = Visibility.Visible; });
 
+            testNullBeatmap();
+            testAsyncLoading();
+
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
                 var ruleset = rulesetInfo.CreateInstance();
@@ -98,8 +101,6 @@ namespace osu.Game.Tests.Visual
                         break;
                 }
             }
-
-            testNullBeatmap();
         }
 
         private void testBeatmapLabels(Ruleset ruleset)
@@ -126,6 +127,26 @@ namespace osu.Game.Tests.Visual
             AddAssert("check no infolabels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
+        private void testAsyncLoading()
+        {
+            RulesetInfo firstRuleset = rulesets.AvailableRulesets.ElementAt(0); // Should be osu standard
+            RulesetInfo secondRuleset = rulesets.AvailableRulesets.ElementAt(1); // Should be taiko
+
+            var firstBeatmap = createTestBeatmap(firstRuleset, 25000);
+            var secondBeatmap = createTestBeatmap(secondRuleset, 1);
+
+            BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
+            AddStep("select two beatmaps", () =>
+            {
+                infoBefore = infoWedge.Info;
+                infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(firstBeatmap));
+                infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(secondBeatmap));
+            });
+            AddUntilStep(() => infoWedge.Info != infoBefore, "wait for load");
+            AddWaitStep(3);
+            AddAssert("loaded info of second beatmap", () => infoWedge.Info.VersionLabel.Text == $"{secondRuleset.ShortName}Version");
+        }
+
         private void selectBeatmap(IBeatmap b)
         {
             BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
@@ -148,10 +169,10 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        private IBeatmap createTestBeatmap(RulesetInfo ruleset)
+        private IBeatmap createTestBeatmap(RulesetInfo ruleset, int hitobjectCount = 50)
         {
             List<HitObject> objects = new List<HitObject>();
-            for (double i = 0; i < 50000; i += 1000)
+            for (double i = 0; i < hitobjectCount * 1000; i += 1000)
                 objects.Add(new TestHitObject { StartTime = i });
 
             return new Beatmap
