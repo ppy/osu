@@ -8,15 +8,25 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoPerformanceCalculator : PerformanceCalculator
     {
-        private readonly int beatmapMaxCombo;
-
+        /// <summary>
+        /// The difficulty strain of the beatmap.
+        /// </summary>
         private double strain;
+
+        /// <summary>
+        /// Maximum combo achievable by the beatmap.
+        /// </summary>
+        private int beatmapMaxCombo;
+
+        /// <summary>
+        /// Hit window of <see cref="HitResult.Great"/> hits.
+        /// </summary>
+        private double hitWindowGreat;
 
         private int countGreat;
         private int countGood;
@@ -26,12 +36,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         public TaikoPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
-            beatmapMaxCombo = beatmap.HitObjects.Count(h => h is Hit);
         }
 
         public override double Calculate(Dictionary<string, object> categoryDifficulty = null)
         {
             strain = (double)Attributes["Strain"];
+            beatmapMaxCombo = (int)Attributes["Max combo"];
+            hitWindowGreat = (double)Attributes["Hit window"];
 
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
             countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
@@ -96,8 +107,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeAccuracyValue()
         {
-            // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-            double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
             if (hitWindowGreat <= 0)
                 return 0;
 
