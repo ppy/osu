@@ -108,14 +108,18 @@ namespace osu.Game.Screens.Select
                 Depth = Info?.Depth + 1 ?? 0,
             }, newInfo =>
             {
-                updateState();
-                Add(Info = newInfo);
+                if (newInfo.Working == beatmap)
+                {
+                    updateState();
+                    Add(Info = newInfo);
+                }
             });
         }
 
         public class BufferedWedgeInfo : BufferedContainer
         {
             private readonly WorkingBeatmap working;
+            public WorkingBeatmap Working { get { return working; } }
             public OsuSpriteText VersionLabel { get; private set; }
             public OsuSpriteText TitleLabel { get; private set; }
             public OsuSpriteText ArtistLabel { get; private set; }
