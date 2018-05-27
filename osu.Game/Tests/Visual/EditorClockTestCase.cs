@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual
 
         protected EditorClockTestCase()
         {
-            Clock = new EditorClock(new ControlPointInfo(), BeatDivisor) { IsCoupled = false };
+            Clock = new EditorClock(new ControlPointInfo(), 5000, BeatDivisor) { IsCoupled = false };
         }
 
         [BackgroundDependencyLoader]
