@@ -6,17 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        private readonly int countHitCircles;
-        private readonly int beatmapMaxCombo;
         /// <summary>
         /// Aim difficulty strain of the beatmap.
         /// </summary>
@@ -37,6 +33,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </summary>
         private double realOverallDifficulty;
 
+        /// <summary>
+        /// Maximum combo achievable by the beatmap.
+        /// </summary>
+        private int beatmapMaxCombo;
+
+        /// <summary>
+        /// Number of hitcircles in the beatmap.
+        /// </summary>
+        private int beatmapCircleCount;
+
         private double accuracy;
         private int scoreMaxCombo;
         private int countGreat;
@@ -47,17 +53,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public OsuPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
-            countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
-
-            beatmapMaxCombo = Beatmap.HitObjects.Count();
-            // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
-            beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
         }
 
         public override double Calculate(Dictionary<string, object> categoryRatings = null)
         {
             aimStrain = (double)Attributes["Aim"];
             speedStrain = (double)Attributes["Speed"];
+            realApproachRate = (double)Attributes["AR"];
+            realOverallDifficulty = (double)Attributes["OD"];
+            beatmapMaxCombo = (int)Attributes["Max combo"];
+            beatmapCircleCount = (int)Attributes["Circle count"];
+
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
@@ -68,13 +74,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Don't count scores made with supposedly unranked mods
             if (Score.Mods.Any(m => !m.Ranked))
                 return 0;
-
-            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-            double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
-            double preEmpt = (int)BeatmapDifficulty.DifficultyRange(Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / TimeRate;
-
-            realApproachRate = preEmpt > 1200 ? (1800 - preEmpt) / 120 : (1200 - preEmpt) / 150 + 5;
-            realOverallDifficulty = (80 - hitWindowGreat) / 6;
 
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.12f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
@@ -100,9 +99,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 categoryRatings.Add("Aim", aimValue);
                 categoryRatings.Add("Speed", speedValue);
                 categoryRatings.Add("Accuracy", accuracyValue);
-                categoryRatings.Add("OD", realOverallDifficulty);
-                categoryRatings.Add("AR", realApproachRate);
-                categoryRatings.Add("Max Combo", beatmapMaxCombo);
             }
 
             return totalValue;
@@ -187,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window
             double betterAccuracyPercentage;
-            int amountHitObjectsWithAccuracy = countHitCircles;
+            int amountHitObjectsWithAccuracy = beatmapCircleCount;
 
             if (amountHitObjectsWithAccuracy > 0)
                 betterAccuracyPercentage = ((countGreat - (totalHits - amountHitObjectsWithAccuracy)) * 6 + countGood * 2 + countMeh) / (amountHitObjectsWithAccuracy * 6);

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -65,6 +66,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (categoryDifficulty != null)
             {
+                // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
+                double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
+                double preEmpt = (int)BeatmapDifficulty.DifficultyRange(Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / TimeRate;
+
+                int maxCombo = Beatmap.HitObjects.Count();
+                // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
+                maxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
+
+                int circleCount = Beatmap.HitObjects.Count(h => h is HitCircle);
+
+                categoryDifficulty["Aim"] = aimRating;
+                categoryDifficulty["Speed"] = speedRating;
+                categoryDifficulty["AR"] = preEmpt > 1200 ? (1800 - preEmpt) / 120 : (1200 - preEmpt) / 150 + 5;
+                categoryDifficulty["OD"] = (80 - hitWindowGreat) / 6;
+                categoryDifficulty["Max combo"] = maxCombo;
+                categoryDifficulty["Circle count"] = circleCount;
             }
 
             return starRating;
