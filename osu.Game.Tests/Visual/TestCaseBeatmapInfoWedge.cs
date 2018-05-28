@@ -129,21 +129,20 @@ namespace osu.Game.Tests.Visual
 
         private void testAsyncLoading()
         {
-            RulesetInfo firstRuleset = rulesets.AvailableRulesets.ElementAt(0); // Should be osu standard
-            RulesetInfo secondRuleset = rulesets.AvailableRulesets.ElementAt(1); // Should be taiko
+            RulesetInfo firstRuleset = new OsuRuleset().RulesetInfo;
+            RulesetInfo secondRuleset = new TaikoRuleset().RulesetInfo;
 
-            var firstBeatmap = createTestBeatmap(firstRuleset, 25000);
-            var secondBeatmap = createTestBeatmap(secondRuleset, 1);
+            var firstBeatmap = createTestBeatmap(firstRuleset, 25000000);
+            var secondBeatmap = createTestBeatmap(secondRuleset, 2000);
 
-            BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
+            int loadedBefore = -1;
             AddStep("select two beatmaps", () =>
             {
-                infoBefore = infoWedge.Info;
+                loadedBefore = TestBeatmapInfoWedge.LoadedBuffersCount;
                 infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(firstBeatmap));
                 infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(secondBeatmap));
             });
-            AddUntilStep(() => infoWedge.Info != infoBefore, "wait for load");
-            AddWaitStep(3);
+            AddUntilStep(() => TestBeatmapInfoWedge.LoadedBuffersCount == loadedBefore + 2, "wait for load");
             AddAssert("loaded info of second beatmap", () => infoWedge.Info.VersionLabel.Text == $"{secondRuleset.ShortName}Version");
         }
 
@@ -169,10 +168,10 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        private IBeatmap createTestBeatmap(RulesetInfo ruleset, int hitobjectCount = 50)
+        private IBeatmap createTestBeatmap(RulesetInfo ruleset, int length = 50000)
         {
             List<HitObject> objects = new List<HitObject>();
-            for (double i = 0; i < hitobjectCount * 1000; i += 1000)
+            for (double i = 0; i < length; i += 1000)
                 objects.Add(new TestHitObject { StartTime = i });
 
             return new Beatmap
@@ -198,6 +197,14 @@ namespace osu.Game.Tests.Visual
         private class TestBeatmapInfoWedge : BeatmapInfoWedge
         {
             public new BufferedWedgeInfo Info => base.Info;
+
+            public static int LoadedBuffersCount;
+
+            protected override void UpdateInfo(BufferedWedgeInfo newInfo)
+            {
+                base.UpdateInfo(newInfo);
+                LoadedBuffersCount += 1;
+            }
         }
 
         private class TestHitObject : HitObject, IHasPosition
