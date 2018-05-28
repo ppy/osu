@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float buttons_spacing = 5;
 
         private readonly Box tabsBg;
-        private readonly Container coverContainer;
+        private readonly UpdateableBeatmapSetCover cover;
         private readonly OsuSpriteText title, artist;
         private readonly Container noVideoButtons;
         private readonly FillFlowContainer videoButtons;
@@ -36,7 +36,6 @@ namespace osu.Game.Overlays.BeatmapSet
         public Details Details;
 
         private BeatmapManager beatmaps;
-        private DelayedLoadWrapper cover;
 
         public readonly BeatmapPicker Picker;
 
@@ -63,7 +62,7 @@ namespace osu.Game.Overlays.BeatmapSet
             artist.Text = BeatmapSet?.Metadata.Artist ?? string.Empty;
             onlineStatusPill.Status = BeatmapSet?.OnlineInfo.Status ?? BeatmapSetOnlineStatus.None;
 
-            cover?.FadeOut(400, Easing.Out);
+            cover.BeatmapSet = null;
             if (BeatmapSet != null)
             {
                 downloadButtonsContainer.FadeIn(transition_duration);
@@ -72,18 +71,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 noVideoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 0 : 1, transition_duration);
                 videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
 
-                coverContainer.Add(cover = new DelayedLoadWrapper(
-                    new BeatmapSetCover(BeatmapSet)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    }, 300)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                });
+                cover.BeatmapSet = BeatmapSet;
             }
             else
             {
@@ -130,12 +118,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
-                                },
-                                coverContainer = new Container
+                                cover = new UpdateableBeatmapSetCover
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
