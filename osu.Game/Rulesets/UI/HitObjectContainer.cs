@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.UI
 
         public virtual void Add(DrawableHitObject hitObject) => AddInternal(hitObject);
         public virtual bool Remove(DrawableHitObject hitObject) => RemoveInternal(hitObject);
+        public virtual void Clear(bool disposeChildren = true) => ClearInternal(disposeChildren);
 
         protected override int Compare(Drawable x, Drawable y)
         {

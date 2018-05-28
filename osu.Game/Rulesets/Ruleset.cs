@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Rulesets
 {
@@ -63,7 +64,7 @@ namespace osu.Game.Rulesets
 
         public virtual PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => null;
 
-        public virtual HitObjectComposer CreateHitObjectComposer() => null;
+        public virtual HitObjectComposer CreateHitObjectComposer(BindableBeatDivisor beatDivisor) => null;
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_question_circle };
 

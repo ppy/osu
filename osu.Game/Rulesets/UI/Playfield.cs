@@ -51,16 +51,22 @@ namespace osu.Game.Rulesets.UI
         public virtual void PostProcess() => nestedPlayfields?.ForEach(p => p.PostProcess());
 
         /// <summary>
-        /// Adds a DrawableHitObject to this Playfield.
+        /// Adds a <see cref="DrawableHitObject"/> to this <see cref="Playfield"/>.
         /// </summary>
-        /// <param name="h">The DrawableHitObject to add.</param>
+        /// <param name="h">The <see cref="DrawableHitObject"/> to add.</param>
         public virtual void Add(DrawableHitObject h) => HitObjects.Add(h);
 
         /// <summary>
-        /// Remove a DrawableHitObject from this Playfield.
+        /// Remove a <see cref="DrawableHitObject"/> from this <see cref="Playfield"/>.
         /// </summary>
-        /// <param name="h">The DrawableHitObject to remove.</param>
+        /// <param name="h">The <see cref="DrawableHitObject"/> to remove.</param>
         public virtual void Remove(DrawableHitObject h) => HitObjects.Remove(h);
+
+        /// <summary>
+        /// Clears all <see cref="DrawableHitObject"/>s from this <see cref="Playfield"/>.
+        /// </summary>
+        /// <param name="disposeChildren">Whether children should be disposed.</param>
+        public virtual void Clear(bool disposeChildren = true) => HitObjects.Clear(disposeChildren);
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.

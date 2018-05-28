@@ -26,7 +26,13 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         private void load([CanBeNull] BindableBeatDivisor beatDivisor)
         {
             if (beatDivisor != null)
+            {
                 this.beatDivisor.BindTo(beatDivisor);
+                // Initialise the value of the snap divisor of the beatmap
+                this.beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
+                // Will probably crash when attempting to load a map with an unsupported beat divisor
+                // that might have been tweaked from the .osu file directly
+            }
 
             ScrollableTimeline timeline;
             Children = new Drawable[]
@@ -104,7 +110,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 return;
             }
 
-            var composer = ruleset.CreateHitObjectComposer();
+            var composer = ruleset.CreateHitObjectComposer(beatDivisor);
             if (composer == null)
             {
                 Logger.Log($"Ruleset {ruleset.Description} doesn't support hitobject composition.");

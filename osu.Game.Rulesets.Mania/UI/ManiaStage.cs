@@ -1,9 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -17,15 +16,16 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
-using OpenTK.Graphics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    internal class ManiaStage : ScrollingPlayfield
+    public class ManiaStage : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
 
@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Mania.UI
         /// Whether this playfield should be inverted. This flips everything inside the playfield.
         /// </summary>
         public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
+
+        public bool DisplayJudgements;
 
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
@@ -171,6 +173,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
+            if (!judgedObject.DisplayJudgement || !DisplayJudgements)
+                return;
+
             judgements.Clear();
             judgements.Add(new DrawableManiaJudgement(judgement, judgedObject)
             {

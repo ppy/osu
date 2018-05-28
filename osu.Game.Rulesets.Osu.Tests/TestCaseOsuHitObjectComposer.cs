@@ -5,22 +5,19 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Timing;
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
-using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Visual;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestCaseHitObjectComposer : OsuTestCase
+    public class TestCaseOsuHitObjectComposer : HitObjectComposerTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -32,15 +29,9 @@ namespace osu.Game.Tests.Visual
             typeof(NotNullAttribute)
         };
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(parent);
-
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        protected override IBeatmap CreateBeatmap()
         {
-            osuGame.Beatmap.Value = new TestWorkingBeatmap(new Beatmap
+            return new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -60,13 +51,13 @@ namespace osu.Game.Tests.Visual
                         Scale = 0.5f,
                     }
                 },
-            });
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo }
+            };
+        }
 
-            var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-            dependencies.CacheAs<IAdjustableClock>(clock);
-            dependencies.CacheAs<IFrameBasedClock>(clock);
-
-            Child = new OsuHitObjectComposer(new OsuRuleset());
+        protected override HitObjectComposer CreateComposer()
+        {
+            return new OsuHitObjectComposer(new OsuRuleset());
         }
     }
 }
