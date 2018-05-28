@@ -28,8 +28,19 @@ namespace osu.Game.Database
             if (isDisposed) return;
             isDisposed = true;
 
-            PerformedWrite |= Context.SaveChanges(transaction) > 0;
-            usageCompleted?.Invoke(this);
+            try
+            {
+                PerformedWrite |= Context.SaveChanges(transaction) > 0;
+            }
+            catch (Exception e)
+            {
+                transaction?.Rollback();
+                throw;
+            }
+            finally
+            {
+                usageCompleted?.Invoke(this);
+            }
         }
 
         public void Dispose()
