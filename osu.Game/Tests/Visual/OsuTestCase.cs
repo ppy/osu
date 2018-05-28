@@ -12,31 +12,35 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class OsuTestCase : TestCase
     {
-        protected GameBeatmap Beatmap { get; private set; }
+        private readonly OsuTestBeatmap beatmap = new OsuTestBeatmap(new DummyWorkingBeatmap());
+        protected GameBeatmap Beatmap => beatmap;
 
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
         {
-            // The beatmap is constructed here rather than load() because our children get dependencies injected before our load() runs
-            Beatmap = new GameBeatmap(new DummyWorkingBeatmap(), parent.Get<AudioManager>());
-
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
-            dependencies.CacheAs<IGameBeatmap>(Beatmap);
-            dependencies.Cache(Beatmap);
+            dependencies.CacheAs<GameBeatmap>(beatmap);
+            dependencies.CacheAs<IGameBeatmap>(beatmap);
 
             return dependencies;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audioManager)
+        {
+            beatmap.SetAudioManager(audioManager);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (Beatmap != null)
+            if (beatmap != null)
             {
-                Beatmap.Disabled = true;
-                Beatmap.Value.Track.Stop();
+                beatmap.Disabled = true;
+                beatmap.Value.Track.Stop();
             }
         }
 
@@ -57,6 +61,23 @@ namespace osu.Game.Tests.Visual
             }
 
             public void RunTestBlocking(TestCase test) => runner.RunTestBlocking(test);
+        }
+
+        private class OsuTestBeatmap : GameBeatmap
+        {
+            public OsuTestBeatmap(WorkingBeatmap defaultValue)
+                : base(defaultValue)
+            {
+            }
+
+            public void SetAudioManager(AudioManager audioManager) => RegisterAudioManager(audioManager);
+
+            public override GameBeatmap GetBoundCopy()
+            {
+                var copy = new OsuTestBeatmap(Default);
+                copy.BindTo(this);
+                return copy;
+            }
         }
     }
 }
