@@ -10,6 +10,7 @@ using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Direct;
@@ -25,7 +26,6 @@ namespace osu.Game.Screens.Menu
         private readonly ButtonSystem buttons;
 
         protected override bool HideOverlaysOnEnter => buttons.State == MenuState.Initial;
-        protected override bool AllowOpeningOverlays => buttons.State != MenuState.Initial;
 
         protected override bool AllowBackButton => buttons.State != MenuState.Initial;
 
@@ -64,6 +64,8 @@ namespace osu.Game.Screens.Menu
                 },
                 sideFlashes = new MenuSideFlashes(),
             };
+
+            buttons.StateChanged += state => UpdateOverlayStates?.Invoke();
         }
 
         [BackgroundDependencyLoader(true)]
@@ -78,6 +80,8 @@ namespace osu.Game.Screens.Menu
             }
 
             preloadSongSelect();
+
+            AllowOverlays.Value = OverlayActivation.Disabled;
         }
 
         private void preloadSongSelect()

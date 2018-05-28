@@ -18,6 +18,8 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using OpenTK;
 using OpenTK.Input;
+using osu.Game.Overlays;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens
 {
@@ -40,19 +42,23 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
 
-        private readonly BindableBool hideOverlaysOnEnter = new BindableBool();
+        private Action updateOverlayStates;
 
         /// <summary>
-        /// Whether overlays should be hidden when this screen is entered or resumed.
+        /// Allows manually updating visibility of all overlays if <see cref="HideOverlaysOnEnter"/> is not enough.
+        /// </summary>
+        protected Action UpdateOverlayStates => updateOverlayStates;
+
+        /// <summary>
+        /// Whether all overlays should be hidden when this screen is entered or resumed.
         /// </summary>
         protected virtual bool HideOverlaysOnEnter => false;
 
-        private readonly BindableBool allowOpeningOverlays = new BindableBool();
-
         /// <summary>
-        /// Whether overlays should be able to be opened while this screen is active.
+        /// Whether overlays should be able to be opened.
+        /// It's bound at load which means changes at construction will potentially disappear.
         /// </summary>
-        protected virtual bool AllowOpeningOverlays => true;
+        protected readonly Bindable<OverlayActivation> AllowOverlays = new Bindable<OverlayActivation>();
 
         /// <summary>
         /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.
@@ -103,8 +109,18 @@ namespace osu.Game.Screens
             if (osuGame != null)
             {
                 Ruleset.BindTo(osuGame.Ruleset);
-                hideOverlaysOnEnter.BindTo(osuGame.HideOverlaysOnEnter);
-                allowOpeningOverlays.BindTo(osuGame.AllowOpeningOverlays);
+                AllowOverlays.BindTo(osuGame.AllowOverlays);
+
+                updateOverlayStates = () =>
+                {
+                    if (HideOverlaysOnEnter)
+                    {
+                        osuGame.CloseAllOverlays();
+                        osuGame.Toolbar.State = Visibility.Hidden;
+                    }
+                    else
+                        osuGame.Toolbar.State = Visibility.Visible;
+                };
             }
 
             sampleExit = audio.Sample.Get(@"UI/screen-back");
@@ -236,8 +252,7 @@ namespace osu.Game.Screens
             if (backgroundParallaxContainer != null)
                 backgroundParallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * BackgroundParallaxAmount;
 
-            hideOverlaysOnEnter.Value = HideOverlaysOnEnter;
-            allowOpeningOverlays.Value = AllowOpeningOverlays;
+            updateOverlayStates?.Invoke();
         }
 
         private void onExitingLogo()

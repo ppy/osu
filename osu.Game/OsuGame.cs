@@ -77,8 +77,7 @@ namespace osu.Game
 
         public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
 
-        public readonly BindableBool HideOverlaysOnEnter = new BindableBool();
-        public readonly BindableBool AllowOpeningOverlays = new BindableBool(true);
+        public readonly Bindable<OverlayActivation> AllowOverlays = new Bindable<OverlayActivation>();
 
         private OsuScreen screenStack;
 
@@ -368,20 +367,13 @@ namespace osu.Game
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
 
-            notifications.Enabled.BindTo(AllowOpeningOverlays);
+            AllowOverlays.ValueChanged += state => notifications.Enabled.Value = state == OverlayActivation.All;
+        }
 
-            HideOverlaysOnEnter.ValueChanged += hide =>
-            {
-                //central game screen change logic.
-                if (hide)
-                {
-                    hideAllOverlays();
-                    musicController.State = Visibility.Hidden;
-                    Toolbar.State = Visibility.Hidden;
-                }
-                else
-                    Toolbar.State = Visibility.Visible;
-            };
+        public void CloseAllOverlays()
+        {
+            hideAllOverlays();
+            musicController.State = Visibility.Hidden;
         }
 
         private void forwardLoggedErrorsToNotifications()

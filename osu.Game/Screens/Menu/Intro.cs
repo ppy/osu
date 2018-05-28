@@ -15,6 +15,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
@@ -32,7 +33,6 @@ namespace osu.Game.Screens.Menu
         private SampleChannel seeya;
 
         protected override bool HideOverlaysOnEnter => true;
-        protected override bool AllowOpeningOverlays => false;
 
         public override bool CursorVisible => false;
 
@@ -77,6 +77,8 @@ namespace osu.Game.Screens.Menu
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
+
+            AllowOverlays.Value = OverlayActivation.Disabled;
         }
 
         protected override void OnEntering(Screen last)
