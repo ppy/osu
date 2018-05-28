@@ -8,6 +8,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Screens.Lounge;
 
 namespace osu.Game.Screens.Multi
@@ -82,6 +83,13 @@ namespace osu.Game.Screens.Multi
         {
             base.OnSuspending(next);
             waves.Hide();
+        }
+
+        protected override void LogoExiting(OsuLogo logo)
+        {
+            // the wave overlay transition takes longer than expected to run.
+            logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
+            base.LogoExiting(logo);
         }
 
         private class MultiplayerWaveContainer : WaveContainer
