@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
@@ -19,7 +20,6 @@ namespace osu.Game.Screens.Menu
         private Color4 iconColour;
 
         protected override bool HideOverlaysOnEnter => true;
-        protected override bool AllowOpeningOverlays => false;
 
         public override bool CursorVisible => false;
 
@@ -93,6 +93,8 @@ namespace osu.Game.Screens.Menu
             LoadComponentAsync(intro = new Intro());
 
             iconColour = colours.Yellow;
+
+            AllowOverlays.Value = OverlayActivation.Disabled;
         }
 
         protected override void OnEntering(Screen last)

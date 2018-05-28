@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK;
 using osu.Framework.Configuration;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -16,13 +17,16 @@ namespace osu.Game.Graphics.Containers
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
-        private readonly BindableBool allowOpeningOverlays = new BindableBool(true);
+        /// <summary>
+        /// Defaults to <see cref="OverlayActivation.All"/> so that the overlay works even if BDL couldn't pass an <see cref="OsuGame"/>.
+        /// </summary>
+        private readonly Bindable<OverlayActivation> allowOverlays = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osuGame, AudioManager audio)
         {
             if (osuGame != null)
-                allowOpeningOverlays.BindTo(osuGame.AllowOpeningOverlays);
+                allowOverlays.BindTo(osuGame.AllowOverlays);
 
             samplePopIn = audio.Sample.Get(@"UI/overlay-pop-in");
             samplePopOut = audio.Sample.Get(@"UI/overlay-pop-out");
@@ -52,7 +56,7 @@ namespace osu.Game.Graphics.Containers
 
         private void onStateChanged(Visibility visibility)
         {
-            if (allowOpeningOverlays)
+            if (allowOverlays == OverlayActivation.All)
             {
                 switch (visibility)
                 {

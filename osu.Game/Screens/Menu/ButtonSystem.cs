@@ -20,6 +20,7 @@ using osu.Game.Input.Bindings;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
@@ -27,8 +28,7 @@ namespace osu.Game.Screens.Menu
     {
         public event Action<MenuState> StateChanged;
 
-        private readonly BindableBool hideOverlaysOnEnter = new BindableBool();
-        private readonly BindableBool allowOpeningOverlays = new BindableBool();
+        private readonly Bindable<OverlayActivation> allowOverlays = new Bindable<OverlayActivation>();
 
         public Action OnEdit;
         public Action OnExit;
@@ -137,10 +137,7 @@ namespace osu.Game.Screens.Menu
         private void load(AudioManager audio, OsuGame game)
         {
             if (game != null)
-            {
-                hideOverlaysOnEnter.BindTo(game.HideOverlaysOnEnter);
-                allowOpeningOverlays.BindTo(game.AllowOpeningOverlays);
-            }
+                allowOverlays.BindTo(game.AllowOverlays);
 
             sampleBack = audio.Sample.Get(@"Menu/button-back-select");
         }
@@ -332,19 +329,19 @@ namespace osu.Game.Screens.Menu
                 case MenuState.Exit:
                 case MenuState.Initial:
                     logoTracking = false;
+                    allowOverlays.Value = OverlayActivation.Disabled;
 
                     logoDelayedAction = Scheduler.AddDelayed(() =>
                     {
-                        hideOverlaysOnEnter.Value = true;
-                        allowOpeningOverlays.Value = false;
-
                         logo.ClearTransforms(targetMember: nameof(Position));
                         logo.RelativePositionAxes = Axes.Both;
 
                         logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
                         logo.ScaleTo(1, 800, Easing.OutExpo);
-                    }, 150);
 
+                        if(state != MenuState.Exit)
+                            allowOverlays.Value = OverlayActivation.All;
+                    }, 150);
                     break;
                 case MenuState.TopLevel:
                 case MenuState.Play:
@@ -365,9 +362,6 @@ namespace osu.Game.Screens.Menu
                                 logoTracking = true;
 
                                 logo.Impact();
-
-                                hideOverlaysOnEnter.Value = false;
-                                allowOpeningOverlays.Value = true;
                             }, 200);
                             break;
                         default:
