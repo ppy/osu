@@ -2,26 +2,31 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using Microsoft.EntityFrameworkCore.Storage;
+using System.Collections.Generic;
 
 namespace osu.Game.Database
 {
     public class DatabaseWriteUsage : IDisposable
     {
         public readonly OsuDbContext Context;
-        private readonly IDbContextTransaction transaction;
         private readonly Action<DatabaseWriteUsage> usageCompleted;
 
         public DatabaseWriteUsage(OsuDbContext context, Action<DatabaseWriteUsage> onCompleted)
         {
             Context = context;
-            transaction = Context.BeginTransaction();
             usageCompleted = onCompleted;
         }
 
         public bool PerformedWrite { get; private set; }
 
         private bool isDisposed;
+        public List<Exception> Errors = new List<Exception>();
+
+        /// <summary>
+        /// Whether this write usage will commit a transaction on completion.
+        /// If false, there is a parent usage responsible for transaction commit.
+        /// </summary>
+        public bool IsTransactionLeader = false;
 
         protected void Dispose(bool disposing)
         {
@@ -30,12 +35,11 @@ namespace osu.Game.Database
 
             try
             {
-                PerformedWrite |= Context.SaveChanges(transaction) > 0;
+                PerformedWrite |= Context.SaveChanges() > 0;
             }
             catch (Exception e)
             {
-                transaction?.Rollback();
-                throw;
+                Errors.Add(e);
             }
             finally
             {
