@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using System.Threading;
+using Microsoft.EntityFrameworkCore.Storage;
 using osu.Framework.Platform;
 
 namespace osu.Game.Database
@@ -17,7 +19,11 @@ namespace osu.Game.Database
         private readonly object writeLock = new object();
 
         private bool currentWriteDidWrite;
+        private bool currentWriteDidError;
+
         private int currentWriteUsages;
+
+        private IDbContextTransaction currentWriteTransaction;
 
         public DatabaseContextFactory(GameHost host)
         {
@@ -40,9 +46,12 @@ namespace osu.Game.Database
         {
             Monitor.Enter(writeLock);
 
+            if (currentWriteTransaction == null)
+                currentWriteTransaction = threadContexts.Value.Database.BeginTransaction();
+
             Interlocked.Increment(ref currentWriteUsages);
 
-            return new DatabaseWriteUsage(threadContexts.Value, usageCompleted);
+            return new DatabaseWriteUsage(threadContexts.Value, usageCompleted) { IsTransactionLeader = currentWriteUsages == 1 };
         }
 
         private void usageCompleted(DatabaseWriteUsage usage)
@@ -52,15 +61,23 @@ namespace osu.Game.Database
             try
             {
                 currentWriteDidWrite |= usage.PerformedWrite;
+                currentWriteDidError |= usage.Errors.Any();
 
                 if (usages > 0) return;
+
+                if (currentWriteDidError)
+                    currentWriteTransaction.Rollback();
+                else
+                    currentWriteTransaction.Commit();
+
+                currentWriteTransaction = null;
+                currentWriteDidWrite = false;
+                currentWriteDidError = false;
 
                 if (currentWriteDidWrite)
                 {
                     // explicitly dispose to ensure any outstanding flushes happen as soon as possible (and underlying resources are purged).
                     usage.Context.Dispose();
-
-                    currentWriteDidWrite = false;
 
                     // once all writes are complete, we want to refresh thread-specific contexts to make sure they don't have stale local caches.
                     recycleThreadContexts();

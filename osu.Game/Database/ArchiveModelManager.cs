@@ -56,13 +56,42 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
+        private readonly List<Action> cachedEvents = new List<Action>();
+
+        private bool delayingEvents;
+
+        private void cacheEvents()
+        {
+            delayingEvents = true;
+        }
+
+        private void flushEvents(bool perform)
+        {
+            if (perform)
+            {
+                foreach (var a in cachedEvents)
+                    a.Invoke();
+            }
+
+            cachedEvents.Clear();
+            delayingEvents = false;
+        }
+
+        private void handleEvent(Action a)
+        {
+            if (delayingEvents)
+                cachedEvents.Add(a);
+            else
+                a.Invoke();
+        }
+
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStore<TModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += s => ItemAdded?.Invoke(s);
-            ModelStore.ItemRemoved += s => ItemRemoved?.Invoke(s);
+            ModelStore.ItemAdded += s => handleEvent(() => ItemAdded?.Invoke(s));
+            ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
 
@@ -138,24 +167,37 @@ namespace osu.Game.Database
         /// <param name="archive">The archive to be imported.</param>
         public TModel Import(ArchiveReader archive)
         {
-            using (ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
+            TModel item = null;
+            cacheEvents();
+
+            try
             {
-                // create a new model (don't yet add to database)
-                var item = CreateModel(archive);
+                using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
+                {
+                    if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
 
-                var existing = CheckForExisting(item);
+                    // create a new model (don't yet add to database)
+                    item = CreateModel(archive);
 
-                if (existing != null) return existing;
+                    var existing = CheckForExisting(item);
 
-                item.Files = createFileInfos(archive, Files);
+                    if (existing != null) return existing;
 
-                Populate(item, archive);
+                    item.Files = createFileInfos(archive, Files);
 
-                // import to store
-                ModelStore.Add(item);
+                    Populate(item, archive);
 
-                return item;
+                    // import to store
+                    ModelStore.Add(item);
+                }
             }
+            catch
+            {
+                item = null;
+            }
+
+            flushEvents(item != null);
+            return item;
         }
 
         /// <summary>
