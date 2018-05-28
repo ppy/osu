@@ -58,13 +58,20 @@ namespace osu.Game.Database
 
         private readonly List<Action> cachedEvents = new List<Action>();
 
+        /// <summary>
+        /// Allows delaying of outwards events until an operation is confirmed (at a database level).
+        /// </summary>
         private bool delayingEvents;
 
-        private void cacheEvents()
-        {
-            delayingEvents = true;
-        }
+        /// <summary>
+        /// Begin delaying outwards events.
+        /// </summary>
+        private void delayEvents() => delayingEvents = true;
 
+        /// <summary>
+        /// Flush delayed events and disable delaying.
+        /// </summary>
+        /// <param name="perform">Whether the flushed events should be performed.</param>
         private void flushEvents(bool perform)
         {
             if (perform)
@@ -167,8 +174,8 @@ namespace osu.Game.Database
         /// <param name="archive">The archive to be imported.</param>
         public TModel Import(ArchiveReader archive)
         {
-            TModel item = null;
-            cacheEvents();
+            TModel item;
+            delayEvents();
 
             try
             {
@@ -196,6 +203,7 @@ namespace osu.Game.Database
                 item = null;
             }
 
+            // we only want to flush events after we've confirmed the write context didn't have any errors.
             flushEvents(item != null);
             return item;
         }
