@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -19,9 +20,16 @@ using OpenTK.Input;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen, IKeyBindingHandler<GlobalAction>
+    public abstract class OsuScreen : Screen, IKeyBindingHandler<GlobalAction>, IHasDescription
     {
         public BackgroundScreen Background { get; private set; }
+
+        /// <summary>
+        /// A user-facing title for this screen.
+        /// </summary>
+        public virtual string Title => GetType().ShortDisplayName();
+
+        public string Description => Title;
 
         protected virtual bool AllowBackButton => true;
 

@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual
             {
                 Player p = null;
                 AddStep(ruleset.RulesetInfo.Name, () => p = loadPlayerFor(ruleset));
-                AddUntilStep(() => p.IsLoaded);
+                AddUntilStep(() => ContinueCondition(p));
             }
             else
             {
@@ -50,10 +50,12 @@ namespace osu.Game.Tests.Visual
                 {
                     Player p = null;
                     AddStep(r.Name, () => p = loadPlayerFor(r));
-                    AddUntilStep(() => p.IsLoaded);
+                    AddUntilStep(() => ContinueCondition(p));
                 }
             }
         }
+
+        protected virtual bool ContinueCondition(Player player) => player.IsLoaded;
 
         protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
 
