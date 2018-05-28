@@ -106,8 +106,7 @@ namespace osu.Game.Database
 
         public IDbContextTransaction BeginTransaction()
         {
-            // return Database.BeginTransaction();
-            return null;
+            return Database.BeginTransaction();
         }
 
         public int SaveChanges(IDbContextTransaction transaction = null)
