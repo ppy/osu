@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Multi.Components
     {
         public const float SELECTION_BORDER_WIDTH = 4;
         private const float corner_radius = 5;
-        private const float transition_duration = 100;
+        private const float transition_duration = 60;
         private const float content_padding = 10;
         private const float height = 100;
         private const float side_strip_width = 5;
@@ -254,7 +254,7 @@ namespace osu.Game.Screens.Multi.Components
                 status.Text = s.Message;
 
                 foreach (Drawable d in new Drawable[] { selectionBox, sideStrip, status })
-                    d.FadeColour(s.GetAppropriateColour(colours), 100);
+                    d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
             };
 
             beatmapBind.ValueChanged += b =>
