@@ -64,7 +64,8 @@ namespace osu.Game
 
         protected override Container<Drawable> Content => content;
 
-        protected GameBeatmap Beatmap;
+        private OsuGameBeatmap beatmap;
+        protected GameBeatmap Beatmap => beatmap;
 
         private Bindable<bool> fpsDisplayVisible;
 
@@ -156,15 +157,15 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
 
             var defaultBeatmap = new DummyWorkingBeatmap(this);
-            Beatmap = new GameBeatmap(defaultBeatmap, Audio);
+            beatmap = new OsuGameBeatmap(defaultBeatmap, Audio);
             BeatmapManager.DefaultBeatmap = defaultBeatmap;
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
             Audio.Track.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
-            dependencies.Cache(Beatmap);
-            dependencies.CacheAs<IGameBeatmap>(Beatmap);
+            dependencies.CacheAs<GameBeatmap>(beatmap);
+            dependencies.CacheAs<IGameBeatmap>(beatmap);
 
             FileStore.Cleanup();
 
@@ -235,5 +236,26 @@ namespace osu.Game
         }
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
+
+        private class OsuGameBeatmap : GameBeatmap
+        {
+            public OsuGameBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
+                : this(defaultValue)
+            {
+                RegisterAudioManager(audioManager);
+            }
+
+            private OsuGameBeatmap(WorkingBeatmap defaultValue)
+                : base(defaultValue)
+            {
+            }
+
+            public override GameBeatmap GetBoundCopy()
+            {
+                var copy = new OsuGameBeatmap(Default);
+                copy.BindTo(this);
+                return copy;
+            }
+        }
     }
 }
