@@ -15,11 +15,6 @@ namespace osu.Game.Screens.Multi.Screens
 
         protected virtual Container<Drawable> TransitionContent => Content;
 
-        public abstract string Title { get; }
-        public abstract string Name { get; }
-
-        public override string ToString() => Name;
-
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);

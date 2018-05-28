@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         protected readonly RoomInspector Inspector;
 
         public override string Title => "lounge";
-        public override string Name => "Lounge";
+
         protected override Container<Drawable> TransitionContent => content;
 
         private IEnumerable<Room> rooms;

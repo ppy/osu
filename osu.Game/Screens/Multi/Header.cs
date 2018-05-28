@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Multi
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += s => screenTitle.Text = s is MultiplayerScreen m ? m.Title : s.ToString();
+            breadcrumbs.Current.ValueChanged += s => screenTitle.Text = ((MultiplayerScreen)s).Title;
             breadcrumbs.Current.TriggerChange();
         }
 
