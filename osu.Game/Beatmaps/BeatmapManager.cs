@@ -107,6 +107,7 @@ namespace osu.Game.Beatmaps
                 {
                     Delete(existingOnlineId);
                     beatmaps.PurgeDeletable(s => s.ID == existingOnlineId.ID);
+                    Logger.Log($"Found existing beatmap set with same OnlineBeatmapSetID ({model.OnlineBeatmapSetID}). It has been purged.", LoggingTarget.Database);
                 }
             }
 
@@ -303,7 +304,7 @@ namespace osu.Game.Beatmaps
         {
             // let's make sure there are actually .osu files to import.
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
-            if (string.IsNullOrEmpty(mapName)) throw new InvalidOperationException("No beatmap files found in the map folder.");
+            if (string.IsNullOrEmpty(mapName)) throw new InvalidOperationException("No beatmap files found in this beatmap archive.");
 
             BeatmapMetadata metadata;
             using (var stream = new StreamReader(reader.GetStream(mapName)))
