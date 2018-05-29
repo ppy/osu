@@ -219,7 +219,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
 
-            return imported.FirstOrDefault();
+            return imported.LastOrDefault();
         }
 
         private void deleteBeatmapSet(BeatmapSetInfo imported, OsuGameBase osu)
