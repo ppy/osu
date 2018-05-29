@@ -24,8 +24,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         private readonly OsuSpriteText name, availabilityStatus;
         private readonly BeatmapTypeInfo beatmapTypeInfo;
+        private readonly ReadyButton readyButton;
 
         private OsuColour colours;
+
+        public Bindable<bool> Ready => readyButton.Ready;
 
         public string Name
         {
@@ -116,7 +119,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                 },
                             },
                         },
-                        new ReadyButton
+                        readyButton = new ReadyButton
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
@@ -146,7 +149,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
         {
             if (status != null)
             {
-                availabilityStatus.FadeColour(status.GetAppropriateColour(colours));
+                availabilityStatus.FadeColour(status.GetAppropriateColour(colours), 100);
                 availabilityStatus.Text = $"{availability.GetDescription()}, {status.Message}";
             }
         }
