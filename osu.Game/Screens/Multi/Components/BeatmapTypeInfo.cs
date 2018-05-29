@@ -12,7 +12,7 @@ using OpenTK;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class BeatmapModeInfo : FillFlowContainer
+    public class BeatmapTypeInfo : FillFlowContainer
     {
         private readonly ModeTypeInfo modeTypeInfo;
         private readonly BeatmapTitle beatmapTitle;
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Multi.Components
             set { modeTypeInfo.Type = value; }
         }
 
-        public BeatmapModeInfo()
+        public BeatmapTypeInfo()
         {
             AutoSizeAxes = Axes.Both;
             Direction = FillDirection.Horizontal;
