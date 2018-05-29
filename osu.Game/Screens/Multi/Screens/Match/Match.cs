@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
             beatmapBind.ValueChanged += b =>
             {
-                header.BeatmapSet = b.BeatmapSet;
+                header.BeatmapSet = b?.BeatmapSet;
                 info.Beatmap = b;
             };
 

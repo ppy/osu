@@ -89,6 +89,53 @@ namespace osu.Game.Tests.Visual
             Match match = new Match(room);
 
             AddStep(@"show", () => Add(match));
+            AddStep(@"null beatmap", () => room.Beatmap.Value = null);
+            AddStep(@"change name", () => room.Name.Value = @"Two Awesome Rooms");
+            AddStep(@"change status", () => room.Status.Value = new RoomStatusPlaying());
+            AddStep(@"change availability", () => room.Availability.Value = RoomAvailability.FriendsOnly);
+            AddStep(@"change type", () => room.Type.Value = new GameTypeTag());
+            AddStep(@"change beatmap", () => room.Beatmap.Value = new BeatmapInfo
+            {
+                StarDifficulty = 4.33,
+                Ruleset = rulesets.GetRuleset(2),
+                Metadata = new BeatmapMetadata
+                {
+                    Title = @"Yasashisa no Riyuu",
+                    Artist = @"ChouCho",
+                    AuthorString = @"celerih",
+                },
+                BeatmapSet = new BeatmapSetInfo
+                {
+                    OnlineInfo = new BeatmapSetOnlineInfo
+                    {
+                        Covers = new BeatmapSetOnlineCovers
+                        {
+                            Cover = @"https://assets.ppy.sh/beatmaps/685391/covers/cover.jpg?1524597970",
+                        },
+                    },
+                },
+            });
+
+            AddStep(@"null max participants", () => room.MaxParticipants.Value = null);
+            AddStep(@"change participants", () => room.Participants.Value = new[]
+            {
+                new User
+                {
+                    Username = @"Spectator",
+                    Id = 702598,
+                    Country = new Country { FlagName = @"KR" },
+                    CoverUrl = @"https://assets.ppy.sh/user-profile-covers/702598/3bbf4cb8b8d2cf8b03145000a975ff27e191ab99b0920832e7dd67386280e288.jpeg",
+                    IsSupporter = true,
+                },
+                new User
+                {
+                    Username = @"celerih",
+                    Id = 4696296,
+                    Country = new Country { FlagName = @"CA" },
+                    CoverUrl = @"https://assets.ppy.sh/user-profile-covers/4696296/7f8500731d0ac66d5472569d146a7be07d9460273361913f22c038867baddaef.jpeg",
+                },
+            });
+
             AddStep(@"exit", match.Exit);
         }
     }
