@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Multi.Components
         private UpdateableBeatmapSetCover cover;
         private FillFlowContainer topFlow, participantsFlow, participantNumbersFlow;
         private OsuSpriteText name, status;
-        private BeatmapModeInfo beatmapModeInfo;
+        private BeatmapTypeInfo beatmapTypeInfo;
         private ScrollContainer participantsScroll;
         private ParticipantInfo participantInfo;
 
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Multi.Components
                                             TextSize = 14,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        beatmapModeInfo = new BeatmapModeInfo(),
+                                        beatmapTypeInfo = new BeatmapTypeInfo(),
                                     },
                                 },
                             },
@@ -226,13 +226,13 @@ namespace osu.Game.Screens.Multi.Components
 
             nameBind.ValueChanged += n => name.Text = n;
             hostBind.ValueChanged += h => participantInfo.Host = h;
-            typeBind.ValueChanged += t => beatmapModeInfo.Type = t;
+            typeBind.ValueChanged += t => beatmapTypeInfo.Type = t;
             statusBind.ValueChanged += displayStatus;
 
             beatmapBind.ValueChanged += b =>
             {
                 cover.BeatmapSet = b?.BeatmapSet;
-                beatmapModeInfo.Beatmap = b;
+                beatmapTypeInfo.Beatmap = b;
             };
 
             maxParticipantsBind.ValueChanged += m =>
@@ -283,7 +283,7 @@ namespace osu.Game.Screens.Multi.Components
                 cover.BeatmapSet = null;
                 participantsFlow.FadeOut(transition_duration);
                 participantNumbersFlow.FadeOut(transition_duration);
-                beatmapModeInfo.FadeOut(transition_duration);
+                beatmapTypeInfo.FadeOut(transition_duration);
                 name.FadeOut(transition_duration);
                 participantInfo.FadeOut(transition_duration);
 
@@ -293,7 +293,7 @@ namespace osu.Game.Screens.Multi.Components
             {
                 participantsFlow.FadeIn(transition_duration);
                 participantNumbersFlow.FadeIn(transition_duration);
-                beatmapModeInfo.FadeIn(transition_duration);
+                beatmapTypeInfo.FadeIn(transition_duration);
                 name.FadeIn(transition_duration);
                 participantInfo.FadeIn(transition_duration);
 
