@@ -39,6 +39,8 @@ namespace osu.Game.Tests.Visual
             AddStep(@"change name", () => info.Name = @"Room Name!");
             AddStep(@"change availability", () => info.Availability = RoomAvailability.InviteOnly);
             AddStep(@"change status", () => info.Status = new RoomStatusOpen());
+            AddStep(@"null beatmap", () => info.Beatmap = null);
+            AddStep(@"change type", () => info.Type = new GameTypeTeamVersus());
             AddStep(@"change beatmap", () => info.Beatmap = new BeatmapInfo
             {
                 StarDifficulty = 4.2,
@@ -50,8 +52,6 @@ namespace osu.Game.Tests.Visual
                     AuthorString = @"Someone",
                 },
             });
-
-            AddStep(@"change type", () => info.Type = new GameTypeTeamVersus());
         }
     }
 }
