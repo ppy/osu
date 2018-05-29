@@ -206,8 +206,9 @@ namespace osu.Game.Database
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
+                Logger.Error(e, $"Import of {archive.Name} failed and has been rolled back.", LoggingTarget.Database);
                 item = null;
             }
 
