@@ -41,17 +41,18 @@ namespace osu.Game.Database
         /// Request a context for write usage. Can be consumed in a nested fashion (and will return the same underlying context).
         /// This method may block if a write is already active on a different thread.
         /// </summary>
+        /// <param name="withTransaction">Whether to start a transaction for this write.</param>
         /// <returns>A usage containing a usable context.</returns>
-        public DatabaseWriteUsage GetForWrite()
+        public DatabaseWriteUsage GetForWrite(bool withTransaction = true)
         {
             Monitor.Enter(writeLock);
 
-            if (currentWriteTransaction == null)
+            if (currentWriteTransaction == null && withTransaction)
                 currentWriteTransaction = threadContexts.Value.Database.BeginTransaction();
 
             Interlocked.Increment(ref currentWriteUsages);
 
-            return new DatabaseWriteUsage(threadContexts.Value, usageCompleted) { IsTransactionLeader = currentWriteUsages == 1 };
+            return new DatabaseWriteUsage(threadContexts.Value, usageCompleted) { IsTransactionLeader = currentWriteTransaction != null && currentWriteUsages == 1 };
         }
 
         private void usageCompleted(DatabaseWriteUsage usage)
@@ -66,9 +67,9 @@ namespace osu.Game.Database
                 if (usages > 0) return;
 
                 if (currentWriteDidError)
-                    currentWriteTransaction.Rollback();
+                    currentWriteTransaction?.Rollback();
                 else
-                    currentWriteTransaction.Commit();
+                    currentWriteTransaction?.Commit();
 
                 currentWriteTransaction = null;
                 currentWriteDidWrite = false;
