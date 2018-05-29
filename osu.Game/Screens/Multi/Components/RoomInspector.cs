@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -39,8 +38,9 @@ namespace osu.Game.Screens.Multi.Components
         private OsuColour colours;
         private Box statusStrip;
         private UpdateableBeatmapSetCover cover;
-        private FillFlowContainer topFlow, participantsFlow, participantNumbersFlow, infoPanelFlow;
+        private FillFlowContainer topFlow, participantsFlow, participantNumbersFlow;
         private OsuSpriteText name, status;
+        private BeatmapModeInfo beatmapModeInfo;
         private ScrollContainer participantsScroll;
         private ParticipantInfo participantInfo;
 
@@ -77,13 +77,12 @@ namespace osu.Game.Screens.Multi.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuColour colours)
         {
             this.colours = colours;
 
             ModeTypeInfo modeTypeInfo;
             OsuSpriteText participants, participantsSlash, maxParticipants, beatmapAuthor;
-            BeatmapTitle beatmapTitle;
 
             Children = new Drawable[]
             {
@@ -189,35 +188,7 @@ namespace osu.Game.Screens.Multi.Components
                                             TextSize = 14,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        infoPanelFlow = new FillFlowContainer
-                                        {
-                                            AutoSizeAxes = Axes.X,
-                                            Height = 30,
-                                            Direction = FillDirection.Horizontal,
-                                            LayoutDuration = transition_duration,
-                                            Spacing = new Vector2(5f, 0f),
-                                            Children = new Drawable[]
-                                            {
-                                                modeTypeInfo = new ModeTypeInfo(),
-                                                new Container
-                                                {
-                                                    AutoSizeAxes = Axes.X,
-                                                    RelativeSizeAxes = Axes.Y,
-                                                    Margin = new MarginPadding { Left = 5 },
-                                                    Children = new Drawable[]
-                                                    {
-                                                        beatmapTitle = new BeatmapTitle(),
-                                                        beatmapAuthor = new OsuSpriteText
-                                                        {
-                                                            Anchor = Anchor.BottomLeft,
-                                                            Origin = Anchor.BottomLeft,
-                                                            TextSize = 14,
-                                                            Colour = colours.Gray9,
-                                                        },
-                                                    },
-                                                },
-                                            },
-                                        },
+                                        beatmapModeInfo = new BeatmapModeInfo(),
                                     },
                                 },
                             },
@@ -255,26 +226,13 @@ namespace osu.Game.Screens.Multi.Components
 
             nameBind.ValueChanged += n => name.Text = n;
             hostBind.ValueChanged += h => participantInfo.Host = h;
-            typeBind.ValueChanged += t => modeTypeInfo.Type = t;
+            typeBind.ValueChanged += t => beatmapModeInfo.Type = t;
             statusBind.ValueChanged += displayStatus;
 
             beatmapBind.ValueChanged += b =>
             {
-                modeTypeInfo.Beatmap = b;
-
-                if (b != null)
-                {
-                    cover.BeatmapSet = b.BeatmapSet;
-                    beatmapTitle.Beatmap = b;
-                    beatmapAuthor.Text = $"mapped by {b.Metadata.Author}";
-                }
-                else
-                {
-                    cover.BeatmapSet = null;
-                    beatmapTitle.Beatmap = null;
-
-                    beatmapAuthor.Text = string.Empty;
-                }
+                cover.BeatmapSet = b?.BeatmapSet;
+                beatmapModeInfo.Beatmap = b;
             };
 
             maxParticipantsBind.ValueChanged += m =>
@@ -325,7 +283,7 @@ namespace osu.Game.Screens.Multi.Components
                 cover.BeatmapSet = null;
                 participantsFlow.FadeOut(transition_duration);
                 participantNumbersFlow.FadeOut(transition_duration);
-                infoPanelFlow.FadeOut(transition_duration);
+                beatmapModeInfo.FadeOut(transition_duration);
                 name.FadeOut(transition_duration);
                 participantInfo.FadeOut(transition_duration);
 
@@ -335,7 +293,7 @@ namespace osu.Game.Screens.Multi.Components
             {
                 participantsFlow.FadeIn(transition_duration);
                 participantNumbersFlow.FadeIn(transition_duration);
-                infoPanelFlow.FadeIn(transition_duration);
+                beatmapModeInfo.FadeIn(transition_duration);
                 name.FadeIn(transition_duration);
                 participantInfo.FadeIn(transition_duration);
 
