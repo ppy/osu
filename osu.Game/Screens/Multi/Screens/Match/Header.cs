@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
@@ -39,11 +40,15 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
             Children = new Drawable[]
             {
-                // todo: gradient over the cover
                 cover = new UpdateableBeatmapSetCover
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
+                },
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Color4.Black.Opacity(0.5f)),
                 },
                 tabStrip = new Box
                 {
