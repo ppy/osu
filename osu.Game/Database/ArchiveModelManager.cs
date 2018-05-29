@@ -181,21 +181,29 @@ namespace osu.Game.Database
             {
                 using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {
-                    if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
+                    try
+                    {
+                        if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
 
-                    // create a new model (don't yet add to database)
-                    item = CreateModel(archive);
+                        // create a new model (don't yet add to database)
+                        item = CreateModel(archive);
 
-                    var existing = CheckForExisting(item);
+                        var existing = CheckForExisting(item);
 
-                    if (existing != null) return existing;
+                        if (existing != null) return existing;
 
-                    item.Files = createFileInfos(archive, Files);
+                        item.Files = createFileInfos(archive, Files);
 
-                    Populate(item, archive);
+                        Populate(item, archive);
 
-                    // import to store
-                    ModelStore.Add(item);
+                        // import to store
+                        ModelStore.Add(item);
+                    }
+                    catch (Exception e)
+                    {
+                        write.Errors.Add(e);
+                        throw;
+                    }
                 }
             }
             catch
