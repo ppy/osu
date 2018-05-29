@@ -25,7 +25,8 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         protected readonly FillFlowContainer<DrawableRoom> RoomsContainer;
         protected readonly RoomInspector Inspector;
 
-        public override string Title => "lounge";
+        public override string Type => "lounge";
+        public override string Title => "Lounge";
 
         protected override Container<Drawable> TransitionContent => content;
 

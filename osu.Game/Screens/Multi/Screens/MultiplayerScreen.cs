@@ -15,6 +15,11 @@ namespace osu.Game.Screens.Multi.Screens
 
         protected virtual Container<Drawable> TransitionContent => Content;
 
+        /// <summary>
+        /// The type to display in the title of the <see cref="Header"/>.
+        /// </summary>
+        public abstract string Type { get; }
+
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
