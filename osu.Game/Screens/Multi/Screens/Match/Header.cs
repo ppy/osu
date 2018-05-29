@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
 {
     public class Header : Container
     {
+        public const float HEIGHT = 200;
+
         private readonly Box tabStrip;
         private readonly UpdateableBeatmapSetCover cover;
 
@@ -33,10 +35,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
         public Header()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 200;
+            Height = HEIGHT;
 
             Children = new Drawable[]
             {
+                // todo: gradient over the cover
                 cover = new UpdateableBeatmapSetCover
                 {
                     RelativeSizeAxes = Axes.Both,
