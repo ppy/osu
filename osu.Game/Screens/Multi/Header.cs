@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Screens.Multi.Screens;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -85,7 +86,7 @@ namespace osu.Game.Screens.Multi
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += s => screenTitle.Text = s.ToString();
+            breadcrumbs.Current.ValueChanged += s => screenTitle.Text = ((MultiplayerScreen)s).Title;
             breadcrumbs.Current.TriggerChange();
         }
 
