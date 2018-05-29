@@ -22,7 +22,6 @@ namespace osu.Game.Tests.Visual
             AddStep(@"set name", () => info.Name = @"Room Name?");
             AddStep(@"set availability", () => info.Availability = RoomAvailability.FriendsOnly);
             AddStep(@"set status", () => info.Status = new RoomStatusPlaying());
-
             AddStep(@"set beatmap", () => info.Beatmap = new BeatmapInfo
             {
                 StarDifficulty = 2.4,
@@ -40,7 +39,6 @@ namespace osu.Game.Tests.Visual
             AddStep(@"change name", () => info.Name = @"Room Name!");
             AddStep(@"change availability", () => info.Availability = RoomAvailability.InviteOnly);
             AddStep(@"change status", () => info.Status = new RoomStatusOpen());
-
             AddStep(@"change beatmap", () => info.Beatmap = new BeatmapInfo
             {
                 StarDifficulty = 4.2,
