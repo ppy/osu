@@ -82,7 +82,8 @@ namespace osu.Game.Screens.Multi.Components
             this.colours = colours;
 
             ModeTypeInfo modeTypeInfo;
-            OsuSpriteText participants, participantsSlash, maxParticipants, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor;
+            OsuSpriteText participants, participantsSlash, maxParticipants, beatmapAuthor;
+            BeatmapTitle beatmapTitle;
 
             Children = new Drawable[]
             {
@@ -203,28 +204,9 @@ namespace osu.Game.Screens.Multi.Components
                                                     AutoSizeAxes = Axes.X,
                                                     RelativeSizeAxes = Axes.Y,
                                                     Margin = new MarginPadding { Left = 5 },
-                                                    Children = new[]
+                                                    Children = new Drawable[]
                                                     {
-                                                        new FillFlowContainer
-                                                        {
-                                                            AutoSizeAxes = Axes.Both,
-                                                            Direction = FillDirection.Horizontal,
-                                                            Children = new[]
-                                                            {
-                                                                beatmapTitle = new OsuSpriteText
-                                                                {
-                                                                    Font = @"Exo2.0-BoldItalic",
-                                                                },
-                                                                beatmapDash = new OsuSpriteText
-                                                                {
-                                                                    Font = @"Exo2.0-BoldItalic",
-                                                                },
-                                                                beatmapArtist = new OsuSpriteText
-                                                                {
-                                                                    Font = @"Exo2.0-RegularItalic",
-                                                                },
-                                                            },
-                                                        },
+                                                        beatmapTitle = new BeatmapTitle(),
                                                         beatmapAuthor = new OsuSpriteText
                                                         {
                                                             Anchor = Anchor.BottomLeft,
@@ -283,20 +265,15 @@ namespace osu.Game.Screens.Multi.Components
                 if (b != null)
                 {
                     cover.BeatmapSet = b.BeatmapSet;
-                    beatmapTitle.Current = localisation.GetUnicodePreference(b.Metadata.TitleUnicode, b.Metadata.Title);
-                    beatmapDash.Text = @" - ";
-                    beatmapArtist.Current = localisation.GetUnicodePreference(b.Metadata.ArtistUnicode, b.Metadata.Artist);
+                    beatmapTitle.Beatmap = b;
                     beatmapAuthor.Text = $"mapped by {b.Metadata.Author}";
                 }
                 else
                 {
                     cover.BeatmapSet = null;
+                    beatmapTitle.Beatmap = null;
 
-                    beatmapTitle.Current = null;
-                    beatmapArtist.Current = null;
-
-                    beatmapTitle.Text = "Changing map";
-                    beatmapDash.Text = beatmapArtist.Text = beatmapAuthor.Text = string.Empty;
+                    beatmapAuthor.Text = string.Empty;
                 }
             };
 
