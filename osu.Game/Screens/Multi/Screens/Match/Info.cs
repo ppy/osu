@@ -180,13 +180,31 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 Triangles.ColourDark = OsuColour.FromHex(@"1f6682");
                 Triangles.TriangleScale = 1.5f;
 
-                // todo: visually select
+                Container active;
+                Add(active = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0f,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.15f,
+                        Blending = BlendingMode.Additive,
+                    },
+                });
+
                 Ready.ValueChanged += value =>
                 {
                     if (value)
+                    {
                         Text = "Not Ready";
+                        active.FadeIn(200);
+                    }
                     else
+                    {
                         Text = "Ready";
+                        active.FadeOut(200);
+                    }
                 };
             }
         }
