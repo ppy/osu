@@ -162,8 +162,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     var osu = loadOsu(host);
 
-                    var temp = prepareTempCopy(osz_path);
-                    Assert.IsTrue(File.Exists(temp));
+                    var temp = createTemporaryBeatmap();
 
                     var importer = new ArchiveImportIPCChannel(client);
                     if (!importer.ImportAsync(temp).Wait(10000))
@@ -188,8 +187,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 try
                 {
                     var osu = loadOsu(host);
-                    var temp = prepareTempCopy(osz_path);
-                    Assert.IsTrue(File.Exists(temp), "Temporary file copy never substantiated");
+                    var temp = createTemporaryBeatmap();
                     using (File.OpenRead(temp))
                         osu.Dependencies.Get<BeatmapManager>().Import(temp);
                     ensureLoaded(osu);
@@ -203,11 +201,16 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
-        private BeatmapSetInfo loadOszIntoOsu(OsuGameBase osu)
+        private string createTemporaryBeatmap()
         {
-            var temp = prepareTempCopy(osz_path);
-
+            var temp = new FileInfo(osz_path).CopyTo(Path.GetTempFileName(), true).FullName;
             Assert.IsTrue(File.Exists(temp));
+            return temp;
+        }
+
+        private BeatmapSetInfo loadOszIntoOsu(OsuGameBase osu, string path = null)
+        {
+            var temp = path ?? createTemporaryBeatmap();
 
             var manager = osu.Dependencies.Get<BeatmapManager>();
 
@@ -230,12 +233,6 @@ namespace osu.Game.Tests.Beatmaps.IO
             Assert.IsTrue(manager.GetAllUsableBeatmapSets().Count == 0);
             Assert.IsTrue(manager.QueryBeatmapSets(_ => true).ToList().Count == 1);
             Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
-        }
-
-        private string prepareTempCopy(string path)
-        {
-            var temp = Path.GetTempFileName();
-            return new FileInfo(path).CopyTo(temp, true).FullName;
         }
 
         private OsuGameBase loadOsu(GameHost host)
