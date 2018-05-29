@@ -38,7 +38,8 @@ namespace osu.Game.Screens.Multi.Components
         private OsuColour colours;
         private Box statusStrip;
         private UpdateableBeatmapSetCover cover;
-        private FillFlowContainer topFlow, participantsFlow, participantNumbersFlow;
+        private ParticipantCount participantCount;
+        private FillFlowContainer topFlow, participantsFlow;
         private OsuSpriteText name, status;
         private BeatmapTypeInfo beatmapTypeInfo;
         private ScrollContainer participantsScroll;
@@ -81,9 +82,6 @@ namespace osu.Game.Screens.Multi.Components
         {
             this.colours = colours;
 
-            ModeTypeInfo modeTypeInfo;
-            OsuSpriteText participants, participantsSlash, maxParticipants, beatmapAuthor;
-
             Children = new Drawable[]
             {
                 new Box
@@ -120,32 +118,10 @@ namespace osu.Game.Screens.Multi.Components
                                     Padding = new MarginPadding(20),
                                     Children = new Drawable[]
                                     {
-                                        participantNumbersFlow = new FillFlowContainer
+                                        participantCount = new ParticipantCount
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            LayoutDuration = transition_duration,
-                                            Children = new[]
-                                            {
-                                                participants = new OsuSpriteText
-                                                {
-                                                    TextSize = 30,
-                                                    Font = @"Exo2.0-Bold"
-                                                },
-                                                participantsSlash = new OsuSpriteText
-                                                {
-                                                    Text = @"/",
-                                                    TextSize = 30,
-                                                    Font = @"Exo2.0-Light"
-                                                },
-                                                maxParticipants = new OsuSpriteText
-                                                {
-                                                    TextSize = 30,
-                                                    Font = @"Exo2.0-Light"
-                                                },
-                                            },
                                         },
                                         name = new OsuSpriteText
                                         {
@@ -227,6 +203,7 @@ namespace osu.Game.Screens.Multi.Components
             nameBind.ValueChanged += n => name.Text = n;
             hostBind.ValueChanged += h => participantInfo.Host = h;
             typeBind.ValueChanged += t => beatmapTypeInfo.Type = t;
+            maxParticipantsBind.ValueChanged += m => participantCount.Max = m;
             statusBind.ValueChanged += displayStatus;
 
             beatmapBind.ValueChanged += b =>
@@ -235,24 +212,9 @@ namespace osu.Game.Screens.Multi.Components
                 beatmapTypeInfo.Beatmap = b;
             };
 
-            maxParticipantsBind.ValueChanged += m =>
-            {
-                if (m == null)
-                {
-                    participantsSlash.FadeOut(transition_duration);
-                    maxParticipants.FadeOut(transition_duration);
-                }
-                else
-                {
-                    participantsSlash.FadeIn(transition_duration);
-                    maxParticipants.FadeIn(transition_duration);
-                    maxParticipants.Text = m.ToString();
-                }
-            };
-
             participantsBind.ValueChanged += p =>
             {
-                participants.Text = p.Length.ToString();
+                participantCount.Count = p.Length;
                 participantInfo.Participants = p;
                 participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u));
             };
@@ -282,7 +244,7 @@ namespace osu.Game.Screens.Multi.Components
             {
                 cover.BeatmapSet = null;
                 participantsFlow.FadeOut(transition_duration);
-                participantNumbersFlow.FadeOut(transition_duration);
+                participantCount.FadeOut(transition_duration);
                 beatmapTypeInfo.FadeOut(transition_duration);
                 name.FadeOut(transition_duration);
                 participantInfo.FadeOut(transition_duration);
@@ -292,7 +254,7 @@ namespace osu.Game.Screens.Multi.Components
             else
             {
                 participantsFlow.FadeIn(transition_duration);
-                participantNumbersFlow.FadeIn(transition_duration);
+                participantCount.FadeIn(transition_duration);
                 beatmapTypeInfo.FadeIn(transition_duration);
                 name.FadeIn(transition_duration);
                 participantInfo.FadeIn(transition_duration);
