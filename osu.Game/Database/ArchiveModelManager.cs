@@ -174,7 +174,7 @@ namespace osu.Game.Database
         /// <param name="archive">The archive to be imported.</param>
         public TModel Import(ArchiveReader archive)
         {
-            TModel item;
+            TModel item = null;
             delayEvents();
 
             try
@@ -211,9 +211,12 @@ namespace osu.Game.Database
                 Logger.Error(e, $"Import of {archive.Name} failed and has been rolled back.", LoggingTarget.Database);
                 item = null;
             }
+            finally
+            {
+                // we only want to flush events after we've confirmed the write context didn't have any errors.
+                flushEvents(item != null);
+            }
 
-            // we only want to flush events after we've confirmed the write context didn't have any errors.
-            flushEvents(item != null);
             return item;
         }
 
