@@ -55,8 +55,7 @@ namespace osu.Game.Screens.Multi.Components
 
         public ModeTypeInfo()
         {
-            AutoSizeAxes = Axes.X;
-            Height = height;
+            AutoSizeAxes = Axes.Both;
 
             Children = new[]
             {
