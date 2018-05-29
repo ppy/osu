@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Width = 300,
+                    OnLoadComplete = d => d.FadeInFromZero(60),
                 }).ToList();
 
                 count.Count = value.Count();
@@ -61,6 +62,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                 AutoSizeAxes = Axes.Y,
                                 Spacing = new Vector2(5),
                                 Padding = new MarginPadding { Top = 40 },
+                                LayoutDuration = 200,
+                                LayoutEasing = Easing.OutQuint,
                             },
                         },
                     },
