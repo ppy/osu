@@ -24,7 +24,6 @@ namespace osu.Game.Screens.Multi.Components
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
             set
             {
                 if (value == beatmap) return;

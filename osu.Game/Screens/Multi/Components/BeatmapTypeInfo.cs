@@ -23,11 +23,7 @@ namespace osu.Game.Screens.Multi.Components
             set
             {
                 modeTypeInfo.Beatmap = beatmapTitle.Beatmap = value;
-
-                if (value == null)
-                    beatmapAuthor.Text = string.Empty;
-                else
-                    beatmapAuthor.Text = $"mapped by {value.Metadata.Author}";
+                beatmapAuthor.Text = value == null ? string.Empty : $"mapped by {value.Metadata.Author}";
             }
         }
 
