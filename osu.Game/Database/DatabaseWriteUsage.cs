@@ -40,6 +40,7 @@ namespace osu.Game.Database
             catch (Exception e)
             {
                 Errors.Add(e);
+                throw;
             }
             finally
             {
