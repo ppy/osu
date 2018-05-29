@@ -21,6 +21,7 @@ namespace osu.Game.Screens.Multi.Screens
 
             TransitionContent.MoveToX(200);
 
+            Content.FadeInFromZero(WaveContainer.APPEAR_DURATION, in_easing);
             TransitionContent.FadeInFromZero(WaveContainer.APPEAR_DURATION, in_easing);
             TransitionContent.MoveToX(0, WaveContainer.APPEAR_DURATION, in_easing);
         }
