@@ -227,18 +227,9 @@ namespace osu.Game.Screens.Multi.Components
 
             beatmapBind.ValueChanged += b =>
             {
+                cover.BeatmapSet = b?.BeatmapSet;
+                beatmapTitle.Beatmap = b;
                 modeTypeInfo.Beatmap = b;
-
-                if (b != null)
-                {
-                    cover.BeatmapSet = b.BeatmapSet;
-                    beatmapTitle.Beatmap = b;
-                }
-                else
-                {
-                    cover.BeatmapSet = null;
-                    beatmapTitle.Beatmap = null;
-                }
             };
 
             nameBind.BindTo(Room.Name);
