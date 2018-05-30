@@ -241,7 +241,13 @@ namespace osu.Game.Beatmaps
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => beatmaps.ConsumableItems.Where(s => !s.DeletePending && !s.Protected).ToList();
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => GetAllUsableBeatmapSetsEnumerable().ToList();
+
+        /// <summary>
+        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
+        /// </summary>
+        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
+        public IQueryable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable() => beatmaps.ConsumableItems.Where(s => !s.DeletePending && !s.Protected);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
