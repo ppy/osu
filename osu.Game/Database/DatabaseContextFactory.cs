@@ -48,7 +48,14 @@ namespace osu.Game.Database
             Monitor.Enter(writeLock);
 
             if (currentWriteTransaction == null && withTransaction)
+            {
+                // this mitigates the fact that changes on tracked entities will not be rolled back with the transaction by ensuring write operations are always executed in isolated contexts.
+                // if this results in sub-optimal efficiency, we may need to look into removing Database-level transactions in favour of running SaveChanges where we currently commit the transaction.
+                if (threadContexts.IsValueCreated)
+                    recycleThreadContexts();
+
                 currentWriteTransaction = threadContexts.Value.Database.BeginTransaction();
+            }
 
             Interlocked.Increment(ref currentWriteUsages);
 
