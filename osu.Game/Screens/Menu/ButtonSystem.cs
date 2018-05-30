@@ -254,9 +254,6 @@ namespace osu.Game.Screens.Menu
                 backButton.ContractStyle = 0;
                 settingsButton.ContractStyle = 0;
 
-                if (state == MenuState.TopLevel)
-                    buttonArea.FinishTransforms(true);
-
                 updateLogoState(lastState);
 
                 using (buttonArea.BeginDelayedSequence(lastState == MenuState.Initial ? 150 : 0, true))
