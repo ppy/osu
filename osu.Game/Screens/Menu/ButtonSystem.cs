@@ -325,52 +325,57 @@ namespace osu.Game.Screens.Menu
         {
             if (logo == null) return;
 
-            logoDelayedAction?.Cancel();
-
             switch (state)
             {
                 case MenuState.Exit:
                 case MenuState.Initial:
-                    logoTracking = false;
-
+                    logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
-                    {
-                        hideOverlaysOnEnter.Value = true;
-                        allowOpeningOverlays.Value = false;
+                        {
+                            logoTracking = false;
 
-                        logo.ClearTransforms(targetMember: nameof(Position));
-                        logo.RelativePositionAxes = Axes.Both;
+                            hideOverlaysOnEnter.Value = true;
+                            allowOpeningOverlays.Value = false;
 
-                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                        logo.ScaleTo(1, 800, Easing.OutExpo);
-                    }, 150);
+                            logo.ClearTransforms(targetMember: nameof(Position));
+                            logo.RelativePositionAxes = Axes.Both;
 
+                            logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                            logo.ScaleTo(1, 800, Easing.OutExpo);
+                        }, buttonArea.Alpha * 150);
                     break;
                 case MenuState.TopLevel:
                 case MenuState.Play:
-                    logo.ClearTransforms(targetMember: nameof(Position));
-                    logo.RelativePositionAxes = Axes.None;
-
                     switch (lastState)
                     {
                         case MenuState.TopLevel: // coming from toplevel to play
+                            break;
                         case MenuState.Initial:
-                            logoTracking = false;
-                            logo.ScaleTo(0.5f, 200, Easing.In);
+                            logo.ClearTransforms(targetMember: nameof(Position));
+                            logo.RelativePositionAxes = Axes.None;
+
+                            bool impact = logo.Scale.X > 0.6f;
+
+                            if (lastState == MenuState.Initial)
+                                logo.ScaleTo(0.5f, 200, Easing.In);
 
                             logo.MoveTo(logoTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In);
 
+                            logoDelayedAction?.Cancel();
                             logoDelayedAction = Scheduler.AddDelayed(() =>
-                            {
-                                logoTracking = true;
+                                {
+                                    logoTracking = true;
 
-                                logo.Impact();
+                                    if (impact)
+                                        logo.Impact();
 
-                                hideOverlaysOnEnter.Value = false;
-                                allowOpeningOverlays.Value = true;
-                            }, 200);
+                                    hideOverlaysOnEnter.Value = false;
+                                    allowOpeningOverlays.Value = true;
+                                }, (1 - buttonArea.Alpha) * 200);
                             break;
                         default:
+                            logo.ClearTransforms(targetMember: nameof(Position));
+                            logo.RelativePositionAxes = Axes.None;
                             logoTracking = true;
                             logo.ScaleTo(0.5f, 200, Easing.OutQuint);
                             break;
