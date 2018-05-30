@@ -36,7 +36,13 @@ namespace osu.Game.Screens
             logo.Position = new Vector2(-40);
             logo.Scale = new Vector2(0.2f);
 
-            logo.FadeInFromZero(5000, Easing.OutQuint);
+            logo.Delay(500).FadeInFromZero(1000, Easing.OutQuint);
+        }
+
+        protected override void LogoSuspending(OsuLogo logo)
+        {
+            base.LogoSuspending(logo);
+            logo.FadeOut(logo.Alpha * 1000);
         }
 
         private OsuScreen loadScreen;
@@ -61,12 +67,6 @@ namespace osu.Game.Screens
                 return;
 
             Push(loadScreen);
-        }
-
-        protected override void LogoSuspending(OsuLogo logo)
-        {
-            base.LogoSuspending(logo);
-            logo.FadeOut(100);
         }
 
         [BackgroundDependencyLoader]
