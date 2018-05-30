@@ -64,24 +64,25 @@ namespace osu.Game.Database
                 currentWriteDidWrite |= usage.PerformedWrite;
                 currentWriteDidError |= usage.Errors.Any();
 
-                if (usages > 0) return;
-
-                if (currentWriteDidError)
-                    currentWriteTransaction?.Rollback();
-                else
-                    currentWriteTransaction?.Commit();
-
-                currentWriteTransaction = null;
-                currentWriteDidWrite = false;
-                currentWriteDidError = false;
-
-                if (currentWriteDidWrite)
+                if (usages == 0)
                 {
-                    // explicitly dispose to ensure any outstanding flushes happen as soon as possible (and underlying resources are purged).
-                    usage.Context.Dispose();
+                    if (currentWriteDidError)
+                        currentWriteTransaction?.Rollback();
+                    else
+                        currentWriteTransaction?.Commit();
 
-                    // once all writes are complete, we want to refresh thread-specific contexts to make sure they don't have stale local caches.
-                    recycleThreadContexts();
+                    if (currentWriteDidWrite || currentWriteDidError)
+                    {
+                        // explicitly dispose to ensure any outstanding flushes happen as soon as possible (and underlying resources are purged).
+                        usage.Context.Dispose();
+
+                        // once all writes are complete, we want to refresh thread-specific contexts to make sure they don't have stale local caches.
+                        recycleThreadContexts();
+                    }
+
+                    currentWriteTransaction = null;
+                    currentWriteDidWrite = false;
+                    currentWriteDidError = false;
                 }
             }
             finally
