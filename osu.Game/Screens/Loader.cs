@@ -42,7 +42,7 @@ namespace osu.Game.Screens
         protected override void LogoSuspending(OsuLogo logo)
         {
             base.LogoSuspending(logo);
-            logo.FadeOut(logo.Alpha * 1000);
+            logo.FadeOut(logo.Alpha * 400);
         }
 
         private OsuScreen loadScreen;
