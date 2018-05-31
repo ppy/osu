@@ -1,9 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Threading;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Screens;
@@ -17,46 +15,53 @@ namespace osu.Game.Tests.Visual
     {
         private TestLoader loader;
 
-        public TestCaseLoaderAnimation()
+        protected override void LoadComplete()
         {
-            bool logoVisible = false;
+            base.LoadComplete();
 
-            AddStep("almost instant display", () => Child = loader = new TestLoader(0.25f));
+            // required to preload the logo in a headless run (so it doesn't delay the loading itself).
+            Add(new OsuLogo());
+
+            bool logoVisible = false;
+            AddStep("almost instant display", () => Child = loader = new TestLoader(250));
             AddUntilStep(() =>
             {
-                logoVisible = loader.Logo.Alpha > 0;
-                return !loader.IsCurrentScreen;
+                logoVisible = loader.Logo?.Alpha > 0;
+                return loader.Logo != null && loader.ScreenLoaded;
             }, "loaded");
             AddAssert("logo not visible", () => !logoVisible);
 
-            AddStep("short load", () => Child = loader = new TestLoader(0.8f));
+            AddStep("short load", () => Child = loader = new TestLoader(800));
             AddUntilStep(() =>
             {
-                logoVisible = loader.Logo.Alpha > 0;
-                return !loader.IsCurrentScreen;
+                logoVisible = loader.Logo?.Alpha > 0;
+                return loader.Logo != null && loader.ScreenLoaded;
             }, "loaded");
             AddAssert("logo visible", () => logoVisible);
-            AddUntilStep(() => loader.Logo.Alpha == 0, "logo gone");
+            AddUntilStep(() => loader.Logo?.Alpha == 0, "logo gone");
 
-            AddStep("longer load", () => Child = loader = new TestLoader(1.4f));
+            AddStep("longer load", () => Child = loader = new TestLoader(1400));
             AddUntilStep(() =>
             {
-                logoVisible = loader.Logo.Alpha > 0;
-                return !loader.IsCurrentScreen;
+                logoVisible = loader.Logo?.Alpha > 0;
+                return loader.Logo != null && loader.ScreenLoaded;
             }, "loaded");
             AddAssert("logo visible", () => logoVisible);
-            AddUntilStep(() => loader.Logo.Alpha == 0, "logo gone");
+            AddUntilStep(() => loader.Logo?.Alpha == 0, "logo gone");
         }
 
         private class TestLoader : Loader
         {
-            private readonly float secondsDelay;
+            private readonly double delay;
 
             public OsuLogo Logo;
+            private TestScreen screen;
 
-            public TestLoader(float secondsDelay)
+            public bool ScreenLoaded => screen.IsCurrentScreen;
+
+            public TestLoader(double delay)
             {
-                this.secondsDelay = secondsDelay;
+                this.delay = delay;
             }
 
             protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -65,16 +70,32 @@ namespace osu.Game.Tests.Visual
                 base.LogoArriving(logo, resuming);
             }
 
-            protected override OsuScreen CreateLoadableScreen() => new TestScreen(secondsDelay);
+            protected override OsuScreen CreateLoadableScreen() => screen = new TestScreen();
+            protected override ShaderPrecompiler CreateShaderPrecompiler() => new TestShaderPrecompiler(delay);
+
+            private class TestShaderPrecompiler : ShaderPrecompiler
+            {
+                private readonly double delay;
+                private double startTime;
+
+                public TestShaderPrecompiler(double delay)
+                {
+                    this.delay = delay;
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+                    startTime = Time.Current;
+                }
+
+                protected override bool AllLoaded => Time.Current > startTime + delay;
+            }
 
             private class TestScreen : OsuScreen
             {
-                private readonly float secondsDelay;
-
-                public TestScreen(float secondsDelay)
+                public TestScreen()
                 {
-                    this.secondsDelay = secondsDelay;
-
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -83,16 +104,9 @@ namespace osu.Game.Tests.Visual
                     };
                 }
 
-                [BackgroundDependencyLoader]
-                private void load()
-                {
-                    Thread.Sleep((int)(secondsDelay * 1000));
-                }
-
                 protected override void LogoArriving(OsuLogo logo, bool resuming)
                 {
                     base.LogoArriving(logo, resuming);
-
                     Child.FadeInFromZero(200);
                 }
             }
