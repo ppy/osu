@@ -124,10 +124,7 @@ namespace osu.Game.Screens.Select
                                             {
                                                 TextColour = Color4.White.Opacity(0.75f),
                                             },
-                                            source = new MetadataSection("Source")
-                                            {
-                                                TextColour = Color4.White.Opacity(0.75f),
-                                            },
+                                            source = new MetadataSection("Source"),
                                             tags = new MetadataSection("Tags"),
                                         },
                                     },
@@ -167,7 +164,7 @@ namespace osu.Game.Screens.Select
         private void load(OsuColour colours, APIAccess api)
         {
             this.api = api;
-            tags.TextColour = colours.Yellow;
+            source.TextColour = tags.TextColour = colours.Yellow;
         }
 
         protected override void UpdateAfterChildren()
