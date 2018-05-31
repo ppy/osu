@@ -328,18 +328,18 @@ namespace osu.Game.Screens.Menu
                 case MenuState.Initial:
                     logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
-                        {
-                            logoTracking = false;
+                    {
+                        logoTracking = false;
 
-                            hideOverlaysOnEnter.Value = true;
-                            allowOpeningOverlays.Value = false;
+                        hideOverlaysOnEnter.Value = true;
+                        allowOpeningOverlays.Value = false;
 
-                            logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.RelativePositionAxes = Axes.Both;
+                        logo.ClearTransforms(targetMember: nameof(Position));
+                        logo.RelativePositionAxes = Axes.Both;
 
-                            logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                            logo.ScaleTo(1, 800, Easing.OutExpo);
-                        }, buttonArea.Alpha * 150);
+                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                        logo.ScaleTo(1, 800, Easing.OutExpo);
+                    }, buttonArea.Alpha * 150);
                     break;
                 case MenuState.TopLevel:
                 case MenuState.Play:
@@ -360,15 +360,15 @@ namespace osu.Game.Screens.Menu
 
                             logoDelayedAction?.Cancel();
                             logoDelayedAction = Scheduler.AddDelayed(() =>
-                                {
-                                    logoTracking = true;
+                            {
+                                logoTracking = true;
 
-                                    if (impact)
-                                        logo.Impact();
+                                if (impact)
+                                    logo.Impact();
 
-                                    hideOverlaysOnEnter.Value = false;
-                                    allowOpeningOverlays.Value = true;
-                                }, (1 - buttonArea.Alpha) * 200);
+                                hideOverlaysOnEnter.Value = false;
+                                allowOpeningOverlays.Value = true;
+                            }, 200);
                             break;
                         default:
                             logo.ClearTransforms(targetMember: nameof(Position));
