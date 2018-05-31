@@ -107,10 +107,7 @@ namespace osu.Game.Overlays.Mods
             else
                 MultiplierLabel.FadeColour(Color4.White, 200);
 
-            if (ranked)
-                UnrankedLabel.FadeOut(200);
-            else
-                UnrankedLabel.FadeIn(200);
+            UnrankedLabel.FadeTo(ranked ? 0 : 1, 200);
         }
 
         protected override void PopOut()
@@ -357,7 +354,6 @@ namespace osu.Game.Overlays.Mods
                                         {
                                             Text = @"Score Multiplier:",
                                             TextSize = 30,
-                                            Shadow = true,
                                             Margin = new MarginPadding
                                             {
                                                 Top = 5,
@@ -368,7 +364,6 @@ namespace osu.Game.Overlays.Mods
                                         {
                                             Font = @"Exo2.0-Bold",
                                             TextSize = 30,
-                                            Shadow = true,
                                             Margin = new MarginPadding
                                             {
                                                 Top = 5
@@ -379,7 +374,6 @@ namespace osu.Game.Overlays.Mods
                                             Font = @"Exo2.0-Bold",
                                             Text = @"(Unranked)",
                                             TextSize = 30,
-                                            Shadow = true,
                                             Margin = new MarginPadding
                                             {
                                                 Top = 5,
