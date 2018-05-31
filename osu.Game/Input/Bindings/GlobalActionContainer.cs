@@ -45,7 +45,9 @@ namespace osu.Game.Input.Bindings
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
         {
             new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene),
-            new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry)
+            new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
@@ -85,6 +87,12 @@ namespace osu.Game.Input.Bindings
         ToggleGameplayMouseButtons,
 
         [Description("Go back")]
-        Back
+        Back,
+
+        [Description("Increase scroll speed")]
+        IncreaseScrollSpeed,
+
+        [Description("Decrease scroll speed")]
+        DecreaseScrollSpeed,
     }
 }
