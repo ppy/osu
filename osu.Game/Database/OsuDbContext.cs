@@ -3,7 +3,6 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
@@ -102,19 +101,6 @@ namespace osu.Game.Database
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.ShortName).IsUnique();
 
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
-        }
-
-        public IDbContextTransaction BeginTransaction()
-        {
-            // return Database.BeginTransaction();
-            return null;
-        }
-
-        public int SaveChanges(IDbContextTransaction transaction = null)
-        {
-            var ret = base.SaveChanges();
-            if (ret > 0) transaction?.Commit();
-            return ret;
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory
