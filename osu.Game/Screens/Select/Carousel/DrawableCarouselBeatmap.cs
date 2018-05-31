@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             if (songSelect != null)
             {
-                startRequested = songSelect.FinaliseSelection;
+                startRequested = b => songSelect.FinaliseSelection(b);
                 editRequested = songSelect.Edit;
             }
 
