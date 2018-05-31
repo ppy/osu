@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -46,30 +45,32 @@ namespace osu.Game.Screens
             logo.FadeOut(logo.Alpha * 400);
         }
 
-        private OsuScreen loadScreen;
+        private OsuScreen loadableScreen;
         private ShaderPrecompiler precompiler;
 
         protected virtual OsuScreen CreateLoadableScreen() => showDisclaimer ? (OsuScreen)new Disclaimer() : new Intro();
+
+        protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
-            LoadComponentAsync(precompiler = new ShaderPrecompiler(loadIfReady), Add);
-            LoadComponentAsync(loadScreen = CreateLoadableScreen(), s => loadIfReady());
+            LoadComponentAsync(precompiler = CreateShaderPrecompiler(), Add);
+            LoadComponentAsync(loadableScreen = CreateLoadableScreen());
+
+            checkIfLoaded();
         }
 
-        private void loadIfReady()
+        private void checkIfLoaded()
         {
-            if (ChildScreen == loadScreen) return;
-
-            if (loadScreen.LoadState != LoadState.Ready)
+            if (loadableScreen.LoadState != LoadState.Ready || !precompiler.FinishedCompiling)
+            {
+                Schedule(checkIfLoaded);
                 return;
+            }
 
-            if (!precompiler.FinishedCompiling)
-                return;
-
-            Push(loadScreen);
+            Push(loadableScreen);
         }
 
         [BackgroundDependencyLoader]
@@ -83,15 +84,9 @@ namespace osu.Game.Screens
         /// </summary>
         public class ShaderPrecompiler : Drawable
         {
-            private readonly Action onLoaded;
             private readonly List<Shader> loadTargets = new List<Shader>();
 
             public bool FinishedCompiling { get; private set; }
-
-            public ShaderPrecompiler(Action onLoaded)
-            {
-                this.onLoaded = onLoaded;
-            }
 
             [BackgroundDependencyLoader]
             private void load(ShaderManager manager)
@@ -106,16 +101,17 @@ namespace osu.Game.Screens
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE));
             }
 
+            protected virtual bool AllLoaded => loadTargets.All(s => s.Loaded);
+
             protected override void Update()
             {
                 base.Update();
 
                 // if our target is null we are done.
-                if (loadTargets.All(s => s.Loaded))
+                if (AllLoaded)
                 {
                     FinishedCompiling = true;
                     Expire();
-                    onLoaded?.Invoke();
                 }
             }
         }
