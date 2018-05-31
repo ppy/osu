@@ -54,8 +54,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.GameplayCursorSize, 1.0, 0.5f, 2, 0.01);
             Set(OsuSetting.AutoCursorSize, false);
 
-            Set(OsuSetting.MouseDisableButtons, false);
-            Set(OsuSetting.MouseDisableWheel, false);
+            Set(OsuSetting.MouseButtons, true);
+            Set(OsuSetting.MouseWheel, true);
 
             // Graphics
             Set(OsuSetting.ShowFpsDisplay, false);
@@ -99,7 +99,7 @@ namespace osu.Game.Configuration
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
         {
-            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled"))
+            new TrackedSetting<bool>(OsuSetting.MouseButtons, v => new SettingDescription(v, "gameplay mouse buttons", v ? "enabled" : "disabled"))
         };
     }
 
@@ -116,8 +116,8 @@ namespace osu.Game.Configuration
         KeyOverlay,
         FloatingComments,
         ShowInterface,
-        MouseDisableButtons,
-        MouseDisableWheel,
+        MouseButtons,
+        MouseWheel,
         AudioOffset,
         VolumeInactive,
         MenuMusic,

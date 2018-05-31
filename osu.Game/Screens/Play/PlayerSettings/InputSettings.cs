@@ -19,12 +19,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
             {
                 mouseButtonsCheckbox = new PlayerCheckbox
                 {
-                    LabelText = "Disable mouse buttons"
+                    LabelText = "Mouse buttons"
                 }
             };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config) => mouseButtonsCheckbox.Bindable = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+        private void load(OsuConfigManager config) => mouseButtonsCheckbox.Bindable = config.GetBindable<bool>(OsuSetting.MouseButtons);
     }
 }

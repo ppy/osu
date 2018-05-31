@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool AllowBackButton => false;
 
-        private Bindable<bool> mouseWheelDisabled;
+        private Bindable<bool> mouseWheel;
         private Bindable<double> userAudioOffset;
 
         public int RestartCount;
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
-            mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+            mouseWheel = config.GetBindable<bool>(OsuSetting.MouseWheel);
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
 
             IBeatmap beatmap;
@@ -364,7 +364,7 @@ namespace osu.Game.Screens.Play
             Background?.FadeTo(1f, fade_out_duration);
         }
 
-        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
+        protected override bool OnWheel(InputState state) => !mouseWheel.Value && !pauseContainer.IsPaused;
 
         private void initializeStoryboard(bool asyncLoad)
         {

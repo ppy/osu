@@ -196,12 +196,12 @@ namespace osu.Game.Rulesets.UI
 
         #region Setting application (disables etc.)
 
-        private Bindable<bool> mouseDisabled;
+        private Bindable<bool> mouseButtons;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+            mouseButtons = config.GetBindable<bool>(OsuSetting.MouseButtons);
         }
 
         protected override void TransformState(InputState state)
@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.UI
 
             if (mouse != null)
             {
-                if (mouseDisabled.Value)
+                if (!mouseButtons.Value)
                 {
                     mouse.SetPressed(MouseButton.Left, false);
                     mouse.SetPressed(MouseButton.Right, false);

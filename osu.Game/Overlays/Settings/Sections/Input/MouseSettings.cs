@@ -45,13 +45,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Disable mouse wheel during gameplay",
-                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
+                    LabelText = "Mouse wheel during gameplay",
+                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseWheel)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Disable mouse buttons during gameplay",
-                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
+                    LabelText = "Mouse buttons during gameplay",
+                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseButtons)
                 },
             };
 
