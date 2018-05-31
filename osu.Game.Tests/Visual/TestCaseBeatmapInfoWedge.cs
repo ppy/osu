@@ -138,11 +138,11 @@ namespace osu.Game.Tests.Visual
             int loadedBefore = -1;
             AddStep("select two beatmaps", () =>
             {
-                loadedBefore = TestBeatmapInfoWedge.LoadedBuffersCount;
+                loadedBefore = infoWedge.LoadedBuffersCount;
                 infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(firstBeatmap));
                 infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(secondBeatmap));
             });
-            AddUntilStep(() => TestBeatmapInfoWedge.LoadedBuffersCount == loadedBefore + 2, "wait for load");
+            AddUntilStep(() => infoWedge.LoadedBuffersCount == loadedBefore + 2, "wait for load");
             AddAssert("loaded info of second beatmap", () => infoWedge.Info.VersionLabel.Text == $"{secondRuleset.ShortName}Version");
         }
 
@@ -168,7 +168,7 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        private IBeatmap createTestBeatmap(RulesetInfo ruleset, int length = 50000)
+        private IBeatmap createTestBeatmap(RulesetInfo ruleset, double length = 50000)
         {
             List<HitObject> objects = new List<HitObject>();
             for (double i = 0; i < length; i += 1000)
@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual
         {
             public new BufferedWedgeInfo Info => base.Info;
 
-            public static int LoadedBuffersCount;
+            public int LoadedBuffersCount;
 
             protected override void UpdateInfo(BufferedWedgeInfo newInfo)
             {
