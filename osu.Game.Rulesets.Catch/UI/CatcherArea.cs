@@ -407,7 +407,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 public CatcherSprite()
                 {
                     Size = new Vector2(CATCHER_SIZE);
-                    FillMode = FillMode.Fill;
 
                     // Sets the origin roughly to the centre of the catcher's plate to allow for correct scaling.
                     OriginPosition = new Vector2(-0.02f, 0.06f) * CATCHER_SIZE;
