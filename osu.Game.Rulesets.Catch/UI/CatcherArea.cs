@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatcherArea : Container
     {
-        public const float CATCHER_SIZE = 172;
+        public const float CATCHER_SIZE = 84;
 
         protected readonly Catcher MovableCatcher;
 
@@ -99,8 +99,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public class Catcher : Container, IKeyBindingHandler<CatchAction>
         {
-            private Texture texture;
-
             private Container<DrawableHitObject> caughtFruit;
 
             public Container ExplodingFruitTarget;
@@ -121,10 +119,8 @@ namespace osu.Game.Rulesets.Catch.UI
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load()
             {
-                texture = textures.Get(@"Play/Catch/fruit-catcher-idle");
-
                 Children = new Drawable[]
                 {
                     caughtFruit = new Container<DrawableHitObject>
@@ -196,13 +192,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 Scheduler.AddDelayed(beginTrail, HyperDashing ? 25 : 50);
             }
 
-            private Sprite createCatcherSprite() => new Sprite
-            {
-                Size = new Vector2(CATCHER_SIZE),
-                FillMode = FillMode.Fill,
-                Texture = texture,
-                OriginPosition = new Vector2(-3, 10) // temporary until the sprite is aligned correctly.
-            };
+            private Sprite createCatcherSprite() => new CatcherSprite();
 
             /// <summary>
             /// Add a caught fruit to the catcher's stack.
@@ -409,6 +399,23 @@ namespace osu.Game.Rulesets.Catch.UI
                     f.FadeOut(750);
 
                     f.Expire();
+                }
+            }
+
+            private class CatcherSprite : Sprite
+            {
+                public CatcherSprite()
+                {
+                    Size = new Vector2(CATCHER_SIZE);
+
+                    // Sets the origin roughly to the centre of the catcher's plate to allow for correct scaling.
+                    OriginPosition = new Vector2(-0.02f, 0.06f) * CATCHER_SIZE;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(TextureStore textures)
+                {
+                    Texture = textures.Get(@"Play/Catch/fruit-catcher-idle");
                 }
             }
         }
