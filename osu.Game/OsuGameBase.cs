@@ -34,6 +34,11 @@ using osu.Game.Skinning;
 
 namespace osu.Game
 {
+    /// <summary>
+    /// The most basic <see cref="Game"/> that can be used to host osu! components and systems.
+    /// Unlike <see cref="OsuGame"/>, this class will not load any kind of UI, allowing it to be used
+    /// for provide dependencies to test cases without interfering with them.
+    /// </summary>
     public class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
         protected OsuConfigManager LocalConfig;
@@ -52,7 +57,7 @@ namespace osu.Game
 
         protected SettingsStore SettingsStore;
 
-        protected CursorOverrideContainer CursorOverrideContainer;
+        protected MenuCursorContainer MenuCursorContainer;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -183,6 +188,20 @@ namespace osu.Game
             FileStore.Cleanup();
 
             AddInternal(api);
+
+            GlobalActionContainer globalBinding;
+
+            MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
+            MenuCursorContainer.Child = globalBinding = new GlobalActionContainer(this)
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
+            };
+
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = MenuCursorContainer });
+
+            KeyBindingStore.Register(globalBinding);
+            dependencies.Cache(globalBinding);
         }
 
         private void runMigrations()
@@ -211,20 +230,6 @@ namespace osu.Game
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            GlobalActionContainer globalBinding;
-
-            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
-            CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both }
-            };
-
-            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
-
-            KeyBindingStore.Register(globalBinding);
-            dependencies.Cache(globalBinding);
 
             // TODO: This is temporary until we reimplement the local FPS display.
             // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.

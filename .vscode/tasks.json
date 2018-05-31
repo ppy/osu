@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "msbuild",
             "args": [
-                "/p:TargetFramework=net461",
+                "/p:TargetFramework=net471",
                 "/p:GenerateFullPaths=true",
                 "/m",
                 "/verbosity:m"
@@ -22,7 +22,7 @@
             "command": "msbuild",
             "args": [
                 "/p:Configuration=Release",
-                "/p:TargetFramework=net461",
+                "/p:TargetFramework=net471",
                 "/p:GenerateFullPaths=true",
                 "/m",
                 "/verbosity:m"
@@ -31,7 +31,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Build (Debug, dotnet)",
+            "label": "Build osu! (Debug, dotnet)",
             "type": "shell",
             "command": "dotnet",
             "args": [
@@ -47,7 +47,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Build (Release, dotnet)",
+            "label": "Build osu! (Release, dotnet)",
             "type": "shell",
             "command": "dotnet",
             "args": [
@@ -64,7 +64,40 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Restore (net461)",
+            "label": "Build tests (Debug, dotnet)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "--no-restore",
+                "osu.Game.Tests",
+                "/p:TargetFramework=netcoreapp2.0",
+                "/p:GenerateFullPaths=true",
+                "/m",
+                "/verbosity:m"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build tests (Release, dotnet)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "--no-restore",
+                "osu.Game.Tests",
+                "/p:TargetFramework=netcoreapp2.0",
+                "/p:Configuration=Release",
+                "/p:GenerateFullPaths=true",
+                "/m",
+                "/verbosity:m"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Restore (net471)",
             "type": "shell",
             "command": "nuget",
             "args": [

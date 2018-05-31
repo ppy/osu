@@ -25,10 +25,10 @@ namespace osu.Game.Screens.Select.Details
                 if (value == metrics) return;
                 metrics = value;
 
-                var retries = Metrics.Retries;
-                var fails = Metrics.Fails;
+                var retries = Metrics?.Retries ?? new int[0];
+                var fails = Metrics?.Fails ?? new int[0];
 
-                float maxValue = fails.Zip(retries, (fail, retry) => fail + retry).Max();
+                float maxValue = fails.Any() ? fails.Zip(retries, (fail, retry) => fail + retry).Max() : 0;
                 failGraph.MaxValue = maxValue;
                 retryGraph.MaxValue = maxValue;
 

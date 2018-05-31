@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -17,6 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.UI;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
@@ -24,7 +26,18 @@ namespace osu.Game.Tests.Visual
     [Description("mod select and icon display")]
     public class TestCaseMods : OsuTestCase
     {
-        private const string unranked_suffix = "(Unranked)";
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(ModSelectOverlay),
+            typeof(ModDisplay),
+            typeof(ModSection),
+            typeof(ModIcon),
+            typeof(ModButton),
+            typeof(ModButtonEmpty),
+            typeof(DifficultyReductionSection),
+            typeof(DifficultyIncreaseSection),
+            typeof(SpecialSection),
+        };
 
         private RulesetStore rulesets;
         private ModDisplay modDisplay;
@@ -66,7 +79,8 @@ namespace osu.Game.Tests.Visual
                 Ruleset ruleset = rulesetInfo.CreateInstance();
                 AddStep($"switch to {ruleset.Description}", () => modSelect.Ruleset.Value = rulesetInfo);
 
-                switch (ruleset) {
+                switch (ruleset)
+                {
                     case OsuRuleset or:
                         testOsuMods(or);
                         break;

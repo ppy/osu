@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -21,15 +22,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 
         private Container composerContainer;
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(parent);
-
-        [BackgroundDependencyLoader]
-        private void load()
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] BindableBeatDivisor beatDivisor)
         {
-            dependencies.Cache(beatDivisor);
+            if (beatDivisor != null)
+                this.beatDivisor.BindTo(beatDivisor);
 
             ScrollableTimeline timeline;
             Children = new Drawable[]

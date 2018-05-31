@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
+using osu.Framework.Configuration.Tracking;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select;
@@ -60,6 +61,9 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowFpsDisplay, false);
 
             Set(OsuSetting.ShowStoryboard, true);
+            Set(OsuSetting.BeatmapSkins, true);
+            Set(OsuSetting.BeatmapHitsounds, true);
+
             Set(OsuSetting.CursorRotation, true);
 
             Set(OsuSetting.MenuParallax, true);
@@ -84,11 +88,19 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Version, string.Empty);
 
             Set(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
+            Set(OsuSetting.ScreenshotCaptureMenuCursor, false);
+
+            Set(OsuSetting.SongSelectRightMouseScroll, false);
         }
 
         public OsuConfigManager(Storage storage) : base(storage)
         {
         }
+
+        public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
+        {
+            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled"))
+        };
     }
 
     public enum OsuSetting
@@ -128,6 +140,10 @@ namespace osu.Game.Configuration
         ShowConvertedBeatmaps,
         SpeedChangeVisualisation,
         Skin,
-        ScreenshotFormat
+        ScreenshotFormat,
+        ScreenshotCaptureMenuCursor,
+        SongSelectRightMouseScroll,
+        BeatmapSkins,
+        BeatmapHitsounds
     }
 }
