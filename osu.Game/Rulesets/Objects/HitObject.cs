@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -51,21 +52,15 @@ namespace osu.Game.Rulesets.Objects
 
         private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
 
-        private HitWindows hitWindows;
-
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
-        public HitWindows HitWindows
-        {
-            get => hitWindows ?? (hitWindows = new HitWindows(overallDifficulty));
-            protected set => hitWindows = value;
-        }
+        public HitWindows HitWindows { get; set; }
 
-        private readonly SortedList<HitObject> nestedHitObjects = new SortedList<HitObject>((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
+        private readonly Lazy<SortedList<HitObject>> nestedHitObjects = new Lazy<SortedList<HitObject>>(() => new SortedList<HitObject>((h1, h2) => h1.StartTime.CompareTo(h2.StartTime)));
 
         [JsonIgnore]
-        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
+        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects.Value;
 
         /// <summary>
         /// Applies default values to this HitObject.
@@ -76,9 +71,19 @@ namespace osu.Game.Rulesets.Objects
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            nestedHitObjects.Clear();
+            if (nestedHitObjects.IsValueCreated)
+                nestedHitObjects.Value.Clear();
+
             CreateNestedHitObjects();
-            nestedHitObjects.ForEach(h => h.ApplyDefaults(controlPointInfo, difficulty));
+
+            if (nestedHitObjects.IsValueCreated)
+            {
+                nestedHitObjects.Value.ForEach(h =>
+                {
+                    h.HitWindows = HitWindows;
+                    h.ApplyDefaults(controlPointInfo, difficulty);
+                });
+            }
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
@@ -89,14 +94,24 @@ namespace osu.Game.Rulesets.Objects
             Kiai = effectPoint.KiaiMode;
             SampleControlPoint = samplePoint;
 
-            overallDifficulty = difficulty.OverallDifficulty;
-            hitWindows = null;
+            if (HitWindows == null)
+                HitWindows = CreateHitWindows();
+            HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
 
         protected virtual void CreateNestedHitObjects()
         {
         }
 
-        protected void AddNested(HitObject hitObject) => nestedHitObjects.Add(hitObject);
+        protected void AddNested(HitObject hitObject) => nestedHitObjects.Value.Add(hitObject);
+
+        /// <summary>
+        /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.
+        /// This can be null to indicate that the <see cref="HitObject"/> has no <see cref="HitWindows"/>.
+        /// <para>
+        /// This will only be invoked if <see cref="HitWindows"/> hasn't been set externally (e.g. from a <see cref="BeatmapConverter"/>.
+        /// </para>
+        /// </summary>
+        protected virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 }

@@ -13,9 +13,14 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 {
     public class CatchBeatmapConverter : BeatmapConverter<CatchHitObject>
     {
+        public CatchBeatmapConverter(IBeatmap beatmap)
+            : base(beatmap)
+        {
+        }
+
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
-        protected override IEnumerable<CatchHitObject> ConvertHitObject(HitObject obj, Beatmap beatmap)
+        protected override IEnumerable<CatchHitObject> ConvertHitObject(HitObject obj, IBeatmap beatmap)
         {
             var curveData = obj as IHasCurve;
             var positionData = obj as IHasXPosition;
@@ -23,7 +28,20 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             var endTime = obj as IHasEndTime;
 
             if (positionData == null)
+            {
+                if (endTime != null)
+                {
+                    yield return new BananaShower
+                    {
+                        StartTime = obj.StartTime,
+                        Samples = obj.Samples,
+                        Duration = endTime.Duration,
+                        NewCombo = comboData?.NewCombo ?? false
+                    };
+                }
+
                 yield break;
+            }
 
             if (curveData != null)
             {
@@ -43,19 +61,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 yield break;
             }
 
-            if (endTime != null)
-            {
-                yield return new BananaShower
-                {
-                    StartTime = obj.StartTime,
-                    Samples = obj.Samples,
-                    Duration = endTime.Duration,
-                    NewCombo = comboData?.NewCombo ?? false
-                };
-
-                yield break;
-            }
-
             yield return new Fruit
             {
                 StartTime = obj.StartTime,
@@ -64,5 +69,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 X = positionData.X / CatchPlayfield.BASE_WIDTH
             };
         }
+
+        protected override Beatmap<CatchHitObject> CreateBeatmap() => new CatchBeatmap();
     }
 }
