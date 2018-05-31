@@ -227,7 +227,8 @@ namespace osu.Game.Screens.Select
         /// Call to make a selection and perform the default action for this SongSelect.
         /// </summary>
         /// <param name="beatmap">An optional beatmap to override the current carousel selection.</param>
-        public void FinaliseSelection(BeatmapInfo beatmap = null)
+        /// <param name="performStartAction">Whether to trigger <see cref="OnStart"/>.</param>
+        public void FinaliseSelection(BeatmapInfo beatmap = null, bool performStartAction = true)
         {
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
@@ -243,14 +244,15 @@ namespace osu.Game.Screens.Select
                 selectionChangedDebounce = null;
             }
 
-            OnSelectionFinalised();
+            if (performStartAction)
+                OnStart();
         }
 
         /// <summary>
         /// Called when a selection is made.
         /// </summary>
         /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
-        protected abstract bool OnSelectionFinalised();
+        protected abstract bool OnStart();
 
         private ScheduledDelegate selectionChangedDebounce;
 
@@ -395,7 +397,7 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnExiting(Screen next)
         {
-            FinaliseSelection();
+            FinaliseSelection(performStartAction: false);
 
             beatmapInfoWedge.State = Visibility.Hidden;
 
