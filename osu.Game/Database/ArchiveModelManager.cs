@@ -190,7 +190,11 @@ namespace osu.Game.Database
 
                         var existing = CheckForExisting(item);
 
-                        if (existing != null) return existing;
+                        if (existing != null)
+                        {
+                            Logger.Log($"Found existing {typeof(TModel)} for {archive.Name} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
+                            return existing;
+                        }
 
                         item.Files = createFileInfos(archive, Files);
 
@@ -205,6 +209,8 @@ namespace osu.Game.Database
                         throw;
                     }
                 }
+
+                Logger.Log($"Import of {archive.Name} successfully completed!", LoggingTarget.Database);
             }
             catch (Exception e)
             {

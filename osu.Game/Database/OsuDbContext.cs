@@ -82,8 +82,8 @@ namespace osu.Game.Database
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.OnlineBeatmapID).IsUnique();
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash).IsUnique();
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash).IsUnique();
+            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
+            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
 
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineBeatmapSetID).IsUnique();
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
