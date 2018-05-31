@@ -174,7 +174,7 @@ namespace osu.Game.Database
         /// <param name="archive">The archive to be imported.</param>
         public TModel Import(ArchiveReader archive)
         {
-            TModel item;
+            TModel item = null;
             delayEvents();
 
             try
@@ -212,14 +212,17 @@ namespace osu.Game.Database
 
                 Logger.Log($"Import of {archive.Name} successfully completed!", LoggingTarget.Database);
             }
-            catch
+            catch (Exception e)
             {
-                Logger.Log($"Import of {archive.Name} failed and has been rolled back.", LoggingTarget.Database);
+                Logger.Error(e, $"Import of {archive.Name} failed and has been rolled back.", LoggingTarget.Database);
                 item = null;
             }
+            finally
+            {
+                // we only want to flush events after we've confirmed the write context didn't have any errors.
+                flushEvents(item != null);
+            }
 
-            // we only want to flush events after we've confirmed the write context didn't have any errors.
-            flushEvents(item != null);
             return item;
         }
 
@@ -243,12 +246,8 @@ namespace osu.Game.Database
         /// <param name="item">The item to delete.</param>
         public void Delete(TModel item)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
-
-                context.ChangeTracker.AutoDetectChangesEnabled = false;
-
                 // re-fetch the model on the import context.
                 var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == item.ID);
 
@@ -256,8 +255,6 @@ namespace osu.Game.Database
 
                 if (ModelStore.Delete(foundModel))
                     Files.Dereference(foundModel.Files.Select(f => f.FileInfo).ToArray());
-
-                context.ChangeTracker.AutoDetectChangesEnabled = true;
             }
         }
 
