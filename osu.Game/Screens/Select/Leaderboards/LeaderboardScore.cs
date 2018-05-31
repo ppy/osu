@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
@@ -161,8 +162,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Margin = new MarginPadding { Left = edge_margin, },
                                                     Children = new Drawable[]
                                                     {
-                                                        maxCombo = new ScoreComponentLabel(FontAwesome.fa_link, Score.MaxCombo.ToString()),
-                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(Score.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", Score.Accuracy)),
+                                                        maxCombo = new ScoreComponentLabel(FontAwesome.fa_link, Score.MaxCombo.ToString(), "Max Combo"),
+                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(Score.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", Score.Accuracy), "Accuracy"),
                                                     },
                                                 },
                                             },
@@ -305,10 +306,13 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        private class ScoreComponentLabel : Container
+        private class ScoreComponentLabel : Container, IHasTooltip
         {
-            public ScoreComponentLabel(FontAwesome icon, string value)
+            public string TooltipText { get; set; }
+
+            public ScoreComponentLabel(FontAwesome icon, string value, string name)
             {
+                TooltipText = name;
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.CentreLeft;
                 Size = new Vector2(60f, 20f);
