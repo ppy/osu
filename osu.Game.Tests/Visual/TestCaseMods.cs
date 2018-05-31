@@ -199,13 +199,13 @@ namespace osu.Game.Tests.Visual
         private void testRankedText(Mod mod)
         {
             AddWaitStep(1, "wait for fade");
-            AddAssert("check for ranked", () => modSelect.RankedLabel.Alpha == 0);
+            AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
             selectNext(mod);
             AddWaitStep(1, "wait for fade");
-            AddAssert("check for unranked", () => modSelect.RankedLabel.Alpha != 0);
+            AddAssert("check for unranked", () => modSelect.UnrankedLabel.Alpha != 0);
             selectPrevious(mod);
             AddWaitStep(1, "wait for fade");
-            AddAssert("check for ranked", () => modSelect.RankedLabel.Alpha == 0);
+            AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
         }
 
         private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));
@@ -241,7 +241,7 @@ namespace osu.Game.Tests.Visual
             }
 
             public new OsuSpriteText MultiplierLabel => base.MultiplierLabel;
-            public new OsuSpriteText RankedLabel => base.RankedLabel;
+            public new OsuSpriteText UnrankedLabel => base.UnrankedLabel;
             public new TriangleButton DeselectAllButton => base.DeselectAllButton;
 
             public new Color4 LowMultiplierColour => base.LowMultiplierColour;

@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Mods
         protected Color4 LowMultiplierColour, HighMultiplierColour;
 
         protected readonly TriangleButton DeselectAllButton;
-        protected readonly OsuSpriteText MultiplierLabel, RankedLabel;
+        protected readonly OsuSpriteText MultiplierLabel, UnrankedLabel;
         private readonly FillFlowContainer footerContainer;
 
         protected override bool BlockPassThroughKeyboard => false;
@@ -107,9 +107,9 @@ namespace osu.Game.Overlays.Mods
                 MultiplierLabel.FadeColour(Color4.White, 200);
 
             if (ranked)
-                RankedLabel.FadeOut(200);
+                UnrankedLabel.FadeOut(200);
             else
-                RankedLabel.FadeIn(200);
+                UnrankedLabel.FadeIn(200);
         }
 
         protected override void PopOut()
@@ -373,7 +373,7 @@ namespace osu.Game.Overlays.Mods
                                                 Top = 5
                                             }
                                         },
-                                        RankedLabel = new OsuSpriteText
+                                        UnrankedLabel = new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-Bold",
                                             Text = @"(Unranked)",
