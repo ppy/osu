@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Allocation;
@@ -62,8 +61,6 @@ namespace osu.Game.Screens.Select
 
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
-
-        private CancellationTokenSource initialAddSetsTask;
 
         private DependencyContainer dependencies;
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
@@ -207,9 +204,7 @@ namespace osu.Game.Screens.Select
             sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
             sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
 
-            initialAddSetsTask = new CancellationTokenSource();
-
-            Carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSets();
+            Carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSetsEnumerable();
 
             Beatmap.DisabledChanged += disabled => Carousel.AllowSelection = !disabled;
             Beatmap.TriggerChange();
@@ -419,8 +414,6 @@ namespace osu.Game.Screens.Select
                 beatmaps.BeatmapHidden -= onBeatmapHidden;
                 beatmaps.BeatmapRestored -= onBeatmapRestored;
             }
-
-            initialAddSetsTask?.Cancel();
         }
 
         /// <summary>
