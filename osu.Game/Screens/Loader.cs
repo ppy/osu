@@ -30,6 +30,7 @@ namespace osu.Game.Screens
         {
             base.LogoArriving(logo, resuming);
 
+            logo.BeatMatching = false;
             logo.Triangles = false;
             logo.Origin = Anchor.BottomRight;
             logo.Anchor = Anchor.BottomRight;
