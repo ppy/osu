@@ -3,12 +3,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Users;
@@ -71,18 +75,19 @@ namespace osu.Game.Tests.Visual
             chatTabControl.OnRequestLeave += chat => chatTabControl.RemoveItem(chat);
             chatTabControl.Current.ValueChanged += chat => currentText.Text = "Currently selected chat: " + chat.ToString();
 
-            AddStep("Add random user", () => addUser(RNG.Next(100000), RNG.Next().ToString()));
-            AddRepeatStep("3 random users", () => addUser(RNG.Next(100000), RNG.Next().ToString()), 3);
+            AddStep("Add random user", addRandomUser);
+            AddRepeatStep("Add 3 random users", addRandomUser, 3);
             AddStep("Add random channel", () => addChannel(RNG.Next().ToString()));
         }
 
-        private void addUser(long id, string name)
+        private List<User> users;
+
+        private void addRandomUser()
         {
-            chatTabControl.AddItem(new Channel(new User
-            {
-                Id = id,
-                Username = name
-            }));
+            if (users == null || users.Count == 0)
+                return;
+
+            chatTabControl.AddItem(new Channel(users[RNG.Next(0, users.Count - 1)]));
         }
 
         private void addChannel(string name)
@@ -91,6 +96,15 @@ namespace osu.Game.Tests.Visual
             {
                 Name = name
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IAPIProvider api)
+        {
+            GetUsersRequest req = new GetUsersRequest();
+            req.Success += list => users = list.Select(e => e.User).ToList();
+
+            api.Queue(req);
         }
     }
 }
