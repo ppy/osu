@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
@@ -59,5 +60,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
         }
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => body.ReceiveMouseInputAt(screenSpacePos);
+
+        public override Vector2 SelectionPoint => ToScreenSpace(OriginPosition);
+        public override Quad SelectionQuad => body.PathDrawQuad;
     }
 }

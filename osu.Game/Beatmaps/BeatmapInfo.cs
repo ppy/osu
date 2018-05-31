@@ -143,5 +143,10 @@ namespace osu.Game.Beatmaps
         public bool BackgroundEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
                                                       BeatmapSet.Hash == other.BeatmapSet.Hash &&
                                                       (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
+
+        /// <summary>
+        /// Returns a shallow-clone of this <see cref="BeatmapInfo"/>.
+        /// </summary>
+        public BeatmapInfo Clone() => (BeatmapInfo)MemberwiseClone();
     }
 }

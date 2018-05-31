@@ -41,10 +41,17 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                Beatmap.Value = BeatmapSet.Beatmaps.First();
-                plays.Value = BeatmapSet.OnlineInfo.PlayCount;
-                favourites.Value = BeatmapSet.OnlineInfo.FavouriteCount;
-                difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Select(b => new DifficultySelectorButton(b)
+                updateDisplay();
+            }
+        }
+
+        private void updateDisplay()
+        {
+            difficulties.Clear();
+
+            if (BeatmapSet != null)
+            {
+                difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty).Select(b => new DifficultySelectorButton(b)
                 {
                     State = DifficultySelectorState.NotSelected,
                     OnHovered = beatmap =>
@@ -53,14 +60,16 @@ namespace osu.Game.Overlays.BeatmapSet
                         starRating.Text = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
                         starRating.FadeIn(100);
                     },
-                    OnClicked = beatmap =>
-                    {
-                        Beatmap.Value = beatmap;
-                    },
+                    OnClicked = beatmap => { Beatmap.Value = beatmap; },
                 });
-
-                updateDifficultyButtons();
             }
+
+            starRating.FadeOut(100);
+            Beatmap.Value = BeatmapSet?.Beatmaps.FirstOrDefault();
+            plays.Value = BeatmapSet?.OnlineInfo.PlayCount ?? 0;
+            favourites.Value = BeatmapSet?.OnlineInfo.FavouriteCount ?? 0;
+
+            updateDifficultyButtons();
         }
 
         public BeatmapPicker()
@@ -140,6 +149,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OsuColour colours)
         {
             starRating.Colour = colours.Yellow;
+            updateDisplay();
         }
 
         protected override void LoadComplete()
@@ -150,7 +160,10 @@ namespace osu.Game.Overlays.BeatmapSet
             Beatmap.TriggerChange();
         }
 
-        private void showBeatmap(BeatmapInfo beatmap) => version.Text = beatmap.Version;
+        private void showBeatmap(BeatmapInfo beatmap)
+        {
+            version.Text = beatmap?.Version;
+        }
 
         private void updateDifficultyButtons()
         {

@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
             Size = hitCircle.Size;
             Scale = hitCircle.Scale;
 
+            CornerRadius = Size.X / 2;
+
             AddInternal(new RingPiece());
 
             hitCircle.HitObject.PositionChanged += _ => Position = hitCircle.Position;

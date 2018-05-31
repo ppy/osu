@@ -11,6 +11,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.BeatmapSet.Buttons;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -18,7 +20,7 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class Header : Container
     {
-        private const float transition_duration = 250;
+        private const float transition_duration = 200;
         private const float tabs_height = 50;
         private const float buttons_height = 45;
         private const float buttons_spacing = 5;
@@ -34,12 +36,13 @@ namespace osu.Game.Overlays.BeatmapSet
         public Details Details;
 
         private BeatmapManager beatmaps;
-
         private DelayedLoadWrapper cover;
 
         public readonly BeatmapPicker Picker;
 
         private BeatmapSetInfo beatmapSet;
+        private readonly FavouriteButton favouriteButton;
+
         public BeatmapSetInfo BeatmapSet
         {
             get { return beatmapSet; }
@@ -49,15 +52,26 @@ namespace osu.Game.Overlays.BeatmapSet
                 beatmapSet = value;
 
                 Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = BeatmapSet;
-                title.Text = BeatmapSet.Metadata.Title;
-                artist.Text = BeatmapSet.Metadata.Artist;
-                onlineStatusPill.Status = BeatmapSet.OnlineInfo.Status;
 
-                downloadButtonsContainer.FadeIn();
+                updateDisplay();
+            }
+        }
+
+        private void updateDisplay()
+        {
+            title.Text = BeatmapSet?.Metadata.Title ?? string.Empty;
+            artist.Text = BeatmapSet?.Metadata.Artist ?? string.Empty;
+            onlineStatusPill.Status = BeatmapSet?.OnlineInfo.Status ?? BeatmapSetOnlineStatus.None;
+
+            cover?.FadeOut(400, Easing.Out);
+            if (BeatmapSet != null)
+            {
+                downloadButtonsContainer.FadeIn(transition_duration);
+                favouriteButton.FadeIn(transition_duration);
+
                 noVideoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 0 : 1, transition_duration);
                 videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
 
-                cover?.FadeOut(400, Easing.Out);
                 coverContainer.Add(cover = new DelayedLoadWrapper(
                     new BeatmapSetCover(BeatmapSet)
                     {
@@ -71,10 +85,16 @@ namespace osu.Game.Overlays.BeatmapSet
                     RelativeSizeAxes = Axes.Both,
                 });
             }
+            else
+            {
+                downloadButtonsContainer.FadeOut(transition_duration);
+                favouriteButton.FadeOut(transition_duration);
+            }
         }
 
         public Header()
         {
+            ExternalLinkButton externalLink;
             RelativeSizeAxes = Axes.X;
             Height = 400;
             Masking = true;
@@ -142,10 +162,24 @@ namespace osu.Game.Overlays.BeatmapSet
                                         Height = 113,
                                         Child = Picker = new BeatmapPicker(),
                                     },
-                                    title = new OsuSpriteText
+                                    new FillFlowContainer
                                     {
-                                        Font = @"Exo2.0-BoldItalic",
-                                        TextSize = 37,
+                                        Direction = FillDirection.Horizontal,
+                                        AutoSizeAxes = Axes.Both,
+                                        Children = new Drawable[]
+                                        {
+                                            title = new OsuSpriteText
+                                            {
+                                                Font = @"Exo2.0-BoldItalic",
+                                                TextSize = 37,
+                                            },
+                                            externalLink = new ExternalLinkButton
+                                            {
+                                                Anchor = Anchor.BottomLeft,
+                                                Origin = Anchor.BottomLeft,
+                                                Margin = new MarginPadding { Left = 3, Bottom = 4 }, //To better lineup with the font
+                                            },
+                                        }
                                     },
                                     artist = new OsuSpriteText
                                     {
@@ -166,7 +200,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                         Margin = new MarginPadding { Top = 10 },
                                         Children = new Drawable[]
                                         {
-                                            new FavouriteButton(),
+                                            favouriteButton = new FavouriteButton(),
                                             downloadButtonsContainer = new Container
                                             {
                                                 RelativeSizeAxes = Axes.Both,
@@ -229,6 +263,7 @@ namespace osu.Game.Overlays.BeatmapSet
             };
 
             Picker.Beatmap.ValueChanged += b => Details.Beatmap = b;
+            Picker.Beatmap.ValueChanged += b => externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
         }
 
         [BackgroundDependencyLoader]
@@ -238,6 +273,8 @@ namespace osu.Game.Overlays.BeatmapSet
             this.beatmaps = beatmaps;
 
             beatmaps.ItemAdded += handleBeatmapAdd;
+
+            updateDisplay();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -246,11 +283,11 @@ namespace osu.Game.Overlays.BeatmapSet
             if (beatmaps != null) beatmaps.ItemAdded -= handleBeatmapAdd;
         }
 
-        private void handleBeatmapAdd(BeatmapSetInfo beatmap)
+        private void handleBeatmapAdd(BeatmapSetInfo beatmap) => Schedule(() =>
         {
             if (beatmap.OnlineBeatmapSetID == BeatmapSet?.OnlineBeatmapSetID)
                 downloadButtonsContainer.FadeOut(transition_duration);
-        }
+        });
 
         private void download(bool noVideo)
         {

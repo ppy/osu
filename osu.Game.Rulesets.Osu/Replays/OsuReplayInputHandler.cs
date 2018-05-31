@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             {
                 new ReplayState<OsuAction>
                 {
-                    Mouse = new ReplayMouseState(ToScreenSpace(Position ?? Vector2.Zero)),
+                    Mouse = new ReplayMouseState(GamefieldToScreenSpace(Position ?? Vector2.Zero)),
                     PressedActions = CurrentFrame.Actions
                 }
             };

@@ -92,7 +92,7 @@ namespace osu.Game.Skinning
                 string lastPiece = filename.Split('/').Last();
 
                 var file = source.Files.FirstOrDefault(f =>
-                    string.Equals(hasExtension ? f.Filename : Path.GetFileNameWithoutExtension(f.Filename), lastPiece, StringComparison.InvariantCultureIgnoreCase));
+                    string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), lastPiece, StringComparison.InvariantCultureIgnoreCase));
                 return file?.FileInfo.StoragePath;
             }
 
@@ -113,6 +113,31 @@ namespace osu.Game.Skinning
                 string path = getPathForFile(name);
                 return path == null ? null : underlyingStore.Get(path);
             }
+
+            #region IDisposable Support
+
+            private bool isDisposed;
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!isDisposed)
+                {
+                    isDisposed = true;
+                }
+            }
+
+            ~LegacySkinResourceStore()
+            {
+                Dispose(false);
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            #endregion
         }
     }
 }

@@ -21,6 +21,7 @@ namespace osu.Game.Screens.Select.Details
         private readonly BarGraph graph;
 
         private BeatmapMetrics metrics;
+
         public BeatmapMetrics Metrics
         {
             get { return metrics; }
@@ -31,15 +32,25 @@ namespace osu.Game.Screens.Select.Details
 
                 const int rating_range = 10;
 
-                var ratings = Metrics.Ratings.Skip(1).Take(rating_range); // adjust for API returning weird empty data at 0.
+                if (metrics == null)
+                {
+                    negativeRatings.Text = "0";
+                    positiveRatings.Text = "0";
+                    ratingsBar.Length = 0;
+                    graph.Values = new float[rating_range];
+                }
+                else
+                {
+                    var ratings = Metrics.Ratings.Skip(1).Take(rating_range); // adjust for API returning weird empty data at 0.
 
-                var negativeCount = ratings.Take(rating_range / 2).Sum();
-                var totalCount = ratings.Sum();
+                    var negativeCount = ratings.Take(rating_range / 2).Sum();
+                    var totalCount = ratings.Sum();
 
-                negativeRatings.Text = negativeCount.ToString();
-                positiveRatings.Text = (totalCount - negativeCount).ToString();
-                ratingsBar.Length = totalCount == 0 ? 0 : (float)negativeCount / totalCount;
-                graph.Values = ratings.Take(rating_range).Select(r => (float)r);
+                    negativeRatings.Text = negativeCount.ToString();
+                    positiveRatings.Text = (totalCount - negativeCount).ToString();
+                    ratingsBar.Length = totalCount == 0 ? 0 : (float)negativeCount / totalCount;
+                    graph.Values = ratings.Take(rating_range).Select(r => (float)r);
+                }
             }
         }
 

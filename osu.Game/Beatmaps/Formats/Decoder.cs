@@ -16,12 +16,12 @@ namespace osu.Game.Beatmaps.Formats
         public TOutput Decode(StreamReader primaryStream, params StreamReader[] otherStreams)
         {
             var output = CreateTemplateObject();
-            foreach (StreamReader stream in new[] { primaryStream }.Concat(otherStreams))
+            foreach (StreamReader stream in otherStreams.Prepend(primaryStream))
                 ParseStreamInto(stream, output);
             return output;
         }
 
-        protected abstract void ParseStreamInto(StreamReader stream, TOutput beatmap);
+        protected abstract void ParseStreamInto(StreamReader stream, TOutput output);
     }
 
     public abstract class Decoder
