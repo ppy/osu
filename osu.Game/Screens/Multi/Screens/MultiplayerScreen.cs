@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Multi.Screens
         /// <summary>
         /// The type to display in the title of the <see cref="Header"/>.
         /// </summary>
-        public abstract string Type { get; }
+        public virtual string Type => Title;
 
         protected override void OnEntering(Screen last)
         {
