@@ -81,7 +81,7 @@ namespace osu.Game.Beatmaps
 
         protected override void Populate(BeatmapSetInfo model, ArchiveReader archive)
         {
-            model.Beatmaps = createBeatmapDifficulties(archive);
+            model.Beatmaps = createBeatmapDifficulties(model, archive);
 
             // remove metadata from difficulties where it matches the set
             foreach (BeatmapInfo b in model.Beatmaps)
@@ -107,6 +107,7 @@ namespace osu.Game.Beatmaps
                 {
                     Delete(existingOnlineId);
                     beatmaps.PurgeDeletable(s => s.ID == existingOnlineId.ID);
+                    Logger.Log($"Found existing beatmap set with same OnlineBeatmapSetID ({model.OnlineBeatmapSetID}). It has been purged.", LoggingTarget.Database);
                 }
             }
 
@@ -241,7 +242,13 @@ namespace osu.Game.Beatmaps
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => beatmaps.ConsumableItems.Where(s => !s.DeletePending && !s.Protected).ToList();
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => GetAllUsableBeatmapSetsEnumerable().ToList();
+
+        /// <summary>
+        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
+        /// </summary>
+        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
+        public IQueryable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable() => beatmaps.ConsumableItems.Where(s => !s.DeletePending && !s.Protected);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
@@ -303,7 +310,7 @@ namespace osu.Game.Beatmaps
         {
             // let's make sure there are actually .osu files to import.
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
-            if (string.IsNullOrEmpty(mapName)) throw new InvalidOperationException("No beatmap files found in the map folder.");
+            if (string.IsNullOrEmpty(mapName)) throw new InvalidOperationException("No beatmap files found in this beatmap archive.");
 
             BeatmapMetadata metadata;
             using (var stream = new StreamReader(reader.GetStream(mapName)))
@@ -321,7 +328,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Create all required <see cref="BeatmapInfo"/>s for the provided archive.
         /// </summary>
-        private List<BeatmapInfo> createBeatmapDifficulties(ArchiveReader reader)
+        private List<BeatmapInfo> createBeatmapDifficulties(BeatmapSetInfo model, ArchiveReader reader)
         {
             var beatmapInfos = new List<BeatmapInfo>();
 
@@ -340,6 +347,14 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Path = name;
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
+
+                    // ensure we have the same online set ID as the set itself.
+                    beatmap.BeatmapInfo.OnlineBeatmapSetID = model.OnlineBeatmapSetID;
+                    beatmap.BeatmapInfo.Metadata.OnlineBeatmapSetID = model.OnlineBeatmapSetID;
+
+                    // check that no existing beatmap exists that is imported with the same online beatmap ID. if so, give it precedence.
+                    if (beatmap.BeatmapInfo.OnlineBeatmapID.HasValue && QueryBeatmap(b => b.OnlineBeatmapID.Value == beatmap.BeatmapInfo.OnlineBeatmapID.Value) != null)
+                        beatmap.BeatmapInfo.OnlineBeatmapID = null;
 
                     RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
 

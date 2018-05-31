@@ -22,7 +22,7 @@
             },
             "type": "mono",
             "request": "launch",
-            "program": "${workspaceRoot}/osu.Game.Tests/bin/Debug/net471/osu.Game.Tests.exe",
+            "program": "${workspaceRoot}/osu.Game.Tests/bin/Release/net471/osu.Game.Tests.exe",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Release, msbuild)",
             "runtimeExecutable": null,
