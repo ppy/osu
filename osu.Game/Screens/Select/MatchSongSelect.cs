@@ -7,7 +7,12 @@ namespace osu.Game.Screens.Select
     {
         protected override bool OnSelectionFinalised()
         {
-            Exit();
+            Schedule(() =>
+            {
+                // needs to be scheduled else we enter an infinite feedback loop.
+                if (IsCurrentScreen) Exit();
+            });
+
             return true;
         }
     }

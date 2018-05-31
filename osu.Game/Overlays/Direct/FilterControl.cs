@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -12,6 +10,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Rulesets;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Direct
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"384552");
         protected override DirectSortCriteria DefaultTab => DirectSortCriteria.Ranked;
+
         protected override Drawable CreateSupplementaryControls()
         {
             modeButtons = new FillFlowContainer<RulesetToggleButton>
@@ -38,7 +39,7 @@ namespace osu.Game.Overlays.Direct
         {
             DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
 
-            Ruleset.BindTo(game?.Ruleset ?? new Bindable<RulesetInfo> { Value = rulesets.GetRuleset(0) });
+            Ruleset.Value = game?.Ruleset.Value ?? rulesets.GetRuleset(0);
             foreach (var r in rulesets.AvailableRulesets)
             {
                 modeButtons.Add(new RulesetToggleButton(Ruleset, r));
@@ -49,14 +50,15 @@ namespace osu.Game.Overlays.Direct
         {
             private Drawable icon
             {
-                get { return iconContainer.Icon; }
-                set { iconContainer.Icon = value; }
+                get => iconContainer.Icon;
+                set => iconContainer.Icon = value;
             }
 
             private RulesetInfo ruleset;
+
             public RulesetInfo Ruleset
             {
-                get { return ruleset; }
+                get => ruleset;
                 set
                 {
                     ruleset = value;
@@ -72,6 +74,9 @@ namespace osu.Game.Overlays.Direct
             {
                 iconContainer.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
             }
+
+            public override bool HandleKeyboardInput => !bindable.Disabled && base.HandleKeyboardInput;
+            public override bool HandleMouseInput => !bindable.Disabled && base.HandleMouseInput;
 
             public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
             {

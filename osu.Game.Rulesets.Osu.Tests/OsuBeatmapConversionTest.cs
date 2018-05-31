@@ -5,17 +5,15 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    internal class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
@@ -42,10 +40,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
         }
 
-        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new OsuBeatmapConverter();
+        protected override Ruleset CreateRuleset() => new OsuRuleset();
     }
 
-    public struct ConvertValue : IEquatable<ConvertValue>
+    internal struct ConvertValue : IEquatable<ConvertValue>
     {
         /// <summary>
         /// A sane value to account for osu!stable using ints everwhere.
