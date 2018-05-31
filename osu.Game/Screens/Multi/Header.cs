@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Screens.Multi.Screens;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Screens.Multi
     {
         public const float HEIGHT = 121;
 
-        private readonly OsuSpriteText screenTitle;
+        private readonly OsuSpriteText screenType;
         private readonly HeaderBreadcrumbControl breadcrumbs;
 
         public Header(Screen initialScreen)
@@ -66,7 +67,7 @@ namespace osu.Game.Screens.Multi
                                             Text = "multiplayer ",
                                             TextSize = 25,
                                         },
-                                        screenTitle = new OsuSpriteText
+                                        screenType = new OsuSpriteText
                                         {
                                             TextSize = 25,
                                             Font = @"Exo2.0-Light",
@@ -85,14 +86,14 @@ namespace osu.Game.Screens.Multi
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += s => screenTitle.Text = s.ToString();
+            breadcrumbs.Current.ValueChanged += s => screenType.Text = ((MultiplayerScreen)s).Type.ToLower();
             breadcrumbs.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            screenTitle.Colour = colours.Yellow;
+            screenType.Colour = colours.Yellow;
             breadcrumbs.StripColour = colours.Green;
         }
 
