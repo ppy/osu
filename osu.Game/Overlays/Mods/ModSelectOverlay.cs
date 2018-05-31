@@ -58,6 +58,7 @@ namespace osu.Game.Overlays.Mods
 
             LowMultiplierColour = colours.Red;
             HighMultiplierColour = colours.Green;
+            UnrankedLabel.Colour = colours.Blue;
 
             if (osu != null)
                 Ruleset.BindTo(osu.Ruleset);
@@ -378,7 +379,6 @@ namespace osu.Game.Overlays.Mods
                                             Font = @"Exo2.0-Bold",
                                             Text = @"(Unranked)",
                                             TextSize = 30,
-                                            Colour = OsuColour.FromHex(@"66ccff"),
                                             Shadow = true,
                                             Margin = new MarginPadding
                                             {
