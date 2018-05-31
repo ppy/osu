@@ -49,12 +49,14 @@ namespace osu.Game.Screens
         private OsuScreen loadScreen;
         private ShaderPrecompiler precompiler;
 
+        protected virtual OsuScreen CreateLoadableScreen() => showDisclaimer ? (OsuScreen)new Disclaimer() : new Intro();
+
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
             LoadComponentAsync(precompiler = new ShaderPrecompiler(loadIfReady), Add);
-            LoadComponentAsync(loadScreen = showDisclaimer ? (OsuScreen)new Disclaimer() : new Intro(), s => loadIfReady());
+            LoadComponentAsync(loadScreen = CreateLoadableScreen(), s => loadIfReady());
         }
 
         private void loadIfReady()
