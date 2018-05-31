@@ -208,7 +208,7 @@ namespace osu.Game
         {
             try
             {
-                using (var db = contextFactory.GetForWrite())
+                using (var db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
             catch (MigrationFailedException e)
@@ -220,7 +220,7 @@ namespace osu.Game
                 contextFactory.ResetDatabase();
                 Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
 
-                using (var db = contextFactory.GetForWrite())
+                using (var db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
         }
