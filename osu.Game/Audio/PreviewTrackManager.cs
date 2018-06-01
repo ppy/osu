@@ -7,6 +7,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 
@@ -45,11 +46,12 @@ namespace osu.Game.Audio
             };
         }
 
-        public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo) =>
+        public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo, OverlayContainer previewOwner) =>
             new PreviewTrack(
                 trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3"),
                 onTrackStart,
-                onTrackStop);
+                onTrackStop,
+                previewOwner);
 
         protected override void Update()
         {

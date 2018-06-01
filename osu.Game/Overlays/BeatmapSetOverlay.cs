@@ -127,7 +127,8 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
-            previewTrackManager.CurrentTrack?.Stop();
+            if (previewTrackManager.CurrentTrack?.Owner == this)
+                previewTrackManager.CurrentTrack?.Stop();
 
             FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out).OnComplete(_ => BeatmapSet = null);
         }
