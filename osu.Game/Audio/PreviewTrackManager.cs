@@ -6,7 +6,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 
@@ -32,12 +31,16 @@ namespace osu.Game.Audio
             config.BindWith(FrameworkSetting.VolumeMusic, trackManager.Volume);
         }
 
-        public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo, OverlayContainer previewOwner)
+        protected override void Update()
         {
-            var previewTrack = new PreviewTrack(
-                trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3"),
-                previewOwner);
+            if (CurrentTrack?.Track.HasCompleted ?? false)
+                CurrentTrack.Stop();
 
+            base.Update();
+        }
+
+        public Track Get(PreviewTrack previewTrack, BeatmapSetInfo beatmapSetInfo)
+        {
             previewTrack.Started += () =>
             {
                 CurrentTrack?.Stop();
@@ -51,15 +54,7 @@ namespace osu.Game.Audio
                 audio.Track.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
             };
 
-            return previewTrack;
-        }
-
-        protected override void Update()
-        {
-            if (CurrentTrack?.Track.HasCompleted ?? false)
-                CurrentTrack.Stop();
-
-            base.Update();
+            return trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3");
         }
     }
 }

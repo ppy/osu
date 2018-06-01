@@ -2,23 +2,34 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Audio
 {
-    public class PreviewTrack
+    public class PreviewTrack : Component
     {
-        public readonly Track Track;
+        public Track Track { get; private set; }
         public readonly OverlayContainer Owner;
+
+        private readonly BeatmapSetInfo beatmapSetInfo;
 
         public event Action Stopped;
         public event Action Started;
 
-        public PreviewTrack(Track track, OverlayContainer owner)
+        public PreviewTrack(BeatmapSetInfo beatmapSetInfo, OverlayContainer owner)
         {
-            Track = track;
+            this.beatmapSetInfo = beatmapSetInfo;
             Owner = owner;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(PreviewTrackManager previewTrackManager)
+        {
+            Track = previewTrackManager.Get(this, beatmapSetInfo);
         }
 
         public void Start()
