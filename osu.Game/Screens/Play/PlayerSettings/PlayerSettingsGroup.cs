@@ -130,14 +130,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (expanded)
-            {
-                button.Colour = colours.Yellow;
-            }
-            else
-            {
-                button.Colour = Color4.White;
-            }
+            button.FadeColour(expanded ? colours.Yellow : Color4.White);
 
             expandedColour = colours.Yellow;
         }
