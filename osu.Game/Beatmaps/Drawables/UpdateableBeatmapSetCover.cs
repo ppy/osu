@@ -59,6 +59,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             displayedCover?.FadeOut(400);
             displayedCover?.Expire();
+            displayedCover = null;
 
             if (beatmapSet != null)
             {
