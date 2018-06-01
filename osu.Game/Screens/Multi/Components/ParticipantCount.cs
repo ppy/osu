@@ -62,6 +62,8 @@ namespace osu.Game.Screens.Multi.Components
                     Font = @"Exo2.0-Light"
                 },
             };
+
+            Max = null;
         }
     }
 }
