@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         public BeatmapSetInfo BeatmapSet
         {
-            set { cover.BeatmapSet = value; }
+            set => cover.BeatmapSet = value;
         }
 
         public Action OnWantsSelectBeatmap;
