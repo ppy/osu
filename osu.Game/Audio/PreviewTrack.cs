@@ -3,23 +3,27 @@
 
 using System;
 using osu.Framework.Audio.Track;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Audio
 {
     public class PreviewTrack
     {
         public readonly Track Track;
+        public readonly OverlayContainer Owner;
+
         private readonly Action<PreviewTrack> onStart;
         private readonly Action onStop;
 
         public event Action Stopped;
         public event Action Started;
 
-        public PreviewTrack(Track track, Action<PreviewTrack> onStart, Action onStop)
+        public PreviewTrack(Track track, Action<PreviewTrack> onStart, Action onStop, OverlayContainer owner)
         {
             Track = track;
             this.onStart = onStart;
             this.onStop = onStop;
+            Owner = owner;
         }
 
         public void Start()

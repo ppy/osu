@@ -35,6 +35,18 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
+        private OverlayContainer parentOverlayContainer
+        {
+            get
+            {
+                var d = Parent;
+                while (!(d is OverlayContainer))
+                    d = d.Parent;
+
+                return (OverlayContainer)d;
+            }
+        }
+
         private PreviewTrackManager previewTrackManager;
 
         private Color4 hoverColour;
@@ -95,7 +107,7 @@ namespace osu.Game.Overlays.Direct
                     Task.Run(() =>
                         {
                             loading = true;
-                            return Preview = previewTrackManager.Get(beatmapSet);
+                            return Preview = previewTrackManager.Get(beatmapSet, parentOverlayContainer);
                         })
                         .ContinueWith(t =>
                         {
