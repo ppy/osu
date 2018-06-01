@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual
             AddStep("show", () =>
             {
                 infoWedge.State = Visibility.Visible;
-                infoWedge.UpdateBeatmap(beatmap);
+                infoWedge.Beatmap = beatmap;
             });
 
             // select part is redundant, but wait for load isn't
@@ -135,14 +135,12 @@ namespace osu.Game.Tests.Visual
             var firstBeatmap = createTestBeatmap(firstRuleset, 25000000);
             var secondBeatmap = createTestBeatmap(secondRuleset, 2000);
 
-            int loadedBefore = -1;
             AddStep("select two beatmaps", () =>
             {
-                loadedBefore = infoWedge.LoadedBuffersCount;
-                infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(firstBeatmap));
-                infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(secondBeatmap));
+                infoWedge.Beatmap = beatmap.Value = new TestWorkingBeatmap(firstBeatmap);
+                infoWedge.Beatmap = beatmap.Value = new TestWorkingBeatmap(secondBeatmap);
             });
-            AddUntilStep(() => infoWedge.LoadedBuffersCount == loadedBefore + 2, "wait for load");
+            AddUntilStep(() => infoWedge.Info.Working.Beatmap == secondBeatmap, "wait for load");
             AddAssert("loaded info of second beatmap", () => infoWedge.Info.VersionLabel.Text == $"{secondRuleset.ShortName}Version");
         }
 
@@ -153,7 +151,7 @@ namespace osu.Game.Tests.Visual
             AddStep($"select {b.Metadata.Title} beatmap", () =>
             {
                 infoBefore = infoWedge.Info;
-                infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(b));
+                infoWedge.Beatmap = beatmap.Value = new TestWorkingBeatmap(b);
             });
 
             AddUntilStep(() => infoWedge.Info != infoBefore, "wait for async load");
@@ -164,7 +162,7 @@ namespace osu.Game.Tests.Visual
             AddStep("select null beatmap", () =>
             {
                 beatmap.Value = beatmap.Default;
-                infoWedge.UpdateBeatmap(beatmap);
+                infoWedge.Beatmap = beatmap;
             });
         }
 
@@ -197,14 +195,6 @@ namespace osu.Game.Tests.Visual
         private class TestBeatmapInfoWedge : BeatmapInfoWedge
         {
             public new BufferedWedgeInfo Info => base.Info;
-
-            public int LoadedBuffersCount;
-
-            protected override void UpdateInfo(BufferedWedgeInfo newInfo)
-            {
-                base.UpdateInfo(newInfo);
-                LoadedBuffersCount += 1;
-            }
         }
 
         private class TestHitObject : HitObject, IHasPosition

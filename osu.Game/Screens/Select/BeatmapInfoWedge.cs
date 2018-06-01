@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Select
         {
             if (osuGame != null)
                 ruleset.BindTo(osuGame.Ruleset);
-            ruleset.ValueChanged += updateRuleset;
+            ruleset.ValueChanged += _ => updateDisplay();
         }
 
         protected override bool BlockPassThroughMouse => false;
@@ -78,45 +78,49 @@ namespace osu.Game.Screens.Select
 
         private WorkingBeatmap beatmap;
 
-        public void UpdateBeatmap(WorkingBeatmap beatmap)
+        public WorkingBeatmap Beatmap
         {
-            this.beatmap = beatmap;
-            loadBeatmap();
+            get => beatmap;
+            set
+            {
+                if (beatmap == value) return;
+
+                beatmap = value;
+                updateDisplay();
+            }
         }
 
-        private void updateRuleset(RulesetInfo ruleset) => loadBeatmap();
+        private BufferedWedgeInfo loadingInfo;
 
-        private void loadBeatmap()
+        private void updateDisplay()
         {
+            void removeOldInfo()
+            {
+                State = beatmap == null ? Visibility.Hidden : Visibility.Visible;
+
+                Info?.FadeOut(250);
+                Info?.Expire();
+                Info = null;
+            }
+
             if (beatmap == null)
             {
-                updateState();
+                removeOldInfo();
                 return;
             }
 
-            LoadComponentAsync(new BufferedWedgeInfo(beatmap, ruleset.Value)
+            LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value)
             {
                 Shear = -Shear,
                 Depth = Info?.Depth + 1 ?? 0,
-            }, UpdateInfo
-            );
-        }
-
-        private void updateState()
-        {
-            State = beatmap == null ? Visibility.Hidden : Visibility.Visible;
-
-            Info?.FadeOut(250);
-            Info?.Expire();
-        }
-
-        protected virtual void UpdateInfo(BufferedWedgeInfo newInfo)
-        {
-            if (newInfo.Working == beatmap)
+            }, loaded =>
             {
-                updateState();
-                Add(Info = newInfo);
-            }
+                // ensure we are the most recent loaded wedge.
+                if (loaded != loadingInfo) return;
+
+                removeOldInfo();
+                Add(Info = loaded);
+            });
         }
 
         public class BufferedWedgeInfo : BufferedContainer
