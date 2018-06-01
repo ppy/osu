@@ -7,7 +7,7 @@ namespace osu.Game.Screens.Select
     {
         protected override bool ShowFooter => false;
 
-        protected override bool OnSelectionFinalised()
+        protected override bool OnStart()
         {
             Exit();
             return true;

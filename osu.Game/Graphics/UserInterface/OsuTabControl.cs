@@ -6,6 +6,7 @@ using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -157,7 +158,7 @@ namespace osu.Game.Graphics.UserInterface
                         Margin = new MarginPadding { Top = 5, Bottom = 5 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
-                        Text = (value as Enum)?.GetDescription() ?? value.ToString(),
+                        Text = (value as IHasDescription)?.Description ?? (value as Enum)?.GetDescription() ?? value.ToString(),
                         TextSize = 14,
                         Font = @"Exo2.0-Bold", // Font should only turn bold when active?
                     },

@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -38,9 +37,11 @@ namespace osu.Game.Screens.Multi.Components
 
         private OsuColour colours;
         private Box statusStrip;
-        private Container coverContainer;
-        private FillFlowContainer topFlow, participantsFlow, participantNumbersFlow, infoPanelFlow;
+        private UpdateableBeatmapSetCover cover;
+        private ParticipantCount participantCount;
+        private FillFlowContainer topFlow, participantsFlow;
         private OsuSpriteText name, status;
+        private BeatmapTypeInfo beatmapTypeInfo;
         private ScrollContainer participantsScroll;
         private ParticipantInfo participantInfo;
 
@@ -77,12 +78,9 @@ namespace osu.Game.Screens.Multi.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuColour colours)
         {
             this.colours = colours;
-
-            ModeTypeInfo modeTypeInfo;
-            OsuSpriteText participants, participantsSlash, maxParticipants, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor;
 
             Children = new Drawable[]
             {
@@ -105,21 +103,9 @@ namespace osu.Game.Screens.Multi.Components
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                new Container
+                                cover = new UpdateableBeatmapSetCover
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4.Black,
-                                        },
-                                        coverContainer = new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                    },
                                 },
                                 new Box
                                 {
@@ -132,32 +118,10 @@ namespace osu.Game.Screens.Multi.Components
                                     Padding = new MarginPadding(20),
                                     Children = new Drawable[]
                                     {
-                                        participantNumbersFlow = new FillFlowContainer
+                                        participantCount = new ParticipantCount
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            LayoutDuration = transition_duration,
-                                            Children = new[]
-                                            {
-                                                participants = new OsuSpriteText
-                                                {
-                                                    TextSize = 30,
-                                                    Font = @"Exo2.0-Bold"
-                                                },
-                                                participantsSlash = new OsuSpriteText
-                                                {
-                                                    Text = @"/",
-                                                    TextSize = 30,
-                                                    Font = @"Exo2.0-Light"
-                                                },
-                                                maxParticipants = new OsuSpriteText
-                                                {
-                                                    TextSize = 30,
-                                                    Font = @"Exo2.0-Light"
-                                                },
-                                            },
                                         },
                                         name = new OsuSpriteText
                                         {
@@ -200,54 +164,7 @@ namespace osu.Game.Screens.Multi.Components
                                             TextSize = 14,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        infoPanelFlow = new FillFlowContainer
-                                        {
-                                            AutoSizeAxes = Axes.X,
-                                            Height = 30,
-                                            Direction = FillDirection.Horizontal,
-                                            LayoutDuration = transition_duration,
-                                            Spacing = new Vector2(5f, 0f),
-                                            Children = new Drawable[]
-                                            {
-                                                modeTypeInfo = new ModeTypeInfo(),
-                                                new Container
-                                                {
-                                                    AutoSizeAxes = Axes.X,
-                                                    RelativeSizeAxes = Axes.Y,
-                                                    Margin = new MarginPadding { Left = 5 },
-                                                    Children = new[]
-                                                    {
-                                                        new FillFlowContainer
-                                                        {
-                                                            AutoSizeAxes = Axes.Both,
-                                                            Direction = FillDirection.Horizontal,
-                                                            Children = new[]
-                                                            {
-                                                                beatmapTitle = new OsuSpriteText
-                                                                {
-                                                                    Font = @"Exo2.0-BoldItalic",
-                                                                },
-                                                                beatmapDash = new OsuSpriteText
-                                                                {
-                                                                    Font = @"Exo2.0-BoldItalic",
-                                                                },
-                                                                beatmapArtist = new OsuSpriteText
-                                                                {
-                                                                    Font = @"Exo2.0-RegularItalic",
-                                                                },
-                                                            },
-                                                        },
-                                                        beatmapAuthor = new OsuSpriteText
-                                                        {
-                                                            Anchor = Anchor.BottomLeft,
-                                                            Origin = Anchor.BottomLeft,
-                                                            TextSize = 14,
-                                                            Colour = colours.Gray9,
-                                                        },
-                                                    },
-                                                },
-                                            },
-                                        },
+                                        beatmapTypeInfo = new BeatmapTypeInfo(),
                                     },
                                 },
                             },
@@ -285,61 +202,19 @@ namespace osu.Game.Screens.Multi.Components
 
             nameBind.ValueChanged += n => name.Text = n;
             hostBind.ValueChanged += h => participantInfo.Host = h;
-            typeBind.ValueChanged += t => modeTypeInfo.Type = t;
+            typeBind.ValueChanged += t => beatmapTypeInfo.Type = t;
+            maxParticipantsBind.ValueChanged += m => participantCount.Max = m;
             statusBind.ValueChanged += displayStatus;
 
             beatmapBind.ValueChanged += b =>
             {
-                modeTypeInfo.Beatmap = b;
-
-                if (b != null)
-                {
-                    coverContainer.FadeIn(transition_duration);
-
-                    LoadComponentAsync(new BeatmapSetCover(b.BeatmapSet)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    }, coverContainer.Add);
-
-                    beatmapTitle.Current = localisation.GetUnicodePreference(b.Metadata.TitleUnicode, b.Metadata.Title);
-                    beatmapDash.Text = @" - ";
-                    beatmapArtist.Current = localisation.GetUnicodePreference(b.Metadata.ArtistUnicode, b.Metadata.Artist);
-                    beatmapAuthor.Text = $"mapped by {b.Metadata.Author}";
-                }
-                else
-                {
-                    coverContainer.FadeOut(transition_duration);
-
-                    beatmapTitle.Current = null;
-                    beatmapArtist.Current = null;
-
-                    beatmapTitle.Text = "Changing map";
-                    beatmapDash.Text = beatmapArtist.Text = beatmapAuthor.Text = string.Empty;
-                }
-            };
-
-            maxParticipantsBind.ValueChanged += m =>
-            {
-                if (m == null)
-                {
-                    participantsSlash.FadeOut(transition_duration);
-                    maxParticipants.FadeOut(transition_duration);
-                }
-                else
-                {
-                    participantsSlash.FadeIn(transition_duration);
-                    maxParticipants.FadeIn(transition_duration);
-                    maxParticipants.Text = m.ToString();
-                }
+                cover.BeatmapSet = b?.BeatmapSet;
+                beatmapTypeInfo.Beatmap = b;
             };
 
             participantsBind.ValueChanged += p =>
             {
-                participants.Text = p.Length.ToString();
+                participantCount.Count = p.Length;
                 participantInfo.Participants = p;
                 participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u));
             };
@@ -367,10 +242,10 @@ namespace osu.Game.Screens.Multi.Components
         {
             if (Room == null)
             {
-                coverContainer.FadeOut(transition_duration);
+                cover.BeatmapSet = null;
                 participantsFlow.FadeOut(transition_duration);
-                participantNumbersFlow.FadeOut(transition_duration);
-                infoPanelFlow.FadeOut(transition_duration);
+                participantCount.FadeOut(transition_duration);
+                beatmapTypeInfo.FadeOut(transition_duration);
                 name.FadeOut(transition_duration);
                 participantInfo.FadeOut(transition_duration);
 
@@ -379,8 +254,8 @@ namespace osu.Game.Screens.Multi.Components
             else
             {
                 participantsFlow.FadeIn(transition_duration);
-                participantNumbersFlow.FadeIn(transition_duration);
-                infoPanelFlow.FadeIn(transition_duration);
+                participantCount.FadeIn(transition_duration);
+                beatmapTypeInfo.FadeIn(transition_duration);
                 name.FadeIn(transition_duration);
                 participantInfo.FadeIn(transition_duration);
 

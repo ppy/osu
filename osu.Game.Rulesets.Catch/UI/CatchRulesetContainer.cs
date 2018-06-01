@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
+        protected override Vector2 PlayfieldArea => new Vector2(0.86f); // matches stable's vertical offset for catcher plate
+
         protected override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)
         {
             switch (h)
