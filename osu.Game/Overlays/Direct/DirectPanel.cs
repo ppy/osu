@@ -27,8 +27,6 @@ namespace osu.Game.Overlays.Direct
     {
         public readonly BeatmapSetInfo SetInfo;
 
-        protected Box BlackBackground;
-
         private const double hover_transition_time = 400;
 
         private Container content;
@@ -81,12 +79,6 @@ namespace osu.Game.Overlays.Direct
                 EdgeEffect = edgeEffectNormal,
                 Children = new[]
                 {
-                    // temporary blackness until the actual background loads.
-                    BlackBackground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                    },
                     CreateBackground(),
                     progressBar = new ProgressBar
                     {
@@ -215,21 +207,10 @@ namespace osu.Game.Overlays.Direct
             return icons;
         }
 
-        protected Drawable CreateBackground() => new DelayedLoadWrapper(
-            new BeatmapSetCover(SetInfo)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fill,
-                OnLoadComplete = d =>
-                {
-                    d.FadeInFromZero(400, Easing.Out);
-                    BlackBackground.Delay(400).FadeOut();
-                },
-            }, 300)
+        protected Drawable CreateBackground() => new UpdateableBeatmapSetCover
         {
             RelativeSizeAxes = Axes.Both,
+            BeatmapSet = SetInfo,
         };
 
         public class Statistic : FillFlowContainer
