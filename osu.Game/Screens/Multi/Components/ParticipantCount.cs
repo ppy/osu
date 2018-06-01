@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Multi.Components
 
         public int Count
         {
-            set { count.Text = value.ToString(); }
+            set => count.Text = value.ToString();
         }
 
         public int? Max
@@ -31,8 +31,8 @@ namespace osu.Game.Screens.Multi.Components
                 else
                 {
                     slash.FadeIn(transition_duration);
-                    max.FadeIn(transition_duration);
                     max.Text = value.ToString();
+                    max.FadeIn(transition_duration);
                 }
             }
         }
