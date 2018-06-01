@@ -61,8 +61,8 @@ namespace osu.Game.Overlays.BeatmapSet
             title.Text = BeatmapSet?.Metadata.Title ?? string.Empty;
             artist.Text = BeatmapSet?.Metadata.Artist ?? string.Empty;
             onlineStatusPill.Status = BeatmapSet?.OnlineInfo.Status ?? BeatmapSetOnlineStatus.None;
+            cover.BeatmapSet = BeatmapSet;
 
-            cover.BeatmapSet = null;
             if (BeatmapSet != null)
             {
                 downloadButtonsContainer.FadeIn(transition_duration);
@@ -70,8 +70,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 noVideoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 0 : 1, transition_duration);
                 videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
-
-                cover.BeatmapSet = BeatmapSet;
             }
             else
             {

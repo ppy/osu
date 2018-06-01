@@ -12,6 +12,7 @@ using osu.Framework.Platform;
 using osu.Game;
 using OpenTK.Input;
 using Microsoft.Win32;
+using osu.Framework.Platform.Windows;
 
 namespace osu.Desktop
 {
@@ -40,7 +41,7 @@ namespace osu.Desktop
         /// <summary>
         /// A method of accessing an osu-stable install in a controlled fashion.
         /// </summary>
-        private class StableStorage : DesktopStorage
+        private class StableStorage : WindowsStorage
         {
             protected override string LocateBasePath()
             {

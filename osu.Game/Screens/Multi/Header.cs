@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Multi
     {
         public const float HEIGHT = 121;
 
-        private readonly OsuSpriteText screenTitle;
+        private readonly OsuSpriteText screenType;
         private readonly HeaderBreadcrumbControl breadcrumbs;
 
         public Header(Screen initialScreen)
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Multi
                                             Text = "multiplayer ",
                                             TextSize = 25,
                                         },
-                                        screenTitle = new OsuSpriteText
+                                        screenType = new OsuSpriteText
                                         {
                                             TextSize = 25,
                                             Font = @"Exo2.0-Light",
@@ -86,14 +86,14 @@ namespace osu.Game.Screens.Multi
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += s => screenTitle.Text = ((MultiplayerScreen)s).Title;
+            breadcrumbs.Current.ValueChanged += s => screenType.Text = ((MultiplayerScreen)s).Type.ToLower();
             breadcrumbs.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            screenTitle.Colour = colours.Yellow;
+            screenType.Colour = colours.Yellow;
             breadcrumbs.StripColour = colours.Green;
         }
 
