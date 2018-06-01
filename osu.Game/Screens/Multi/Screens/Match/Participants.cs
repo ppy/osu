@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         public int? Max
         {
-            set { count.Max = value; }
+            set => count.Max = value;
         }
 
         public Participants()
