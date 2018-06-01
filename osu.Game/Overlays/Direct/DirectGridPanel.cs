@@ -223,34 +223,22 @@ namespace osu.Game.Overlays.Direct
             {
                 Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
+
+            PreviewPlaying.ValueChanged += _ => updateStatusContainer();
         }
 
         protected override bool OnHover(InputState state)
         {
-            statusContainer.FadeOut(120, Easing.InOutQuint);
-
+            updateStatusContainer();
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
             base.OnHoverLost(state);
-
-            statusContainer.FadeIn(120, Easing.InOutQuint);
+            updateStatusContainer();
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (PreviewPlaying)
-            {
-                statusContainer.Hide();
-            }
-            else if (!IsHovered)
-            {
-                statusContainer.Show();
-            }
-        }
+        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying ? 0 : 1, 120, Easing.InOutQuint);
     }
 }
