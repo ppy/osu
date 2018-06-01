@@ -22,6 +22,7 @@ namespace osu.Game.Screens.Multi.Components
         }
 
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
             set
@@ -41,18 +42,9 @@ namespace osu.Game.Screens.Multi.Components
 
             Children = new[]
             {
-                beatmapTitle = new OsuSpriteText
-                {
-                    Font = @"Exo2.0-BoldItalic",
-                },
-                beatmapDash = new OsuSpriteText
-                {
-                    Font = @"Exo2.0-BoldItalic",
-                },
-                beatmapArtist = new OsuSpriteText
-                {
-                    Font = @"Exo2.0-RegularItalic",
-                },
+                beatmapTitle = new OsuSpriteText { Font = @"Exo2.0-BoldItalic", },
+                beatmapDash = new OsuSpriteText { Font = @"Exo2.0-BoldItalic", },
+                beatmapArtist = new OsuSpriteText { Font = @"Exo2.0-RegularItalic", },
             };
         }
 
@@ -65,7 +57,6 @@ namespace osu.Game.Screens.Multi.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             updateText();
         }
 
@@ -74,7 +65,6 @@ namespace osu.Game.Screens.Multi.Components
             if (beatmap == null)
             {
                 beatmapTitle.Current = beatmapArtist.Current = null;
-
                 beatmapTitle.Text = "Changing map";
                 beatmapDash.Text = beatmapArtist.Text = string.Empty;
             }
