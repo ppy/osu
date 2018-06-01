@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -108,12 +107,13 @@ namespace osu.Game.Screens.Multi.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuColour colours)
         {
             Box sideStrip;
             UpdateableBeatmapSetCover cover;
-            OsuSpriteText name, status, beatmapTitle, beatmapDash, beatmapArtist;
+            OsuSpriteText name, status;
             ParticipantInfo participantInfo;
+            BeatmapTitle beatmapTitle;
             ModeTypeInfo modeTypeInfo;
 
             Children = new Drawable[]
@@ -193,30 +193,10 @@ namespace osu.Game.Screens.Multi.Components
                                                 TextSize = 14,
                                                 Font = @"Exo2.0-Bold",
                                             },
-                                            new FillFlowContainer<OsuSpriteText>
+                                            beatmapTitle = new BeatmapTitle
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Colour = colours.Gray9,
-                                                Direction = FillDirection.Horizontal,
-                                                Children = new[]
-                                                {
-                                                    beatmapTitle = new OsuSpriteText
-                                                    {
-                                                        TextSize = 14,
-                                                        Font = @"Exo2.0-BoldItalic",
-                                                    },
-                                                    beatmapDash = new OsuSpriteText
-                                                    {
-                                                        TextSize = 14,
-                                                        Font = @"Exo2.0-BoldItalic",
-                                                    },
-                                                    beatmapArtist = new OsuSpriteText
-                                                    {
-                                                        TextSize = 14,
-                                                        Font = @"Exo2.0-RegularItalic",
-                                                    },
-                                                },
+                                                TextSize = 14,
+                                                Colour = colours.Gray9
                                             },
                                         },
                                     },
@@ -247,25 +227,9 @@ namespace osu.Game.Screens.Multi.Components
 
             beatmapBind.ValueChanged += b =>
             {
+                cover.BeatmapSet = b?.BeatmapSet;
+                beatmapTitle.Beatmap = b;
                 modeTypeInfo.Beatmap = b;
-
-                if (b != null)
-                {
-                    cover.BeatmapSet = b.BeatmapSet;
-                    beatmapTitle.Current = localisation.GetUnicodePreference(b.Metadata.TitleUnicode, b.Metadata.Title);
-                    beatmapDash.Text = @" - ";
-                    beatmapArtist.Current = localisation.GetUnicodePreference(b.Metadata.ArtistUnicode, b.Metadata.Artist);
-                }
-                else
-                {
-                    cover.BeatmapSet = null;
-
-                    beatmapTitle.Current = null;
-                    beatmapArtist.Current = null;
-
-                    beatmapTitle.Text = "Changing map";
-                    beatmapDash.Text = beatmapArtist.Text = string.Empty;
-                }
             };
 
             nameBind.BindTo(Room.Name);
