@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -15,9 +14,7 @@ namespace osu.Game.Audio
 {
     public class PreviewTrackManager : Component
     {
-        private Action<PreviewTrack> onTrackStart;
-        private Action onTrackStop;
-
+        private AudioManager audio;
         private TrackManager trackManager;
         private BindableDouble muteBindable;
 
@@ -27,31 +24,35 @@ namespace osu.Game.Audio
         private void load(AudioManager audio, FrameworkConfigManager config)
         {
             trackManager = new TrackManager(new OnlineStore());
-
             muteBindable = new BindableDouble();
 
+            this.audio = audio;
             audio.AddItem(trackManager);
-            config.BindWith(FrameworkSetting.VolumeMusic, trackManager.Volume);
 
-            onTrackStart = track =>
-            {
-                CurrentTrack?.Stop();
-                audio.Track.AddAdjustment(AdjustableProperty.Volume, muteBindable);
-                CurrentTrack = track;
-            };
-            onTrackStop = () =>
-            {
-                audio.Track.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
-                CurrentTrack = null;
-            };
+            config.BindWith(FrameworkSetting.VolumeMusic, trackManager.Volume);
         }
 
-        public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo, OverlayContainer previewOwner) =>
-            new PreviewTrack(
+        public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo, OverlayContainer previewOwner)
+        {
+            var previewTrack = new PreviewTrack(
                 trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3"),
-                onTrackStart,
-                onTrackStop,
                 previewOwner);
+
+            previewTrack.Started += () =>
+            {
+                CurrentTrack?.Stop();
+                CurrentTrack = previewTrack;
+                audio.Track.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+            };
+
+            previewTrack.Stopped += () =>
+            {
+                CurrentTrack = null;
+                audio.Track.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+            };
+
+            return previewTrack;
+        }
 
         protected override void Update()
         {
