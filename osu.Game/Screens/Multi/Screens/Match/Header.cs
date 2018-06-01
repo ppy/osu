@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -26,18 +27,21 @@ namespace osu.Game.Screens.Multi.Screens.Match
         private readonly Box tabStrip;
         private readonly UpdateableBeatmapSetCover cover;
 
-        public readonly OsuClickableContainer BeatmapButton;
+        public readonly PageTabControl<MatchHeaderPage> Tabs;
 
         public BeatmapSetInfo BeatmapSet
         {
             set { cover.BeatmapSet = value; }
         }
 
+        public Action OnWantsSelectBeatmap;
+
         public Header()
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
 
+            BeatmapSelectButton beatmapButton;
             Children = new Drawable[]
             {
                 cover = new UpdateableBeatmapSetCover
@@ -70,12 +74,12 @@ namespace osu.Game.Screens.Multi.Screens.Match
                             RelativeSizeAxes = Axes.Y,
                             Width = 200,
                             Padding = new MarginPadding { Vertical = 5 },
-                            Child = BeatmapButton = new BeatmapSelectButton
+                            Child = beatmapButton = new BeatmapSelectButton
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
                         },
-                        new PageTabControl<MatchHeaderPage>
+                        Tabs = new PageTabControl<MatchHeaderPage>
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
@@ -84,6 +88,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     },
                 },
             };
+
+            beatmapButton.Action = () => OnWantsSelectBeatmap?.Invoke();
         }
 
         [BackgroundDependencyLoader]

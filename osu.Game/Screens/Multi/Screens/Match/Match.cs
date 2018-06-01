@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 },
             };
 
-            header.BeatmapButton.Action = () => Push(new MatchSongSelect());
+            header.OnWantsSelectBeatmap = () => Push(new MatchSongSelect());
             nameBind.ValueChanged += n => info.Name = n;
             statusBind.ValueChanged += s => info.Status = s;
             availabilityBind.ValueChanged += a => info.Availability = a;
