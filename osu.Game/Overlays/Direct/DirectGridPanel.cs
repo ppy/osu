@@ -19,6 +19,8 @@ namespace osu.Game.Overlays.Direct
 {
     public class DirectGridPanel : DirectPanel
     {
+        private const float transition_duration = 120;
+        private const Easing transition_easing = Easing.InOutQuint;
         private const float horizontal_padding = 10;
         private const float vertical_padding = 5;
 
@@ -218,11 +220,17 @@ namespace osu.Game.Overlays.Direct
             {
                 Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
+
+            PreviewPlaying.ValueChanged += p =>
+            {
+                if (!p && !IsHovered)
+                    statusContainer.FadeIn(transition_duration, transition_easing);
+            };
         }
 
         protected override bool OnHover(InputState state)
         {
-            statusContainer.FadeOut(120, Easing.InOutQuint);
+            statusContainer.FadeOut(transition_duration, transition_easing);
 
             return base.OnHover(state);
         }
@@ -231,7 +239,8 @@ namespace osu.Game.Overlays.Direct
         {
             base.OnHoverLost(state);
 
-            statusContainer.FadeIn(120, Easing.InOutQuint);
+            if (!PreviewPlaying.Value)
+                statusContainer.FadeIn(transition_duration, transition_easing);
         }
     }
 }
