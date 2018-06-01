@@ -12,30 +12,23 @@ namespace osu.Game.Audio
         public readonly Track Track;
         public readonly OverlayContainer Owner;
 
-        private readonly Action<PreviewTrack> onStart;
-        private readonly Action onStop;
-
         public event Action Stopped;
         public event Action Started;
 
-        public PreviewTrack(Track track, Action<PreviewTrack> onStart, Action onStop, OverlayContainer owner)
+        public PreviewTrack(Track track, OverlayContainer owner)
         {
             Track = track;
-            this.onStart = onStart;
-            this.onStop = onStop;
             Owner = owner;
         }
 
         public void Start()
         {
-            onStart?.Invoke(this);
             Track.Restart();
             Started?.Invoke();
         }
 
         public void Stop()
         {
-            onStop?.Invoke();
             Track.Stop();
             Stopped?.Invoke();
         }
