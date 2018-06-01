@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Multi.Components
         private void load(OsuColour colours, LocalisationEngine localisation)
         {
             Box sideStrip;
-            Container coverContainer;
+            UpdateableBeatmapSetCover cover;
             OsuSpriteText name, status, beatmapTitle, beatmapDash, beatmapArtist;
             ParticipantInfo participantInfo;
             ModeTypeInfo modeTypeInfo;
@@ -146,24 +146,12 @@ namespace osu.Game.Screens.Multi.Components
                                 RelativeSizeAxes = Axes.Y,
                                 Width = side_strip_width,
                             },
-                            new Container
+                            cover = new UpdateableBeatmapSetCover
                             {
                                 Width = cover_width,
                                 RelativeSizeAxes = Axes.Y,
                                 Masking = true,
                                 Margin = new MarginPadding { Left = side_strip_width },
-                                Children = new Drawable[]
-                                {
-                                    new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.Black,
-                                    },
-                                    coverContainer = new Container
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                    },
-                                },
                             },
                             new Container
                             {
@@ -263,23 +251,14 @@ namespace osu.Game.Screens.Multi.Components
 
                 if (b != null)
                 {
-                    coverContainer.FadeIn(transition_duration);
-
-                    LoadComponentAsync(new BeatmapSetCover(b.BeatmapSet)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    }, coverContainer.Add);
-
+                    cover.BeatmapSet = b.BeatmapSet;
                     beatmapTitle.Current = localisation.GetUnicodePreference(b.Metadata.TitleUnicode, b.Metadata.Title);
                     beatmapDash.Text = @" - ";
                     beatmapArtist.Current = localisation.GetUnicodePreference(b.Metadata.ArtistUnicode, b.Metadata.Artist);
                 }
                 else
                 {
-                    coverContainer.FadeOut(transition_duration);
+                    cover.BeatmapSet = null;
 
                     beatmapTitle.Current = null;
                     beatmapArtist.Current = null;

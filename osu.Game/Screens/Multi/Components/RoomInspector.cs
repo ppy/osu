@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Multi.Components
 
         private OsuColour colours;
         private Box statusStrip;
-        private Container coverContainer;
+        private UpdateableBeatmapSetCover cover;
         private FillFlowContainer topFlow, participantsFlow, participantNumbersFlow, infoPanelFlow;
         private OsuSpriteText name, status;
         private ScrollContainer participantsScroll;
@@ -105,21 +105,9 @@ namespace osu.Game.Screens.Multi.Components
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                new Container
+                                cover = new UpdateableBeatmapSetCover
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4.Black,
-                                        },
-                                        coverContainer = new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                    },
                                 },
                                 new Box
                                 {
@@ -294,17 +282,7 @@ namespace osu.Game.Screens.Multi.Components
 
                 if (b != null)
                 {
-                    coverContainer.FadeIn(transition_duration);
-
-                    LoadComponentAsync(new BeatmapSetCover(b.BeatmapSet)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    }, coverContainer.Add);
-
+                    cover.BeatmapSet = b.BeatmapSet;
                     beatmapTitle.Current = localisation.GetUnicodePreference(b.Metadata.TitleUnicode, b.Metadata.Title);
                     beatmapDash.Text = @" - ";
                     beatmapArtist.Current = localisation.GetUnicodePreference(b.Metadata.ArtistUnicode, b.Metadata.Artist);
@@ -312,7 +290,7 @@ namespace osu.Game.Screens.Multi.Components
                 }
                 else
                 {
-                    coverContainer.FadeOut(transition_duration);
+                    cover.BeatmapSet = null;
 
                     beatmapTitle.Current = null;
                     beatmapArtist.Current = null;
@@ -367,7 +345,7 @@ namespace osu.Game.Screens.Multi.Components
         {
             if (Room == null)
             {
-                coverContainer.FadeOut(transition_duration);
+                cover.BeatmapSet = null;
                 participantsFlow.FadeOut(transition_duration);
                 participantNumbersFlow.FadeOut(transition_duration);
                 infoPanelFlow.FadeOut(transition_duration);
