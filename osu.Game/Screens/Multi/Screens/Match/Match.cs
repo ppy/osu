@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         protected override Container<Drawable> TransitionContent => participants;
 
+        public override string Type => "room";
         public override string Title => room.Name.Value;
 
         public Match(Room room)
