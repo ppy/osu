@@ -46,8 +46,6 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        private PreviewTrackManager previewTrackManager;
-
         private Color4 hoverColour;
         private readonly SpriteIcon icon;
         private readonly LoadingAnimation loadingAnimation;
@@ -94,7 +92,6 @@ namespace osu.Game.Overlays.Direct
         private void load(OsuColour colour, PreviewTrackManager previewTrackManager)
         {
             hoverColour = colour.Yellow;
-            this.previewTrackManager = previewTrackManager;
         }
 
         protected override bool OnClick(InputState state)
