@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, PreviewTrackManager previewTrackManager)
+        private void load(OsuColour colour)
         {
             hoverColour = colour.Yellow;
         }
