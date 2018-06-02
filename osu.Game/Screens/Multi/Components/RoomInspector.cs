@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -33,7 +34,7 @@ namespace osu.Game.Screens.Multi.Components
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
-        private readonly Bindable<User[]> participantsBind = new Bindable<User[]>();
+        private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
 
         private OsuColour colours;
         private Box statusStrip;
@@ -214,7 +215,7 @@ namespace osu.Game.Screens.Multi.Components
 
             participantsBind.ValueChanged += p =>
             {
-                participantCount.Count = p.Length;
+                participantCount.Count = p.Count();
                 participantInfo.Participants = p;
                 participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u));
             };
