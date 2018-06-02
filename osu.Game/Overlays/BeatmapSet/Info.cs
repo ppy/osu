@@ -135,8 +135,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OsuColour colours)
         {
             successRateBackground.Colour = colours.GrayE;
-            description.TextColour = colours.Gray5;
-            source.TextColour = tags.TextColour = colours.BlueDark;
+            description.TextColour = source.TextColour = tags.TextColour = colours.Gray5;
 
             updateDisplay();
         }

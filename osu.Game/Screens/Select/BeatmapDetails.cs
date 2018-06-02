@@ -6,7 +6,6 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System.Linq;
@@ -120,10 +119,7 @@ namespace osu.Game.Screens.Select
                                         Margin = new MarginPadding { Top = spacing * 2 },
                                         Children = new[]
                                         {
-                                            description = new MetadataSection("Description")
-                                            {
-                                                TextColour = Color4.White.Opacity(0.75f),
-                                            },
+                                            description = new MetadataSection("Description"),
                                             source = new MetadataSection("Source"),
                                             tags = new MetadataSection("Tags"),
                                         },
@@ -161,10 +157,10 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(APIAccess api)
         {
             this.api = api;
-            source.TextColour = tags.TextColour = colours.Yellow;
+            description.TextColour = source.TextColour = tags.TextColour = Color4.White.Opacity(0.75f);
         }
 
         protected override void UpdateAfterChildren()
