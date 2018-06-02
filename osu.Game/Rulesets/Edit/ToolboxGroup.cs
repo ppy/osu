@@ -2,11 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class ToolboxGroup : PlayerSettingsGroup
+    public class ToolboxGroup : SettingsGroup
     {
         protected override string Title => "toolbox";
 

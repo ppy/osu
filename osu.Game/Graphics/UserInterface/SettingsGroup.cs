@@ -1,20 +1,19 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Play.PlayerSettings
+namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class PlayerSettingsGroup : Container
+    public abstract class SettingsGroup : Container
     {
         /// <summary>
         /// The title to be displayed in the header of this group.
@@ -34,10 +33,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public bool Expanded
         {
-            get { return expanded; }
+            get => expanded;
             set
             {
                 if (expanded == value) return;
+                if (!value && !allowCollapsing) throw new InvalidOperationException("Cannot collapse a container that does not allow collapsing.");
+
                 expanded = value;
 
                 content.ClearTransforms();
@@ -54,9 +55,22 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
         }
 
+        private bool allowCollapsing = true;
+
+        public bool AllowCollapsing
+        {
+            get => allowCollapsing;
+            set
+            {
+                allowCollapsing = value;
+                if (button != null)
+                    button.Alpha = value ? 1 : 0;
+            }
+        }
+
         private Color4 buttonActiveColour;
 
-        protected PlayerSettingsGroup()
+        protected SettingsGroup()
         {
             AutoSizeAxes = Axes.Y;
             Width = container_width;
@@ -106,6 +120,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Icon = FontAwesome.fa_bars,
                                     Scale = new Vector2(0.75f),
                                     Action = () => Expanded = !Expanded,
+                                    Alpha = allowCollapsing ? 1 : 0, // Just in case
                                 },
                             }
                         },

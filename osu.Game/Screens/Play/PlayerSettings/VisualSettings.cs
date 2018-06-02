@@ -5,10 +5,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class VisualSettings : PlayerSettingsGroup
+    public class VisualSettings : SettingsGroup
     {
         protected override string Title => "Visual settings";
 

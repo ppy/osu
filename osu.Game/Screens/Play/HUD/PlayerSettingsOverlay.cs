@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using osu.Framework.Input;
 using osu.Game.Screens.Play.PlayerSettings;
@@ -26,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
             AlwaysPresent = true;
             RelativeSizeAxes = Axes.Both;
 
-            Child = new FillFlowContainer<PlayerSettingsGroup>
+            Child = new FillFlowContainer<SettingsGroup>
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.Play.HUD
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 20),
                 Margin = new MarginPadding { Top = 100, Right = 10 },
-                Children = new PlayerSettingsGroup[]
+                Children = new SettingsGroup[]
                 {
                     //CollectionSettings = new CollectionSettings(),
                     //DiscussionSettings = new DiscussionSettings(),

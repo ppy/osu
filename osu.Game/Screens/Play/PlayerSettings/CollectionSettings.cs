@@ -5,11 +5,12 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Music;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
-    public class CollectionSettings : PlayerSettingsGroup
+    public class CollectionSettings : SettingsGroup
     {
         protected override string Title => @"collections";
 

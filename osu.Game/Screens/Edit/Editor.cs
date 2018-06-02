@@ -16,6 +16,7 @@ using osu.Framework.Input;
 using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Screens;
+using osu.Game.Screens.Edit.Screens.Setup;
 using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Design;
 using osu.Game.Screens.Edit.Components;
@@ -167,6 +168,9 @@ namespace osu.Game.Screens.Edit
 
             switch (mode)
             {
+                case EditorScreenMode.SongSetup:
+                    currentScreen = new Setup();
+                    break;
                 case EditorScreenMode.Compose:
                     currentScreen = new Compose();
                     break;
