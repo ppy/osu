@@ -39,8 +39,6 @@ namespace osu.Game.Tests.Visual
             typeof(SpecialSection),
         };
 
-        private const string unranked_suffix = " (Unranked)";
-
         private RulesetStore rulesets;
         private ModDisplay modDisplay;
         private TestModSelectOverlay modSelect;
@@ -121,7 +119,7 @@ namespace osu.Game.Tests.Visual
 
         private void testManiaMods(ManiaRuleset ruleset)
         {
-            testMultiplierTextUnranked(ruleset.GetModsFor(ModType.Special).First(m => m is ManiaModRandom));
+            testRankedText(ruleset.GetModsFor(ModType.Special).First(m => m is ManiaModRandom));
         }
 
         private void testSingleMod(Mod mod)
@@ -198,13 +196,16 @@ namespace osu.Game.Tests.Visual
             checkLabelColor(Color4.White);
         }
 
-        private void testMultiplierTextUnranked(Mod mod)
+        private void testRankedText(Mod mod)
         {
-            AddAssert("check for ranked", () => !modSelect.MultiplierLabel.Text.EndsWith(unranked_suffix));
+            AddWaitStep(1, "wait for fade");
+            AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
             selectNext(mod);
-            AddAssert("check for unranked", () => modSelect.MultiplierLabel.Text.EndsWith(unranked_suffix));
+            AddWaitStep(1, "wait for fade");
+            AddAssert("check for unranked", () => modSelect.UnrankedLabel.Alpha != 0);
             selectPrevious(mod);
-            AddAssert("check for ranked", () => !modSelect.MultiplierLabel.Text.EndsWith(unranked_suffix));
+            AddWaitStep(1, "wait for fade");
+            AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
         }
 
         private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));
@@ -240,6 +241,7 @@ namespace osu.Game.Tests.Visual
             }
 
             public new OsuSpriteText MultiplierLabel => base.MultiplierLabel;
+            public new OsuSpriteText UnrankedLabel => base.UnrankedLabel;
             public new TriangleButton DeselectAllButton => base.DeselectAllButton;
 
             public new Color4 LowMultiplierColour => base.LowMultiplierColour;
