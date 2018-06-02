@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 Child = new TestCatcherArea(new BeatmapDifficulty { CircleSize = size })
                 {
                     Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.BottomLeft
+                    Origin = Anchor.TopLeft
                 },
             };
         }
