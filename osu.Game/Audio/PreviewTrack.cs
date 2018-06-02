@@ -13,7 +13,7 @@ namespace osu.Game.Audio
     public class PreviewTrack : Component
     {
         public Track Track { get; private set; }
-        public readonly OverlayContainer Owner;
+        private readonly OverlayContainer owner;
 
         private readonly BeatmapSetInfo beatmapSetInfo;
 
@@ -23,7 +23,7 @@ namespace osu.Game.Audio
         public PreviewTrack(BeatmapSetInfo beatmapSetInfo, OverlayContainer owner)
         {
             this.beatmapSetInfo = beatmapSetInfo;
-            Owner = owner;
+            this.owner = owner;
         }
 
         [BackgroundDependencyLoader]
@@ -38,8 +38,14 @@ namespace osu.Game.Audio
             Started?.Invoke();
         }
 
-        public void Stop()
+        /// <summary>
+        /// Stop preview playback
+        /// </summary>
+        /// <param name="source">An <see cref="OverlayContainer"/> which is probably the owner of this <see cref="PreviewTrack"/></param>
+        public void Stop(OverlayContainer source = null)
         {
+            if (source != null && owner != source)
+                return;
             Track.Stop();
             Stopped?.Invoke();
         }

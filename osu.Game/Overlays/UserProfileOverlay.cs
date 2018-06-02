@@ -73,7 +73,7 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
-            previewTrackManager.CurrentTrack?.Stop();
+            previewTrackManager.CurrentTrack?.Stop(this);
             FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
         }
 

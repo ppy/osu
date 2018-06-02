@@ -302,8 +302,7 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            if (previewTrackManager.CurrentTrack?.Owner == this)
-                previewTrackManager.CurrentTrack?.Stop();
+            previewTrackManager.CurrentTrack?.Stop(this);
             base.PopOut();
         }
 
