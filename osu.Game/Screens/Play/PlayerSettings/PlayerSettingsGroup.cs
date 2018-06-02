@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
                 }
 
-                button.FadeColour(expanded ? expandedColour : Color4.White, 200, Easing.OutQuint);
+                updateExpanded();
             }
         }
 
@@ -130,10 +130,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            button.FadeColour(expanded ? colours.Yellow : Color4.White);
-
             expandedColour = colours.Yellow;
+
+            updateExpanded();
         }
+
+        private void updateExpanded() => button.FadeColour(expanded ? expandedColour : Color4.White, 200, Easing.InOutQuint);
 
         protected override Container<Drawable> Content => content;
 
