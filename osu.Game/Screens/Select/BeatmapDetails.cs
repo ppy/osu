@@ -160,7 +160,6 @@ namespace osu.Game.Screens.Select
         private void load(APIAccess api)
         {
             this.api = api;
-            description.TextColour = source.TextColour = tags.TextColour = Color4.White.Opacity(0.75f);
         }
 
         protected override void UpdateAfterChildren()
@@ -373,6 +372,12 @@ namespace osu.Game.Screens.Select
             {
                 get { return textFlow.Colour; }
                 set { textFlow.Colour = value; }
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                textFlow.Colour = Color4.White.Opacity(0.75f);
             }
         }
 
