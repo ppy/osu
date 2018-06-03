@@ -17,9 +17,6 @@ namespace osu.Game.Graphics.Containers
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
-        /// <summary>
-        /// Defaults to <see cref="OverlayActivation.All"/> so that the overlay works even if BDL couldn't pass an <see cref="OsuGame"/>.
-        /// </summary>
         private readonly Bindable<OverlayActivation> allowOverlays = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         [BackgroundDependencyLoader(true)]

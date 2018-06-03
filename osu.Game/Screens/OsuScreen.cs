@@ -54,11 +54,12 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual bool HideOverlaysOnEnter => false;
 
+        private readonly Bindable<OverlayActivation> allowOverlays = new Bindable<OverlayActivation>();
+
         /// <summary>
-        /// Whether overlays should be able to be opened.
-        /// It's bound at load which means changes at construction will potentially disappear.
+        /// Whether overlays should be able to be opened once this screen is entered or resumed.
         /// </summary>
-        protected readonly Bindable<OverlayActivation> AllowOverlays = new Bindable<OverlayActivation>();
+        protected virtual OverlayActivation OverlayActivationLevel => OverlayActivation.All;
 
         /// <summary>
         /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.
@@ -109,7 +110,7 @@ namespace osu.Game.Screens
             if (osuGame != null)
             {
                 Ruleset.BindTo(osuGame.Ruleset);
-                AllowOverlays.BindTo(osuGame.AllowOverlays);
+                allowOverlays.BindTo(osuGame.AllowOverlays);
 
                 updateOverlayStates = () =>
                 {
@@ -252,6 +253,8 @@ namespace osu.Game.Screens
             if (backgroundParallaxContainer != null)
                 backgroundParallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * BackgroundParallaxAmount;
 
+            allowOverlays.Value = OverlayActivationLevel;
+            
             updateOverlayStates?.Invoke();
         }
 

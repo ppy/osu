@@ -8,7 +8,6 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -20,15 +19,12 @@ using osu.Game.Input.Bindings;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
     public class ButtonSystem : Container, IStateful<MenuState>, IKeyBindingHandler<GlobalAction>
     {
         public event Action<MenuState> StateChanged;
-
-        private readonly Bindable<OverlayActivation> allowOverlays = new Bindable<OverlayActivation>();
 
         public Action OnEdit;
         public Action OnExit;
@@ -134,11 +130,8 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuGame game)
+        private void load(AudioManager audio)
         {
-            if (game != null)
-                allowOverlays.BindTo(game.AllowOverlays);
-
             sampleBack = audio.Sample.Get(@"Menu/button-back-select");
         }
 
@@ -329,7 +322,6 @@ namespace osu.Game.Screens.Menu
                 case MenuState.Exit:
                 case MenuState.Initial:
                     logoTracking = false;
-                    allowOverlays.Value = OverlayActivation.Disabled;
 
                     logoDelayedAction = Scheduler.AddDelayed(() =>
                     {
@@ -338,9 +330,6 @@ namespace osu.Game.Screens.Menu
 
                         logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
                         logo.ScaleTo(1, 800, Easing.OutExpo);
-
-                        if(state != MenuState.Exit)
-                            allowOverlays.Value = OverlayActivation.All;
                     }, 150);
                     break;
                 case MenuState.TopLevel:

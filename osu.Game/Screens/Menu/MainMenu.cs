@@ -10,7 +10,6 @@ using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Direct;
@@ -80,8 +79,6 @@ namespace osu.Game.Screens.Menu
             }
 
             preloadSongSelect();
-
-            AllowOverlays.Value = OverlayActivation.Disabled;
         }
 
         private void preloadSongSelect()
