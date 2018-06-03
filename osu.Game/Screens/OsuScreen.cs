@@ -248,7 +248,10 @@ namespace osu.Game.Screens
 
         private void applyArrivingDefaults(bool isResuming)
         {
-            logo.AppendAnimatingAction(() => LogoArriving(logo, isResuming), true);
+            logo.AppendAnimatingAction(() =>
+            {
+                if (IsCurrentScreen) LogoArriving(logo, isResuming);
+            }, true);
 
             if (backgroundParallaxContainer != null)
                 backgroundParallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * BackgroundParallaxAmount;
