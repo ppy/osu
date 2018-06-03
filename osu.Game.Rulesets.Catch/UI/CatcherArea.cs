@@ -277,7 +277,7 @@ namespace osu.Game.Rulesets.Catch.UI
             /// The modifier multiplied to the catcher speed.
             /// It is always not less than 1 and it is greater than 1 if and only if the catcher is hyper-dashing.
             /// </summary>
-            protected double HyperDashModifier
+            public double HyperDashModifier
             {
                 get => hyperDashModifier;
                 set
