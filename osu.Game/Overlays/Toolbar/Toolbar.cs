@@ -31,9 +31,6 @@ namespace osu.Game.Overlays.Toolbar
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
 
-        /// <summary>
-        /// Defaults to <see cref="OverlayActivation.All"/> so that the overlay works even if BDL couldn't pass an <see cref="OsuGame"/>.
-        /// </summary>
         private readonly Bindable<OverlayActivation> allowOverlays = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         public Toolbar()

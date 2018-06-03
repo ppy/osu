@@ -33,6 +33,7 @@ namespace osu.Game.Screens.Menu
         private SampleChannel seeya;
 
         protected override bool HideOverlaysOnEnter => true;
+        protected override OverlayActivation OverlayActivationLevel => OverlayActivation.Disabled;
 
         public override bool CursorVisible => false;
 
@@ -77,8 +78,6 @@ namespace osu.Game.Screens.Menu
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
-
-            AllowOverlays.Value = OverlayActivation.Disabled;
         }
 
         protected override void OnEntering(Screen last)
