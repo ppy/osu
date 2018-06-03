@@ -15,10 +15,8 @@ using OpenTK.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Framework.Input;
-using osu.Framework.Logging;
 using System.Collections.Generic;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Audio.Track;
 
 namespace osu.Game.Tests.Visual
 {
@@ -37,8 +35,11 @@ namespace osu.Game.Tests.Visual
         private RulesetStore rulesetStore;
 
         //To override OnClick and OnPressed
-        private class CustomContainer : KeyBindingContainer<CustomAction>, IKeyBindingHandler<CustomAction> {
-            MusicController musicController;
+        private class CustomContainer : KeyBindingContainer<CustomAction>, IKeyBindingHandler<CustomAction>
+        {
+            private MusicController musicController;
+
+            public void SetMusicController(MusicController musicController) => this.musicController = musicController;
 
             //Press space to pause song
             public override IEnumerable<KeyBinding> DefaultKeyBindings => new List<KeyBinding> { new KeyBinding(InputKey.Space ,  CustomAction.TogglePause) };
@@ -52,8 +53,6 @@ namespace osu.Game.Tests.Visual
             }
 
             public bool OnReleased(CustomAction action)  { return false; }
-
-            public void SetMusicController(MusicController musicController) => this.musicController = musicController;
 
             protected override bool OnClick(InputState inputState)
             {
