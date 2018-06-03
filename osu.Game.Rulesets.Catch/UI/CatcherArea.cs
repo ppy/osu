@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
+using System.Diagnostics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -243,14 +244,21 @@ namespace osu.Game.Rulesets.Catch.UI
                     double positionDifference = target.X * CatchPlayfield.BASE_WIDTH - catcherPosition;
                     double velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
 
-                    HyperDashing = true;
-                    hyperDashModifier = Math.Abs(velocity);
-                    hyperDashDirection = Math.Sign(velocity);
-                    hyperDashTargetPosition = target.X;
+                    // An edge case
+                    if (Math.Abs(velocity) <= 1)
+                    {
+                        HyperDashModifier = 1;
+                    }
+                    else
+                    {
+                        hyperDashDirection = Math.Sign(velocity);
+                        hyperDashTargetPosition = target.X;
+                        HyperDashModifier = Math.Abs(velocity);
+                    }
                 }
                 else
                 {
-                    HyperDashing = false;
+                    HyperDashModifier = 1;
                 }
 
                 return validCatch;
@@ -259,23 +267,27 @@ namespace osu.Game.Rulesets.Catch.UI
             private double hyperDashModifier = 1;
             private int hyperDashDirection;
             private float hyperDashTargetPosition;
-            private bool hyperDashing;
 
             /// <summary>
             /// Whether we are hypderdashing or not.
             /// </summary>
-            protected bool HyperDashing
+            public bool HyperDashing => hyperDashModifier != 1;
+
+            /// <summary>
+            /// The modifier multiplied to the catcher speed.
+            /// It is always not less than 1 and it is greater than 1 if and only if the catcher is hyper-dashing.
+            /// </summary>
+            protected double HyperDashModifier
             {
-                get => hyperDashing;
+                get => hyperDashModifier;
                 set
                 {
-                    if (hyperDashing == value) return;
-
-                    hyperDashing = value;
+                    Trace.Assert(value >= 1);
+                    if (hyperDashModifier == value) return;
+                    hyperDashModifier = value;
 
                     if (!HyperDashing)
                     {
-                        hyperDashModifier = 1;
                         hyperDashDirection = 0;
                     }
 
@@ -355,7 +367,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     hyperDashDirection < 0 && hyperDashTargetPosition > X)
                 {
                     X = hyperDashTargetPosition;
-                    HyperDashing = false;
+                    HyperDashModifier = 1;
                 }
             }
 
