@@ -73,6 +73,11 @@ namespace osu.Game.Overlays
             playlist.Hide();
         }
 
+        public void TogglePause()
+        {
+            play();
+        }
+
         private Vector2 dragStart;
 
         protected override bool OnDragStart(InputState state)
