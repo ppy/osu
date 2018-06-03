@@ -257,7 +257,7 @@ namespace osu.Game.Screens
                 backgroundParallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * BackgroundParallaxAmount;
 
             allowOverlays.Value = OverlayActivationLevel;
-            
+
             updateOverlayStates?.Invoke();
         }
 
