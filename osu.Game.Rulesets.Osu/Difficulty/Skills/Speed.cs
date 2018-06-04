@@ -35,5 +35,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return speedValue / current.DeltaTime;
         }
+
+        protected override double StaminaValueOf(OsuDifficultyHitObject current)
+        {
+            double distance = current.Distance;
+
+            double staminaValue;
+            if (distance > single_spacing_threshold)
+                staminaValue = 1.3;
+            else if (distance > stream_spacing_threshold)
+                staminaValue = 1.12 + 0.18 * (distance - stream_spacing_threshold) / (single_spacing_threshold - stream_spacing_threshold);
+            else if (distance > almost_diameter)
+                staminaValue = 1.04 + 0.08 * (distance - almost_diameter) / (stream_spacing_threshold - almost_diameter);
+            else if (distance > almost_diameter / 2)
+                staminaValue = 1 + 0.04 * (distance - almost_diameter / 2) / (almost_diameter / 2);
+            else
+                staminaValue = 1;
+            
+            return staminaValue / current.DeltaTime;
+        }
     }
 }

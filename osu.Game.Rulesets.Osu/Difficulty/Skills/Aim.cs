@@ -15,5 +15,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainDecayBase => 0.15;
 
         protected override double StrainValueOf(OsuDifficultyHitObject current) => Math.Pow(current.Distance, 0.99) / current.DeltaTime;
+        protected override double StaminaValueOf(OsuDifficultyHitObject current) => 0;
     }
 }
