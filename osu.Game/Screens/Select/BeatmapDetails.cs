@@ -356,7 +356,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Colour = textFlow.Colour,
+                    Colour = Color4.White.Opacity(0.75f),
                     Text = text
                 }, loaded =>
                 {
@@ -366,18 +366,6 @@ namespace osu.Game.Screens.Select
                     // fade in if we haven't yet.
                     this.FadeIn(transition_duration);
                 });
-            }
-
-            public Color4 TextColour
-            {
-                get { return textFlow.Colour; }
-                set { textFlow.Colour = value; }
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                textFlow.Colour = Color4.White.Opacity(0.75f);
             }
         }
 
