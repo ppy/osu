@@ -22,7 +22,7 @@
             },
             "type": "mono",
             "request": "launch",
-            "program": "${workspaceRoot}/bin/Debug/net471/osu.Game.Rulesets.Osu.Tests.exe",
+            "program": "${workspaceRoot}/bin/Release/net471/osu.Game.Rulesets.Osu.Tests.exe",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Release, msbuild)",
             "runtimeExecutable": null,
@@ -48,7 +48,7 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/bin/Debug/netcoreapp2.1/osu.Game.Rulesets.Osu.Tests.dll"
+                "${workspaceRoot}/bin/Release/netcoreapp2.1/osu.Game.Rulesets.Osu.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Release, dotnet)",
