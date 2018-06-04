@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected readonly History<OsuDifficultyHitObject> Previous = new History<OsuDifficultyHitObject>(2); // Contained objects not used yet
 
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
-        private double currentStamina = 1;
+        private double currentStamina = 1; // We keep track of the stamina level at all times throughout the beatmap.
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
         private double staminaThreshold = 256.24; // This is the point at which we start to account for stamina difficulty.
         private double decayMultiplier = 1; // This is the current multiplier for the decay.
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             //At roughly the equivalent of 50 stacked 220 bpm 1/4 notes, we start to decay less to account for stamina.
             //The threshold at which we do this goes up every time this happens.
-            if (SkillMultiplier == 1400 && currentStamina >= staminaThreshold && decayMultiplier < 1.67 && current.DeltaTime < 100)
+            if (this is Speed && currentStamina >= staminaThreshold && decayMultiplier < 1.67 && current.DeltaTime < 100)
             {
                 decayMultiplier *= 1.03;
                 staminaThreshold *= Math.Pow(1.03, 2);
@@ -54,19 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             //Strain decay will very rapidly approach the normal value once the streaming stops.
             else if (current.DeltaTime >= 100)
             {
-                double staminaRecovery = 1 / Math.Pow(1.03, 5);
-                decayMultiplier = Math.Max(1, decayMultiplier * staminaRecovery);
-                staminaThreshold = Math.Max(1, staminaThreshold * Math.Pow(staminaRecovery, 2));
-                double time = current.DeltaTime - 100;
-                //Any extended break during gameplay will most likely bring decay back to its original value.
-                for (int i = 0; time > 0; i++)
-                {
-                    time -= 75;
-                    decayMultiplier = Math.Max(1, decayMultiplier * Math.Pow(staminaRecovery, 1 + i));
-                    staminaThreshold = Math.Max(234.63, staminaThreshold * Math.Pow(Math.Pow(staminaRecovery, 2), 1 + i));
-                    if (decayMultiplier == 1)
-                        break;
-                }
+                staminaDecay(current.DeltaTime);
             }
             currentStamina *= strainDecay(current.DeltaTime);
             currentStrain *= strainDecay(current.DeltaTime);
@@ -131,6 +119,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// Calculates the stamina strain of an <see cref="OsuDifficultyHitObject"/>. This value is affected by previoiusly procesed objects.
         /// </summary>
         protected abstract double StaminaValueOf(OsuDifficultyHitObject current);
+
+        private void staminaDecay(double ms)
+        {
+            double staminaRecovery = 1 / Math.Pow(1.03, 5);
+            decayMultiplier = Math.Max(1, decayMultiplier * staminaRecovery);
+            staminaThreshold = Math.Max(1, staminaThreshold * Math.Pow(staminaRecovery, 2));
+            ms -= 100;
+            //Any extended break during gameplay will most likely bring decay back to its original value.
+            for (int i = 0; ms > 0; i++)
+            {
+                ms -= 75;
+                decayMultiplier = Math.Max(1, decayMultiplier * Math.Pow(staminaRecovery, 1 + i));
+                staminaThreshold = Math.Max(234.63, staminaThreshold * Math.Pow(Math.Pow(staminaRecovery, 2), 1 + i));
+                if (decayMultiplier == 1)
+                    break;
+            }
+        }
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase * decayMultiplier, ms / 1000);
     }

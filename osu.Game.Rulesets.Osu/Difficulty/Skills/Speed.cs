@@ -36,6 +36,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return speedValue / current.DeltaTime;
         }
 
+        /// <summary>
+        /// Resembles the strain function, but spacing will only increases stamina strain by up to 30%
+        /// </summary>
         protected override double StaminaValueOf(OsuDifficultyHitObject current)
         {
             double distance = current.Distance;
