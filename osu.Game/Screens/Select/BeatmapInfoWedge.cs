@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Select
         {
             if (osuGame != null)
                 ruleset.BindTo(osuGame.Ruleset);
-            ruleset.ValueChanged += updateRuleset;
+            ruleset.ValueChanged += _ => updateDisplay();
         }
 
         protected override bool BlockPassThroughMouse => false;
@@ -78,44 +78,54 @@ namespace osu.Game.Screens.Select
 
         private WorkingBeatmap beatmap;
 
-        public void UpdateBeatmap(WorkingBeatmap beatmap)
+        public WorkingBeatmap Beatmap
         {
-            this.beatmap = beatmap;
-            loadBeatmap();
+            get => beatmap;
+            set
+            {
+                if (beatmap == value) return;
+
+                beatmap = value;
+                updateDisplay();
+            }
         }
 
-        private void updateRuleset(RulesetInfo ruleset) => loadBeatmap();
+        private BufferedWedgeInfo loadingInfo;
 
-        private void loadBeatmap()
+        private void updateDisplay()
         {
-            void updateState()
+            void removeOldInfo()
             {
                 State = beatmap == null ? Visibility.Hidden : Visibility.Visible;
 
                 Info?.FadeOut(250);
                 Info?.Expire();
+                Info = null;
             }
 
             if (beatmap == null)
             {
-                updateState();
+                removeOldInfo();
                 return;
             }
 
-            LoadComponentAsync(new BufferedWedgeInfo(beatmap, ruleset.Value)
+            LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value)
             {
                 Shear = -Shear,
                 Depth = Info?.Depth + 1 ?? 0,
-            }, newInfo =>
+            }, loaded =>
             {
-                updateState();
-                Add(Info = newInfo);
+                // ensure we are the most recent loaded wedge.
+                if (loaded != loadingInfo) return;
+
+                removeOldInfo();
+                Add(Info = loaded);
             });
         }
 
         public class BufferedWedgeInfo : BufferedContainer
         {
-            private readonly WorkingBeatmap working;
+            public WorkingBeatmap Working { get; private set; }
             public OsuSpriteText VersionLabel { get; private set; }
             public OsuSpriteText TitleLabel { get; private set; }
             public OsuSpriteText ArtistLabel { get; private set; }
@@ -128,7 +138,7 @@ namespace osu.Game.Screens.Select
 
             public BufferedWedgeInfo(WorkingBeatmap working, RulesetInfo userRuleset)
             {
-                this.working = working;
+                Working = working;
 
                 ruleset = userRuleset ?? working.BeatmapInfo.Ruleset;
             }
@@ -136,8 +146,8 @@ namespace osu.Game.Screens.Select
             [BackgroundDependencyLoader]
             private void load(LocalisationEngine localisation)
             {
-                var beatmapInfo = working.BeatmapInfo;
-                var metadata = beatmapInfo.Metadata ?? working.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+                var beatmapInfo = Working.BeatmapInfo;
+                var metadata = beatmapInfo.Metadata ?? Working.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
                 PixelSnapping = true;
                 CacheDrawnFrameBuffer = true;
@@ -165,7 +175,7 @@ namespace osu.Game.Screens.Select
                         Children = new[]
                         {
                             // Zoomed-in and cropped beatmap background
-                            new BeatmapBackgroundSprite(working)
+                            new BeatmapBackgroundSprite(Working)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
@@ -248,7 +258,7 @@ namespace osu.Game.Screens.Select
 
             private InfoLabel[] getInfoLabels()
             {
-                var beatmap = working.Beatmap;
+                var beatmap = Working.Beatmap;
 
                 List<InfoLabel> labels = new List<InfoLabel>();
 
@@ -276,12 +286,12 @@ namespace osu.Game.Screens.Select
                     try
                     {
                         // Try to get the beatmap with the user's ruleset
-                        playableBeatmap = working.GetPlayableBeatmap(ruleset);
+                        playableBeatmap = Working.GetPlayableBeatmap(ruleset);
                     }
                     catch (BeatmapInvalidForRulesetException)
                     {
                         // Can't be converted to the user's ruleset, so use the beatmap's own ruleset
-                        playableBeatmap = working.GetPlayableBeatmap(working.BeatmapInfo.Ruleset);
+                        playableBeatmap = Working.GetPlayableBeatmap(Working.BeatmapInfo.Ruleset);
                     }
 
                     labels.AddRange(playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)));

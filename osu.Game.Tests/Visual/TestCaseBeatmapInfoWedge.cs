@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual
             AddStep("show", () =>
             {
                 infoWedge.State = Visibility.Visible;
-                infoWedge.UpdateBeatmap(beatmap);
+                infoWedge.Beatmap = beatmap;
             });
 
             // select part is redundant, but wait for load isn't
@@ -66,6 +66,9 @@ namespace osu.Game.Tests.Visual
             AddWaitStep(3);
 
             AddStep("show", () => { infoWedge.State = Visibility.Visible; });
+
+            testNullBeatmap();
+            testAsyncLoading();
 
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
@@ -98,8 +101,6 @@ namespace osu.Game.Tests.Visual
                         break;
                 }
             }
-
-            testNullBeatmap();
         }
 
         private void testBeatmapLabels(Ruleset ruleset)
@@ -126,6 +127,23 @@ namespace osu.Game.Tests.Visual
             AddAssert("check no infolabels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
+        private void testAsyncLoading()
+        {
+            RulesetInfo firstRuleset = new OsuRuleset().RulesetInfo;
+            RulesetInfo secondRuleset = new TaikoRuleset().RulesetInfo;
+
+            var firstBeatmap = createTestBeatmap(firstRuleset, 25000000);
+            var secondBeatmap = createTestBeatmap(secondRuleset, 2000);
+
+            AddStep("select two beatmaps", () =>
+            {
+                infoWedge.Beatmap = beatmap.Value = new TestWorkingBeatmap(firstBeatmap);
+                infoWedge.Beatmap = beatmap.Value = new TestWorkingBeatmap(secondBeatmap);
+            });
+            AddUntilStep(() => infoWedge.Info.Working.Beatmap == secondBeatmap, "wait for load");
+            AddAssert("loaded info of second beatmap", () => infoWedge.Info.VersionLabel.Text == $"{secondRuleset.ShortName}Version");
+        }
+
         private void selectBeatmap(IBeatmap b)
         {
             BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
@@ -133,7 +151,7 @@ namespace osu.Game.Tests.Visual
             AddStep($"select {b.Metadata.Title} beatmap", () =>
             {
                 infoBefore = infoWedge.Info;
-                infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(b));
+                infoWedge.Beatmap = beatmap.Value = new TestWorkingBeatmap(b);
             });
 
             AddUntilStep(() => infoWedge.Info != infoBefore, "wait for async load");
@@ -144,14 +162,14 @@ namespace osu.Game.Tests.Visual
             AddStep("select null beatmap", () =>
             {
                 beatmap.Value = beatmap.Default;
-                infoWedge.UpdateBeatmap(beatmap);
+                infoWedge.Beatmap = beatmap;
             });
         }
 
-        private IBeatmap createTestBeatmap(RulesetInfo ruleset)
+        private IBeatmap createTestBeatmap(RulesetInfo ruleset, double length = 50000)
         {
             List<HitObject> objects = new List<HitObject>();
-            for (double i = 0; i < 50000; i += 1000)
+            for (double i = 0; i < length; i += 1000)
                 objects.Add(new TestHitObject { StartTime = i });
 
             return new Beatmap
