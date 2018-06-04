@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Multi.Components
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
-        private readonly Bindable<User[]> participantsBind = new Bindable<User[]>();
+        private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
 
         public readonly Room Room;
 

@@ -37,6 +37,11 @@ namespace osu.Game.Beatmaps
         public bool HasVideo { get; set; }
 
         /// <summary>
+        /// Whether or not this beatmap set has a storyboard.
+        /// </summary>
+        public bool HasStoryboard { get; set; }
+
+        /// <summary>
         /// The different sizes of cover art for this beatmap set.
         /// </summary>
         public BeatmapSetOnlineCovers Covers { get; set; }
