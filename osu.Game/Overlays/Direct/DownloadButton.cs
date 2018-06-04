@@ -5,19 +5,22 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class DownloadButton : BeatmapSetDownloadButton
+    public class DownloadButton : OsuClickableContainer
     {
         private readonly SpriteIcon icon;
 
-        public DownloadButton(BeatmapSetInfo set, bool noVideo = false) : base(set, noVideo)
+        public DownloadButton(BeatmapSetInfo set, bool noVideo = false)
         {
+            BeatmapSetDownloader downloader;
             Children = new Drawable[]
             {
+                downloader = new BeatmapSetDownloader(set, noVideo),
                 icon = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
@@ -27,7 +30,9 @@ namespace osu.Game.Overlays.Direct
                 },
             };
 
-            Downloaded.ValueChanged += e =>
+            Action = downloader.Download;
+
+            downloader.Downloaded.ValueChanged += e =>
             {
                 if (e)
                     this.FadeOut(200);

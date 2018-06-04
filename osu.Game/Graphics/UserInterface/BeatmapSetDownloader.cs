@@ -1,25 +1,27 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Input;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class BeatmapSetDownloadButton : OsuClickableContainer
+    public class BeatmapSetDownloader : Drawable
     {
         private readonly BeatmapSetInfo set;
         private readonly bool noVideo;
 
         private BeatmapManager beatmaps;
 
-        protected readonly BindableBool Downloaded = new BindableBool();
+        public readonly BindableBool Downloaded = new BindableBool();
 
-        protected BeatmapSetDownloadButton(BeatmapSetInfo set, bool noVideo = false)
+        public event Action OnAlreadyDownloading;
+
+        public BeatmapSetDownloader(BeatmapSetInfo set, bool noVideo = false)
         {
             this.set = set;
             this.noVideo = noVideo;
@@ -35,24 +37,6 @@ namespace osu.Game.Graphics.UserInterface
 
             // initial value
             Downloaded.Value = beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID && !s.DeletePending).Count() != 0;
-
-            Action = () =>
-            {
-                if (beatmaps.GetExistingDownload(set) != null)
-                {
-                    AlreadyDownloading();
-                    return;
-                }
-
-                beatmaps.Download(set, noVideo);
-            };
-        }
-
-        protected override bool OnClick(InputState state)
-        {
-            if (Enabled.Value && !Downloaded.Value)
-                Action?.Invoke();
-            return true;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -66,8 +50,18 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected virtual void AlreadyDownloading()
+        public void Download()
         {
+            if (Downloaded.Value)
+                return;
+
+            if (beatmaps.GetExistingDownload(set) != null)
+            {
+                OnAlreadyDownloading?.Invoke();
+                return;
+            }
+
+            beatmaps.Download(set, noVideo);
         }
 
         private void setAdded(BeatmapSetInfo s)
