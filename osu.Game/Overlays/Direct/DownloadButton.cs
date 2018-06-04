@@ -26,6 +26,14 @@ namespace osu.Game.Overlays.Direct
                     Icon = FontAwesome.fa_osu_chevron_down_o,
                 },
             };
+
+            Downloaded.ValueChanged += e =>
+            {
+                if (e)
+                    this.FadeOut(200);
+                else
+                    this.FadeIn(200);
+            };
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -49,20 +57,6 @@ namespace osu.Game.Overlays.Direct
         protected override void OnHoverLost(InputState state)
         {
             icon.ScaleTo(1f, 500, Easing.OutElastic);
-        }
-
-        protected override void Enable()
-        {
-            this.FadeIn(200);
-        }
-
-        protected override void Disable()
-        {
-            this.FadeOut(200);
-        }
-
-        protected override void AlreadyDownloading()
-        {
         }
     }
 }
