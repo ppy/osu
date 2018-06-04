@@ -68,6 +68,16 @@ namespace osu.Game.Overlays
             AlwaysPresent = true;
         }
 
+        public void HidePlaylist()
+        {
+            playlist.Hide();
+        }
+
+        public void TogglePause()
+        {
+            play();
+        }
+
         private Vector2 dragStart;
 
         protected override bool OnDragStart(InputState state)
