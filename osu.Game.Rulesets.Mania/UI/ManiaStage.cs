@@ -171,6 +171,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
+            if (!judgedObject.DisplayJudgement)
+                return;
+
             judgements.Clear();
             judgements.Add(new DrawableManiaJudgement(judgement, judgedObject)
             {

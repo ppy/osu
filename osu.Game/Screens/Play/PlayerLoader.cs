@@ -209,8 +209,11 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            // if the player never got pushed, we should explicitly dispose it.
-            loadTask?.ContinueWith(_ => player.Dispose());
+            if (isDisposing)
+            {
+                // if the player never got pushed, we should explicitly dispose it.
+                loadTask?.ContinueWith(_ => player.Dispose());
+            }
         }
 
         private class BeatmapMetadataDisplay : Container
