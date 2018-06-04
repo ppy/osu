@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// Number of hitcircles in the beatmap.
         /// </summary>
-        private int beatmapCircleCount;
+        private readonly int beatmapCircleCount;
 
         private double accuracy;
         private int scoreMaxCombo;
@@ -53,6 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public OsuPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
+            beatmapCircleCount = Beatmap.HitObjects.Count(h => h is HitCircle);
         }
 
         public override double Calculate(Dictionary<string, object> categoryRatings = null)
@@ -62,7 +64,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             realApproachRate = (double)Attributes["AR"];
             realOverallDifficulty = (double)Attributes["OD"];
             beatmapMaxCombo = (int)Attributes["Max combo"];
-            beatmapCircleCount = (int)Attributes["Circle count"];
 
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
