@@ -123,15 +123,15 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         /// </summary>
         private float? localZoomTarget;
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
             if (!state.Keyboard.ControlPressed)
-                return base.OnWheel(state);
+                return base.OnScroll(state);
 
             relativeContentZoomTarget = Content.ToLocalSpace(state.Mouse.NativeState.Position).X / Content.DrawSize.X;
             localZoomTarget = ToLocalSpace(state.Mouse.NativeState.Position).X;
 
-            Zoom += state.Mouse.WheelDelta;
+            Zoom += state.Mouse.ScrollDelta.Y;
 
             return true;
         }
