@@ -53,9 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
             //Strain decay will very rapidly approach the normal value once the streaming stops.
             else if (current.DeltaTime >= 100)
-            {
                 staminaDecay(current.DeltaTime);
-            }
             currentStamina *= strainDecay(current.DeltaTime);
             currentStrain *= strainDecay(current.DeltaTime);
             if (!(current.BaseObject is Spinner))
@@ -131,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 ms -= 75;
                 decayMultiplier = Math.Max(1, decayMultiplier * Math.Pow(staminaRecovery, 1 + i));
-                staminaThreshold = Math.Max(234.63, staminaThreshold * Math.Pow(Math.Pow(staminaRecovery, 2), 1 + i));
+                staminaThreshold = Math.Max(256.24, staminaThreshold * Math.Pow(Math.Pow(staminaRecovery, 2), 1 + i));
                 if (decayMultiplier == 1)
                     break;
             }
