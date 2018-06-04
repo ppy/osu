@@ -59,8 +59,6 @@ namespace osu.Game
 
         protected MenuCursorContainer MenuCursorContainer;
 
-        protected override string MainResourceFile => @"osu.Game.Resources.dll";
-
         private Container content;
 
         protected override Container<Drawable> Content => content;
@@ -100,6 +98,8 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
+            Resources.AddStore(new DllResourceStore(@"osu.Game.Resources.dll"));
+
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
 
             dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
