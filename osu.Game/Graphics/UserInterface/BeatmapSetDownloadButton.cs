@@ -7,7 +7,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -27,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps, APIAccess api)
+        private void load(BeatmapManager beatmaps)
         {
             this.beatmaps = beatmaps;
 
