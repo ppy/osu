@@ -6,9 +6,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Beatmaps.Drawables
 {
     public class BeatmapSetDownloader : Drawable
     {
