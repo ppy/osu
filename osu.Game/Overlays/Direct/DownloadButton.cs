@@ -3,17 +3,18 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class DownloadButton : OsuClickableContainer
+    public class DownloadButton : BeatmapSetDownloadButton
     {
         private readonly SpriteIcon icon;
 
-        public DownloadButton()
+        public DownloadButton(BeatmapSetInfo set, bool noVideo = false) : base(set, noVideo)
         {
             Children = new Drawable[]
             {
@@ -48,6 +49,20 @@ namespace osu.Game.Overlays.Direct
         protected override void OnHoverLost(InputState state)
         {
             icon.ScaleTo(1f, 500, Easing.OutElastic);
+        }
+
+        protected override void Enable()
+        {
+            this.FadeIn(200);
+        }
+
+        protected override void Disable()
+        {
+            this.FadeOut(200);
+        }
+
+        protected override void AlreadyDownloading()
+        {
         }
     }
 }

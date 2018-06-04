@@ -144,12 +144,11 @@ namespace osu.Game.Overlays.Direct
                                 },
                             },
                         },
-                        new DownloadButton
+                        new DownloadButton(SetInfo)
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             Size = new Vector2(height - vertical_padding * 2),
-                            Action = StartDownload
                         },
                     },
                 },
