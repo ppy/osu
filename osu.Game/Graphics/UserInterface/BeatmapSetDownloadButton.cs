@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -16,29 +15,15 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly BeatmapSetInfo set;
         private readonly bool noVideo;
-        private readonly BindableBool downloaded = new BindableBool();
 
         private BeatmapManager beatmaps;
 
-        private Action action;
-        public Action Action
-        {
-            get => action;
-            set => action = value;
-        }
+        protected readonly BindableBool Downloaded = new BindableBool();
 
         protected BeatmapSetDownloadButton(BeatmapSetInfo set, bool noVideo = false)
         {
             this.set = set;
             this.noVideo = noVideo;
-
-            downloaded.ValueChanged += e =>
-            {
-                if (e)
-                    Disable();
-                else
-                    Enable();
-            };
         }
 
         [BackgroundDependencyLoader]
@@ -49,8 +34,8 @@ namespace osu.Game.Graphics.UserInterface
             beatmaps.ItemAdded += setAdded;
             beatmaps.ItemRemoved += setRemoved;
 
-            // initial downloaded value
-            downloaded.Value = beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID && !s.DeletePending).Count() != 0;
+            // initial value
+            Downloaded.Value = beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID && !s.DeletePending).Count() != 0;
 
             Action = () =>
             {
@@ -66,7 +51,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(InputState state)
         {
-            if (!downloaded.Value)
+            if (Enabled.Value && !Downloaded.Value)
                 Action?.Invoke();
             return true;
         }
@@ -82,20 +67,20 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected abstract void Enable();
-        protected abstract void Disable();
-        protected abstract void AlreadyDownloading();
+        protected virtual void AlreadyDownloading()
+        {
+        }
 
         private void setAdded(BeatmapSetInfo s)
         {
             if (s.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
-                downloaded.Value = true;
+                Downloaded.Value = true;
         }
 
         private void setRemoved(BeatmapSetInfo s)
         {
             if (s.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
-                downloaded.Value = false;
+                Downloaded.Value = false;
         }
     }
 }
