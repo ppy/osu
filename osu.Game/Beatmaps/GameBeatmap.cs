@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Registers an <see cref="AudioManager"/> for <see cref="Track"/>s to be added to.
         /// </summary>
-        /// <param name="audioManager">The <see cref="AudioManager"/>.</param>
+        /// <param name="audioManager">The <see cref="AudioManager"/> to register.</param>
         protected void RegisterAudioManager([NotNull] AudioManager audioManager)
         {
             if (this.audioManager != null) throw new InvalidOperationException($"Cannot register multiple {nameof(AudioManager)}s.");
