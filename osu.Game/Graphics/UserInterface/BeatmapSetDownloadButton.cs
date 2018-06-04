@@ -18,6 +18,8 @@ namespace osu.Game.Graphics.UserInterface
         private readonly bool noVideo;
         private readonly BindableBool downloaded = new BindableBool();
 
+        private BeatmapManager beatmaps;
+
         private Action action;
         public Action Action
         {
@@ -42,17 +44,10 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmaps, APIAccess api)
         {
-            beatmaps.ItemAdded += s =>
-            {
-                if (s.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
-                    downloaded.Value = true;
-            };
+            this.beatmaps = beatmaps;
 
-            beatmaps.ItemRemoved += s =>
-            {
-                if (s.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
-                    downloaded.Value = false;
-            };
+            beatmaps.ItemAdded += setAdded;
+            beatmaps.ItemRemoved += setRemoved;
 
             // initial downloaded value
             downloaded.Value = beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID && !s.DeletePending).Count() != 0;
@@ -76,8 +71,31 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmaps != null)
+            {
+                beatmaps.ItemAdded -= setAdded;
+                beatmaps.ItemRemoved -= setRemoved;
+            }
+        }
+
         protected abstract void Enable();
         protected abstract void Disable();
         protected abstract void AlreadyDownloading();
+
+        private void setAdded(BeatmapSetInfo s)
+        {
+            if (s.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
+                downloaded.Value = true;
+        }
+
+        private void setRemoved(BeatmapSetInfo s)
+        {
+            if (s.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
+                downloaded.Value = false;
+        }
     }
 }
