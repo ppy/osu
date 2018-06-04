@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 staminaValue = 1 + 0.04 * (distance - almost_diameter / 2) / (almost_diameter / 2);
             else
                 staminaValue = 1;
-            
+
             return staminaValue / current.DeltaTime;
         }
     }
