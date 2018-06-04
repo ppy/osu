@@ -175,11 +175,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModHidden))
                 speedValue *= 1.18f;
 
-            double ODSquared = Math.Pow(realOverallDifficulty, 2);
+            double realODSquared = Math.Pow(realOverallDifficulty, 2);
             // Scale the speed value with accuracy _slightly_
-            speedValue *= 0.5f + Math.Pow(accuracy, 0.5 + ODSquared * 0.025) / 2.0f;
+            speedValue *= 0.5f + Math.Pow(accuracy, 0.5 + realODSquared * 0.025) / 2.0f;
             // It is important to also consider accuracy difficulty when doing that
-            speedValue *= 0.98f + ODSquared / 2500;
+            speedValue *= 0.98f + realODSquared / 2500;
 
             return speedValue;
         }
