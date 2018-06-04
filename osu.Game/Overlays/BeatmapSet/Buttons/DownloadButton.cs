@@ -3,18 +3,21 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class DownloadButton : HeaderButton
     {
-        public DownloadButton(string title, string subtitle)
+        public DownloadButton(string title, string subtitle, BeatmapSetInfo set, bool noVideo = false)
         {
             Width = 120;
 
+            BeatmapSetDownloader downloader;
             Add(new Container
             {
                 Depth = -1,
@@ -22,6 +25,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 Padding = new MarginPadding { Horizontal = 10 },
                 Children = new Drawable[]
                 {
+                    downloader = new BeatmapSetDownloader(set, noVideo),
                     new FillFlowContainer
                     {
                         Anchor = Anchor.CentreLeft,
@@ -54,6 +58,16 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     },
                 },
             });
+
+            Action = downloader.Download;
+
+            downloader.Downloaded.ValueChanged += d =>
+            {
+                if (d)
+                    this.FadeOut(200);
+                else
+                    this.FadeIn(200);
+            };
         }
     }
 }

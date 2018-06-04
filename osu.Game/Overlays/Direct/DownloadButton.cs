@@ -32,9 +32,9 @@ namespace osu.Game.Overlays.Direct
 
             Action = downloader.Download;
 
-            downloader.Downloaded.ValueChanged += e =>
+            downloader.Downloaded.ValueChanged += d =>
             {
-                if (e)
+                if (d)
                     this.FadeOut(200);
                 else
                     this.FadeIn(200);
