@@ -176,7 +176,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets, BeatmapManager beatmaps)
+        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets)
         {
             this.api = api;
             this.rulesets = rulesets;
