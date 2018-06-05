@@ -59,9 +59,9 @@ namespace osu.Game.Tests.Visual
             Clock.ProcessFrame();
         }
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
-            if (state.Mouse.WheelDelta > 0)
+            if (state.Mouse.ScrollDelta.Y > 0)
                 Clock.SeekBackward(true);
             else
                 Clock.SeekForward(true);
