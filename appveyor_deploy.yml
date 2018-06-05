@@ -2,8 +2,6 @@ clone_depth: 1
 version: '{build}'
 skip_non_tags: true
 image: Visual Studio 2017
-cache:
-  - '%USERPROFILE%\.nuget\packages -> **\*.csproj'
 install:
   - git clone https://github.com/ppy/osu-deploy
 before_build:
