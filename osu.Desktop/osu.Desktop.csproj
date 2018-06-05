@@ -30,7 +30,6 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.3" />
-    <PackageReference Include="ppy.osu.Framework" Version="2018.505.0" />
     <PackageReference Include="squirrel.windows" Version="1.8.0" Condition="'$(TargetFramework)' == 'net471'" />
   </ItemGroup>
   <ItemGroup Label="Resources">
