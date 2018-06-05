@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using osu.Framework.IO.File;
 
 namespace osu.Game.IO.Archives
 {
@@ -15,7 +14,8 @@ namespace osu.Game.IO.Archives
     {
         private readonly string path;
 
-        public LegacyFilesystemReader(string path) : base(Path.GetFileName(path))
+        public LegacyFilesystemReader(string path)
+            : base(Path.GetFileName(path))
         {
             this.path = path;
         }
@@ -27,7 +27,7 @@ namespace osu.Game.IO.Archives
             // no-op
         }
 
-        public override IEnumerable<string> Filenames => Directory.GetFiles(path, "*", SearchOption.AllDirectories).Select(f => FileSafety.GetRelativePath(f, path)).ToArray();
+        public override IEnumerable<string> Filenames => Directory.GetFiles(path, "*", SearchOption.AllDirectories).Select(f => f.Replace(path, string.Empty).Trim(Path.DirectorySeparatorChar)).ToArray();
 
         public override Stream GetUnderlyingStream() => null;
     }
