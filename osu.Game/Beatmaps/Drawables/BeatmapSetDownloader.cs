@@ -35,7 +35,8 @@ namespace osu.Game.Beatmaps.Drawables
             beatmaps.ItemRemoved += setRemoved;
 
             // initial value
-            Downloaded.Value = beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID && !s.DeletePending).Count() != 0;
+            if (set.OnlineBeatmapSetID != null)
+                Downloaded.Value = beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID && !s.DeletePending).Count() != 0;
         }
 
         protected override void Dispose(bool isDisposing)
