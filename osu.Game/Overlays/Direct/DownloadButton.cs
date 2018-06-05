@@ -39,6 +39,14 @@ namespace osu.Game.Overlays.Direct
                 else
                     this.FadeIn(200);
             };
+
+            downloader.OnAlreadyDownloading += () =>
+            {
+                Content.MoveToX(-5, 50, Easing.OutSine).Then()
+                       .MoveToX(5, 100, Easing.InOutSine).Then()
+                       .MoveToX(-5, 100, Easing.InOutSine).Then()
+                       .MoveToX(0, 50, Easing.InSine);
+            };
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)

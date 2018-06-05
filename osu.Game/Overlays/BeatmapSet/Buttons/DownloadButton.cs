@@ -68,6 +68,14 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 else
                     this.FadeIn(200);
             };
+
+            downloader.OnAlreadyDownloading += () =>
+            {
+                Content.MoveToX(-5, 50, Easing.OutSine).Then()
+                       .MoveToX(5, 100, Easing.InOutSine).Then()
+                       .MoveToX(-5, 100, Easing.InOutSine).Then()
+                       .MoveToX(0, 50, Easing.InSine);
+            };
         }
     }
 }
