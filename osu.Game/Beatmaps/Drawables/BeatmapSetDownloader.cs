@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class BeatmapSetDownloader : Drawable
+    public class BeatmapSetDownloader : Component
     {
         private readonly BeatmapSetInfo set;
         private readonly bool noVideo;
