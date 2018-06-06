@@ -1,12 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -235,18 +233,10 @@ namespace osu.Game.Screens.Multi.Screens.Match
             }
         }
 
-        private class ApplyButton : OsuButton
+        private class ApplyButton : TriangleButton
         {
-            protected override SpriteText CreateText() => new OsuSpriteText
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            };
-
             public ApplyButton()
             {
-                Masking = true;
-                CornerRadius = 5;
                 Text = "Apply";
             }
 
@@ -254,6 +244,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
             private void load(OsuColour colours)
             {
                 BackgroundColour = colours.Yellow;
+                Triangles.ColourLight = colours.YellowLight;
+                Triangles.ColourDark = colours.YellowDark;
             }
         }
     }
