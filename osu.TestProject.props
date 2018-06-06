@@ -7,7 +7,6 @@
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
   </ItemGroup>
@@ -18,7 +17,7 @@
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
   </ItemGroup>
-  <ItemGroup>  
+  <ItemGroup>
     <Compile Include="..\osu.Game\Tests\VisualTestRunner.cs">
       <Link>VisualTestRunner.cs</Link>
     </Compile>
