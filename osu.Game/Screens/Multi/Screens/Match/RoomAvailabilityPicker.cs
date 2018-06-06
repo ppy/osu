@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
 {
     public class RoomAvailabilityPicker : TabControl<RoomAvailability>
     {
-        protected override TabItem<RoomAvailability> CreateTabItem(RoomAvailability value) => new AvailabilityPickerItem(value);
+        protected override TabItem<RoomAvailability> CreateTabItem(RoomAvailability value) => new RoomAvailabilityPickerItem(value);
         protected override Dropdown<RoomAvailability> CreateDropdown() => null;
 
         public RoomAvailabilityPicker()
@@ -30,13 +30,13 @@ namespace osu.Game.Screens.Multi.Screens.Match
             AddItem(RoomAvailability.InviteOnly);
         }
 
-        private class AvailabilityPickerItem : TabItem<RoomAvailability>
+        private class RoomAvailabilityPickerItem : TabItem<RoomAvailability>
         {
             private const float transition_duration = 200;
 
             private readonly Box selection;
 
-            public AvailabilityPickerItem(RoomAvailability value) : base(value)
+            public RoomAvailabilityPickerItem(RoomAvailability value) : base(value)
             {
                 RelativeSizeAxes = Axes.Y;
                 Width = 120;
