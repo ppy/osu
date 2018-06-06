@@ -11,6 +11,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Screens.Match
 {
@@ -45,7 +46,10 @@ namespace osu.Game.Screens.Multi.Screens.Match
                             {
                                 Children = new[]
                                 {
-                                    new Section("ROOM NAME"),
+                                    new Section("ROOM NAME")
+                                    {
+                                        Child = new SettingsTextBox(),
+                                    },
                                     new Section("ROOM VISIBILITY"),
                                     new Section("GAME TYPE"),
                                 },
@@ -56,8 +60,14 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                 Origin = Anchor.TopRight,
                                 Children = new[]
                                 {
-                                    new Section("MAX PARTICIPANTS"),
-                                    new Section("PASSWORD (OPTIONAL)"),
+                                    new Section("MAX PARTICIPANTS")
+                                    {
+                                        Child = new SettingsTextBox(),
+                                    },
+                                    new Section("PASSWORD (OPTIONAL)")
+                                    {
+                                        Child = new SettingsTextBox("Password"),
+                                    },
                                 },
                             },
                         },
@@ -88,6 +98,59 @@ namespace osu.Game.Screens.Multi.Screens.Match
             Content.MoveToY(-1, transition_duration, Easing.InSine);
         }
 
+        private class SettingsTextBox : OsuTextBox
+        {
+            private readonly Container labelContainer;
+
+            protected override Color4 BackgroundUnfocused => Color4.Black;
+            protected override Color4 BackgroundFocused => Color4.Black;
+
+            protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText
+            {
+                Text = c.ToString(),
+                TextSize = 18,
+            };
+
+            public SettingsTextBox(string label = null)
+            {
+                RelativeSizeAxes = Axes.X;
+
+                if (label != null)
+                {
+                    // todo: overflow broken
+                    Add(labelContainer = new Container
+                    {
+                        AutoSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Y,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = OsuColour.FromHex(@"3d3943"),
+                            },
+                            new OsuSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Font = @"Exo2.0-Bold",
+                                Text = label,
+                                Margin = new MarginPadding { Horizontal = 10 },
+                            },
+                        },
+                    });
+                }
+            }
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                if (labelContainer != null)
+                    TextContainer.Padding = new MarginPadding { Horizontal = labelContainer.DrawWidth };
+            }
+        }
+
         private class SectionContainer : FillFlowContainer<Section>
         {
             public SectionContainer()
@@ -107,11 +170,13 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
             public Section(string title)
             {
-                AutoSizeAxes = Axes.Both;
+                AutoSizeAxes = Axes.Y;
+                RelativeSizeAxes = Axes.X;
 
                 InternalChild = new FillFlowContainer
                 {
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(5),
                     Children = new Drawable[]
@@ -124,7 +189,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
                         },
                         content = new Container
                         {
-                            AutoSizeAxes = Axes.Both,
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
                         },
                     },
                 };
