@@ -84,35 +84,14 @@ namespace osu.Game.Rulesets.Taiko
                     {
                         new TaikoModEasy(),
                         new TaikoModNoFail(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModHalfTime(),
-                                new TaikoModDaycore(),
-                            },
-                        },
+                        new MultiMod(new TaikoModHalfTime(), new TaikoModDaycore()),
                     };
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
                         new TaikoModHardRock(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModSuddenDeath(),
-                                new TaikoModPerfect(),
-                            },
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModDoubleTime(),
-                                new TaikoModNightcore(),
-                            },
-                        },
+                        new MultiMod(new TaikoModSuddenDeath(), new TaikoModPerfect()),
+                        new MultiMod(new TaikoModDoubleTime(), new TaikoModDaycore()),
                         new TaikoModHidden(),
                         new TaikoModFlashlight(),
                     };
@@ -122,14 +101,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModRelax(),
                         null,
                         null,
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModAutoplay(),
-                                new ModCinema(),
-                            },
-                        },
+                        new MultiMod(new TaikoModAutoplay(), new ModCinema()),
                     };
                 case ModType.DifficultyCalculation:
                     return new Mod[]

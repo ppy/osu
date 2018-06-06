@@ -82,36 +82,15 @@ namespace osu.Game.Rulesets.Catch
                     {
                         new CatchModEasy(),
                         new CatchModNoFail(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new CatchModHalfTime(),
-                                new CatchModDaycore(),
-                            },
-                        },
+                        new MultiMod(new CatchModHalfTime(), new CatchModDaycore())
                     };
 
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
                         new CatchModHardRock(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new CatchModSuddenDeath(),
-                                new CatchModPerfect(),
-                            },
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new CatchModDoubleTime(),
-                                new CatchModNightcore(),
-                            },
-                        },
+                        new MultiMod(new CatchModSuddenDeath(), new CatchModPerfect()),
+                        new MultiMod(new CatchModDoubleTime(), new CatchModNightcore()),
                         new CatchModHidden(),
                         new CatchModFlashlight(),
                     };
@@ -122,14 +101,7 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModRelax(),
                         null,
                         null,
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new CatchModAutoplay(),
-                                new ModCinema(),
-                            },
-                        },
+                        new MultiMod(new CatchModAutoplay(), new ModCinema()),
                     };
 
                 default:
