@@ -14,6 +14,9 @@ namespace osu.Game.Online.Multiplayer
     {
         public abstract string Name { get; }
         public abstract Drawable GetIcon(OsuColour colours, float size);
+
+        public override int GetHashCode() => GetType().GetHashCode();
+        public override bool Equals(object obj) => GetType() == obj?.GetType();
     }
 
     public class GameTypeTag : GameType
