@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModHidden : Mod, IReadFromConfig
+    public abstract class ModHidden : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
     {
         public override string Name => "Hidden";
         public override string ShortenedName => "HD";
@@ -25,15 +25,11 @@ namespace osu.Game.Rulesets.Mods
             IncreaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
         }
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public virtual void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var d in drawables)
-            {
-                if (d == drawables.Last() && IncreaseFirstObjectVisibility)
-                    return;
-
+            // todo: fix ordering of objects so we don't have to do this (#2740).
+            foreach (var d in drawables.Reverse().Skip(IncreaseFirstObjectVisibility ? 1 : 0))
                 d.ApplyCustomUpdateState += ApplyHiddenState;
-            }
         }
 
         protected virtual void ApplyHiddenState(DrawableHitObject hitObject, ArmedState state) { }
