@@ -15,16 +15,16 @@ namespace osu.Game.Tests.Visual
         private readonly OsuTestBeatmap beatmap = new OsuTestBeatmap(new DummyWorkingBeatmap());
         protected BindableBeatmap Beatmap => beatmap;
 
-        private DependencyContainer dependencies;
+        protected DependencyContainer Dependencies { get; private set; }
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
         {
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            Dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
-            dependencies.CacheAs<BindableBeatmap>(beatmap);
-            dependencies.CacheAs<IBindableBeatmap>(beatmap);
+            Dependencies.CacheAs<BindableBeatmap>(beatmap);
+            Dependencies.CacheAs<IBindableBeatmap>(beatmap);
 
-            return dependencies;
+            return Dependencies;
         }
 
         [BackgroundDependencyLoader]

@@ -27,7 +27,6 @@ namespace osu.Game.Tests.Visual
 
         private RulesetStore rulesets;
 
-        private DependencyContainer dependencies;
         private WorkingBeatmap defaultBeatmap;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
@@ -48,9 +47,6 @@ namespace osu.Game.Tests.Visual
             typeof(DrawableCarouselBeatmapSet),
         };
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
-
         private class TestSongSelect : PlaySongSelect
         {
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
@@ -68,8 +64,8 @@ namespace osu.Game.Tests.Visual
             // this is by no means clean. should be replacing inside of OsuGameBase somehow.
             IDatabaseContextFactory factory = new SingletonContextFactory(new OsuDbContext());
 
-            dependencies.Cache(rulesets = new RulesetStore(factory));
-            dependencies.Cache(manager = new BeatmapManager(storage, factory, rulesets, null, null)
+            Dependencies.Cache(rulesets = new RulesetStore(factory));
+            Dependencies.Cache(manager = new BeatmapManager(storage, factory, rulesets, null, null)
             {
                 DefaultBeatmap = defaultBeatmap = Beatmap.Default
             });
