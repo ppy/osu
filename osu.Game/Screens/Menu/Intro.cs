@@ -15,6 +15,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Menu
         private SampleChannel seeya;
 
         protected override bool HideOverlaysOnEnter => true;
-        protected override bool AllowOpeningOverlays => false;
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         public override bool CursorVisible => false;
 
