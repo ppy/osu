@@ -6,7 +6,7 @@ namespace osu.Game.Overlays
     public enum OverlayActivation
     {
         Disabled,
-        //UserTriggered, // currently there is no way to discern user action
+        UserTriggered,
         All
     }
 }
