@@ -34,11 +34,15 @@ namespace osu.Game.Screens.Multi.Screens.Match
         {
             this.room = room;
             Header header;
+            RoomSettingsOverlay settings;
             Info info;
 
             Children = new Drawable[]
             {
-                header = new Header(),
+                header = new Header
+                {
+                    Depth = -1,
+                },
                 info = new Info
                 {
                     Margin = new MarginPadding { Top = Header.HEIGHT },
@@ -47,6 +51,17 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Header.HEIGHT + Info.HEIGHT },
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = Header.HEIGHT },
+                    Child = settings = new RoomSettingsOverlay
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Height = 0.9f,
+                        Room = room,
+                    },
                 },
             };
 
@@ -62,6 +77,20 @@ namespace osu.Game.Screens.Multi.Screens.Match
             {
                 header.BeatmapSet = b?.BeatmapSet;
                 info.Beatmap = b;
+            };
+
+            header.Tabs.Current.ValueChanged += t =>
+            {
+                if (t == MatchHeaderPage.Settings)
+                    settings.Show();
+                else
+                    settings.Hide();
+            };
+
+            settings.StateChanged += s =>
+            {
+                if (s == Visibility.Hidden)
+                    header.Tabs.Current.Value = MatchHeaderPage.Room;
             };
 
             nameBind.BindTo(room.Name);
