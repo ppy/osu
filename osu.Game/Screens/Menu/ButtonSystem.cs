@@ -322,17 +322,18 @@ namespace osu.Game.Screens.Menu
                 case MenuState.Initial:
                     logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
-                    {
-                        logoTracking = false;
+                        {
+                            logoTracking = false;
 
-                        game.OverlayActivationMode.Value = state == MenuState.Exit ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
+                            if (game != null)
+                                game.OverlayActivationMode.Value = state == MenuState.Exit ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
 
-                        logo.ClearTransforms(targetMember: nameof(Position));
-                        logo.RelativePositionAxes = Axes.Both;
+                            logo.ClearTransforms(targetMember: nameof(Position));
+                            logo.RelativePositionAxes = Axes.Both;
 
-                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                        logo.ScaleTo(1, 800, Easing.OutExpo);
-                    }, buttonArea.Alpha * 150);
+                            logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                            logo.ScaleTo(1, 800, Easing.OutExpo);
+                        }, buttonArea.Alpha * 150);
                     break;
                 case MenuState.TopLevel:
                 case MenuState.Play:
@@ -359,8 +360,11 @@ namespace osu.Game.Screens.Menu
                                 if (impact)
                                     logo.Impact();
 
-                                game.OverlayActivationMode.Value = OverlayActivation.All;
-                                game.Toolbar.State = Visibility.Visible;
+                                if (game != null)
+                                {
+                                    game.OverlayActivationMode.Value = OverlayActivation.All;
+                                    game.Toolbar.State = Visibility.Visible;
+                                }
                             }, 200);
                             break;
                         default:
