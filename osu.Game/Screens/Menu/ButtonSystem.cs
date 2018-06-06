@@ -16,6 +16,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -129,9 +130,12 @@ namespace osu.Game.Screens.Menu
             buttonFlow.AddRange(buttonsTopLevel);
         }
 
+        private OsuGame game;
+
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, OsuGame game)
         {
+            this.game = game;
             sampleBack = audio.Sample.Get(@"Menu/button-back-select");
         }
 
@@ -321,6 +325,8 @@ namespace osu.Game.Screens.Menu
                     {
                         logoTracking = false;
 
+                        game.OverlayActivationMode.Value = state == MenuState.Exit ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
+
                         logo.ClearTransforms(targetMember: nameof(Position));
                         logo.RelativePositionAxes = Axes.Both;
 
@@ -352,6 +358,9 @@ namespace osu.Game.Screens.Menu
 
                                 if (impact)
                                     logo.Impact();
+
+                                game.OverlayActivationMode.Value = OverlayActivation.All;
+                                game.Toolbar.State = Visibility.Visible;
                             }, 200);
                             break;
                         default:

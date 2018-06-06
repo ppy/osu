@@ -63,8 +63,6 @@ namespace osu.Game.Screens.Menu
                 },
                 sideFlashes = new MenuSideFlashes(),
             };
-
-            buttons.StateChanged += state => UpdateOverlayStates?.Invoke();
         }
 
         [BackgroundDependencyLoader(true)]

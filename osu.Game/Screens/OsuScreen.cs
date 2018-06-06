@@ -45,21 +45,16 @@ namespace osu.Game.Screens
         private Action updateOverlayStates;
 
         /// <summary>
-        /// Allows manually updating visibility of all overlays if <see cref="HideOverlaysOnEnter"/> is not enough.
-        /// </summary>
-        protected Action UpdateOverlayStates => updateOverlayStates;
-
-        /// <summary>
         /// Whether all overlays should be hidden when this screen is entered or resumed.
         /// </summary>
         protected virtual bool HideOverlaysOnEnter => false;
 
-        private readonly Bindable<OverlayActivation> allowOverlays = new Bindable<OverlayActivation>();
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         /// <summary>
         /// Whether overlays should be able to be opened once this screen is entered or resumed.
         /// </summary>
-        protected virtual OverlayActivation OverlayActivationLevel => OverlayActivation.All;
+        protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
         /// <summary>
         /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.
@@ -110,15 +105,12 @@ namespace osu.Game.Screens
             if (osuGame != null)
             {
                 Ruleset.BindTo(osuGame.Ruleset);
-                allowOverlays.BindTo(osuGame.OverlayActivationMode);
+                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
 
                 updateOverlayStates = () =>
                 {
                     if (HideOverlaysOnEnter)
-                    {
                         osuGame.CloseAllOverlays();
-                        osuGame.Toolbar.State = Visibility.Hidden;
-                    }
                     else
                         osuGame.Toolbar.State = Visibility.Visible;
                 };
@@ -257,7 +249,7 @@ namespace osu.Game.Screens
             if (backgroundParallaxContainer != null)
                 backgroundParallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * BackgroundParallaxAmount;
 
-            allowOverlays.Value = OverlayActivationLevel;
+            OverlayActivationMode.Value = InitialOverlayActivationMode;
 
             updateOverlayStates?.Invoke();
         }

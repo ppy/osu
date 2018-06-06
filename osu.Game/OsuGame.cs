@@ -93,6 +93,8 @@ namespace osu.Game
 
         private SettingsOverlay settings;
 
+        private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
+
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
 
@@ -104,6 +106,17 @@ namespace osu.Game
         public void ToggleSettings() => settings.ToggleVisibility();
 
         public void ToggleDirect() => direct.ToggleVisibility();
+
+        /// <summary>
+        /// Close all game-wide overlays.
+        /// </summary>
+        /// <param name="toolbar">Whether the toolbar should also be hidden.</param>
+        public void CloseAllOverlays(bool toolbar = true)
+        {
+            foreach (var o in overlays)
+                o.State = Visibility.Hidden;
+            if (toolbar) Toolbar.State = Visibility.Hidden;
+        }
 
         private DependencyContainer dependencies;
 
@@ -250,7 +263,7 @@ namespace osu.Game
                 Depth = -5,
                 OnHome = delegate
                 {
-                    hideAllOverlays();
+                    CloseAllOverlays(false);
                     intro?.ChildScreen?.MakeCurrent();
                 },
             }, overlayContent.Add);
@@ -307,6 +320,8 @@ namespace osu.Game
 
             // ensure only one of these overlays are open at once.
             var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
+            overlays.AddRange(singleDisplayOverlays);
+
             foreach (var overlay in singleDisplayOverlays)
             {
                 overlay.StateChanged += state =>
@@ -322,6 +337,8 @@ namespace osu.Game
             }
 
             var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
+            overlays.AddRange(singleDisplaySideOverlays);
+
             foreach (var overlay in singleDisplaySideOverlays)
             {
                 overlay.StateChanged += state =>
@@ -338,6 +355,8 @@ namespace osu.Game
 
             // eventually informational overlays should be displayed in a stack, but for now let's only allow one to stay open at a time.
             var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile };
+            overlays.AddRange(informationalOverlays);
+
             foreach (var overlay in informationalOverlays)
             {
                 overlay.StateChanged += state =>
@@ -351,6 +370,11 @@ namespace osu.Game
                     }
                 };
             }
+
+            OverlayActivationMode.ValueChanged += v =>
+            {
+                if (v != OverlayActivation.All) CloseAllOverlays();
+            };
 
             void updateScreenOffset()
             {
@@ -366,12 +390,6 @@ namespace osu.Game
 
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
-        }
-
-        public void CloseAllOverlays()
-        {
-            hideAllOverlays();
-            musicController.State = Visibility.Hidden;
         }
 
         private void forwardLoggedErrorsToNotifications()
@@ -487,16 +505,6 @@ namespace osu.Game
 
         private OsuScreen currentScreen;
         private FrameworkConfigManager frameworkConfig;
-
-        private void hideAllOverlays()
-        {
-            settings.State = Visibility.Hidden;
-            chat.State = Visibility.Hidden;
-            direct.State = Visibility.Hidden;
-            social.State = Visibility.Hidden;
-            userProfile.State = Visibility.Hidden;
-            notifications.State = Visibility.Hidden;
-        }
 
         protected override bool OnExiting()
         {

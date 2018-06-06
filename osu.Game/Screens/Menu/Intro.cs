@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Menu
         private SampleChannel seeya;
 
         protected override bool HideOverlaysOnEnter => true;
-        protected override OverlayActivation OverlayActivationLevel => OverlayActivation.Disabled;
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         public override bool CursorVisible => false;
 
