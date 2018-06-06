@@ -366,8 +366,6 @@ namespace osu.Game
 
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
-
-            AllowOverlays.ValueChanged += state => notifications.Enabled.Value = state == OverlayActivation.All;
         }
 
         public void CloseAllOverlays()
