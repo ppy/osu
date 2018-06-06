@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -20,31 +21,20 @@ namespace osu.Game.Screens.Multi.Screens.Match
         private const float transition_duration = 500;
         private const float field_padding = 45;
 
+        private readonly Bindable<string> nameBind = new Bindable<string>();
+        private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
+        private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
+        private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
+
         private readonly Container content;
-        private readonly SettingsTextBox name, maxParticipants;
-        private readonly RoomAvailabilityPicker availability;
-        private readonly GameTypePicker type;
 
-        private Room room;
-        public Room Room
-        {
-            get => room;
-            set
-            {
-                if (value == room) return;
-                room = value;
-
-                name.Text = room.Name.Value;
-                maxParticipants.Text = room.MaxParticipants.Value?.ToString();
-                availability.Current.Value = room.Availability.Value;
-                type.Current.Value = room.Type.Value;
-            }
-        }
-
-        public RoomSettingsOverlay()
+        public RoomSettingsOverlay(Room room)
         {
             Masking = true;
 
+            SettingsTextBox name, maxParticipants;
+            RoomAvailabilityPicker availability;
+            GameTypePicker type;
             Child = content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -126,10 +116,29 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     },
                 },
             };
+
+            nameBind.ValueChanged += n => name.Text = n;
+            availabilityBind.ValueChanged += a => availability.Current.Value = a;
+            typeBind.ValueChanged += t => type.Current.Value = t;
+            maxParticipantsBind.ValueChanged += m => maxParticipants.Text = m?.ToString();
+
+            nameBind.BindTo(room.Name);
+            availabilityBind.BindTo(room.Availability);
+            typeBind.BindTo(room.Type);
+            maxParticipantsBind.BindTo(room.MaxParticipants);
         }
 
         protected override void PopIn()
         {
+            // reapply the rooms values if the overlay was completely closed
+            if (content.Y == -1)
+            {
+                nameBind.TriggerChange();
+                availabilityBind.TriggerChange();
+                typeBind.TriggerChange();
+                maxParticipantsBind.TriggerChange();
+            }
+
             content.MoveToY(0, transition_duration, Easing.OutQuint);
         }
 

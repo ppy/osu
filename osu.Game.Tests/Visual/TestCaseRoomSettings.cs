@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Screens.Match;
 
 namespace osu.Game.Tests.Visual
@@ -12,9 +13,10 @@ namespace osu.Game.Tests.Visual
     {
         public TestCaseRoomSettings()
         {
-            RoomSettingsOverlay overlay;
+            Room room = new Room();
 
-            Add(overlay = new RoomSettingsOverlay
+            RoomSettingsOverlay overlay;
+            Add(overlay = new RoomSettingsOverlay(room)
             {
                 RelativeSizeAxes = Axes.Both,
                 Height = 0.75f,
