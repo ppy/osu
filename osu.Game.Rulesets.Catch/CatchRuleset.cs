@@ -84,7 +84,6 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModNoFail(),
                         new MultiMod(new CatchModHalfTime(), new CatchModDaycore())
                     };
-
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -94,7 +93,6 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModHidden(),
                         new CatchModFlashlight(),
                     };
-
                 case ModType.Special:
                     return new Mod[]
                     {
@@ -103,7 +101,6 @@ namespace osu.Game.Rulesets.Catch
                         null,
                         new MultiMod(new CatchModAutoplay(), new ModCinema()),
                     };
-
                 default:
                     return new Mod[] { };
             }

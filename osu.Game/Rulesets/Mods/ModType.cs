@@ -7,7 +7,6 @@ namespace osu.Game.Rulesets.Mods
     {
         DifficultyReduction,
         DifficultyIncrease,
-        Special,
-        DifficultyCalculation
+        Special
     }
 }

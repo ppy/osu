@@ -103,47 +103,6 @@ namespace osu.Game.Rulesets.Taiko
                         null,
                         new MultiMod(new TaikoModAutoplay(), new ModCinema()),
                     };
-                case ModType.DifficultyCalculation:
-                    return new Mod[]
-                    {
-                        new MultiMod(),
-                        new TaikoModDoubleTime(),
-                        new TaikoModHalfTime(),
-                        new TaikoModEasy(),
-                        new TaikoModHardRock(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModEasy(),
-                                new TaikoModDoubleTime(),
-                            }
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModEasy(),
-                                new TaikoModHalfTime(),
-                            }
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModHardRock(),
-                                new TaikoModDoubleTime(),
-                            }
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModHardRock(),
-                                new TaikoModHalfTime(),
-                            }
-                        },
-                    };
                 default:
                     return new Mod[] { };
             }

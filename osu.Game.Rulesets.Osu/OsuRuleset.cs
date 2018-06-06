@@ -113,47 +113,6 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModAutoplay(), new ModCinema()),
                         new OsuModTarget(),
                     };
-                case ModType.DifficultyCalculation:
-                    return new Mod[]
-                    {
-                        new MultiMod(),
-                        new OsuModDoubleTime(),
-                        new OsuModHalfTime(),
-                        new OsuModEasy(),
-                        new OsuModHardRock(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModEasy(),
-                                new OsuModDoubleTime(),
-                            }
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModEasy(),
-                                new OsuModHalfTime(),
-                            }
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModHardRock(),
-                                new OsuModDoubleTime(),
-                            }
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModHardRock(),
-                                new OsuModHalfTime(),
-                            }
-                        },
-                    };
                 default:
                     return new Mod[] { };
             }
