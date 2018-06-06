@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
-        public override bool ShowOverlaysOnEnter => false;
+        protected override bool HideOverlaysOnEnter => true;
         public override bool AllowBeatmapRulesetChange => false;
 
         private Box bottomBackground;
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit
         {
             // TODO: should probably be done at a RulesetContainer level to share logic with Player.
             var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
-            clock = new EditorClock(Beatmap.Value.Beatmap.ControlPointInfo, beatDivisor) { IsCoupled = false };
+            clock = new EditorClock(Beatmap, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
 
             dependencies.CacheAs<IFrameBasedClock>(clock);
@@ -182,9 +182,9 @@ namespace osu.Game.Screens.Edit
             LoadComponentAsync(currentScreen, screenContainer.Add);
         }
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
-            if (state.Mouse.WheelDelta > 0)
+            if (state.Mouse.ScrollDelta.X + state.Mouse.ScrollDelta.Y > 0)
                 clock.SeekBackward(true);
             else
                 clock.SeekForward(true);

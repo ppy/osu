@@ -12,7 +12,7 @@ namespace osu.Game.Graphics.Cursor
     /// <summary>
     /// A container which provides a <see cref="MenuCursor"/> which can be overridden by hovered <see cref="Drawable"/>s.
     /// </summary>
-    public class CursorOverrideContainer : Container, IProvideCursor
+    public class MenuCursorContainer : Container, IProvideCursor
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.Cursor
         public CursorContainer Cursor { get; }
         public bool ProvidingUserCursor => true;
 
-        public CursorOverrideContainer()
+        public MenuCursorContainer()
         {
             AddRangeInternal(new Drawable[]
             {

@@ -27,7 +27,8 @@ namespace osu.Game.Screens.Menu
     {
         public event Action<MenuState> StateChanged;
 
-        private readonly BindableBool showOverlays = new BindableBool();
+        private readonly BindableBool hideOverlaysOnEnter = new BindableBool();
+        private readonly BindableBool allowOpeningOverlays = new BindableBool();
 
         public Action OnEdit;
         public Action OnExit;
@@ -135,7 +136,12 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuGame game)
         {
-            if (game != null) showOverlays.BindTo(game.ShowOverlays);
+            if (game != null)
+            {
+                hideOverlaysOnEnter.BindTo(game.HideOverlaysOnEnter);
+                allowOpeningOverlays.BindTo(game.AllowOpeningOverlays);
+            }
+
             sampleBack = audio.Sample.Get(@"Menu/button-back-select");
         }
 
@@ -148,6 +154,8 @@ namespace osu.Game.Screens.Menu
                 case Key.Space:
                     logo?.TriggerOnClick(state);
                     return true;
+                case Key.Escape:
+                    return goBack();
             }
 
             return false;
@@ -158,17 +166,22 @@ namespace osu.Game.Screens.Menu
             switch (action)
             {
                 case GlobalAction.Back:
-                    switch (State)
-                    {
-                        case MenuState.TopLevel:
-                            State = MenuState.Initial;
-                            return true;
-                        case MenuState.Play:
-                            backButton.TriggerOnClick();
-                            return true;
-                        default:
-                            return false;
-                    }
+                    return goBack();
+                default:
+                    return false;
+            }
+        }
+
+        private bool goBack()
+        {
+            switch (State)
+            {
+                case MenuState.TopLevel:
+                    State = MenuState.Initial;
+                    return true;
+                case MenuState.Play:
+                    backButton.TriggerOnClick();
+                    return true;
                 default:
                     return false;
             }
@@ -241,9 +254,6 @@ namespace osu.Game.Screens.Menu
                 backButton.ContractStyle = 0;
                 settingsButton.ContractStyle = 0;
 
-                if (state == MenuState.TopLevel)
-                    buttonArea.FinishTransforms(true);
-
                 updateLogoState(lastState);
 
                 using (buttonArea.BeginDelayedSequence(lastState == MenuState.Initial ? 150 : 0, true))
@@ -312,49 +322,57 @@ namespace osu.Game.Screens.Menu
         {
             if (logo == null) return;
 
-            logoDelayedAction?.Cancel();
-
             switch (state)
             {
                 case MenuState.Exit:
                 case MenuState.Initial:
-                    logoTracking = false;
-
+                    logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
                     {
-                        showOverlays.Value = false;
+                        logoTracking = false;
+
+                        hideOverlaysOnEnter.Value = true;
+                        allowOpeningOverlays.Value = false;
 
                         logo.ClearTransforms(targetMember: nameof(Position));
                         logo.RelativePositionAxes = Axes.Both;
 
                         logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
                         logo.ScaleTo(1, 800, Easing.OutExpo);
-                    }, 150);
-
+                    }, buttonArea.Alpha * 150);
                     break;
                 case MenuState.TopLevel:
                 case MenuState.Play:
-                    logo.ClearTransforms(targetMember: nameof(Position));
-                    logo.RelativePositionAxes = Axes.None;
-
                     switch (lastState)
                     {
                         case MenuState.TopLevel: // coming from toplevel to play
+                            break;
                         case MenuState.Initial:
-                            logoTracking = false;
-                            logo.ScaleTo(0.5f, 200, Easing.In);
+                            logo.ClearTransforms(targetMember: nameof(Position));
+                            logo.RelativePositionAxes = Axes.None;
+
+                            bool impact = logo.Scale.X > 0.6f;
+
+                            if (lastState == MenuState.Initial)
+                                logo.ScaleTo(0.5f, 200, Easing.In);
 
                             logo.MoveTo(logoTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In);
 
+                            logoDelayedAction?.Cancel();
                             logoDelayedAction = Scheduler.AddDelayed(() =>
                             {
                                 logoTracking = true;
 
-                                logo.Impact();
-                                showOverlays.Value = true;
+                                if (impact)
+                                    logo.Impact();
+
+                                hideOverlaysOnEnter.Value = false;
+                                allowOpeningOverlays.Value = true;
                             }, 200);
                             break;
                         default:
+                            logo.ClearTransforms(targetMember: nameof(Position));
+                            logo.RelativePositionAxes = Axes.None;
                             logoTracking = true;
                             logo.ScaleTo(0.5f, 200, Easing.OutQuint);
                             break;
