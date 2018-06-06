@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using OpenTK;
 
-namespace osu.Game.Screens.Multi.Screens.Match
+namespace osu.Game.Screens.Multi.Screens.Match.Settings
 {
     public class RoomAvailabilityPicker : TabControl<RoomAvailability>
     {
