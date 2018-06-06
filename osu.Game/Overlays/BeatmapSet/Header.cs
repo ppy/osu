@@ -70,8 +70,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     videoButtons.Children = new[]
                     {
-                        new DownloadButton("Download", "with Video", BeatmapSet),
-                        new DownloadButton("Download", "without Video", BeatmapSet, true),
+                        new DownloadButton(BeatmapSet),
+                        new DownloadButton(BeatmapSet, true),
                     };
 
                     videoButtons.FadeIn(transition_duration);
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
                 else
                 {
-                    noVideoButtons.Child = new DownloadButton("Download", string.Empty, BeatmapSet);
+                    noVideoButtons.Child = new DownloadButton(BeatmapSet);
 
                     noVideoButtons.FadeIn(transition_duration);
                     videoButtons.FadeOut(transition_duration);
