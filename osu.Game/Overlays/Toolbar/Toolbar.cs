@@ -10,6 +10,8 @@ using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -28,6 +30,8 @@ namespace osu.Game.Overlays.Toolbar
 
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
+
+        private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         public Toolbar()
         {
@@ -74,6 +78,19 @@ namespace osu.Game.Overlays.Toolbar
 
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, HEIGHT);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame osuGame)
+        {
+            if (osuGame != null)
+                overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+
+            StateChanged += visibility =>
+            {
+                if (overlayActivationMode == OverlayActivation.Disabled)
+                    State = Visibility.Hidden;
+            };
         }
 
         public class ToolbarBackground : Container
