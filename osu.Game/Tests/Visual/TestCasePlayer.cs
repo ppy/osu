@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual
             if (Player != null)
                 Remove(Player);
 
-            var player = CreatePlayer(Beatmap, r);
+            var player = CreatePlayer(r);
 
             LoadComponentAsync(player, LoadScreen);
 
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual
             Beatmap.Value.Track.Rate = Clock.Rate;
         }
 
-        protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset) => new Player
+        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player
         {
             AllowPause = false,
             AllowLeadIn = false,
