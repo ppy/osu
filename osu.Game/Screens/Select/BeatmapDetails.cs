@@ -6,7 +6,6 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System.Linq;
@@ -120,14 +119,8 @@ namespace osu.Game.Screens.Select
                                         Margin = new MarginPadding { Top = spacing * 2 },
                                         Children = new[]
                                         {
-                                            description = new MetadataSection("Description")
-                                            {
-                                                TextColour = Color4.White.Opacity(0.75f),
-                                            },
-                                            source = new MetadataSection("Source")
-                                            {
-                                                TextColour = Color4.White.Opacity(0.75f),
-                                            },
+                                            description = new MetadataSection("Description"),
+                                            source = new MetadataSection("Source"),
                                             tags = new MetadataSection("Tags"),
                                         },
                                     },
@@ -164,10 +157,9 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(APIAccess api)
         {
             this.api = api;
-            tags.TextColour = colours.Yellow;
         }
 
         protected override void UpdateAfterChildren()
@@ -364,7 +356,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Colour = textFlow.Colour,
+                    Colour = Color4.White.Opacity(0.75f),
                     Text = text
                 }, loaded =>
                 {
@@ -374,12 +366,6 @@ namespace osu.Game.Screens.Select
                     // fade in if we haven't yet.
                     this.FadeIn(transition_duration);
                 });
-            }
-
-            public Color4 TextColour
-            {
-                get { return textFlow.Colour; }
-                set { textFlow.Colour = value; }
             }
         }
 
