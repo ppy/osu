@@ -1,11 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -84,7 +86,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                     },
                                     new Section("PASSWORD (OPTIONAL)")
                                     {
-                                        Child = new SettingsTextBox("Password"),
+                                        Child = new SettingsTextBox(),
                                     },
                                 },
                             },
@@ -149,8 +151,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         private class SettingsTextBox : OsuTextBox
         {
-            private readonly Container labelContainer;
-
             protected override Color4 BackgroundUnfocused => Color4.Black;
             protected override Color4 BackgroundFocused => Color4.Black;
 
@@ -160,43 +160,9 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 TextSize = 18,
             };
 
-            public SettingsTextBox(string label = null)
+            public SettingsTextBox()
             {
                 RelativeSizeAxes = Axes.X;
-
-                if (label != null)
-                {
-                    // todo: overflow broken
-                    Add(labelContainer = new Container
-                    {
-                        AutoSizeAxes = Axes.X,
-                        RelativeSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.FromHex(@"3d3943"),
-                            },
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Font = @"Exo2.0-Bold",
-                                Text = label,
-                                Margin = new MarginPadding { Horizontal = 10 },
-                            },
-                        },
-                    });
-                }
-            }
-
-            protected override void UpdateAfterChildren()
-            {
-                base.UpdateAfterChildren();
-
-                if (labelContainer != null)
-                    TextContainer.Padding = new MarginPadding { Horizontal = labelContainer.DrawWidth };
             }
         }
 
