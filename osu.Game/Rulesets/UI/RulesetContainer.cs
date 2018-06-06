@@ -57,6 +57,7 @@ namespace osu.Game.Rulesets.UI
         public abstract IEnumerable<HitObject> Objects { get; }
 
         private readonly Lazy<Playfield> playfield;
+
         /// <summary>
         /// The playfield.
         /// </summary>
@@ -130,7 +131,6 @@ namespace osu.Game.Rulesets.UI
             HasReplayLoaded.Value = ReplayInputManager.ReplayInputHandler != null;
         }
 
-
         /// <summary>
         /// Creates the cursor. May be null if the <see cref="RulesetContainer"/> doesn't provide a custom cursor.
         /// </summary>
@@ -194,6 +194,7 @@ namespace osu.Game.Rulesets.UI
 
         protected override Container<Drawable> Content => content;
         private Container content;
+        private IEnumerable<Mod> mods;
 
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
@@ -216,13 +217,10 @@ namespace osu.Game.Rulesets.UI
 
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
-
-            // Add mods, should always be the last thing applied to give full control to mods
-            applyMods(Mods);
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             KeyBindingInputManager.Add(content = new Container
             {
@@ -235,6 +233,9 @@ namespace osu.Game.Rulesets.UI
             if (Cursor != null)
                 KeyBindingInputManager.Add(Cursor);
 
+            // Apply mods
+            applyMods(Mods, config);
+
             loadObjects();
         }
 
@@ -242,13 +243,16 @@ namespace osu.Game.Rulesets.UI
         /// Applies the active mods to this RulesetContainer.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyMods(IEnumerable<Mod> mods)
+        private void applyMods(IEnumerable<Mod> mods, OsuConfigManager config)
         {
             if (mods == null)
                 return;
 
             foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);
+
+            foreach (var mod in mods.OfType<IReadFromConfig>())
+                mod.ReadFromConfig(config);
         }
 
         public override void SetReplay(Replay replay)

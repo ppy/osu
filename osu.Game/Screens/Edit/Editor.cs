@@ -182,9 +182,9 @@ namespace osu.Game.Screens.Edit
             LoadComponentAsync(currentScreen, screenContainer.Add);
         }
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
-            if (state.Mouse.WheelDelta > 0)
+            if (state.Mouse.ScrollDelta.X + state.Mouse.ScrollDelta.Y > 0)
                 clock.SeekBackward(true);
             else
                 clock.SeekForward(true);

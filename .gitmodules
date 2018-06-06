@@ -1,6 +1,3 @@
-[submodule "osu-framework"]
-	path = osu-framework
-	url = https://github.com/ppy/osu-framework
 [submodule "osu-resources"]
 	path = osu-resources
 	url = https://github.com/ppy/osu-resources
