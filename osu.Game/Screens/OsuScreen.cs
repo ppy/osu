@@ -209,6 +209,7 @@ namespace osu.Game.Screens
             logo.Anchor = Anchor.TopLeft;
             logo.Origin = Anchor.Centre;
             logo.RelativePositionAxes = Axes.None;
+            logo.BeatMatching = true;
             logo.Triangles = true;
             logo.Ripple = true;
         }

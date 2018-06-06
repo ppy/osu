@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual
             AddStep("show", () =>
             {
                 infoWedge.State = Visibility.Visible;
-                infoWedge.UpdateBeatmap(Beatmap);
+                infoWedge.Beatmap = Beatmap;
             });
 
             // select part is redundant, but wait for load isn't
@@ -129,7 +129,7 @@ namespace osu.Game.Tests.Visual
             AddStep($"select {b.Metadata.Title} beatmap", () =>
             {
                 infoBefore = infoWedge.Info;
-                infoWedge.UpdateBeatmap(Beatmap.Value = new TestWorkingBeatmap(b));
+                infoWedge.Beatmap = Beatmap.Value = new TestWorkingBeatmap(b);
             });
 
             AddUntilStep(() => infoWedge.Info != infoBefore, "wait for async load");
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual
             AddStep("select null beatmap", () =>
             {
                 Beatmap.Value = Beatmap.Default;
-                infoWedge.UpdateBeatmap(Beatmap);
+                infoWedge.Beatmap = Beatmap;
             });
         }
 
