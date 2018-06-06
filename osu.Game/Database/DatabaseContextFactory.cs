@@ -63,6 +63,7 @@ namespace osu.Game.Database
                 }
                 else
                 {
+                    // we want to try-catch the retrieval of the context because it could throw an error (in CreateContext).
                     context = threadContexts.Value;
                 }
             }
