@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         }
 
         [BackgroundDependencyLoader]
-        private void load(IGameBeatmap beatmap)
+        private void load(IBindableBeatmap beatmap)
         {
             this.beatmap.BindTo(beatmap);
 

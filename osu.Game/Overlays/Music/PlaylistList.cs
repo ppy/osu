@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Music
             }
 
             [BackgroundDependencyLoader]
-            private void load(BeatmapManager beatmaps, IGameBeatmap beatmap)
+            private void load(BeatmapManager beatmaps, IBindableBeatmap beatmap)
             {
                 beatmaps.GetAllUsableBeatmapSets().ForEach(addBeatmapSet);
                 beatmaps.ItemAdded += addBeatmapSet;

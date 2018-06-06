@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Select
         protected readonly BeatmapDetailArea BeatmapDetails;
         private bool removeAutoModOnResume;
 
-        private GameBeatmap beatmap;
+        private BindableBeatmap beatmap;
 
         public PlaySongSelect()
         {
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Select
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay, OsuGame osu, GameBeatmap beatmap)
+        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay, OsuGame osu, BindableBeatmap beatmap)
         {
             this.beatmap = beatmap.GetBoundCopy();
 

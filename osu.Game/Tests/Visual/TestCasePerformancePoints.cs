@@ -108,9 +108,9 @@ namespace osu.Game.Tests.Visual
         {
             private readonly Container<BeatmapDisplay> beatmapDisplays;
             private readonly Ruleset ruleset;
-            private readonly GameBeatmap beatmapBindable;
+            private readonly BindableBeatmap beatmapBindable;
 
-            public BeatmapList(Ruleset ruleset, GameBeatmap beatmapBindable)
+            public BeatmapList(Ruleset ruleset, BindableBeatmap beatmapBindable)
             {
                 this.ruleset = ruleset;
                 this.beatmapBindable = beatmapBindable;
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual
                 private readonly OsuSpriteText text;
                 private readonly BeatmapInfo beatmap;
 
-                private readonly GameBeatmap beatmapBindable;
+                private readonly BindableBeatmap beatmapBindable;
 
                 private BeatmapManager beatmaps;
 
@@ -148,7 +148,7 @@ namespace osu.Game.Tests.Visual
 
                 public string TooltipText => text.Text;
 
-                public BeatmapDisplay(BeatmapInfo beatmap, GameBeatmap beatmapBindable)
+                public BeatmapDisplay(BeatmapInfo beatmap, BindableBeatmap beatmapBindable)
                 {
                     this.beatmap = beatmap;
                     this.beatmapBindable = beatmapBindable;
@@ -223,7 +223,7 @@ namespace osu.Game.Tests.Visual
             }
 
             [BackgroundDependencyLoader]
-            private void load(IGameBeatmap beatmap, APIAccess api)
+            private void load(IBindableBeatmap beatmap, APIAccess api)
             {
                 this.api = api;
 
@@ -336,7 +336,7 @@ namespace osu.Game.Tests.Visual
             }
 
             [BackgroundDependencyLoader]
-            private void load(IGameBeatmap beatmap)
+            private void load(IBindableBeatmap beatmap)
             {
                 beatmap.ValueChanged += beatmapChanged;
             }

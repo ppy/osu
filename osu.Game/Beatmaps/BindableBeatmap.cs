@@ -12,14 +12,14 @@ namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// A <see cref="Bindable{WorkingBeatmap}"/> for the <see cref="OsuGame"/> beatmap.
-    /// This should be used sparingly in-favour of <see cref="IGameBeatmap"/>.
+    /// This should be used sparingly in-favour of <see cref="IBindableBeatmap"/>.
     /// </summary>
-    public abstract class GameBeatmap : NonNullableBindable<WorkingBeatmap>, IGameBeatmap
+    public abstract class BindableBeatmap : NonNullableBindable<WorkingBeatmap>, IBindableBeatmap
     {
         private AudioManager audioManager;
         private WorkingBeatmap lastBeatmap;
 
-        protected GameBeatmap(WorkingBeatmap defaultValue)
+        protected BindableBeatmap(WorkingBeatmap defaultValue)
             : base(defaultValue)
         {
         }
@@ -63,13 +63,13 @@ namespace osu.Game.Beatmaps
         }
 
         [NotNull]
-        IGameBeatmap IGameBeatmap.GetBoundCopy() => GetBoundCopy();
+        IBindableBeatmap IBindableBeatmap.GetBoundCopy() => GetBoundCopy();
 
         /// <summary>
-        /// Retrieve a new <see cref="GameBeatmap"/> instance weakly bound to this <see cref="GameBeatmap"/>.
-        /// If you are further binding to events of the retrieved <see cref="GameBeatmap"/>, ensure a local reference is held.
+        /// Retrieve a new <see cref="BindableBeatmap"/> instance weakly bound to this <see cref="BindableBeatmap"/>.
+        /// If you are further binding to events of the retrieved <see cref="BindableBeatmap"/>, ensure a local reference is held.
         /// </summary>
         [NotNull]
-        public abstract GameBeatmap GetBoundCopy();
+        public abstract BindableBeatmap GetBoundCopy();
     }
 }
