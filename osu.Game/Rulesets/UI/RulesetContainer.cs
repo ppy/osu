@@ -57,6 +57,7 @@ namespace osu.Game.Rulesets.UI
         public abstract IEnumerable<HitObject> Objects { get; }
 
         private readonly Lazy<Playfield> playfield;
+
         /// <summary>
         /// The playfield.
         /// </summary>
@@ -250,8 +251,8 @@ namespace osu.Game.Rulesets.UI
             foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);
 
-                foreach (var mod in mods.OfType<IReadFromConfig>())
-                    mod.ReadFromConfig(config);
+            foreach (var mod in mods.OfType<IReadFromConfig>())
+                mod.ReadFromConfig(config);
         }
 
         public override void SetReplay(Replay replay)
