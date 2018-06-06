@@ -13,12 +13,12 @@ using OpenTK;
 
 namespace osu.Game.Screens.Multi.Screens.Match
 {
-    public class AvailabilityPicker : TabControl<RoomAvailability>
+    public class RoomAvailabilityPicker : TabControl<RoomAvailability>
     {
         protected override TabItem<RoomAvailability> CreateTabItem(RoomAvailability value) => new AvailabilityPickerItem(value);
         protected override Dropdown<RoomAvailability> CreateDropdown() => null;
 
-        public AvailabilityPicker()
+        public RoomAvailabilityPicker()
         {
             RelativeSizeAxes = Axes.X;
             Height = 35;
