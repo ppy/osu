@@ -53,20 +53,18 @@ namespace osu.Game.Graphics.Containers
 
         private void onStateChanged(Visibility visibility)
         {
-            if (allowOverlays == OverlayActivation.All)
+            switch (visibility)
             {
-                switch (visibility)
-                {
-                    case Visibility.Visible:
+                case Visibility.Visible:
+                    if (allowOverlays != OverlayActivation.Disabled)
                         samplePopIn?.Play();
-                        break;
-                    case Visibility.Hidden:
-                        samplePopOut?.Play();
-                        break;
-                }
+                    else
+                        State = Visibility.Hidden;
+                    break;
+                case Visibility.Hidden:
+                    samplePopOut?.Play();
+                    break;
             }
-            else
-                State = Visibility.Hidden;
         }
     }
 }
