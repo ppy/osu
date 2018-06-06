@@ -13,7 +13,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using OpenTK;
 
-namespace osu.Game.Screens.Multi.Screens.Match
+namespace osu.Game.Screens.Multi.Screens.Match.Settings
 {
     public class GameTypePicker : FillFlowContainer, IHasCurrentValue<GameType>
     {
