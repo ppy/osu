@@ -264,7 +264,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private string createTemporaryBeatmap()
         {
-            var temp = Path.GetTempFileName() + Guid.NewGuid() + ".osz";
+            var temp = Path.GetTempFileName() + ".osz";
             File.Copy(osz_path, temp, true);
             Assert.IsTrue(File.Exists(temp));
             return temp;
