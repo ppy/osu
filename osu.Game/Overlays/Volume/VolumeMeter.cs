@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
@@ -189,5 +190,18 @@ namespace osu.Game.Overlays.Volume
         }
 
         public bool OnReleased(GlobalAction action) => false;
+
+        private const float transition_length = 500;
+
+        protected override bool OnHover(InputState state)
+        {
+            this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
+            return true;
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            this.ScaleTo(1f, transition_length, Easing.OutExpo);
+        }
     }
 }
