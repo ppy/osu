@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
@@ -17,7 +16,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Screens.Match
 {
-    public class RoomSettingsOverlay : OsuFocusedOverlayContainer
+    public class RoomSettingsOverlay : OverlayContainer
     {
         private const float transition_duration = 500;
 
@@ -25,8 +24,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
         private readonly SettingsTextBox name, maxParticipants;
         private readonly RoomAvailabilityPicker availability;
         private readonly GameTypePicker type;
-
-        protected override Container<Drawable> Content => content;
 
         private Room room;
         public Room Room
@@ -44,11 +41,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
             }
         }
 
-        public Action OnApply;
-
         public RoomSettingsOverlay()
         {
-            InternalChild = content = new Container
+            Masking = true;
+
+            Child = content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Y,
@@ -75,7 +72,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                     },
                                     new Section("ROOM VISIBILITY")
                                     {
-                                        Child = availability =new RoomAvailabilityPicker(),
+                                        Child = availability = new RoomAvailabilityPicker(),
                                     },
                                     new Section("GAME TYPE")
                                     {
@@ -122,7 +119,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                     room.MaxParticipants.Value = null;
                             }
 
-                            OnApply?.Invoke();
                             Hide();
                         },
                     },
@@ -132,16 +128,12 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         protected override void PopIn()
         {
-            base.PopIn();
-
-            Content.MoveToY(0, transition_duration, Easing.OutQuint);
+            content.MoveToY(0, transition_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            base.PopOut();
-
-            Content.MoveToY(-1, transition_duration, Easing.InSine);
+            content.MoveToY(-1, transition_duration, Easing.InSine);
         }
 
         private class SettingsTextBox : OsuTextBox
