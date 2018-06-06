@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays.SearchableList;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -17,6 +18,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
     public class RoomSettingsOverlay : OverlayContainer
     {
         private const float transition_duration = 500;
+        private const float field_padding = 45;
 
         private readonly Container content;
         private readonly SettingsTextBox name, maxParticipants;
@@ -57,11 +59,12 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = 35, Bottom = 75, Horizontal = 50 },
+                        Padding = new MarginPadding { Top = 35, Bottom = 75, Horizontal = SearchableListOverlay.WIDTH_PADDING },
                         Children = new[]
                         {
                             new SectionContainer
                             {
+                                Padding = new MarginPadding { Right = field_padding / 2 },
                                 Children = new[]
                                 {
                                     new Section("ROOM NAME")
@@ -82,6 +85,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
+                                Padding = new MarginPadding { Left = field_padding / 2 },
                                 Children = new[]
                                 {
                                     new Section("MAX PARTICIPANTS")
@@ -192,9 +196,9 @@ namespace osu.Game.Screens.Multi.Screens.Match
             public SectionContainer()
             {
                 RelativeSizeAxes = Axes.Both;
-                Width = 0.45f;
+                Width = 0.5f;
                 Direction = FillDirection.Vertical;
-                Spacing = new Vector2(45);
+                Spacing = new Vector2(field_padding);
             }
         }
 
