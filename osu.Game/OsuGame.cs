@@ -77,7 +77,7 @@ namespace osu.Game
 
         public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
 
-        public readonly Bindable<OverlayActivation> AllowOverlays = new Bindable<OverlayActivation>();
+        public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         private OsuScreen screenStack;
 

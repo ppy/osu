@@ -17,13 +17,13 @@ namespace osu.Game.Graphics.Containers
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
-        private readonly Bindable<OverlayActivation> allowOverlays = new Bindable<OverlayActivation>(OverlayActivation.All);
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osuGame, AudioManager audio)
         {
             if (osuGame != null)
-                allowOverlays.BindTo(osuGame.AllowOverlays);
+                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
 
             samplePopIn = audio.Sample.Get(@"UI/overlay-pop-in");
             samplePopOut = audio.Sample.Get(@"UI/overlay-pop-out");
@@ -56,7 +56,7 @@ namespace osu.Game.Graphics.Containers
             switch (visibility)
             {
                 case Visibility.Visible:
-                    if (allowOverlays != OverlayActivation.Disabled)
+                    if (OverlayActivationMode != OverlayActivation.Disabled)
                         samplePopIn?.Play();
                     else
                         State = Visibility.Hidden;
