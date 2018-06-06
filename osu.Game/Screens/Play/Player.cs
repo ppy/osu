@@ -21,6 +21,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -36,6 +37,8 @@ namespace osu.Game.Screens.Play
         protected override float BackgroundParallaxAmount => 0.1f;
 
         protected override bool HideOverlaysOnEnter => true;
+
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         public Action RestartRequested;
 
@@ -364,7 +367,7 @@ namespace osu.Game.Screens.Play
             Background?.FadeTo(1f, fade_out_duration);
         }
 
-        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
+        protected override bool OnScroll(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
 
         private void initializeStoryboard(bool asyncLoad)
         {
