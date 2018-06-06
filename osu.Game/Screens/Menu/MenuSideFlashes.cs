@@ -24,8 +24,8 @@ namespace osu.Game.Screens.Menu
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
-        private readonly Box leftBox;
-        private readonly Box rightBox;
+        private Box leftBox;
+        private Box rightBox;
 
         private const float amplitude_dead_zone = 0.25f;
         private const float alpha_multiplier = (1 - amplitude_dead_zone) / 0.55f;
@@ -42,27 +42,6 @@ namespace osu.Game.Screens.Menu
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            Children = new Drawable[]
-            {
-                leftBox = new Box
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = box_width,
-                    Alpha = 0,
-                    Blending = BlendingMode.Additive,
-                },
-                rightBox = new Box
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = box_width,
-                    Alpha = 0,
-                    Blending = BlendingMode.Additive,
-                }
-            };
         }
 
         [BackgroundDependencyLoader]
@@ -72,10 +51,34 @@ namespace osu.Game.Screens.Menu
 
             // linear colour looks better in this case, so let's use it for now.
             Color4 gradientDark = colours.Blue.Opacity(0).ToLinear();
-            Color4 gradientLight = colours.Blue.Opacity(0.3f).ToLinear();
+            Color4 gradientLight = colours.Blue.Opacity(0.6f).ToLinear();
 
-            leftBox.Colour = ColourInfo.GradientHorizontal(gradientLight, gradientDark);
-            rightBox.Colour = ColourInfo.GradientHorizontal(gradientDark, gradientLight);
+            Children = new Drawable[]
+            {
+                leftBox = new Box
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = box_width * 2,
+                    // align off-screen to make sure our edges don't become visible during parallax.
+                    X = -box_width,
+                    Alpha = 0,
+                    Blending = BlendingMode.Additive,
+                    Colour = ColourInfo.GradientHorizontal(gradientLight, gradientDark)
+                },
+                rightBox = new Box
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = box_width * 2,
+                    X = box_width,
+                    Alpha = 0,
+                    Blending = BlendingMode.Additive,
+                    Colour = ColourInfo.GradientHorizontal(gradientDark, gradientLight)
+                }
+            };
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
