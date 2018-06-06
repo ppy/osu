@@ -51,7 +51,10 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                         Child = new SettingsTextBox(),
                                     },
                                     new Section("ROOM VISIBILITY"),
-                                    new Section("GAME TYPE"),
+                                    new Section("GAME TYPE")
+                                    {
+                                        Child = new GameTypePicker(),
+                                    },
                                 },
                             },
                             new SectionContainer
