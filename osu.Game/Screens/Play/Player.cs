@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool HideOverlaysOnEnter => true;
 
-        protected override OverlayActivation OverlayActivationLevel => OverlayActivation.UserTriggered;
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         public Action RestartRequested;
 

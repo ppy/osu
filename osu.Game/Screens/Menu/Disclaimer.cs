@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Menu
         private Color4 iconColour;
 
         protected override bool HideOverlaysOnEnter => true;
-        protected override OverlayActivation OverlayActivationLevel => OverlayActivation.Disabled;
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         public override bool CursorVisible => false;
 
