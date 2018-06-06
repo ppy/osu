@@ -14,11 +14,6 @@ namespace osu.Game.Tests.Visual
         private readonly SettingsOverlay settings;
         private readonly DialogOverlay dialogOverlay;
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
-
         public TestCaseSettings()
         {
             settings = new MainSettings
@@ -34,7 +29,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            dependencies.Cache(dialogOverlay);
+            Dependencies.Cache(dialogOverlay);
 
             Add(settings);
         }
