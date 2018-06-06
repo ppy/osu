@@ -18,8 +18,6 @@ namespace osu.Game.Beatmaps.Drawables
 
         public readonly BindableBool Downloaded = new BindableBool();
 
-        public event Action OnAlreadyDownloading;
-
         public BeatmapSetDownloader(BeatmapSetInfo set, bool noVideo = false)
         {
             this.set = set;
@@ -50,18 +48,16 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
-        public void Download()
+        public bool Download()
         {
             if (Downloaded.Value)
-                return;
+                return false;
 
             if (beatmaps.GetExistingDownload(set) != null)
-            {
-                OnAlreadyDownloading?.Invoke();
-                return;
-            }
+                return false;
 
             beatmaps.Download(set, noVideo);
+            return true;
         }
 
         private void setAdded(BeatmapSetInfo s)
