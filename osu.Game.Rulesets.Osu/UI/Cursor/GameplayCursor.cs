@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             private Bindable<double> cursorScale;
             private Bindable<bool> autoCursorScale;
-            private IBindable<WorkingBeatmap> beatmap;
+            private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
             public OsuCursor()
             {
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     RelativeSizeAxes = Axes.Both,
                 };
 
-                this.beatmap = beatmap.GetBoundCopy();
+                this.beatmap.BindTo(beatmap);
                 beatmap.ValueChanged += v => calculateScale();
 
                 cursorScale = config.GetBindable<double>(OsuSetting.GameplayCursorSize);
