@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Toolbar
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
 
-        private readonly Bindable<OverlayActivation> allowOverlays = new Bindable<OverlayActivation>(OverlayActivation.All);
+        private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         public Toolbar()
         {
@@ -84,11 +84,11 @@ namespace osu.Game.Overlays.Toolbar
         private void load(OsuGame osuGame)
         {
             if (osuGame != null)
-                allowOverlays.BindTo(osuGame.OverlayActivationMode);
+                overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
 
             StateChanged += visibility =>
             {
-                if (allowOverlays == OverlayActivation.Disabled)
+                if (overlayActivationMode == OverlayActivation.Disabled)
                     State = Visibility.Hidden;
             };
         }
