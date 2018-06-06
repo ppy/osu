@@ -1,7 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Linq;
 using System.Threading;
+using Microsoft.EntityFrameworkCore.Storage;
 using osu.Framework.Platform;
 
 namespace osu.Game.Database
@@ -17,7 +20,11 @@ namespace osu.Game.Database
         private readonly object writeLock = new object();
 
         private bool currentWriteDidWrite;
+        private bool currentWriteDidError;
+
         private int currentWriteUsages;
+
+        private IDbContextTransaction currentWriteTransaction;
 
         public DatabaseContextFactory(GameHost host)
         {
@@ -35,14 +42,41 @@ namespace osu.Game.Database
         /// Request a context for write usage. Can be consumed in a nested fashion (and will return the same underlying context).
         /// This method may block if a write is already active on a different thread.
         /// </summary>
+        /// <param name="withTransaction">Whether to start a transaction for this write.</param>
         /// <returns>A usage containing a usable context.</returns>
-        public DatabaseWriteUsage GetForWrite()
+        public DatabaseWriteUsage GetForWrite(bool withTransaction = true)
         {
             Monitor.Enter(writeLock);
+            OsuDbContext context;
+
+            try
+            {
+                if (currentWriteTransaction == null && withTransaction)
+                {
+                    // this mitigates the fact that changes on tracked entities will not be rolled back with the transaction by ensuring write operations are always executed in isolated contexts.
+                    // if this results in sub-optimal efficiency, we may need to look into removing Database-level transactions in favour of running SaveChanges where we currently commit the transaction.
+                    if (threadContexts.IsValueCreated)
+                        recycleThreadContexts();
+
+                    context = threadContexts.Value;
+                    currentWriteTransaction = context.Database.BeginTransaction();
+                }
+                else
+                {
+                    // we want to try-catch the retrieval of the context because it could throw an error (in CreateContext).
+                    context = threadContexts.Value;
+                }
+            }
+            catch (Exception e)
+            {
+                // retrieval of a context could trigger a fatal error.
+                Monitor.Exit(writeLock);
+                throw;
+            }
 
             Interlocked.Increment(ref currentWriteUsages);
 
-            return new DatabaseWriteUsage(threadContexts.Value, usageCompleted);
+            return new DatabaseWriteUsage(context, usageCompleted) { IsTransactionLeader = currentWriteTransaction != null && currentWriteUsages == 1 };
         }
 
         private void usageCompleted(DatabaseWriteUsage usage)
@@ -52,18 +86,27 @@ namespace osu.Game.Database
             try
             {
                 currentWriteDidWrite |= usage.PerformedWrite;
+                currentWriteDidError |= usage.Errors.Any();
 
-                if (usages > 0) return;
-
-                if (currentWriteDidWrite)
+                if (usages == 0)
                 {
-                    // explicitly dispose to ensure any outstanding flushes happen as soon as possible (and underlying resources are purged).
-                    usage.Context.Dispose();
+                    if (currentWriteDidError)
+                        currentWriteTransaction?.Rollback();
+                    else
+                        currentWriteTransaction?.Commit();
 
+                    if (currentWriteDidWrite || currentWriteDidError)
+                    {
+                        // explicitly dispose to ensure any outstanding flushes happen as soon as possible (and underlying resources are purged).
+                        usage.Context.Dispose();
+
+                        // once all writes are complete, we want to refresh thread-specific contexts to make sure they don't have stale local caches.
+                        recycleThreadContexts();
+                    }
+
+                    currentWriteTransaction = null;
                     currentWriteDidWrite = false;
-
-                    // once all writes are complete, we want to refresh thread-specific contexts to make sure they don't have stale local caches.
-                    recycleThreadContexts();
+                    currentWriteDidError = false;
                 }
             }
             finally
@@ -74,19 +117,18 @@ namespace osu.Game.Database
 
         private void recycleThreadContexts() => threadContexts = new ThreadLocal<OsuDbContext>(CreateContext);
 
-        protected virtual OsuDbContext CreateContext()
+        protected virtual OsuDbContext CreateContext() => new OsuDbContext(host.Storage.GetDatabaseConnectionString(database_name))
         {
-            var ctx = new OsuDbContext(host.Storage.GetDatabaseConnectionString(database_name));
-            ctx.Database.AutoTransactionsEnabled = false;
-
-            return ctx;
-        }
+            Database = { AutoTransactionsEnabled = false }
+        };
 
         public void ResetDatabase()
         {
             lock (writeLock)
             {
                 recycleThreadContexts();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
                 host.Storage.DeleteDatabase(database_name);
             }
         }

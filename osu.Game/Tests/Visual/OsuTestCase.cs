@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.IO;
-using System.Reflection;
 using osu.Framework.Testing;
 
 namespace osu.Game.Tests.Visual
@@ -13,8 +11,6 @@ namespace osu.Game.Tests.Visual
 
         public class OsuTestCaseTestRunner : OsuGameBase, ITestCaseTestRunner
         {
-            protected override string MainResourceFile => File.Exists(base.MainResourceFile) ? base.MainResourceFile : Assembly.GetExecutingAssembly().Location;
-
             private TestCaseTestRunner.TestRunner runner;
 
             protected override void LoadAsyncComplete()
