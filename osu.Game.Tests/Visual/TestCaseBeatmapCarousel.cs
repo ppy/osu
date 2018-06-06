@@ -65,11 +65,7 @@ namespace osu.Game.Tests.Visual
 
             carousel.SelectionChanged = s => currentSelection = s;
 
-            AddStep("Load Beatmaps", () => { carousel.BeatmapSets = beatmapSets; });
-
-            bool changed = false;
-            carousel.BeatmapSetsChanged = () => changed = true;
-            AddUntilStep(() => changed, "Wait for load");
+            loadBeatmaps(beatmapSets);
 
             testTraversal();
             testFiltering();
@@ -82,6 +78,17 @@ namespace osu.Game.Tests.Visual
             testHiding();
             testSelectingFilteredRuleset();
             testCarouselRootIsRandom();
+        }
+
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets)
+        {
+            bool changed = false;
+            AddStep($"Load {beatmapSets.Count} Beatmaps", () =>
+            {
+                carousel.BeatmapSetsChanged = () => changed = true;
+                carousel.BeatmapSets = beatmapSets;
+            });
+            AddUntilStep(() => changed, "Wait for load");
         }
 
         private void ensureRandomFetchSuccess() =>
@@ -423,7 +430,7 @@ namespace osu.Game.Tests.Visual
             for (int i = 1; i <= 50; i++)
                 beatmapSets.Add(createTestBeatmapSet(i));
 
-            AddStep("Load 50 Beatmaps", () => { carousel.BeatmapSets = beatmapSets; });
+            loadBeatmaps(beatmapSets);
             advanceSelection(direction: 1, diff: false);
             checkNonmatchingFilter();
             checkNonmatchingFilter();

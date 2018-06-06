@@ -40,7 +40,7 @@
                 "build",
                 "--no-restore",
                 "osu.Game.Rulesets.Catch.Tests.csproj",
-                "/p:TargetFramework=netcoreapp2.0",
+                "/p:TargetFramework=netcoreapp2.1",
                 "/p:GenerateFullPaths=true",
                 "/m",
                 "/verbosity:m"
@@ -56,7 +56,7 @@
                 "build",
                 "--no-restore",
                 "osu.Game.Rulesets.Catch.Tests.csproj",
-                "/p:TargetFramework=netcoreapp2.0",
+                "/p:TargetFramework=netcoreapp2.1",
                 "/p:Configuration=Release",
                 "/p:GenerateFullPaths=true",
                 "/m",
@@ -75,7 +75,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Restore (netcoreapp2.0)",
+            "label": "Restore (netcoreapp2.1)",
             "type": "shell",
             "command": "dotnet",
             "args": [
