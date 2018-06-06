@@ -211,15 +211,17 @@ namespace osu.Game
                 using (var db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
-            catch (MigrationFailedException e)
+            catch (Exception e)
             {
                 Logger.Error(e.InnerException ?? e, "Migration failed! We'll be starting with a fresh database.", LoggingTarget.Database);
 
                 // if we failed, let's delete the database and start fresh.
                 // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
                 contextFactory.ResetDatabase();
+
                 Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
 
+                // only run once more, then hard bail.
                 using (var db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
