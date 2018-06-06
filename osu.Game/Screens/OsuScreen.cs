@@ -110,7 +110,7 @@ namespace osu.Game.Screens
             if (osuGame != null)
             {
                 Ruleset.BindTo(osuGame.Ruleset);
-                allowOverlays.BindTo(osuGame.AllowOverlays);
+                allowOverlays.BindTo(osuGame.OverlayActivationMode);
 
                 updateOverlayStates = () =>
                 {

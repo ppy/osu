@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Toolbar
         private void load(OsuGame osuGame)
         {
             if (osuGame != null)
-                allowOverlays.BindTo(osuGame.AllowOverlays);
+                allowOverlays.BindTo(osuGame.OverlayActivationMode);
 
             StateChanged += visibility =>
             {
