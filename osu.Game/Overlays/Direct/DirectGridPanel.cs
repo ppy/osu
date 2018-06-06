@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Direct
                                             {
                                                 new OsuSpriteText
                                                 {
-                                                    Text = $"from {SetInfo.Metadata.Source}",
+                                                    Text = $"{SetInfo.Metadata.Source}",
                                                     TextSize = 14,
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
@@ -195,17 +195,17 @@ namespace osu.Game.Overlays.Direct
                         new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
                 },
-                playButton = new PlayButton(SetInfo)
-                {
-                    Margin = new MarginPadding { Top = 5, Left = 10 },
-                    Size = new Vector2(30),
-                    Alpha = 0,
-                },
                 statusContainer = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Margin = new MarginPadding { Top = 5, Left = 5 },
                     Spacing = new Vector2(5),
+                },
+                playButton = new PlayButton(SetInfo)
+                {
+                    Margin = new MarginPadding { Top = 5, Left = 10 },
+                    Size = new Vector2(30),
+                    Alpha = 0,
                 },
             });
 
@@ -214,24 +214,31 @@ namespace osu.Game.Overlays.Direct
                 statusContainer.Add(new IconPill(FontAwesome.fa_film));
             }
 
+            if (SetInfo.OnlineInfo?.HasStoryboard ?? false)
+            {
+                statusContainer.Add(new IconPill(FontAwesome.fa_image));
+            }
+
             statusContainer.Add(new BeatmapSetOnlineStatusPill(12, new MarginPadding { Horizontal = 10, Vertical = 5 })
             {
                 Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
+
+            PreviewPlaying.ValueChanged += _ => updateStatusContainer();
         }
 
         protected override bool OnHover(InputState state)
         {
-            statusContainer.FadeOut(120, Easing.InOutQuint);
-
+            updateStatusContainer();
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
             base.OnHoverLost(state);
-
-            statusContainer.FadeIn(120, Easing.InOutQuint);
+            updateStatusContainer();
         }
+
+        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying ? 0 : 1, 120, Easing.InOutQuint);
     }
 }
