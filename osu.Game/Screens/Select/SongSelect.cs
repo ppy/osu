@@ -62,8 +62,6 @@ namespace osu.Game.Screens.Select
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
 
-        private BindableBeatmap beatmap;
-
         private DependencyContainer dependencies;
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
@@ -178,11 +176,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours, BindableBeatmap beatmap)
+        [BackgroundDependencyLoader(true)]
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
         {
-            this.beatmap = beatmap.GetBoundCopy();
-
             dependencies.CacheAs(this);
 
             if (Footer != null)
@@ -219,7 +215,7 @@ namespace osu.Game.Screens.Select
 
         public void Edit(BeatmapInfo beatmap)
         {
-            this.beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
             Push(new Editor());
         }
 
@@ -285,7 +281,7 @@ namespace osu.Game.Screens.Select
                 {
                     bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
 
-                    this.beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
                     ensurePlayingSelected(preview);
                 }
 

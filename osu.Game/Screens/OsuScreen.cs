@@ -68,7 +68,7 @@ namespace osu.Game.Screens
         /// </summary>
         public virtual bool AllowBeatmapRulesetChange => true;
 
-        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         protected virtual float BackgroundParallaxAmount => 1;
 
@@ -78,8 +78,8 @@ namespace osu.Game.Screens
 
         private SampleChannel sampleExit;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(IBindableBeatmap beatmap, OsuGame osuGame, AudioManager audio)
+        [BackgroundDependencyLoader(true)]
+        private void load(BindableBeatmap beatmap, OsuGame osuGame, AudioManager audio)
         {
             if (beatmap != null)
                 Beatmap.BindTo(beatmap);
