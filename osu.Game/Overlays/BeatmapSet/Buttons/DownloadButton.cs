@@ -13,9 +13,14 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class DownloadButton : HeaderButton
     {
-        public DownloadButton(string title, string subtitle, BeatmapSetInfo set, bool noVideo = false)
+        public DownloadButton(BeatmapSetInfo set, bool noVideo = false)
         {
             Width = 120;
+
+            string subtitle = string.Empty;
+
+            if (set.OnlineInfo.HasVideo)
+                subtitle = noVideo ? "without Video" : "with Video";
 
             BeatmapSetDownloader downloader;
             Add(new Container
@@ -36,7 +41,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = title,
+                                Text = "Download",
                                 TextSize = 13,
                                 Font = @"Exo2.0-Bold",
                             },
