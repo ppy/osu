@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Multiplayer;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -20,8 +22,29 @@ namespace osu.Game.Screens.Multi.Screens.Match
         private const float transition_duration = 500;
 
         private readonly Container content;
+        private readonly SettingsTextBox name, maxParticipants;
+        private readonly RoomAvailabilityPicker availability;
+        private readonly GameTypePicker type;
 
         protected override Container<Drawable> Content => content;
+
+        private Room room;
+        public Room Room
+        {
+            get => room;
+            set
+            {
+                if (value == room) return;
+                room = value;
+
+                name.Text = room.Name.Value;
+                maxParticipants.Text = room.MaxParticipants.Value?.ToString();
+                availability.Current.Value = room.Availability.Value;
+                type.Current.Value = room.Type.Value;
+            }
+        }
+
+        public Action OnApply;
 
         public RoomSettingsOverlay()
         {
@@ -48,15 +71,15 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                 {
                                     new Section("ROOM NAME")
                                     {
-                                        Child = new SettingsTextBox(),
+                                        Child = name = new SettingsTextBox(),
                                     },
                                     new Section("ROOM VISIBILITY")
                                     {
-                                        Child = new AvailabilityPicker(),
+                                        Child = availability =new RoomAvailabilityPicker(),
                                     },
                                     new Section("GAME TYPE")
                                     {
-                                        Child = new GameTypePicker(),
+                                        Child = type = new GameTypePicker(),
                                     },
                                 },
                             },
@@ -68,7 +91,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                 {
                                     new Section("MAX PARTICIPANTS")
                                     {
-                                        Child = new SettingsTextBox(),
+                                        Child = maxParticipants = new SettingsTextBox(),
                                     },
                                     new Section("PASSWORD (OPTIONAL)")
                                     {
@@ -84,7 +107,24 @@ namespace osu.Game.Screens.Multi.Screens.Match
                         Origin = Anchor.BottomCentre,
                         Size = new Vector2(230, 35),
                         Margin = new MarginPadding { Bottom = 20 },
-                        Action = Hide,
+                        Action = () =>
+                        {
+                            if (room != null)
+                            {
+                                room.Name.Value = name.Text;
+                                room.Availability.Value = availability.Current.Value;
+                                room.Type.Value = type.Current.Value;
+
+                                int max;
+                                if (int.TryParse(maxParticipants.Text, out max))
+                                    room.MaxParticipants.Value = max;
+                                else
+                                    room.MaxParticipants.Value = null;
+                            }
+
+                            OnApply?.Invoke();
+                            Hide();
+                        },
                     },
                 },
             };
