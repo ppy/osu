@@ -1,29 +1,24 @@
-branches:
-  only:
-  - release
-skip_tags: true
-skip_branch_with_pr: true
 clone_depth: 1
-version: '{branch}-{build}'
+version: '{build}'
+skip_non_tags: true
 image: Visual Studio 2017
-configuration: Debug
-cache:
-  - packages -> **\packages.config
 install:
-  - cmd: git submodule update --init --recursive --depth=5
+  - git clone https://github.com/ppy/osu-deploy
 before_build:
+  - ps: if($env:appveyor_repo_tag -eq 'True') { Update-AppveyorBuild -Version $env:appveyor_repo_tag_name }
+  - cmd: git submodule update --init --recursive --depth=5
   - cmd: nuget restore -verbosity quiet
-build:
-  project: osu.Desktop.Deploy/osu.Desktop.Deploy.csproj
-  verbosity: minimal
-after_build:
+build_script:
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
   - appveyor DownloadFile https://puu.sh/A6g5K/4d08705438.enc # signing certificate
   - cmd: appveyor-tools\secure-file -decrypt 4d08705438.enc -secret %decode_secret% -out %HOMEPATH%\deanherbert.pfx
   - appveyor DownloadFile https://puu.sh/A6g75/fdc6f19b04.enc # deploy configuration
-  - cmd: appveyor-tools\secure-file -decrypt fdc6f19b04.enc -secret %decode_secret% -out osu.Desktop.Deploy\bin\Debug\net471\osu.Desktop.Deploy.exe.config
-  - cd osu.Desktop.Deploy\bin\Debug\net471\
-  - osu.Desktop.Deploy.exe %code_signing_password%
+  - cd osu-deploy
+  - nuget restore -verbosity quiet
+  - msbuild osu.Desktop.Deploy.csproj
+  - cmd: ..\appveyor-tools\secure-file -decrypt ..\fdc6f19b04.enc -secret %decode_secret% -out bin\Debug\net471\osu.Desktop.Deploy.exe.config
+  - cd bin\Debug\net471\
+  - osu.Desktop.Deploy.exe %code_signing_password% %APPVEYOR_REPO_TAG_NAME%
 environment:
   TargetFramework: net471
   decode_secret:
@@ -32,3 +27,6 @@ environment:
     secure: 34tLNqvjmmZEi97MLKfrnQ==
 artifacts:
   - path: 'Releases\*'
+deploy:
+  - provider: Environment
+    name: github
