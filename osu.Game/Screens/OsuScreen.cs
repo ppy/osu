@@ -79,7 +79,7 @@ namespace osu.Game.Screens
         private SampleChannel sampleExit;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(IGameBeatmap beatmap, OsuGame osuGame, AudioManager audio)
+        private void load(IBindableBeatmap beatmap, OsuGame osuGame, AudioManager audio)
         {
             if (beatmap != null)
                 Beatmap.BindTo(beatmap);

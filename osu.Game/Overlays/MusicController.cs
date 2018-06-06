@@ -54,7 +54,7 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
-        private GameBeatmap beatmap;
+        private BindableBeatmap beatmap;
 
         public MusicController()
         {
@@ -94,7 +94,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(GameBeatmap beatmap, BeatmapManager beatmaps, OsuColour colours, LocalisationEngine localisation)
+        private void load(BindableBeatmap beatmap, BeatmapManager beatmaps, OsuColour colours, LocalisationEngine localisation)
         {
             this.beatmap = beatmap.GetBoundCopy();
             this.beatmaps = beatmaps;

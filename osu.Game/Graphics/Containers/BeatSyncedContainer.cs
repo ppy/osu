@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         [BackgroundDependencyLoader]
-        private void load(IGameBeatmap beatmap)
+        private void load(IBindableBeatmap beatmap)
         {
             Beatmap.BindTo(beatmap);
         }

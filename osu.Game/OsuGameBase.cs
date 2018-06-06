@@ -64,8 +64,8 @@ namespace osu.Game
 
         protected override Container<Drawable> Content => content;
 
-        private OsuGameBeatmap beatmap;
-        protected GameBeatmap Beatmap => beatmap;
+        private OsuBindableBeatmap beatmap;
+        protected BindableBeatmap Beatmap => beatmap;
 
         private Bindable<bool> fpsDisplayVisible;
 
@@ -157,15 +157,15 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
 
             var defaultBeatmap = new DummyWorkingBeatmap(this);
-            beatmap = new OsuGameBeatmap(defaultBeatmap, Audio);
+            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
             BeatmapManager.DefaultBeatmap = defaultBeatmap;
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
             Audio.Track.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
-            dependencies.CacheAs<GameBeatmap>(beatmap);
-            dependencies.CacheAs<IGameBeatmap>(beatmap);
+            dependencies.CacheAs<BindableBeatmap>(beatmap);
+            dependencies.CacheAs<IBindableBeatmap>(beatmap);
 
             FileStore.Cleanup();
 
@@ -237,22 +237,22 @@ namespace osu.Game
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
 
-        private class OsuGameBeatmap : GameBeatmap
+        private class OsuBindableBeatmap : BindableBeatmap
         {
-            public OsuGameBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
+            public OsuBindableBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
                 : this(defaultValue)
             {
                 RegisterAudioManager(audioManager);
             }
 
-            private OsuGameBeatmap(WorkingBeatmap defaultValue)
+            private OsuBindableBeatmap(WorkingBeatmap defaultValue)
                 : base(defaultValue)
             {
             }
 
-            public override GameBeatmap GetBoundCopy()
+            public override BindableBeatmap GetBoundCopy()
             {
-                var copy = new OsuGameBeatmap(Default);
+                var copy = new OsuBindableBeatmap(Default);
                 copy.BindTo(this);
                 return copy;
             }

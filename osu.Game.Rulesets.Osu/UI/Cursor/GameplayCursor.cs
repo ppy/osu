@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager config, IGameBeatmap beatmap)
+            private void load(OsuConfigManager config, IBindableBeatmap beatmap)
             {
                 Child = cursorContainer = new SkinnableDrawable("cursor", _ => new CircularContainer
                 {

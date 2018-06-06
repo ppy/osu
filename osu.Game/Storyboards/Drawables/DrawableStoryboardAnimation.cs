@@ -64,7 +64,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IGameBeatmap beatmap, TextureStore textureStore)
+        private void load(IBindableBeatmap beatmap, TextureStore textureStore)
         {
             var basePath = Animation.Path.ToLowerInvariant();
             for (var frame = 0; frame < Animation.FrameCount; frame++)

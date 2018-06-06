@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(IGameBeatmap beatmap, OsuColour colours)
+        private void load(IBindableBeatmap beatmap, OsuColour colours)
         {
             this.beatmap.BindTo(beatmap);
 

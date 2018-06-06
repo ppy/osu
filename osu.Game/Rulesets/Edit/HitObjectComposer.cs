@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(IGameBeatmap beatmap, IFrameBasedClock framedClock)
+        private void load(IBindableBeatmap beatmap, IFrameBasedClock framedClock)
         {
             this.beatmap.BindTo(beatmap);
 

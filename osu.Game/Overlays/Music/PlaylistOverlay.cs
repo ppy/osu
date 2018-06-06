@@ -26,14 +26,14 @@ namespace osu.Game.Overlays.Music
         /// </summary>
         public Action<BeatmapSetInfo, int> OrderChanged;
 
-        private GameBeatmap beatmap;
+        private BindableBeatmap beatmap;
         private BeatmapManager beatmaps;
 
         private FilterControl filter;
         private PlaylistList list;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, GameBeatmap beatmap, BeatmapManager beatmaps)
+        private void load(OsuColour colours, BindableBeatmap beatmap, BeatmapManager beatmaps)
         {
             this.beatmap = beatmap.GetBoundCopy();
             this.beatmaps = beatmaps;

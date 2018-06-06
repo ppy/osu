@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Select
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
 
-        private GameBeatmap beatmap;
+        private BindableBeatmap beatmap;
 
         private DependencyContainer dependencies;
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours, GameBeatmap beatmap)
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours, BindableBeatmap beatmap)
         {
             this.beatmap = beatmap.GetBoundCopy();
 
