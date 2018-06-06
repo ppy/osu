@@ -80,31 +80,6 @@ namespace osu.Game.Screens.Menu
             seeya = audio.Sample.Get(@"seeya");
         }
 
-        protected override void OnEntering(Screen last)
-        {
-            base.OnEntering(last);
-
-            Game.Beatmap.Value = beatmap;
-
-            if (menuVoice)
-                welcome.Play();
-
-            Scheduler.AddDelayed(delegate
-            {
-                // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
-                if (menuMusic)
-                    track.Start();
-
-                LoadComponentAsync(mainMenu = new MainMenu());
-
-                Scheduler.AddDelayed(delegate
-                {
-                    DidLoadMenu = true;
-                    Push(mainMenu);
-                }, delay_step_one);
-            }, delay_step_two);
-        }
-
         private const double delay_step_one = 2300;
         private const double delay_step_two = 600;
 
@@ -113,6 +88,29 @@ namespace osu.Game.Screens.Menu
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
+
+            if (!resuming)
+            {
+                Game.Beatmap.Value = beatmap;
+
+                if (menuVoice)
+                    welcome.Play();
+
+                Scheduler.AddDelayed(delegate
+                {
+                    // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
+                    if (menuMusic)
+                        track.Start();
+
+                    LoadComponentAsync(mainMenu = new MainMenu());
+
+                    Scheduler.AddDelayed(delegate
+                    {
+                        DidLoadMenu = true;
+                        Push(mainMenu);
+                    }, delay_step_one);
+                }, delay_step_two);
+            }
 
             logo.RelativePositionAxes = Axes.Both;
             logo.Colour = Color4.White;

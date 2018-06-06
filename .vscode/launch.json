@@ -58,12 +58,12 @@
             "console": "internalConsole"
         },
         {
-            "name": "VisualTests (Debug, netcoreapp2.0)",
+            "name": "VisualTests (Debug, netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp2.0/osu.Game.Tests.dll"
+                "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp2.1/osu.Game.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tests (Debug, dotnet)",
@@ -71,12 +71,12 @@
             "console": "internalConsole"
         },
         {
-            "name": "VisualTests (Release, netcoreapp2.0)",
+            "name": "VisualTests (Release, netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp2.0/osu.Game.Tests.dll"
+                "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp2.1/osu.Game.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tests (Release, dotnet)",
@@ -84,12 +84,12 @@
             "console": "internalConsole"
         },
         {
-            "name": "osu! (Debug, netcoreapp2.0)",
+            "name": "osu! (Debug, netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.0/osu!.dll",
+                "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/osu!.dll",
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Debug, dotnet)",
@@ -97,12 +97,12 @@
             "console": "internalConsole"
         },
         {
-            "name": "osu! (Release, netcoreapp2.0)",
+            "name": "osu! (Release, netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.0/osu!.dll",
+                "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1/osu!.dll",
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Release, dotnet)",
