@@ -57,7 +57,7 @@ namespace osu.Game
 
         protected SettingsStore SettingsStore;
 
-        protected CursorOverrideContainer CursorOverrideContainer;
+        protected MenuCursorContainer MenuCursorContainer;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -191,14 +191,14 @@ namespace osu.Game
 
             GlobalActionContainer globalBinding;
 
-            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
-            CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
+            MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
+            MenuCursorContainer.Child = globalBinding = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both }
+                Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
             };
 
-            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = MenuCursorContainer });
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);
@@ -208,7 +208,7 @@ namespace osu.Game
         {
             try
             {
-                using (var db = contextFactory.GetForWrite())
+                using (var db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
             catch (MigrationFailedException e)
@@ -220,7 +220,7 @@ namespace osu.Game
                 contextFactory.ResetDatabase();
                 Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
 
-                using (var db = contextFactory.GetForWrite())
+                using (var db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
         }

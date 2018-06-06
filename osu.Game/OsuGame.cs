@@ -77,7 +77,8 @@ namespace osu.Game
 
         public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
 
-        public readonly BindableBool ShowOverlays = new BindableBool();
+        public readonly BindableBool HideOverlaysOnEnter = new BindableBool();
+        public readonly BindableBool AllowOpeningOverlays = new BindableBool(true);
 
         private OsuScreen screenStack;
 
@@ -211,7 +212,7 @@ namespace osu.Game
 
         protected override void LoadComplete()
         {
-            // this needs to be cached before base.LoadComplete as it is used by CursorOverrideContainer.
+            // this needs to be cached before base.LoadComplete as it is used by MenuCursorContainer.
             dependencies.Cache(screenshotManager = new ScreenshotManager());
 
             base.LoadComplete();
@@ -219,7 +220,7 @@ namespace osu.Game
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
             // in the cursor being shown for a few frames during the intro.
             // This prevents the cursor from showing until we have a screen with CursorVisible = true
-            CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
+            MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
 
             // hook up notifications to components.
             SkinManager.PostNotification = n => notifications?.Post(n);
@@ -367,12 +368,12 @@ namespace osu.Game
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
 
-            notifications.Enabled.BindTo(ShowOverlays);
+            notifications.Enabled.BindTo(AllowOpeningOverlays);
 
-            ShowOverlays.ValueChanged += show =>
+            HideOverlaysOnEnter.ValueChanged += hide =>
             {
                 //central game screen change logic.
-                if (!show)
+                if (hide)
                 {
                     hideAllOverlays();
                     musicController.State = Visibility.Hidden;
@@ -547,7 +548,7 @@ namespace osu.Game
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
-            CursorOverrideContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
+            MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
         private void screenAdded(Screen newScreen)

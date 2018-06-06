@@ -1,6 +1,6 @@
 clone_depth: 1
 version: '{branch}-{build}'
-image: Visual Studio 2017
+image: Visual Studio 2017 preview
 configuration: Debug
 cache:
   - C:\ProgramData\chocolatey\bin -> appveyor.yml
