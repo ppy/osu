@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         public bool DidLoadMenu;
 
-        private BindableBeatmap beatmapBacking;
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         private MainMenu mainMenu;
         private SampleChannel welcome;
@@ -43,12 +43,12 @@ namespace osu.Game.Screens.Menu
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
         private Track track;
-        private WorkingBeatmap beatmap;
+        private WorkingBeatmap introBeatmap;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game, BindableBeatmap beatmap)
         {
-            beatmapBacking = beatmap.GetBoundCopy();
+            this.beatmap.BindTo(beatmap);
 
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
@@ -76,8 +76,8 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            this.beatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-            track = this.beatmap.Track;
+            introBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+            track = introBeatmap.Track;
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                beatmapBacking.Value = beatmap;
+                beatmap.Value = introBeatmap;
 
                 if (menuVoice)
                     welcome.Play();

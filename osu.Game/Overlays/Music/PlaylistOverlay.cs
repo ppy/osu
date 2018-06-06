@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.Music
         /// </summary>
         public Action<BeatmapSetInfo, int> OrderChanged;
 
-        private BindableBeatmap beatmap;
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
         private BeatmapManager beatmaps;
 
         private FilterControl filter;
@@ -35,7 +36,7 @@ namespace osu.Game.Overlays.Music
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, BindableBeatmap beatmap, BeatmapManager beatmaps)
         {
-            this.beatmap = beatmap.GetBoundCopy();
+            this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;
 
             Children = new Drawable[]

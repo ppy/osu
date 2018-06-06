@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -54,7 +55,7 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
-        private BindableBeatmap beatmap;
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public MusicController()
         {
@@ -96,7 +97,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(BindableBeatmap beatmap, BeatmapManager beatmaps, OsuColour colours, LocalisationEngine localisation)
         {
-            this.beatmap = beatmap.GetBoundCopy();
+            this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;
             this.localisation = localisation;
 
