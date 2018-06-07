@@ -63,7 +63,8 @@ namespace osu.Game.Screens.Select
         private SampleChannel sampleChangeBeatmap;
 
         private DependencyContainer dependencies;
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         protected SongSelect()
         {
@@ -175,7 +176,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
+        [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
         {
             dependencies.CacheAs(this);
@@ -206,15 +207,13 @@ namespace osu.Game.Screens.Select
 
             Carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSetsEnumerable();
 
-            Beatmap.DisabledChanged += disabled => Carousel.AllowSelection = !disabled;
-            Beatmap.TriggerChange();
-
-            Beatmap.ValueChanged += workingBeatmapChanged;
+            Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
+            Beatmap.BindValueChanged(workingBeatmapChanged);
         }
 
         public void Edit(BeatmapInfo beatmap)
         {
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap);
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
             Push(new Editor());
         }
 
@@ -280,7 +279,7 @@ namespace osu.Game.Screens.Select
                 {
                     bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
 
-                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap);
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
                     ensurePlayingSelected(preview);
                 }
 
@@ -367,7 +366,7 @@ namespace osu.Game.Screens.Select
         {
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
-                UpdateBeatmap(Beatmap);
+                UpdateBeatmap(Beatmap.Value);
                 ensurePlayingSelected();
             }
 

@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Edit
         private RulesetContainer rulesetContainer;
         private readonly List<Container> layerContainers = new List<Container>();
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -38,9 +38,9 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, IFrameBasedClock framedClock)
+        private void load(IBindableBeatmap beatmap, IFrameBasedClock framedClock)
         {
-            beatmap.BindTo(osuGame.Beatmap);
+            this.beatmap.BindTo(beatmap);
 
             try
             {
