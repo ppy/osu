@@ -123,8 +123,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             if (!IsLoaded)
                 return;
 
-            foreground.Colour = AccentColour.Opacity(0.4f);
-            background.Colour = AccentColour.Opacity(0.2f);
+            foreground.Colour = AccentColour.Opacity(0.9f);
+            background.Colour = AccentColour.Opacity(0.6f);
 
             subtractionCache.Invalidate();
         }
