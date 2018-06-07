@@ -47,9 +47,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         private void load(IBindableBeatmap beatmap)
         {
             this.beatmap.BindTo(beatmap);
-
-            beatmap.ValueChanged += beatmapChanged;
-            beatmapChanged(beatmap.Value);
+            this.beatmap.BindValueChanged(beatmapChanged, true);
         }
 
         private void beatmapChanged(WorkingBeatmap beatmap) => waveform.Beatmap = beatmap;

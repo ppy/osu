@@ -237,11 +237,8 @@ namespace osu.Game.Overlays
 
         protected override void LoadComplete()
         {
-            beatmap.ValueChanged += beatmapChanged;
-            beatmap.DisabledChanged += beatmapDisabledChanged;
-
-            beatmapChanged(beatmap.Value);
-
+            beatmap.BindValueChanged(beatmapChanged, true);
+            beatmap.BindDisabledChanged(beatmapDisabledChanged, true);
             base.LoadComplete();
         }
 
