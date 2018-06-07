@@ -32,8 +32,7 @@ namespace osu.Game.Tests.Visual
             Dependencies.CacheAs<IFrameBasedClock>(Clock);
             Dependencies.CacheAs<IAdjustableClock>(Clock);
 
-            Beatmap.ValueChanged += beatmapChanged;
-            beatmapChanged(Beatmap.Value);
+            Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
         private void beatmapChanged(WorkingBeatmap working)

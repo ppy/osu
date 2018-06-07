@@ -207,10 +207,8 @@ namespace osu.Game.Screens.Select
 
             Carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSetsEnumerable();
 
-            Beatmap.DisabledChanged += disabled => Carousel.AllowSelection = !disabled;
-            Beatmap.ValueChanged += workingBeatmapChanged;
-
-            workingBeatmapChanged(Beatmap.Value);
+            Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
+            Beatmap.BindValueChanged(workingBeatmapChanged);
         }
 
         public void Edit(BeatmapInfo beatmap)
