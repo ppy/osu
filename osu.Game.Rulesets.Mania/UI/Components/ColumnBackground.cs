@@ -20,13 +20,13 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         private readonly ScrollingDirection direction;
 
+        private Box background;
+        private Box backgroundOverlay;
+
         public ColumnBackground(ScrollingDirection direction)
         {
             this.direction = direction;
         }
-
-        private Box background;
-        private Box backgroundOverlay;
 
         [BackgroundDependencyLoader]
         private void load()

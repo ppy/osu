@@ -24,12 +24,12 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         private readonly ScrollingDirection direction;
 
+        private Container keyIcon;
+
         public ColumnKeyArea(ScrollingDirection direction)
         {
             this.direction = direction;
         }
-
-        private Container keyIcon;
 
         [BackgroundDependencyLoader]
         private void load()
