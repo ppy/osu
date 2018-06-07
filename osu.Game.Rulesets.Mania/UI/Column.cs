@@ -14,6 +14,7 @@ using System;
 using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -32,8 +33,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public ManiaAction Action;
 
-        private readonly Box background;
-        private readonly Box backgroundOverlay;
+        private readonly ColumnBackground background;
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
 
@@ -43,8 +43,8 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
 
-        public Column()
-            : base(ScrollingDirection.Up)
+        public Column(ScrollingDirection direction = ScrollingDirection.Up)
+            : base(direction)
         {
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
@@ -54,22 +54,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    Name = "Background",
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.3f
-                },
-                backgroundOverlay = new Box
-                {
-                    Name = "Background Gradient Overlay",
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.5f,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                    Blending = BlendingMode.Additive,
-                    Alpha = 0
-                },
+                background = new ColumnBackground(direction) { RelativeSizeAxes = Axes.Both },
                 new Container
                 {
                     Name = "Hit target + hit objects",
@@ -192,8 +177,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     return;
                 accentColour = value;
 
-                background.Colour = accentColour;
-                backgroundOverlay.Colour = ColourInfo.GradientVertical(accentColour.Opacity(0.6f), accentColour.Opacity(0));
+                background.AccentColour = value;
 
                 hitTargetBar.EdgeEffect = new EdgeEffectParameters
                 {
@@ -235,7 +219,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             if (action == Action)
             {
-                backgroundOverlay.FadeTo(1, 50, Easing.OutQuint).Then().FadeTo(0.5f, 250, Easing.OutQuint);
+                background.IsLit = true;
                 keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint).Then().ScaleTo(1.3f, 250, Easing.OutQuint);
             }
 
@@ -246,7 +230,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             if (action == Action)
             {
-                backgroundOverlay.FadeTo(0, 250, Easing.OutQuint);
+                background.IsLit = false;
                 keyIcon.ScaleTo(1f, 125, Easing.OutQuint);
             }
 
