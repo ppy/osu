@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -17,12 +18,21 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using OpenTK;
 using OpenTK.Input;
+using osu.Game.Overlays;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen, IKeyBindingHandler<GlobalAction>
+    public abstract class OsuScreen : Screen, IKeyBindingHandler<GlobalAction>, IHasDescription
     {
         public BackgroundScreen Background { get; private set; }
+
+        /// <summary>
+        /// A user-facing title for this screen.
+        /// </summary>
+        public virtual string Title => GetType().ShortDisplayName();
+
+        public string Description => Title;
 
         protected virtual bool AllowBackButton => true;
 
@@ -32,19 +42,19 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
 
-        private readonly BindableBool hideOverlaysOnEnter = new BindableBool();
+        private Action updateOverlayStates;
 
         /// <summary>
-        /// Whether overlays should be hidden when this screen is entered or resumed.
+        /// Whether all overlays should be hidden when this screen is entered or resumed.
         /// </summary>
         protected virtual bool HideOverlaysOnEnter => false;
 
-        private readonly BindableBool allowOpeningOverlays = new BindableBool();
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         /// <summary>
-        /// Whether overlays should be able to be opened while this screen is active.
+        /// Whether overlays should be able to be opened once this screen is entered or resumed.
         /// </summary>
-        protected virtual bool AllowOpeningOverlays => true;
+        protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
         /// <summary>
         /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.
@@ -95,8 +105,15 @@ namespace osu.Game.Screens
             if (osuGame != null)
             {
                 Ruleset.BindTo(osuGame.Ruleset);
-                hideOverlaysOnEnter.BindTo(osuGame.HideOverlaysOnEnter);
-                allowOpeningOverlays.BindTo(osuGame.AllowOpeningOverlays);
+                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+
+                updateOverlayStates = () =>
+                {
+                    if (HideOverlaysOnEnter)
+                        osuGame.CloseAllOverlays();
+                    else
+                        osuGame.Toolbar.State = Visibility.Visible;
+                };
             }
 
             sampleExit = audio.Sample.Get(@"UI/screen-back");
@@ -217,19 +234,24 @@ namespace osu.Game.Screens
             logo.Anchor = Anchor.TopLeft;
             logo.Origin = Anchor.Centre;
             logo.RelativePositionAxes = Axes.None;
+            logo.BeatMatching = true;
             logo.Triangles = true;
             logo.Ripple = true;
         }
 
         private void applyArrivingDefaults(bool isResuming)
         {
-            logo.AppendAnimatingAction(() => LogoArriving(logo, isResuming), true);
+            logo.AppendAnimatingAction(() =>
+            {
+                if (IsCurrentScreen) LogoArriving(logo, isResuming);
+            }, true);
 
             if (backgroundParallaxContainer != null)
                 backgroundParallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * BackgroundParallaxAmount;
 
-            hideOverlaysOnEnter.Value = HideOverlaysOnEnter;
-            allowOpeningOverlays.Value = AllowOpeningOverlays;
+            OverlayActivationMode.Value = InitialOverlayActivationMode;
+
+            updateOverlayStates?.Invoke();
         }
 
         private void onExitingLogo()
