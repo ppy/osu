@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public ManiaAction Action;
 
         private readonly Box background;
+        private readonly Box backgroundOverlay;
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
 
@@ -42,14 +43,14 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
 
-        private const float opacity_released = 0.1f;
-        private const float opacity_pressed = 0.25f;
-
         public Column()
             : base(ScrollingDirection.Up)
         {
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
+
+            Masking = true;
+            CornerRadius = 5;
 
             InternalChildren = new Drawable[]
             {
@@ -57,7 +58,17 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Name = "Background",
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = opacity_released
+                    Alpha = 0.3f
+                },
+                backgroundOverlay = new Box
+                {
+                    Name = "Background Gradient Overlay",
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.5f,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    Blending = BlendingMode.Additive,
+                    Alpha = 0
                 },
                 new Container
                 {
@@ -182,6 +193,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 accentColour = value;
 
                 background.Colour = accentColour;
+                backgroundOverlay.Colour = ColourInfo.GradientVertical(accentColour.Opacity(0.6f), accentColour.Opacity(0));
 
                 hitTargetBar.EdgeEffect = new EdgeEffectParameters
                 {
@@ -223,8 +235,8 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             if (action == Action)
             {
-                background.FadeTo(opacity_pressed, 50, Easing.OutQuint);
-                keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint);
+                backgroundOverlay.FadeTo(1, 50, Easing.OutQuint).Then().FadeTo(0.5f, 250, Easing.OutQuint);
+                keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint).Then().ScaleTo(1.3f, 250, Easing.OutQuint);
             }
 
             return false;
@@ -234,8 +246,8 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             if (action == Action)
             {
-                background.FadeTo(opacity_released, 800, Easing.OutQuart);
-                keyIcon.ScaleTo(1f, 400, Easing.OutQuart);
+                backgroundOverlay.FadeTo(0, 250, Easing.OutQuint);
+                keyIcon.ScaleTo(1f, 125, Easing.OutQuint);
             }
 
             return false;

@@ -5,6 +5,7 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects.Drawables;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -28,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             : base(barLine)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 1;
+            Height = 2f;
 
             AddInternal(new Box
             {
@@ -36,6 +37,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
                 RelativeSizeAxes = Axes.Both,
+                Colour = new Color4(255, 204, 33, 255),
             });
 
             bool isMajor = barLine.BeatIndex % (int)barLine.ControlPoint.TimeSignature == 0;
