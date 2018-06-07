@@ -18,12 +18,19 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         private Circle border;
 
+        private const float drawable_radius = (float)CatchHitObject.OBJECT_RADIUS * radius_adjust;
+
+        /// <summary>
+        /// Because we're adding a border around the fruit, we need to scale down some.
+        /// </summary>
+        private const float radius_adjust = 1.1f;
+
         public DrawableFruit(Fruit h)
             : base(h)
         {
             Origin = Anchor.Centre;
 
-            Size = new Vector2((float)CatchHitObject.OBJECT_RADIUS);
+            Size = new Vector2(drawable_radius);
             Masking = false;
 
             Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
@@ -44,14 +51,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     {
                         Hollow = !HitObject.HyperDash,
                         Type = EdgeEffectType.Glow,
-                        Radius = 4,
+                        Radius = 4 * radius_adjust,
                         Colour = HitObject.HyperDash ? Color4.Red : AccentColour.Darken(1).Opacity(0.6f)
                     },
-                    Size = new Vector2(Height * 1.5f),
+                    Size = new Vector2(Height),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BorderColour = Color4.White,
-                    BorderThickness = 4f,
+                    BorderThickness = 3f * radius_adjust,
                     Children = new Framework.Graphics.Drawable[]
                     {
                         new Box
@@ -82,8 +89,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         private Framework.Graphics.Drawable createPulp(FruitVisualRepresentation representation)
         {
-            const float large_pulp_3 = 13f;
-            const float distance_from_centre_3 = 0.23f;
+            const float large_pulp_3 = 8f * radius_adjust;
+            const float distance_from_centre_3 = 0.15f;
 
             const float large_pulp_4 = large_pulp_3 * 0.925f;
             const float distance_from_centre_4 = distance_from_centre_3 / 0.925f;
@@ -106,11 +113,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.BottomCentre,
                                 AccentColour = AccentColour,
                                 Size = new Vector2(small_pulp),
-                                Y = 0.05f,
+                                Y = -0.34f,
                             },
                             new Pulp
                             {
@@ -146,11 +151,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.BottomCentre,
                                 AccentColour = AccentColour,
                                 Size = new Vector2(small_pulp),
-                                Y = 0.1f,
+                                Y = -0.3f,
                             },
                             new Pulp
                             {
@@ -186,11 +189,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
                                 AccentColour = AccentColour,
                                 Size = new Vector2(small_pulp),
-                                Y = -0.1f,
+                                Y = -0.33f,
                             },
                             new Pulp
                             {
@@ -220,10 +221,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
                                 AccentColour = AccentColour,
                                 Size = new Vector2(small_pulp),
+                                Y = -0.25f,
                             },
                             new Pulp
                             {
@@ -253,16 +253,15 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
                                 AccentColour = AccentColour,
                                 Size = new Vector2(small_pulp),
-                                Y = -0.15f
+                                Y = -0.3f
                             },
                             new Pulp
                             {
                                 AccentColour = AccentColour,
-                                Size = new Vector2(large_pulp_4 * 1.2f, large_pulp_4 * 3),
+                                Size = new Vector2(large_pulp_4 * 0.8f, large_pulp_4 * 2.5f),
+                                Y = 0.05f,
                             },
                         }
                     };

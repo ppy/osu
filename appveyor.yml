@@ -2,11 +2,6 @@ clone_depth: 1
 version: '{branch}-{build}'
 image: Visual Studio 2017
 configuration: Debug
-cache:
-  - C:\ProgramData\chocolatey\bin -> appveyor.yml
-  - C:\ProgramData\chocolatey\lib -> appveyor.yml
-  - inspectcode -> appveyor.yml
-  - packages -> **\packages.config
 install:
   - cmd: git submodule update --init --recursive --depth=5
   - cmd: choco install resharper-clt -y

@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>, IKeyBindingHandler<ManiaAction>
     {
+        public override bool DisplayJudgement => false;
+
         public readonly DrawableNote Head;
         public readonly DrawableNote Tail;
 
