@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.UI
 
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
-            InternalChild = KeyBindingContainer = new RulesetKeyBindingContainer(ruleset, variant, unique);
+            InternalChild = KeyBindingContainer = CreateKeyBindingContainer(ruleset, variant, unique);
         }
 
         #region Action mapping (for replays)
@@ -247,6 +247,9 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
+
+        protected virtual RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+            => new RulesetKeyBindingContainer(ruleset, variant, unique);
     }
 
     /// <summary>
