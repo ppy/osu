@@ -20,19 +20,13 @@ namespace osu.Game.Rulesets.Mania.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new ManiaInputManager(new ManiaRuleset().RulesetInfo, 1)
+            Child = new Column
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
                 Height = 0.85f,
-                Child = new Column
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AccentColour = Color4.OrangeRed,
-                    Action = ManiaAction.Special1
-                }
+                AccentColour = Color4.OrangeRed,
+                Action = ManiaAction.Special1
             };
         }
     }
