@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly DrawableNote head;
         private readonly DrawableNote tail;
 
-        private readonly GlowPiece glowPiece;
         private readonly BodyPiece bodyPiece;
         private readonly Container fullHeightContainer;
 
@@ -45,17 +44,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                // The hit object itself cannot be used for various elements because the tail overshoots it
-                // So a specialized container that is updated to contain the tail height is used
-                fullHeightContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Child = glowPiece = new GlowPiece()
-                },
                 bodyPiece = new BodyPiece
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                 },
                 tickContainer = new Container<DrawableHoldNoteTick>
@@ -92,7 +82,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             {
                 base.AccentColour = value;
 
-                glowPiece.AccentColour = value;
                 bodyPiece.AccentColour = value;
                 head.AccentColour = value;
                 tail.AccentColour = value;
@@ -121,12 +110,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.Update();
 
             // Make the body piece not lie under the head note
-            bodyPiece.Y = head.Height;
-            bodyPiece.Height = DrawHeight - head.Height;
-
-            // Make the fullHeightContainer "contain" the height of the tail note, keeping in mind
-            // that the tail note overshoots the height of this hit object
-            fullHeightContainer.Height = DrawHeight + tail.Height;
+            bodyPiece.Y = head.Height / 2;
+            bodyPiece.Height = DrawHeight - head.Height / 2 + tail.Height / 2;
         }
 
         public bool OnPressed(ManiaAction action)
@@ -175,8 +160,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 : base(holdNote.HitObject.Head, action)
             {
                 this.holdNote = holdNote;
-
-                GlowPiece.Alpha = 0;
             }
 
             public override bool OnPressed(ManiaAction action)
@@ -219,8 +202,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 : base(holdNote.HitObject.Tail, action)
             {
                 this.holdNote = holdNote;
-
-                GlowPiece.Alpha = 0;
             }
 
             protected override void CheckForJudgements(bool userTriggered, double timeOffset)
