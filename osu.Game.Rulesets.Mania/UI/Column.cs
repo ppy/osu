@@ -65,9 +65,12 @@ namespace osu.Game.Rulesets.Mania.UI
             Masking = true;
             CornerRadius = 5;
 
-            InternalChildren = new Drawable[]
+            background = new ColumnBackground(direction) { RelativeSizeAxes = Axes.Both };
+
+            InternalChildren = new[]
             {
-                background = new ColumnBackground(direction) { RelativeSizeAxes = Axes.Both },
+                // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
+                background.CreateProxy(),
                 new Container
                 {
                     Name = "Hit target + hit objects",
@@ -158,6 +161,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         }
                     }
                 },
+                background,
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
