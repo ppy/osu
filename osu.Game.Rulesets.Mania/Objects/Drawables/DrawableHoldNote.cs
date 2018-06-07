@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 bodyPiece.AccentColour = value;
                 head.AccentColour = value;
                 tail.AccentColour = value;
-                tickContainer.ForEach(t=>t.AccentColour=value);
+                tickContainer.ForEach(t => t.AccentColour = value);
             }
         }
 

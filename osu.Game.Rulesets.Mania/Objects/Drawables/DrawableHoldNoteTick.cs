@@ -8,7 +8,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Scoring;
 
