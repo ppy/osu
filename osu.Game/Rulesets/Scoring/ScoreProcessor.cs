@@ -66,6 +66,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableInt HighestCombo = new BindableInt();
 
         /// <summary>
+        /// The <see cref="ScoringMode"/> used to calculate scores.
+        /// </summary>
+        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
+
+        /// <summary>
         /// Whether all <see cref="Judgement"/>s have been processed.
         /// </summary>
         protected virtual bool HasCompleted => false;
@@ -169,8 +174,6 @@ namespace osu.Game.Rulesets.Scoring
         private const double combo_portion = 0.7;
         private const double max_score = 1000000;
 
-        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
-
         protected sealed override bool HasCompleted => JudgedHits == MaxHits;
 
         protected int MaxHits { get; private set; }
@@ -202,6 +205,8 @@ namespace osu.Game.Rulesets.Scoring
                 Mode.Value = ScoringMode.Exponential;
                 Mode.Disabled = true;
             }
+
+            Mode.ValueChanged += _ => updateScore();
         }
 
         /// <summary>
@@ -296,7 +301,7 @@ namespace osu.Game.Rulesets.Scoring
                     TotalScore.Value = max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo / maxHighestCombo) + bonusScore;
                     break;
                 case ScoringMode.Exponential:
-                    TotalScore.Value = (baseScore + bonusScore) * Math.Log(HighestCombo + 1, 2);
+                    TotalScore.Value = (baseScore + bonusScore) * Math.Max(0, HighestCombo - 1) / 25f;
                     break;
             }
         }
