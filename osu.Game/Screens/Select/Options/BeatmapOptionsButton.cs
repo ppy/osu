@@ -84,6 +84,17 @@ namespace osu.Game.Screens.Select.Options
             return false;
         }
 
+        protected override bool OnHover(InputState state)
+        {
+            box.ScaleTo(new Vector2(1.5f, 1), 500, Easing.OutExpo);
+            return true;
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            box.ScaleTo(new Vector2(1, 1), 500, Easing.OutExpo);
+        }
+
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
 
         public BeatmapOptionsButton()
