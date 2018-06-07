@@ -7,14 +7,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class ColumnBackground : CompositeDrawable, IHasAccentColour
+    public class ColumnBackground : CompositeDrawable, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
+        public ManiaAction Action;
+
         private readonly ScrollingDirection direction;
 
         public ColumnBackground(ScrollingDirection direction)
@@ -85,25 +88,18 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 direction == ScrollingDirection.Up ? dimPoint : brightPoint);
         }
 
-        private bool isLit;
-
-        /// <summary>
-        /// Whether the column lighting should be visible.
-        /// </summary>
-        public bool IsLit
+        public bool OnPressed(ManiaAction action)
         {
-            set
-            {
-                if (isLit == value)
-                    return;
-                isLit = value;
-
-                if (isLit)
-                    backgroundOverlay.FadeTo(1, 50, Easing.OutQuint).Then().FadeTo(0.5f, 250, Easing.OutQuint);
-                else
-                    backgroundOverlay.FadeTo(0, 250, Easing.OutQuint);
-            }
+            if (action == Action)
+                backgroundOverlay.FadeTo(1, 50, Easing.OutQuint).Then().FadeTo(0.5f, 250, Easing.OutQuint);
+            return false;
         }
 
+        public bool OnReleased(ManiaAction action)
+        {
+            if (action == Action)
+                backgroundOverlay.FadeTo(0, 250, Easing.OutQuint);
+            return false;
+        }
     }
 }
