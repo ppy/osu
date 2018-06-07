@@ -66,6 +66,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                     {
                                         Child = Name = new SettingsTextBox
                                         {
+                                            RelativeSizeAxes = Axes.X,
                                             OnCommit = (sender, text) => apply(),
                                         },
                                     },
@@ -107,6 +108,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                     {
                                         Child = MaxParticipants = new SettingsTextBox
                                         {
+                                            RelativeSizeAxes = Axes.X,
                                             OnCommit = (sender, text) => apply(),
                                         },
                                     },
@@ -114,6 +116,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                     {
                                         Child = new SettingsTextBox
                                         {
+                                            RelativeSizeAxes = Axes.X,
                                             OnCommit = (sender, text) => apply(),
                                         },
                                     },
@@ -198,11 +201,6 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                 Text = c.ToString(),
                 TextSize = 18,
             };
-
-            public SettingsTextBox()
-            {
-                RelativeSizeAxes = Axes.X;
-            }
         }
 
         private class SectionContainer : FillFlowContainer<Section>
