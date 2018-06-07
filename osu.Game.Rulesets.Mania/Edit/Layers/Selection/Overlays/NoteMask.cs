@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
             base.Update();
 
             Size = HitObject.DrawSize;
-            Position = Parent.ToLocalSpace(HitObject.ScreenSpaceDrawQuad.BottomLeft);
+            Position = Parent.ToLocalSpace(HitObject.ScreenSpaceDrawQuad.TopLeft);
         }
     }
 }
