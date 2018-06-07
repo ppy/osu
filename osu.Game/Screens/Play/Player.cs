@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap);
+                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap.Value);
                 }
 
                 if (!RulesetContainer.Objects.Any())
