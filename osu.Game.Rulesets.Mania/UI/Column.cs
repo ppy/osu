@@ -31,7 +31,20 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float column_width = 45;
         private const float special_column_width = 70;
 
-        public ManiaAction Action;
+        private ManiaAction action;
+
+        public ManiaAction Action
+        {
+            get => action;
+            set
+            {
+                if (action == value)
+                    return;
+                action = value;
+
+                background.Action = value;
+            }
+        }
 
         private readonly ColumnBackground background;
         private readonly Container hitTargetBar;
@@ -218,10 +231,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private bool onPressed(ManiaAction action)
         {
             if (action == Action)
-            {
-                background.IsLit = true;
                 keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint).Then().ScaleTo(1.3f, 250, Easing.OutQuint);
-            }
 
             return false;
         }
@@ -229,10 +239,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private bool onReleased(ManiaAction action)
         {
             if (action == Action)
-            {
-                background.IsLit = false;
                 keyIcon.ScaleTo(1f, 125, Easing.OutQuint);
-            }
 
             return false;
         }
