@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual
                                 new ScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Child = new BeatmapList(ruleset)
+                                    Child = new BeatmapList(ruleset, Beatmap)
                                 }
                             }
                         },
@@ -108,10 +108,12 @@ namespace osu.Game.Tests.Visual
         {
             private readonly Container<BeatmapDisplay> beatmapDisplays;
             private readonly Ruleset ruleset;
+            private readonly BindableBeatmap beatmapBindable;
 
-            public BeatmapList(Ruleset ruleset)
+            public BeatmapList(Ruleset ruleset, BindableBeatmap beatmapBindable)
             {
                 this.ruleset = ruleset;
+                this.beatmapBindable = beatmapBindable;
 
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
@@ -130,7 +132,7 @@ namespace osu.Game.Tests.Visual
                 var sets = beatmaps.GetAllUsableBeatmapSets();
                 var allBeatmaps = sets.SelectMany(s => s.Beatmaps).Where(b => ruleset.LegacyID == null || b.RulesetID == ruleset.LegacyID);
 
-                allBeatmaps.ForEach(b => beatmapDisplays.Add(new BeatmapDisplay(b)));
+                allBeatmaps.ForEach(b => beatmapDisplays.Add(new BeatmapDisplay(b, beatmapBindable)));
             }
 
             private class BeatmapDisplay : CompositeDrawable, IHasTooltip
@@ -138,27 +140,47 @@ namespace osu.Game.Tests.Visual
                 private readonly OsuSpriteText text;
                 private readonly BeatmapInfo beatmap;
 
+                private readonly BindableBeatmap beatmapBindable;
+
                 private BeatmapManager beatmaps;
-                private OsuGameBase osuGame;
 
                 private bool isSelected;
 
                 public string TooltipText => text.Text;
 
-                public BeatmapDisplay(BeatmapInfo beatmap)
+                public BeatmapDisplay(BeatmapInfo beatmap, BindableBeatmap beatmapBindable)
                 {
                     this.beatmap = beatmap;
+                    this.beatmapBindable = beatmapBindable;
 
                     AutoSizeAxes = Axes.Both;
                     InternalChild = text = new OsuSpriteText();
+
+                    this.beatmapBindable.ValueChanged += beatmapChanged;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(BeatmapManager beatmaps)
+                {
+                    this.beatmaps = beatmaps;
+
+                    var working = beatmaps.GetWorkingBeatmap(beatmap);
+                    text.Text = $"{working.Metadata.Artist} - {working.Metadata.Title} ({working.Metadata.AuthorString}) [{working.BeatmapInfo.Version}]";
+                }
+
+                private void beatmapChanged(WorkingBeatmap newBeatmap)
+                {
+                    if (isSelected)
+                        this.FadeColour(Color4.White, 100);
+                    isSelected = false;
                 }
 
                 protected override bool OnClick(InputState state)
                 {
-                    if (osuGame.Beatmap.Value.BeatmapInfo.ID == beatmap.ID)
+                    if (beatmapBindable.Value.BeatmapInfo.ID == beatmap.ID)
                         return false;
 
-                    osuGame.Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
+                    beatmapBindable.Value = beatmaps.GetWorkingBeatmap(beatmap);
                     isSelected = true;
                     return true;
                 }
@@ -177,25 +199,6 @@ namespace osu.Game.Tests.Visual
                         return;
                     this.FadeColour(Color4.White, 100);
                 }
-
-                [BackgroundDependencyLoader]
-                private void load(OsuGameBase osuGame, BeatmapManager beatmaps)
-                {
-                    this.osuGame = osuGame;
-                    this.beatmaps = beatmaps;
-
-                    var working = beatmaps.GetWorkingBeatmap(beatmap);
-                    text.Text = $"{working.Metadata.Artist} - {working.Metadata.Title} ({working.Metadata.AuthorString}) [{working.BeatmapInfo.Version}]";
-
-                    osuGame.Beatmap.ValueChanged += beatmapChanged;
-                }
-
-                private void beatmapChanged(WorkingBeatmap newBeatmap)
-                {
-                    if (isSelected)
-                        this.FadeColour(Color4.White, 100);
-                    isSelected = false;
-                }
             }
         }
 
@@ -204,7 +207,7 @@ namespace osu.Game.Tests.Visual
             private readonly FillFlowContainer<PerformanceDisplay> scores;
             private APIAccess api;
 
-            private readonly Bindable<WorkingBeatmap> currentBeatmap = new Bindable<WorkingBeatmap>();
+            private readonly IBindable<WorkingBeatmap> currentBeatmap = new Bindable<WorkingBeatmap>();
 
             public PerformanceList()
             {
@@ -220,7 +223,7 @@ namespace osu.Game.Tests.Visual
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuGameBase osuGame, APIAccess api)
+            private void load(IBindableBeatmap beatmap, APIAccess api)
             {
                 this.api = api;
 
@@ -235,7 +238,7 @@ namespace osu.Game.Tests.Visual
                 }
 
                 currentBeatmap.ValueChanged += beatmapChanged;
-                currentBeatmap.BindTo(osuGame.Beatmap);
+                currentBeatmap.BindTo(beatmap);
             }
 
             private GetScoresRequest lastRequest;
@@ -333,9 +336,9 @@ namespace osu.Game.Tests.Visual
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuGameBase osuGame)
+            private void load(IBindableBeatmap beatmap)
             {
-                osuGame.Beatmap.ValueChanged += beatmapChanged;
+                beatmap.ValueChanged += beatmapChanged;
             }
 
             private Cached informationCache = new Cached();

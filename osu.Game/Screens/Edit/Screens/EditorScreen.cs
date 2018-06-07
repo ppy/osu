@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +14,7 @@ namespace osu.Game.Screens.Edit.Screens
     /// </summary>
     public class EditorScreen : Container
     {
-        public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -25,6 +26,12 @@ namespace osu.Game.Screens.Edit.Screens
             RelativeSizeAxes = Axes.Both;
 
             InternalChild = content = new Container { RelativeSizeAxes = Axes.Both };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IBindableBeatmap beatmap)
+        {
+            Beatmap.BindTo(beatmap);
         }
 
         protected override void LoadComplete()

@@ -77,30 +77,15 @@ namespace osu.Game.Screens
 
         private ParallaxContainer backgroundParallaxContainer;
 
-        public WorkingBeatmap InitialBeatmap
-        {
-            set
-            {
-                if (IsLoaded) throw new InvalidOperationException($"Cannot set {nameof(InitialBeatmap)} post-load.");
-                Beatmap.Value = value;
-            }
-        }
-
         protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private SampleChannel sampleExit;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGameBase game, OsuGame osuGame, AudioManager audio)
+        [BackgroundDependencyLoader(true)]
+        private void load(BindableBeatmap beatmap, OsuGame osuGame, AudioManager audio)
         {
-            if (game != null)
-            {
-                //if we were given a beatmap at ctor time, we want to pass this on to the game-wide beatmap.
-                var localMap = Beatmap.Value;
-                Beatmap.BindTo(game.Beatmap);
-                if (localMap != null)
-                    Beatmap.Value = localMap;
-            }
+            if (beatmap != null)
+                Beatmap.BindTo(beatmap);
 
             if (osuGame != null)
             {

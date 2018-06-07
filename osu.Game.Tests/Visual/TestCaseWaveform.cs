@@ -5,11 +5,9 @@ using NUnit.Framework;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
@@ -19,9 +17,8 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseWaveform : OsuTestCase
     {
-        private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
-
-        public TestCaseWaveform()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             FillFlowContainer flow;
             Child = flow = new FillFlowContainer
@@ -46,10 +43,11 @@ namespace osu.Game.Tests.Visual
                 var newDisplay = new BeatmapWaveformGraph
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Resolution = 1f / i
+                    Resolution = 1f / i,
+                    Beatmap = Beatmap
                 };
 
-                newDisplay.Beatmap.BindTo(beatmapBacking);
+                Beatmap.ValueChanged += b => newDisplay.Beatmap = b;
 
                 flow.Add(new Container
                 {
@@ -83,8 +81,5 @@ namespace osu.Game.Tests.Visual
                 });
             }
         }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame) => beatmapBacking.BindTo(osuGame.Beatmap);
     }
 }

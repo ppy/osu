@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -63,7 +62,8 @@ namespace osu.Game
 
         protected override Container<Drawable> Content => content;
 
-        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
+        private OsuBindableBeatmap beatmap;
+        protected BindableBeatmap Beatmap => beatmap;
 
         private Bindable<bool> fpsDisplayVisible;
 
@@ -157,33 +157,15 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
 
             var defaultBeatmap = new DummyWorkingBeatmap(this);
-            Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
             BeatmapManager.DefaultBeatmap = defaultBeatmap;
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
             Audio.Track.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
-            Beatmap.ValueChanged += b =>
-            {
-                var trackLoaded = lastBeatmap?.TrackLoaded ?? false;
-
-                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
-                if (!trackLoaded || lastBeatmap?.Track != b.Track)
-                {
-                    if (trackLoaded)
-                    {
-                        Debug.Assert(lastBeatmap != null);
-                        Debug.Assert(lastBeatmap.Track != null);
-
-                        lastBeatmap.RecycleTrack();
-                    }
-
-                    Audio.Track.AddItem(b.Track);
-                }
-
-                lastBeatmap = b;
-            };
+            dependencies.CacheAs<BindableBeatmap>(beatmap);
+            dependencies.CacheAs<IBindableBeatmap>(beatmap);
 
             FileStore.Cleanup();
 
@@ -202,6 +184,17 @@ namespace osu.Game
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // TODO: This is temporary until we reimplement the local FPS display.
+            // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
+            fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
+            fpsDisplayVisible.ValueChanged += val => { FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
+            fpsDisplayVisible.TriggerChange();
         }
 
         private void runMigrations()
@@ -227,19 +220,6 @@ namespace osu.Game
             }
         }
 
-        private WorkingBeatmap lastBeatmap;
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // TODO: This is temporary until we reimplement the local FPS display.
-            // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
-            fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
-            fpsDisplayVisible.ValueChanged += val => { FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
-            fpsDisplayVisible.TriggerChange();
-        }
-
         public override void SetHost(GameHost host)
         {
             if (LocalConfig == null)
@@ -258,5 +238,26 @@ namespace osu.Game
         }
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
+
+        private class OsuBindableBeatmap : BindableBeatmap
+        {
+            public OsuBindableBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
+                : this(defaultValue)
+            {
+                RegisterAudioManager(audioManager);
+            }
+
+            private OsuBindableBeatmap(WorkingBeatmap defaultValue)
+                : base(defaultValue)
+            {
+            }
+
+            public override BindableBeatmap GetBoundCopy()
+            {
+                var copy = new OsuBindableBeatmap(Default);
+                copy.BindTo(this);
+                return copy;
+            }
+        }
     }
 }

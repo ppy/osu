@@ -73,13 +73,13 @@ namespace osu.Game.Overlays.Music
             }
 
             [BackgroundDependencyLoader]
-            private void load(BeatmapManager beatmaps, OsuGameBase osuGame)
+            private void load(BeatmapManager beatmaps, IBindableBeatmap beatmap)
             {
                 beatmaps.GetAllUsableBeatmapSets().ForEach(addBeatmapSet);
                 beatmaps.ItemAdded += addBeatmapSet;
                 beatmaps.ItemRemoved += removeBeatmapSet;
 
-                beatmapBacking.BindTo(osuGame.Beatmap);
+                beatmapBacking.BindTo(beatmap);
                 beatmapBacking.ValueChanged += _ => updateSelectedSet();
             }
 

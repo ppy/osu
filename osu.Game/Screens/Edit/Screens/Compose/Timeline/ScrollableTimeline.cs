@@ -2,11 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -14,8 +12,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 {
     public class ScrollableTimeline : CompositeDrawable
     {
-        public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
-
         private readonly ScrollingTimelineContainer timelineContainer;
 
         public ScrollableTimeline()
@@ -117,7 +113,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             hitSoundsCheckbox.Current.Value = true;
             waveformCheckbox.Current.Value = true;
 
-            timelineContainer.Beatmap.BindTo(Beatmap);
             timelineContainer.WaveformVisible.BindTo(waveformCheckbox.Current);
         }
 
