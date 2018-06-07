@@ -149,10 +149,10 @@ namespace osu.Game.Screens.Play
 
             // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
             // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            var offsetClock = new FramedOffsetClock(adjustableClock) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 22 : 0 };
+            var platformOffsetClock = new FramedOffsetClock(adjustableClock) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 22 : 0 };
 
             // the final usable gameplay clock with user-set offsets applied.
-            offsetClock = new FramedOffsetClock(offsetClock);
+            var offsetClock = new FramedOffsetClock(platformOffsetClock);
 
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
