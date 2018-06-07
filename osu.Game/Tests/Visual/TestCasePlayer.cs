@@ -19,8 +19,6 @@ namespace osu.Game.Tests.Visual
 
         protected Player Player;
 
-        private TestWorkingBeatmap working;
-
         protected TestCasePlayer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
@@ -67,13 +65,13 @@ namespace osu.Game.Tests.Visual
         {
             var beatmap = CreateBeatmap(r);
 
-            working = new TestWorkingBeatmap(beatmap);
-            working.Mods.Value = new[] { r.GetAllMods().First(m => m is ModNoFail) };
+            Beatmap.Value = new TestWorkingBeatmap(beatmap);
+            Beatmap.Value.Mods.Value = new[] { r.GetAllMods().First(m => m is ModNoFail) };
 
             if (Player != null)
                 Remove(Player);
 
-            var player = CreatePlayer(working, r);
+            var player = CreatePlayer(r);
 
             LoadComponentAsync(player, LoadScreen);
 
@@ -84,14 +82,12 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            if (working != null)
-                // note that this will override any mod rate application
-                working.Track.Rate = Clock.Rate;
+            // note that this will override any mod rate application
+            Beatmap.Value.Track.Rate = Clock.Rate;
         }
 
-        protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset) => new Player
+        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player
         {
-            InitialBeatmap = beatmap,
             AllowPause = false,
             AllowLeadIn = false,
             AllowResults = false,
