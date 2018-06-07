@@ -18,14 +18,12 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
         public HoldNoteMask(DrawableHoldNote hold)
             : base(hold)
         {
-            Position = hold.Position;
-
             var holdObject = hold.HitObject;
 
             InternalChildren = new Drawable[]
             {
-                new NoteMask(hold.Head),
-                new NoteMask(hold.Tail),
+                new HoldNoteNoteMask(hold.Head),
+                new HoldNoteNoteMask(hold.Tail),
                 body = new BodyPiece
                 {
                     AccentColour = Color4.Transparent
@@ -39,6 +37,30 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
         private void load(OsuColour colours)
         {
             body.BorderColour = colours.Yellow;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Size = HitObject.DrawSize;
+            Position = Parent.ToLocalSpace(HitObject.ScreenSpaceDrawQuad.TopLeft);
+        }
+
+        private class HoldNoteNoteMask : NoteMask
+        {
+            public HoldNoteNoteMask(DrawableNote note)
+                : base(note)
+            {
+                Select();
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                Position = HitObject.DrawPosition;
+            }
         }
     }
 }
