@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
 
         private readonly Room room;
         private readonly Container content;
+        private readonly OsuSpriteText typeLabel;
 
         protected readonly OsuTextBox Name, MaxParticipants;
         protected readonly RoomAvailabilityPicker Availability;
@@ -74,7 +75,24 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                     },
                                     new Section("GAME TYPE")
                                     {
-                                        Child = Type = new GameTypePicker(),
+                                        Child = new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(7),
+                                            Children = new Drawable[]
+                                            {
+                                                Type = new GameTypePicker
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                },
+                                                typeLabel = new OsuSpriteText
+                                                {
+                                                    TextSize = 14,
+                                                },
+                                            },
+                                        },
                                     },
                                 },
                             },
@@ -114,6 +132,8 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                 },
             };
 
+            Type.Current.ValueChanged += t => typeLabel.Text = t.Name;
+
             nameBind.ValueChanged += n => Name.Text = n;
             availabilityBind.ValueChanged += a => Availability.Current.Value = a;
             typeBind.ValueChanged += t => Type.Current.Value = t;
@@ -123,6 +143,12 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
             availabilityBind.BindTo(room.Availability);
             typeBind.BindTo(room.Type);
             maxParticipantsBind.BindTo(room.MaxParticipants);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            typeLabel.Colour = colours.Yellow;
         }
 
         protected override void PopIn()
