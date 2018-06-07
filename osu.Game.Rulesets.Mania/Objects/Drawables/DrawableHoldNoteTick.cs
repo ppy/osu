@@ -87,16 +87,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             AddJudgement(new HoldNoteTickJudgement { Result = HitResult.Perfect });
         }
 
-        protected override void UpdateState(ArmedState state)
-        {
-            switch (State.Value)
-            {
-                case ArmedState.Hit:
-                    AccentColour = Color4.Green;
-                    break;
-            }
-        }
-
         protected override void Update()
         {
             if (AllJudged)
