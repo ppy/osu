@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
@@ -24,7 +24,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly DrawableNote tail;
 
         private readonly BodyPiece bodyPiece;
-        private readonly Container fullHeightContainer;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -168,11 +167,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 return true;
             }
-
-            protected override void UpdateState(ArmedState state)
-            {
-                // The holdnote keeps scrolling through for now, so having the head disappear looks weird
-            }
         }
 
         /// <summary>
@@ -223,11 +217,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Result = result,
                     HasBroken = holdNote.hasBroken
                 });
-            }
-
-            protected override void UpdateState(ArmedState state)
-            {
-                // The holdnote keeps scrolling through, so having the tail disappear looks weird
             }
 
             public override bool OnPressed(ManiaAction action) => false; // Tail doesn't handle key down

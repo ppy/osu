@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
@@ -70,17 +69,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return;
 
             AddJudgement(new ManiaJudgement { Result = result });
-        }
-
-        protected override void UpdateState(ArmedState state)
-        {
-            switch (state)
-            {
-                case ArmedState.Hit:
-                case ArmedState.Miss:
-                    this.FadeOut(100).Expire();
-                    break;
-            }
         }
 
         public virtual bool OnPressed(ManiaAction action)

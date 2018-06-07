@@ -64,9 +64,9 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Name = "Background Gradient Overlay",
                     RelativeSizeAxes = Axes.Both,
-                    // Height = 0.5f, (doesn't work)
-                    // Anchor = Anchor.BottomLeft,
-                    // Origin = Anchor.BottomLeft,
+                    Height = 0.5f,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                     Blending = BlendingMode.Additive,
                     Alpha = 0
                 },
@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 accentColour = value;
 
                 background.Colour = accentColour;
-                backgroundOverlay.Colour = ColourInfo.GradientVertical(accentColour.Opacity(0.3f), accentColour.Opacity(0));
+                backgroundOverlay.Colour = ColourInfo.GradientVertical(accentColour.Opacity(0.6f), accentColour.Opacity(0));
 
                 hitTargetBar.EdgeEffect = new EdgeEffectParameters
                 {

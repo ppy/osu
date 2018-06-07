@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
     /// </summary>
     internal class NotePiece : Container, IHasAccentColour
     {
-        private const float head_height = 10;
+        public const float NOTE_HEIGHT = 10;
         private const float head_colour_height = 6;
 
         private readonly Box colouredBox;
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
         public NotePiece()
         {
             RelativeSizeAxes = Axes.X;
-            Height = head_height;
+            Height = NOTE_HEIGHT;
 
             Children = new[]
             {
