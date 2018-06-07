@@ -29,6 +29,7 @@ namespace osu.Game.Overlays.Direct
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
+                Preview.Stop(parentOverlayContainer);
                 Playing.Value = false;
                 Preview = null;
             }
