@@ -326,7 +326,10 @@ namespace osu.Game.Screens.Menu
                             logoTracking = false;
 
                             if (game != null)
-                                game.OverlayActivationMode.Value = state == MenuState.Exit ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
+                            {
+                                game.OverlayActivationMode.Value = state == MenuState.Exit ? OverlayActivation.Disabled : OverlayActivation.All;
+                                game.Toolbar.Hide();
+                            }
 
                             logo.ClearTransforms(targetMember: nameof(Position));
                             logo.RelativePositionAxes = Axes.Both;
