@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             typeof(DrawableCatchHitObject),
             typeof(DrawableFruit),
             typeof(DrawableDroplet),
+            typeof(BananaShower),
             typeof(Pulp),
         };
 
@@ -53,12 +54,19 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private DrawableFruit createDrawable(int index)
         {
-            var fruit = new Fruit
-            {
-                StartTime = 1000000000000,
-                IndexInBeatmap = index,
-                Scale = 1.5f,
-            };
+            Fruit fruit = index == 5
+                ? new BananaShower.Banana
+                {
+                    StartTime = 1000000000000,
+                    IndexInBeatmap = index,
+                    Scale = 1.5f,
+                }
+                : new Fruit
+                {
+                    StartTime = 1000000000000,
+                    IndexInBeatmap = index,
+                    Scale = 1.5f,
+                };
 
             return new DrawableFruit(fruit)
             {

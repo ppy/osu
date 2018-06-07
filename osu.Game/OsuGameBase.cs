@@ -10,7 +10,6 @@ using System.Reflection;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Configuration;
-using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
@@ -31,6 +30,7 @@ using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using DebugUtils = osu.Game.Utils.DebugUtils;
 
 namespace osu.Game
 {
@@ -57,9 +57,7 @@ namespace osu.Game
 
         protected SettingsStore SettingsStore;
 
-        protected CursorOverrideContainer CursorOverrideContainer;
-
-        protected override string MainResourceFile => @"osu.Game.Resources.dll";
+        protected MenuCursorContainer MenuCursorContainer;
 
         private Container content;
 
@@ -100,6 +98,8 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
+            Resources.AddStore(new DllResourceStore(@"osu.Game.Resources.dll"));
+
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
 
             dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
@@ -191,14 +191,14 @@ namespace osu.Game
 
             GlobalActionContainer globalBinding;
 
-            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
-            CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
+            MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
+            MenuCursorContainer.Child = globalBinding = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both }
+                Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
             };
 
-            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = MenuCursorContainer });
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);
@@ -208,19 +208,21 @@ namespace osu.Game
         {
             try
             {
-                using (var db = contextFactory.GetForWrite())
+                using (var db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
-            catch (MigrationFailedException e)
+            catch (Exception e)
             {
                 Logger.Error(e.InnerException ?? e, "Migration failed! We'll be starting with a fresh database.", LoggingTarget.Database);
 
                 // if we failed, let's delete the database and start fresh.
                 // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
                 contextFactory.ResetDatabase();
+
                 Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
 
-                using (var db = contextFactory.GetForWrite())
+                // only run once more, then hard bail.
+                using (var db = contextFactory.GetForWrite(false))
                     db.Context.Migrate();
             }
         }
