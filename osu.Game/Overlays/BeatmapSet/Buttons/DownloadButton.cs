@@ -17,11 +17,6 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         {
             Width = 120;
 
-            string subtitle = string.Empty;
-
-            if (set.OnlineInfo.HasVideo)
-                subtitle = noVideo ? "without Video" : "with Video";
-
             BeatmapSetDownloader downloader;
             Add(new Container
             {
@@ -47,7 +42,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             },
                             new OsuSpriteText
                             {
-                                Text = subtitle,
+                                Text = set.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
                                 TextSize = 11,
                                 Font = @"Exo2.0-Bold",
                             },
