@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
@@ -15,10 +14,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
         public NoteMask(DrawableNote note)
             : base(note)
         {
-            Origin = Anchor.Centre;
-
-            Position = note.Position;
-            Size = note.Size;
             Scale = note.Scale;
 
             AddInternal(new NotePiece());
@@ -30,6 +25,14 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Size = HitObject.DrawSize;
+            Position = Parent.ToLocalSpace(HitObject.ScreenSpaceDrawQuad.BottomLeft);
         }
     }
 }
