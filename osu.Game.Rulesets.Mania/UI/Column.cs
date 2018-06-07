@@ -2,10 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using System.Linq;
@@ -18,9 +16,6 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
-        private const float hit_target_height = 10;
-        private const float hit_target_bar_height = 2;
-
         private const float column_width = 45;
         private const float special_column_width = 70;
 
@@ -42,14 +37,12 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly ColumnBackground background;
         private readonly ColumnKeyArea keyArea;
-
-        private readonly Container hitTargetBar;
+        private readonly ColumnHitObjectArea hitObjectArea;
 
         internal readonly Container TopLevelContainer;
         private readonly Container explosionContainer;
 
-        protected override Container<Drawable> Content => content;
-        private readonly Container<Drawable> content;
+        protected override Container<Drawable> Content => hitObjectArea;
 
         public Column(ScrollingDirection direction = ScrollingDirection.Up)
             : base(direction)
@@ -70,43 +63,14 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Name = "Hit target + hit objects",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = ManiaStage.HIT_TARGET_POSITION },
+                    Padding = new MarginPadding
+                    {
+                        Top = direction == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
+                        Bottom = direction == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
+                    },
                     Children = new Drawable[]
                     {
-                        new Container
-                        {
-                            Name = "Hit target",
-                            RelativeSizeAxes = Axes.X,
-                            Height = hit_target_height,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Name = "Background",
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black
-                                },
-                                hitTargetBar = new Container
-                                {
-                                    Name = "Bar",
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = hit_target_bar_height,
-                                    Masking = true,
-                                    Children = new[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        content = new Container
-                        {
-                            Name = "Hit objects",
-                            RelativeSizeAxes = Axes.Both,
-                        },
+                        hitObjectArea = new ColumnHitObjectArea(direction) { RelativeSizeAxes = Axes.Both },
                         explosionContainer = new Container
                         {
                             Name = "Hit explosions",
@@ -156,13 +120,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 background.AccentColour = value;
                 keyArea.AccentColour = value;
-
-                hitTargetBar.EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Radius = 5,
-                    Colour = accentColour.Opacity(0.5f),
-                };
+                hitObjectArea.AccentColour = value;
             }
         }
 

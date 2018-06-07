@@ -22,7 +22,8 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             typeof(Column),
             typeof(ColumnBackground),
-            typeof(ColumnKeyArea)
+            typeof(ColumnKeyArea),
+            typeof(ColumnHitObjectArea)
         };
 
         public TestCaseColumn()
