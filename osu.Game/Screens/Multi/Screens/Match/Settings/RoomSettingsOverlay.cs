@@ -26,6 +26,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
 
+        private readonly Room room;
         private readonly Container content;
 
         protected readonly OsuTextBox Name, MaxParticipants;
@@ -35,6 +36,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
 
         public RoomSettingsOverlay(Room room)
         {
+            this.room = room;
             Masking = true;
 
             Child = content = new Container
@@ -61,7 +63,10 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                 {
                                     new Section("ROOM NAME")
                                     {
-                                        Child = Name = new SettingsTextBox(),
+                                        Child = Name = new SettingsTextBox
+                                        {
+                                            OnCommit = (sender, text) => apply(),
+                                        },
                                     },
                                     new Section("ROOM VISIBILITY")
                                     {
@@ -82,11 +87,17 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                 {
                                     new Section("MAX PARTICIPANTS")
                                     {
-                                        Child = MaxParticipants = new SettingsTextBox(),
+                                        Child = MaxParticipants = new SettingsTextBox
+                                        {
+                                            OnCommit = (sender, text) => apply(),
+                                        },
                                     },
                                     new Section("PASSWORD (OPTIONAL)")
                                     {
-                                        Child = new SettingsTextBox(),
+                                        Child = new SettingsTextBox
+                                        {
+                                            OnCommit = (sender, text) => apply(),
+                                        },
                                     },
                                 },
                             },
@@ -98,23 +109,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                         Origin = Anchor.BottomCentre,
                         Size = new Vector2(230, 35),
                         Margin = new MarginPadding { Bottom = 20 },
-                        Action = () =>
-                        {
-                            if (room != null)
-                            {
-                                room.Name.Value = Name.Text;
-                                room.Availability.Value = Availability.Current.Value;
-                                room.Type.Value = Type.Current.Value;
-
-                                int max;
-                                if (int.TryParse(MaxParticipants.Text, out max))
-                                    room.MaxParticipants.Value = max;
-                                else
-                                    room.MaxParticipants.Value = null;
-                            }
-
-                            Hide();
-                        },
+                        Action = apply,
                     },
                 },
             };
@@ -147,6 +142,24 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
         protected override void PopOut()
         {
             content.MoveToY(-1, transition_duration, Easing.InSine);
+        }
+
+        private void apply()
+        {
+            if (room != null)
+            {
+                room.Name.Value = Name.Text;
+                room.Availability.Value = Availability.Current.Value;
+                room.Type.Value = Type.Current.Value;
+
+                int max;
+                if (int.TryParse(MaxParticipants.Text, out max))
+                    room.MaxParticipants.Value = max;
+                else
+                    room.MaxParticipants.Value = null;
+            }
+
+            Hide();
         }
 
         private class SettingsTextBox : OsuTextBox
