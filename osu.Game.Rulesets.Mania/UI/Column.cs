@@ -1,16 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using System;
 using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
@@ -21,10 +18,6 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
-        private const float key_icon_size = 10;
-        private const float key_icon_corner_radius = 3;
-        private const float key_icon_border_radius = 2;
-
         private const float hit_target_height = 10;
         private const float hit_target_bar_height = 2;
 
@@ -43,12 +36,14 @@ namespace osu.Game.Rulesets.Mania.UI
                 action = value;
 
                 background.Action = value;
+                keyArea.Action = value;
             }
         }
 
         private readonly ColumnBackground background;
+        private readonly ColumnKeyArea keyArea;
+
         private readonly Container hitTargetBar;
-        private readonly Container keyIcon;
 
         internal readonly Container TopLevelContainer;
         private readonly Container explosionContainer;
@@ -112,12 +107,6 @@ namespace osu.Game.Rulesets.Mania.UI
                             Name = "Hit objects",
                             RelativeSizeAxes = Axes.Both,
                         },
-                        // For column lighting, we need to capture input events before the notes
-                        new InputTarget
-                        {
-                            Pressed = onPressed,
-                            Released = onReleased
-                        },
                         explosionContainer = new Container
                         {
                             Name = "Hit explosions",
@@ -125,41 +114,12 @@ namespace osu.Game.Rulesets.Mania.UI
                         }
                     }
                 },
-                new Container
+                keyArea = new ColumnKeyArea(direction)
                 {
-                    Name = "Key",
+                    Anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
+                    Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = ManiaStage.HIT_TARGET_POSITION,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Name = "Key gradient",
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0)),
-                            Alpha = 0.5f
-                        },
-                        keyIcon = new Container
-                        {
-                            Name = "Key icon",
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = new Vector2(key_icon_size),
-                            Masking = true,
-                            CornerRadius = key_icon_corner_radius,
-                            BorderThickness = 2,
-                            BorderColour = Color4.White, // Not true
-                            Children = new[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0,
-                                    AlwaysPresent = true
-                                }
-                            }
-                        }
-                    }
                 },
                 background,
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
@@ -195,15 +155,9 @@ namespace osu.Game.Rulesets.Mania.UI
                 accentColour = value;
 
                 background.AccentColour = value;
+                keyArea.AccentColour = value;
 
                 hitTargetBar.EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Radius = 5,
-                    Colour = accentColour.Opacity(0.5f),
-                };
-
-                keyIcon.EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
                     Radius = 5,
@@ -230,41 +184,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 return;
 
             explosionContainer.Add(new HitExplosion(judgedObject));
-        }
-
-        private bool onPressed(ManiaAction action)
-        {
-            if (action == Action)
-                keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint).Then().ScaleTo(1.3f, 250, Easing.OutQuint);
-
-            return false;
-        }
-
-        private bool onReleased(ManiaAction action)
-        {
-            if (action == Action)
-                keyIcon.ScaleTo(1f, 125, Easing.OutQuint);
-
-            return false;
-        }
-
-        /// <summary>
-        /// This is a simple container which delegates various input events that have to be captured before the notes.
-        /// </summary>
-        private class InputTarget : Container, IKeyBindingHandler<ManiaAction>
-        {
-            public Func<ManiaAction, bool> Pressed;
-            public Func<ManiaAction, bool> Released;
-
-            public InputTarget()
-            {
-                RelativeSizeAxes = Axes.Both;
-                AlwaysPresent = true;
-                Alpha = 0;
-            }
-
-            public bool OnPressed(ManiaAction action) => Pressed?.Invoke(action) ?? false;
-            public bool OnReleased(ManiaAction action) => Released?.Invoke(action) ?? false;
         }
 
         public bool OnPressed(ManiaAction action)
