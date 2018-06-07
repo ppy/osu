@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -16,6 +15,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
             : base(note)
         {
             Scale = note.Scale;
+
+            CornerRadius = 5;
+            Masking = true;
 
             AddInternal(new NotePiece());
 
