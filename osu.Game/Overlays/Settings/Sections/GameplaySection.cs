@@ -21,7 +21,8 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 new GeneralSettings(),
                 new SongSelectSettings(),
-                new ScrollingSettings()
+                new ScrollingSettings(),
+                new ModsSettings(),
             };
         }
 

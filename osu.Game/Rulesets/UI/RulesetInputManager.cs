@@ -121,8 +121,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         private bool validState;
 
-        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && validState;
-
         private bool isAttached => replayInputHandler != null && !UseParentState;
 
         private const int max_catch_up_updates_per_frame = 50;

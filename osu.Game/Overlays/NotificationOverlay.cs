@@ -22,38 +22,12 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        /// <summary>
-        /// Whether posted notifications should be processed.
-        /// </summary>
-        public readonly BindableBool Enabled = new BindableBool(true);
-
         private FlowContainer<NotificationSection> sections;
 
         /// <summary>
         /// Provide a source for the toolbar height.
         /// </summary>
         public Func<float> GetToolbarHeight;
-
-        public NotificationOverlay()
-        {
-            ScheduledDelegate notificationsEnabler = null;
-            Enabled.ValueChanged += v =>
-            {
-                if (!IsLoaded)
-                {
-                    processingPosts = v;
-                    return;
-                }
-
-                notificationsEnabler?.Cancel();
-
-                if (v)
-                    // we want a slight delay before toggling notifications on to avoid the user becoming overwhelmed.
-                    notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, 1000);
-                else
-                    processingPosts = false;
-            };
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -101,6 +75,29 @@ namespace osu.Game.Overlays
                     }
                 }
             };
+        }
+
+        private ScheduledDelegate notificationsEnabler;
+        private void updateProcessingMode()
+        {
+            bool enabled = OverlayActivationMode == OverlayActivation.All || State == Visibility.Visible;
+
+            notificationsEnabler?.Cancel();
+
+            if (enabled)
+                // we want a slight delay before toggling notifications on to avoid the user becoming overwhelmed.
+                notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, State == Visibility.Visible ? 0 : 1000);
+            else
+                processingPosts = false;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            StateChanged += _ => updateProcessingMode();
+            OverlayActivationMode.ValueChanged += _ => updateProcessingMode();
+            OverlayActivationMode.TriggerChange();
         }
 
         private int totalCount => sections.Select(c => c.DisplayedCount).Sum();
