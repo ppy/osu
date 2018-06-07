@@ -16,7 +16,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Screens.Match.Settings
 {
-    public class RoomSettingsOverlay : OverlayContainer
+    public class RoomSettingsOverlay : FocusedOverlayContainer
     {
         private const float transition_duration = 500;
         private const float field_padding = 45;
@@ -28,13 +28,15 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
 
         private readonly Container content;
 
+        protected readonly OsuTextBox Name, MaxParticipants;
+        protected readonly RoomAvailabilityPicker Availability;
+        protected readonly GameTypePicker Type;
+        protected readonly TriangleButton Apply;
+
         public RoomSettingsOverlay(Room room)
         {
             Masking = true;
 
-            SettingsTextBox name, maxParticipants;
-            RoomAvailabilityPicker availability;
-            GameTypePicker type;
             Child = content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -59,15 +61,15 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                 {
                                     new Section("ROOM NAME")
                                     {
-                                        Child = name = new SettingsTextBox(),
+                                        Child = Name = new SettingsTextBox(),
                                     },
                                     new Section("ROOM VISIBILITY")
                                     {
-                                        Child = availability = new RoomAvailabilityPicker(),
+                                        Child = Availability = new RoomAvailabilityPicker(),
                                     },
                                     new Section("GAME TYPE")
                                     {
-                                        Child = type = new GameTypePicker(),
+                                        Child = Type = new GameTypePicker(),
                                     },
                                 },
                             },
@@ -80,7 +82,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                 {
                                     new Section("MAX PARTICIPANTS")
                                     {
-                                        Child = maxParticipants = new SettingsTextBox(),
+                                        Child = MaxParticipants = new SettingsTextBox(),
                                     },
                                     new Section("PASSWORD (OPTIONAL)")
                                     {
@@ -90,7 +92,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                             },
                         },
                     },
-                    new ApplyButton
+                    Apply = new ApplyButton
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
@@ -100,12 +102,12 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                         {
                             if (room != null)
                             {
-                                room.Name.Value = name.Text;
-                                room.Availability.Value = availability.Current.Value;
-                                room.Type.Value = type.Current.Value;
+                                room.Name.Value = Name.Text;
+                                room.Availability.Value = Availability.Current.Value;
+                                room.Type.Value = Type.Current.Value;
 
                                 int max;
-                                if (int.TryParse(maxParticipants.Text, out max))
+                                if (int.TryParse(MaxParticipants.Text, out max))
                                     room.MaxParticipants.Value = max;
                                 else
                                     room.MaxParticipants.Value = null;
@@ -117,10 +119,10 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                 },
             };
 
-            nameBind.ValueChanged += n => name.Text = n;
-            availabilityBind.ValueChanged += a => availability.Current.Value = a;
-            typeBind.ValueChanged += t => type.Current.Value = t;
-            maxParticipantsBind.ValueChanged += m => maxParticipants.Text = m?.ToString();
+            nameBind.ValueChanged += n => Name.Text = n;
+            availabilityBind.ValueChanged += a => Availability.Current.Value = a;
+            typeBind.ValueChanged += t => Type.Current.Value = t;
+            maxParticipantsBind.ValueChanged += m => MaxParticipants.Text = m?.ToString();
 
             nameBind.BindTo(room.Name);
             availabilityBind.BindTo(room.Availability);

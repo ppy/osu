@@ -3,26 +3,115 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi.Screens.Match;
+using osu.Game.Screens.Multi.Screens.Match.Settings;
+using OpenTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseRoomSettings : OsuTestCase
+    public class TestCaseRoomSettings : ManualInputManagerTestCase
     {
+        private readonly Room room;
+        private readonly TestRoomSettingsOverlay overlay;
+
         public TestCaseRoomSettings()
         {
-            Room room = new Room();
+            room = new Room
+            {
+                Name = { Value = "One Testing Room" },
+                Availability = { Value = RoomAvailability.Public },
+                Type = { Value = new GameTypeTeamVersus() },
+                MaxParticipants = { Value = 10 },
+            };
 
-            RoomSettingsOverlay overlay;
-            Add(overlay = new RoomSettingsOverlay(room)
+            Add(overlay = new TestRoomSettingsOverlay(room)
             {
                 RelativeSizeAxes = Axes.Both,
                 Height = 0.75f,
             });
 
-            AddStep(@"toggle", overlay.ToggleVisibility);
+            AddStep(@"show", overlay.Show);
+            assertAll();
+            AddStep(@"set name", () => overlay.CurrentName = @"Two Testing Room");
+            AddStep(@"set max", () => overlay.CurrentMaxParticipants = null);
+            AddStep(@"set availability", () => overlay.CurrentAvailability = RoomAvailability.InviteOnly);
+            AddStep(@"set type", () => overlay.CurrentType = new GameTypeTagTeam());
+            apply();
+            assertAll();
+            AddStep(@"show", overlay.Show);
+            AddStep(@"set room name", () => room.Name.Value = @"Room Changed Name!");
+            AddStep(@"set room availability", () => room.Availability.Value = RoomAvailability.Public);
+            AddStep(@"set room type", () => room.Type.Value = new GameTypeTag());
+            AddStep(@"set room max", () => room.MaxParticipants.Value = 100);
+            assertAll();
+            AddStep(@"set name", () => overlay.CurrentName = @"Unsaved Testing Room");
+            AddStep(@"set max", () => overlay.CurrentMaxParticipants = 20);
+            AddStep(@"set availability", () => overlay.CurrentAvailability = RoomAvailability.FriendsOnly);
+            AddStep(@"set type", () => overlay.CurrentType = new GameTypeVersus());
+            AddStep(@"hide", overlay.Hide);
+            AddWaitStep(5);
+            AddStep(@"show", overlay.Show);
+            assertAll();
+            AddStep(@"hide", overlay.Hide);
+        }
+
+        private void apply()
+        {
+            AddStep(@"apply", () =>
+            {
+                InputManager.MoveMouseTo(overlay.ApplyButton);
+                InputManager.Click(MouseButton.Left);
+            });
+        }
+
+        private void assertAll()
+        {
+            AddAssert(@"name == room name", () => overlay.CurrentName == room.Name.Value);
+            AddAssert(@"max == room max", () => overlay.CurrentMaxParticipants == room.MaxParticipants.Value);
+            AddAssert(@"availability == room availability", () => overlay.CurrentAvailability == room.Availability.Value);
+            AddAssert(@"type == room type", () => Equals(overlay.CurrentType, room.Type.Value));
+        }
+
+        private class TestRoomSettingsOverlay : RoomSettingsOverlay
+        {
+            public string CurrentName
+            {
+                get => Name.Text;
+                set => Name.Text = value;
+            }
+
+            public int? CurrentMaxParticipants
+            {
+                get
+                {
+                    int max;
+                    if (int.TryParse(MaxParticipants.Text, out max))
+                        return max;
+
+                    return null;
+                }
+                set => MaxParticipants.Text = value?.ToString();
+            }
+
+            public RoomAvailability CurrentAvailability
+            {
+                get => Availability.Current.Value;
+                set => Availability.Current.Value = value;
+            }
+
+            public GameType CurrentType
+            {
+                get => Type.Current.Value;
+                set => Type.Current.Value = value;
+            }
+
+            public TriangleButton ApplyButton => Apply;
+
+            public TestRoomSettingsOverlay(Room room) : base(room)
+            {
+            }
         }
     }
 }
