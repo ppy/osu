@@ -36,10 +36,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private bool hasBroken;
 
+        private readonly Container<DrawableHoldNoteTick> tickContainer;
+
         public DrawableHoldNote(HoldNote hitObject, ManiaAction action)
             : base(hitObject, action)
         {
-            Container<DrawableHoldNoteTick> tickContainer;
             RelativeSizeAxes = Axes.X;
 
             InternalChildren = new Drawable[]
@@ -85,17 +86,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 bodyPiece.AccentColour = value;
                 head.AccentColour = value;
                 tail.AccentColour = value;
-            }
-        }
-
-        protected override void UpdateState(ArmedState state)
-        {
-            switch (state)
-            {
-                case ArmedState.Hit:
-                    // Good enough for now, we just want them to have a lifetime end
-                    this.Delay(2000).Expire();
-                    break;
+                tickContainer.ForEach(t=>t.AccentColour=value);
             }
         }
 
