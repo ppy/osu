@@ -131,8 +131,6 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Origin = Anchor.Centre,
             });
 
-            playfield.Inverted.Value = inverted;
-
             return playfield;
         }
 
@@ -157,8 +155,6 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Origin = Anchor.Centre,
                 Clock = new FramedClock(rateAdjustClock)
             });
-
-            playfield.Inverted.Value = inverted;
 
             for (double t = start_time; t <= start_time + duration; t += 100)
             {

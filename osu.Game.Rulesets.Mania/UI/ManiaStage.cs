@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -27,11 +26,6 @@ namespace osu.Game.Rulesets.Mania.UI
     internal class ManiaStage : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
-
-        /// <summary>
-        /// Whether this playfield should be inverted. This flips everything inside the playfield.
-        /// </summary>
-        public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
@@ -139,15 +133,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 AddColumn(column);
             }
-
-            Inverted.ValueChanged += invertedChanged;
-            Inverted.TriggerChange();
-        }
-
-        private void invertedChanged(bool newValue)
-        {
-            Scale = new Vector2(1, newValue ? -1 : 1);
-            Judgements.Scale = Scale;
         }
 
         public void AddColumn(Column c)
