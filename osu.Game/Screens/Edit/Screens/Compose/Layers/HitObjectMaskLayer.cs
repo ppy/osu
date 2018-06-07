@@ -55,13 +55,18 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 maskContainer,
                 dragLayer.CreateProxy()
             };
-            AddMasks();
+
+            addMasks(Playfield);
         }
 
-        protected virtual void AddMasks()
+        private void addMasks(Playfield playfield)
         {
-            foreach (var obj in Playfield.HitObjects.Objects)
-                AddMask(obj);
+            foreach (var obj in playfield.HitObjects.Objects)
+                addMask(obj);
+
+            if (playfield.NestedPlayfields != null)
+                foreach (var p in playfield.NestedPlayfields)
+                    addMasks(p);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -74,7 +79,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// Adds a mask for a <see cref="DrawableHitObject"/> which adds movement support.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create a mask for.</param>
-        protected void AddMask(DrawableHitObject hitObject)
+        private void addMask(DrawableHitObject hitObject)
         {
             var mask = Composer.CreateMaskFor(hitObject);
             if (mask == null)
