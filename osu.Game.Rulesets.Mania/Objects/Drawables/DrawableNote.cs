@@ -9,6 +9,7 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -36,6 +37,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Origin = Anchor.TopCentre
                 }
             };
+        }
+
+        public override ScrollingDirection Direction
+        {
+            set
+            {
+                base.Direction = value;
+
+                headPiece.Direction = value;
+                headPiece.Anchor = Anchor;
+                headPiece.Origin = Origin;
+            }
         }
 
         public override Color4 AccentColour
