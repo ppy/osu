@@ -15,6 +15,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -58,12 +59,12 @@ namespace osu.Game.Rulesets.Mania.Tests
             var note = new Note { StartTime = 999999999 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            return new NoteContainer(direction, $"note, scrolling {direction.ToString().ToLower()}")
+            return new ScrollingTestContainer(new ScrollingInfo(direction))
             {
-                Child = new DrawableNote(note, ManiaAction.Key1)
+                AutoSizeAxes = Axes.Both,
+                Child = new NoteContainer(direction, $"note, scrolling {direction.ToString().ToLower()}")
                 {
-                    AccentColour = Color4.OrangeRed,
-                    Direction = direction
+                    Child = new DrawableNote(note, ManiaAction.Key1) { AccentColour = Color4.OrangeRed }
                 }
             };
         }
@@ -73,13 +74,16 @@ namespace osu.Game.Rulesets.Mania.Tests
             var note = new HoldNote { StartTime = 999999999, Duration = 1000 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            return new NoteContainer(direction, $"hold note, scrolling {direction.ToString().ToLower()}")
+            return new ScrollingTestContainer(new ScrollingInfo(direction))
             {
-                Child = new DrawableHoldNote(note, ManiaAction.Key1)
+                AutoSizeAxes = Axes.Both,
+                Child = new NoteContainer(direction, $"hold note, scrolling {direction.ToString().ToLower()}")
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    AccentColour = Color4.OrangeRed,
-                    Direction = direction
+                    Child = new DrawableHoldNote(note, ManiaAction.Key1)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        AccentColour = Color4.OrangeRed,
+                    }
                 }
             };
         }

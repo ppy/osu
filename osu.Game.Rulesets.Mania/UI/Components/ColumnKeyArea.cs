@@ -22,17 +22,10 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         public ManiaAction Action;
 
-        private readonly ScrollingDirection direction;
-
         private Container keyIcon;
 
-        public ColumnKeyArea(ScrollingDirection direction)
-        {
-            this.direction = direction;
-        }
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ScrollingInfo scrollingInfo)
         {
             InternalChildren = new Drawable[]
             {
@@ -41,8 +34,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     Name = "Key gradient",
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(
-                        direction == ScrollingDirection.Up ? Color4.Black : Color4.Black.Opacity(0),
-                        direction == ScrollingDirection.Up ? Color4.Black.Opacity(0) : Color4.Black),
+                        scrollingInfo.Direction == ScrollingDirection.Up ? Color4.Black : Color4.Black.Opacity(0),
+                        scrollingInfo.Direction == ScrollingDirection.Up ? Color4.Black.Opacity(0) : Color4.Black),
                     Alpha = 0.5f
                 },
                 keyIcon = new Container

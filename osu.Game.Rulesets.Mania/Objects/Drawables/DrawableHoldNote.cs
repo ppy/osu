@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
@@ -9,6 +10,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -35,6 +37,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// Whether the hold note has been released too early and shouldn't give full score for the release.
         /// </summary>
         private bool hasBroken;
+
+        private ScrollingInfo scrollingInfo;
 
         private readonly Container<DrawableHoldNoteTick> tickContainer;
 
@@ -76,17 +80,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             AddNested(tail);
         }
 
-        private ScrollingDirection direction;
-        public override ScrollingDirection Direction
+        [BackgroundDependencyLoader]
+        private void load(ScrollingInfo scrollingInfo)
         {
-            set
-            {
-                base.Direction = value;
-                direction = value;
+            this.scrollingInfo = scrollingInfo;
 
-                bodyPiece.Anchor = value == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-                bodyPiece.Origin = bodyPiece.Anchor;
-            }
+            bodyPiece.Anchor = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+            bodyPiece.Origin = bodyPiece.Anchor;
         }
 
         public override Color4 AccentColour
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.Update();
 
             // Make the body piece not lie under the head note
-            bodyPiece.Y = (direction == ScrollingDirection.Up ? 1 : -1) * head.Height / 2;
+            bodyPiece.Y = (scrollingInfo.Direction == ScrollingDirection.Up ? 1 : -1) * head.Height / 2;
             bodyPiece.Height = DrawHeight - head.Height / 2 + tail.Height / 2;
         }
 

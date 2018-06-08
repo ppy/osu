@@ -37,10 +37,18 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
         }
 
-        private ManiaStage createStage(ScrollingDirection direction, ManiaAction action)
+        private Drawable createStage(ScrollingDirection direction, ManiaAction action)
         {
             var specialAction = ManiaAction.Special1;
-            return new ManiaStage(direction, 0, new StageDefinition { Columns = 2 }, ref action, ref specialAction);
+
+            return new ScrollingTestContainer(new ScrollingInfo(direction))
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Y,
+                AutoSizeAxes = Axes.X,
+                Child = new ManiaStage(direction, 0, new StageDefinition { Columns = 2 }, ref action, ref specialAction)
+            };
         }
     }
 }

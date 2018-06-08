@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -57,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.UI
             Masking = true;
             CornerRadius = 5;
 
-            background = new ColumnBackground(direction) { RelativeSizeAxes = Axes.Both };
+            background = new ColumnBackground { RelativeSizeAxes = Axes.Both };
 
             InternalChildren = new[]
             {
@@ -74,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     },
                     Children = new Drawable[]
                     {
-                        hitObjectArea = new ColumnHitObjectArea(direction) { RelativeSizeAxes = Axes.Both },
+                        hitObjectArea = new ColumnHitObjectArea { RelativeSizeAxes = Axes.Both },
                         explosionContainer = new Container
                         {
                             Name = "Hit explosions",
@@ -82,7 +81,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         }
                     }
                 },
-                keyArea = new ColumnKeyArea(direction)
+                keyArea = new ColumnKeyArea
                 {
                     Anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
                     Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
@@ -134,9 +133,6 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <param name="hitObject">The DrawableHitObject to add.</param>
         public override void Add(DrawableHitObject hitObject)
         {
-            var maniaObject = (DrawableManiaHitObject)hitObject;
-            maniaObject.Direction = direction;
-
             hitObject.AccentColour = AccentColour;
             hitObject.OnJudgement += OnJudgement;
 

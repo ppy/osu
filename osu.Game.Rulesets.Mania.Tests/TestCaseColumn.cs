@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             }
         }
 
-        private Column createColumn(ScrollingDirection direction, ManiaAction action)
+        private Drawable createColumn(ScrollingDirection direction, ManiaAction action)
         {
             var column = new Column(direction)
             {
@@ -97,7 +97,15 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
 
             columns.Add(column);
-            return column;
+
+            return new ScrollingTestContainer(new ScrollingInfo(direction))
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                AutoSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Y,
+                Child = column
+            };
         }
     }
 }
