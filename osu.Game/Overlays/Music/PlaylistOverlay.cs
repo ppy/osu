@@ -21,17 +21,22 @@ namespace osu.Game.Overlays.Music
         private const float transition_duration = 600;
         private const float playlist_height = 510;
 
+        /// <summary>
+        /// Invoked when the order of an item in the list has changed.
+        /// The second parameter indicates the new index of the item.
+        /// </summary>
         public Action<BeatmapSetInfo, int> OrderChanged;
 
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
         private BeatmapManager beatmaps;
+
         private FilterControl filter;
         private PlaylistList list;
 
-        private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
-
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, BeatmapManager beatmaps, OsuColour colours)
+        private void load(OsuColour colours, BindableBeatmap beatmap, BeatmapManager beatmaps)
         {
+            this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;
 
             Children = new Drawable[]
@@ -73,15 +78,13 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            beatmapBacking.BindTo(game.Beatmap);
-
             filter.Search.OnCommit = (sender, newText) =>
             {
-                BeatmapInfo beatmap = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
-                if (beatmap != null)
+                BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
+                if (toSelect != null)
                 {
-                    beatmapBacking.Value = beatmaps.GetWorkingBeatmap(beatmap);
-                    beatmapBacking.Value.Track.Restart();
+                    beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);
+                    beatmap.Value.Track.Restart();
                 }
             };
         }
@@ -105,14 +108,14 @@ namespace osu.Game.Overlays.Music
 
         private void itemSelected(BeatmapSetInfo set)
         {
-            if (set.ID == (beatmapBacking.Value?.BeatmapSetInfo?.ID ?? -1))
+            if (set.ID == (beatmap.Value?.BeatmapSetInfo?.ID ?? -1))
             {
-                beatmapBacking.Value?.Track?.Seek(0);
+                beatmap.Value?.Track?.Seek(0);
                 return;
             }
 
-            beatmapBacking.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
-            beatmapBacking.Value.Track.Restart();
+            beatmap.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
+            beatmap.Value.Track.Restart();
         }
     }
 
