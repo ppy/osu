@@ -24,6 +24,10 @@ namespace osu.Game.Online.API
             Success?.Invoke(((JsonWebRequest<T>)WebRequest).ResponseObject);
         }
 
+        /// <summary>
+        /// Invoked on successful completion of an API request.
+        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
+        /// </summary>
         public new event APISuccessHandler<T> Success;
     }
 
@@ -52,7 +56,16 @@ namespace osu.Game.Online.API
         protected APIAccess API;
         protected WebRequest WebRequest;
 
+        /// <summary>
+        /// Invoked on successful completion of an API request.
+        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
+        /// </summary>
         public event APISuccessHandler Success;
+
+        /// <summary>
+        /// Invoked on failure to complete an API request.
+        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
+        /// </summary>
         public event APIFailureHandler Failure;
 
         private bool cancelled;
