@@ -7,6 +7,10 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -25,6 +29,8 @@ namespace osu.Game.Rulesets.Mania.Tests
             typeof(ColumnKeyArea),
             typeof(ColumnHitObjectArea)
         };
+
+        private readonly List<Column> columns = new List<Column>();
 
         public TestCaseColumn()
             : base(2)
@@ -48,13 +54,38 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
         }
 
-        private Column createColumn(ScrollingDirection direction, ManiaAction action) => new Column(direction)
+        protected override void LoadComplete()
         {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            Height = 0.85f,
-            AccentColour = Color4.OrangeRed,
-            Action = action
-        };
+            base.LoadComplete();
+
+            AddStep("note", createNote);
+        }
+
+        private void createNote()
+        {
+            for (int i = 0; i < columns.Count; i++)
+            {
+                var obj = new Note { Column = i, StartTime = Time.Current + 2000 };
+                obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                columns[i].Add(new DrawableNote(obj, columns[i].Action));
+            }
+        }
+
+        private Column createColumn(ScrollingDirection direction, ManiaAction action)
+        {
+            var column = new Column(direction)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Height = 0.85f,
+                AccentColour = Color4.OrangeRed,
+                Action = action,
+                VisibleTimeRange = { Value = 2000 }
+            };
+
+            columns.Add(column);
+            return column;
+        }
     }
 }
