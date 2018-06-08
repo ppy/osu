@@ -180,7 +180,7 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
             if (HasFocus)
             {
@@ -192,7 +192,7 @@ namespace osu.Game.Overlays.KeyBinding
                 }
             }
 
-            return base.OnWheel(state);
+            return base.OnScroll(state);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
