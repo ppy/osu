@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -22,20 +23,21 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         public ManiaAction Action;
 
+        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+
         private Container keyIcon;
 
         [BackgroundDependencyLoader]
-        private void load(ScrollingInfo scrollingInfo)
+        private void load(IScrollingInfo scrollingInfo)
         {
-            InternalChildren = new Drawable[]
+            Drawable gradient;
+
+            InternalChildren = new[]
             {
-                new Box
+                gradient = new Box
                 {
                     Name = "Key gradient",
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(
-                        scrollingInfo.Direction == ScrollingDirection.Up ? Color4.Black : Color4.Black.Opacity(0),
-                        scrollingInfo.Direction == ScrollingDirection.Up ? Color4.Black.Opacity(0) : Color4.Black),
                     Alpha = 0.5f
                 },
                 keyIcon = new Container
@@ -59,6 +61,14 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     }
                 }
             };
+
+            direction.BindTo(scrollingInfo.Direction);
+            direction.BindValueChanged(direction =>
+            {
+                gradient.Colour = ColourInfo.GradientVertical(
+                    direction == ScrollingDirection.Up ? Color4.Black : Color4.Black.Opacity(0),
+                    direction == ScrollingDirection.Up ? Color4.Black.Opacity(0) : Color4.Black);
+            }, true);
         }
 
         protected override void LoadComplete()

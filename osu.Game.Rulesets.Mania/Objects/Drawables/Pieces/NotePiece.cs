@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -21,6 +22,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
         public const float NOTE_HEIGHT = 10;
         private const float head_colour_height = 6;
 
+        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+
         private readonly Box colouredBox;
 
         public NotePiece()
@@ -36,8 +39,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 },
                 colouredBox = new Box
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                     Height = head_colour_height,
                     Alpha = 0.2f
@@ -46,10 +47,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
         }
 
         [BackgroundDependencyLoader]
-        private void load(ScrollingInfo scrollingInfo)
+        private void load(IScrollingInfo scrollingInfo)
         {
-            colouredBox.Anchor = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
-            colouredBox.Origin = colouredBox.Anchor;
+            direction.BindTo(scrollingInfo.Direction);
+            direction.BindValueChanged(direction =>
+            {
+                colouredBox.Anchor = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+                colouredBox.Origin = colouredBox.Anchor;
+            }, true);
         }
 
         private Color4 accentColour;

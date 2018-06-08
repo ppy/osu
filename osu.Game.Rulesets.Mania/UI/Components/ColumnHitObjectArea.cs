@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,25 +21,25 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         private Container<Drawable> content;
         protected override Container<Drawable> Content => content;
 
-        private Container hitTargetBar;
+        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+
+        private Container hitTargetLine;
 
         [BackgroundDependencyLoader]
-        private void load(ScrollingInfo scrollingInfo)
+        private void load(IScrollingInfo scrollingInfo)
         {
-            InternalChildren = new Drawable[]
+            Drawable hitTargetBar;
+
+            InternalChildren = new[]
             {
-                new Box
+                hitTargetBar = new Box
                 {
-                    Anchor = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
-                    Origin = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = hit_target_height,
                     Colour = Color4.Black
                 },
-                hitTargetBar = new Container
+                hitTargetLine = new Container
                 {
-                    Anchor = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
-                    Origin = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = hit_target_bar_height,
                     Masking = true,
@@ -50,6 +51,15 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     RelativeSizeAxes = Axes.Both,
                 },
             };
+
+            direction.BindTo(scrollingInfo.Direction);
+            direction.BindValueChanged(direction =>
+            {
+                hitTargetBar.Anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                hitTargetBar.Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                hitTargetLine.Anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                hitTargetLine.Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+            }, true);
         }
 
         protected override void LoadComplete()
@@ -78,7 +88,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             if (!IsLoaded)
                 return;
 
-            hitTargetBar.EdgeEffect = new EdgeEffectParameters
+            hitTargetLine.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Radius = 5,
