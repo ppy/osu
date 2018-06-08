@@ -2,63 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "VisualTests (Debug, net471)",
-            "windows": {
-                "type": "clr"
-            },
-            "type": "mono",
-            "request": "launch",
-            "program": "${workspaceRoot}/osu.Game.Tests/bin/Debug/net471/osu.Game.Tests.exe",
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build (Debug, msbuild)",
-            "runtimeExecutable": null,
-            "env": {},
-            "console": "internalConsole"
-        },
-        {
-            "name": "VisualTests (Release, net471)",
-            "windows": {
-                "type": "clr"
-            },
-            "type": "mono",
-            "request": "launch",
-            "program": "${workspaceRoot}/osu.Game.Tests/bin/Release/net471/osu.Game.Tests.exe",
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build (Release, msbuild)",
-            "runtimeExecutable": null,
-            "env": {},
-            "console": "internalConsole"
-        },
-        {
-            "name": "osu! (Debug, net471)",
-            "windows": {
-                "type": "clr"
-            },
-            "type": "mono",
-            "request": "launch",
-            "program": "${workspaceRoot}/osu.Desktop/bin/Debug/net471/osu!.exe",
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build (Debug, msbuild)",
-            "runtimeExecutable": null,
-            "env": {},
-            "console": "internalConsole"
-        },
-        {
-            "name": "osu! (Release, net471)",
-            "windows": {
-                "type": "clr"
-            },
-            "type": "mono",
-            "request": "launch",
-            "program": "${workspaceRoot}/osu.Desktop/bin/Release/net471/osu!.exe",
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build (Release, msbuild)",
-            "runtimeExecutable": null,
-            "env": {},
-            "console": "internalConsole"
-        },
-        {
-            "name": "VisualTests (Debug, netcoreapp2.1)",
+            "name": "VisualTests (Debug)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
@@ -66,12 +10,12 @@
                 "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp2.1/osu.Game.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build tests (Debug, dotnet)",
+            "preLaunchTask": "Build tests (Debug)",
             "env": {},
             "console": "internalConsole"
         },
         {
-            "name": "VisualTests (Release, netcoreapp2.1)",
+            "name": "VisualTests (Release)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
@@ -79,12 +23,12 @@
                 "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp2.1/osu.Game.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build tests (Release, dotnet)",
+            "preLaunchTask": "Build tests (Release)",
             "env": {},
             "console": "internalConsole"
         },
         {
-            "name": "osu! (Debug, netcoreapp2.1)",
+            "name": "osu! (Debug)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
@@ -92,12 +36,12 @@
                 "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/osu!.dll",
             ],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build osu! (Debug, dotnet)",
+            "preLaunchTask": "Build osu! (Debug)",
             "env": {},
             "console": "internalConsole"
         },
         {
-            "name": "osu! (Release, netcoreapp2.1)",
+            "name": "osu! (Release)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
@@ -105,7 +49,7 @@
                 "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1/osu!.dll",
             ],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build osu! (Release, dotnet)",
+            "preLaunchTask": "Build osu! (Release)",
             "env": {},
             "console": "internalConsole"
         }
