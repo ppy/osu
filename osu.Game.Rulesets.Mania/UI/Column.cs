@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -35,6 +36,8 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        private readonly ScrollingDirection direction;
+
         private readonly ColumnBackground background;
         private readonly ColumnKeyArea keyArea;
         private readonly ColumnHitObjectArea hitObjectArea;
@@ -47,6 +50,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public Column(ScrollingDirection direction)
             : base(direction)
         {
+            this.direction = direction;
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
 
@@ -130,6 +134,9 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <param name="hitObject">The DrawableHitObject to add.</param>
         public override void Add(DrawableHitObject hitObject)
         {
+            var maniaObject = (DrawableManiaHitObject)hitObject;
+            maniaObject.Direction = direction;
+
             hitObject.AccentColour = AccentColour;
             hitObject.OnJudgement += OnJudgement;
 
