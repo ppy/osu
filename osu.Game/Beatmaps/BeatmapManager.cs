@@ -83,10 +83,29 @@ namespace osu.Game.Beatmaps
         {
             model.Beatmaps = createBeatmapDifficulties(archive);
 
-            // remove metadata from difficulties where it matches the set
             foreach (BeatmapInfo b in model.Beatmaps)
+            {
+                // remove metadata from difficulties where it matches the set
                 if (model.Metadata.Equals(b.Metadata))
                     b.Metadata = null;
+
+                // by setting the model here, we can update the noline set id below.
+                b.BeatmapSet = model;
+
+                fetchAndPopulateOnlineIDs(b);
+            }
+
+            // check if a set already exists with the same online id, delete if it does.
+            if (model.OnlineBeatmapSetID != null)
+            {
+                var existingOnlineId = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID);
+                if (existingOnlineId != null)
+                {
+                    Delete(existingOnlineId);
+                    beatmaps.PurgeDeletable(s => s.ID == existingOnlineId.ID);
+                    Logger.Log($"Found existing beatmap set with same OnlineBeatmapSetID ({model.OnlineBeatmapSetID}). It has been purged.", LoggingTarget.Database);
+                }
+            }
         }
 
         protected override BeatmapSetInfo CheckForExisting(BeatmapSetInfo model)
@@ -97,18 +116,6 @@ namespace osu.Game.Beatmaps
             {
                 Undelete(existingHashMatch);
                 return existingHashMatch;
-            }
-
-            // check if a set already exists with the same online id
-            if (model.OnlineBeatmapSetID != null)
-            {
-                var existingOnlineId = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID);
-                if (existingOnlineId != null)
-                {
-                    Delete(existingOnlineId);
-                    beatmaps.PurgeDeletable(s => s.ID == existingOnlineId.ID);
-                    Logger.Log($"Found existing beatmap set with same OnlineBeatmapSetID ({model.OnlineBeatmapSetID}). It has been purged.", LoggingTarget.Database);
-                }
             }
 
             return null;
@@ -318,7 +325,7 @@ namespace osu.Game.Beatmaps
 
             return new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID,
+                OnlineBeatmapSetID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
                 Hash = computeBeatmapSetHash(reader),
                 Metadata = beatmap.Metadata
@@ -370,6 +377,40 @@ namespace osu.Game.Beatmaps
             }
 
             return beatmapInfos;
+        }
+
+        /// <summary>
+        /// Query the API to populate mising OnlineBeatmapID / OnlineBeatmapSetID properties.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to populate.</param>
+        /// <param name="force">Whether to re-query if the provided beatmap already has populated values.</param>
+        /// <returns>True if population was successful.</returns>
+        private bool fetchAndPopulateOnlineIDs(BeatmapInfo beatmap, bool force = false)
+        {
+            if (!force && beatmap.OnlineBeatmapID != null && beatmap.BeatmapSet.OnlineBeatmapSetID != null)
+                return true;
+
+            Logger.Log("Attempting online lookup for IDs...", LoggingTarget.Database);
+
+            try
+            {
+                var req = new GetBeatmapRequest(beatmap);
+
+                req.Perform(api);
+
+                var res = req.Result;
+
+                Logger.Log($"Successfully mapped to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.", LoggingTarget.Database);
+
+                beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
+                beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Failed ({e})", LoggingTarget.Database);
+                return false;
+            }
         }
 
         /// <summary>
