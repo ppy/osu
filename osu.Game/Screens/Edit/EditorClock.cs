@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Configuration;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -24,12 +23,12 @@ namespace osu.Game.Screens.Edit
 
         private readonly BindableBeatDivisor beatDivisor;
 
-        public EditorClock(Bindable<WorkingBeatmap> beatmap, BindableBeatDivisor beatDivisor)
+        public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor = beatDivisor;
 
-            ControlPointInfo = beatmap.Value.Beatmap.ControlPointInfo;
-            TrackLength = beatmap.Value.Track.Length;
+            ControlPointInfo = beatmap.Beatmap.ControlPointInfo;
+            TrackLength = beatmap.Track.Length;
         }
 
         public EditorClock(ControlPointInfo controlPointInfo, double trackLength, BindableBeatDivisor beatDivisor)

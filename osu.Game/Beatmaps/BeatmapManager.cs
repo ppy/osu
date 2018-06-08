@@ -170,7 +170,7 @@ namespace osu.Game.Beatmaps
             {
                 if (error is OperationCanceledException) return;
 
-                downloadNotification.State = ProgressNotificationState.Completed;
+                downloadNotification.State = ProgressNotificationState.Cancelled;
                 Logger.Error(error, "Beatmap download failed!");
                 currentDownloads.Remove(request);
             };

@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -21,6 +22,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -36,6 +38,8 @@ namespace osu.Game.Screens.Play
         protected override float BackgroundParallaxAmount => 0.1f;
 
         protected override bool HideOverlaysOnEnter => true;
+
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         public Action RestartRequested;
 
@@ -117,7 +121,7 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap);
+                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap.Value);
                 }
 
                 if (!RulesetContainer.Objects.Any())
@@ -143,8 +147,12 @@ namespace osu.Game.Screens.Play
 
             adjustableClock.ProcessFrame();
 
+            // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
+            // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
+            var platformOffsetClock = new FramedOffsetClock(adjustableClock) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 22 : 0 };
+
             // the final usable gameplay clock with user-set offsets applied.
-            var offsetClock = new FramedOffsetClock(adjustableClock);
+            var offsetClock = new FramedOffsetClock(platformOffsetClock);
 
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
@@ -364,7 +372,7 @@ namespace osu.Game.Screens.Play
             Background?.FadeTo(1f, fade_out_duration);
         }
 
-        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
+        protected override bool OnScroll(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
 
         private void initializeStoryboard(bool asyncLoad)
         {

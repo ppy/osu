@@ -264,7 +264,8 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private string createTemporaryBeatmap()
         {
-            var temp = new FileInfo(osz_path).CopyTo(Path.GetTempFileName(), true).FullName;
+            var temp = Path.GetTempFileName() + ".osz";
+            File.Copy(osz_path, temp, true);
             Assert.IsTrue(File.Exists(temp));
             return temp;
         }
@@ -344,12 +345,12 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
         {
-            Action waitAction = () =>
+            Task task = Task.Run(() =>
             {
                 while (!result()) Thread.Sleep(200);
-            };
+            });
 
-            Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout), failureMessage);
+            Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
     }
 }
