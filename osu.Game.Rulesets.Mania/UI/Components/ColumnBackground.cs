@@ -18,19 +18,16 @@ namespace osu.Game.Rulesets.Mania.UI.Components
     {
         public ManiaAction Action;
 
-        private readonly ScrollingDirection direction;
-
         private Box background;
         private Box backgroundOverlay;
 
-        public ColumnBackground(ScrollingDirection direction)
-        {
-            this.direction = direction;
-        }
+        private ScrollingInfo scrollingInfo;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ScrollingInfo scrollingInfo)
         {
+            this.scrollingInfo = scrollingInfo;
+
             InternalChildren = new[]
             {
                 background = new Box
@@ -44,8 +41,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     Name = "Background Gradient Overlay",
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
-                    Anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
-                    Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
+                    Anchor = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
+                    Origin = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
                     Blending = BlendingMode.Additive,
                     Alpha = 0
                 }
@@ -84,8 +81,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             var dimPoint = AccentColour.Opacity(0);
 
             backgroundOverlay.Colour = ColourInfo.GradientVertical(
-                direction == ScrollingDirection.Up ? brightPoint : dimPoint,
-                direction == ScrollingDirection.Up ? dimPoint : brightPoint);
+                scrollingInfo.Direction == ScrollingDirection.Up ? brightPoint : dimPoint,
+                scrollingInfo.Direction == ScrollingDirection.Up ? dimPoint : brightPoint);
         }
 
         public bool OnPressed(ManiaAction action)

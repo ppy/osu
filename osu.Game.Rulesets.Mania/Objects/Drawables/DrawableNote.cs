@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -29,26 +31,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             CornerRadius = 5;
             Masking = true;
 
-            InternalChildren = new Drawable[]
-            {
-                headPiece = new NotePiece
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                }
-            };
+            InternalChild = headPiece = new NotePiece();
         }
 
-        public override ScrollingDirection Direction
+        [BackgroundDependencyLoader]
+        private void load(ScrollingInfo scrollingInfo)
         {
-            set
-            {
-                base.Direction = value;
-
-                headPiece.Direction = value;
-                headPiece.Anchor = Anchor;
-                headPiece.Origin = Origin;
-            }
+            headPiece.Anchor = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+            headPiece.Origin = headPiece.Anchor;
         }
 
         public override Color4 AccentColour

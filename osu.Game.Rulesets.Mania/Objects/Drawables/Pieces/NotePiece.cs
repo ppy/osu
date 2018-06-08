@@ -1,12 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
@@ -43,13 +45,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             };
         }
 
-        public ScrollingDirection Direction
+        [BackgroundDependencyLoader]
+        private void load(ScrollingInfo scrollingInfo)
         {
-            set
-            {
-                colouredBox.Anchor = value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
-                colouredBox.Origin = colouredBox.Anchor;
-            }
+            colouredBox.Anchor = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+            colouredBox.Origin = colouredBox.Anchor;
         }
 
         private Color4 accentColour;

@@ -36,6 +36,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
+        private ScrollingInfo scrollingInfo;
+
         public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
@@ -73,7 +75,19 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
         }
 
-        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(ScrollingDirection.Up, Beatmap.Stages)
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        {
+            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+
+            scrollingInfo = new ScrollingInfo(ScrollingDirection.Up);
+            dependencies.Cache(scrollingInfo);
+
+            return dependencies;
+        }
+
+        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(scrollingInfo.Direction, Beatmap.Stages)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,

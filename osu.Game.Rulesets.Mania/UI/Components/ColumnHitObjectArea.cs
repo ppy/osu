@@ -20,32 +20,25 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         private Container<Drawable> content;
         protected override Container<Drawable> Content => content;
 
-        private readonly ScrollingDirection direction;
-
         private Container hitTargetBar;
 
-        public ColumnHitObjectArea(ScrollingDirection direction)
-        {
-            this.direction = direction;
-        }
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ScrollingInfo scrollingInfo)
         {
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
-                    Anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
-                    Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
+                    Anchor = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
+                    Origin = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = hit_target_height,
                     Colour = Color4.Black
                 },
                 hitTargetBar = new Container
                 {
-                    Anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
-                    Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
+                    Anchor = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
+                    Origin = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = hit_target_bar_height,
                     Masking = true,
