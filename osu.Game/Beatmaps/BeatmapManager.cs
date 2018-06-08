@@ -81,7 +81,7 @@ namespace osu.Game.Beatmaps
 
         protected override void Populate(BeatmapSetInfo model, ArchiveReader archive)
         {
-            model.Beatmaps = createBeatmapDifficulties(model, archive);
+            model.Beatmaps = createBeatmapDifficulties(archive);
 
             // remove metadata from difficulties where it matches the set
             foreach (BeatmapInfo b in model.Beatmaps)
@@ -318,7 +318,7 @@ namespace osu.Game.Beatmaps
 
             return new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = beatmap.BeatmapInfo.OnlineBeatmapSetID,
+                OnlineBeatmapSetID = beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
                 Hash = computeBeatmapSetHash(reader),
                 Metadata = beatmap.Metadata
@@ -328,7 +328,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Create all required <see cref="BeatmapInfo"/>s for the provided archive.
         /// </summary>
-        private List<BeatmapInfo> createBeatmapDifficulties(BeatmapSetInfo model, ArchiveReader reader)
+        private List<BeatmapInfo> createBeatmapDifficulties(ArchiveReader reader)
         {
             var beatmapInfos = new List<BeatmapInfo>();
 
@@ -347,9 +347,6 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Path = name;
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
-
-                    // ensure we have the same online set ID as the set itself.
-                    beatmap.BeatmapInfo.OnlineBeatmapSetID = model.OnlineBeatmapSetID;
 
                     // check that no existing beatmap exists that is imported with the same online beatmap ID. if so, give it precedence.
                     if (beatmap.BeatmapInfo.OnlineBeatmapID.HasValue && QueryBeatmap(b => b.OnlineBeatmapID.Value == beatmap.BeatmapInfo.OnlineBeatmapID.Value) != null)
