@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Mania.UI
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
 
-        public ManiaPlayfield(List<StageDefinition> stageDefinitions)
-            : base(ScrollingDirection.Up)
+        public ManiaPlayfield(ScrollingDirection direction, List<StageDefinition> stageDefinitions)
+            : base(direction)
         {
             if (stageDefinitions == null)
                 throw new ArgumentNullException(nameof(stageDefinitions));
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.UI
             int firstColumnIndex = 0;
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                var newStage = new ManiaStage(direction, firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
 
                 playfieldGrid.Content[0][i] = newStage;

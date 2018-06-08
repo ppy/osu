@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override Container<Drawable> Content => hitObjectArea;
 
-        public Column(ScrollingDirection direction = ScrollingDirection.Up)
+        public Column(ScrollingDirection direction)
             : base(direction)
         {
             RelativeSizeAxes = Axes.Y;
