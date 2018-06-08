@@ -96,20 +96,6 @@ namespace osu.Game.Rulesets.Mania
                 yield return new ManiaModSuddenDeath();
         }
 
-        private static readonly Mod[] key_mods =
-        {
-            new MultiMod(),
-            new ManiaModKey1(),
-            new ManiaModKey2(),
-            new ManiaModKey3(),
-            new ManiaModKey4(),
-            new ManiaModKey5(),
-            new ManiaModKey6(),
-            new ManiaModKey7(),
-            new ManiaModKey8(),
-            new ManiaModKey9(),
-        };
-
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
             switch (type)
