@@ -59,7 +59,10 @@ namespace osu.Game.Online.API.Requests.Responses
                 Ruleset = rulesets.GetRuleset(ruleset),
                 StarDifficulty = starDifficulty,
                 OnlineBeatmapID = OnlineBeatmapID,
-                OnlineBeatmapSetID = OnlineBeatmapSetID,
+                BeatmapSet = new BeatmapSetInfo
+                {
+                    OnlineBeatmapSetID = OnlineBeatmapSetID,
+                },
                 Version = version,
                 BaseDifficulty = new BeatmapDifficulty
                 {

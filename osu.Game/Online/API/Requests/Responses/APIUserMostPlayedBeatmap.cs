@@ -25,7 +25,6 @@ namespace osu.Game.Online.API.Requests.Responses
         {
             BeatmapSetInfo setInfo = beatmapSet.ToBeatmapSet(rulesets);
             beatmap.BeatmapSet = setInfo;
-            beatmap.OnlineBeatmapSetID = setInfo.OnlineBeatmapSetID;
             beatmap.Metadata = setInfo.Metadata;
             return beatmap;
         }
