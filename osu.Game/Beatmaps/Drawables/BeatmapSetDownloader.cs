@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             // initial value
             if (set.OnlineBeatmapSetID != null)
-                Downloaded.Value = beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID && !s.DeletePending).Count() != 0;
+                Downloaded.Value = beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID && !s.DeletePending).Any();
         }
 
         protected override void Dispose(bool isDisposing)
