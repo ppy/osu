@@ -14,15 +14,14 @@ namespace osu.Game.Online.API
     {
         protected override WebRequest CreateWebRequest() => new JsonWebRequest<T>(Uri);
 
+        public T Result => ((JsonWebRequest<T>)WebRequest).ResponseObject;
+
         protected APIRequest()
         {
             base.Success += onSuccess;
         }
 
-        private void onSuccess()
-        {
-            Success?.Invoke(((JsonWebRequest<T>)WebRequest).ResponseObject);
-        }
+        private void onSuccess() => Success?.Invoke(Result);
 
         /// <summary>
         /// Invoked on successful completion of an API request.
