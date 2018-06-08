@@ -59,6 +59,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             base.LoadComplete();
 
             AddStep("note", createNote);
+            AddStep("hold note", createHoldNote);
         }
 
         private void createNote()
@@ -69,6 +70,17 @@ namespace osu.Game.Rulesets.Mania.Tests
                 obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
                 columns[i].Add(new DrawableNote(obj, columns[i].Action));
+            }
+        }
+
+        private void createHoldNote()
+        {
+            for (int i = 0; i < columns.Count; i++)
+            {
+                var obj = new HoldNote { Column = i, StartTime = Time.Current + 2000, Duration = 500 };
+                obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                columns[i].Add(new DrawableHoldNote(obj, columns[i].Action));
             }
         }
 
