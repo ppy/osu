@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -81,8 +82,9 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
-            scrollingInfo = new ScrollingInfo(ScrollingDirection.Up);
-            dependencies.Cache(scrollingInfo);
+            scrollingInfo = new ScrollingInfo { Direction = { Value = ScrollingDirection.Up } };
+
+            dependencies.CacheAs<IScrollingInfo>(scrollingInfo);
 
             return dependencies;
         }
@@ -119,5 +121,11 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
 
         protected override IRulesetConfigManager CreateConfig(Ruleset ruleset, SettingsStore settings) => new ManiaConfigManager(settings, Ruleset.RulesetInfo, Variant);
+
+        private class ScrollingInfo : IScrollingInfo
+        {
+            public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+            IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
+        }
     }
 }

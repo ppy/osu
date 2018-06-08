@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             columns.Add(column);
 
-            return new ScrollingTestContainer(new ScrollingInfo(direction))
+            return new ScrollingTestContainer(direction)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

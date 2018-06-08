@@ -15,7 +15,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -59,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             var note = new Note { StartTime = 999999999 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            return new ScrollingTestContainer(new ScrollingInfo(direction))
+            return new ScrollingTestContainer(direction)
             {
                 AutoSizeAxes = Axes.Both,
                 Child = new NoteContainer(direction, $"note, scrolling {direction.ToString().ToLower()}")
@@ -74,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             var note = new HoldNote { StartTime = 999999999, Duration = 1000 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            return new ScrollingTestContainer(new ScrollingInfo(direction))
+            return new ScrollingTestContainer(direction)
             {
                 AutoSizeAxes = Axes.Both,
                 Child = new NoteContainer(direction, $"hold note, scrolling {direction.ToString().ToLower()}")

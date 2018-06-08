@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -21,13 +22,11 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         private Box background;
         private Box backgroundOverlay;
 
-        private ScrollingInfo scrollingInfo;
+        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         [BackgroundDependencyLoader]
-        private void load(ScrollingInfo scrollingInfo)
+        private void load(IScrollingInfo scrollingInfo)
         {
-            this.scrollingInfo = scrollingInfo;
-
             InternalChildren = new[]
             {
                 background = new Box
@@ -41,12 +40,18 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     Name = "Background Gradient Overlay",
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
-                    Anchor = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
-                    Origin = scrollingInfo.Direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
                     Blending = BlendingMode.Additive,
                     Alpha = 0
                 }
             };
+
+            direction.BindTo(scrollingInfo.Direction);
+            direction.BindValueChanged(direction =>
+            {
+                backgroundOverlay.Anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                backgroundOverlay.Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                updateColours();
+            }, true);
         }
 
         protected override void LoadComplete()
@@ -81,8 +86,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             var dimPoint = AccentColour.Opacity(0);
 
             backgroundOverlay.Colour = ColourInfo.GradientVertical(
-                scrollingInfo.Direction == ScrollingDirection.Up ? brightPoint : dimPoint,
-                scrollingInfo.Direction == ScrollingDirection.Up ? dimPoint : brightPoint);
+                direction.Value == ScrollingDirection.Up ? brightPoint : dimPoint,
+                direction.Value == ScrollingDirection.Up ? dimPoint : brightPoint);
         }
 
         public bool OnPressed(ManiaAction action)
