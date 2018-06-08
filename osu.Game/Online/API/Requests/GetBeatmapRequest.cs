@@ -6,15 +6,17 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetBeatmapDetailsRequest : APIRequest<APIBeatmapMetrics>
+    public class GetBeatmapRequest : APIRequest<APIBeatmap>
     {
         private readonly BeatmapInfo beatmap;
 
-        public GetBeatmapDetailsRequest(BeatmapInfo beatmap)
+        private string lookupString => beatmap.OnlineBeatmapID > 0 ? beatmap.OnlineBeatmapID.ToString() : $@"lookup?checksum={beatmap.Hash}&filename={System.Uri.EscapeUriString(beatmap.Path)}";
+
+        public GetBeatmapRequest(BeatmapInfo beatmap)
         {
             this.beatmap = beatmap;
         }
 
-        protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}";
+        protected override string Target => $@"beatmaps/{lookupString}";
     }
 }
