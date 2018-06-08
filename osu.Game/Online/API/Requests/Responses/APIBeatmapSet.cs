@@ -1,16 +1,16 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using System;
 
-namespace osu.Game.Online.API.Requests
+namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIResponseBeatmapSet : BeatmapMetadata // todo: this is a bit wrong...
+    public class APIBeatmapSet : BeatmapMetadata // todo: this is a bit wrong...
     {
         [JsonProperty(@"covers")]
         private BeatmapSetOnlineCovers covers { get; set; }
