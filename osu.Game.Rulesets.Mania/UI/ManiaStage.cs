@@ -43,8 +43,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly int firstColumnIndex;
 
-        public ManiaStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
-            : base(ScrollingDirection.Up)
+        public ManiaStage(ScrollingDirection direction, int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
+            : base(direction)
         {
             this.firstColumnIndex = firstColumnIndex;
 
@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < definition.Columns; i++)
             {
                 var isSpecial = definition.IsSpecialColumn(i);
-                var column = new Column
+                var column = new Column(direction)
                 {
                     IsSpecial = isSpecial,
                     Action = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++
