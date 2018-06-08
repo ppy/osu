@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        protected override bool OnSelectionFinalised()
+        protected override bool OnStart()
         {
             if (player != null) return false;
 

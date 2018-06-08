@@ -73,6 +73,7 @@ namespace osu.Game.Online.API
                 throw new TimeoutException(@"API request timeout hit");
 
             WebRequest = CreateWebRequest();
+            WebRequest.Failed += Fail;
             WebRequest.AllowRetryOnTimeout = false;
             WebRequest.AddHeader("Authorization", $"Bearer {api.AccessToken}");
 
