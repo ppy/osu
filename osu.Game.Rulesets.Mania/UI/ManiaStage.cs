@@ -9,7 +9,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
@@ -78,6 +77,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
                             Masking = true,
+                            CornerRadius = 5,
                             Children = new Drawable[]
                             {
                                 new Box
@@ -183,15 +183,15 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             normalColumnColours = new List<Color4>
             {
-                colours.RedDark,
-                colours.GreenDark
+                new Color4(94, 0, 57, 255),
+                new Color4(6, 84, 0, 255)
             };
 
-            specialColumnColour = colours.BlueDark;
+            specialColumnColour = new Color4(0, 48, 63, 255);
 
             // Set the special column + colour + key
             foreach (var column in Columns)
