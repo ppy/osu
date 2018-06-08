@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -46,20 +47,36 @@ namespace osu.Game.Database
         public DatabaseWriteUsage GetForWrite(bool withTransaction = true)
         {
             Monitor.Enter(writeLock);
+            OsuDbContext context;
 
-            if (currentWriteTransaction == null && withTransaction)
+            try
             {
-                // this mitigates the fact that changes on tracked entities will not be rolled back with the transaction by ensuring write operations are always executed in isolated contexts.
-                // if this results in sub-optimal efficiency, we may need to look into removing Database-level transactions in favour of running SaveChanges where we currently commit the transaction.
-                if (threadContexts.IsValueCreated)
-                    recycleThreadContexts();
+                if (currentWriteTransaction == null && withTransaction)
+                {
+                    // this mitigates the fact that changes on tracked entities will not be rolled back with the transaction by ensuring write operations are always executed in isolated contexts.
+                    // if this results in sub-optimal efficiency, we may need to look into removing Database-level transactions in favour of running SaveChanges where we currently commit the transaction.
+                    if (threadContexts.IsValueCreated)
+                        recycleThreadContexts();
 
-                currentWriteTransaction = threadContexts.Value.Database.BeginTransaction();
+                    context = threadContexts.Value;
+                    currentWriteTransaction = context.Database.BeginTransaction();
+                }
+                else
+                {
+                    // we want to try-catch the retrieval of the context because it could throw an error (in CreateContext).
+                    context = threadContexts.Value;
+                }
+            }
+            catch (Exception e)
+            {
+                // retrieval of a context could trigger a fatal error.
+                Monitor.Exit(writeLock);
+                throw;
             }
 
             Interlocked.Increment(ref currentWriteUsages);
 
-            return new DatabaseWriteUsage(threadContexts.Value, usageCompleted) { IsTransactionLeader = currentWriteTransaction != null && currentWriteUsages == 1 };
+            return new DatabaseWriteUsage(context, usageCompleted) { IsTransactionLeader = currentWriteTransaction != null && currentWriteUsages == 1 };
         }
 
         private void usageCompleted(DatabaseWriteUsage usage)
@@ -100,19 +117,18 @@ namespace osu.Game.Database
 
         private void recycleThreadContexts() => threadContexts = new ThreadLocal<OsuDbContext>(CreateContext);
 
-        protected virtual OsuDbContext CreateContext()
+        protected virtual OsuDbContext CreateContext() => new OsuDbContext(host.Storage.GetDatabaseConnectionString(database_name))
         {
-            var ctx = new OsuDbContext(host.Storage.GetDatabaseConnectionString(database_name));
-            ctx.Database.AutoTransactionsEnabled = false;
-
-            return ctx;
-        }
+            Database = { AutoTransactionsEnabled = false }
+        };
 
         public void ResetDatabase()
         {
             lock (writeLock)
             {
                 recycleThreadContexts();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
                 host.Storage.DeleteDatabase(database_name);
             }
         }

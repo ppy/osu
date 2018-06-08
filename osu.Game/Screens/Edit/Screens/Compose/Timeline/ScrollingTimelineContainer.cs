@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using OpenTK;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -17,7 +18,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         public readonly Bindable<bool> HitObjectsVisible = new Bindable<bool>();
         public readonly Bindable<bool> HitSoundsVisible = new Bindable<bool>();
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
-        public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         private readonly BeatmapWaveformGraph waveform;
 
@@ -36,11 +38,19 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             Content.AutoSizeAxes = Axes.None;
             Content.RelativeSizeAxes = Axes.Both;
 
-            waveform.Beatmap.BindTo(Beatmap);
             WaveformVisible.ValueChanged += waveformVisibilityChanged;
 
             Zoom = 10;
         }
+
+        [BackgroundDependencyLoader]
+        private void load(IBindableBeatmap beatmap)
+        {
+            this.beatmap.BindTo(beatmap);
+            this.beatmap.BindValueChanged(beatmapChanged, true);
+        }
+
+        private void beatmapChanged(WorkingBeatmap beatmap) => waveform.Beatmap = beatmap;
 
         private float minZoom = 1;
         /// <summary>
@@ -123,15 +133,15 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         /// </summary>
         private float? localZoomTarget;
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
             if (!state.Keyboard.ControlPressed)
-                return base.OnWheel(state);
+                return base.OnScroll(state);
 
             relativeContentZoomTarget = Content.ToLocalSpace(state.Mouse.NativeState.Position).X / Content.DrawSize.X;
             localZoomTarget = ToLocalSpace(state.Mouse.NativeState.Position).X;
 
-            Zoom += state.Mouse.WheelDelta;
+            Zoom += state.Mouse.ScrollDelta.Y;
 
             return true;
         }
