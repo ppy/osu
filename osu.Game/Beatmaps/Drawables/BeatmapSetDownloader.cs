@@ -8,6 +8,9 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
+    /// <summary>
+    /// A component to allow downloading of a beatmap set. Automatically handles state syncing between other instances.
+    /// </summary>
     public class BeatmapSetDownloader : Component
     {
         private readonly BeatmapSetInfo set;
@@ -15,6 +18,9 @@ namespace osu.Game.Beatmaps.Drawables
 
         private BeatmapManager beatmaps;
 
+        /// <summary>
+        /// Whether the associated beatmap set has been downloading (by this instance or any other instance).
+        /// </summary>
         public readonly BindableBool Downloaded = new BindableBool();
 
         public BeatmapSetDownloader(BeatmapSetInfo set, bool noVideo = false)
@@ -47,6 +53,10 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
+        /// <summary>
+        /// Begin downloading the associated beatmap set.
+        /// </summary>
+        /// <returns>True if downloading began. False if an existing download is active or completed.</returns>
         public bool Download()
         {
             if (Downloaded.Value)
