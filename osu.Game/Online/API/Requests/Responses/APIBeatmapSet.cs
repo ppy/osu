@@ -46,12 +46,13 @@ namespace osu.Game.Online.API.Requests.Responses
         private DateTimeOffset lastUpdated { get; set; }
 
         [JsonProperty(@"user_id")]
-        private long creatorId {
+        private long creatorId
+        {
             set { Author.Id = value; }
         }
 
         [JsonProperty(@"beatmaps")]
-        private IEnumerable<APIResponseBeatmap> beatmaps { get; set; }
+        private IEnumerable<APIBeatmap> beatmaps { get; set; }
 
         public BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
         {
@@ -75,75 +76,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 },
                 Beatmaps = beatmaps?.Select(b => b.ToBeatmap(rulesets)).ToList(),
             };
-        }
-
-        private class APIResponseBeatmap : BeatmapMetadata
-        {
-            [JsonProperty(@"id")]
-            private int onlineBeatmapID { get; set; }
-
-            [JsonProperty(@"playcount")]
-            private int playCount { get; set; }
-
-            [JsonProperty(@"passcount")]
-            private int passCount { get; set; }
-
-            [JsonProperty(@"mode_int")]
-            private int ruleset { get; set; }
-
-            [JsonProperty(@"difficulty_rating")]
-            private double starDifficulty { get; set; }
-
-            [JsonProperty(@"drain")]
-            private float drainRate { get; set; }
-
-            [JsonProperty(@"cs")]
-            private float circleSize { get; set; }
-
-            [JsonProperty(@"ar")]
-            private float approachRate { get; set; }
-
-            [JsonProperty(@"accuracy")]
-            private float overallDifficulty { get; set; }
-
-            [JsonProperty(@"total_length")]
-            private double length { get; set; }
-
-            [JsonProperty(@"count_circles")]
-            private int circleCount { get; set; }
-
-            [JsonProperty(@"count_sliders")]
-            private int sliderCount { get; set; }
-
-            [JsonProperty(@"version")]
-            private string version { get; set; }
-
-            public BeatmapInfo ToBeatmap(RulesetStore rulesets)
-            {
-                return new BeatmapInfo
-                {
-                    Metadata = this,
-                    Ruleset = rulesets.GetRuleset(ruleset),
-                    StarDifficulty = starDifficulty,
-                    OnlineBeatmapID = onlineBeatmapID,
-                    Version = version,
-                    BaseDifficulty = new BeatmapDifficulty
-                    {
-                        DrainRate = drainRate,
-                        CircleSize = circleSize,
-                        ApproachRate = approachRate,
-                        OverallDifficulty = overallDifficulty,
-                    },
-                    OnlineInfo = new BeatmapOnlineInfo
-                    {
-                        PlayCount = playCount,
-                        PassCount = passCount,
-                        Length = length,
-                        CircleCount = circleCount,
-                        SliderCount = sliderCount,
-                    },
-                };
-            }
         }
     }
 }
