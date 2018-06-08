@@ -30,6 +30,9 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty(@"video")]
         private bool hasVideo { get; set; }
 
+        [JsonProperty(@"storyboard")]
+        private bool hasStoryboard { get; set; }
+
         [JsonProperty(@"status")]
         private BeatmapSetOnlineStatus status { get; set; }
 
@@ -65,6 +68,7 @@ namespace osu.Game.Online.API.Requests
                     BPM = bpm,
                     Status = status,
                     HasVideo = hasVideo,
+                    HasStoryboard = hasStoryboard,
                     Submitted = submitted,
                     Ranked = ranked,
                     LastUpdated = lastUpdated,
