@@ -3,10 +3,31 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
-    public abstract class DrawableManiaHitObject<TObject> : DrawableHitObject<ManiaHitObject>
+    public abstract class DrawableManiaHitObject : DrawableHitObject<ManiaHitObject>
+    {
+        protected DrawableManiaHitObject(ManiaHitObject hitObject)
+            : base(hitObject)
+        {
+        }
+
+        /// <summary>
+        /// Sets the scrolling direction.
+        /// </summary>
+        public virtual ScrollingDirection Direction
+        {
+            set
+            {
+                Anchor = value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+                Origin = Anchor;
+            }
+        }
+    }
+
+    public abstract class DrawableManiaHitObject<TObject> : DrawableManiaHitObject
         where TObject : ManiaHitObject
     {
         /// <summary>
