@@ -306,22 +306,22 @@ namespace osu.Game.Beatmaps
             return hashable.ComputeSHA2Hash();
         }
 
-       protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
+        protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
             if (string.IsNullOrEmpty(mapName)) throw new InvalidOperationException("No beatmap files found in this beatmap archive.");
 
-            BeatmapMetadata metadata;
+            Beatmap beatmap;
             using (var stream = new StreamReader(reader.GetStream(mapName)))
-                metadata = Decoder.GetDecoder<Beatmap>(stream).Decode(stream).Metadata;
+                beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
 
             return new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
+                OnlineBeatmapSetID = beatmap.BeatmapInfo.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
                 Hash = computeBeatmapSetHash(reader),
-                Metadata = metadata
+                Metadata = beatmap.Metadata
             };
         }
 
@@ -350,7 +350,6 @@ namespace osu.Game.Beatmaps
 
                     // ensure we have the same online set ID as the set itself.
                     beatmap.BeatmapInfo.OnlineBeatmapSetID = model.OnlineBeatmapSetID;
-                    beatmap.BeatmapInfo.Metadata.OnlineBeatmapSetID = model.OnlineBeatmapSetID;
 
                     // check that no existing beatmap exists that is imported with the same online beatmap ID. if so, give it precedence.
                     if (beatmap.BeatmapInfo.OnlineBeatmapID.HasValue && QueryBeatmap(b => b.OnlineBeatmapID.Value == beatmap.BeatmapInfo.OnlineBeatmapID.Value) != null)
