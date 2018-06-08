@@ -148,7 +148,10 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!judgement.IsHit || !judgedObject.DisplayJudgement)
                 return;
 
-            explosionContainer.Add(new HitExplosion(judgedObject));
+            explosionContainer.Add(new HitExplosion(judgedObject)
+            {
+                Anchor = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre
+            });
         }
 
         public bool OnPressed(ManiaAction action)
