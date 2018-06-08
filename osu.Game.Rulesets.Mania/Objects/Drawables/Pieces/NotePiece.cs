@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 {
@@ -40,6 +41,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                     Alpha = 0.2f
                 }
             };
+        }
+
+        public ScrollingDirection Direction
+        {
+            set
+            {
+                colouredBox.Anchor = value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+                colouredBox.Origin = colouredBox.Anchor;
+            }
         }
 
         private Color4 accentColour;
