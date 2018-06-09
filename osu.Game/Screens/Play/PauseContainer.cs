@@ -6,11 +6,11 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
 using OpenTK.Graphics;
-using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -131,23 +131,12 @@ namespace osu.Game.Screens.Play
             base.Update();
         }
 
-        public class PauseOverlay : GameplayMenuOverlay
+        public class PauseOverlay : GameplayMenuOverlay, IKeyBindingHandler<GlobalAction>
         {
             public Action OnResume;
 
             public override string Header => "paused";
             public override string Description => "you're not going to do what i think you're going to do, are ya?";
-
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-            {
-                if (!args.Repeat && args.Key == Key.Escape)
-                {
-                    InternalButtons.Children.First().TriggerOnClick();
-                    return true;
-                }
-
-                return base.OnKeyDown(state, args);
-            }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -156,6 +145,19 @@ namespace osu.Game.Screens.Play
                 AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
                 AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
             }
+            
+            public bool OnPressed(GlobalAction action)
+            {
+                if (action == GlobalAction.Back)
+                {
+                    InternalButtons.Children.First().TriggerOnClick();
+                    return true;
+                }
+
+                return false;
+            }
+
+            public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
         }
     }
 }
