@@ -1,19 +1,20 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Linq;
 using osu.Game.Graphics;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using System.Linq;
-using osu.Framework.Input.Bindings;
-using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class FailOverlay : GameplayMenuOverlay, IKeyBindingHandler<GlobalAction>
+    public class FailOverlay : GameplayMenuOverlay
     {
         public override string Header => "failed";
         public override string Description => "you're dead, try again?";
+
+        protected override Action DefaultBackAction => () => InternalButtons.Children.Last().TriggerOnClick();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -21,18 +22,5 @@ namespace osu.Game.Screens.Play
             AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
             AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
         }
-        
-        public bool OnPressed(GlobalAction action)
-        {
-            if (action == GlobalAction.Back)
-            {
-                InternalButtons.Children.Last().TriggerOnClick();
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
     }
 }

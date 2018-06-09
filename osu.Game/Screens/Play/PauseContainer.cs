@@ -2,14 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
-using osu.Game.Input.Bindings;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
@@ -131,7 +128,7 @@ namespace osu.Game.Screens.Play
             base.Update();
         }
 
-        public class PauseOverlay : GameplayMenuOverlay, IKeyBindingHandler<GlobalAction>
+        public class PauseOverlay : GameplayMenuOverlay
         {
             public Action OnResume;
 
@@ -145,19 +142,6 @@ namespace osu.Game.Screens.Play
                 AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
                 AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
             }
-            
-            public bool OnPressed(GlobalAction action)
-            {
-                if (action == GlobalAction.Back)
-                {
-                    InternalButtons.Children.First().TriggerOnClick();
-                    return true;
-                }
-
-                return false;
-            }
-
-            public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
         }
     }
 }
