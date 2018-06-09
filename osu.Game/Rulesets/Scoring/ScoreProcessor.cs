@@ -301,7 +301,8 @@ namespace osu.Game.Rulesets.Scoring
                     TotalScore.Value = max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo / maxHighestCombo) + bonusScore;
                     break;
                 case ScoringMode.Exponential:
-                    TotalScore.Value = (baseScore + bonusScore) * Math.Max(0, HighestCombo - 1) / 25f;
+                    // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
+                    TotalScore.Value = bonusScore + baseScore * (1 + Math.Max(0, HighestCombo - 1) / 25);
                     break;
             }
         }
