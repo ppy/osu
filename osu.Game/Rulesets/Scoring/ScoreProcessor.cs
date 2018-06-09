@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Scoring
 
             if (maxBaseScore == 0 || maxHighestCombo == 0)
             {
-                Mode.Value = ScoringMode.Exponential;
+                Mode.Value = ScoringMode.Classic;
                 Mode.Disabled = true;
             }
 
@@ -213,7 +213,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Simulates an autoplay of <see cref="HitObject"/>s that will be judged by this <see cref="ScoreProcessor{TObject}"/>
         /// by adding <see cref="Judgement"/>s for each <see cref="HitObject"/> in the <see cref="Beatmap{TObject}"/>.
         /// <para>
-        /// This is required for <see cref="ScoringMode.Standardised"/> to work, otherwise <see cref="ScoringMode.Exponential"/> will be used.
+        /// This is required for <see cref="ScoringMode.Standardised"/> to work, otherwise <see cref="ScoringMode.Classic"/> will be used.
         /// </para>
         /// </summary>
         /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> containing the <see cref="HitObject"/>s that will be judged by this <see cref="ScoreProcessor{TObject}"/>.</param>
@@ -300,7 +300,7 @@ namespace osu.Game.Rulesets.Scoring
                 case ScoringMode.Standardised:
                     TotalScore.Value = max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo / maxHighestCombo) + bonusScore;
                     break;
-                case ScoringMode.Exponential:
+                case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
                     TotalScore.Value = bonusScore + baseScore * (1 + Math.Max(0, HighestCombo - 1) / 25);
                     break;
@@ -328,6 +328,6 @@ namespace osu.Game.Rulesets.Scoring
     public enum ScoringMode
     {
         Standardised,
-        Exponential
+        Classic
     }
 }
