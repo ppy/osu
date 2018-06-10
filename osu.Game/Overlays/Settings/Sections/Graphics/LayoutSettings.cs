@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -19,10 +19,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private FillFlowContainer letterboxSettings;
 
         private Bindable<bool> letterboxing;
+        private Bindable<Size> sizeFullscreen;
 
         private OsuGame game;
         private SettingsDropdown<int> resolutionDropdown;
         private SettingsEnumDropdown<WindowMode> windowModeDropdown;
+
 
         private const int transition_duration = 400;
 
@@ -32,6 +34,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             this.game = game;
 
             letterboxing = config.GetBindable<bool>(FrameworkSetting.Letterboxing);
+            sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
+
+            var resolutions = getResolutions();
+            var resolutionDropdownBindable = new BindableInt(resolutions.FirstOrDefault(r => r.Key.StartsWith($"{sizeFullscreen.Value.Width}x{sizeFullscreen.Value.Height}")).Value);
+
+            resolutionDropdownBindable.ValueChanged += _ =>
+            {
+                var newResolution = resolutions.First(r => r.Value == _);
+                var newResolutionparts = newResolution.Key.Split('x');
+                sizeFullscreen.Value = new Size(int.Parse(newResolutionparts.First()), int.Parse(newResolutionparts.Last()));
+            };
 
             Children = new Drawable[]
             {
@@ -43,8 +56,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 resolutionDropdown = new SettingsDropdown<int>
                 {
                     LabelText = "Resolution",
-                    Items = getResolutions(),
-                    Bindable = config.GetBindable<int>(FrameworkSetting.FullscreenResolution)
+                    Items = resolutions,
+                    Bindable = resolutionDropdownBindable
                 },
                 new SettingsCheckbox
                 {
@@ -98,11 +111,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             letterboxing.TriggerChange();
         }
 
-        private IEnumerable<KeyValuePair<string, int>> getResolutions()
+        private List<KeyValuePair<string, int>> getResolutions()
         {
             var availableDisplayResolutions = (game.Window as DesktopGameWindow)?.AvailableDisplayResolutions;
+            if (availableDisplayResolutions == null)
+                return new List<KeyValuePair<string, int>>();
+            var availableDisplayResolutionsStr = availableDisplayResolutions.Select(r => $"{r.Width}x{r.Height}").Distinct().ToList();
 
-            return (availableDisplayResolutions ?? throw new InvalidOperationException()).Select((t, i) => new KeyValuePair<string, int>($"{t.Width}x{t.Height}@{t.RefreshRate}Hz", i));
+            return availableDisplayResolutionsStr.Select((t, i) => new KeyValuePair<string, int>(t, i)).ToList();
         }
     }
 }
