@@ -24,13 +24,23 @@ namespace osu.Game.Rulesets.Catch.Scoring
                 switch (obj)
                 {
                     case JuiceStream stream:
-                        foreach (var _ in stream.NestedHitObjects.Cast<CatchHitObject>())
-                            AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+                        foreach (var nestedObject in stream.NestedHitObjects)
+                            switch (nestedObject)
+                            {
+                                case TinyDroplet _:
+                                    AddJudgement(new CatchTinyDropletJudgement { Result = HitResult.Perfect });
+                                    break;
+                                case Droplet _:
+                                    AddJudgement(new CatchDropletJudgement { Result = HitResult.Perfect });
+                                    break;
+                                case Fruit _:
+                                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+                                    break;
+                            }
                         break;
                     case BananaShower shower:
                         foreach (var _ in shower.NestedHitObjects.Cast<CatchHitObject>())
-                            AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-                        AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+                            AddJudgement(new CatchBananaJudgement { Result = HitResult.Perfect });
                         break;
                     case Fruit _:
                         AddJudgement(new CatchJudgement { Result = HitResult.Perfect });

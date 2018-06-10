@@ -6,15 +6,8 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Judgements
 {
-    public class CatchJudgement : Judgement
+    public class CatchDropletJudgement : CatchJudgement
     {
-        public override HitResult MaxResult => HitResult.Perfect;
-
-        /// <summary>
-        /// The positional hit offset.
-        /// </summary>
-        public float PositionOffset;
-
         protected override int NumericResultFor(HitResult result)
         {
             switch (result)
@@ -22,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Judgements
                 default:
                     return 0;
                 case HitResult.Perfect:
-                    return 300;
+                    return 30;
             }
         }
     }

@@ -6,14 +6,9 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Judgements
 {
-    public class CatchJudgement : Judgement
+    public class CatchTinyDropletJudgement : CatchJudgement
     {
-        public override HitResult MaxResult => HitResult.Perfect;
-
-        /// <summary>
-        /// The positional hit offset.
-        /// </summary>
-        public float PositionOffset;
+        public override bool AffectsCombo => false;
 
         protected override int NumericResultFor(HitResult result)
         {
@@ -22,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Judgements
                 default:
                     return 0;
                 case HitResult.Perfect:
-                    return 300;
+                    return 10;
             }
         }
     }
