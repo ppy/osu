@@ -6,6 +6,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
     public class TaikoStrongHitJudgement : TaikoJudgement
     {
         public override bool AffectsCombo => false;
+        public override bool IsBonus => true;
 
         public TaikoStrongHitJudgement()
         {
