@@ -25,5 +25,26 @@ namespace osu.Game.Rulesets.Catch.Judgements
                     return 300;
             }
         }
+
+        /// <summary>
+        /// The base health increase for the result achieved.
+        /// </summary>
+        public float HealthIncrease => HealthIncreaseFor(Result);
+
+        /// <summary>
+        /// Convert a <see cref="HitResult"/> to a base health increase.
+        /// </summary>
+        /// <param name="result">The value to convert.</param>
+        /// <returns>The base health increase.</returns>
+        protected virtual float HealthIncreaseFor(HitResult result)
+        {
+            switch (result)
+            {
+                default:
+                    return 0;
+                case HitResult.Perfect:
+                    return 10.2f;
+            }
+        }
     }
 }
