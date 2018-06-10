@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (timeOffset >= 0)
-                AddJudgement(new Judgement { Result = NestedHitObjects.Cast<DrawableCatchHitObject>().Any(n => n.Judgements.Any(j => j.IsHit)) ? HitResult.Perfect : HitResult.Miss });
+                AddJudgement(new CatchBananaShowerJudgement());
         }
 
         protected override void AddNested(DrawableHitObject h)

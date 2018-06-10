@@ -6,6 +6,8 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Rulesets.Catch.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -19,6 +21,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Origin = Anchor.Centre;
             Size = new Vector2((float)CatchHitObject.OBJECT_RADIUS) / 4;
             Masking = false;
+        }
+
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        {
+            if (CheckPosition == null) return;
+
+            if (timeOffset >= 0)
+                AddJudgement(new CatchDropletJudgement { Result = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss });
         }
 
         [BackgroundDependencyLoader]
