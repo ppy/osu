@@ -19,6 +19,7 @@ using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Design;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Edit.Screens.Setup;
 
 namespace osu.Game.Screens.Edit
 {
@@ -172,6 +173,9 @@ namespace osu.Game.Screens.Edit
                     break;
                 case EditorScreenMode.Design:
                     currentScreen = new Design();
+                    break;
+                case EditorScreenMode.BeatmapSetup:
+                    currentScreen = new Setup();
                     break;
                 default:
                     currentScreen = new EditorScreen();

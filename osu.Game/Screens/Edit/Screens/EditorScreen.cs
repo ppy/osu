@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Edit.Screens
     /// <summary>
     /// TODO: eventually make this inherit Screen and add a local scren stack inside the Editor.
     /// </summary>
-    public class EditorScreen : Container
+    public class EditorScreen : OsuScreen // Change back to Container if problems occur
     {
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
