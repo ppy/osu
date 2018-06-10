@@ -9,6 +9,7 @@ namespace osu.Game.Rulesets.Catch.Judgements
     public class CatchBananaJudgement : CatchJudgement
     {
         public override bool AffectsCombo => false;
+        public override bool IsBonus => true;
 
         protected override int NumericResultFor(HitResult result)
         {

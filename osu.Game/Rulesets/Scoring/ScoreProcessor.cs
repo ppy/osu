@@ -256,13 +256,19 @@ namespace osu.Game.Rulesets.Scoring
                         break;
                 }
 
-                baseScore += judgement.NumericResult;
-                rollingMaxBaseScore += judgement.MaxNumericResult;
-
                 JudgedHits++;
             }
-            else if (judgement.IsHit)
-                bonusScore += judgement.NumericResult;
+
+            if (judgement.IsBonus)
+            {
+                if (judgement.IsHit)
+                    bonusScore += judgement.NumericResult;
+            }
+            else
+            {
+                baseScore += judgement.NumericResult;
+                rollingMaxBaseScore += judgement.MaxNumericResult;
+            }
         }
 
         /// <summary>
@@ -275,14 +281,18 @@ namespace osu.Game.Rulesets.Scoring
             HighestCombo.Value = judgement.HighestComboAtJudgement;
 
             if (judgement.AffectsCombo)
+                JudgedHits--;
+
+            if (judgement.IsBonus)
+            {
+                if (judgement.IsHit)
+                    bonusScore -= judgement.NumericResult;
+            }
+            else
             {
                 baseScore -= judgement.NumericResult;
                 rollingMaxBaseScore -= judgement.MaxNumericResult;
-
-                JudgedHits--;
             }
-            else if (judgement.IsHit)
-                bonusScore -= judgement.NumericResult;
         }
 
         private void updateScore()
