@@ -20,5 +20,16 @@ namespace osu.Game.Rulesets.Catch.Judgements
                     return 10;
             }
         }
+
+        protected override float HealthIncreaseFor(HitResult result)
+        {
+            switch (result)
+            {
+                default:
+                    return 0;
+                case HitResult.Perfect:
+                    return 4;
+            }
+        }
     }
 }

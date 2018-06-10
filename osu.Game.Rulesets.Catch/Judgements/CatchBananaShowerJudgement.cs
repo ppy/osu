@@ -16,5 +16,6 @@ namespace osu.Game.Rulesets.Catch.Judgements
         }
 
         protected override int NumericResultFor(HitResult result) => 0;
+        protected override float HealthIncreaseFor(HitResult result) => 0;
     }
 }
