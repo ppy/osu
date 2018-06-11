@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -24,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             InternalChild = bananaContainer = new Container { RelativeSizeAxes = Axes.Both };
 
-            foreach (var b in s.NestedHitObjects.Cast<BananaShower.Banana>())
+            foreach (var b in s.NestedHitObjects.Cast<Banana>())
                 AddNested(getVisualRepresentation?.Invoke(b));
         }
 
