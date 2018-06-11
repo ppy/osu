@@ -14,7 +14,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
+    public class Column : ManiaScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
         private const float column_width = 45;
         private const float special_column_width = 70;
@@ -35,8 +35,6 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        private readonly ScrollingDirection direction;
-
         private readonly ColumnBackground background;
         private readonly ColumnKeyArea keyArea;
         private readonly ColumnHitObjectArea hitObjectArea;
@@ -49,7 +47,6 @@ namespace osu.Game.Rulesets.Mania.UI
         public Column(ScrollingDirection direction)
             : base(direction)
         {
-            this.direction = direction;
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
 
@@ -58,19 +55,16 @@ namespace osu.Game.Rulesets.Mania.UI
 
             background = new ColumnBackground { RelativeSizeAxes = Axes.Both };
 
+            Container hitTargetContainer;
+
             InternalChildren = new[]
             {
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                new Container
+                hitTargetContainer = new Container
                 {
                     Name = "Hit target + hit objects",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding
-                    {
-                        Top = direction == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
-                        Bottom = direction == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
-                    },
                     Children = new Drawable[]
                     {
                         hitObjectArea = new ColumnHitObjectArea { RelativeSizeAxes = Axes.Both },
@@ -83,8 +77,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 },
                 keyArea = new ColumnKeyArea
                 {
-                    Anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
-                    Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = ManiaStage.HIT_TARGET_POSITION,
                 },
@@ -93,6 +85,18 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             TopLevelContainer.Add(explosionContainer.CreateProxy());
+
+            Direction.BindValueChanged(d =>
+            {
+                hitTargetContainer.Padding = new MarginPadding
+                {
+                    Top = d == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
+                    Bottom = d == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
+                };
+
+                keyArea.Anchor = d == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                keyArea.Origin = d == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+            }, true);
         }
 
         public override Axes RelativeSizeAxes => Axes.Y;
@@ -146,7 +150,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             explosionContainer.Add(new HitExplosion(judgedObject)
             {
-                Anchor = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre
+                Anchor = Direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre
             });
         }
 

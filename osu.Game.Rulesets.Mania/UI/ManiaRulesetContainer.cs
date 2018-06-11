@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -34,6 +35,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
+        private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
         private ScrollingInfo scrollingInfo;
 
         public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
@@ -68,9 +70,12 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ManiaConfigManager config)
         {
             BarLines.ForEach(Playfield.Add);
+
+            config.BindWith(ManiaSetting.ScrollDirection, configDirection);
+            configDirection.BindValueChanged(d => scrollingInfo.Direction.Value = (ScrollingDirection)d, true);
         }
 
         private DependencyContainer dependencies;
@@ -78,11 +83,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
         {
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
-
-            scrollingInfo = new ScrollingInfo { Direction = { Value = ScrollingDirection.Up } };
-
-            dependencies.CacheAs<IScrollingInfo>(scrollingInfo);
-
+            dependencies.CacheAs<IScrollingInfo>(scrollingInfo = new ScrollingInfo());
             return dependencies;
         }
 
