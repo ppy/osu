@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -26,6 +25,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         public event Action OnStart;
 
+        /// <summary>
+        /// A judgement is only displayed when the user has complete the swell (either a hit or miss).
+        /// </summary>
+        public override bool DisplayJudgement => AllJudged;
+
         private const float target_ring_thick_border = 1.4f;
         private const float target_ring_thin_border = 1f;
         private const float target_ring_scale = 5f;
@@ -34,11 +38,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
-
-        /// <summary>
-        /// The amount of times the user has hit this swell.
-        /// </summary>
-        private int userHits;
 
         private bool hasStarted;
         private readonly SwellSymbolPiece symbol;
@@ -136,9 +135,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             if (userTriggered)
             {
-                userHits++;
+                AddJudgement(new TaikoIntermediateSwellJudgement());
 
-                var completion = (float)userHits / HitObject.RequiredHits;
+                var completion = (float)Judgements.Count / HitObject.RequiredHits;
 
                 expandingRing
                     .FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
@@ -149,7 +148,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
-                if (userHits == HitObject.RequiredHits)
+                if (Judgements.Count == HitObject.RequiredHits)
                     AddJudgement(new TaikoJudgement { Result = HitResult.Great });
             }
             else
@@ -158,7 +157,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     return;
 
                 //TODO: THIS IS SHIT AND CAN'T EXIST POST-TAIKO WORLD CUP
-                AddJudgement(userHits > HitObject.RequiredHits / 2
+                AddJudgement(Judgements.Count > HitObject.RequiredHits / 2
                     ? new TaikoJudgement { Result = HitResult.Good }
                     : new TaikoJudgement { Result = HitResult.Miss });
             }
@@ -169,20 +168,21 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             const float preempt = 100;
             const float out_transition_time = 300;
 
-            double untilStartTime = HitObject.StartTime - Time.Current;
-            double untilJudgement = untilStartTime + (Judgements.FirstOrDefault()?.TimeOffset ?? 0) + HitObject.Duration;
-
-            targetRing.Delay(untilStartTime - preempt).ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
-            this.Delay(untilJudgement).FadeOut(out_transition_time, Easing.Out);
-
             switch (state)
             {
+                case ArmedState.Idle:
+                    expandingRing.FadeTo(0);
+                    using (BeginAbsoluteSequence(HitObject.StartTime - preempt, true))
+                        targetRing.ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
+                    break;
+                case ArmedState.Miss:
                 case ArmedState.Hit:
-                    bodyContainer.Delay(untilJudgement).ScaleTo(1.4f, out_transition_time);
+                    this.FadeOut(out_transition_time, Easing.Out);
+                    bodyContainer.ScaleTo(1.4f, out_transition_time);
+
+                    Expire();
                     break;
             }
-
-            Expire();
         }
 
         protected override void Update()
