@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -42,8 +42,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly InfoColumn statistics;
         private readonly ScoreModsContainer modsContainer;
 
-        private OnlineScore score;
-        public OnlineScore Score
+        private APIScore score;
+        public APIScore Score
         {
             get { return score; }
             set
