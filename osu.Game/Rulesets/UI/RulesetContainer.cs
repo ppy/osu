@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
@@ -86,27 +85,21 @@ namespace osu.Game.Rulesets.UI
             Cursor = CreateCursor();
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] OnScreenDisplay onScreenDisplay, [CanBeNull] SettingsStore settings)
-        {
-            this.onScreenDisplay = onScreenDisplay;
-
-            if (settings != null)
-            {
-                rulesetConfig = Ruleset.CreateConfig(settings);
-
-                if (rulesetConfig != null)
-                {
-                    dependencies.Cache(rulesetConfig);
-                    onScreenDisplay?.BeginTracking(this, rulesetConfig);
-                }
-            }
-        }
-
-        private DependencyContainer dependencies;
-
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        {
+            var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+
+            onScreenDisplay = dependencies.Get<OnScreenDisplay>();
+
+            rulesetConfig = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+            if (rulesetConfig != null)
+            {
+                dependencies.Cache(rulesetConfig);
+                onScreenDisplay?.BeginTracking(this, rulesetConfig);
+            }
+
+            return dependencies;
+        }
 
         public abstract ScoreProcessor CreateScoreProcessor();
 
