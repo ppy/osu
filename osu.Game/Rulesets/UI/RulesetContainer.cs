@@ -91,16 +91,11 @@ namespace osu.Game.Rulesets.UI
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
-            var settings = dependencies.Get<SettingsStore>();
-            if (settings != null)
+            rulesetConfig = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+            if (rulesetConfig != null)
             {
-                rulesetConfig = Ruleset.CreateConfig(settings);
-
-                if (rulesetConfig != null)
-                {
-                    dependencies.Cache(rulesetConfig);
-                    onScreenDisplay?.BeginTracking(this, rulesetConfig);
-                }
+                dependencies.Cache(rulesetConfig);
+                onScreenDisplay?.BeginTracking(this, rulesetConfig);
             }
 
             return dependencies;
