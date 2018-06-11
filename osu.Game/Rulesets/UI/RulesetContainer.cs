@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
@@ -86,16 +87,19 @@ namespace osu.Game.Rulesets.UI
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
+        private void load([CanBeNull] OnScreenDisplay onScreenDisplay, [CanBeNull] SettingsStore settings)
         {
             this.onScreenDisplay = onScreenDisplay;
 
-            rulesetConfig = CreateConfig(Ruleset, settings);
-
-            if (rulesetConfig != null)
+            if (settings != null)
             {
-                dependencies.Cache(rulesetConfig);
-                onScreenDisplay?.BeginTracking(this, rulesetConfig);
+                rulesetConfig = CreateConfig(Ruleset, settings);
+
+                if (rulesetConfig != null)
+                {
+                    dependencies.Cache(rulesetConfig);
+                    onScreenDisplay?.BeginTracking(this, rulesetConfig);
+                }
             }
         }
 
