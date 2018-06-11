@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Ranking
 
         private static readonly Vector2 background_blur = new Vector2(20);
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         private const float overscan = 1.3f;
 
@@ -274,10 +274,10 @@ namespace osu.Game.Screens.Ranking
                 switch (mode)
                 {
                     case ResultMode.Summary:
-                        currentPage = new ResultsPageScore(score, Beatmap);
+                        currentPage = new ResultsPageScore(score, Beatmap.Value);
                         break;
                     case ResultMode.Ranking:
-                        currentPage = new ResultsPageRanking(score, Beatmap);
+                        currentPage = new ResultsPageRanking(score, Beatmap.Value);
                         break;
                 }
 
