@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
@@ -61,6 +62,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             return starRating;
         }
+
+        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        {
+            new TaikoModDoubleTime(),
+            new TaikoModHalfTime(),
+            new TaikoModEasy(),
+            new TaikoModHardRock(),
+        };
 
         private bool calculateStrainValues()
         {

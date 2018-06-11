@@ -66,6 +66,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableInt HighestCombo = new BindableInt();
 
         /// <summary>
+        /// The <see cref="ScoringMode"/> used to calculate scores.
+        /// </summary>
+        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
+
+        /// <summary>
         /// Whether all <see cref="Judgement"/>s have been processed.
         /// </summary>
         protected virtual bool HasCompleted => false;
@@ -169,8 +174,6 @@ namespace osu.Game.Rulesets.Scoring
         private const double combo_portion = 0.7;
         private const double max_score = 1000000;
 
-        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
-
         protected sealed override bool HasCompleted => JudgedHits == MaxHits;
 
         protected int MaxHits { get; private set; }
@@ -199,16 +202,18 @@ namespace osu.Game.Rulesets.Scoring
 
             if (maxBaseScore == 0 || maxHighestCombo == 0)
             {
-                Mode.Value = ScoringMode.Exponential;
+                Mode.Value = ScoringMode.Classic;
                 Mode.Disabled = true;
             }
+
+            Mode.ValueChanged += _ => updateScore();
         }
 
         /// <summary>
         /// Simulates an autoplay of <see cref="HitObject"/>s that will be judged by this <see cref="ScoreProcessor{TObject}"/>
         /// by adding <see cref="Judgement"/>s for each <see cref="HitObject"/> in the <see cref="Beatmap{TObject}"/>.
         /// <para>
-        /// This is required for <see cref="ScoringMode.Standardised"/> to work, otherwise <see cref="ScoringMode.Exponential"/> will be used.
+        /// This is required for <see cref="ScoringMode.Standardised"/> to work, otherwise <see cref="ScoringMode.Classic"/> will be used.
         /// </para>
         /// </summary>
         /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> containing the <see cref="HitObject"/>s that will be judged by this <see cref="ScoreProcessor{TObject}"/>.</param>
@@ -295,8 +300,9 @@ namespace osu.Game.Rulesets.Scoring
                 case ScoringMode.Standardised:
                     TotalScore.Value = max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo / maxHighestCombo) + bonusScore;
                     break;
-                case ScoringMode.Exponential:
-                    TotalScore.Value = (baseScore + bonusScore) * Math.Log(HighestCombo + 1, 2);
+                case ScoringMode.Classic:
+                    // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
+                    TotalScore.Value = bonusScore + baseScore * (1 + Math.Max(0, HighestCombo - 1) / 25);
                     break;
             }
         }
@@ -322,6 +328,6 @@ namespace osu.Game.Rulesets.Scoring
     public enum ScoringMode
     {
         Standardised,
-        Exponential
+        Classic
     }
 }
