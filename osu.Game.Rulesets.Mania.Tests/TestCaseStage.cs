@@ -1,11 +1,16 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK;
@@ -15,8 +20,12 @@ namespace osu.Game.Rulesets.Mania.Tests
     [TestFixture]
     public class TestCaseStage : ManiaInputTestCase
     {
+        private const int columns = 4;
+
+        private readonly List<ManiaStage> stages = new List<ManiaStage>();
+
         public TestCaseStage()
-            : base(4)
+            : base(columns)
         {
         }
 
@@ -37,9 +46,60 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddStep("note", createNote);
+            AddStep("hold note", createHoldNote);
+            AddStep("bar line", createBarLine);
+        }
+
+        private void createNote()
+        {
+            foreach (var stage in stages)
+            {
+                for (int i = 0; i < stage.Columns.Count; i++)
+                {
+                    var obj = new Note { Column = i, StartTime = Time.Current + 2000 };
+                    obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                    stage.Add(new DrawableNote(obj, stage.Columns[i].Action));
+                }
+            }
+        }
+
+        private void createHoldNote()
+        {
+            foreach (var stage in stages)
+            {
+                for (int i = 0; i < stage.Columns.Count; i++)
+                {
+                    var obj = new HoldNote { Column = i, StartTime = Time.Current + 2000, Duration = 500 };
+                    obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                    stage.Add(new DrawableHoldNote(obj, stage.Columns[i].Action));
+                }
+            }
+        }
+
+        private void createBarLine()
+        {
+            foreach (var stage in stages)
+            {
+                var obj = new BarLine { StartTime = Time.Current + 2000, ControlPoint = new TimingControlPoint() };
+                obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                stage.Add(obj);
+            }
+        }
+
         private Drawable createStage(ScrollingDirection direction, ManiaAction action)
         {
             var specialAction = ManiaAction.Special1;
+
+            var stage = new ManiaStage(direction, 0, new StageDefinition { Columns = 2 }, ref action, ref specialAction);
+            stages.Add(stage);
 
             return new ScrollingTestContainer(direction)
             {
@@ -47,7 +107,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
-                Child = new ManiaStage(direction, 0, new StageDefinition { Columns = 2 }, ref action, ref specialAction)
+                Child = stage
             };
         }
     }

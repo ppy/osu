@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Mania.UI
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
 
-        protected override Container<Drawable> Content => content;
-        private readonly Container<Drawable> content;
+        protected override Container<Drawable> Content => barLineContainer;
+        private readonly Container<Drawable> barLineContainer;
 
         public Container<DrawableManiaJudgement> Judgements => judgements;
         private readonly JudgementContainer<DrawableManiaJudgement> judgements;
@@ -100,13 +100,12 @@ namespace osu.Game.Rulesets.Mania.UI
                             Width = 1366, // Bar lines should only be masked on the vertical axis
                             BypassAutoSizeAxes = Axes.Both,
                             Masking = true,
-                            Child = content = new Container
+                            Child = barLineContainer = new Container
                             {
                                 Name = "Bar lines",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
-                                Padding = new MarginPadding { Top = HIT_TARGET_POSITION }
                             }
                         },
                         judgements = new JudgementContainer<DrawableManiaJudgement>
@@ -133,6 +132,15 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 AddColumn(column);
             }
+
+            Direction.BindValueChanged(d =>
+            {
+                barLineContainer.Padding = new MarginPadding
+                {
+                    Top = d == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
+                    Bottom = d == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
+                };
+            }, true);
         }
 
         public void AddColumn(Column c)
@@ -203,7 +211,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             // Due to masking differences, it is not possible to get the width of the columns container automatically
             // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
-            content.Width = columnFlow.Width;
+            barLineContainer.Width = columnFlow.Width;
         }
     }
 }
