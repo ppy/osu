@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,8 +24,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly Container content;
 
         public override string Title => "General";
-
-        // protected override Container<Drawable> TransitionContent => content;
 
         public GeneralScreen()
         {
@@ -37,29 +36,67 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new ScrollContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            //Width = 0.55f,
-                            //Padding = new MarginPadding
-                            //{
-                            //    Vertical = 35 - DrawableRoom.SELECTION_BORDER_WIDTH,
-                            //    Right = 20 - DrawableRoom.SELECTION_BORDER_WIDTH
-                            //},
-                        },
                         new FillFlowContainer
                         {
+                            Margin = new MarginPadding { Left = 75, Top = 200 },
+                            Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
-                            Children = new[]
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Spacing = new Vector2(10),
+                            Children = new Drawable[]
                             {
                                 new OsuSpriteText
                                 {
-                                    Margin = new MarginPadding { Left = 75, Top = 100 },
                                     Colour = Color4.White,
                                     Text = "Metadata",
                                     TextSize = 18,
                                     Font = @"Exo2.0-Bold",
+                                },
+                                new Container
+                                {
+                                    Colour = OsuColour.FromHex("1c2125"),
+                                    //Anchor = Anchor.CentreLeft,
+                                    //Origin = Anchor.CentreLeft,
+                                    //AutoSizeAxes = Axes.X,
+                                    //RelativeSizeAxes = Axes.Y,
+                                    //Height = 50,
+                                    //Size = new Vector2(50),
+                                    Children = new Drawable[]
+                                    {
+                                        new OsuTextBox
+                                        {
+                                            RelativeSizeAxes = Axes.Y,
+                                            //Size = new Vector2(50),
+                                            //Height = 50,
+                                            Padding = new MarginPadding { Left = 300 },
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Padding = new MarginPadding { Left = 20 },
+                                            Colour = Color4.White,
+                                            TextSize = 16,
+                                            Text = "Artist",
+                                            Font = @"Exo2.0-Bold",
+                                        },
+                                    }
+                                },
+                                new LabelledTextBox
+                                {
+                                    LabelText = "Artist",
+                                },
+                                new LabelledTextBox
+                                {
+                                    LabelText = "Romanised Artist",
+                                },
+                                new LabelledTextBox
+                                {
+                                    LabelText = "Title",
+                                },
+                                new LabelledTextBox
+                                {
+                                    LabelText = "Romanised Title",
                                 },
                             }
                         }

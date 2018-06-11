@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Edit.Screens.Setup;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
+using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
 using osu.Game.Screens.Edit.Screens.Setup.Screens;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace osu.Game.Tests.Visual
             typeof(Setup),
             typeof(SetupMenuBar),
             typeof(SetupScreenSelectionTabControl),
+            typeof(LabelledTextBox),
             typeof(Header),
             typeof(GeneralScreen),
             typeof(DifficultyScreen),

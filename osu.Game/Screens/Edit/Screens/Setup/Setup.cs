@@ -14,20 +14,22 @@ using OpenTK;
 using osu.Framework.Configuration;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
 using osu.Framework.Allocation;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup
 {
     public class Setup : EditorScreen
     {
         public SetupMenuBar MenuBar;
-        private EditorScreen currentScreen;
+        private EditorScreen currentScreen = new GeneralScreen();
         private Header header;
+        private readonly Container screenContainer;
 
         public Setup()
         {
             Children = new Drawable[]
             {
-                new Container
+                screenContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     CornerRadius = 30,
@@ -73,13 +75,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                                 }
                             },
                         },
-                        header = new Header(currentScreen = new GeneralScreen()),
-                        currentScreen,
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            CornerRadius = 30,
-                            Masking = true,
                             Height = 40,
                             Margin = new MarginPadding { Top = 50 },
                             Child = MenuBar = new SetupMenuBar
@@ -89,6 +87,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                                 RelativeSizeAxes = Axes.Both,
                             }
                         },
+                        header = new Header(currentScreen),
+                        currentScreen,
                     }
                 },
             };
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
 
             header.UpdateScreen(mode.ToString());
             currentScreen.Beatmap.BindTo(Beatmap);
-            //LoadComponentAsync(currentScreen, screenContainer.Add);
+            LoadComponentAsync(currentScreen, screenContainer.Add);
         }
     }
 }

@@ -21,7 +21,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup
         public const float HEIGHT = 50;
 
         private readonly OsuSpriteText screenType;
-        private readonly HeaderBreadcrumbControl breadcrumbs;
         private readonly Container boxContainer;
         private readonly FillFlowContainer textContainer;
         private readonly FillFlowContainer childModeButtons;
@@ -30,6 +29,16 @@ namespace osu.Game.Screens.Edit.Screens.Setup
         {
             Children = new Drawable[]
             {
+                // This does not create a visible box above the triangles to indicate the end of the area of each screen
+                new Box
+                {
+                    Margin = new MarginPadding { Left = 50, Top = 120 },
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 10,
+                    Colour = OsuColour.FromHex("1a2328"),
+                },
                 boxContainer = new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -41,15 +50,15 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        // This does not create a visible box above the triangles to indicate the end of the area of each screen
                         new Container
                         {
-                            AutoSizeAxes = Axes.X,
-                            RelativeSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Left = 50, Top = 20 },
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Height = 50,
+                            //AutoSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Both,
+                            //Margin = new MarginPadding { Left = 50, Top = 20 },
+                            //Anchor = Anchor.CentreLeft,
+                            //Origin = Anchor.CentreLeft,
+                            //Height = 50,
+                            //Width = 1,
                             //Size = new Vector2(1),
                             Colour = OsuColour.FromHex("1a2328"),
                         },
@@ -83,62 +92,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                     },
                 },
             };
-            //RelativeSizeAxes = Axes.X;
-            //Height = HEIGHT;
-            //Anchor = Anchor.Centre;
-            //CornerRadius = 20;
-            //Size = new Vector2(0.6f);
-            //Children = new Drawable[]
-            //{
-            //    new Box
-            //    {
-            //        RelativeSizeAxes = Axes.Both,
-            //        Colour = OsuColour.FromHex(@"192428"),
-            //    },
-            //    new Container
-            //    {
-            //        RelativeSizeAxes = Axes.Both,
-            //        Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
-            //        Children = new Drawable[]
-            //        {
-            //            new FillFlowContainer
-            //            {
-            //                Anchor = Anchor.CentreLeft,
-            //                Origin = Anchor.BottomLeft,
-            //                //Position = new Vector2(-35f, 5f),
-            //                AutoSizeAxes = Axes.Both,
-            //                Direction = FillDirection.Horizontal,
-            //                Spacing = new Vector2(10f, 0f),
-            //                Children = new Drawable[]
-            //                {
-            //                    new SpriteIcon
-            //                    {
-            //                        Size = new Vector2(25),
-            //                        Icon = FontAwesome.fa_osu_edit_o,
-            //                    },
-            //                    new FillFlowContainer
-            //                    {
-            //                        AutoSizeAxes = Axes.Both,
-            //                        Direction = FillDirection.Horizontal,
-            //                        Children = new[]
-            //                        {
-            //                            new OsuSpriteText
-            //                            {
-            //                                Text = "Beatmap Setup ",
-            //                                TextSize = 25,
-            //                            },
-            //                            screenType = new OsuSpriteText
-            //                            {
-            //                                TextSize = 25,
-            //                                Font = @"Exo2.0-Light",
-            //                            },
-            //                        },
-            //                    },
-            //                },
-            //            },
-            //        },
-            //    },
-            //};
         }
 
         [BackgroundDependencyLoader]
@@ -148,18 +101,5 @@ namespace osu.Game.Screens.Edit.Screens.Setup
         }
 
         public void UpdateScreen(string screenName) => screenType.Text = screenName;
-
-        private class HeaderBreadcrumbControl : ScreenBreadcrumbControl
-        {
-            public HeaderBreadcrumbControl(Screen initialScreen) : base(initialScreen)
-            {
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                AccentColour = Color4.White;
-            }
-        }
     }
 }

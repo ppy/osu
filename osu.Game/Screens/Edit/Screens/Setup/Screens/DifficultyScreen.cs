@@ -21,8 +21,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         public override string Title => "Difficulty";
 
-        // protected override Container<Drawable> TransitionContent => content;
-
         public DifficultyScreen()
         {
             Children = new Drawable[]
@@ -32,28 +30,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new ScrollContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.55f,
-                            //Padding = new MarginPadding
-                            //{
-                            //    Vertical = 35 - DrawableRoom.SELECTION_BORDER_WIDTH,
-                            //    Right = 20 - DrawableRoom.SELECTION_BORDER_WIDTH
-                            //},
-                            //Child = search = new SearchContainer
-                            //{
-                            //    RelativeSizeAxes = Axes.X,
-                            //    AutoSizeAxes = Axes.Y,
-                            //    Child = RoomsContainer = new RoomsFilterContainer
-                            //    {
-                            //        RelativeSizeAxes = Axes.X,
-                            //        AutoSizeAxes = Axes.Y,
-                            //        Direction = FillDirection.Vertical,
-                            //        Spacing = new Vector2(10 - DrawableRoom.SELECTION_BORDER_WIDTH * 2),
-                            //    },
-                            //},
-                        },
+
                     },
                 },
             };
