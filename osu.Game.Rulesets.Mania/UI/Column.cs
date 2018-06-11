@@ -94,8 +94,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     Bottom = d == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
                 };
 
-                keyArea.Anchor = d == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-                keyArea.Origin = d == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                keyArea.Anchor = keyArea.Origin= d == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
             }, true);
         }
 
