@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets
 
         public abstract string Description { get; }
 
-        public virtual SettingsSubsection CreateSettings() => null;
+        public virtual RulesetSettingsSubsection CreateSettings() => null;
 
         /// <summary>
         /// Creates the <see cref="IRulesetConfigManager"/> for this <see cref="Ruleset"/>.
