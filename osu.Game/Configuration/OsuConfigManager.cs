@@ -147,6 +147,6 @@ namespace osu.Game.Configuration
         SongSelectRightMouseScroll,
         BeatmapSkins,
         BeatmapHitsounds,
-        IncreaseFirstObjectVisibility
+        IncreaseFirstObjectVisibility,
     }
 }

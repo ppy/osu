@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
 
-        private readonly ScrollingDirection direction;
+        protected readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
         /// <summary>
         /// Creates a new <see cref="ScrollingPlayfield"/>.
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected ScrollingPlayfield(ScrollingDirection direction, float? customWidth = null, float? customHeight = null)
             : base(customWidth, customHeight)
         {
-            this.direction = direction;
+            Direction.Value = direction;
         }
 
         [BackgroundDependencyLoader]
@@ -99,6 +99,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return false;
         }
 
-        protected sealed override HitObjectContainer CreateHitObjectContainer() => new ScrollingHitObjectContainer(direction);
+        protected sealed override HitObjectContainer CreateHitObjectContainer()
+        {
+            var container = new ScrollingHitObjectContainer();
+            container.Direction.BindTo(Direction);
+            return container;
+        }
     }
 }

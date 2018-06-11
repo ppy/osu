@@ -16,7 +16,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : ScrollingPlayfield
+    public class ManiaPlayfield : ManiaScrollingPlayfield
     {
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
