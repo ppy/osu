@@ -86,6 +86,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 switch (State.Value)
                 {
                     case ArmedState.Idle:
+                        UnproxyContent();
                         this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
                         break;
                     case ArmedState.Miss:
@@ -93,6 +94,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                             .Expire();
                         break;
                     case ArmedState.Hit:
+                        if (X >= -0.05f)
+                            ProxyContent();
+
                         var flash = circlePiece?.FlashBox;
                         if (flash != null)
                         {
