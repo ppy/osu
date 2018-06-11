@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.UI
 
             if (settings != null)
             {
-                rulesetConfig = CreateConfig(Ruleset, settings);
+                rulesetConfig = Ruleset.CreateConfig(settings);
 
                 if (rulesetConfig != null)
                 {
@@ -139,8 +139,6 @@ namespace osu.Game.Rulesets.UI
         /// Creates the cursor. May be null if the <see cref="RulesetContainer"/> doesn't provide a custom cursor.
         /// </summary>
         protected virtual CursorContainer CreateCursor() => null;
-
-        protected virtual IRulesetConfigManager CreateConfig(Ruleset ruleset, SettingsStore settings) => null;
 
         /// <summary>
         /// Creates a Playfield.
