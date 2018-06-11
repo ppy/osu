@@ -40,8 +40,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected virtual void OnDirectionChanged(ScrollingDirection direction)
         {
-            Anchor = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
-            Origin = Anchor;
+            Anchor = Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
         protected override void UpdateState(ArmedState state)

@@ -36,8 +36,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.OnDirectionChanged(direction);
 
-            headPiece.Anchor = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
-            headPiece.Origin = headPiece.Anchor;
+            headPiece.Anchor = headPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
         public override Color4 AccentColour

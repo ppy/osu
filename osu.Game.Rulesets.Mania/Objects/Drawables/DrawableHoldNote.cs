@@ -80,8 +80,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.OnDirectionChanged(direction);
 
-            bodyPiece.Anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-            bodyPiece.Origin = bodyPiece.Anchor;
+            bodyPiece.Anchor = bodyPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
         }
 
         public override Color4 AccentColour
