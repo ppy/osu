@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Configuration;
 namespace osu.Game.Rulesets
 {
     /// <summary>
-    /// A cache that provides a single <see cref="IRulesetConfigManager"/> per-ruleset
+    /// A cache that provides a single <see cref="IRulesetConfigManager"/> per-ruleset.
     /// This is done to support referring to and updating ruleset configs from multiple locations in the absence of inter-config bindings.
     /// </summary>
     public class RulesetConfigCache : Component
