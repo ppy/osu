@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             switch (h)
             {
-                case BananaShower.Banana banana:
+                case Banana banana:
                     return new DrawableBanana(banana);
                 case Fruit fruit:
                     return new DrawableFruit(fruit);
