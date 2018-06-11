@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
@@ -73,11 +74,6 @@ namespace osu.Game.Rulesets.UI
         private IRulesetConfigManager rulesetConfig;
         private OnScreenDisplay onScreenDisplay;
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
-
         /// <summary>
         /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
         /// </summary>
@@ -91,18 +87,26 @@ namespace osu.Game.Rulesets.UI
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
+        private void load([CanBeNull] OnScreenDisplay onScreenDisplay, [CanBeNull] SettingsStore settings)
         {
             this.onScreenDisplay = onScreenDisplay;
 
-            rulesetConfig = CreateConfig(Ruleset, settings);
-
-            if (rulesetConfig != null)
+            if (settings != null)
             {
-                dependencies.Cache(rulesetConfig);
-                onScreenDisplay?.BeginTracking(this, rulesetConfig);
+                rulesetConfig = Ruleset.CreateConfig(settings);
+
+                if (rulesetConfig != null)
+                {
+                    dependencies.Cache(rulesetConfig);
+                    onScreenDisplay?.BeginTracking(this, rulesetConfig);
+                }
             }
         }
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         public abstract ScoreProcessor CreateScoreProcessor();
 
@@ -135,8 +139,6 @@ namespace osu.Game.Rulesets.UI
         /// Creates the cursor. May be null if the <see cref="RulesetContainer"/> doesn't provide a custom cursor.
         /// </summary>
         protected virtual CursorContainer CreateCursor() => null;
-
-        protected virtual IRulesetConfigManager CreateConfig(Ruleset ruleset, SettingsStore settings) => null;
 
         /// <summary>
         /// Creates a Playfield.
