@@ -32,15 +32,10 @@ namespace osu.Game.Tests.Visual
             typeof(NotNullAttribute)
         };
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(parent);
-
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        private void load()
         {
-            osuGame.Beatmap.Value = new TestWorkingBeatmap(new Beatmap
+            Beatmap.Value = new TestWorkingBeatmap(new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -63,8 +58,8 @@ namespace osu.Game.Tests.Visual
             });
 
             var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-            dependencies.CacheAs<IAdjustableClock>(clock);
-            dependencies.CacheAs<IFrameBasedClock>(clock);
+            Dependencies.CacheAs<IAdjustableClock>(clock);
+            Dependencies.CacheAs<IFrameBasedClock>(clock);
 
             Child = new OsuHitObjectComposer(new OsuRuleset());
         }

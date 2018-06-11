@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
@@ -23,9 +23,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly DrawableNote head;
         private readonly DrawableNote tail;
 
-        private readonly GlowPiece glowPiece;
         private readonly BodyPiece bodyPiece;
-        private readonly Container fullHeightContainer;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -37,25 +35,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private bool hasBroken;
 
+        private readonly Container<DrawableHoldNoteTick> tickContainer;
+
         public DrawableHoldNote(HoldNote hitObject, ManiaAction action)
             : base(hitObject, action)
         {
-            Container<DrawableHoldNoteTick> tickContainer;
             RelativeSizeAxes = Axes.X;
 
             InternalChildren = new Drawable[]
             {
-                // The hit object itself cannot be used for various elements because the tail overshoots it
-                // So a specialized container that is updated to contain the tail height is used
-                fullHeightContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Child = glowPiece = new GlowPiece()
-                },
                 bodyPiece = new BodyPiece
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                 },
                 tickContainer = new Container<DrawableHoldNoteTick>
@@ -92,21 +82,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             {
                 base.AccentColour = value;
 
-                glowPiece.AccentColour = value;
                 bodyPiece.AccentColour = value;
                 head.AccentColour = value;
                 tail.AccentColour = value;
-            }
-        }
-
-        protected override void UpdateState(ArmedState state)
-        {
-            switch (state)
-            {
-                case ArmedState.Hit:
-                    // Good enough for now, we just want them to have a lifetime end
-                    this.Delay(2000).Expire();
-                    break;
+                tickContainer.ForEach(t => t.AccentColour = value);
             }
         }
 
@@ -121,12 +100,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.Update();
 
             // Make the body piece not lie under the head note
-            bodyPiece.Y = head.Height;
-            bodyPiece.Height = DrawHeight - head.Height;
-
-            // Make the fullHeightContainer "contain" the height of the tail note, keeping in mind
-            // that the tail note overshoots the height of this hit object
-            fullHeightContainer.Height = DrawHeight + tail.Height;
+            bodyPiece.Y = head.Height / 2;
+            bodyPiece.Height = DrawHeight - head.Height / 2 + tail.Height / 2;
         }
 
         public bool OnPressed(ManiaAction action)
@@ -175,8 +150,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 : base(holdNote.HitObject.Head, action)
             {
                 this.holdNote = holdNote;
-
-                GlowPiece.Alpha = 0;
             }
 
             public override bool OnPressed(ManiaAction action)
@@ -193,11 +166,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 holdNote.holdStartTime = Time.Current;
 
                 return true;
-            }
-
-            protected override void UpdateState(ArmedState state)
-            {
-                // The holdnote keeps scrolling through for now, so having the head disappear looks weird
             }
         }
 
@@ -219,8 +187,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 : base(holdNote.HitObject.Tail, action)
             {
                 this.holdNote = holdNote;
-
-                GlowPiece.Alpha = 0;
             }
 
             protected override void CheckForJudgements(bool userTriggered, double timeOffset)
@@ -251,11 +217,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Result = result,
                     HasBroken = holdNote.hasBroken
                 });
-            }
-
-            protected override void UpdateState(ArmedState state)
-            {
-                // The holdnote keeps scrolling through, so having the tail disappear looks weird
             }
 
             public override bool OnPressed(ManiaAction action) => false; // Tail doesn't handle key down

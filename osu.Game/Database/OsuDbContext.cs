@@ -58,11 +58,20 @@ namespace osu.Game.Database
             this.connectionString = connectionString;
 
             var connection = Database.GetDbConnection();
-            connection.Open();
-            using (var cmd = connection.CreateCommand())
+            try
             {
-                cmd.CommandText = "PRAGMA journal_mode=WAL;";
-                cmd.ExecuteNonQuery();
+                connection.Open();
+
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "PRAGMA journal_mode=WAL;";
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception e)
+            {
+                connection.Close();
+                throw;
             }
         }
 
