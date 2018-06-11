@@ -78,14 +78,14 @@ namespace osu.Game.Tests.Visual
             // Scroll in at 0.25
             AddStep("Move mouse to 0.25x", () => InputManager.MoveMouseTo(new Vector2(scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X, scrollQuad.Centre.Y)));
             AddStep("Press ctrl", () => InputManager.PressKey(Key.LControl));
-            AddStep("Scroll by 3", () => InputManager.ScrollBy(3));
+            AddStep("Scroll by 3", () => InputManager.ScrollBy(new Vector2(3, 0)));
             AddStep("Release ctrl", () => InputManager.ReleaseKey(Key.LControl));
             AddAssert("Box not at 0", () => !Precision.AlmostEquals(boxQuad.TopLeft, scrollQuad.TopLeft));
             AddAssert("Box 1/4 at 1/4", () => Precision.AlmostEquals(boxQuad.TopLeft.X + 0.25f * boxQuad.Size.X, scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X));
 
             // Scroll out at 0.25
             AddStep("Press ctrl", () => InputManager.PressKey(Key.LControl));
-            AddStep("Scroll by -3", () => InputManager.ScrollBy(-3));
+            AddStep("Scroll by -3", () => InputManager.ScrollBy(new Vector2(-3, 0)));
             AddStep("Release ctrl", () => InputManager.ReleaseKey(Key.LControl));
             AddAssert("Box at 0", () => Precision.AlmostEquals(boxQuad.TopLeft, scrollQuad.TopLeft));
             AddAssert("Box 1/4 at 1/4", () => Precision.AlmostEquals(boxQuad.TopLeft.X + 0.25f * boxQuad.Size.X, scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X));
@@ -99,13 +99,13 @@ namespace osu.Game.Tests.Visual
             // Scroll in at 0.25
             AddStep("Move mouse to 0.25x", () => InputManager.MoveMouseTo(new Vector2(scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X, scrollQuad.Centre.Y)));
             AddStep("Press ctrl", () => InputManager.PressKey(Key.LControl));
-            AddStep("Scroll by 1", () => InputManager.ScrollBy(1));
+            AddStep("Scroll by 1", () => InputManager.ScrollBy(new Vector2(1, 0)));
             AddStep("Release ctrl", () => InputManager.ReleaseKey(Key.LControl));
 
             // Scroll in at 0.6
             AddStep("Move mouse to 0.75x", () => InputManager.MoveMouseTo(new Vector2(scrollQuad.TopLeft.X + 0.75f * scrollQuad.Size.X, scrollQuad.Centre.Y)));
             AddStep("Press ctrl", () => InputManager.PressKey(Key.LControl));
-            AddStep("Scroll by 1", () => InputManager.ScrollBy(1));
+            AddStep("Scroll by 1", () => InputManager.ScrollBy(new Vector2(1, 0)));
             AddStep("Release ctrl", () => InputManager.ReleaseKey(Key.LControl));
             AddAssert("Box not at 0", () => !Precision.AlmostEquals(boxQuad.TopLeft, scrollQuad.TopLeft));
 
@@ -116,13 +116,13 @@ namespace osu.Game.Tests.Visual
 
             // Scroll out at 0.6
             AddStep("Press ctrl", () => InputManager.PressKey(Key.LControl));
-            AddStep("Scroll by -1", () => InputManager.ScrollBy(-1));
+            AddStep("Scroll by -1", () => InputManager.ScrollBy(new Vector2(-1, 0)));
             AddStep("Release ctrl", () => InputManager.ReleaseKey(Key.LControl));
 
             // Scroll out at 0.25
             AddStep("Move mouse to 0.25x", () => InputManager.MoveMouseTo(new Vector2(scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X, scrollQuad.Centre.Y)));
             AddStep("Press ctrl", () => InputManager.PressKey(Key.LControl));
-            AddStep("Scroll by -1", () => InputManager.ScrollBy(-1));
+            AddStep("Scroll by -1", () => InputManager.ScrollBy(new Vector2(-1, 0)));
             AddStep("Release ctrl", () => InputManager.ReleaseKey(Key.LControl));
             AddAssert("Box at 0", () => Precision.AlmostEquals(boxQuad.TopLeft, scrollQuad.TopLeft));
         }

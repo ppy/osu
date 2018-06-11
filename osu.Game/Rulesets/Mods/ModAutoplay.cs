@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mods
         public override string ShortenedName => "AT";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_auto;
         public override string Description => "Watch a perfect automated play through the song.";
-        public override double ScoreMultiplier => 0;
+        public override double ScoreMultiplier => 1;
         public bool AllowFail => false;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };
     }

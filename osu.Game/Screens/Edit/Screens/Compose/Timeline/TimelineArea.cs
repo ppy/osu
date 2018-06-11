@@ -2,11 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -14,8 +12,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 {
     public class TimelineArea : CompositeDrawable
     {
-        public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
-
         private readonly Timeline timeline;
 
         public TimelineArea()
@@ -26,6 +22,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             OsuCheckbox hitObjectsCheckbox;
             OsuCheckbox hitSoundsCheckbox;
             OsuCheckbox waveformCheckbox;
+
             InternalChildren = new Drawable[]
             {
                 new Box
@@ -125,7 +122,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             hitSoundsCheckbox.Current.Value = true;
             waveformCheckbox.Current.Value = true;
 
-            timeline.Beatmap.BindTo(Beatmap);
             timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
         }
     }
