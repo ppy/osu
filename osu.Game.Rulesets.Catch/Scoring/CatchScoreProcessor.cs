@@ -69,9 +69,8 @@ namespace osu.Game.Rulesets.Catch.Scoring
                 return;
             }
 
-            var catchJudgement = judgement as CatchJudgement;
-
-            Health.Value += Math.Max(catchJudgement.HealthIncrease - hpDrainRate, 0) * harshness;
+            if (judgement is CatchJudgement catchJudgement)
+                Health.Value += Math.Max(catchJudgement.HealthIncrease - hpDrainRate, 0) * harshness;
         }
     }
 }
