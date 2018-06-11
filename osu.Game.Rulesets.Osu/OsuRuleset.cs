@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override string ShortName => "osu";
 
-        public override SettingsSubsection CreateSettings() => new OsuSettings();
+        public override RulesetSettingsSubsection CreateSettings() => new OsuSettings(this);
 
         public override int? LegacyID => 0;
 
