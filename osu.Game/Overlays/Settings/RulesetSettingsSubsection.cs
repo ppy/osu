@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Game.Configuration;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Settings
@@ -26,7 +25,7 @@ namespace osu.Game.Overlays.Settings
         {
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
-            var config = ruleset.CreateConfig(dependencies.Get<SettingsStore>());
+            var config = dependencies.Get<RulesetConfigCache>().GetConfigFor(ruleset);
             if (config != null)
                 dependencies.Cache(config);
 
