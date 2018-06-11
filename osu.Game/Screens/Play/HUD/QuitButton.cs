@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -182,14 +183,14 @@ namespace osu.Game.Screens.Play.HUD
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                if (!pendingAnimation && state.Mouse.Buttons.Count == 1)
+                if (!pendingAnimation && state.Mouse.Buttons.Count() == 1)
                     BeginConfirm();
                 return true;
             }
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                if (state.Mouse.Buttons.Count == 0)
+                if (!state.Mouse.Buttons.Any())
                     AbortConfirm();
                 return true;
             }

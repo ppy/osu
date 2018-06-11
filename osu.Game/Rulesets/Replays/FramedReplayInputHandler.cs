@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Replays
             return true;
         }
 
-        public override List<InputState> GetPendingStates() => new List<InputState>();
+        public override List<IInput> GetPendingInputs() => new List<IInput>();
 
         public bool AtLastFrame => currentFrameIndex == Frames.Count - 1;
         public bool AtFirstFrame => currentFrameIndex == 0;
@@ -119,7 +119,8 @@ namespace osu.Game.Rulesets.Replays
         {
             public ReplayKeyboardState(List<Key> keys)
             {
-                Keys = keys;
+                foreach (var key in keys)
+                    Keys.Add(key);
             }
         }
     }
