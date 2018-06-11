@@ -73,11 +73,6 @@ namespace osu.Game.Rulesets.UI
         private IRulesetConfigManager rulesetConfig;
         private OnScreenDisplay onScreenDisplay;
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
-
         /// <summary>
         /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
         /// </summary>
@@ -103,6 +98,11 @@ namespace osu.Game.Rulesets.UI
                 onScreenDisplay?.BeginTracking(this, rulesetConfig);
             }
         }
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         public abstract ScoreProcessor CreateScoreProcessor();
 
