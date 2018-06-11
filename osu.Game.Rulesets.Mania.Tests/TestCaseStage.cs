@@ -52,7 +52,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddStep("note", createNote);
             AddStep("hold note", createHoldNote);
-            AddStep("bar line", createBarLine);
+            AddStep("minor bar line", () => createBarLine(false));
+            AddStep("major bar line", () => createBarLine(true));
         }
 
         private void createNote()
@@ -83,11 +84,17 @@ namespace osu.Game.Rulesets.Mania.Tests
             }
         }
 
-        private void createBarLine()
+        private void createBarLine(bool major)
         {
             foreach (var stage in stages)
             {
-                var obj = new BarLine { StartTime = Time.Current + 2000, ControlPoint = new TimingControlPoint() };
+                var obj = new BarLine
+                {
+                    StartTime = Time.Current + 2000,
+                    ControlPoint = new TimingControlPoint(),
+                    BeatIndex = major ? 0 : 1
+                };
+
                 obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
                 stage.Add(obj);
@@ -98,7 +105,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var specialAction = ManiaAction.Special1;
 
-            var stage = new ManiaStage(direction, 0, new StageDefinition { Columns = 2 }, ref action, ref specialAction);
+            var stage = new ManiaStage(direction, 0, new StageDefinition { Columns = 2 }, ref action, ref specialAction) { VisibleTimeRange = { Value = 2000 } };
             stages.Add(stage);
 
             return new ScrollingTestContainer(direction)
