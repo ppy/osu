@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
 
             if (judgement.Result == HitResult.Miss)
             {
-                if (judgement.AffectsCombo)
+                if (!judgement.IsBonus)
                     Health.Value -= hpDrainRate * (harshness * 2);
                 return;
             }
