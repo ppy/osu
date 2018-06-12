@@ -15,6 +15,15 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"covers")]
         private BeatmapSetOnlineCovers covers { get; set; }
 
+        private int? onlineBeatmapSetID;
+
+        [JsonProperty(@"id")]
+        public int? OnlineBeatmapSetID
+        {
+            get { return onlineBeatmapSetID; }
+            set { onlineBeatmapSetID = value > 0 ? value : null; }
+        }
+
         [JsonProperty(@"preview_url")]
         private string preview { get; set; }
 

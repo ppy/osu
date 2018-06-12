@@ -22,18 +22,18 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public BeatmapSetOnlineInfo OnlineInfo { get; set; }
 
-        public double MaxStarDifficulty => Beatmaps.Max(b => b.StarDifficulty);
+        public double MaxStarDifficulty => Beatmaps?.Max(b => b.StarDifficulty) ?? 0;
 
         [NotMapped]
         public bool DeletePending { get; set; }
 
         public string Hash { get; set; }
 
-        public string StoryboardFile => Files.FirstOrDefault(f => f.Filename.EndsWith(".osb"))?.Filename;
+        public string StoryboardFile => Files?.FirstOrDefault(f => f.Filename.EndsWith(".osb"))?.Filename;
 
         public List<BeatmapSetFileInfo> Files { get; set; }
 
-        public override string ToString() => Metadata.ToString();
+        public override string ToString() => Metadata?.ToString() ?? base.ToString();
 
         public bool Protected { get; set; }
     }

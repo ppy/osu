@@ -449,7 +449,6 @@ namespace osu.Game.Tests.Visual
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
-                    OnlineBeatmapSetID = id,
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = $"peppy{id.ToString().PadLeft(6, '0')}",
                     Title = $"test set #{id}!",
@@ -503,7 +502,6 @@ namespace osu.Game.Tests.Visual
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
-                    OnlineBeatmapSetID = id,
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = $"peppy{id.ToString().PadLeft(6, '0')}",
                     Title = $"test set #{id}!",
