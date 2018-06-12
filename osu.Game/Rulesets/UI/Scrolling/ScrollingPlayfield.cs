@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// The step increase/decrease of the span of time visible by the length of the scrolling axes.
         /// </summary>
-        private const double time_span_step = 500;
+        private const double time_span_step = 200;
 
         /// <summary>
         /// The span of time that is visible by the length of the scrolling axes.
