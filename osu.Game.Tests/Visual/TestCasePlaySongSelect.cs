@@ -122,7 +122,6 @@ namespace osu.Game.Tests.Visual
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
-                    OnlineBeatmapSetID = 1234 + i,
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = "MONACA " + RNG.Next(0, 9),
                     Title = "Black Song " + RNG.Next(0, 9),
