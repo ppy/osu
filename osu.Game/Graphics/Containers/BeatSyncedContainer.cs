@@ -12,7 +12,7 @@ namespace osu.Game.Graphics.Containers
 {
     public class BeatSyncedContainer : Container
     {
-        protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private int lastBeat;
         private TimingControlPoint lastTimingPoint;
@@ -74,9 +74,9 @@ namespace osu.Game.Graphics.Containers
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load(IBindableBeatmap beatmap)
         {
-            Beatmap.BindTo(game.Beatmap);
+            Beatmap.BindTo(beatmap);
         }
 
         protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)

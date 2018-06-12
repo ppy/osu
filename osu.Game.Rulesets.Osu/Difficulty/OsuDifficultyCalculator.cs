@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
@@ -84,5 +85,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return starRating;
         }
+
+        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        {
+            new OsuModDoubleTime(),
+            new OsuModHalfTime(),
+            new OsuModEasy(),
+            new OsuModHardRock(),
+        };
     }
 }
