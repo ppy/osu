@@ -158,6 +158,7 @@ namespace osu.Game.Screens.Play
             userAudioOffset.TriggerChange();
 
             ScoreProcessor = RulesetContainer.CreateScoreProcessor();
+            config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
             Children = new Drawable[]
             {
