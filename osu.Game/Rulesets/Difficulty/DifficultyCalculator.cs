@@ -71,6 +71,13 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         protected virtual Mod[] DifficultyAdjustmentMods => Array.Empty<Mod>();
 
+        /// <summary>
+        /// Calculates the difficulty of the provided beatmap.
+        /// Optionally provides additional information relating to the difficulty of the beatmap.
+        /// </summary>
+        /// <param name="categoryDifficulty">A provided dictionary in which additional information relating to the difficulty of the beatmap is placed.
+        /// May be null if no additional information is required.</param>
+        /// <returns>The total difficulty rating of the beatmap.</returns>
         public abstract double Calculate(Dictionary<string, object> categoryDifficulty = null);
     }
 }

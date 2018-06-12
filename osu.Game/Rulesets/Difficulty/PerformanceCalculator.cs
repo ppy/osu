@@ -41,6 +41,13 @@ namespace osu.Game.Rulesets.Difficulty
             TimeRate = clock.Rate;
         }
 
+        /// <summary>
+        /// Calculates the performance of the provided score.
+        /// Optionally provides additional information relating to the performance of the score.
+        /// </summary>
+        /// <param name="categoryDifficulty">A provided dictionary in which additional information relating to the performance of the score is placed.
+        /// May be null if no additional information is required.</param>
+        /// <returns>The total performance rating of the score.</returns>
         public abstract double Calculate(Dictionary<string, object> categoryDifficulty = null);
     }
 }
