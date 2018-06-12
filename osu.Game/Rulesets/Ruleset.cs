@@ -15,6 +15,8 @@ using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets
@@ -69,7 +71,13 @@ namespace osu.Game.Rulesets
 
         public abstract string Description { get; }
 
-        public virtual SettingsSubsection CreateSettings() => null;
+        public virtual RulesetSettingsSubsection CreateSettings() => null;
+
+        /// <summary>
+        /// Creates the <see cref="IRulesetConfigManager"/> for this <see cref="Ruleset"/>.
+        /// </summary>
+        /// <param name="settings">The <see cref="SettingsStore"/> to store the settings.</param>
+        public virtual IRulesetConfigManager CreateConfig(SettingsStore settings) => null;
 
         /// <summary>
         /// Do not override this unless you are a legacy mode.
