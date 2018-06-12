@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         /// <summary>
         /// Gets or sets the content zoom level of this <see cref="ZoomableScrollContainer"/>.
         /// </summary>
-        public int Zoom
+        public float Zoom
         {
             get => zoomTarget;
             set
@@ -97,23 +97,23 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             zoomedContent.Width = DrawWidth * currentZoom;
         }
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
             if (!state.Keyboard.ControlPressed)
-                return base.OnWheel(state);
+                return base.OnScroll(state);
 
-            setZoomTarget(zoomTarget + state.Mouse.WheelDelta, zoomedContent.ToLocalSpace(state.Mouse.NativeState.Position).X);
+            setZoomTarget(zoomTarget + state.Mouse.ScrollDelta.X, zoomedContent.ToLocalSpace(state.Mouse.NativeState.Position).X);
             return true;
         }
 
-        private int zoomTarget = 1;
-        private void setZoomTarget(int newZoom, float focusPoint)
+        private float zoomTarget = 1;
+        private void setZoomTarget(float newZoom, float focusPoint)
         {
             zoomTarget = MathHelper.Clamp(newZoom, MinZoom, MaxZoom);
             transformZoomTo(zoomTarget, focusPoint, ZoomDuration, ZoomEasing);
         }
 
-        private void transformZoomTo(int newZoom, float focusPoint, double duration = 0, Easing easing = Easing.None)
+        private void transformZoomTo(float newZoom, float focusPoint, double duration = 0, Easing easing = Easing.None)
             => this.TransformTo(this.PopulateTransform(new TransformZoom(focusPoint, zoomedContent.DrawWidth, Current), newZoom, duration, easing));
 
         private class TransformZoom : Transform<float, ZoomableScrollContainer>
