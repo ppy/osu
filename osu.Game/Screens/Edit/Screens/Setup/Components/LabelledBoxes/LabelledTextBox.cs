@@ -6,6 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
@@ -18,28 +19,59 @@ using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 {
-    public class LabelledTextBox : Drawable
+    public class LabelledTextBox : CompositeDrawable
     {
-        // Determine the accessibility of the following
         private readonly OsuTextBox textBox;
         private readonly Container content;
         private readonly OsuSpriteText label;
 
-        public const float DEFAULT_LABEL_TEXT_SIZE = 16;
+        public const float DEFAULT_LABEL_TEXT_SIZE = 18;
         public const float DEFAULT_HEIGHT = 50;
-        public const float DEFAULT_LABEL_PADDING = 20;
+        public const float DEFAULT_LABEL_PADDING = 15;
         public const float DEFAULT_TEXT_BOX_PADDING = 300;
 
+        private string labelText;
         public string LabelText
         {
-            get => label.Text;
-            set => label.Text = value;
+            get => labelText;
+            set
+            {
+                labelText = value;
+                label.Text = value;
+            }
         }
 
+        private float labelTextSize;
         public float LabelTextSize
         {
-            get => label.TextSize;
-            set => label.TextSize = value;
+            get => labelTextSize;
+            set
+            {
+                labelTextSize = value;
+                label.TextSize = value;
+            }
+        }
+
+        private string textBoxPlaceholderText;
+        public string TextBoxPlaceholderText
+        {
+            get => textBoxPlaceholderText;
+            set
+            {
+                textBoxPlaceholderText = value;
+                textBox.PlaceholderText = value;
+            }
+        }
+
+        private string textBoxText;
+        public string TextBoxText
+        {
+            get => textBoxText;
+            set
+            {
+                textBoxText = value;
+                textBox.Text = value;
+            }
         }
 
         private float height = DEFAULT_HEIGHT;
@@ -52,6 +84,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                 textBox.Height = value;
                 content.Height = value;
             }
+        }
+
+        public MarginPadding Padding
+        {
+            get => base.Padding;
+            set => base.Padding = value;
         }
 
         public MarginPadding LabelPadding
@@ -80,29 +118,63 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 
         public LabelledTextBox()
         {
-            content = new Container
+            Masking = true;
+            CornerRadius = 15;
+            //RelativeSizeAxes = Axes.Y;
+
+            InternalChildren = new Drawable[]
             {
-                Colour = OsuColour.FromHex("1c2125"),
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                AutoSizeAxes = Axes.X,
-                RelativeSizeAxes = Axes.Y,
-                Height = DEFAULT_HEIGHT,
-                Children = new Drawable[]
+                new Container
                 {
-                    textBox = new OsuTextBox
+                    Masking = true,
+                    CornerRadius = 15,
+                    Height = DEFAULT_HEIGHT,
+                    RelativeSizeAxes = Axes.X,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Y,
-                        Height = DEFAULT_HEIGHT,
-                        Padding = new MarginPadding { Left = DEFAULT_TEXT_BOX_PADDING },
-                    },
-                    label = new OsuSpriteText
-                    {
-                        Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING },
-                        Colour = Color4.White,
-                        TextSize = DEFAULT_LABEL_TEXT_SIZE,
-                        Font = @"Exo2.0-Bold",
-                    },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.FromHex("1c2125"),
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        label = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.TopLeft,
+                                            Origin = Anchor.TopLeft,
+                                            Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_LABEL_PADDING },
+                                            Colour = Color4.White,
+                                            TextSize = DEFAULT_LABEL_TEXT_SIZE,
+                                            Text = LabelText,
+                                            Font = @"Exo2.0-Bold",
+                                        },
+                                        textBox = new OsuTextBox
+                                        {
+                                            CornerRadius = 15,
+                                            Anchor = Anchor.TopLeft,
+                                            Origin = Anchor.TopLeft,
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = DEFAULT_HEIGHT,
+                                        },
+                                    },
+                                },
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.Absolute, 180),
+                                    new Dimension()
+                                }
+                            }
+                        }
+                    }
                 }
             };
         }

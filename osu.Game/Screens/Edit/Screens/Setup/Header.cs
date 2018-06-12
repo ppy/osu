@@ -29,68 +29,134 @@ namespace osu.Game.Screens.Edit.Screens.Setup
         {
             Children = new Drawable[]
             {
+                // TODO: Fix the box
                 // This does not create a visible box above the triangles to indicate the end of the area of each screen
-                new Box
+                //new Container
+                //{
+                //    Masking = true,
+                //    CornerRadius = 15,
+                //    Height = 50,
+                //    RelativeSizeAxes = Axes.X,
+                //    Children = new Drawable[]
+                //    {
+                //        new Box
+                //        {
+                //            RelativeSizeAxes = Axes.Both,
+                //            Colour = OsuColour.FromHex("1a2328"),
+                //            Height = 10,
+                //            Anchor = Anchor.CentreLeft,
+                //            Origin = Anchor.CentreLeft,
+                //        },
+                //        //new Box
+                //        //{
+                //        //    Margin = new MarginPadding { Left = 50, Top = 120 },
+                //        //    Anchor = Anchor.BottomLeft,
+                //        //    Origin = Anchor.BottomLeft,
+                //        //    RelativeSizeAxes = Axes.X,
+                //        //    Height = 10,
+                //        //    Colour = OsuColour.FromHex("1a2328"),
+                //        //},
+                //        boxContainer = new Container
+                //        {
+                //            RelativeSizeAxes = Axes.X,
+                //            AutoSizeAxes = Axes.Y,
+                //            //CornerRadius = 20,
+                //            //Masking = true,
+                //            Margin = new MarginPadding { Left = 50, Top = 20 },
+                //            Anchor = Anchor.Centre,
+                //            Origin = Anchor.Centre,
+                //            Children = new Drawable[]
+                //            {
+                //                //new Container
+                //                //{
+                //                //    //AutoSizeAxes = Axes.X,
+                //                //    RelativeSizeAxes = Axes.Both,
+                //                //    //Margin = new MarginPadding { Left = 50, Top = 20 },
+                //                //    //Anchor = Anchor.CentreLeft,
+                //                //    //Origin = Anchor.CentreLeft,
+                //                //    //Height = 50,
+                //                //    //Width = 1,
+                //                //    //Size = new Vector2(1),
+                //                //    Colour = OsuColour.FromHex("1a2328"),
+                //                //},
+                //                textContainer = new FillFlowContainer
+                //                {
+                //                    AutoSizeAxes = Axes.X,
+                //                    Direction = FillDirection.Horizontal,
+                //                    Spacing = new Vector2(7.5f, 0f),
+                //                    Children = new Drawable[]
+                //                    {
+                //                        new SpriteIcon
+                //                        {
+                //                            Size = new Vector2(40),
+                //                            Icon = FontAwesome.fa_osu_edit_o,
+                //                        },
+                //                        new OsuSpriteText
+                //                        {
+                //                            Margin = new MarginPadding { Top = 7.5f },
+                //                            Text = "Beatmap Setup",
+                //                            TextSize = 25,
+                //                        },
+                //                        screenType = new OsuSpriteText
+                //                        {
+                //                            TextSize = 25,
+                //                            Margin = new MarginPadding { Top = 7.5f },
+                //                            Text = "General",
+                //                            Font = @"Exo2.0-Light",
+                //                        },
+                //                    }
+                //                },
+                //            },
+                //        }
+                //    }
+                //},
+                // ---
+                new Container
                 {
-                    Margin = new MarginPadding { Left = 50, Top = 120 },
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
+                    Margin = new MarginPadding { Left = 25, Top = 10 },
+                    Height = 50,
                     RelativeSizeAxes = Axes.X,
-                    Height = 10,
-                    Colour = OsuColour.FromHex("1a2328"),
-                },
-                boxContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    //CornerRadius = 20,
-                    //Masking = true,
-                    Margin = new MarginPadding { Left = 50, Top = 20 },
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        new Container
+                        new Box
                         {
-                            //AutoSizeAxes = Axes.X,
                             RelativeSizeAxes = Axes.Both,
-                            //Margin = new MarginPadding { Left = 50, Top = 20 },
-                            //Anchor = Anchor.CentreLeft,
-                            //Origin = Anchor.CentreLeft,
-                            //Height = 50,
-                            //Width = 1,
-                            //Size = new Vector2(1),
+                            Size = new Vector2(1),
                             Colour = OsuColour.FromHex("1a2328"),
                         },
-                        textContainer = new FillFlowContainer
+                        new Container
                         {
-                            AutoSizeAxes = Axes.X,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(7.5f, 0f),
-                            Children = new Drawable[]
+                            RelativeSizeAxes = Axes.Both,
+                            Child = textContainer = new FillFlowContainer
                             {
-                                new SpriteIcon
+                                AutoSizeAxes = Axes.X,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(7.5f, 0f),
+                                Children = new Drawable[]
                                 {
-                                    Size = new Vector2(40),
-                                    Icon = FontAwesome.fa_osu_edit_o,
-                                },
-                                new OsuSpriteText
-                                {
-                                    Margin = new MarginPadding { Top = 7.5f },
-                                    Text = "Beatmap Setup",
-                                    TextSize = 25,
-                                },
-                                screenType = new OsuSpriteText
-                                {
-                                    TextSize = 25,
-                                    Margin = new MarginPadding { Top = 7.5f },
-                                    Text = "General",
-                                    Font = @"Exo2.0-Light",
+                                    new SpriteIcon
+                                    {
+                                        Size = new Vector2(40),
+                                        Icon = FontAwesome.fa_osu_edit_o,
+                                    },
+                                    new OsuSpriteText
+                                    {
+                                        Margin = new MarginPadding { Top = 7.5f },
+                                        Text = "Beatmap Setup",
+                                        TextSize = 25,
+                                    },
+                                    screenType = new OsuSpriteText
+                                    {
+                                        TextSize = 25,
+                                        Margin = new MarginPadding { Top = 7.5f },
+                                        Text = "General",
+                                        Font = @"Exo2.0-Light",
+                                    },
                                 },
                             }
-                        },
-                    },
-                },
+                        }
+                    }
+                }
             };
         }
 

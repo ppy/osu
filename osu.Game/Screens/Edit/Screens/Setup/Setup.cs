@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                     Masking = true,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(0.6f, 0.8f),
+                    Size = new Vector2(0.7f, 0.8f),
                     Children = new[]
                     {
                         new Container

@@ -29,6 +29,7 @@ namespace osu.Game.Tests.Visual
             typeof(DesignScreen),
             typeof(AdvancedScreen),
         };
+
         public TestCaseEditorSetupScreen()
         {
             Setup setup;

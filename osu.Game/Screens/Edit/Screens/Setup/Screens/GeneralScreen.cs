@@ -32,16 +32,16 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 content = new Container
                 {
                     //Colour = OsuColour.FromHex("222d31"),
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Both,
+                    //AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
                         {
                             Margin = new MarginPadding { Left = 75, Top = 200 },
                             Direction = FillDirection.Vertical,
-                            RelativeSizeAxes = Axes.Y,
-                            AutoSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Both,
+                            //AutoSizeAxes = Axes.X,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Spacing = new Vector2(10),
@@ -54,49 +54,33 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 18,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                new Container
-                                {
-                                    Colour = OsuColour.FromHex("1c2125"),
-                                    //Anchor = Anchor.CentreLeft,
-                                    //Origin = Anchor.CentreLeft,
-                                    //AutoSizeAxes = Axes.X,
-                                    //RelativeSizeAxes = Axes.Y,
-                                    //Height = 50,
-                                    //Size = new Vector2(50),
-                                    Children = new Drawable[]
-                                    {
-                                        new OsuTextBox
-                                        {
-                                            RelativeSizeAxes = Axes.Y,
-                                            //Size = new Vector2(50),
-                                            //Height = 50,
-                                            Padding = new MarginPadding { Left = 300 },
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Padding = new MarginPadding { Left = 20 },
-                                            Colour = Color4.White,
-                                            TextSize = 16,
-                                            Text = "Artist",
-                                            Font = @"Exo2.0-Bold",
-                                        },
-                                    }
-                                },
                                 new LabelledTextBox
                                 {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Artist",
+                                    TextBoxPlaceholderText = "Artist",
                                 },
                                 new LabelledTextBox
                                 {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Romanised Artist",
+                                    TextBoxPlaceholderText = "Romanised Artist",
                                 },
                                 new LabelledTextBox
                                 {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Title",
+                                    TextBoxPlaceholderText = "Title",
                                 },
                                 new LabelledTextBox
                                 {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Romanised Title",
+                                    TextBoxPlaceholderText = "Romanised Title",
                                 },
                             }
                         }
