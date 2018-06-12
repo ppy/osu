@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual
         {
             reset();
             AddStep("Set zoom = 10", () => scrollContainer.Zoom = 10);
-            AddAssert("Box at 1/2", () => Precision.AlmostEquals(boxQuad.Centre, scrollQuad.Centre));
+            AddAssert("Box at 1/2", () => Precision.AlmostEquals(boxQuad.Centre, scrollQuad.Centre, 1));
             AddAssert("Box width = 10x", () => Precision.AlmostEquals(boxQuad.Size.X, 10 * scrollQuad.Size.X));
         }
 
