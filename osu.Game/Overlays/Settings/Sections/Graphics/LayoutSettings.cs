@@ -39,9 +39,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             var resolutions = getResolutions();
             var resolutionDropdownBindable = new BindableInt(resolutions.FirstOrDefault(r => r.Key.StartsWith($"{sizeFullscreen.Value.Width}x{sizeFullscreen.Value.Height}")).Value);
 
-            resolutionDropdownBindable.ValueChanged += _ =>
+            resolutionDropdownBindable.ValueChanged += resolution =>
             {
-                var newResolution = resolutions.First(r => r.Value == _);
+                var newResolution = resolutions.First(r => r.Value == resolution);
                 var newResolutionparts = newResolution.Key.Split('x');
                 sizeFullscreen.Value = new Size(int.Parse(newResolutionparts.First()), int.Parse(newResolutionparts.Last()));
             };
@@ -91,9 +91,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
             };
 
-            windowModeDropdown.Bindable.ValueChanged += (s) =>
+            windowModeDropdown.Bindable.ValueChanged += windowMode =>
             {
-                if (windowModeDropdown.Bindable.Value == WindowMode.Fullscreen)
+                if (windowMode == WindowMode.Fullscreen)
                     resolutionDropdown.Show();
                 else
                     resolutionDropdown.Hide();
