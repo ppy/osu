@@ -62,6 +62,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             if (categoryDifficulty != null)
             {
+                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
                 double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
 
                 categoryDifficulty["Strain"] = starRating;

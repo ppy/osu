@@ -65,8 +65,6 @@ namespace osu.Game.Rulesets
 
         public virtual PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => null;
 
-        public virtual PerformanceCalculator CreatePerformanceCalculator(Dictionary<string, object> difficultyAttributes, Score score) => null;
-
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_question_circle };
