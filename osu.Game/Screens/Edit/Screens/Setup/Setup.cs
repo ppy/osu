@@ -31,12 +31,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup
             {
                 screenContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.None,
                     CornerRadius = 30,
                     Masking = true,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(0.7f, 0.8f),
+                    Size = new Vector2(900, 600),
                     Children = new[]
                     {
                         new Container

@@ -4,14 +4,15 @@
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Edit.Screens
 {
     /// <summary>
-    /// TODO: eventually make this inherit Screen and add a local scren stack inside the Editor.
+    /// TODO: Add a local screen stack inside the Editor.
     /// </summary>
-    public class EditorScreen : OsuScreen // Change back to Container if problems occur
+    public class EditorScreen : Screen
     {
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 

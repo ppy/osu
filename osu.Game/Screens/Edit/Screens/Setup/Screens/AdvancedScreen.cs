@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     {
         private readonly Container content;
 
-        public override string Title => "Advanced";
+        public string Title => "Advanced";
 
         public AdvancedScreen()
         {

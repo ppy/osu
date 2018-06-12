@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     {
         private readonly Container content;
 
-        public override string Title => "General";
+        public string Title => "General";
 
         public GeneralScreen()
         {
@@ -60,6 +60,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Artist",
                                     TextBoxPlaceholderText = "Artist",
+                                    TextBoxText = Beatmap?.Value?.Metadata.ArtistUnicode,
+                                    //TextBoxTextChangedAction = a => Beatmap.Value.Metadata.ArtistUnicode = a
                                 },
                                 new LabelledTextBox
                                 {
@@ -67,6 +69,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Romanised Artist",
                                     TextBoxPlaceholderText = "Romanised Artist",
+                                    TextBoxText = Beatmap?.Value?.Metadata.Artist,
+                                    //TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Artist = a
                                 },
                                 new LabelledTextBox
                                 {
@@ -74,6 +78,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Title",
                                     TextBoxPlaceholderText = "Title",
+                                    TextBoxText = Beatmap?.Value?.Metadata.TitleUnicode,
+                                    //TextBoxTextChangedAction = a => Beatmap.Value.Metadata.TitleUnicode = a
                                 },
                                 new LabelledTextBox
                                 {
@@ -81,6 +87,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Romanised Title",
                                     TextBoxPlaceholderText = "Romanised Title",
+                                    TextBoxText = Beatmap?.Value?.Metadata.Title,
+                                    //TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Title = a
                                 },
                             }
                         }

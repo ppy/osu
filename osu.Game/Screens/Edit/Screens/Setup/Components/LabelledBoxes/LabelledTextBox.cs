@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,7 +29,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public const float DEFAULT_LABEL_TEXT_SIZE = 18;
         public const float DEFAULT_HEIGHT = 50;
         public const float DEFAULT_LABEL_PADDING = 15;
-        public const float DEFAULT_TEXT_BOX_PADDING = 300;
+
+        public Action<string> TextBoxTextChangedAction;
+
+        public void TriggerTextBoxTextChanged(string newText)
+        {
+            TextBoxTextChangedAction?.Invoke(newText);
+        }
 
         private string labelText;
         public string LabelText
@@ -177,6 +184,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                     }
                 }
             };
+            textBox.OnCommit += delegate { TriggerTextBoxTextChanged(textBox.Text); };
         }
     }
 }
