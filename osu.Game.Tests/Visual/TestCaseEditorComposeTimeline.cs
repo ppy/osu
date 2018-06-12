@@ -19,7 +19,6 @@ namespace osu.Game.Tests.Visual
         {
             typeof(TimelineArea),
             typeof(Timeline),
-            typeof(BeatmapWaveformGraph),
             typeof(TimelineButton),
             typeof(CentreMarker)
         };
