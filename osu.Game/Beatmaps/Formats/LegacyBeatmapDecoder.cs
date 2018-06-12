@@ -34,7 +34,8 @@ namespace osu.Game.Beatmaps.Formats
 
         private readonly int offset;
 
-        public LegacyBeatmapDecoder(int version = LATEST_VERSION) : base(version)
+        public LegacyBeatmapDecoder(int version = LATEST_VERSION)
+            : base(version)
         {
             // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
             offset = FormatVersion < 5 ? 24 : 0;
@@ -135,6 +136,7 @@ namespace osu.Game.Beatmaps.Formats
                             parser = new Rulesets.Objects.Legacy.Mania.ConvertHitObjectParser();
                             break;
                     }
+
                     break;
                 case @"LetterboxInBreaks":
                     beatmap.BeatmapInfo.LetterboxInBreaks = int.Parse(pair.Value) == 1;
@@ -207,8 +209,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.OnlineBeatmapID = int.Parse(pair.Value);
                     break;
                 case @"BeatmapSetID":
-                    beatmap.BeatmapInfo.OnlineBeatmapSetID = int.Parse(pair.Value);
-                    metadata.OnlineBeatmapSetID = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = int.Parse(pair.Value) };
                     break;
             }
         }
