@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             if (!state.Keyboard.ControlPressed)
                 return base.OnScroll(state);
 
-            setZoomTarget(zoomTarget + state.Mouse.ScrollDelta.X, zoomedContent.ToLocalSpace(state.Mouse.NativeState.Position).X);
+            setZoomTarget(zoomTarget + state.Mouse.ScrollDelta.Y, zoomedContent.ToLocalSpace(state.Mouse.NativeState.Position).X);
             return true;
         }
 
