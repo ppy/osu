@@ -13,7 +13,6 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
