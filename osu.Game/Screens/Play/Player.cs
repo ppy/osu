@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play
         protected ScoreProcessor ScoreProcessor;
         protected RulesetContainer RulesetContainer;
 
-        private HUDOverlay hudOverlay;
+        protected HUDOverlay HudOverlay;
         private FailOverlay failOverlay;
 
         private DrawableStoryboard storyboard;
@@ -170,9 +170,9 @@ namespace osu.Game.Screens.Play
                     OnPause = () =>
                     {
                         pauseContainer.Retries = RestartCount;
-                        hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
+                        HudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
                     },
-                    OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
+                    OnResume = () => HudOverlay.KeyCounter.IsCounting = true,
                     Children = new[]
                     {
                         storyboardContainer = new Container
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Play
                             Breaks = beatmap.Breaks
                         },
                         RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
-                        hudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
+                        HudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
                             Clock = Clock, // hud overlay doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
@@ -228,7 +228,8 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            hudOverlay.HoldToQuit.Action = Exit;
+            HudOverlay.HoldToQuit.Action = Exit;
+            HudOverlay.KeyCounter.Visible.Value = RulesetContainer.HasReplayLoaded;
 
             if (ShowStoryboard)
                 initializeStoryboard(false);
@@ -368,7 +369,7 @@ namespace osu.Game.Screens.Play
             RulesetContainer?.FadeOut(fade_out_duration);
             Content.FadeOut(fade_out_duration);
 
-            hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, Easing.In);
+            HudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, Easing.In);
 
             Background?.FadeTo(1f, fade_out_duration);
         }
