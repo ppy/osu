@@ -6,11 +6,11 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Tests.Visual
 {
@@ -40,14 +40,13 @@ namespace osu.Game.Tests.Visual
 
             for (int i = 1; i <= 16; i *= 2)
             {
-                var newDisplay = new BeatmapWaveformGraph
+                var newDisplay = new WaveformGraph
                 {
                     RelativeSizeAxes = Axes.Both,
                     Resolution = 1f / i,
-                    Beatmap = Beatmap
                 };
 
-                Beatmap.ValueChanged += b => newDisplay.Beatmap = b;
+                Beatmap.ValueChanged += b => newDisplay.Waveform = b.Waveform;
 
                 flow.Add(new Container
                 {
