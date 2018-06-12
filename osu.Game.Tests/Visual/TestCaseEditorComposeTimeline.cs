@@ -19,8 +19,6 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseEditorComposeTimeline()
         {
-            TimelineArea timelineArea;
-
             Children = new Drawable[]
             {
                 new MusicController
