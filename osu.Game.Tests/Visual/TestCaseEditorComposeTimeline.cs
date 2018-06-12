@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using OpenTK;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
@@ -16,10 +15,9 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseEditorComposeTimeline : EditorClockTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(TimelineArea), typeof(Timeline), typeof(BeatmapWaveformGraph), typeof(TimelineButton) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(TimelineArea), typeof(Timeline), typeof(TimelineButton) };
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        public TestCaseEditorComposeTimeline()
         {
             TimelineArea timelineArea;
 
@@ -31,7 +29,7 @@ namespace osu.Game.Tests.Visual
                     Origin = Anchor.TopCentre,
                     State = Visibility.Visible
                 },
-                timelineArea = new TimelineArea
+                new TimelineArea
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -39,8 +37,6 @@ namespace osu.Game.Tests.Visual
                     Size = new Vector2(0.8f, 100)
                 }
             };
-
-            timelineArea.Beatmap.BindTo(osuGame.Beatmap);
         }
     }
 }

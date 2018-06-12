@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Input;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -15,7 +16,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
     public class Timeline : ZoomableScrollContainer
     {
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
-        public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private IAdjustableClock adjustableClock;
 
@@ -24,24 +25,32 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
             Zoom = 10;
+        }
 
-            BeatmapWaveformGraph waveform;
-            Child = waveform = new BeatmapWaveformGraph
+        private WaveformGraph waveform;
+
+        [BackgroundDependencyLoader]
+        private void load(IBindableBeatmap beatmap, IAdjustableClock adjustableClock)
+        {
+            this.adjustableClock = adjustableClock;
+
+            Child = waveform = new WaveformGraph
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = OsuColour.FromHex("222"),
                 Depth = float.MaxValue
             };
 
-            waveform.Beatmap.BindTo(Beatmap);
-
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
+
+            Beatmap.BindTo(beatmap);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(IAdjustableClock adjustableClock)
+        protected override void LoadComplete()
         {
-            this.adjustableClock = adjustableClock;
+            base.LoadComplete();
+            Beatmap.BindValueChanged(b => waveform.Waveform = b.Waveform);
+            waveform.Waveform = Beatmap.Value.Waveform;
         }
 
         /// <summary>

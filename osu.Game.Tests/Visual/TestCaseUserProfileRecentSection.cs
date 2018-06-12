@@ -12,6 +12,7 @@ using osu.Game.Overlays.Profile.Sections.Recent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tests.Visual
 {
@@ -49,15 +50,15 @@ namespace osu.Game.Tests.Visual
             };
         }
 
-        private IEnumerable<RecentActivity> createDummyActivities()
+        private IEnumerable<APIRecentActivity> createDummyActivities()
         {
-            var dummyBeatmap = new RecentActivity.RecentActivityBeatmap
+            var dummyBeatmap = new APIRecentActivity.RecentActivityBeatmap
             {
                 Title = @"Dummy beatmap",
                 Url = "/b/1337",
             };
 
-            var dummyUser = new RecentActivity.RecentActivityUser
+            var dummyUser = new APIRecentActivity.RecentActivityUser
             {
                 Username = "DummyReborn",
                 Url = "/u/666",
@@ -66,61 +67,61 @@ namespace osu.Game.Tests.Visual
 
             return new[]
             {
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.Achievement,
-                    Achievement = new RecentActivity.RecentActivityAchievement
+                    Achievement = new APIRecentActivity.RecentActivityAchievement
                     {
                         Name = @"Feelin' It",
                         Slug = @"all-secret-feelinit",
                     },
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.BeatmapPlaycount,
                     Count = 1337,
                     Beatmap = dummyBeatmap,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.BeatmapsetApprove,
                     Approval = BeatmapApproval.Qualified,
                     Beatmapset = dummyBeatmap,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.BeatmapsetDelete,
                     Beatmapset = dummyBeatmap,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.BeatmapsetRevive,
                     Beatmapset = dummyBeatmap,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.BeatmapsetRevive,
                     Beatmapset = dummyBeatmap,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.BeatmapsetUpdate,
                     Beatmapset = dummyBeatmap,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.BeatmapsetUpload,
                     Beatmapset = dummyBeatmap,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.Rank,
@@ -128,29 +129,29 @@ namespace osu.Game.Tests.Visual
                     Mode = "osu!",
                     Beatmap = dummyBeatmap,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.RankLost,
                     Mode = "osu!",
                     Beatmap = dummyBeatmap,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.UsernameChange,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.UserSupportAgain,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.UserSupportFirst,
                 },
-                new RecentActivity
+                new APIRecentActivity
                 {
                     User = dummyUser,
                     Type = RecentActivityType.UserSupportGift,
