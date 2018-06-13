@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         public override void PostProcess()
         {
-            finalizePosition();
+            applyPositionOffsets();
 
             initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
 
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         public const int RNG_SEED = 1337;
 
-        private void finalizePosition()
+        private void applyPositionOffsets()
         {
             var rng = new FastRandom(RNG_SEED);
             // todo: HardRock displacement should be applied here
