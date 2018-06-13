@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play
         protected ScoreProcessor ScoreProcessor;
         protected RulesetContainer RulesetContainer;
 
-        protected HUDOverlay HudOverlay;
+        private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
 
         private DrawableStoryboard storyboard;
@@ -170,9 +170,9 @@ namespace osu.Game.Screens.Play
                     OnPause = () =>
                     {
                         pauseContainer.Retries = RestartCount;
-                        HudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
+                        hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
                     },
-                    OnResume = () => HudOverlay.KeyCounter.IsCounting = true,
+                    OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
                     Children = new[]
                     {
                         storyboardContainer = new Container
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Play
                             Breaks = beatmap.Breaks
                         },
                         RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
-                        HudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
+                        hudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
                             Clock = Clock, // hud overlay doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
@@ -228,8 +228,8 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            HudOverlay.HoldToQuit.Action = Exit;
-            HudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
+            hudOverlay.HoldToQuit.Action = Exit;
+            hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             if (ShowStoryboard)
                 initializeStoryboard(false);
@@ -369,7 +369,7 @@ namespace osu.Game.Screens.Play
             RulesetContainer?.FadeOut(fade_out_duration);
             Content.FadeOut(fade_out_duration);
 
-            HudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, Easing.In);
+            hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, Easing.In);
 
             Background?.FadeTo(1f, fade_out_duration);
         }
