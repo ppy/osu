@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Beatmaps
             var result = new ConvertResult();
             var converter = rulesetInstance.CreateBeatmapConverter(beatmap);
 
-            List<KeyValuePair<HitObject, IEnumerable<HitObject>>> conversions = new List<KeyValuePair<HitObject, IEnumerable<HitObject>>>();
+            var conversions = new List<KeyValuePair<HitObject, IEnumerable<HitObject>>>();
 
             converter.ObjectConverted += (orig, converted) =>
             {
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Beatmaps
             };
 
             IBeatmap convertedBeatmap = converter.Convert();
-            rulesetInstance.CreateBeatmapProcessor(convertedBeatmap).PostProcess();
+            rulesetInstance.CreateBeatmapProcessor(convertedBeatmap)?.PostProcess();
 
             foreach (var pair in conversions)
             {
