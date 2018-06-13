@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Menu
         public override bool HandleKeyboardInput => false;
         public override bool HandleMouseInput => false;
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         private Box leftBox;
         private Box rightBox;
@@ -45,9 +45,9 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuColour colours)
+        private void load(IBindableBeatmap beatmap, OsuColour colours)
         {
-            beatmap.BindTo(game.Beatmap);
+            this.beatmap.BindTo(beatmap);
 
             // linear colour looks better in this case, so let's use it for now.
             Color4 gradientDark = colours.Blue.Opacity(0).ToLinear();
