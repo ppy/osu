@@ -177,12 +177,13 @@ namespace osu.Game.Overlays.Volume
         {
             float amount = adjust_step * direction;
 
-            var mouse = GetContainingInputManager().CurrentState.Mouse;
-            if (mouse.HasPreciseScroll)
+            // handle the case where the OnPressed action was actually a mouse wheel.
+            // this allows for precise wheel handling.
+            var state = GetContainingInputManager().CurrentState;
+            if (state.Mouse?.ScrollDelta.Y != 0)
             {
-                float scrollDelta = mouse.ScrollDelta.Y;
-                if (scrollDelta != 0)
-                    amount *= Math.Abs(scrollDelta / 10);
+                OnScroll(state);
+                return;
             }
 
             Volume += amount;
@@ -203,6 +204,14 @@ namespace osu.Game.Overlays.Volume
             }
 
             return false;
+        }
+
+        protected override bool OnScroll(InputState state)
+        {
+            double amount = adjust_step * state.Mouse.ScrollDelta.Y * (state.Mouse.HasPreciseScroll ? 0.5f : 1);
+
+            Volume += Math.Sign(amount) * Math.Max(0.01, Math.Abs(amount));
+            return true;
         }
 
         public bool OnReleased(GlobalAction action) => false;
