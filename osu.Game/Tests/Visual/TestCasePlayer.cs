@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Lists;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -55,6 +54,7 @@ namespace osu.Game.Tests.Visual
                     Player p = null;
                     AddStep(r.Name, () => p = loadPlayerFor(r));
                     AddUntilStep(() => ContinueCondition(p));
+
                     AddAssert("no leaked beatmaps", () =>
                     {
                         p = null;
@@ -64,9 +64,16 @@ namespace osu.Game.Tests.Visual
                         int count = 0;
 
                         workingWeakReferences.ForEachAlive(_ => count++);
+                        return count == 1;
+                    });
 
-                        Logger.Log($"reference count {count}");
+                    AddAssert("no leaked players", () =>
+                    {
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        int count = 0;
 
+                        playerWeakReferences.ForEachAlive(_ => count++);
                         return count == 1;
                     });
                 }
@@ -78,6 +85,7 @@ namespace osu.Game.Tests.Visual
         protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
 
         private readonly WeakList<WorkingBeatmap> workingWeakReferences = new WeakList<WorkingBeatmap>();
+        private readonly WeakList<Player> playerWeakReferences = new WeakList<Player>();
 
         private Player loadPlayerFor(RulesetInfo ri) => loadPlayerFor(ri.CreateInstance());
 
@@ -94,6 +102,8 @@ namespace osu.Game.Tests.Visual
             Player?.Exit();
 
             var player = CreatePlayer(r);
+
+            playerWeakReferences.Add(player);
 
             LoadComponentAsync(player, p =>
             {
