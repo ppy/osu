@@ -84,19 +84,26 @@ namespace osu.Game.Tests.Beatmaps
             beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
 
             var result = new ConvertResult();
-
             var converter = rulesetInstance.CreateBeatmapConverter(beatmap);
+
+            List<KeyValuePair<HitObject, IEnumerable<HitObject>>> conversions = new List<KeyValuePair<HitObject, IEnumerable<HitObject>>>();
+
             converter.ObjectConverted += (orig, converted) =>
             {
+                conversions.Add(new KeyValuePair<HitObject, IEnumerable<HitObject>>(orig, converted));
                 converted.ForEach(h => h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty));
-
-                var mapping = new ConvertMapping { StartTime = orig.StartTime };
-                foreach (var obj in converted)
-                    mapping.Objects.AddRange(CreateConvertValue(obj));
-                result.Mappings.Add(mapping);
             };
 
-            converter.Convert();
+            IBeatmap convertedBeatmap = converter.Convert();
+            rulesetInstance.CreateBeatmapProcessor(convertedBeatmap).PostProcess();
+
+            foreach (var pair in conversions)
+            {
+                var mapping = new ConvertMapping { StartTime = pair.Key.StartTime };
+                foreach (var obj in pair.Value)
+                    mapping.Objects.AddRange(CreateConvertValue(obj));
+                result.Mappings.Add(mapping);
+            }
 
             return result;
         }
