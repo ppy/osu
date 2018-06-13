@@ -19,19 +19,16 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(SummaryTimeline) };
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        private void load()
         {
-            osuGame.Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
-            SummaryTimeline summaryTimeline;
-            Add(summaryTimeline = new SummaryTimeline
+            Add(new SummaryTimeline
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(500, 50)
             });
-
-            summaryTimeline.Beatmap.BindTo(osuGame.Beatmap);
         }
     }
 }

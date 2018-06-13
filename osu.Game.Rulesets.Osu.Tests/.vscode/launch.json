@@ -22,7 +22,7 @@
             },
             "type": "mono",
             "request": "launch",
-            "program": "${workspaceRoot}/bin/Debug/net471/osu.Game.Rulesets.Osu.Tests.exe",
+            "program": "${workspaceRoot}/bin/Release/net471/osu.Game.Rulesets.Osu.Tests.exe",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Release, msbuild)",
             "runtimeExecutable": null,
@@ -30,12 +30,12 @@
             "console": "internalConsole"
         },
         {
-            "name": "VisualTests (Debug, netcoreapp2.0)",
+            "name": "VisualTests (Debug, netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/bin/Debug/netcoreapp2.0/osu.Game.Rulesets.Osu.Tests.dll"
+                "${workspaceRoot}/bin/Debug/netcoreapp2.1/osu.Game.Rulesets.Osu.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Debug, dotnet)",
@@ -43,12 +43,12 @@
             "console": "internalConsole"
         },
         {
-            "name": "VisualTests (Release, netcoreapp2.0)",
+            "name": "VisualTests (Release, netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/bin/Debug/netcoreapp2.0/osu.Game.Rulesets.Osu.Tests.dll"
+                "${workspaceRoot}/bin/Release/netcoreapp2.1/osu.Game.Rulesets.Osu.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Release, dotnet)",

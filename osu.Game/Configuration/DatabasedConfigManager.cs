@@ -13,13 +13,13 @@ namespace osu.Game.Configuration
     {
         private readonly SettingsStore settings;
 
-        private readonly int variant;
+        private readonly int? variant;
 
         private readonly List<DatabasedSetting> databasedSettings;
 
         private readonly RulesetInfo ruleset;
 
-        protected DatabasedConfigManager(SettingsStore settings, RulesetInfo ruleset = null, int variant = 0)
+        protected DatabasedConfigManager(SettingsStore settings, RulesetInfo ruleset = null, int? variant = null)
         {
             this.settings = settings;
             this.ruleset = ruleset;
