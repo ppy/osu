@@ -122,6 +122,14 @@ namespace osu.Game.Overlays
 
         private ScheduledDelegate popOutDelegate;
 
+        public override void Show()
+        {
+            if (State == Visibility.Visible)
+                schedulePopOut();
+
+            base.Show();
+        }
+
         protected override void PopIn()
         {
             ClearTransforms();
