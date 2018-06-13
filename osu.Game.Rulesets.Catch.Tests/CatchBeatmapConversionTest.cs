@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
 
         [TestCase("basic"), Ignore("See: https://github.com/ppy/osu/issues/2232")]
+        [TestCase("spinner")]
         public new void Test(string name)
         {
             base.Test(name);
@@ -27,6 +28,17 @@ namespace osu.Game.Rulesets.Catch.Tests
             if (hitObject is JuiceStream stream)
             {
                 foreach (var nested in stream.NestedHitObjects)
+                {
+                    yield return new ConvertValue
+                    {
+                        StartTime = nested.StartTime,
+                        Position = ((CatchHitObject)nested).X * CatchPlayfield.BASE_WIDTH
+                    };
+                }
+            }
+            else if (hitObject is BananaShower shower)
+            {
+                foreach (var nested in shower.NestedHitObjects)
                 {
                     yield return new ConvertValue
                     {

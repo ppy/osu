@@ -48,10 +48,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         foreach (var nested in bananaShower.NestedHitObjects)
                         {
                             ((BananaShower.Banana)nested).X = (float)rng.NextDouble();
-                            // discarding 3 times
-                            rng.Next();
-                            rng.Next();
-                            rng.Next();
+                            rng.Next(); // osu!stable retrieved a random banana type
+                            rng.Next(); // osu!stable retrieved a random banana rotation
                         }
                         break;
                     case JuiceStream juiceStream:
