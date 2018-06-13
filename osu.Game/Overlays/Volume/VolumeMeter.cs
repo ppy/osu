@@ -206,11 +206,18 @@ namespace osu.Game.Overlays.Volume
             return false;
         }
 
+        // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
+        private double scrollAmount;
+
         protected override bool OnScroll(InputState state)
         {
-            double amount = adjust_step * state.Mouse.ScrollDelta.Y * (state.Mouse.HasPreciseScroll ? 0.5f : 1);
+            scrollAmount += adjust_step * state.Mouse.ScrollDelta.Y * (state.Mouse.HasPreciseScroll ? 0.1f : 1);
 
-            Volume += Math.Sign(amount) * Math.Max(0.01, Math.Abs(amount));
+            if (Math.Abs(scrollAmount) < Bindable.Precision)
+                return true;
+
+            Volume += scrollAmount;
+            scrollAmount = 0;
             return true;
         }
 
