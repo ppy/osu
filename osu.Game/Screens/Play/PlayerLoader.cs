@@ -218,7 +218,7 @@ namespace osu.Game.Screens.Play
 
         private class BeatmapMetadataDisplay : Container
         {
-            private class MetadataLine : Container
+            private class MetadataLine : FillFlowContainer
             {
                 public MetadataLine(string left, string right)
                 {
