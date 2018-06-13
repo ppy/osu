@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Ranking
 
         private static readonly Vector2 background_blur = new Vector2(20);
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         private const float overscan = 1.3f;
 
@@ -57,6 +57,7 @@ namespace osu.Game.Screens.Ranking
         {
             base.OnEntering(last);
             (Background as BackgroundScreenBeatmap)?.BlurTo(background_blur, 2500, Easing.OutQuint);
+            Background.ScaleTo(1.1f, transition_time, Easing.OutQuint);
 
             allCircles.ForEach(c =>
             {
@@ -101,6 +102,8 @@ namespace osu.Game.Screens.Ranking
             {
                 c.ScaleTo(0, transition_time, Easing.OutSine);
             });
+
+            Background.ScaleTo(1f, transition_time / 4, Easing.OutQuint);
 
             Content.FadeOut(transition_time / 4);
 
@@ -160,7 +163,6 @@ namespace osu.Game.Screens.Ranking
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ParallaxAmount = 0.01f,
-                                    Scale = new Vector2(1 / circle_outer_scale / overscan),
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Children = new Drawable[]
@@ -272,10 +274,10 @@ namespace osu.Game.Screens.Ranking
                 switch (mode)
                 {
                     case ResultMode.Summary:
-                        currentPage = new ResultsPageScore(score, Beatmap);
+                        currentPage = new ResultsPageScore(score, Beatmap.Value);
                         break;
                     case ResultMode.Ranking:
-                        currentPage = new ResultsPageRanking(score, Beatmap);
+                        currentPage = new ResultsPageRanking(score, Beatmap.Value);
                         break;
                 }
 

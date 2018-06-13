@@ -61,11 +61,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => !m.Ranked))
                 return 0;
 
-            double hitWindowGreat = (Beatmap.HitObjects.First().HitWindows.Great / 2 - 0.5) / TimeRate;
-            double preEmpt = BeatmapDifficulty.DifficultyRange(Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / TimeRate;
+            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
+            double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
+            double preEmpt = (int)BeatmapDifficulty.DifficultyRange(Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / TimeRate;
 
             realApproachRate = preEmpt > 1200 ? (1800 - preEmpt) / 120 : (1200 - preEmpt) / 150 + 5;
-            realOverallDifficulty = (80 - 0.5 - hitWindowGreat) / 6;
+            realOverallDifficulty = (80 - hitWindowGreat) / 6;
 
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.12f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
