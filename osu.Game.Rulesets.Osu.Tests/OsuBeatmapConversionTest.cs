@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         [TestCase("basic")]
         [TestCase("colinear-perfect-curve")]
+        [TestCase("slider-ticks")]
         public new void Test(string name)
         {
             base.Test(name);
