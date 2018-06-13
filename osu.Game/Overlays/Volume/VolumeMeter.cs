@@ -221,7 +221,7 @@ namespace osu.Game.Overlays.Volume
         protected override bool OnHover(InputState state)
         {
             this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
-            return true;
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)

@@ -142,13 +142,18 @@ namespace osu.Game.Overlays
             return base.OnMouseMove(state);
         }
 
+        protected override bool OnHover(InputState state)
+        {
+            Show();
+            return true;
+        }
+
         private void schedulePopOut()
         {
             popOutDelegate?.Cancel();
             this.Delay(1000).Schedule(() =>
             {
-                // only actually hide if the mouse isn't within our bounds.
-                if (!ScreenSpaceDrawQuad.Contains(GetContainingInputManager().CurrentState.Mouse.Position))
+                if (!IsHovered)
                     Hide();
             }, out popOutDelegate);
         }
