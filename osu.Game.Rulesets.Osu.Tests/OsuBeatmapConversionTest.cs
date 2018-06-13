@@ -13,7 +13,8 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    internal class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    [TestFixture]
+    public class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected override Ruleset CreateRuleset() => new OsuRuleset();
     }
 
-    internal struct ConvertValue : IEquatable<ConvertValue>
+    public struct ConvertValue : IEquatable<ConvertValue>
     {
         /// <summary>
         /// A sane value to account for osu!stable using ints everwhere.
