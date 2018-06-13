@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                             //AutoSizeAxes = Axes.X,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Spacing = new Vector2(10),
+                            Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText
@@ -56,7 +56,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 new LabelledTextBox
                                 {
-                                    RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Artist",
                                     TextBoxPlaceholderText = "Artist",
@@ -65,7 +64,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 new LabelledTextBox
                                 {
-                                    RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Romanised Artist",
                                     TextBoxPlaceholderText = "Romanised Artist",
@@ -74,7 +72,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 new LabelledTextBox
                                 {
-                                    RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Title",
                                     TextBoxPlaceholderText = "Title",
@@ -83,7 +80,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 new LabelledTextBox
                                 {
-                                    RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Romanised Title",
                                     TextBoxPlaceholderText = "Romanised Title",

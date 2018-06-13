@@ -128,28 +128,33 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             Masking = true;
             CornerRadius = 15;
             //RelativeSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
+            base.Height = DEFAULT_HEIGHT;
 
             InternalChildren = new Drawable[]
             {
                 new Container
                 {
-                    Masking = true,
-                    CornerRadius = 15,
-                    Height = DEFAULT_HEIGHT,
                     RelativeSizeAxes = Axes.X,
+                    Height = DEFAULT_HEIGHT,
+                    CornerRadius = 15,
+                    Masking = true,
                     Children = new Drawable[]
                     {
                         new Box
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            Height = DEFAULT_HEIGHT,
                             Colour = OsuColour.FromHex("1c2125"),
                         },
                         new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            Height = DEFAULT_HEIGHT,
                             Child = new GridContainer
                             {
-                                RelativeSizeAxes = Axes.Both,
+                                RelativeSizeAxes = Axes.X,
+                                Height = DEFAULT_HEIGHT,
                                 Content = new[]
                                 {
                                     new Drawable[]
@@ -166,11 +171,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                         },
                                         textBox = new OsuTextBox
                                         {
-                                            CornerRadius = 15,
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
                                             RelativeSizeAxes = Axes.X,
                                             Height = DEFAULT_HEIGHT,
+                                            CornerRadius = 15,
                                         },
                                     },
                                 },
