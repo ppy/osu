@@ -27,5 +27,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != null)
                 Action = action.Value;
         }
+
+        protected override void UpdateState(ArmedState state)
+        {
+            switch (state)
+            {
+                case ArmedState.Miss:
+                    this.FadeOut(150, Easing.In).Expire();
+                    break;
+                case ArmedState.Hit:
+                    this.FadeOut(150, Easing.OutQuint).Expire();
+                    break;
+            }
+        }
     }
 }

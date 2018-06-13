@@ -4,34 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build (Debug, msbuild)",
-            "type": "shell",
-            "command": "msbuild",
-            "args": [
-                "/p:TargetFramework=net471",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
-            ],
-            "group": "build",
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Build (Release, msbuild)",
-            "type": "shell",
-            "command": "msbuild",
-            "args": [
-                "/p:Configuration=Release",
-                "/p:TargetFramework=net471",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
-            ],
-            "group": "build",
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Build osu! (Debug, dotnet)",
+            "label": "Build osu! (Debug)",
             "type": "shell",
             "command": "dotnet",
             "args": [
@@ -47,7 +20,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Build osu! (Release, dotnet)",
+            "label": "Build osu! (Release)",
             "type": "shell",
             "command": "dotnet",
             "args": [
@@ -64,7 +37,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Build tests (Debug, dotnet)",
+            "label": "Build tests (Debug)",
             "type": "shell",
             "command": "dotnet",
             "args": [
@@ -80,7 +53,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Build tests (Release, dotnet)",
+            "label": "Build tests (Release)",
             "type": "shell",
             "command": "dotnet",
             "args": [
@@ -95,15 +68,6 @@
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Restore (net471)",
-            "type": "shell",
-            "command": "nuget",
-            "args": [
-                "restore"
-            ],
-            "problemMatcher": []
         },
         {
             "label": "Restore (netcoreapp2.1)",
