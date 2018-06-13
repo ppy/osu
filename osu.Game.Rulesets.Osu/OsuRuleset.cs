@@ -93,57 +93,26 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModEasy(),
                         new OsuModNoFail(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModHalfTime(),
-                                new OsuModDaycore(),
-                            },
-                        },
+                        new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
                     };
-
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
                         new OsuModHardRock(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModSuddenDeath(),
-                                new OsuModPerfect(),
-                            },
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModDoubleTime(),
-                                new OsuModNightcore(),
-                            },
-                        },
+                        new MultiMod(new OsuModSuddenDeath(), new OsuModPerfect()),
+                        new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
                         new OsuModHidden(),
                         new OsuModFlashlight(),
                     };
-
                 case ModType.Special:
                     return new Mod[]
                     {
                         new OsuModRelax(),
                         new OsuModAutopilot(),
                         new OsuModSpunOut(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModAutoplay(),
-                                new ModCinema(),
-                            },
-                        },
+                        new MultiMod(new OsuModAutoplay(), new ModCinema()),
                         new OsuModTarget(),
                     };
-
                 default:
                     return new Mod[] { };
             }
@@ -161,7 +130,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override string ShortName => "osu";
 
-        public override SettingsSubsection CreateSettings() => new OsuSettings();
+        public override RulesetSettingsSubsection CreateSettings() => new OsuSettings(this);
 
         public override int? LegacyID => 0;
 

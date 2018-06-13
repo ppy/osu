@@ -147,22 +147,6 @@ namespace osu.Game.Overlays.Direct
 
         protected void ShowInformation() => beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
 
-        protected void StartDownload()
-        {
-            if (beatmaps.GetExistingDownload(SetInfo) != null)
-            {
-                // we already have an active download running.
-                content.MoveToX(-5, 50, Easing.OutSine).Then()
-                       .MoveToX(5, 100, Easing.InOutSine).Then()
-                       .MoveToX(-5, 100, Easing.InOutSine).Then()
-                       .MoveToX(0, 50, Easing.InSine).Then();
-
-                return;
-            }
-
-            beatmaps.Download(SetInfo);
-        }
-
         private void attachDownload(DownloadBeatmapSetRequest request)
         {
             if (request.BeatmapSet.OnlineBeatmapSetID != SetInfo.OnlineBeatmapSetID)
