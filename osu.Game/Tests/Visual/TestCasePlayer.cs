@@ -45,7 +45,6 @@ namespace osu.Game.Tests.Visual
                 Player p = null;
                 AddStep(ruleset.RulesetInfo.Name, () => p = loadPlayerFor(ruleset));
                 AddUntilStep(() => ContinueCondition(p));
-
             }
             else
             {
