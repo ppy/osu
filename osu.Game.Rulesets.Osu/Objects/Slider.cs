@@ -96,11 +96,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             createRepeatPoints();
 
             if (LegacyLastTickOffset != null)
-            {
-                var lastObject = NestedHitObjects.Last();
-                if (!(lastObject is SliderCircle))
-                    lastObject.StartTime = Math.Max(StartTime + Duration / 2, lastObject.StartTime - LegacyLastTickOffset.Value);
-            }
+                TailCircle.StartTime = Math.Max(StartTime + Duration / 2, TailCircle.StartTime - LegacyLastTickOffset.Value);
         }
 
         private void createSliderEnds()
