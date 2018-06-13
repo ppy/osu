@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         [TestCase("basic"), Ignore("See: https://github.com/ppy/osu/issues/2232")]
         [TestCase("spinner")]
+        [TestCase("spinner-and-circles")]
         public new void Test(string name)
         {
             base.Test(name);
