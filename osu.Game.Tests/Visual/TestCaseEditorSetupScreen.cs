@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Screens.Edit.Screens.Setup;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
+using osu.Game.Screens.Edit.Screens.Setup.BottomHeaders;
 using osu.Game.Screens.Edit.Screens.Setup.Screens;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Rulesets;
@@ -31,6 +32,7 @@ namespace osu.Game.Tests.Visual
             typeof(ColoursScreen),
             typeof(DesignScreen),
             typeof(AdvancedScreen),
+            typeof(GeneralScreenBottomHeader),
         };
 
         public TestCaseEditorSetupScreen()

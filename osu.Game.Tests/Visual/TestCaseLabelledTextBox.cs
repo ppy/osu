@@ -29,10 +29,9 @@ namespace osu.Game.Tests.Visual
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    //RelativeSizeAxes = Axes.Both,
                     LabelText = "Testing text",
                     TextBoxPlaceholderText = "This is definitely working as intended",
-                    Padding = new MarginPadding(150)
+                    Padding = new MarginPadding { Left = 150, Right = 150 }
                 }
             };
         }

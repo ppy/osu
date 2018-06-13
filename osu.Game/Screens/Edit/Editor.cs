@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Edit
                     currentScreen = new Design();
                     break;
                 case EditorScreenMode.BeatmapSetup:
-                    currentScreen = new Setup();
+                    currentScreen = new Setup(Beatmap.Value);
                     break;
                 default:
                     currentScreen = new EditorScreen();

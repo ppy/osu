@@ -15,6 +15,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
+using osu.Game.Screens.Edit.Screens.Setup.BottomHeaders;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -119,6 +120,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextBoxText = Beatmap.Value.Metadata.Tags,
                                     TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Tags = a
                                 },
+                                new GeneralScreenBottomHeader
+                                {
+                                    Padding = new MarginPadding { Right = 150 },
+
+                                }
                             }
                         }
                     },
