@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         private readonly Container content;
         private readonly OsuSpriteText label;
 
-        public const float DEFAULT_LABEL_TEXT_SIZE = 18;
+        public const float DEFAULT_LABEL_TEXT_SIZE = 20;
         public const float DEFAULT_HEIGHT = 50;
         public const float DEFAULT_LABEL_PADDING = 15;
 
@@ -35,6 +35,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public void TriggerTextBoxTextChanged(string newText)
         {
             TextBoxTextChangedAction?.Invoke(newText);
+        }
+
+        private bool readOnly = false;
+        public bool ReadOnly
+        {
+            get => readOnly;
+            set
+            {
+                textBox.ReadOnly = value;
+                readOnly = value;
+            }
         }
 
         private string labelText;
@@ -96,7 +107,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public MarginPadding Padding
         {
             get => base.Padding;
-            set => base.Padding = value;
+            set
+            {
+                base.Padding = value;
+                base.Height = Height + base.Padding.Top;
+            }
         }
 
         public MarginPadding LabelPadding
@@ -129,7 +144,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             CornerRadius = 15;
             //RelativeSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-            base.Height = DEFAULT_HEIGHT;
+            base.Height = DEFAULT_HEIGHT + Padding.Top;
 
             InternalChildren = new Drawable[]
             {
@@ -175,13 +190,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                             Origin = Anchor.TopLeft,
                                             RelativeSizeAxes = Axes.X,
                                             Height = DEFAULT_HEIGHT,
+                                            ReadOnly = ReadOnly,
                                             CornerRadius = 15,
                                         },
                                     },
                                 },
                                 ColumnDimensions = new[]
                                 {
-                                    new Dimension(GridSizeMode.Absolute, 180),
+                                    new Dimension(GridSizeMode.Absolute, 160),
                                     new Dimension()
                                 }
                             }

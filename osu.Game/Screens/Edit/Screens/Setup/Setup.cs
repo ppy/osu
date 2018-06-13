@@ -15,18 +15,22 @@ using osu.Framework.Configuration;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
 using osu.Framework.Allocation;
 using OpenTK.Graphics;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Edit.Screens.Setup
 {
     public class Setup : EditorScreen
     {
         public SetupMenuBar MenuBar;
-        private EditorScreen currentScreen = new GeneralScreen();
+        private EditorScreen currentScreen;
         private Header header;
         private readonly Container screenContainer;
 
-        public Setup()
+        public Setup(WorkingBeatmap workingBeatmap)
         {
+            Beatmap.Value = workingBeatmap;
+            currentScreen = new GeneralScreen(workingBeatmap);
+
             Children = new Drawable[]
             {
                 screenContainer = new Container
@@ -36,7 +40,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                     Masking = true,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(900, 600),
+                    Size = new Vector2(900, 650),
                     Children = new[]
                     {
                         new Container
@@ -103,7 +107,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
             switch (mode)
             {
                 case SetupScreenMode.General:
-                    currentScreen = new GeneralScreen();
+                    currentScreen = new GeneralScreen(Beatmap.Value);
                     break;
                 case SetupScreenMode.Difficulty:
                     currentScreen = new DifficultyScreen();

@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -25,15 +26,15 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         public string Title => "General";
 
-        public GeneralScreen()
+        public GeneralScreen(WorkingBeatmap workingBeatmap)
         {
+            Beatmap.Value = workingBeatmap;
+
             Children = new Drawable[]
             {
                 content = new Container
                 {
-                    //Colour = OsuColour.FromHex("222d31"),
                     RelativeSizeAxes = Axes.Both,
-                    //AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -41,50 +42,82 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                             Margin = new MarginPadding { Left = 75, Top = 200 },
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.Both,
-                            //AutoSizeAxes = Axes.X,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Spacing = new Vector2(5),
+                            Spacing = new Vector2(3),
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText
                                 {
                                     Colour = Color4.White,
                                     Text = "Metadata",
-                                    TextSize = 18,
+                                    TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
                                 new LabelledTextBox
                                 {
-                                    Padding = new MarginPadding { Right = 150 },
+                                    Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "Artist",
                                     TextBoxPlaceholderText = "Artist",
-                                    TextBoxText = Beatmap?.Value?.Metadata.ArtistUnicode,
-                                    //TextBoxTextChangedAction = a => Beatmap.Value.Metadata.ArtistUnicode = a
+                                    TextBoxText = Beatmap.Value.Metadata.ArtistUnicode,
+                                    TextBoxTextChangedAction = a => Beatmap.Value.Metadata.ArtistUnicode = a
                                 },
                                 new LabelledTextBox
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Romanised Artist",
                                     TextBoxPlaceholderText = "Romanised Artist",
-                                    TextBoxText = Beatmap?.Value?.Metadata.Artist,
-                                    //TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Artist = a
+                                    TextBoxText = Beatmap.Value.Metadata.Artist,
+                                    TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Artist = a
                                 },
                                 new LabelledTextBox
                                 {
-                                    Padding = new MarginPadding { Right = 150 },
+                                    Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "Title",
                                     TextBoxPlaceholderText = "Title",
-                                    TextBoxText = Beatmap?.Value?.Metadata.TitleUnicode,
-                                    //TextBoxTextChangedAction = a => Beatmap.Value.Metadata.TitleUnicode = a
+                                    TextBoxText = Beatmap.Value.Metadata.TitleUnicode,
+                                    TextBoxTextChangedAction = a => Beatmap.Value.Metadata.TitleUnicode = a
                                 },
                                 new LabelledTextBox
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Romanised Title",
                                     TextBoxPlaceholderText = "Romanised Title",
-                                    TextBoxText = Beatmap?.Value?.Metadata.Title,
-                                    //TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Title = a
+                                    TextBoxText = Beatmap.Value.Metadata.Title,
+                                    TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Title = a
+                                },
+                                new LabelledTextBox
+                                {
+                                    Padding = new MarginPadding { Top = 10, Right = 150 },
+                                    ReadOnly = true,
+                                    LabelText = "Beatmap Creator",
+                                    TextBoxPlaceholderText = "Beatmap Creator",
+                                    TextBoxText = Beatmap.Value.Metadata.AuthorString,
+                                    TextBoxTextChangedAction = a => Beatmap.Value.Metadata.AuthorString = a
+                                },
+                                new LabelledTextBox
+                                {
+                                    Padding = new MarginPadding { Right = 150 },
+                                    LabelText = "Difficulty",
+                                    TextBoxPlaceholderText = "Difficulty",
+                                    TextBoxText = Beatmap.Value.Beatmap.BeatmapInfo.Version,
+                                    TextBoxTextChangedAction = a => Beatmap.Value.Beatmap.BeatmapInfo.Version = a
+                                },
+                                new LabelledTextBox
+                                {
+                                    Padding = new MarginPadding { Right = 150 },
+                                    LabelText = "Source",
+                                    TextBoxPlaceholderText = "Source",
+                                    TextBoxText = Beatmap.Value.Metadata.Source,
+                                    TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Source = a
+                                },
+                                new LabelledTextBox
+                                {
+                                    Padding = new MarginPadding { Right = 150 },
+                                    LabelText = "Tags",
+                                    TextBoxPlaceholderText = "Tags",
+                                    TextBoxText = Beatmap.Value.Metadata.Tags,
+                                    TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Tags = a
                                 },
                             }
                         }
