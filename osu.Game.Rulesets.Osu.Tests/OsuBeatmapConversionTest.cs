@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -27,17 +26,23 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
-            var startPosition = (hitObject as IHasPosition)?.Position ?? new Vector2(256, 192);
-            var endPosition = (hitObject as Slider)?.EndPosition ?? startPosition;
-
-            yield return new ConvertValue
+            switch (hitObject)
             {
-                StartTime = hitObject.StartTime,
-                EndTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime,
-                StartX = startPosition.X,
-                StartY = startPosition.Y,
-                EndX = endPosition.X,
-                EndY = endPosition.Y
+                case Slider slider:
+                    foreach (var nested in slider.NestedHitObjects)
+                        yield return createConvertValue(nested);
+                    break;
+                default:
+                    yield return createConvertValue(hitObject);
+                    break;
+            }
+
+            ConvertValue createConvertValue(HitObject obj) => new ConvertValue
+            {
+                StartTime = obj.StartTime,
+                EndTime = (obj as IHasEndTime)?.EndTime ?? obj.StartTime,
+                X = (obj as IHasPosition)?.X ?? 256,
+                Y = (obj as IHasPosition)?.Y ?? 192,
             };
         }
 
@@ -53,17 +58,13 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public double StartTime;
         public double EndTime;
-        public float StartX;
-        public float StartY;
-        public float EndX;
-        public float EndY;
+        public float X;
+        public float Y;
 
         public bool Equals(ConvertValue other)
-            => Precision.AlmostEquals(StartTime, other.StartTime)
+            => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
                && Precision.AlmostEquals(EndTime, other.EndTime, conversion_lenience)
-               && Precision.AlmostEquals(StartX, other.StartX)
-               && Precision.AlmostEquals(StartY, other.StartY, conversion_lenience)
-               && Precision.AlmostEquals(EndX, other.EndX, conversion_lenience)
-               && Precision.AlmostEquals(EndY, other.EndY, conversion_lenience);
+               && Precision.AlmostEquals(X, other.X, conversion_lenience)
+               && Precision.AlmostEquals(Y, other.Y, conversion_lenience);
     }
 }
