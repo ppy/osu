@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             ((BananaShower.Banana)nested).X = (float)rng.NextDouble();
                             rng.Next(); // osu!stable retrieved a random banana type
                             rng.Next(); // osu!stable retrieved a random banana rotation
+                            rng.Next(); // osu!stable retrieved a random banana colour
                         }
                         break;
                     case JuiceStream juiceStream:
