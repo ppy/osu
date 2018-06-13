@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Taiko
                     {
                         new TaikoModHardRock(),
                         new MultiMod(new TaikoModSuddenDeath(), new TaikoModPerfect()),
-                        new MultiMod(new TaikoModDoubleTime(), new TaikoModDaycore()),
+                        new MultiMod(new TaikoModDoubleTime(), new TaikoModNightcore()),
                         new TaikoModHidden(),
                         new TaikoModFlashlight(),
                     };
