@@ -56,13 +56,9 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         foreach (var nested in juiceStream.NestedHitObjects)
                         {
                             if (nested is TinyDroplet tinyDroplet)
-                            {
                                 tinyDroplet.X += rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH;
-                            }
                             else if (nested is Droplet)
-                            {
-                                rng.Next(); // Big droplets are not slided
-                            }
+                                rng.Next(); // osu!stable retrieved a random droplet rotation
                         }
                         break;
                 }
