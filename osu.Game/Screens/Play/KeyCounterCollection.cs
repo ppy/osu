@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play
         private const int duration = 100;
 
         public readonly Bindable<bool> Visible = new Bindable<bool>(true);
-        private readonly Bindable<bool> alwaysVisible = new Bindable<bool>();
+        private readonly Bindable<bool> configVisibility = new Bindable<bool>();
 
         public KeyCounterCollection()
         {
@@ -47,10 +47,10 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.KeyOverlay, alwaysVisible);
+            config.BindWith(OsuSetting.KeyOverlay, configVisibility);
 
             Visible.BindValueChanged(_ => updateVisibility());
-            alwaysVisible.BindValueChanged(_ => updateVisibility(), true);
+            configVisibility.BindValueChanged(_ => updateVisibility(), true);
         }
 
         //further: change default values here and in KeyCounter if needed, instead of passing them in every constructor
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private void updateVisibility() => this.FadeTo(Visible.Value || alwaysVisible.Value ? 1 : 0, duration);
+        private void updateVisibility() => this.FadeTo(Visible.Value || configVisibility.Value ? 1 : 0, duration);
 
         public override bool HandleKeyboardInput => receptor == null;
         public override bool HandleMouseInput => receptor == null;
