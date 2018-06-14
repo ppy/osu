@@ -93,8 +93,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     ReadOnly = true,
                                     LabelText = "Beatmap Creator",
                                     TextBoxPlaceholderText = "Beatmap Creator",
-                                    TextBoxText = Beatmap.Value.Metadata.AuthorString,
-                                    TextBoxTextChangedAction = a => Beatmap.Value.Metadata.AuthorString = a
+                                    TextBoxText = Beatmap.Value.Metadata.AuthorString
                                 },
                                 new LabelledTextBox
                                 {

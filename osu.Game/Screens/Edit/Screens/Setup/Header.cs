@@ -27,50 +27,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup
 
         public Header(Screen initialScreen)
         {
-            // TODO: Fix the box
-            // This does not create a visible box above the triangles to indicate the end of the area of each screen
             Children = new Drawable[]
             {
-                //new Container
-                //{
-                //    RelativeSizeAxes = Axes.X,
-                //    Height = HEIGHT,
-                //    Children = new Drawable[]
-                //    {
-                //        new Box
-                //        {
-                //            RelativeSizeAxes = Axes.X,
-                //            Height = HEIGHT,
-                //            Colour = OsuColour.FromHex("1a2328"),
-                //        },
-                //        new Container
-                //        {
-                //            RelativeSizeAxes = Axes.X,
-                //            Height = HEIGHT,
-                //            Child = new GridContainer
-                //            {
-                //                RelativeSizeAxes = Axes.X,
-                //                Height = HEIGHT,
-                //                Content = new[]
-                //                {
-                //                    new Drawable[]
-                //                    {
-                //                        new OsuSpriteText
-                //                        {
-                //                            Anchor = Anchor.TopLeft,
-                //                            Origin = Anchor.TopLeft,
-                //                            Padding = new MarginPadding { },
-                //                            Colour = Color4.White,
-                //                            TextSize = 18,
-                //                            Text = "Fucking test",
-                //                            Font = @"Exo2.0-Bold",
-                //                        },
-                //                    },
-                //                },
-                //            }
-                //        }
-                //    }
-                //},
                 new Container
                 {
                     Height = 50,
