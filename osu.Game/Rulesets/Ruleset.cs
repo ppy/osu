@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Creates the provider of <see cref="Mod"/> combinations that affect the <see cref="Beatmap"/> difficulty for this <see cref="Ruleset"/>.
         /// </summary>
-        public virtual DifficultyAdjustmentMods CreateDifficultyAdjustmentMods() => new DifficultyAdjustmentMods();
+        public virtual DifficultyAdjustmentMods CreateDifficultyAdjustmentMods(IBeatmap beatmap) => new DifficultyAdjustmentMods();
 
         /// <summary>
         /// Create a ruleset info based on this ruleset.

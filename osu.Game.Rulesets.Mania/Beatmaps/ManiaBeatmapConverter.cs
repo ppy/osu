@@ -67,7 +67,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             return base.ConvertBeatmap(original);
         }
 
-        protected override Beatmap<ManiaHitObject> CreateBeatmap() => beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
+        protected override Beatmap<ManiaHitObject> CreateBeatmap() => beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns })
+        {
+            IsManiaBeatmap = IsForCurrentRuleset
+        };
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
         {
