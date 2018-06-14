@@ -43,8 +43,7 @@ namespace osu.Game.Screens
             {
                 base.Push(screen);
             }
-            catch 
-            {
+            catch{
             }
         }
         protected override void Update()
