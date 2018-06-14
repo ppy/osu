@@ -33,10 +33,6 @@ namespace osu.Game.Rulesets.Difficulty
             TimeRate = clock.Rate;
         }
 
-        protected virtual void PreprocessHitObjects()
-        {
-        }
-
         /// <summary>
         /// Creates all <see cref="Mod"/> combinations which adjust the <see cref="Beatmap"/> difficulty.
         /// </summary>
