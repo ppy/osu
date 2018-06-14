@@ -2,9 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.NonVisual
@@ -15,7 +13,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestNoMods()
         {
-            var combinations = new TestDifficultyCalculator().CreateDifficultyAdjustmentModCombinations();
+            var combinations = new TestDifficultyAdjustmentMods().CreateCombinations();
 
             Assert.AreEqual(1, combinations.Length);
             Assert.IsTrue(combinations[0] is NoModMod);
@@ -24,7 +22,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestSingleMod()
         {
-            var combinations = new TestDifficultyCalculator(new ModA()).CreateDifficultyAdjustmentModCombinations();
+            var combinations = new TestDifficultyAdjustmentMods(new ModA()).CreateCombinations();
 
             Assert.AreEqual(2, combinations.Length);
             Assert.IsTrue(combinations[0] is NoModMod);
@@ -34,7 +32,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestDoubleMod()
         {
-            var combinations = new TestDifficultyCalculator(new ModA(), new ModB()).CreateDifficultyAdjustmentModCombinations();
+            var combinations = new TestDifficultyAdjustmentMods(new ModA(), new ModB()).CreateCombinations();
 
             Assert.AreEqual(4, combinations.Length);
             Assert.IsTrue(combinations[0] is NoModMod);
@@ -49,7 +47,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestIncompatibleMods()
         {
-            var combinations = new TestDifficultyCalculator(new ModA(), new ModIncompatibleWithA()).CreateDifficultyAdjustmentModCombinations();
+            var combinations = new TestDifficultyAdjustmentMods(new ModA(), new ModIncompatibleWithA()).CreateCombinations();
 
             Assert.AreEqual(3, combinations.Length);
             Assert.IsTrue(combinations[0] is NoModMod);
@@ -60,7 +58,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestDoubleIncompatibleMods()
         {
-            var combinations = new TestDifficultyCalculator(new ModA(), new ModB(), new ModIncompatibleWithA(), new ModIncompatibleWithAAndB()).CreateDifficultyAdjustmentModCombinations();
+            var combinations = new TestDifficultyAdjustmentMods(new ModA(), new ModB(), new ModIncompatibleWithA(), new ModIncompatibleWithAAndB()).CreateCombinations();
 
             Assert.AreEqual(8, combinations.Length);
             Assert.IsTrue(combinations[0] is NoModMod);
@@ -83,7 +81,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestIncompatibleThroughBaseType()
         {
-            var combinations = new TestDifficultyCalculator(new ModAofA(), new ModIncompatibleWithAofA()).CreateDifficultyAdjustmentModCombinations();
+            var combinations = new TestDifficultyAdjustmentMods(new ModAofA(), new ModIncompatibleWithAofA()).CreateCombinations();
 
             Assert.AreEqual(3, combinations.Length);
             Assert.IsTrue(combinations[0] is NoModMod);
@@ -136,17 +134,14 @@ namespace osu.Game.Tests.NonVisual
             public override Type[] IncompatibleMods => new[] { typeof(ModA), typeof(ModB) };
         }
 
-        private class TestDifficultyCalculator : DifficultyCalculator
+        private class TestDifficultyAdjustmentMods : DifficultyAdjustmentMods
         {
-            public TestDifficultyCalculator(params Mod[] mods)
-                : base(null)
+            public TestDifficultyAdjustmentMods(params Mod[] mods)
             {
-                DifficultyAdjustmentMods = mods;
+                Mods = mods;
             }
 
-            public override double Calculate(Dictionary<string, double> categoryDifficulty = null) => throw new NotImplementedException();
-
-            protected override Mod[] DifficultyAdjustmentMods { get; }
+            protected override Mod[] Mods { get; }
         }
     }
 }
