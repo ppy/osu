@@ -13,24 +13,44 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public abstract class DifficultyCalculator
     {
-        protected readonly IBeatmap Beatmap;
-        protected readonly Mod[] Mods;
+        private readonly Ruleset ruleset;
+        private readonly WorkingBeatmap beatmap;
 
-        protected double TimeRate { get; private set; } = 1;
-
-        protected DifficultyCalculator(IBeatmap beatmap, Mod[] mods = null)
+        protected DifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
         {
-            Beatmap = beatmap;
-            Mods = mods ?? new Mod[0];
-
-            ApplyMods(Mods);
+            this.ruleset = ruleset;
+            this.beatmap = beatmap;
         }
 
-        protected virtual void ApplyMods(Mod[] mods)
+        /// <summary>
+        /// Calculates the difficulty of the beatmap using a specific mod combination.
+        /// </summary>
+        /// <param name="mods">The mods that should be applied to the beatmap.</param>
+        /// <returns>A structure describing the difficulty of the beatmap.</returns>
+        public DifficultyAttributes Calculate(params Mod[] mods)
         {
+            beatmap.Mods.Value = mods;
+            IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+
             var clock = new StopwatchClock();
             mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
-            TimeRate = clock.Rate;
+
+            return Calculate(playableBeatmap, mods, clock.Rate);
+        }
+
+        /// <summary>
+        /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
+        /// </summary>
+        /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
+        public IEnumerable<DifficultyAttributes> CalculateAll()
+        {
+            foreach (var combination in CreateDifficultyAdjustmentModCombinations())
+            {
+                if (combination is MultiMod multi)
+                    yield return Calculate(multi.Mods);
+                else
+                    yield return Calculate(combination);
+            }
         }
 
         /// <summary>
@@ -71,6 +91,13 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         protected virtual Mod[] DifficultyAdjustmentMods => Array.Empty<Mod>();
 
-        public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);
+        /// <summary>
+        /// Calculates the difficulty of a <see cref="Beatmap"/> using a specific <see cref="Mod"/> combination.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> to compute the difficulty for.</param>
+        /// <param name="mods">The <see cref="Mod"/>s that should be applied.</param>
+        /// <param name="timeRate">The rate of time in <paramref name="beatmap"/>.</param>
+        /// <returns>A structure containing the difficulty attributes.</returns>
+        protected abstract DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate);
     }
 }
