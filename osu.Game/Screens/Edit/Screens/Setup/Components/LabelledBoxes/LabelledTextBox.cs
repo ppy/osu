@@ -7,6 +7,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
@@ -89,6 +90,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             {
                 textBoxText = value;
                 textBox.Text = value;
+                TextBoxTextChangedAction?.Invoke(value);
             }
         }
 

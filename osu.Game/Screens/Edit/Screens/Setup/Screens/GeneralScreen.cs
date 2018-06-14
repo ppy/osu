@@ -24,6 +24,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     public class GeneralScreen : EditorScreen
     {
         private readonly Container content;
+        private readonly LabelledTextBox artist;
+        private readonly LabelledTextBox romanisedArtist;
+        private readonly LabelledTextBox title;
+        private readonly LabelledTextBox romanisedTitle;
+        private readonly LabelledTextBox beatmapCreator;
+        private readonly LabelledTextBox difficulty;
+        private readonly LabelledTextBox source;
+        private readonly LabelledTextBox tags;
 
         public string Title => "General";
 
@@ -55,7 +63,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                new LabelledTextBox
+                                artist = new LabelledTextBox
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "Artist",
@@ -63,7 +71,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextBoxText = Beatmap.Value.Metadata.ArtistUnicode,
                                     TextBoxTextChangedAction = a => Beatmap.Value.Metadata.ArtistUnicode = a
                                 },
-                                new LabelledTextBox
+                                romanisedArtist = new LabelledTextBox
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Romanised Artist",
@@ -71,7 +79,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextBoxText = Beatmap.Value.Metadata.Artist,
                                     TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Artist = a
                                 },
-                                new LabelledTextBox
+                                title = new LabelledTextBox
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "Title",
@@ -79,7 +87,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextBoxText = Beatmap.Value.Metadata.TitleUnicode,
                                     TextBoxTextChangedAction = a => Beatmap.Value.Metadata.TitleUnicode = a
                                 },
-                                new LabelledTextBox
+                                romanisedTitle = new LabelledTextBox
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Romanised Title",
@@ -87,7 +95,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextBoxText = Beatmap.Value.Metadata.Title,
                                     TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Title = a
                                 },
-                                new LabelledTextBox
+                                beatmapCreator = new LabelledTextBox
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
                                     ReadOnly = true,
@@ -95,7 +103,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextBoxPlaceholderText = "Beatmap Creator",
                                     TextBoxText = Beatmap.Value.Metadata.AuthorString
                                 },
-                                new LabelledTextBox
+                                difficulty = new LabelledTextBox
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Difficulty",
@@ -103,7 +111,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextBoxText = Beatmap.Value.Beatmap.BeatmapInfo.Version,
                                     TextBoxTextChangedAction = a => Beatmap.Value.Beatmap.BeatmapInfo.Version = a
                                 },
-                                new LabelledTextBox
+                                source = new LabelledTextBox
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Source",
@@ -111,7 +119,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextBoxText = Beatmap.Value.Metadata.Source,
                                     TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Source = a
                                 },
-                                new LabelledTextBox
+                                tags = new LabelledTextBox
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Tags",
@@ -122,7 +130,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 new GeneralScreenBottomHeader
                                 {
                                     Padding = new MarginPadding { Top = 10 },
-
                                 }
                             }
                         }
@@ -130,5 +137,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 },
             };
         }
+
+        public void ChangeArtist(string newValue) => artist.TextBoxText = newValue;
+        public void ChangeRomanisedArtist(string newValue) => romanisedArtist.TextBoxText = newValue;
+        public void ChangeTitle(string newValue) => title.TextBoxText = newValue;
+        public void ChangeRomanisedTitle(string newValue) => romanisedTitle.TextBoxText = newValue;
+        public void ChangeDifficulty(string newValue) => difficulty.TextBoxText = newValue;
+        public void ChangeSource(string newValue) => source.TextBoxText = newValue;
+        public void ChangeTags(string newValue) => tags.TextBoxText = newValue;
     }
 }

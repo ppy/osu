@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
     public class Setup : EditorScreen
     {
         public SetupMenuBar MenuBar;
-        private EditorScreen currentScreen;
+        public EditorScreen CurrentScreen;
         private Header header;
         private readonly Container screenContainer;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
         public Setup(WorkingBeatmap workingBeatmap)
         {
             Beatmap.Value = workingBeatmap;
-            currentScreen = new GeneralScreen(workingBeatmap);
+            CurrentScreen = new GeneralScreen(workingBeatmap);
 
             Children = new Drawable[]
             {
@@ -94,8 +94,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                                 RelativeSizeAxes = Axes.Both,
                             }
                         },
-                        header = new Header(currentScreen),
-                        currentScreen,
+                        header = new Header(CurrentScreen),
+                        CurrentScreen,
                     }
                 },
             };
@@ -105,36 +105,36 @@ namespace osu.Game.Screens.Edit.Screens.Setup
 
         private void onModeChanged(SetupScreenMode mode)
         {
-            currentScreen?.Exit();
+            CurrentScreen?.Exit();
 
             switch (mode)
             {
                 case SetupScreenMode.General:
-                    currentScreen = new GeneralScreen(Beatmap.Value);
+                    CurrentScreen = new GeneralScreen(Beatmap.Value);
                     break;
                 case SetupScreenMode.Difficulty:
-                    currentScreen = new DifficultyScreen();
+                    CurrentScreen = new DifficultyScreen();
                     break;
                 case SetupScreenMode.Audio:
-                    currentScreen = new AudioScreen();
+                    CurrentScreen = new AudioScreen();
                     break;
                 case SetupScreenMode.Colours:
-                    currentScreen = new ColoursScreen();
+                    CurrentScreen = new ColoursScreen();
                     break;
                 case SetupScreenMode.Design:
-                    currentScreen = new DesignScreen();
+                    CurrentScreen = new DesignScreen();
                     break;
                 case SetupScreenMode.Advanced:
-                    currentScreen = new AdvancedScreen();
+                    CurrentScreen = new AdvancedScreen();
                     break;
                 default:
-                    currentScreen = new EditorScreen();
+                    CurrentScreen = new EditorScreen();
                     break;
             }
 
             header.UpdateScreen(mode.ToString());
-            currentScreen.Beatmap.BindTo(Beatmap);
-            LoadComponentAsync(currentScreen, screenContainer.Add);
+            CurrentScreen.Beatmap.BindTo(Beatmap);
+            LoadComponentAsync(CurrentScreen, screenContainer.Add);
         }
     }
 }
