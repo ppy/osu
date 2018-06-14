@@ -58,6 +58,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         public override Pattern Generate()
         {
+            if (TotalColumns == 1)
+            {
+                var pattern = new Pattern();
+                addToPattern(pattern, 0, HitObject.StartTime, endTime);
+                return pattern;
+            }
+
             if (spanCount > 1)
             {
                 if (segmentDuration <= 90)
