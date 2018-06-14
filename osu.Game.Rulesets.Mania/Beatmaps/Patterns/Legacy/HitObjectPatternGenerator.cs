@@ -361,7 +361,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             addToCentre = false;
 
             if ((convertType & PatternType.ForceNotStack) > 0)
-                return getRandomNoteCount(p2 / 2, p2, (p2 + p3) / 2, p3);
+                return getRandomNoteCount(1 / 2f + p2 / 2, p2, (p2 + p3) / 2, p3);
 
             switch (TotalColumns)
             {
