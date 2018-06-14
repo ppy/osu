@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 new GeneralScreenBottomHeader
                                 {
-                                    Padding = new MarginPadding { Right = 150 },
+                                    Padding = new MarginPadding { Top = 10 },
 
                                 }
                             }

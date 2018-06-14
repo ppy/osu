@@ -23,57 +23,75 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
 {
     public class GeneralScreenBottomHeader : Container
     {
-
         public GeneralScreenBottomHeader()
         {
-            Child = new Container
+            //Anchor = Anchor.BottomCentre;
+            //Origin = Anchor.BottomCentre;
+            //Margin = new MarginPadding { Bottom = 20 };
+            Width = Setup.SIZE_X - 385;
+
+            Children = new Drawable[]
             {
-                Children = new[]
+                // TODO: Align the layout properly with the links on the right side
+                new Container
                 {
-                    new FillFlowContainer
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    Children = new[]
                     {
-                        Direction = FillDirection.Vertical,
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Children = new[]
+                        new FillFlowContainer
                         {
-                            new OsuSpriteText
+                            Direction = FillDirection.Vertical,
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                            Children = new[]
                             {
-                                Anchor = Anchor.TopLeft,
-                                Origin = Anchor.TopLeft,
-                                Colour = Color4.Yellow,
-                                TextSize = 14,
-                                Font = @"Exo2.0-BoldItalic",
-                                Text = @"Due to large number of beatmap submissions, the standard of approval is relatively high."
-                            },
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.TopLeft,
-                                Origin = Anchor.TopLeft,
-                                Colour = Color4.Yellow,
-                                TextSize = 14,
-                                Font = @"Exo2.0-BoldItalic",
-                                Text = @"Please ensure your beatmap is at least timed properly, or it will likely be ignored."
-                            },
-                        }
-                    },
-                    new FillFlowContainer
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Colour = Color4.Yellow,
+                                    TextSize = 14,
+                                    Font = @"Exo2.0-BoldItalic",
+                                    Text = @"Due to large number of beatmap submissions, the standard of approval is relatively high."
+                                },
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Colour = Color4.Yellow,
+                                    TextSize = 14,
+                                    Font = @"Exo2.0-BoldItalic",
+                                    Text = @"Please ensure your beatmap is at least timed properly, or it will likely be ignored."
+                                },
+                            }
+                        },
+                    }
+                },
+                new Container
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Children = new[]
                     {
-                        Direction = FillDirection.Horizontal,
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Spacing = new Vector2(20),
-                        Children = new[]
+                        new FillFlowContainer
                         {
-                            new LinkSpriteText
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(30),
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Children = new[]
                             {
-                                Text = @"Editor Guide",
-                                Link = @"https://osu.ppy.sh/help/wiki/Beatmapping",
-                            },
-                            new LinkSpriteText
-                            {
-                                Text = @"Official Submission Criteria",
-                                Link = @"https://osu.ppy.sh/help/wiki/Ranking_Criteria",
+                                new LinkSpriteText
+                                {
+                                    Text = @"Editor Guide",
+                                    Link = @"https://osu.ppy.sh/help/wiki/Beatmapping",
+                                },
+                                new LinkSpriteText
+                                {
+                                    Text = @"Official Submission Criteria",
+                                    Link = @"https://osu.ppy.sh/help/wiki/Ranking_Criteria",
+                                },
                             }
                         }
                     }

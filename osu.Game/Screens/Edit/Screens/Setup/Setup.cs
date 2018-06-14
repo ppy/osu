@@ -26,6 +26,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup
         private Header header;
         private readonly Container screenContainer;
 
+        public const float SIZE_X = 1080;
+        public const float SIZE_Y = 650;
+
         public Setup(WorkingBeatmap workingBeatmap)
         {
             Beatmap.Value = workingBeatmap;
@@ -40,7 +43,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                     Masking = true,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(900, 650),
+                    Size = new Vector2(SIZE_X, SIZE_Y),
                     Children = new[]
                     {
                         new Container

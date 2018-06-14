@@ -51,7 +51,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         protected override bool OnClick(InputState state)
         {
-            Process.Start(Link);
+            if (Link != null)
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = Link,
+                    UseShellExecute = true //see https://github.com/dotnet/corefx/issues/10361
+                });
             return true;
         }
     }
