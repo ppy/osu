@@ -5,9 +5,14 @@ namespace osu.Game.Screens.Select
 {
     public class MatchSongSelect : SongSelect
     {
-        protected override bool OnSelectionFinalised()
+        protected override bool OnStart()
         {
-            Exit();
+            Schedule(() =>
+            {
+                // needs to be scheduled else we enter an infinite feedback loop.
+                if (IsCurrentScreen) Exit();
+            });
+
             return true;
         }
     }

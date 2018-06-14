@@ -5,20 +5,23 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModHardRock : ModHardRock, IApplicableToHitObject<OsuHitObject>
+    public class OsuModHardRock : ModHardRock, IApplicableToHitObject
     {
         public override double ScoreMultiplier => 1.06;
         public override bool Ranked => true;
 
-        public void ApplyToHitObject(OsuHitObject hitObject)
+        public void ApplyToHitObject(HitObject hitObject)
         {
-            hitObject.Position = new Vector2(hitObject.Position.X, OsuPlayfield.BASE_SIZE.Y - hitObject.Y);
+            var osuObject = (OsuHitObject)hitObject;
+
+            osuObject.Position = new Vector2(osuObject.Position.X, OsuPlayfield.BASE_SIZE.Y - osuObject.Y);
 
             var slider = hitObject as Slider;
             if (slider == null)

@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -14,17 +12,14 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class ManiaBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    internal class ManiaBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
-        private bool isForCurrentRuleset;
-
         [NonParallelizable]
-        [TestCase("basic", false)]
-        public void Test(string name, bool isForCurrentRuleset)
+        [TestCase("basic")]
+        public new void Test(string name)
         {
-            this.isForCurrentRuleset = isForCurrentRuleset;
             base.Test(name);
         }
 
@@ -38,10 +33,10 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
         }
 
-        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new ManiaBeatmapConverter(isForCurrentRuleset, beatmap);
+        protected override Ruleset CreateRuleset() => new ManiaRuleset();
     }
 
-    public struct ConvertValue : IEquatable<ConvertValue>
+    internal struct ConvertValue : IEquatable<ConvertValue>
     {
         /// <summary>
         /// A sane value to account for osu!stable using ints everwhere.

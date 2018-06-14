@@ -13,12 +13,17 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Beatmaps;
+using osu.Game.Rulesets.Taiko.Difficulty;
 
 namespace osu.Game.Rulesets.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new TaikoRulesetContainer(this, beatmap, isForCurrentRuleset);
+        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new TaikoRulesetContainer(this, beatmap);
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -79,56 +84,25 @@ namespace osu.Game.Rulesets.Taiko
                     {
                         new TaikoModEasy(),
                         new TaikoModNoFail(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModHalfTime(),
-                                new TaikoModDaycore(),
-                            },
-                        },
+                        new MultiMod(new TaikoModHalfTime(), new TaikoModDaycore()),
                     };
-
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
                         new TaikoModHardRock(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModSuddenDeath(),
-                                new TaikoModPerfect(),
-                            },
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModDoubleTime(),
-                                new TaikoModNightcore(),
-                            },
-                        },
+                        new MultiMod(new TaikoModSuddenDeath(), new TaikoModPerfect()),
+                        new MultiMod(new TaikoModDoubleTime(), new TaikoModNightcore()),
                         new TaikoModHidden(),
                         new TaikoModFlashlight(),
                     };
-
                 case ModType.Special:
                     return new Mod[]
                     {
                         new TaikoModRelax(),
                         null,
                         null,
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new TaikoModAutoplay(),
-                                new ModCinema(),
-                            },
-                        },
+                        new MultiMod(new TaikoModAutoplay(), new ModCinema()),
                     };
-
                 default:
                     return new Mod[] { };
             }
@@ -140,7 +114,9 @@ namespace osu.Game.Rulesets.Taiko
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_taiko_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new TaikoDifficultyCalculator(beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => new TaikoDifficultyCalculator(beatmap, mods);
+
+        public override PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => new TaikoPerformanceCalculator(this, beatmap, score);
 
         public override int? LegacyID => 1;
 

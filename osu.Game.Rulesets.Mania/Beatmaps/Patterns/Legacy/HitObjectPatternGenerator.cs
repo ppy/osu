@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private readonly PatternType convertType;
 
-        public HitObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density, PatternType lastStair, Beatmap originalBeatmap)
+        public HitObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density, PatternType lastStair, IBeatmap originalBeatmap)
             : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
         {
             if (previousTime > hitObject.StartTime) throw new ArgumentOutOfRangeException(nameof(previousTime));

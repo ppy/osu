@@ -33,6 +33,11 @@ namespace osu.Game.Beatmaps
         public double SliderTickRate { get; set; } = 1;
 
         /// <summary>
+        /// Returns a shallow-clone of this <see cref="BeatmapDifficulty"/>.
+        /// </summary>
+        public BeatmapDifficulty Clone() => (BeatmapDifficulty)MemberwiseClone();
+
+        /// <summary>
         /// Maps a difficulty value [0, 10] to a two-piece linear range of values.
         /// </summary>
         /// <param name="difficulty">The difficulty value to be mapped.</param>

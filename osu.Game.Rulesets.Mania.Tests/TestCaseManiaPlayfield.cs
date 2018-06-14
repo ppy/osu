@@ -8,6 +8,8 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
@@ -83,27 +85,25 @@ namespace osu.Game.Rulesets.Mania.Tests
 
                 int col = rng.Next(0, 4);
 
-                var note = new DrawableNote(new Note { Column = col }, ManiaAction.Key1)
+                var note = new Note { Column = col };
+                note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                var drawableNote = new DrawableNote(note, ManiaAction.Key1)
                 {
                     AccentColour = playfield.Columns.ElementAt(col).AccentColour
                 };
 
-                playfield.OnJudgement(note, new ManiaJudgement { Result = HitResult.Perfect });
-                playfield.Columns[col].OnJudgement(note, new ManiaJudgement { Result = HitResult.Perfect });
+                playfield.OnJudgement(drawableNote, new ManiaJudgement { Result = HitResult.Perfect });
+                playfield.Columns[col].OnJudgement(drawableNote, new ManiaJudgement { Result = HitResult.Perfect });
             });
         }
-
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets, SettingsStore settings)
         {
             maniaRuleset = rulesets.GetRuleset(3);
 
-            dependencies.Cache(new ManiaConfigManager(settings, maniaRuleset, 4));
+            Dependencies.Cache(new ManiaConfigManager(settings, maniaRuleset, 4));
         }
 
         private ManiaPlayfield createPlayfield(int cols, bool inverted = false)
@@ -162,32 +162,24 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             for (double t = start_time; t <= start_time + duration; t += 100)
             {
-                playfield.Add(new DrawableNote(new Note
-                {
-                    StartTime = t,
-                    Column = 0
-                }, ManiaAction.Key1));
+                var note1 = new Note { StartTime = t, Column = 0 };
+                var note2 = new Note { StartTime = t, Column = 3 };
 
-                playfield.Add(new DrawableNote(new Note
-                {
-                    StartTime = t,
-                    Column = 3
-                }, ManiaAction.Key4));
+                note1.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+                note2.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                playfield.Add(new DrawableNote(note1, ManiaAction.Key1));
+                playfield.Add(new DrawableNote(note2, ManiaAction.Key4));
             }
 
-            playfield.Add(new DrawableHoldNote(new HoldNote
-            {
-                StartTime = start_time,
-                Duration = duration,
-                Column = 1
-            }, ManiaAction.Key2));
+            var holdNote1 = new HoldNote { StartTime = start_time, Duration = duration, Column = 1 };
+            var holdNote2 = new HoldNote { StartTime = start_time, Duration = duration, Column = 2 };
 
-            playfield.Add(new DrawableHoldNote(new HoldNote
-            {
-                StartTime = start_time,
-                Duration = duration,
-                Column = 2
-            }, ManiaAction.Key3));
+            holdNote1.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            holdNote2.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+            playfield.Add(new DrawableHoldNote(holdNote1, ManiaAction.Key2));
+            playfield.Add(new DrawableHoldNote(holdNote2, ManiaAction.Key3));
         }
     }
 }

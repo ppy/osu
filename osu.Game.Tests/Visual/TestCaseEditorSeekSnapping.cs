@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        private void load()
         {
             var testBeatmap = new Beatmap
             {
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            osuGame.Beatmap.Value = new TestWorkingBeatmap(testBeatmap);
+            Beatmap.Value = new TestWorkingBeatmap(testBeatmap);
 
             Child = new TimingPointVisualiser(testBeatmap, 5000) { Clock = Clock };
 
@@ -332,7 +332,7 @@ namespace osu.Game.Tests.Visual
 
             private readonly Drawable tracker;
 
-            public TimingPointVisualiser(Beatmap beatmap, double length)
+            public TimingPointVisualiser(IBeatmap beatmap, double length)
             {
                 this.length = length;
 

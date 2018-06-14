@@ -6,10 +6,11 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using System;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModHardRock : ModHardRock, IApplicableToHitObject<CatchHitObject>
+    public class CatchModHardRock : ModHardRock, IApplicableToHitObject
     {
         public override double ScoreMultiplier => 1.12;
         public override bool Ranked => true;
@@ -17,9 +18,11 @@ namespace osu.Game.Rulesets.Catch.Mods
         private float lastStartX;
         private int lastStartTime;
 
-        public void ApplyToHitObject(CatchHitObject hitObject)
+        public void ApplyToHitObject(HitObject hitObject)
         {
-            float position = hitObject.X;
+            var catchObject = (CatchHitObject)hitObject;
+
+            float position = catchObject.X;
             int startTime = (int)hitObject.StartTime;
 
             if (lastStartX == 0)
@@ -60,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                         position += rand;
                 }
 
-                hitObject.X = position;
+                catchObject.X = position;
 
                 return;
             }
@@ -79,7 +82,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                 }
             }
 
-            hitObject.X = position;
+            catchObject.X = position;
 
             lastStartX = position;
             lastStartTime = startTime;

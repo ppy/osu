@@ -28,9 +28,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <summary>
         /// The beatmap which <see cref="HitObject"/> is being converted from.
         /// </summary>
-        protected readonly Beatmap OriginalBeatmap;
+        protected readonly IBeatmap OriginalBeatmap;
 
-        protected PatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, Beatmap originalBeatmap)
+        protected PatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
             : base(hitObject, beatmap, previousPattern)
         {
             if (random == null) throw new ArgumentNullException(nameof(random));
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 drainTime /= 1000;
 
                 BeatmapDifficulty difficulty = OriginalBeatmap.BeatmapInfo.BaseDifficulty;
-                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + OriginalBeatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
+                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + OriginalBeatmap.HitObjects.Count() / drainTime * 9f) / 38f * 5f / 1.15;
                 conversionDifficulty = Math.Min(conversionDifficulty.Value, 12);
 
                 return conversionDifficulty.Value;

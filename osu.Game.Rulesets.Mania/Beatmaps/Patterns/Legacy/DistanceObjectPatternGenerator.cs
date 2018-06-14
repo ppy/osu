@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private PatternType convertType;
 
-        public DistanceObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, Beatmap originalBeatmap)
+        public DistanceObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
             : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
         {
             convertType = PatternType.None;

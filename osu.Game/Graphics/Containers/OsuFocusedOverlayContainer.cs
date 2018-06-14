@@ -7,6 +7,8 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK;
+using osu.Framework.Configuration;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -15,9 +17,14 @@ namespace osu.Game.Graphics.Containers
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame osuGame, AudioManager audio)
         {
+            if (osuGame != null)
+                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+
             samplePopIn = audio.Sample.Get(@"UI/overlay-pop-in");
             samplePopOut = audio.Sample.Get(@"UI/overlay-pop-out");
 
@@ -44,25 +51,15 @@ namespace osu.Game.Graphics.Containers
             return base.OnClick(state);
         }
 
-        protected override bool OnDragStart(InputState state)
-        {
-            if (!base.ReceiveMouseInputAt(state.Mouse.NativeState.Position))
-            {
-                State = Visibility.Hidden;
-                return true;
-            }
-
-            return base.OnDragStart(state);
-        }
-
-        protected override bool OnDrag(InputState state) => State == Visibility.Hidden;
-
         private void onStateChanged(Visibility visibility)
         {
             switch (visibility)
             {
                 case Visibility.Visible:
-                    samplePopIn?.Play();
+                    if (OverlayActivationMode != OverlayActivation.Disabled)
+                        samplePopIn?.Play();
+                    else
+                        State = Visibility.Hidden;
                     break;
                 case Visibility.Hidden:
                     samplePopOut?.Play();

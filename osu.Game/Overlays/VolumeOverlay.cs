@@ -100,6 +100,8 @@ namespace osu.Game.Overlays
 
         public bool Adjust(GlobalAction action)
         {
+            if (!IsLoaded) return false;
+
             switch (action)
             {
                 case GlobalAction.DecreaseVolume:

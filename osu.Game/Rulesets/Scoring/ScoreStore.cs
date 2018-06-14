@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Scoring
         public Score ReadReplayFile(string replayFilename)
         {
             using (Stream s = storage.GetStream(Path.Combine(replay_folder, replayFilename)))
-                return new LegacyScoreParser(rulesets, beatmaps).Parse(s);
+                return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(s);
         }
     }
 }

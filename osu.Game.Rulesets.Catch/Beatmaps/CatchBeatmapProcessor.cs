@@ -12,16 +12,21 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
-    public class CatchBeatmapProcessor : BeatmapProcessor<CatchHitObject>
+    public class CatchBeatmapProcessor : BeatmapProcessor
     {
-        public override void PostProcess(Beatmap<CatchHitObject> beatmap)
+        public CatchBeatmapProcessor(IBeatmap beatmap)
+            : base(beatmap)
         {
-            initialiseHyperDash(beatmap.HitObjects);
+        }
 
-            base.PostProcess(beatmap);
+        public override void PostProcess()
+        {
+            initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
+
+            base.PostProcess();
 
             int index = 0;
-            foreach (var obj in beatmap.HitObjects)
+            foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
                 obj.IndexInBeatmap = index++;
         }
 

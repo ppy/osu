@@ -17,14 +17,14 @@ namespace osu.Game.Tests.Beatmaps
         {
         }
 
-        public TestWorkingBeatmap(Beatmap beatmap)
+        public TestWorkingBeatmap(IBeatmap beatmap)
             : base(beatmap.BeatmapInfo)
         {
             this.beatmap = beatmap;
         }
 
-        private readonly Beatmap beatmap;
-        protected override Beatmap GetBeatmap() => beatmap;
+        private readonly IBeatmap beatmap;
+        protected override IBeatmap GetBeatmap() => beatmap;
         protected override Texture GetBackground() => null;
 
         protected override Track GetTrack()
