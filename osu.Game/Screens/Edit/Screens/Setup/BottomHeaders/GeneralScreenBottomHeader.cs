@@ -25,14 +25,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
     {
         public GeneralScreenBottomHeader()
         {
-            //Anchor = Anchor.BottomCentre;
-            //Origin = Anchor.BottomCentre;
-            //Margin = new MarginPadding { Bottom = 20 };
-            Width = Setup.SIZE_X - 385;
+            // I seriously don't know why the number is like that, the paddings and stuff look weirdly stacked I suppose
+            Width = Setup.SIZE_X - 392;
 
             Children = new Drawable[]
             {
-                // TODO: Align the layout properly with the links on the right side
                 new Container
                 {
                     Anchor = Anchor.TopLeft,

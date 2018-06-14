@@ -142,7 +142,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         {
             Masking = true;
             CornerRadius = 15;
-            //RelativeSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
             base.Height = DEFAULT_HEIGHT + Padding.Top;
 
@@ -197,7 +196,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                 },
                                 ColumnDimensions = new[]
                                 {
-                                    new Dimension(GridSizeMode.Absolute, 160),
+                                    new Dimension(GridSizeMode.Absolute, 180),
                                     new Dimension()
                                 }
                             }

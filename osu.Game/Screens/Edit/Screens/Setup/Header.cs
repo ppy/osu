@@ -16,7 +16,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup
 {
-    public class Header : Container
+    public class Header : Screen
     {
         public const float HEIGHT = 50;
 
@@ -27,106 +27,67 @@ namespace osu.Game.Screens.Edit.Screens.Setup
 
         public Header(Screen initialScreen)
         {
+            // TODO: Fix the box
+            // This does not create a visible box above the triangles to indicate the end of the area of each screen
             Children = new Drawable[]
             {
-                // TODO: Fix the box
-                // This does not create a visible box above the triangles to indicate the end of the area of each screen
                 //new Container
                 //{
-                //    Masking = true,
-                //    CornerRadius = 15,
-                //    Height = 50,
                 //    RelativeSizeAxes = Axes.X,
+                //    Height = HEIGHT,
                 //    Children = new Drawable[]
                 //    {
                 //        new Box
                 //        {
-                //            RelativeSizeAxes = Axes.Both,
+                //            RelativeSizeAxes = Axes.X,
+                //            Height = HEIGHT,
                 //            Colour = OsuColour.FromHex("1a2328"),
-                //            Height = 10,
-                //            Anchor = Anchor.CentreLeft,
-                //            Origin = Anchor.CentreLeft,
                 //        },
-                //        //new Box
-                //        //{
-                //        //    Margin = new MarginPadding { Left = 50, Top = 120 },
-                //        //    Anchor = Anchor.BottomLeft,
-                //        //    Origin = Anchor.BottomLeft,
-                //        //    RelativeSizeAxes = Axes.X,
-                //        //    Height = 10,
-                //        //    Colour = OsuColour.FromHex("1a2328"),
-                //        //},
-                //        boxContainer = new Container
+                //        new Container
                 //        {
                 //            RelativeSizeAxes = Axes.X,
-                //            AutoSizeAxes = Axes.Y,
-                //            //CornerRadius = 20,
-                //            //Masking = true,
-                //            Margin = new MarginPadding { Left = 50, Top = 20 },
-                //            Anchor = Anchor.Centre,
-                //            Origin = Anchor.Centre,
-                //            Children = new Drawable[]
+                //            Height = HEIGHT,
+                //            Child = new GridContainer
                 //            {
-                //                //new Container
-                //                //{
-                //                //    //AutoSizeAxes = Axes.X,
-                //                //    RelativeSizeAxes = Axes.Both,
-                //                //    //Margin = new MarginPadding { Left = 50, Top = 20 },
-                //                //    //Anchor = Anchor.CentreLeft,
-                //                //    //Origin = Anchor.CentreLeft,
-                //                //    //Height = 50,
-                //                //    //Width = 1,
-                //                //    //Size = new Vector2(1),
-                //                //    Colour = OsuColour.FromHex("1a2328"),
-                //                //},
-                //                textContainer = new FillFlowContainer
+                //                RelativeSizeAxes = Axes.X,
+                //                Height = HEIGHT,
+                //                Content = new[]
                 //                {
-                //                    AutoSizeAxes = Axes.X,
-                //                    Direction = FillDirection.Horizontal,
-                //                    Spacing = new Vector2(7.5f, 0f),
-                //                    Children = new Drawable[]
+                //                    new Drawable[]
                 //                    {
-                //                        new SpriteIcon
-                //                        {
-                //                            Size = new Vector2(40),
-                //                            Icon = FontAwesome.fa_osu_edit_o,
-                //                        },
                 //                        new OsuSpriteText
                 //                        {
-                //                            Margin = new MarginPadding { Top = 7.5f },
-                //                            Text = "Beatmap Setup",
-                //                            TextSize = 25,
+                //                            Anchor = Anchor.TopLeft,
+                //                            Origin = Anchor.TopLeft,
+                //                            Padding = new MarginPadding { },
+                //                            Colour = Color4.White,
+                //                            TextSize = 18,
+                //                            Text = "Fucking test",
+                //                            Font = @"Exo2.0-Bold",
                 //                        },
-                //                        screenType = new OsuSpriteText
-                //                        {
-                //                            TextSize = 25,
-                //                            Margin = new MarginPadding { Top = 7.5f },
-                //                            Text = "General",
-                //                            Font = @"Exo2.0-Light",
-                //                        },
-                //                    }
+                //                    },
                 //                },
-                //            },
+                //            }
                 //        }
                 //    }
                 //},
-                // ---
                 new Container
                 {
-                    Margin = new MarginPadding { Left = 25, Top = 10 },
                     Height = 50,
                     RelativeSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         new Box
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(1),
+                            RelativeSizeAxes = Axes.X,
+                            Height = HEIGHT,
                             Colour = OsuColour.FromHex("1a2328"),
                         },
                         new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            Margin = new MarginPadding { Left = 25, Top = 10 },
+                            RelativeSizeAxes = Axes.X,
+                            Height = HEIGHT,
                             Child = textContainer = new FillFlowContainer
                             {
                                 AutoSizeAxes = Axes.X,
