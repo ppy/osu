@@ -155,6 +155,8 @@ namespace osu.Game.Rulesets.Mania
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new ManiaConfigManager(settings, RulesetInfo);
 
+        public override DifficultyAdjustmentMods CreateDifficultyAdjustmentMods(IBeatmap beatmap) => new ManiaDifficultyAdjustmentMods(beatmap);
+
         public ManiaRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)
         {

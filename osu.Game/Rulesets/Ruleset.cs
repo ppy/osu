@@ -116,6 +116,11 @@ namespace osu.Game.Rulesets
         public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
 
         /// <summary>
+        /// Creates the provider of <see cref="Mod"/> combinations that affect the <see cref="Beatmap"/> difficulty for this <see cref="Ruleset"/>.
+        /// </summary>
+        public virtual DifficultyAdjustmentMods CreateDifficultyAdjustmentMods(IBeatmap beatmap) => new DifficultyAdjustmentMods();
+
+        /// <summary>
         /// Create a ruleset info based on this ruleset.
         /// </summary>
         /// <returns>A filled <see cref="RulesetInfo"/>.</returns>

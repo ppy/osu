@@ -23,6 +23,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public int TotalColumns => Stages.Sum(g => g.Columns);
 
         /// <summary>
+        /// Whether this <see cref="ManiaBeatmap"/> is an osu!mania-specific <see cref="Beatmap"/>.
+        /// If false, this <see cref="ManiaBeatmap"/> was converted from another <see cref="Ruleset"/>.
+        /// </summary>
+        public bool IsManiaBeatmap;
+
+        /// <summary>
         /// Creates a new <see cref="ManiaBeatmap"/>.
         /// </summary>
         /// <param name="defaultStage">The initial stages.</param>

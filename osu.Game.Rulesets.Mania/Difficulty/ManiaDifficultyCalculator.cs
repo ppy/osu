@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 
@@ -142,22 +141,5 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             return difficulty;
         }
-
-        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
-        {
-            new ManiaModDoubleTime(),
-            new ManiaModHalfTime(),
-            new ManiaModEasy(),
-            new ManiaModHardRock(),
-            new ManiaModKey1(),
-            new ManiaModKey2(),
-            new ManiaModKey3(),
-            new ManiaModKey4(),
-            new ManiaModKey5(),
-            new ManiaModKey6(),
-            new ManiaModKey7(),
-            new ManiaModKey8(),
-            new ManiaModKey9(),
-        };
     }
 }
