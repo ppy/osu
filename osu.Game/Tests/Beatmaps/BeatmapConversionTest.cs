@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Beatmaps
                                 else if (!expectedMapping.Equals(ourMapping))
                                     Assert.Fail($"The conversion mapping differed for object at time {expectedMapping.StartTime}:\n"
                                                 + $"Expected {JsonConvert.SerializeObject(expectedMapping)}\n"
-                                                + $"Received: {JsonConvert.SerializeObject(ourMapping)}");
+                                                + $"Received: {JsonConvert.SerializeObject(ourMapping)}\n");
                                 else if (!expectedMapping.Objects[objectCounter].Equals(ourMapping.Objects[objectCounter]))
                                 {
                                     Assert.Fail($"The conversion generated differing hitobjects for object at time: {expectedMapping.StartTime}:\n"
