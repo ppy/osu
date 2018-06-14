@@ -47,9 +47,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (!calculateStrainValues(difficultyHitObjects, timeRate))
                 return new DifficultyAttributes(mods, 0);
 
+
             double starRating = calculateDifficulty(difficultyHitObjects, timeRate) * star_scaling_factor;
 
-            return new DifficultyAttributes(mods, starRating);
+            return new ManiaDifficultyAttributes(mods, starRating)
+            {
+                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
+                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate
+            };
         }
 
         private bool calculateStrainValues(List<ManiaHitObjectDifficulty> objects, double timeRate)
