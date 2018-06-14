@@ -43,7 +43,7 @@ namespace osu.Game.Screens
             {
                 base.Push(screen);
             }
-            catch (System.InvalidOperationException)
+            catch 
             {
             }
         }
