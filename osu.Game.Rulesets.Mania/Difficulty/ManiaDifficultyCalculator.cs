@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        public override double Calculate(Dictionary<string, object> categoryDifficulty = null)
         {
             // Fill our custom DifficultyHitObject class, that carries additional information
             difficultyHitObjects.Clear();
@@ -61,7 +61,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double starRating = calculateDifficulty() * star_scaling_factor;
 
             if (categoryDifficulty != null)
+            {
+                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
+                double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
+
                 categoryDifficulty["Strain"] = starRating;
+                categoryDifficulty["Hit window 300"] = hitWindowGreat;
+            }
 
             return starRating;
         }

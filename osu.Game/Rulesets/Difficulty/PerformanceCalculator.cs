@@ -13,19 +13,19 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public abstract class PerformanceCalculator
     {
-        private readonly Dictionary<string, double> attributes = new Dictionary<string, double>();
-        protected IDictionary<string, double> Attributes => attributes;
+        private readonly Dictionary<string, object> attributes = new Dictionary<string, object>();
+        protected IDictionary<string, object> Attributes => attributes;
 
-        protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
+        protected readonly Ruleset Ruleset;
         protected readonly Score Score;
 
         protected double TimeRate { get; private set; } = 1;
 
         protected PerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
         {
-            Ruleset = ruleset;
             Beatmap = beatmap;
+            Ruleset = ruleset;
             Score = score;
 
             var diffCalc = ruleset.CreateDifficultyCalculator(beatmap, score.Mods);
@@ -41,6 +41,13 @@ namespace osu.Game.Rulesets.Difficulty
             TimeRate = clock.Rate;
         }
 
-        public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);
+        /// <summary>
+        /// Calculates the performance of the provided score.
+        /// Optionally provides additional information relating to the performance of the score.
+        /// </summary>
+        /// <param name="categoryDifficulty">A provided dictionary in which additional information relating to the performance of the score is placed.
+        /// May be null if no additional information is required.</param>
+        /// <returns>The total performance rating of the score.</returns>
+        public abstract double Calculate(Dictionary<string, object> categoryDifficulty = null);
     }
 }

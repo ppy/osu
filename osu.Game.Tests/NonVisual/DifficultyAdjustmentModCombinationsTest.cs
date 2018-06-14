@@ -144,7 +144,7 @@ namespace osu.Game.Tests.NonVisual
                 DifficultyAdjustmentMods = mods;
             }
 
-            public override double Calculate(Dictionary<string, double> categoryDifficulty = null) => throw new NotImplementedException();
+            public override double Calculate(Dictionary<string, object> categoryDifficulty = null) => throw new NotImplementedException();
 
             protected override Mod[] DifficultyAdjustmentMods { get; }
         }

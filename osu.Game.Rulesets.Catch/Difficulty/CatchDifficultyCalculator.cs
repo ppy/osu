@@ -13,6 +13,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null) => 0;
+        public override double Calculate(Dictionary<string, object> categoryDifficulty = null) => 0;
     }
 }

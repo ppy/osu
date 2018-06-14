@@ -8,15 +8,26 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoPerformanceCalculator : PerformanceCalculator
     {
-        private readonly int beatmapMaxCombo;
+        /// <summary>
+        /// The difficulty strain of the beatmap.
+        /// </summary>
+        private double strain;
 
-        private Mod[] mods;
+        /// <summary>
+        /// Maximum combo achievable by the beatmap.
+        /// </summary>
+        private int beatmapMaxCombo;
+
+        /// <summary>
+        /// Hit window of <see cref="HitResult.Great"/> hits.
+        /// </summary>
+        private double hitWindowGreat;
+
         private int countGreat;
         private int countGood;
         private int countMeh;
@@ -25,28 +36,30 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         public TaikoPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
-            beatmapMaxCombo = beatmap.HitObjects.Count(h => h is Hit);
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        public override double Calculate(Dictionary<string, object> categoryDifficulty = null)
         {
-            mods = Score.Mods;
+            strain = (double)Attributes["Strain"];
+            beatmapMaxCombo = (int)Attributes["Max combo"];
+            hitWindowGreat = (double)Attributes["Hit window 300"];
+
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
             countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
             countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
             countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
 
             // Don't count scores made with supposedly unranked mods
-            if (mods.Any(m => !m.Ranked))
+            if (Score.Mods.Any(m => !m.Ranked))
                 return 0;
 
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.1; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
-            if (mods.Any(m => m is ModNoFail))
+            if (Score.Mods.Any(m => m is ModNoFail))
                 multiplier *= 0.90;
 
-            if (mods.Any(m => m is ModHidden))
+            if (Score.Mods.Any(m => m is ModHidden))
                 multiplier *= 1.10;
 
             double strainValue = computeStrainValue();
@@ -68,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeStrainValue()
         {
-            double strainValue = Math.Pow(5.0 * Math.Max(1.0, Attributes["Strain"] / 0.0075) - 4.0, 2.0) / 100000.0;
+            double strainValue = Math.Pow(5.0 * Math.Max(1.0, strain / 0.0075) - 4.0, 2.0) / 100000.0;
 
             // Longer maps are worth more
             double lengthBonus = 1 + 0.1f * Math.Min(1.0, totalHits / 1500.0);
@@ -81,10 +94,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (beatmapMaxCombo > 0)
                 strainValue *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(beatmapMaxCombo, 0.5), 1.0);
 
-            if (mods.Any(m => m is ModHidden))
+            if (Score.Mods.Any(m => m is ModHidden))
                 strainValue *= 1.025;
 
-            if (mods.Any(m => m is ModFlashlight))
+            if (Score.Mods.Any(m => m is ModFlashlight))
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
                 strainValue *= 1.05 * lengthBonus;
 
@@ -94,8 +107,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeAccuracyValue()
         {
-            // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-            double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
             if (hitWindowGreat <= 0)
                 return 0;
 

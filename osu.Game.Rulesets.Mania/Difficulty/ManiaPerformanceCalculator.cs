@@ -13,7 +13,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
-        private Mod[] mods;
+        /// <summary>
+        /// The difficulty strain of the beatmap.
+        /// </summary>
+        private double strain;
+
+        /// <summary>
+        /// Hit window of <see cref="HitResult.Great"/> hits.
+        /// </summary>
+        private double hitWindowGreat;
 
         // Score after being scaled by non-difficulty-increasing mods
         private double scaledScore;
@@ -30,9 +38,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        public override double Calculate(Dictionary<string, object> categoryDifficulty = null)
         {
-            mods = Score.Mods;
+            strain = (double)Attributes["Strain"];
+            hitWindowGreat = (double)Attributes["Hit window 300"];
+
             scaledScore = Score.TotalScore;
             countPerfect = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
@@ -41,13 +51,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
             countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
 
-            if (mods.Any(m => !m.Ranked))
+            if (Score.Mods.Any(m => !m.Ranked))
                 return 0;
 
             IEnumerable<Mod> scoreIncreaseMods = Ruleset.GetModsFor(ModType.DifficultyIncrease);
 
             double scoreMultiplier = 1.0;
-            foreach (var m in mods.Where(m => !scoreIncreaseMods.Contains(m)))
+            foreach (var m in Score.Mods.Where(m => !scoreIncreaseMods.Contains(m)))
                 scoreMultiplier *= m.ScoreMultiplier;
 
             // Scale score up, so it's comparable to other keymods
@@ -57,9 +67,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             // The specific number has no intrinsic meaning and can be adjusted as needed.
             double multiplier = 0.8;
 
-            if (mods.Any(m => m is ModNoFail))
+            if (Score.Mods.Any(m => m is ModNoFail))
                 multiplier *= 0.9;
-            if (mods.Any(m => m is ModEasy))
+            if (Score.Mods.Any(m => m is ModEasy))
                 multiplier *= 0.5;
 
             double strainValue = computeStrainValue();
@@ -82,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double computeStrainValue()
         {
             // Obtain strain difficulty
-            double strainValue = Math.Pow(5 * Math.Max(1, Attributes["Strain"] / 0.2) - 4.0, 2.2) / 135.0;
+            double strainValue = Math.Pow(5 * Math.Max(1, strain / 0.2) - 4.0, 2.2) / 135.0;
 
             // Longer maps are worth more
             strainValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
@@ -105,8 +115,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeAccuracyValue(double strainValue)
         {
-            // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-            double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
             if (hitWindowGreat <= 0)
                 return 0;
 
