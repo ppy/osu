@@ -39,12 +39,7 @@ namespace osu.Game.Screens
             // Make sure the in-progress loading is complete before pushing the screen.
             while (screen.LoadState < LoadState.Ready)
                 Thread.Sleep(1);
-            try
-            {
-                base.Push(screen);
-            }
-            catch{
-            }
+            if (base.IsCurrentScreen) { base.Push(screen); }
         }
         protected override void Update()
         {
