@@ -8,8 +8,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyAttributes : DifficultyAttributes
     {
-        public double AimStrain { get; set; }
-        public double SpeedStrain { get; set; }
+        public double AimStrain;
+        public double SpeedStrain;
 
         public OsuDifficultyAttributes(Mod[] mods, double starRating)
             : base(mods, starRating)
