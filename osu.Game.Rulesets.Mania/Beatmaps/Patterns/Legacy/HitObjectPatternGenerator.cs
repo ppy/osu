@@ -77,6 +77,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
             else
                 convertType |= PatternType.LowProbability;
+
+            if ((convertType & PatternType.KeepSingle) == 0)
+            {
+                if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && TotalColumns != 8)
+                    convertType |= PatternType.Mirror;
+                else
+                    convertType |= PatternType.Gathered;
+            }
         }
 
         public override Pattern Generate()
