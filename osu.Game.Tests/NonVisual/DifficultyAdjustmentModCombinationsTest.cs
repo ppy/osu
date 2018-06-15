@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 
@@ -139,14 +139,14 @@ namespace osu.Game.Tests.NonVisual
         private class TestDifficultyCalculator : DifficultyCalculator
         {
             public TestDifficultyCalculator(params Mod[] mods)
-                : base(null)
+                : base(null, null)
             {
                 DifficultyAdjustmentMods = mods;
             }
 
-            public override double Calculate(Dictionary<string, double> categoryDifficulty = null) => throw new NotImplementedException();
-
             protected override Mod[] DifficultyAdjustmentMods { get; }
+
+            protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate) => throw new NotImplementedException();
         }
     }
 }

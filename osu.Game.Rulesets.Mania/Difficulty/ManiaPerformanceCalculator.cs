@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public ManiaPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
+        public ManiaPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
         }
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double computeStrainValue()
         {
             // Obtain strain difficulty
-            double strainValue = Math.Pow(5 * Math.Max(1, Attributes["Strain"] / 0.2) - 4.0, 2.2) / 135.0;
+            double strainValue = Math.Pow(5 * Math.Max(1, Attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
 
             // Longer maps are worth more
             strainValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
