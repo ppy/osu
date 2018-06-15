@@ -28,8 +28,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public int TargetColumns;
         public readonly bool IsForCurrentRuleset;
 
+        // Internal for testing purposes
+        internal FastRandom Random { get; private set; }
+
         private Pattern lastPattern = new Pattern();
-        private FastRandom random;
 
         private ManiaBeatmap beatmap;
 
@@ -62,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
             int seed = (int)Math.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)Math.Round(difficulty.ApproachRate);
-            random = new FastRandom(seed);
+            Random = new FastRandom(seed);
 
             return base.ConvertBeatmap(original);
         }
@@ -115,7 +117,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <returns>The hit objects generated.</returns>
         private IEnumerable<ManiaHitObject> generateSpecific(HitObject original, IBeatmap originalBeatmap)
         {
-            var generator = new SpecificBeatmapPatternGenerator(random, original, beatmap, lastPattern, originalBeatmap);
+            var generator = new SpecificBeatmapPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
 
             Pattern newPattern = generator.Generate();
             lastPattern = newPattern;
@@ -138,14 +140,17 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
-                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, lastPattern, originalBeatmap);
+            {
+                var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
+                conversion = generator;
+            }
             else if (endTimeData != null)
-                conversion = new EndTimeObjectPatternGenerator(random, original, beatmap, originalBeatmap);
+                conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
             else if (positionData != null)
             {
                 computeDensity(original.StartTime);
 
-                conversion = new HitObjectPatternGenerator(random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair, originalBeatmap);
+                conversion = new HitObjectPatternGenerator(Random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair, originalBeatmap);
 
                 recordNote(original.StartTime, positionData.Position);
             }
