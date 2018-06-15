@@ -160,7 +160,7 @@ namespace osu.Game.Overlays.Direct
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = $"from {SetInfo.Metadata.Source}",
+                                            Text = SetInfo.Metadata.Source,
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
                                             TextSize = 14,
