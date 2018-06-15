@@ -88,7 +88,9 @@ namespace osu.Game.Tests.Visual
             protected override void Update()
             {
                 base.Update();
-                marker.X = (float)(adjustableClock.CurrentTime / beatmap.Value.Track.Length);
+
+                if (beatmap.Value.Track.IsLoaded)
+                    marker.X = (float)(adjustableClock.CurrentTime / beatmap.Value.Track.Length);
             }
         }
 
