@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// The step increase/decrease of the span of time visible by the length of the scrolling axes.
         /// </summary>
-        private const double time_span_step = 50;
+        private const double time_span_step = 200;
 
         /// <summary>
         /// The span of time that is visible by the length of the scrolling axes.
@@ -88,10 +88,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 switch (args.Key)
                 {
                     case Key.Minus:
-                        this.TransformBindableTo(VisibleTimeRange, VisibleTimeRange + time_span_step, 200, Easing.OutQuint);
+                        this.TransformBindableTo(VisibleTimeRange, VisibleTimeRange + time_span_step, 600, Easing.OutQuint);
                         break;
                     case Key.Plus:
-                        this.TransformBindableTo(VisibleTimeRange, VisibleTimeRange - time_span_step, 200, Easing.OutQuint);
+                        this.TransformBindableTo(VisibleTimeRange, VisibleTimeRange - time_span_step, 600, Easing.OutQuint);
                         break;
                 }
             }
