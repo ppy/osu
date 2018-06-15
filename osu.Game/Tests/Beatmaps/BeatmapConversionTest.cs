@@ -25,6 +25,8 @@ namespace osu.Game.Tests.Beatmaps
 
         protected abstract string ResourceAssembly { get; }
 
+        protected IBeatmapConverter Converter { get; private set; }
+
         protected void Test(string name)
         {
             var ourResult = convert(name);
@@ -88,10 +90,11 @@ namespace osu.Game.Tests.Beatmaps
             var rulesetInstance = CreateRuleset();
             beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
 
-            var result = new ConvertResult();
-            var converter = rulesetInstance.CreateBeatmapConverter(beatmap);
+            Converter = rulesetInstance.CreateBeatmapConverter(beatmap);
 
-            converter.ObjectConverted += (orig, converted) =>
+            var result = new ConvertResult();
+
+            Converter.ObjectConverted += (orig, converted) =>
             {
                 converted.ForEach(h => h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty));
 
@@ -103,7 +106,7 @@ namespace osu.Game.Tests.Beatmaps
                 result.Mappings.Add(mapping);
             };
 
-            IBeatmap convertedBeatmap = converter.Convert();
+            IBeatmap convertedBeatmap = Converter.Convert();
             rulesetInstance.CreateBeatmapProcessor(convertedBeatmap)?.PostProcess();
 
             return result;
