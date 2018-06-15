@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using osu.Game.Audio;
@@ -87,7 +88,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
         }
 
-        public override Pattern Generate()
+        public override IEnumerable<Pattern> Generate()
+        {
+            yield return generate();
+        }
+
+        private Pattern generate()
         {
             var pattern = new Pattern();
 
