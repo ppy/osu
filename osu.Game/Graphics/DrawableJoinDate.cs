@@ -14,7 +14,9 @@ namespace osu.Game.Graphics
             this.date = date;
         }
 
-        protected override string Format() => Text = string.Format($"{date:MMMM yyyy}");
+        protected override string Format() => Text = date.ToUniversalTime().Year < 2008 ?
+            "Here since the beginning" :
+            string.Format($"{date:MMMM yyyy}");
 
         public override string TooltipText => string.Format($"{date:MMMM d, yyyy}");
     }
