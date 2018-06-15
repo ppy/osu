@@ -136,6 +136,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var endTimeData = original as IHasEndTime;
             var distanceData = original as IHasDistance;
             var positionData = original as IHasPosition;
+            var repeatsData = original as IHasRepeats;
 
             Patterns.PatternGenerator conversion = null;
 
@@ -143,9 +144,20 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             {
                 var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
                 conversion = generator;
+
+                for (double time = original.StartTime; time <= generator.EndTime; time += generator.SegmentDuration)
+                {
+                    recordNote(time, positionData?.Position ?? Vector2.Zero);
+                    computeDensity(time);
+                }
             }
             else if (endTimeData != null)
+            {
                 conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
+
+                recordNote(endTimeData.EndTime, new Vector2(256, 192));
+                computeDensity(endTimeData.EndTime);
+            }
             else if (positionData != null)
             {
                 computeDensity(original.StartTime);
