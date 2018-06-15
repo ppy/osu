@@ -119,10 +119,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             var generator = new SpecificBeatmapPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
 
-            Pattern newPattern = generator.Generate();
-            lastPattern = newPattern;
+            foreach (var newPattern in generator.Generate())
+            {
+                lastPattern = newPattern;
 
-            return newPattern.HitObjects;
+                foreach (var obj in newPattern.HitObjects)
+                    yield return obj;
+            }
         }
 
         /// <summary>
@@ -167,14 +170,17 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
 
             if (conversion == null)
-                return null;
+                yield break;
 
-            Pattern newPattern = conversion.Generate();
+            foreach (var newPattern in conversion.Generate())
+            {
+                lastPattern = conversion is EndTimeObjectPatternGenerator ? lastPattern : newPattern;
+                lastStair = (conversion as HitObjectPatternGenerator)?.StairType ?? lastStair;
 
-            lastPattern = conversion is EndTimeObjectPatternGenerator ? lastPattern : newPattern;
-            lastStair = (conversion as HitObjectPatternGenerator)?.StairType ?? lastStair;
+                foreach (var obj in newPattern.HitObjects)
+                    yield return obj;
 
-            return newPattern.HitObjects;
+            }
         }
 
         /// <summary>
@@ -187,7 +193,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             {
             }
 
-            public override Pattern Generate()
+            public override IEnumerable<Pattern> Generate()
+            {
+                yield return generate();
+            }
+
+            private Pattern generate()
             {
                 var endTimeData = HitObject as IHasEndTime;
                 var positionData = HitObject as IHasXPosition;

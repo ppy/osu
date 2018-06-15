@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.MathUtils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
@@ -57,7 +58,30 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             SegmentDuration = (EndTime - HitObject.StartTime) / spanCount;
         }
 
-        public override Pattern Generate()
+        public override IEnumerable<Pattern> Generate()
+        {
+            var originalPattern = generate();
+
+            // We need to split the intermediate pattern into two new patterns:
+            // 1. A pattern containing all objects that do not end at our EndTime.
+            // 2. A pattern containing all objects that end at our EndTime. This will be used for further pattern generation.
+            var intermediatePattern = new Pattern();
+            var endTimePattern = new Pattern();
+
+            foreach (var obj in originalPattern.HitObjects)
+            {
+                if (!Precision.AlmostEquals(EndTime, (obj as IHasEndTime)?.EndTime ?? obj.StartTime))
+                    intermediatePattern.Add(obj);
+                else
+                    endTimePattern.Add(obj);
+            }
+
+
+            yield return intermediatePattern;
+            yield return endTimePattern;
+        }
+
+        private Pattern generate()
         {
             if (TotalColumns == 1)
             {
