@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Direct
                                             {
                                                 new OsuSpriteText
                                                 {
-                                                    Text = $"{SetInfo.Metadata.Source}",
+                                                    Text = SetInfo.Metadata.Source,
                                                     TextSize = 14,
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
