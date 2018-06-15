@@ -16,7 +16,8 @@ using osu.Game.Rulesets.Objects;
 namespace osu.Game.Tests.Beatmaps
 {
     [TestFixture]
-    public abstract class BeatmapConversionTest<TConvertValue>
+    public abstract class BeatmapConversionTest<TConvertMapping, TConvertValue>
+        where TConvertMapping : ConvertMapping<TConvertValue>, IEquatable<TConvertMapping>, new()
         where TConvertValue : IEquatable<TConvertValue>
     {
         private const string resource_namespace = "Testing.Beatmaps";
@@ -59,9 +60,13 @@ namespace osu.Game.Tests.Beatmaps
                                 else if (objectCounter >= expectedMapping.Objects.Count)
                                     Assert.Fail($"The conversion generated a hitobject, but should not have, for hitobject at time: {ourMapping.StartTime}:\n"
                                                 + $"Received: {JsonConvert.SerializeObject(ourMapping.Objects[objectCounter])}\n");
-                                else if (!EqualityComparer<TConvertValue>.Default.Equals(expectedMapping.Objects[objectCounter], ourMapping.Objects[objectCounter]))
+                                else if (!expectedMapping.Equals(ourMapping))
+                                    Assert.Fail($"The conversion mapping differed for object at time {expectedMapping.StartTime}:\n"
+                                                + $"Expected {JsonConvert.SerializeObject(expectedMapping)}\n"
+                                                + $"Received: {JsonConvert.SerializeObject(ourMapping)}\n");
+                                else if (!expectedMapping.Objects[objectCounter].Equals(ourMapping.Objects[objectCounter]))
                                 {
-                                    Assert.Fail($"The conversion generated differing hitobjects for object at time: {expectedMapping.StartTime}\n"
+                                    Assert.Fail($"The conversion generated differing hitobjects for object at time: {expectedMapping.StartTime}:\n"
                                                 + $"Expected: {JsonConvert.SerializeObject(expectedMapping.Objects[objectCounter])}\n"
                                                 + $"Received: {JsonConvert.SerializeObject(ourMapping.Objects[objectCounter])}\n");
                                 }
@@ -84,19 +89,22 @@ namespace osu.Game.Tests.Beatmaps
             beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
 
             var result = new ConvertResult();
-
             var converter = rulesetInstance.CreateBeatmapConverter(beatmap);
+
             converter.ObjectConverted += (orig, converted) =>
             {
                 converted.ForEach(h => h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty));
 
-                var mapping = new ConvertMapping { StartTime = orig.StartTime };
+                var mapping = CreateConvertMapping();
+                mapping.StartTime = orig.StartTime;
+
                 foreach (var obj in converted)
                     mapping.Objects.AddRange(CreateConvertValue(obj));
                 result.Mappings.Add(mapping);
             };
 
-            converter.Convert();
+            IBeatmap convertedBeatmap = converter.Convert();
+            rulesetInstance.CreateBeatmapProcessor(convertedBeatmap)?.PostProcess();
 
             return result;
         }
@@ -128,21 +136,54 @@ namespace osu.Game.Tests.Beatmaps
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 
-        protected abstract IEnumerable<TConvertValue> CreateConvertValue(HitObject hitObject);
-        protected abstract Ruleset CreateRuleset();
+        /// <summary>
+        /// Creates the conversion mapping for a <see cref="HitObject"/>. A conversion mapping stores important information about the conversion process.
+        /// This is generated _after_ the <see cref="HitObject"/> has been converted.
+        /// <para>
+        /// This should be used to validate the integrity of the conversion process after a conversion has occurred.
+        /// </para>
+        /// </summary>
+        protected virtual TConvertMapping CreateConvertMapping() => new TConvertMapping();
 
-        private class ConvertMapping
-        {
-            [JsonProperty]
-            public double StartTime;
-            [JsonProperty]
-            public List<TConvertValue> Objects = new List<TConvertValue>();
-        }
+        /// <summary>
+        /// Creates the conversion value for a <see cref="HitObject"/>. A conversion value stores information about the converted <see cref="HitObject"/>.
+        /// <para>
+        /// This should be used to validate the integrity of the converted <see cref="HitObject"/>.
+        /// </para>
+        /// </summary>
+        /// <param name="hitObject">The converted <see cref="HitObject"/>.</param>
+        protected abstract IEnumerable<TConvertValue> CreateConvertValue(HitObject hitObject);
+
+        /// <summary>
+        /// Creates the <see cref="Ruleset"/> applicable to this <see cref="BeatmapConversionTest{TConvertMapping,TConvertValue}"/>.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract Ruleset CreateRuleset();
 
         private class ConvertResult
         {
             [JsonProperty]
-            public List<ConvertMapping> Mappings = new List<ConvertMapping>();
+            public List<TConvertMapping> Mappings = new List<TConvertMapping>();
         }
+    }
+
+    public abstract class BeatmapConversionTest<TConvertValue> : BeatmapConversionTest<ConvertMapping<TConvertValue>, TConvertValue>
+        where TConvertValue : IEquatable<TConvertValue>
+    {
+    }
+
+    public class ConvertMapping<TConvertValue> : IEquatable<ConvertMapping<TConvertValue>>
+        where TConvertValue : IEquatable<TConvertValue>
+    {
+        [JsonProperty]
+        public double StartTime;
+
+        [JsonIgnore]
+        public List<TConvertValue> Objects = new List<TConvertValue>();
+
+        [JsonProperty("Objects")]
+        private List<TConvertValue> setObjects { set => Objects = value; }
+
+        public virtual bool Equals(ConvertMapping<TConvertValue> other) => StartTime.Equals(other?.StartTime);
     }
 }
