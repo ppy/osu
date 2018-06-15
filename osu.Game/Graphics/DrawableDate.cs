@@ -58,9 +58,9 @@ namespace osu.Game.Graphics
 
         public override bool HandleMouseInput => true;
 
-        protected virtual string Format() => Text = date.Humanize();
+        protected virtual string Format() => date.Humanize();
 
-        private void updateTime() => Format();
+        private void updateTime() => Text = Format();
 
         public virtual string TooltipText => string.Format($"{date:MMMM d, yyyy h:mm tt \"UTC\"z}");
     }
