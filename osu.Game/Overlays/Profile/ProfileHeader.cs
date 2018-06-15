@@ -357,15 +357,12 @@ namespace osu.Game.Overlays.Profile
 
             infoTextLeft.NewParagraph();
 
-            if (user.JoinDate.ToUniversalTime().Year < 2008)
-            {
-                infoTextLeft.AddText("Here since the beginning", boldItalic);
-            }
-            else
+            if (user.JoinDate.ToUniversalTime().Year >= 2008)
             {
                 infoTextLeft.AddText("Joined ", lightText);
-                infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), boldItalic);
             }
+
+            infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), boldItalic);
 
             infoTextLeft.NewLine();
             infoTextLeft.AddText("Last seen ", lightText);
