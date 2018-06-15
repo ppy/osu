@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && TotalColumns != 8)
                     convertType |= PatternType.Mirror;
-                else
+                else if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP))
                     convertType |= PatternType.Gathered;
             }
         }
