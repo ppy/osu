@@ -62,6 +62,6 @@ namespace osu.Game.Graphics
 
         private void updateTime() => Format();
 
-        public virtual string TooltipText => string.Format($"{date:d MMMM yyyy H:mm \"UTC\"z}");
+        public virtual string TooltipText => string.Format($"{date:MMMM d, yyyy h:mm tt \"UTC\"z}");
     }
 }

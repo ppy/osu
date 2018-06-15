@@ -16,6 +16,6 @@ namespace osu.Game.Graphics
 
         protected override string Format() => Text = string.Format($"{date:MMMM yyyy}");
 
-        public override string TooltipText => string.Format($"{date:d MMMM yyyy}");
+        public override string TooltipText => string.Format($"{date:MMMM d, yyyy}");
     }
 }
