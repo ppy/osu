@@ -77,10 +77,25 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
             else
                 convertType |= PatternType.LowProbability;
+
+            if ((convertType & PatternType.KeepSingle) == 0)
+            {
+                if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && TotalColumns != 8)
+                    convertType |= PatternType.Mirror;
+                else
+                    convertType |= PatternType.Gathered;
+            }
         }
 
         public override Pattern Generate()
         {
+            if (TotalColumns == 1)
+            {
+                var pattern = new Pattern();
+                addToPattern(pattern, 0);
+                return pattern;
+            }
+
             int lastColumn = PreviousPattern.HitObjects.FirstOrDefault()?.Column ?? 0;
 
             if ((convertType & PatternType.Reverse) > 0 && PreviousPattern.HitObjects.Any())
@@ -346,7 +361,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             addToCentre = false;
 
             if ((convertType & PatternType.ForceNotStack) > 0)
-                return getRandomNoteCount(p2 / 2, p2, (p2 + p3) / 2, p3);
+                return getRandomNoteCount(1 / 2f + p2 / 2, p2, (p2 + p3) / 2, p3);
 
             switch (TotalColumns)
             {
