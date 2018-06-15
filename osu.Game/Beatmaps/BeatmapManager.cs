@@ -390,6 +390,9 @@ namespace osu.Game.Beatmaps
             if (!force && beatmap.OnlineBeatmapID != null && beatmap.BeatmapSet.OnlineBeatmapSetID != null)
                 return true;
 
+            if (api.State != APIState.Online)
+                return false;
+
             Logger.Log("Attempting online lookup for IDs...", LoggingTarget.Database);
 
             try
