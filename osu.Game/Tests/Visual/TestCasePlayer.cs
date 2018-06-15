@@ -1,9 +1,11 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -51,6 +53,28 @@ namespace osu.Game.Tests.Visual
                     Player p = null;
                     AddStep(r.Name, () => p = loadPlayerFor(r));
                     AddUntilStep(() => ContinueCondition(p));
+
+                    AddAssert("no leaked beatmaps", () =>
+                    {
+                        p = null;
+
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        int count = 0;
+
+                        workingWeakReferences.ForEachAlive(_ => count++);
+                        return count == 1;
+                    });
+
+                    AddAssert("no leaked players", () =>
+                    {
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        int count = 0;
+
+                        playerWeakReferences.ForEachAlive(_ => count++);
+                        return count == 1;
+                    });
                 }
             }
         }
@@ -59,21 +83,32 @@ namespace osu.Game.Tests.Visual
 
         protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
 
+        private readonly WeakList<WorkingBeatmap> workingWeakReferences = new WeakList<WorkingBeatmap>();
+        private readonly WeakList<Player> playerWeakReferences = new WeakList<Player>();
+
         private Player loadPlayerFor(RulesetInfo ri) => loadPlayerFor(ri.CreateInstance());
 
         private Player loadPlayerFor(Ruleset r)
         {
             var beatmap = CreateBeatmap(r);
+            var working = new TestWorkingBeatmap(beatmap);
 
-            Beatmap.Value = new TestWorkingBeatmap(beatmap);
+            workingWeakReferences.Add(working);
+
+            Beatmap.Value = working;
             Beatmap.Value.Mods.Value = new[] { r.GetAllMods().First(m => m is ModNoFail) };
 
-            if (Player != null)
-                Remove(Player);
+            Player?.Exit();
 
             var player = CreatePlayer(r);
 
-            LoadComponentAsync(player, LoadScreen);
+            playerWeakReferences.Add(player);
+
+            LoadComponentAsync(player, p =>
+            {
+                Player = p;
+                LoadScreen(p);
+            });
 
             return player;
         }
