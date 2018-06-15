@@ -136,7 +136,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var endTimeData = original as IHasEndTime;
             var distanceData = original as IHasDistance;
             var positionData = original as IHasPosition;
-            var repeatsData = original as IHasRepeats;
 
             Patterns.PatternGenerator conversion = null;
 
