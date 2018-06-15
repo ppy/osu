@@ -367,7 +367,6 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), boldItalic);
             }
 
-
             infoTextLeft.NewLine();
             infoTextLeft.AddText("Last seen ", lightText);
             infoTextLeft.AddText(new DrawableDate(user.LastVisit), boldItalic);
