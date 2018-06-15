@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private double lastTime;
         private Vector2 lastPosition;
-        private PatternType lastStair;
+        private PatternType lastStair = PatternType.Stair;
         private void recordNote(double time, Vector2 position)
         {
             lastTime = time;
