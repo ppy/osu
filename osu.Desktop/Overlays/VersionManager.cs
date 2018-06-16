@@ -118,7 +118,7 @@ namespace osu.Desktop.Overlays
                 Icon = FontAwesome.fa_check_square;
                 Activated = delegate
                 {
-                    Process.Start($"https://github.com/ppy/osu/releases/tag/v{version}");
+                    Process.Start($"https://osu.ppy.sh/home/changelog/{version}");
                     return true;
                 };
             }
