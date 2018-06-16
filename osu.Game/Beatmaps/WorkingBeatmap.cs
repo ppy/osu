@@ -107,8 +107,14 @@ namespace osu.Game.Beatmaps
             IBeatmap converted = converter.Convert();
 
             // Apply difficulty mods
-            foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+            if (Mods.Value.Any(m => m is IApplicableToDifficulty))
+            {
+                converted.BeatmapInfo = converted.BeatmapInfo.Clone();
+                converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
+
+                foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
+                    mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+            }
 
             // Post-process
             rulesetInstance.CreateBeatmapProcessor(converted)?.PostProcess();
