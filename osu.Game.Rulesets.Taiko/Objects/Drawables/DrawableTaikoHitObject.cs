@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     public abstract class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
     {
         protected readonly Container Content;
-        public readonly Container ProxiedContent;
+        private readonly Container proxiedContent;
 
         private readonly Container nonProxiedContent;
 
@@ -31,12 +31,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Child = Content = new Container { RelativeSizeAxes = Axes.Both }
                 },
-                ProxiedContent = new Container { RelativeSizeAxes = Axes.Both }
+                proxiedContent = new Container { RelativeSizeAxes = Axes.Both }
             };
         }
 
         /// <summary>
-        /// <see cref="ProxiedContent"/> is proxied into an upper layer. We don't want to get masked away otherwise <see cref="ProxiedContent"/> would too.
+        /// <see cref="proxiedContent"/> is proxied into an upper layer. We don't want to get masked away otherwise <see cref="proxiedContent"/> would too.
         /// </summary>
         protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
@@ -46,8 +46,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected void ProxyContent()
         {
             nonProxiedContent.Remove(Content);
-            ProxiedContent.Remove(Content);
-            ProxiedContent.Add(Content);
+            proxiedContent.Remove(Content);
+            proxiedContent.Add(Content);
         }
 
         /// <summary>
@@ -55,10 +55,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         protected void UnproxyContent()
         {
-            ProxiedContent.Remove(Content);
+            proxiedContent.Remove(Content);
             nonProxiedContent.Remove(Content);
             nonProxiedContent.Add(Content);
         }
+
+        /// <summary>
+        /// Creates a proxy for the content of this <see cref="DrawableTaikoHitObject"/>.
+        /// </summary>
+        public Drawable CreateProxiedContent() => proxiedContent.CreateProxy();
 
         public abstract bool OnPressed(TaikoAction action);
         public virtual bool OnReleased(TaikoAction action) => false;

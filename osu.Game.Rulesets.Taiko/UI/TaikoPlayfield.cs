@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var taikoObject = h as DrawableTaikoHitObject;
             if (taikoObject != null)
-                topLevelHitContainer.Add(taikoObject.ProxiedContent.CreateProxy());
+                topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
         }
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
