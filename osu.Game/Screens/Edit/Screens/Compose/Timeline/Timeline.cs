@@ -42,6 +42,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                 Depth = float.MaxValue
             };
 
+            // We don't want the centre marker to scroll
+            AddInternal(new CentreMarker());
+
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(beatmap);
