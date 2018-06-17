@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = HEIGHT,
-                            Colour = OsuColour.FromHex("1a2328"),
+                            Colour = OsuColour.FromHex("1c2125"),
                         },
                         new Container
                         {

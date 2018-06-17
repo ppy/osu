@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
             MaskingContainer.CornerRadius = 0;
             ItemsContainer.Padding = new MarginPadding { Left = 100 };
-            BackgroundColour = OsuColour.FromHex("1a2328");
+            BackgroundColour = OsuColour.FromHex("1c2125");
 
             SetupScreenSelectionTabControl tabControl;
             AddRangeInternal(new Drawable[]
