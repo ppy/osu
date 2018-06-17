@@ -136,23 +136,20 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             get
             {
-                if (isForCurrentRuleset)
-                {
-                    return new Mod[]
-                    {
-                        new ManiaModDoubleTime(),
-                        new ManiaModHalfTime(),
-                        new ManiaModEasy(),
-                        new ManiaModHardRock(),
-                    };
-                }
-
-                return new Mod[]
+                var mods = new Mod[]
                 {
                     new ManiaModDoubleTime(),
                     new ManiaModHalfTime(),
                     new ManiaModEasy(),
                     new ManiaModHardRock(),
+                };
+
+                if (isForCurrentRuleset)
+                    return mods;
+
+                // if we are a convert, we can be played in any key mod.
+                return mods.Concat(new Mod[]
+                {
                     new ManiaModKey1(),
                     new ManiaModKey2(),
                     new ManiaModKey3(),
@@ -162,7 +159,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                     new ManiaModKey7(),
                     new ManiaModKey8(),
                     new ManiaModKey9(),
-                };
+                }).ToArray();
             }
         }
     }
