@@ -49,8 +49,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             fields.Children = new Drawable[]
             {
-                new Field("made by", BeatmapSet.Metadata.Author.Username, @"Exo2.0-RegularItalic"),
-                new Field("submitted on", online.Submitted.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold")
+                new Field("mapped by", BeatmapSet.Metadata.Author.Username, @"Exo2.0-RegularItalic"),
+                new Field("submitted on", online.Submitted.ToString(@"MMMM d, yyyy"), @"Exo2.0-Bold")
                 {
                     Margin = new MarginPadding { Top = 5 },
                 },
@@ -58,11 +58,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (online.Ranked.HasValue)
             {
-                fields.Add(new Field("ranked on ", online.Ranked.Value.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold"));
+                fields.Add(new Field("ranked on", online.Ranked.Value.ToString(@"MMMM d, yyyy"), @"Exo2.0-Bold"));
             }
             else if (online.LastUpdated.HasValue)
             {
-                fields.Add(new Field("last updated on ", online.LastUpdated.Value.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold"));
+                fields.Add(new Field("last updated on", online.LastUpdated.Value.ToString(@"MMMM d, yyyy"), @"Exo2.0-Bold"));
             }
         }
 

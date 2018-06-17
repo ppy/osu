@@ -5,6 +5,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Configuration
@@ -80,7 +81,11 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.FloatingComments, false);
 
+            Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
+
             Set(OsuSetting.SpeedChangeVisualisation, SpeedChangeVisualisationMethod.Sequential);
+
+            Set(OsuSetting.IncreaseFirstObjectVisibility, true);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -144,6 +149,8 @@ namespace osu.Game.Configuration
         ScreenshotCaptureMenuCursor,
         SongSelectRightMouseScroll,
         BeatmapSkins,
-        BeatmapHitsounds
+        BeatmapHitsounds,
+        IncreaseFirstObjectVisibility,
+        ScoreDisplayMode
     }
 }

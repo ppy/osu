@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Direct
                 return;
             }
 
-            icon.Icon = playing ? FontAwesome.fa_pause : FontAwesome.fa_play;
+            icon.Icon = playing ? FontAwesome.fa_stop : FontAwesome.fa_play;
             icon.FadeColour(playing || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
 
             if (playing)
