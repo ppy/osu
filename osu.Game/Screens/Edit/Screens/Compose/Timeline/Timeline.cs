@@ -2,9 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
+using osu.Framework.Input;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
@@ -14,6 +17,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
     {
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+        private IAdjustableClock adjustableClock;
 
         public Timeline()
         {
@@ -25,8 +30,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         private WaveformGraph waveform;
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap)
+        private void load(IBindableBeatmap beatmap, IAdjustableClock adjustableClock)
         {
+            this.adjustableClock = adjustableClock;
+
             Child = waveform = new WaveformGraph
             {
                 RelativeSizeAxes = Axes.Both,
@@ -46,12 +53,132 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             waveform.Waveform = Beatmap.Value.Waveform;
         }
 
+        /// <summary>
+        /// The track's time in the previous frame.
+        /// </summary>
+        private double lastTrackTime;
+
+        /// <summary>
+        /// Whether the user is currently dragging the timeline.
+        /// </summary>
+        private bool handlingDragInput;
+
+        /// <summary>
+        /// Whether the track was playing before a user drag event.
+        /// </summary>
+        private bool trackWasPlaying;
+
         protected override void Update()
         {
             base.Update();
 
-            // We want time = 0 to be at the centre of the container when scrolled to the start
+            // The extrema of track time should be positioned at the centre of the container when scrolled to the start or end
             Content.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
+
+            if (handlingDragInput)
+            {
+                // The user is dragging - the track should always follow the timeline
+                seekTrackToCurrent();
+            }
+            else if (adjustableClock.IsRunning)
+            {
+                // If the user hasn't provided mouse input but the track is running, always follow the track
+                scrollToTrackTime();
+            }
+            else
+            {
+                // The track isn't playing, so we want to smooth-scroll once more, and re-enable wheel scrolling
+                // There are two cases we have to be wary of:
+                // 1) The user scrolls on this timeline: We want the track to follow us
+                // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline): We want to follow the track time
+
+                // The simplest way to cover both cases is by checking that inter-frame track times are identical
+                if (adjustableClock.CurrentTime == lastTrackTime)
+                {
+                    // The track hasn't been seeked externally
+                    seekTrackToCurrent();
+                }
+                else
+                {
+                    // The track has been seeked externally
+                    scrollToTrackTime();
+                }
+            }
+
+            lastTrackTime = adjustableClock.CurrentTime;
+
+            void seekTrackToCurrent()
+            {
+                if (!(Beatmap.Value.Track is TrackVirtual))
+                    adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
+            }
+
+            void scrollToTrackTime()
+            {
+                if (!(Beatmap.Value.Track is TrackVirtual))
+                    ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
+            }
+        }
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            if (base.OnMouseDown(state, args))
+            {
+                beginUserDrag();
+                return true;
+            }
+
+            return false;
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            endUserDrag();
+            return base.OnMouseUp(state, args);
+        }
+
+        private void beginUserDrag()
+        {
+            handlingDragInput = true;
+            trackWasPlaying = adjustableClock.IsRunning;
+            adjustableClock.Stop();
+        }
+
+        private void endUserDrag()
+        {
+            handlingDragInput = false;
+            if (trackWasPlaying)
+                adjustableClock.Start();
+        }
+
+        protected override ScrollbarContainer CreateScrollbar(Direction direction) => new TimelineScrollbar(this, direction);
+
+        private class TimelineScrollbar : ScrollbarContainer
+        {
+            private readonly Timeline timeline;
+
+            public TimelineScrollbar(Timeline timeline, Direction scrollDir)
+                : base(scrollDir)
+            {
+                this.timeline = timeline;
+            }
+
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            {
+                if (base.OnMouseDown(state, args))
+                {
+                    timeline.beginUserDrag();
+                    return true;
+                }
+
+                return false;
+            }
+
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            {
+                timeline.endUserDrag();
+                return base.OnMouseUp(state, args);
+            }
         }
     }
 }
