@@ -10,7 +10,10 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APIBeatmap : BeatmapMetadata
     {
         [JsonProperty(@"id")]
-        private int onlineBeatmapID { get; set; }
+        public int OnlineBeatmapID { get; set; }
+
+        [JsonProperty(@"beatmapset_id")]
+        public int OnlineBeatmapSetID { get; set; }
 
         [JsonProperty(@"playcount")]
         private int playCount { get; set; }
@@ -55,7 +58,11 @@ namespace osu.Game.Online.API.Requests.Responses
                 Metadata = this,
                 Ruleset = rulesets.GetRuleset(ruleset),
                 StarDifficulty = starDifficulty,
-                OnlineBeatmapID = onlineBeatmapID,
+                OnlineBeatmapID = OnlineBeatmapID,
+                BeatmapSet = new BeatmapSetInfo
+                {
+                    OnlineBeatmapSetID = OnlineBeatmapSetID,
+                },
                 Version = version,
                 BaseDifficulty = new BeatmapDifficulty
                 {

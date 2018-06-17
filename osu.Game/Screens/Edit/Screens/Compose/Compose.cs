@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
                                                         Padding = new MarginPadding { Right = 5 },
-                                                        Child = new ScrollableTimeline { RelativeSizeAxes = Axes.Both }
+                                                        Child = new TimelineArea { RelativeSizeAxes = Axes.Both }
                                                     },
                                                     new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
                                                 },
