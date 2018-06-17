@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
+        public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
+
         private readonly int countHitCircles;
         private readonly int beatmapMaxCombo;
 
@@ -37,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public OsuPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
+        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
@@ -102,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue()
         {
-            double aimValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes["Aim"] / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double aimValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes.AimStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
             double lengthBonus = 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
@@ -151,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue()
         {
-            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes["Speed"] / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes.SpeedStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
             speedValue *= 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
