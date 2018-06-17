@@ -11,21 +11,21 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsSliderGrayscale : SettingsSlider<double>
     {
-        private readonly Circle Swatch;
+        private readonly Circle swatch;
 
         public override Bindable<double> Bindable
         {
             get => base.Bindable;
             set {
                 base.Bindable = value;
-                Swatch.Colour = Color4.FromHsl(new Vector4(0, 0, (float)Bindable, 1));
-                Bindable.ValueChanged += _ => Swatch.Colour = Color4.FromHsl(new Vector4(0, 0, (float)Bindable, 1));
+                swatch.Colour = Color4.FromHsl(new Vector4(0, 0, (float)Bindable, 1));
+                Bindable.ValueChanged += _ => swatch.Colour = Color4.FromHsl(new Vector4(0, 0, (float)Bindable, 1));
             }
         }
 
         public SettingsSliderGrayscale()
         {
-            Add(Swatch = new Circle
+            Add(swatch = new Circle
             {
                 Width = 25,
                 Height = 25,

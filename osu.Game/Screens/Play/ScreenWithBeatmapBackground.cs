@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Play
         {
             if (!IsCurrentScreen) return;
 
-            BackgroundScreenBeatmap bg = (Background as BackgroundScreenBeatmap);
+            BackgroundScreenBeatmap bg = Background as BackgroundScreenBeatmap;
             if (bg == null) return;
 
             bg.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
