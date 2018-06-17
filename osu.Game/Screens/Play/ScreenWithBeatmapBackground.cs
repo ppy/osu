@@ -1,13 +1,16 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Screens.Backgrounds;
-using OpenTK;
 
 namespace osu.Game.Screens.Play
 {
@@ -24,6 +27,7 @@ namespace osu.Game.Screens.Play
         #region User Settings
 
         protected Bindable<double> DimLevel;
+        protected Bindable<double> DimLightness;
         protected Bindable<double> BlurLevel;
         protected Bindable<bool> ShowStoryboard;
 
@@ -33,6 +37,7 @@ namespace osu.Game.Screens.Play
         private void load(OsuConfigManager config)
         {
             DimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            DimLightness = config.GetBindable<double>(OsuSetting.DimLightness);
             BlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
         }
@@ -41,6 +46,7 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
             DimLevel.ValueChanged += _ => UpdateBackgroundElements();
+            DimLightness.ValueChanged += _ => UpdateBackgroundElements();
             BlurLevel.ValueChanged += _ => UpdateBackgroundElements();
             ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();
             UpdateBackgroundElements();
@@ -56,8 +62,9 @@ namespace osu.Game.Screens.Play
         {
             if (!IsCurrentScreen) return;
 
-            Background?.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            (Background as BackgroundScreenBeatmap)?.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             (Background as BackgroundScreenBeatmap)?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            (Background as BackgroundScreenBeatmap).DimColour = Color4.FromHsl(new Vector4(0, 0, (float)DimLightness, 1));
         }
     }
 }

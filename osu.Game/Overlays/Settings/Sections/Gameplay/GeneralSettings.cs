@@ -23,6 +23,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Bindable = config.GetBindable<double>(OsuSetting.DimLevel),
                     KeyboardStep = 0.1f
                 },
+                new SettingsSliderGrayscale
+                {
+                    LabelText = "Background dim lightness",
+                    Bindable = config.GetBindable<double>(OsuSetting.DimLightness),
+                    KeyboardStep = 0.1f
+                },
                 new SettingsSlider<double>
                 {
                     LabelText = "Background blur",
