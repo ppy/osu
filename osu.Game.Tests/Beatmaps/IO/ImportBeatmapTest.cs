@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Beatmaps.IO
     [TestFixture]
     public class ImportBeatmapTest
     {
-        private const string osz_path = @"../../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
+        public const string TEST_OSZ_PATH = @"../../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
 
         [Test]
         public void TestImportWhenClosed()
@@ -265,7 +265,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         private string createTemporaryBeatmap()
         {
             var temp = Path.GetTempFileName() + ".osz";
-            File.Copy(osz_path, temp, true);
+            File.Copy(TEST_OSZ_PATH, temp, true);
             Assert.IsTrue(File.Exists(temp));
             return temp;
         }
