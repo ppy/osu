@@ -3,21 +3,15 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.UserInterface;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 
 namespace osu.Game.Overlays.Settings
 {
-    class SettingsSliderGrayscale : SettingsSlider<double>
+    public class SettingsSliderGrayscale : SettingsSlider<double>
     {
-        private Circle Swatch;
+        private readonly Circle Swatch;
 
         public override Bindable<double> Bindable
         {
@@ -31,7 +25,7 @@ namespace osu.Game.Overlays.Settings
 
         public SettingsSliderGrayscale()
         {
-            Add(Swatch = new Circle()
+            Add(Swatch = new Circle
             {
                 Width = 25,
                 Height = 25,

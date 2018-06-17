@@ -6,10 +6,8 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Screens.Play
@@ -62,9 +60,12 @@ namespace osu.Game.Screens.Play
         {
             if (!IsCurrentScreen) return;
 
-            (Background as BackgroundScreenBeatmap)?.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            (Background as BackgroundScreenBeatmap)?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            (Background as BackgroundScreenBeatmap).DimColour = Color4.FromHsl(new Vector4(0, 0, (float)DimLightness, 1));
+            BackgroundScreenBeatmap bg = (Background as BackgroundScreenBeatmap);
+            if (bg == null) return;
+
+            bg.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            bg.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            bg.DimColour = Color4.FromHsl(new Vector4(0, 0, (float)DimLightness, 1));
         }
     }
 }

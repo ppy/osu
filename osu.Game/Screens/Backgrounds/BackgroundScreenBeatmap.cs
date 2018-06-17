@@ -4,7 +4,6 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
@@ -17,7 +16,7 @@ namespace osu.Game.Screens.Backgrounds
     public class BackgroundScreenBeatmap : BackgroundScreen
     {
         private Background background;
-        private Box dimColourBox;
+        private readonly Box dimColourBox;
 
         private WorkingBeatmap beatmap;
         private Vector2 blurTarget;
@@ -64,7 +63,7 @@ namespace osu.Game.Screens.Backgrounds
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
         {
             Beatmap = beatmap;
-            Add(dimColourBox = new Box()
+            Add(dimColourBox = new Box
             {
                 Depth = float.MaxValue,
                 FillMode = FillMode.Fill,
