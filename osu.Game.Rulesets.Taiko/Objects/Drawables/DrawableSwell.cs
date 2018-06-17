@@ -20,12 +20,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableSwell : DrawableTaikoHitObject<Swell>
     {
-        /// <summary>
-        /// Invoked when the swell has reached the hit target, i.e. when CurrentTime >= StartTime.
-        /// This is only ever invoked once.
-        /// </summary>
-        public event Action OnStart;
-
         private const float target_ring_thick_border = 1.4f;
         private const float target_ring_thin_border = 1f;
         private const float target_ring_scale = 5f;
@@ -40,7 +34,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private int userHits;
 
-        private bool hasStarted;
         private readonly SwellSymbolPiece symbol;
 
         public DrawableSwell(Swell swell)
@@ -48,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             FillMode = FillMode.Fit;
 
-            AddInternal(bodyContainer = new Container
+            Content.Add(bodyContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = 1,
@@ -177,6 +170,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             switch (state)
             {
+                case ArmedState.Idle:
+                    UnproxyContent();
+                    break;
                 case ArmedState.Hit:
                     bodyContainer.Delay(untilJudgement).ScaleTo(1.4f, out_transition_time);
                     break;
@@ -195,11 +191,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             X = Math.Max(0, X);
 
             double t = Math.Min(HitObject.StartTime, Time.Current);
-            if (t == HitObject.StartTime && !hasStarted)
-            {
-                OnStart?.Invoke();
-                hasStarted = true;
-            }
+            if (t == HitObject.StartTime)
+                ProxyContent();
         }
 
         private bool? lastWasCentre;
