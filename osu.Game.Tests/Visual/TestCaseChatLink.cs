@@ -54,9 +54,9 @@ namespace osu.Game.Tests.Visual
             var chatManager = new ChannelManager();
             chatManager.AvailableChannels.Add(new Channel { Name = "#english"});
             chatManager.AvailableChannels.Add(new Channel { Name = "#japanese" });
-            dependencies.Cache(chatManager);
+            Dependencies.Cache(chatManager);
 
-            dependencies.Cache(new ChatOverlay());
+            Dependencies.Cache(new ChatOverlay());
 
             testLinksGeneral();
             testEcho();
