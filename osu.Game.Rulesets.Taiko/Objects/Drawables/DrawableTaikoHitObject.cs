@@ -40,23 +40,31 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
+        private bool isProxied;
+
         /// <summary>
         /// Moves <see cref="Content"/> to a layer proxied above the playfield.
+        /// Does nothing is content is already proxied.
         /// </summary>
         protected void ProxyContent()
         {
+            if (isProxied) return;
+            isProxied = true;
+
             nonProxiedContent.Remove(Content);
-            proxiedContent.Remove(Content);
             proxiedContent.Add(Content);
         }
 
         /// <summary>
         /// Moves <see cref="Content"/> to the normal hitobject layer.
+        /// Does nothing is content is not currently proxied.
         /// </summary>
         protected void UnproxyContent()
         {
+            if (!isProxied) return;
+            isProxied = false;
+
             proxiedContent.Remove(Content);
-            nonProxiedContent.Remove(Content);
             nonProxiedContent.Add(Content);
         }
 
