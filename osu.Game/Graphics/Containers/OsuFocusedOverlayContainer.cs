@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.Containers
 
         /// <summary>
         /// Whether mouse input should be blocked screen-wide while this overlay is visible.
-        /// Performing mouse actions outside of the valid extents will hide the overlay but pass the events through.
+        /// Performing mouse actions outside of the valid extents will hide the overlay.
         /// </summary>
         public virtual bool BlockScreenWideMouse => BlockPassThroughMouse;
 
