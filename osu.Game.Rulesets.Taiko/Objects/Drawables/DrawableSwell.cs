@@ -34,7 +34,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private int userHits;
 
-        private bool hasProxied;
         private readonly SwellSymbolPiece symbol;
 
         public DrawableSwell(Swell swell)
@@ -172,7 +171,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    hasProxied = false;
                     UnproxyContent();
                     break;
                 case ArmedState.Hit:
@@ -193,11 +191,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             X = Math.Max(0, X);
 
             double t = Math.Min(HitObject.StartTime, Time.Current);
-            if (t == HitObject.StartTime && !hasProxied)
-            {
+            if (t == HitObject.StartTime)
                 ProxyContent();
-                hasProxied = true;
-            }
         }
 
         private bool? lastWasCentre;
