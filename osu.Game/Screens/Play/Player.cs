@@ -229,6 +229,7 @@ namespace osu.Game.Screens.Play
             };
 
             hudOverlay.HoldToQuit.Action = Exit;
+            hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             if (ShowStoryboard)
                 initializeStoryboard(false);
