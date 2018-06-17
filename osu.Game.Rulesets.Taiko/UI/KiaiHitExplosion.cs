@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public class KiaiHitExplosion : CircularContainer
     {
+        public override bool RemoveWhenNotAlive => true;
+
         public readonly DrawableHitObject JudgedObject;
 
         private readonly bool isRim;
@@ -62,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             this.ScaleTo(new Vector2(1, 3f), 500, Easing.OutQuint);
             this.FadeOut(250);
 
-            Expire();
+            Expire(true);
         }
     }
 }

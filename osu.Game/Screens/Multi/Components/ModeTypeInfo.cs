@@ -64,6 +64,7 @@ namespace osu.Game.Screens.Multi.Components
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(5f, 0f),
+                    LayoutDuration = 100,
                     Children = new[]
                     {
                         rulesetContainer = new Container

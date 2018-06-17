@@ -35,9 +35,6 @@ namespace osu.Game.Tests.Visual
             typeof(MessageFormatter)
         };
 
-        private DependencyContainer dependencies;
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
-
         public TestCaseChatLink()
         {
             Add(textContainer = new TestChatLineContainer

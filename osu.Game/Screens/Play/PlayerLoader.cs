@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(info = new BeatmapMetadataDisplay(Beatmap)
+            Add(info = new BeatmapMetadataDisplay(Beatmap.Value)
             {
                 Alpha = 0,
                 Anchor = Anchor.Centre,
