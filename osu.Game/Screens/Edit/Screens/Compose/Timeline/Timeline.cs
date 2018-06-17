@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Input;
@@ -31,14 +32,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         private WaveformGraph waveform;
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, IAdjustableClock adjustableClock)
+        private void load(IBindableBeatmap beatmap, IAdjustableClock adjustableClock, OsuColour colours)
         {
             this.adjustableClock = adjustableClock;
 
             Child = waveform = new WaveformGraph
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.FromHex("222"),
+                Colour = colours.Blue.Opacity(0.2f),
+                LowColour = colours.BlueLighter,
+                MidColour = colours.BlueDark,
+                HighColour = colours.BlueDarker,
                 Depth = float.MaxValue
             };
 
