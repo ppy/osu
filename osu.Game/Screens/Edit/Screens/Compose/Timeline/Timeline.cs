@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
             Zoom = 10;
+            ScrollbarVisible = false;
         }
 
         private WaveformGraph waveform;
@@ -155,36 +156,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             handlingDragInput = false;
             if (trackWasPlaying)
                 adjustableClock.Start();
-        }
-
-        protected override ScrollbarContainer CreateScrollbar(Direction direction) => new TimelineScrollbar(this, direction);
-
-        private class TimelineScrollbar : ScrollbarContainer
-        {
-            private readonly Timeline timeline;
-
-            public TimelineScrollbar(Timeline timeline, Direction scrollDir)
-                : base(scrollDir)
-            {
-                this.timeline = timeline;
-            }
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-            {
-                if (base.OnMouseDown(state, args))
-                {
-                    timeline.beginUserDrag();
-                    return true;
-                }
-
-                return false;
-            }
-
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-            {
-                timeline.endUserDrag();
-                return base.OnMouseUp(state, args);
-            }
         }
     }
 }
