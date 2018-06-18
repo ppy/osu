@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
@@ -19,6 +20,32 @@ namespace osu.Game.Graphics.Sprites
             Shadow = true;
             TextSize = FONT_SIZE;
         }
+        
+        public void Truncate(float maxWidth, bool ellipsis = false)
+        {
+            if (ellipsis)
+            {
+                Texture period = this.GetTextureForCharacter('.');
+                // Scale the width to the current TextSize
+                float scaleFactor = (float)period.Width / period.Height;
+                maxWidth -= 3 * (period.Width - (period.Height - this.TextSize) * scaleFactor);
+
+            }
+
+            float totalWidth = 0;
+            for (int a = 0; a < this.Text.Length; a++)
+            {
+                Texture t = this.GetTextureForCharacter(this.Text[a]);
+                float scaleFactor = (float)t.Width / t.Height;
+                totalWidth += t.Width - (t.Height - this.TextSize) * scaleFactor;
+                if (totalWidth > maxWidth)
+                {
+                    this.Text = ellipsis ? this.Text.Substring(0, a - 1) + "..." : this.Text.Substring(0, a - 1);
+                    return;
+                }
+            }
+        }
+
 
         protected override Drawable CreateFallbackCharacterDrawable()
         {
