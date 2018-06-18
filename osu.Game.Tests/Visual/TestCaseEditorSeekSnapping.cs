@@ -16,6 +16,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseEditorSeekSnapping : EditorClockTestCase
     {
         public TestCaseEditorSeekSnapping()
