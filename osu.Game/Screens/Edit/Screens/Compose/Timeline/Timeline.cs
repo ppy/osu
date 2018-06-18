@@ -62,9 +62,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         }
 
         /// <summary>
-        /// The timeline's last scroll position.
+        /// The timeline's scroll position in the last frame.
         /// </summary>
-        private double lastScrollPosition;
+        private float lastScrollPosition;
+
+        /// <summary>
+        /// The track time in the last frame.
+        /// </summary>
+        private double lastTrackTime;
 
         /// <summary>
         /// Whether the user is currently dragging the timeline.
@@ -100,20 +105,15 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                 // 1) The user scrolls on this timeline: We want the track to follow us
                 // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline): We want to follow the track time
 
-                // The simplest way to cover both cases is by checking whether the inter-frame timeline positions are identical
-                if (Current != lastScrollPosition)
-                {
-                    // The timeline has moved, seek the track
+                // The simplest way to cover both cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
+                if (Current != lastScrollPosition && adjustableClock.CurrentTime == lastTrackTime)
                     seekTrackToCurrent();
-                }
                 else
-                {
-                    // The timeline hasn't moved, scroll to the track time
                     scrollToTrackTime();
-                }
             }
 
             lastScrollPosition = Current;
+            lastTrackTime = adjustableClock.CurrentTime;
 
             void seekTrackToCurrent()
             {
