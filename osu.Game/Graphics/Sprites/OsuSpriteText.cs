@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Sprites
             Shadow = true;
             TextSize = FONT_SIZE;
         }
-        
+
         public void Truncate(float maxWidth, bool ellipsis = false)
         {
             if (ellipsis)
@@ -45,7 +45,6 @@ namespace osu.Game.Graphics.Sprites
                 }
             }
         }
-
 
         protected override Drawable CreateFallbackCharacterDrawable()
         {
