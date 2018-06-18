@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
                 conversion = generator;
 
-                for (double time = original.StartTime; time <= generator.EndTime; time += generator.SegmentDuration)
+                for (double time = original.StartTime; !Precision.DefinitelyBigger(time, generator.EndTime); time += generator.SegmentDuration)
                 {
                     recordNote(time, positionData?.Position ?? Vector2.Zero);
                     computeDensity(time);
