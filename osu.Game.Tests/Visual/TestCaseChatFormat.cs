@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual
 
         private void testFormatting()
         {
-            for(int a = 0; a < 15; a++)
+            for (int a = 0; a < 15; a++)
                 addMessageWithChecks($"Wide {a} character username.", username: new string('w', a));
             addMessageWithChecks("Short name with spaces.", username: "sho rt name");
             addMessageWithChecks("Long name with spaces.", username: "long name with s p a c e s");
@@ -83,16 +83,11 @@ namespace osu.Game.Tests.Visual
             public DummyMessage(string text, bool isAction = false, bool isImportant = false, int number = 0, string username = null)
                 : base(messageCounter++)
             {
-                if (username == null)
-                {
-                    username = $"user {number}";
-                }
-
                 Content = text;
                 IsAction = isAction;
                 Sender = new User
                 {
-                    Username = username,
+                    Username = username ?? $"user {number}",
                     Id = number,
                     Colour = isImportant ? "#250cc9" : null,
                 };
