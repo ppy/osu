@@ -1,8 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -10,9 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
 using OpenTK;
@@ -22,8 +18,6 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseEditorSeekSnapping : EditorClockTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(HitObjectComposer) };
-
         public TestCaseEditorSeekSnapping()
         {
             BeatDivisor.Value = 4;
@@ -56,22 +50,13 @@ namespace osu.Game.Tests.Visual
             Beatmap.Value = new TestWorkingBeatmap(testBeatmap);
 
             Child = new TimingPointVisualiser(testBeatmap, 5000) { Clock = Clock };
-
-            testSeekNoSnapping();
-            testSeekSnappingOnBeat();
-            testSeekSnappingInBetweenBeat();
-            testSeekForwardNoSnapping();
-            testSeekForwardSnappingOnBeat();
-            testSeekForwardSnappingFromInBetweenBeat();
-            testSeekBackwardSnappingOnBeat();
-            testSeekBackwardSnappingFromInBetweenBeat();
-            testSeekingWithFloatingPointBeatLength();
         }
 
         /// <summary>
         /// Tests whether time is correctly seeked without snapping.
         /// </summary>
-        private void testSeekNoSnapping()
+        [Test]
+        public void TestSeekNoSnapping()
         {
             reset();
 
@@ -94,7 +79,8 @@ namespace osu.Game.Tests.Visual
         /// Tests whether seeking to exact beat times puts us on the beat time.
         /// These are the white/yellow ticks on the graph.
         /// </summary>
-        private void testSeekSnappingOnBeat()
+        [Test]
+        public void TestSeekSnappingOnBeat()
         {
             reset();
 
@@ -117,9 +103,9 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// Tests whether seeking to somewhere in the middle between beats puts us on the expected beats.
         /// For example, snapping between a white/yellow beat should put us on either the yellow or white, depending on which one we're closer too.
-        /// If
         /// </summary>
-        private void testSeekSnappingInBetweenBeat()
+        [Test]
+        public void TestSeekSnappingInBetweenBeat()
         {
             reset();
 
@@ -140,7 +126,8 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// Tests that when seeking forward with no beat snapping, beats are never explicitly snapped to, nor the next timing point (if we've skipped it).
         /// </summary>
-        private void testSeekForwardNoSnapping()
+        [Test]
+        public void TestSeekForwardNoSnapping()
         {
             reset();
 
@@ -159,7 +146,8 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// Tests that when seeking forward with beat snapping, all beats are snapped to and timing points are never skipped.
         /// </summary>
-        private void testSeekForwardSnappingOnBeat()
+        [Test]
+        public void TestSeekForwardSnappingOnBeat()
         {
             reset();
 
@@ -181,7 +169,8 @@ namespace osu.Game.Tests.Visual
         /// Tests that when seeking forward from in-between two beats, the next beat or timing point is snapped to, and no beats are skipped.
         /// This will also test being extremely close to the next beat/timing point, to ensure rounding is not an issue.
         /// </summary>
-        private void testSeekForwardSnappingFromInBetweenBeat()
+        [Test]
+        public void TestSeekForwardSnappingFromInBetweenBeat()
         {
             reset();
 
@@ -214,7 +203,8 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// Tests that when seeking backward with no beat snapping, beats are never explicitly snapped to, nor the next timing point (if we've skipped it).
         /// </summary>
-        private void testSeekBackwardNoSnapping()
+        [Test]
+        public void TestSeekBackwardNoSnapping()
         {
             reset();
 
@@ -236,7 +226,8 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// Tests that when seeking backward with beat snapping, all beats are snapped to and timing points are never skipped.
         /// </summary>
-        private void testSeekBackwardSnappingOnBeat()
+        [Test]
+        public void TestSeekBackwardSnappingOnBeat()
         {
             reset();
 
@@ -259,7 +250,8 @@ namespace osu.Game.Tests.Visual
         /// Tests that when seeking backward from in-between two beats, the previous beat or timing point is snapped to, and no beats are skipped.
         /// This will also test being extremely close to the previous beat/timing point, to ensure rounding is not an issue.
         /// </summary>
-        private void testSeekBackwardSnappingFromInBetweenBeat()
+        [Test]
+        public void TestSeekBackwardSnappingFromInBetweenBeat()
         {
             reset();
 
@@ -280,7 +272,8 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// Tests that there are no rounding issues when snapping to beats within a timing point with a floating-point beatlength.
         /// </summary>
-        private void testSeekingWithFloatingPointBeatLength()
+        [Test]
+        public void TestSeekingWithFloatingPointBeatLength()
         {
             reset();
 
@@ -288,7 +281,7 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Seek(0)", () => Clock.Seek(0));
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 9; i++)
             {
                 AddStep("SeekForward, Snap", () =>
                 {
@@ -298,7 +291,7 @@ namespace osu.Game.Tests.Visual
                 AddAssert("Time > lastTime", () => Clock.CurrentTime > lastTime);
             }
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 9; i++)
             {
                 AddStep("SeekBackward, Snap", () =>
                 {
@@ -314,16 +307,6 @@ namespace osu.Game.Tests.Visual
         private void reset()
         {
             AddStep("Reset", () => Clock.Seek(0));
-        }
-
-        private class TestHitObjectComposer : HitObjectComposer
-        {
-            public TestHitObjectComposer(Ruleset ruleset)
-                : base(ruleset)
-            {
-            }
-
-            protected override IReadOnlyList<ICompositionTool> CompositionTools => new ICompositionTool[0];
         }
 
         private class TimingPointVisualiser : CompositeDrawable
