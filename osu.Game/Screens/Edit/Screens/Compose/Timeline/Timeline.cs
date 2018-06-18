@@ -117,14 +117,21 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
             void seekTrackToCurrent()
             {
+                var track = Beatmap.Value.Track;
+                if (track is TrackVirtual || !track.IsLoaded)
+                    return;
+
                 if (!(Beatmap.Value.Track is TrackVirtual))
                     adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
             }
 
             void scrollToTrackTime()
             {
-                if (!(Beatmap.Value.Track is TrackVirtual))
-                    ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
+                var track = Beatmap.Value.Track;
+                if (track is TrackVirtual || !track.IsLoaded)
+                    return;
+
+                ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
             }
         }
 
