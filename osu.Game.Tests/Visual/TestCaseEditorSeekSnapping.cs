@@ -210,15 +210,13 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Seek(450)", () => Clock.Seek(450));
             AddStep("SeekBackward", () => Clock.SeekBackward());
-            AddAssert("Time = 425", () => Clock.CurrentTime == 425);
+            AddAssert("Time = 400", () => Clock.CurrentTime == 400);
             AddStep("SeekBackward", () => Clock.SeekBackward());
-            AddAssert("Time = 375", () => Clock.CurrentTime == 375);
+            AddAssert("Time = 350", () => Clock.CurrentTime == 350);
             AddStep("SeekBackward", () => Clock.SeekBackward());
-            AddAssert("Time = 325", () => Clock.CurrentTime == 325);
+            AddAssert("Time = 150", () => Clock.CurrentTime == 150);
             AddStep("SeekBackward", () => Clock.SeekBackward());
-            AddAssert("Time = 125", () => Clock.CurrentTime == 125);
-            AddStep("SeekBackward", () => Clock.SeekBackward());
-            AddAssert("Time = 25", () => Clock.CurrentTime == 25);
+            AddAssert("Time = 50", () => Clock.CurrentTime == 50);
             AddStep("SeekBackward", () => Clock.SeekBackward());
             AddAssert("Time = 0", () => Clock.CurrentTime == 0);
         }
