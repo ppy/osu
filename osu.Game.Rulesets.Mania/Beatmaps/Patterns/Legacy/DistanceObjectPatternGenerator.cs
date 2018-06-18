@@ -62,6 +62,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         {
             var originalPattern = generate();
 
+            if (originalPattern.HitObjects.Count() == 1)
+            {
+                yield return originalPattern;
+                yield break;
+            }
+
             // We need to split the intermediate pattern into two new patterns:
             // 1. A pattern containing all objects that do not end at our EndTime.
             // 2. A pattern containing all objects that end at our EndTime. This will be used for further pattern generation.
@@ -75,7 +81,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 else
                     endTimePattern.Add(obj);
             }
-
 
             yield return intermediatePattern;
             yield return endTimePattern;
