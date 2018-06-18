@@ -223,10 +223,7 @@ namespace osu.Game.Overlays.Chat
             timestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
 
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
-
-            username.Text = message.Sender.Username;
-            username.Truncate(message_padding - 20, ellipsis: true);
-            username.Text = $@"{username.Text}" + (senderHasBackground || message.IsAction ? "" : ":");
+            username.Text = $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
 
             // remove non-existent channels from the link list
             message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chat?.AvailableChannels.Any(c => c.Name == link.Argument) != true);

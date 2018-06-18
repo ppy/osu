@@ -451,7 +451,7 @@ namespace osu.Game.Tests.Visual
                 {
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = $"peppy{id.ToString().PadLeft(6, '0')}",
-                    Title = $"test set with a really really really really really really really really really really really really really really really really #{id}!",
+                    Title = $"test set #{id}!",
                     AuthorString = string.Concat(Enumerable.Repeat((char)('z' - Math.Min(25, id - 1)), 5))
                 },
                 Beatmaps = new List<BeatmapInfo>(new[]

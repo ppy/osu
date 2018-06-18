@@ -65,10 +65,10 @@ namespace osu.Game.Tests.Visual
 
         private void clear() => AddStep("clear messages", textContainer.Clear);
 
-        private void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false, bool isImportant = false, string username = null, params LinkAction[] expectedActions)
+        private void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false, bool isImportant = false, params LinkAction[] expectedActions)
         {
             int index = textContainer.Count + 1;
-            var newLine = new ChatLine(new DummyMessage(text, isAction, isImportant, index, username));
+            var newLine = new ChatLine(new DummyMessage(text, isAction, isImportant, index));
             textContainer.Add(newLine);
 
             AddAssert($"msg #{index} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
@@ -134,10 +134,6 @@ namespace osu.Game.Tests.Visual
             addMessageWithChecks("Join my osu://chan/#english.", 1, expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks("Join my #english or #japanese channels.", 2, expectedActions: new[] { LinkAction.OpenChannel, LinkAction.OpenChannel });
             addMessageWithChecks("Join my #english or #nonexistent #hashtag channels.", 1, expectedActions: LinkAction.OpenChannel);
-            addMessageWithChecks("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa I have a long username!", username: "Osu Tatakae Ouendan");
-            addMessageWithChecks("14 character username.", username: "WWWWWWWWWWWWWW");
-            addMessageWithChecks("15 character username.", username: "WWWWWWWWWWWWWWW");
-            addMessageWithChecks("16 character username.", username: "WWWWWWWWWWWWWWWW");
         }
 
         private void testEcho()
@@ -192,19 +188,14 @@ namespace osu.Game.Tests.Visual
 
             public new DateTimeOffset Timestamp = DateTimeOffset.Now;
 
-            public DummyMessage(string text, bool isAction = false, bool isImportant = false, int number = 0, string username = null)
+            public DummyMessage(string text, bool isAction = false, bool isImportant = false, int number = 0)
                 : base(messageCounter++)
             {
-                if (username == null)
-                {
-                    username = $"user {number}";
-                }
-
                 Content = text;
                 IsAction = isAction;
                 Sender = new User
                 {
-                    Username = username,
+                    Username = $"User {number}",
                     Id = number,
                     Colour = isImportant ? "#250cc9" : null,
                 };
