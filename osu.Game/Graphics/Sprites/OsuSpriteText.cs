@@ -25,22 +25,22 @@ namespace osu.Game.Graphics.Sprites
         {
             if (ellipsis)
             {
-                Texture period = this.GetTextureForCharacter('.');
+                Texture period = GetTextureForCharacter('.');
                 // Scale the width to the current TextSize
                 float scaleFactor = (float)period.Width / period.Height;
-                maxWidth -= 3 * (period.Width - (period.Height - this.TextSize) * scaleFactor);
+                maxWidth -= 3 * (period.Width - (period.Height - TextSize) * scaleFactor);
 
             }
 
             float totalWidth = 0;
-            for (int a = 0; a < this.Text.Length; a++)
+            for (int a = 0; a < Text.Length; a++)
             {
-                Texture t = this.GetTextureForCharacter(this.Text[a]);
+                Texture t = GetTextureForCharacter(Text[a]);
                 float scaleFactor = (float)t.Width / t.Height;
-                totalWidth += t.Width - (t.Height - this.TextSize) * scaleFactor;
+                totalWidth += t.Width - (t.Height - TextSize) * scaleFactor;
                 if (totalWidth > maxWidth)
                 {
-                    this.Text = ellipsis ? this.Text.Substring(0, a - 1) + "..." : this.Text.Substring(0, a - 1);
+                    Text = ellipsis ? Text.Substring(0, a - 1) + "..." : Text.Substring(0, a - 1);
                     return;
                 }
             }

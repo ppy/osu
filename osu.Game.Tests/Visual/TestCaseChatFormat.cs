@@ -1,21 +1,16 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Users;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
 {
@@ -44,35 +39,26 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            testLinksGeneral();
+            testFormatting();
         }
 
         private void clear() => AddStep("clear messages", textContainer.Clear);
 
-        private void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false, bool isImportant = false, bool isTruncated = false, string username = null, params LinkAction[] expectedActions)
+        private void addMessageWithChecks(string text, bool isAction = false, bool isImportant = false, string username = null)
         {
             int index = textContainer.Count + 1;
             var newLine = new ChatLine(new DummyMessage(text, isAction, isImportant, index, username));
             textContainer.Add(newLine);
-
-            //if (isTruncated)
-            //    AddAssert($"msg #{index} username is truncated", () => );
-            //else
-            //    AddAssert($"msg #{index} username is not truncated", () => );
         }
 
-        private void testLinksGeneral()
+        private void testFormatting()
         {
             for(int a = 0; a < 15; a++)
-            {
-                bool isTruncated = a > 6 ? true : false;
-                addMessageWithChecks($"Wide {a} character username.", username: new string('w', a), isTruncated: isTruncated);
-
-            }
+                addMessageWithChecks($"Wide {a} character username.", username: new string('w', a));
             addMessageWithChecks("Short name with spaces.", username: "sho rt name");
-            addMessageWithChecks("Long name with spaces.", username: "long name with s p a c e s", isTruncated: true);
+            addMessageWithChecks("Long name with spaces.", username: "long name with s p a c e s");
         }
 
         private class DummyMessage : Message
