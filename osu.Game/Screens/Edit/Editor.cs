@@ -13,6 +13,7 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Screens;
@@ -39,13 +40,16 @@ namespace osu.Game.Screens.Edit
         private EditorClock clock;
 
         private DependencyContainer dependencies;
+        private GameHost host;
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, GameHost host)
         {
+            this.host = host;
+
             // TODO: should probably be done at a RulesetContainer level to share logic with Player.
             var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
@@ -155,7 +159,7 @@ namespace osu.Game.Screens.Edit
 
         private void exportBeatmap()
         {
-            Beatmap.Value.Save();
+            host.OpenFileExternally(Beatmap.Value.Save());
         }
 
         private void onModeChanged(EditorScreenMode mode)
