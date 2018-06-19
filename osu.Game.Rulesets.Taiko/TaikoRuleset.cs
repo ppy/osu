@@ -32,9 +32,7 @@ namespace osu.Game.Rulesets.Taiko
             new KeyBinding(InputKey.J, TaikoAction.RightCentre),
             new KeyBinding(InputKey.K, TaikoAction.RightRim),
             new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
-            new KeyBinding(InputKey.MouseLeft, TaikoAction.RightCentre),
             new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
-            new KeyBinding(InputKey.MouseRight, TaikoAction.RightRim),
         };
 
         public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
