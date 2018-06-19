@@ -12,28 +12,23 @@ namespace osu.Game.Screens.Multi.Components
         private const float text_size = 30;
         private const float transition_duration = 100;
 
-        private readonly OsuSpriteText count, slash, max;
+        private readonly OsuSpriteText count, slash, maxText;
 
         public int Count
         {
             set => count.Text = value.ToString();
         }
 
+        private int? max;
         public int? Max
         {
+            get => max;
             set
             {
-                if (value == null)
-                {
-                    slash.FadeOut(transition_duration);
-                    max.FadeOut(transition_duration);
-                }
-                else
-                {
-                    slash.FadeIn(transition_duration);
-                    max.Text = value.ToString();
-                    max.FadeIn(transition_duration);
-                }
+                if (value == max) return;
+                max = value;
+
+                updateMax();
             }
         }
 
@@ -56,12 +51,29 @@ namespace osu.Game.Screens.Multi.Components
                     TextSize = text_size,
                     Font = @"Exo2.0-Light"
                 },
-                max = new OsuSpriteText
+                maxText = new OsuSpriteText
                 {
                     TextSize = text_size,
                     Font = @"Exo2.0-Light"
                 },
             };
+
+            updateMax();
+        }
+
+        private void updateMax()
+        {
+            if (Max == null)
+            {
+                slash.FadeOut(transition_duration);
+                maxText.FadeOut(transition_duration);
+            }
+            else
+            {
+                slash.FadeIn(transition_duration);
+                maxText.Text = Max.ToString();
+                maxText.FadeIn(transition_duration);
+            }
         }
     }
 }

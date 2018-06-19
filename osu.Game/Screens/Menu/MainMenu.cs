@@ -25,7 +25,6 @@ namespace osu.Game.Screens.Menu
         private readonly ButtonSystem buttons;
 
         protected override bool HideOverlaysOnEnter => buttons.State == MenuState.Initial;
-        protected override bool AllowOpeningOverlays => buttons.State != MenuState.Initial;
 
         protected override bool AllowBackButton => buttons.State != MenuState.Initial;
 
