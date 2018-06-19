@@ -63,9 +63,10 @@ namespace osu.Game.Overlays.Chat
         public const float LEFT_PADDING = message_padding + padding * 2;
 
         private const float padding = 15;
-        private const float message_padding = 200;
+        private const float message_padding = 250;
         private const float action_padding = 3;
         private const float text_size = 20;
+        private const int max_username_length = 15;
 
         private Color4 customUsernameColour;
 
@@ -86,6 +87,8 @@ namespace osu.Game.Overlays.Chat
         private LinkFlowContainer contentFlow;
 
         public LinkFlowContainer ContentFlow => contentFlow;
+
+        private ChatOverlay chat;
 
         public Message Message
         {
@@ -123,6 +126,7 @@ namespace osu.Game.Overlays.Chat
                 Font = @"Exo2.0-BoldItalic",
                 Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
                 TextSize = text_size,
+                FixedWidth = true,
             };
 
             if (hasBackground)
@@ -215,7 +219,12 @@ namespace osu.Game.Overlays.Chat
             FinishTransforms(true);
         }
 
-        private ChatOverlay chat;
+        private string normalizeUsername(string usernameText)
+        {
+            if(usernameText.Length <= max_username_length)
+                return usernameText;
+            return usernameText.Substring(0, max_username_length - 3) + "...";
+        }
 
         private void updateMessageContent()
         {
@@ -223,7 +232,7 @@ namespace osu.Game.Overlays.Chat
             timestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
 
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
-            username.Text = $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
+            username.Text = $@"{normalizeUsername(message.Sender.Username)}" + (senderHasBackground || message.IsAction ? "" : ":");
 
             // remove non-existent channels from the link list
             message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chat?.AvailableChannels.Any(c => c.Name == link.Argument) != true);
