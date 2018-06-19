@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IO;
@@ -364,7 +365,7 @@ namespace osu.Game.Database
                 using (Stream s = reader.GetStream(file))
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = file,
+                        Filename = FileSafety.PathSanitise(file),
                         FileInfo = files.Add(s)
                     });
 

@@ -35,9 +35,6 @@ namespace osu.Game.Tests.Visual
             typeof(MessageFormatter)
         };
 
-        private DependencyContainer dependencies;
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
-
         public TestCaseChatLink()
         {
             Add(textContainer = new TestChatLineContainer
@@ -53,7 +50,7 @@ namespace osu.Game.Tests.Visual
         private void load(OsuColour colours)
         {
             linkColour = colours.Blue;
-            dependencies.Cache(new ChatOverlay
+            Dependencies.Cache(new ChatOverlay
             {
                 AvailableChannels =
                 {

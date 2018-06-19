@@ -2,15 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using Newtonsoft.Json;
+using osu.Game.Users;
 
-namespace osu.Desktop.Deploy
+namespace osu.Game.Online.API.Requests.Responses
 {
-    public class GitHubObject
+    public class APIUser
     {
-        [JsonProperty(@"id")]
-        public int Id;
-
-        [JsonProperty(@"name")]
-        public string Name;
+        [JsonProperty]
+        public User User;
     }
 }

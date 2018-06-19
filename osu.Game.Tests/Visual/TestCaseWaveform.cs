@@ -5,51 +5,38 @@ using NUnit.Framework;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
-using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
     public class TestCaseWaveform : OsuTestCase
     {
-        private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
-
-        public TestCaseWaveform()
+        [BackgroundDependencyLoader]
+        private void load()
         {
+            Beatmap.Value = new WaveformTestBeatmap();
+
             FillFlowContainer flow;
             Child = flow = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 10),
-                Children = new Drawable[]
-                {
-                    new MusicController
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Y = 100,
-                        State = Visibility.Visible
-                    },
-                }
             };
 
             for (int i = 1; i <= 16; i *= 2)
             {
-                var newDisplay = new BeatmapWaveformGraph
+                var newDisplay = new WaveformGraph
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Resolution = 1f / i
+                    Resolution = 1f / i,
+                    Waveform = Beatmap.Value.Waveform,
                 };
-
-                newDisplay.Beatmap.BindTo(beatmapBacking);
 
                 flow.Add(new Container
                 {
@@ -83,8 +70,5 @@ namespace osu.Game.Tests.Visual
                 });
             }
         }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame) => beatmapBacking.BindTo(osuGame.Beatmap);
     }
 }
