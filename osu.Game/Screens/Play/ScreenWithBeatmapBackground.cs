@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Play
         protected virtual void UpdateBackgroundElements()
         {
             if (!IsCurrentScreen) return;
-            if (Background is BackgroundScreenBeatmap bg && bg != null) {
+            if (Background is BackgroundScreenBeatmap bg) {
                 bg.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
                 bg.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
                 bg.DimColour = OsuColour.Gray((float)DimColour);
