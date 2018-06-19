@@ -54,7 +54,6 @@ namespace osu.Game.Screens.Backgrounds
 
         public Color4 DimColour
         {
-            get { return dimColourBox.Colour; }
             set {
                 if (dimColourBox != null) dimColourBox.Colour = value;
             }

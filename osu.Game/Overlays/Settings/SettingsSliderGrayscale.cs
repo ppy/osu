@@ -2,10 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -18,8 +18,8 @@ namespace osu.Game.Overlays.Settings
             get => base.Bindable;
             set {
                 base.Bindable = value;
-                swatch.Colour = Color4.FromHsl(new Vector4(0, 0, (float)Bindable, 1));
-                Bindable.ValueChanged += _ => swatch.Colour = Color4.FromHsl(new Vector4(0, 0, (float)Bindable, 1));
+                swatch.Colour = OsuColour.Gray((float)Bindable);
+                Bindable.ValueChanged += _ => swatch.Colour = OsuColour.Gray((float)Bindable);
             }
         }
 

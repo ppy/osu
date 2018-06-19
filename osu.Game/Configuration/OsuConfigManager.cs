@@ -74,7 +74,7 @@ namespace osu.Game.Configuration
 
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
-            Set(OsuSetting.DimLightness, 0, 0, 1, 0.01);
+            Set(OsuSetting.DimColour, 0, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
 
             Set(OsuSetting.ShowInterface, true);
@@ -117,7 +117,7 @@ namespace osu.Game.Configuration
         GameplayCursorSize,
         AutoCursorSize,
         DimLevel,
-        DimLightness,
+        DimColour,
         BlurLevel,
         ShowStoryboard,
         KeyOverlay,
