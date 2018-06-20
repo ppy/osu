@@ -51,26 +51,31 @@ namespace osu.Game.Screens.Multi.Screens.Match
             };
 
             header.OnWantsSelectBeatmap = () => Push(new MatchSongSelect());
-            nameBind.ValueChanged += n => info.Name = n;
-            statusBind.ValueChanged += s => info.Status = s;
-            availabilityBind.ValueChanged += a => info.Availability = a;
-            typeBind.ValueChanged += t => info.Type = t;
-            maxParticipantsBind.ValueChanged += m => { participants.Max = m; };
-            participantsBind.ValueChanged += p => participants.Users = p;
 
-            beatmapBind.ValueChanged += b =>
+            beatmapBind.BindTo(room.Beatmap);
+            beatmapBind.BindValueChanged(b =>
             {
                 header.BeatmapSet = b?.BeatmapSet;
                 info.Beatmap = b;
-            };
+            }, true);
 
             nameBind.BindTo(room.Name);
+            nameBind.BindValueChanged(n => info.Name = n, true);
+
             statusBind.BindTo(room.Status);
+            statusBind.BindValueChanged(s => info.Status = s, true);
+
             availabilityBind.BindTo(room.Availability);
+            availabilityBind.BindValueChanged(a => info.Availability = a, true);
+
             typeBind.BindTo(room.Type);
-            beatmapBind.BindTo(room.Beatmap);
+            typeBind.BindValueChanged(t => info.Type = t, true);
+
             maxParticipantsBind.BindTo(room.MaxParticipants);
+            maxParticipantsBind.BindValueChanged(m => { participants.Max = m; }, true);
+
             participantsBind.BindTo(room.Participants);
+            participantsBind.BindValueChanged(p => participants.Users = p, true);
         }
     }
 }
