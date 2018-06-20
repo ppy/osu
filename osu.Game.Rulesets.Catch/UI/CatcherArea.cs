@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
-using System.Diagnostics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -250,21 +249,11 @@ namespace osu.Game.Rulesets.Catch.UI
                     double positionDifference = target.X * CatchPlayfield.BASE_WIDTH - catcherPosition;
                     double velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
 
-                    // An edge case
-                    if (Math.Abs(velocity) <= 1)
-                    {
-                        HyperDashModifier = 1;
-                    }
-                    else
-                    {
-                        hyperDashDirection = Math.Sign(velocity);
-                        hyperDashTargetPosition = target.X;
-                        HyperDashModifier = Math.Abs(velocity);
-                    }
+                    SetHyperdashState(Math.Abs(velocity), target.X);
                 }
                 else
                 {
-                    HyperDashModifier = 1;
+                    SetHyperdashState();
                 }
 
                 return validCatch;
@@ -279,36 +268,38 @@ namespace osu.Game.Rulesets.Catch.UI
             /// </summary>
             public bool HyperDashing => hyperDashModifier != 1;
 
+            private const float hyperdash_transition_length = 180;
+
             /// <summary>
-            /// The modifier multiplied to the catcher speed.
-            /// It is always not less than 1 and it is greater than 1 if and only if the catcher is hyper-dashing.
+            /// Set hyperdash state.
             /// </summary>
-            public double HyperDashModifier
+            /// <param name="modifier">The speed multiplier. If this is less or equals to 1, this catcher will be non-hyperdashing state.</param>
+            /// <param name="targetPosition">When this catcher crosses this position, this catcher ends hyperdashing.</param>
+            public void SetHyperdashState(double modifier = 1, float targetPosition = -1)
             {
-                get => hyperDashModifier;
-                set
+                bool previouslyHyperDashing = HyperDashing;
+                if (modifier <= 1 || X == targetPosition)
                 {
-                    Trace.Assert(value >= 1);
-                    if (hyperDashModifier == value) return;
-                    hyperDashModifier = value;
+                    hyperDashModifier = 1;
+                    hyperDashDirection = 0;
 
-                    if (!HyperDashing)
+                    if (previouslyHyperDashing)
                     {
-                        hyperDashDirection = 0;
+                        this.FadeColour(Color4.White, hyperdash_transition_length, Easing.OutQuint);
+                        this.FadeTo(1, hyperdash_transition_length, Easing.OutQuint);
                     }
+                }
+                else
+                {
+                    hyperDashModifier = modifier;
+                    hyperDashDirection = Math.Sign(targetPosition - X);
+                    hyperDashTargetPosition = targetPosition;
 
-                    const float transition_length = 180;
-
-                    if (HyperDashing)
+                    if (!previouslyHyperDashing)
                     {
-                        this.FadeColour(Color4.OrangeRed, transition_length, Easing.OutQuint);
-                        this.FadeTo(0.2f, transition_length, Easing.OutQuint);
+                        this.FadeColour(Color4.OrangeRed, hyperdash_transition_length, Easing.OutQuint);
+                        this.FadeTo(0.2f, hyperdash_transition_length, Easing.OutQuint);
                         Trail = true;
-                    }
-                    else
-                    {
-                        this.FadeColour(Color4.White, transition_length, Easing.OutQuint);
-                        this.FadeTo(1, transition_length, Easing.OutQuint);
                     }
                 }
             }
@@ -373,7 +364,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     hyperDashDirection < 0 && hyperDashTargetPosition > X)
                 {
                     X = hyperDashTargetPosition;
-                    HyperDashModifier = 1;
+                    SetHyperdashState();
                 }
             }
 
