@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         AddNested(new TinyDroplet
                         {
                             StartTime = t,
-                            X = X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
+                            X = MathHelper.Clamp(X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH, 0, 1),
                             Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                             {
                                 Bank = s.Bank,
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         AddNested(new Droplet
                         {
                             StartTime = time,
-                            X = X + Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
+                            X = MathHelper.Clamp(X + Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH, 0, 1),
                             Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                             {
                                 Bank = s.Bank,
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 {
                     Samples = Samples,
                     StartTime = spanStartTime + spanDuration,
-                    X = X + Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
+                    X = MathHelper.Clamp(X + Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH, 0, 1)
                 });
             }
 
