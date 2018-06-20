@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
             set => cover.BeatmapSet = value;
         }
 
-        public Action OnWantsSelectBeatmap;
+        public Action OnRequestSelectBeatmap;
 
         public Header()
         {
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 },
             };
 
-            beatmapButton.Action = () => OnWantsSelectBeatmap?.Invoke();
+            beatmapButton.Action = () => OnRequestSelectBeatmap?.Invoke();
         }
 
         [BackgroundDependencyLoader]
