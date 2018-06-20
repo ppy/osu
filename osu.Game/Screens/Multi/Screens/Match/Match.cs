@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 },
             };
 
-            header.OnWantsSelectBeatmap = () => Push(new MatchSongSelect());
+            header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect());
 
             beatmapBind.BindTo(room.Beatmap);
             beatmapBind.BindValueChanged(b =>
