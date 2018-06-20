@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     {
                         TextSize = 14,
                         Text = "show more",
-                        Padding = new MarginPadding {Top = 10, Bottom = 10, Left = 15, Right = 15 },
+                        Padding = new MarginPadding {Vertical = 10, Horizontal = 15 },
                     }
                 },
                 ShowMoreLoading = new LoadingAnimation
