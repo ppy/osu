@@ -13,6 +13,7 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Screens;
@@ -39,16 +40,19 @@ namespace osu.Game.Screens.Edit
         private EditorClock clock;
 
         private DependencyContainer dependencies;
+        private GameHost host;
 
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(parent);
+            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, GameHost host)
         {
+            this.host = host;
+
             // TODO: should probably be done at a RulesetContainer level to share logic with Player.
             var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
-            clock = new EditorClock(Beatmap, beatDivisor) { IsCoupled = false };
+            clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
 
             dependencies.CacheAs<IFrameBasedClock>(clock);
@@ -128,9 +132,9 @@ namespace osu.Game.Screens.Edit
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding { Right = 10 },
-                                            Child = timeInfo = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
+                                            Child = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
                                         },
-                                        timeline = new SummaryTimeline
+                                        new SummaryTimeline
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
@@ -138,7 +142,7 @@ namespace osu.Game.Screens.Edit
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding { Left = 10 },
-                                            Child = playback = new PlaybackControl { RelativeSizeAxes = Axes.Both },
+                                            Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
                                         }
                                     },
                                 }
@@ -148,9 +152,6 @@ namespace osu.Game.Screens.Edit
                 },
             };
 
-            timeInfo.Beatmap.BindTo(Beatmap);
-            timeline.Beatmap.BindTo(Beatmap);
-            playback.Beatmap.BindTo(Beatmap);
             menuBar.Mode.ValueChanged += onModeChanged;
 
             bottomBackground.Colour = colours.Gray2;
@@ -158,7 +159,7 @@ namespace osu.Game.Screens.Edit
 
         private void exportBeatmap()
         {
-            Beatmap.Value.Save();
+            host.OpenFileExternally(Beatmap.Value.Save());
         }
 
         private void onModeChanged(EditorScreenMode mode)
@@ -178,13 +179,12 @@ namespace osu.Game.Screens.Edit
                     break;
             }
 
-            currentScreen.Beatmap.BindTo(Beatmap);
             LoadComponentAsync(currentScreen, screenContainer.Add);
         }
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
-            if (state.Mouse.WheelDelta > 0)
+            if (state.Mouse.ScrollDelta.X + state.Mouse.ScrollDelta.Y > 0)
                 clock.SeekBackward(true);
             else
                 clock.SeekForward(true);

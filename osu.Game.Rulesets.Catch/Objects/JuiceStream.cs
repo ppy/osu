@@ -124,6 +124,9 @@ namespace osu.Game.Rulesets.Catch.Objects
                     X = X + Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
                 });
             }
+
+            if (NestedHitObjects.LastOrDefault() is IHasComboInformation lastNested)
+                lastNested.LastInCombo = LastInCombo;
         }
 
         public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
