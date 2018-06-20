@@ -40,7 +40,8 @@ namespace osu.Game.Screens
             while (screen.LoadState < LoadState.Ready)
                 Thread.Sleep(1);
 
-            base.Push(screen);
+            if (IsCurrentScreen)
+                base.Push(screen);
         }
 
         protected override void Update()
