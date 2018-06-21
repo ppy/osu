@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Allocation;
@@ -63,10 +62,9 @@ namespace osu.Game.Screens.Select
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
 
-        private CancellationTokenSource initialAddSetsTask;
-
         private DependencyContainer dependencies;
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         protected SongSelect()
         {
@@ -178,7 +176,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
+        [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
         {
             dependencies.CacheAs(this);
@@ -207,19 +205,15 @@ namespace osu.Game.Screens.Select
             sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
             sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
 
-            initialAddSetsTask = new CancellationTokenSource();
+            Carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSetsEnumerable();
 
-            Carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSets();
-
-            Beatmap.DisabledChanged += disabled => Carousel.AllowSelection = !disabled;
-            Beatmap.TriggerChange();
-
-            Beatmap.ValueChanged += workingBeatmapChanged;
+            Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
+            Beatmap.BindValueChanged(workingBeatmapChanged);
         }
 
         public void Edit(BeatmapInfo beatmap)
         {
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap);
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
             Push(new Editor());
         }
 
@@ -227,7 +221,8 @@ namespace osu.Game.Screens.Select
         /// Call to make a selection and perform the default action for this SongSelect.
         /// </summary>
         /// <param name="beatmap">An optional beatmap to override the current carousel selection.</param>
-        public void FinaliseSelection(BeatmapInfo beatmap = null)
+        /// <param name="performStartAction">Whether to trigger <see cref="OnStart"/>.</param>
+        public void FinaliseSelection(BeatmapInfo beatmap = null, bool performStartAction = true)
         {
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
@@ -243,14 +238,15 @@ namespace osu.Game.Screens.Select
                 selectionChangedDebounce = null;
             }
 
-            OnSelectionFinalised();
+            if (performStartAction)
+                OnStart();
         }
 
         /// <summary>
         /// Called when a selection is made.
         /// </summary>
         /// <returns>If a resultant action occurred that takes the user away from SongSelect.</returns>
-        protected abstract bool OnSelectionFinalised();
+        protected abstract bool OnStart();
 
         private ScheduledDelegate selectionChangedDebounce;
 
@@ -283,7 +279,7 @@ namespace osu.Game.Screens.Select
                 {
                     bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
 
-                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap);
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
                     ensurePlayingSelected(preview);
                 }
 
@@ -370,7 +366,7 @@ namespace osu.Game.Screens.Select
         {
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
-                UpdateBeatmap(Beatmap);
+                UpdateBeatmap(Beatmap.Value);
                 ensurePlayingSelected();
             }
 
@@ -395,7 +391,7 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnExiting(Screen next)
         {
-            FinaliseSelection();
+            FinaliseSelection(performStartAction: false);
 
             beatmapInfoWedge.State = Visibility.Hidden;
 
@@ -417,8 +413,6 @@ namespace osu.Game.Screens.Select
                 beatmaps.BeatmapHidden -= onBeatmapHidden;
                 beatmaps.BeatmapRestored -= onBeatmapRestored;
             }
-
-            initialAddSetsTask?.Cancel();
         }
 
         /// <summary>
@@ -435,7 +429,7 @@ namespace osu.Game.Screens.Select
                 backgroundModeBeatmap.FadeTo(1, 250);
             }
 
-            beatmapInfoWedge.UpdateBeatmap(beatmap);
+            beatmapInfoWedge.Beatmap = beatmap;
         }
 
         private void ensurePlayingSelected(bool preview = false)

@@ -7,6 +7,8 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK;
+using osu.Framework.Configuration;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -15,9 +17,14 @@ namespace osu.Game.Graphics.Containers
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame osuGame, AudioManager audio)
         {
+            if (osuGame != null)
+                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+
             samplePopIn = audio.Sample.Get(@"UI/overlay-pop-in");
             samplePopOut = audio.Sample.Get(@"UI/overlay-pop-out");
 
@@ -26,7 +33,7 @@ namespace osu.Game.Graphics.Containers
 
         /// <summary>
         /// Whether mouse input should be blocked screen-wide while this overlay is visible.
-        /// Performing mouse actions outside of the valid extents will hide the overlay but pass the events through.
+        /// Performing mouse actions outside of the valid extents will hide the overlay.
         /// </summary>
         public virtual bool BlockScreenWideMouse => BlockPassThroughMouse;
 
@@ -49,7 +56,10 @@ namespace osu.Game.Graphics.Containers
             switch (visibility)
             {
                 case Visibility.Visible:
-                    samplePopIn?.Play();
+                    if (OverlayActivationMode != OverlayActivation.Disabled)
+                        samplePopIn?.Play();
+                    else
+                        State = Visibility.Hidden;
                     break;
                 case Visibility.Hidden:
                     samplePopOut?.Play();

@@ -84,11 +84,8 @@ namespace osu.Game.Tests.Visual
 
         private abstract class TestScreen : OsuScreen
         {
-            protected abstract string Title { get; }
             protected abstract string NextTitle { get; }
             protected abstract TestScreen CreateNextScreen();
-
-            public override string ToString() => Title;
 
             public TestScreen PushNext()
             {
@@ -130,14 +127,14 @@ namespace osu.Game.Tests.Visual
 
         private class TestScreenOne : TestScreen
         {
-            protected override string Title => @"Screen One";
+            public override string Title => @"Screen One";
             protected override string NextTitle => @"Two";
             protected override TestScreen CreateNextScreen() => new TestScreenTwo();
         }
 
         private class TestScreenTwo : TestScreen
         {
-            protected override string Title => @"Screen Two";
+            public override string Title => @"Screen Two";
             protected override string NextTitle => @"One";
             protected override TestScreen CreateNextScreen() => new TestScreenOne();
         }

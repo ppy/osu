@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 using System.Linq;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
@@ -36,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
                 MissingText.Hide();
 
-                foreach (RecentActivity activity in activities)
+                foreach (APIRecentActivity activity in activities)
                 {
                     ItemsContainer.Add(new DrawableRecentActivity(activity));
                 }

@@ -24,6 +24,8 @@ namespace osu.Game.Overlays.Volume
     public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
     {
         private CircularProgress volumeCircle;
+        private CircularProgress volumeCircleGlow;
+
         public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1 };
         private readonly float circleSize;
         private readonly Color4 meterColour;
@@ -44,90 +46,143 @@ namespace osu.Game.Overlays.Volume
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Add(new Container
-            {
-                Size = new Vector2(120, 20),
-                CornerRadius = 10,
-                Masking = true,
-                Margin = new MarginPadding { Left = circleSize + 10 },
-                Origin = Anchor.CentreLeft,
-                Anchor = Anchor.CentreLeft,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colours.Gray1,
-                        Alpha = 0.9f,
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = "Exo2.0-Bold",
-                        Text = name
-                    }
-                }
-            });
+            Color4 backgroundColour = colours.Gray1;
 
             CircularProgress bgProgress;
 
-            Add(new CircularContainer
+            const float progress_start_radius = 0.75f;
+            const float progress_size = 0.03f;
+            const float progress_end_radius = progress_start_radius + progress_size;
+
+            const float blur_amount = 5;
+
+            Children = new Drawable[]
             {
-                Masking = true,
-                Size = new Vector2(circleSize),
-                Children = new Drawable[]
+                new Container
                 {
-                    new Box
+                    Size = new Vector2(circleSize),
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colours.Gray1,
-                        Alpha = 0.9f,
-                    },
-                    bgProgress = new CircularProgress
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        InnerRadius = 0.05f,
-                        Rotation = 180,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Colour = colours.Gray2,
-                        Size = new Vector2(0.8f)
-                    },
-                    new Container
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.8f),
-                        Padding = new MarginPadding(-Blur.KernelSize(5)),
-                        Rotation = 180,
-                        Child = (volumeCircle = new CircularProgress
+                        new BufferedContainer
                         {
+                            Alpha = 0.9f,
                             RelativeSizeAxes = Axes.Both,
-                            InnerRadius = 0.05f,
+                            Children = new Drawable[]
+                            {
+                                new Circle
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = backgroundColour,
+                                },
+                                new CircularContainer
+                                {
+                                    Masking = true,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(progress_end_radius),
+                                    Children = new Drawable[]
+                                    {
+                                        bgProgress = new CircularProgress
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            RelativeSizeAxes = Axes.Both,
+                                            Rotation = 180,
+                                            Colour = backgroundColour,
+                                        },
+                                        new Container
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Name = "Progress under covers for smoothing",
+                                            RelativeSizeAxes = Axes.Both,
+                                            Rotation = 180,
+                                            Child = volumeCircle = new CircularProgress
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                            }
+                                        },
+                                    }
+                                },
+                                new Circle
+                                {
+                                    Name = "Inner Cover",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = backgroundColour,
+                                    Size = new Vector2(progress_start_radius),
+                                },
+                                new Container
+                                {
+                                    Name = "Progress overlay for glow",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(progress_start_radius + progress_size / 1.5f),
+                                    Rotation = 180,
+                                    Padding = new MarginPadding(-Blur.KernelSize(blur_amount)),
+                                    Child = (volumeCircleGlow = new CircularProgress
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        InnerRadius = progress_size * 0.8f,
+                                    }).WithEffect(new GlowEffect
+                                    {
+                                        Colour = meterColour,
+                                        BlurSigma = new Vector2(blur_amount),
+                                        Strength = 5,
+                                        PadExtent = true
+                                    }),
+                                },
+                            },
+                        },
+                        maxGlow = (text = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = "Venera",
+                            TextSize = 0.16f * circleSize
                         }).WithEffect(new GlowEffect
                         {
-                            Colour = meterColour,
-                            Strength = 2,
-                            PadExtent = true
-                        }),
-                    },
-                    maxGlow = (text = new OsuSpriteText
+                            Colour = Color4.Transparent,
+                            PadExtent = true,
+                        })
+                    }
+                },
+                new Container
+                {
+                    Size = new Vector2(120, 20),
+                    CornerRadius = 10,
+                    Masking = true,
+                    Margin = new MarginPadding { Left = circleSize + 10 },
+                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = "Venera",
-                        TextSize = 0.16f * circleSize
-                    }).WithEffect(new GlowEffect
-                    {
-                        Colour = Color4.Transparent,
-                        PadExtent = true,
-                    })
+                        new Box
+                        {
+                            Alpha = 0.9f,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = backgroundColour,
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = "Exo2.0-Bold",
+                            Text = name
+                        }
+                    }
                 }
-            });
-
-            Bindable.ValueChanged += newVolume => { this.TransformTo("DisplayVolume", newVolume, 400, Easing.OutQuint); };
+            };
+            Bindable.ValueChanged += newVolume =>
+            {
+                this.TransformTo("DisplayVolume",
+                    newVolume,
+                    400,
+                    Easing.OutQuint);
+            };
             bgProgress.Current.Value = 0.75f;
         }
 
@@ -158,6 +213,7 @@ namespace osu.Game.Overlays.Volume
                 }
 
                 volumeCircle.Current.Value = displayVolume * 0.75f;
+                volumeCircleGlow.Current.Value = displayVolume * 0.75f;
             }
         }
 
@@ -167,9 +223,25 @@ namespace osu.Game.Overlays.Volume
             private set => Bindable.Value = value;
         }
 
-        public void Increase() => Volume += 0.05f;
+        private const float adjust_step = 0.05f;
 
-        public void Decrease() => Volume -= 0.05f;
+        public void Increase() => adjust(1);
+        public void Decrease() => adjust(-1);
+
+        private void adjust(int direction)
+        {
+            float amount = adjust_step * direction;
+
+            var mouse = GetContainingInputManager().CurrentState.Mouse;
+            if (mouse.HasPreciseScroll)
+            {
+                float scrollDelta = mouse.ScrollDelta.Y;
+                if (scrollDelta != 0)
+                    amount *= Math.Abs(scrollDelta / 10);
+            }
+
+            Volume += amount;
+        }
 
         public bool OnPressed(GlobalAction action)
         {
