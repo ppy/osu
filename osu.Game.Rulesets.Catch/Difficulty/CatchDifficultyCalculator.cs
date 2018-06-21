@@ -40,10 +40,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (!beatmap.HitObjects.Any())
                 return new CatchDifficultyAttributes(mods, 0);
 
-            float circleSize = beatmap.BeatmapInfo.BaseDifficulty.CircleSize;
-            float catcherWidth = (1.0f - 0.7f * (circleSize - 5) / 5) * 0.62064f * CatcherArea.CATCHER_SIZE;
-            float catcherWidthHalf = catcherWidth / 2;
-            catcherWidthHalf *= 0.8f;
+            var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty);
+            float halfCatchWidth = catcher.CatchWidth * 0.5f;
 
             var difficultyHitObjects = new List<CatchDifficultyHitObject>();
 
@@ -52,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
                 if (hitObject is Fruit)
                 {
-                    difficultyHitObjects.Add(new CatchDifficultyHitObject((CatchHitObject)hitObject, catcherWidthHalf));
+                    difficultyHitObjects.Add(new CatchDifficultyHitObject((CatchHitObject)hitObject, halfCatchWidth));
                 }
                 if (hitObject is JuiceStream)
                 {
@@ -61,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     {
                         CatchHitObject objectInJuiceStream = (CatchHitObject)nestedHitObjectsEnumerator.Current;
                         if (!(objectInJuiceStream is TinyDroplet))
-                            difficultyHitObjects.Add(new CatchDifficultyHitObject(objectInJuiceStream, catcherWidthHalf));
+                            difficultyHitObjects.Add(new CatchDifficultyHitObject(objectInJuiceStream, halfCatchWidth));
                     }
                     // Dispose the enumerator after counting all fruits.
                     nestedHitObjectsEnumerator.Dispose();
