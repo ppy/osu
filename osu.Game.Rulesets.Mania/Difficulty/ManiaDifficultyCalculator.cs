@@ -29,9 +29,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         /// </summary>
         private const double decay_weight = 0.9;
 
+        private readonly bool isForCurrentRuleset;
+
         public ManiaDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
         }
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
@@ -129,22 +132,35 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return difficulty;
         }
 
-        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        protected override Mod[] DifficultyAdjustmentMods
         {
-            new ManiaModDoubleTime(),
-            new ManiaModHalfTime(),
-            new ManiaModEasy(),
-            new ManiaModHardRock(),
-            new ManiaModKey1(),
-            new ManiaModKey2(),
-            new ManiaModKey3(),
-            new ManiaModKey4(),
-            new ManiaModKey5(),
-            new ManiaModKey6(),
-            new ManiaModKey7(),
-            new ManiaModKey8(),
-            new ManiaModKey9(),
-        };
+            get
+            {
+                var mods = new Mod[]
+                {
+                    new ManiaModDoubleTime(),
+                    new ManiaModHalfTime(),
+                    new ManiaModEasy(),
+                    new ManiaModHardRock(),
+                };
 
+                if (isForCurrentRuleset)
+                    return mods;
+
+                // if we are a convert, we can be played in any key mod.
+                return mods.Concat(new Mod[]
+                {
+                    new ManiaModKey1(),
+                    new ManiaModKey2(),
+                    new ManiaModKey3(),
+                    new ManiaModKey4(),
+                    new ManiaModKey5(),
+                    new ManiaModKey6(),
+                    new ManiaModKey7(),
+                    new ManiaModKey8(),
+                    new ManiaModKey9(),
+                }).ToArray();
+            }
+        }
     }
 }
