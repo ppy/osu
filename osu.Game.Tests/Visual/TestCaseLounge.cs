@@ -8,6 +8,8 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
+using osu.Game.Screens;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Screens.Lounge;
 using osu.Game.Users;
@@ -198,6 +200,8 @@ namespace osu.Game.Tests.Visual
 
         private class TestLounge : Lounge
         {
+            protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
+
             public IEnumerable<DrawableRoom> ChildRooms => RoomsContainer.Children.Where(r => r.MatchingFilter);
             public Room SelectedRoom => Inspector.Room;
 
