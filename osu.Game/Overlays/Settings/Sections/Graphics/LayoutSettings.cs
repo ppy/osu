@@ -20,6 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private Bindable<bool> letterboxing;
         private Bindable<Size> sizeFullscreen;
+        private readonly BindableInt resolutionDropdownBindable = new BindableInt();
 
         private OsuGame game;
         private SettingsDropdown<int> resolutionDropdown;
@@ -36,14 +37,23 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             letterboxing = config.GetBindable<bool>(FrameworkSetting.Letterboxing);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
 
-            var resolutions = getResolutions();
-            var resolutionDropdownBindable = new BindableInt(resolutions.FirstOrDefault(r => r.Key.StartsWith($"{sizeFullscreen.Value.Width}x{sizeFullscreen.Value.Height}")).Value);
+            sizeFullscreen.ValueChanged += size =>
+            {
+                KeyValuePair<string, int> valuePair = getResolutions().FirstOrDefault(r => r.Key.StartsWith($"{size.Width}x{size.Height}"));
+
+                resolutionDropdownBindable.Value = valuePair.Value;
+            };
 
             resolutionDropdownBindable.ValueChanged += resolution =>
             {
-                var newResolution = resolutions.First(r => r.Value == resolution);
-                var newResolutionparts = newResolution.Key.Split('x');
-                sizeFullscreen.Value = new Size(int.Parse(newResolutionparts.First()), int.Parse(newResolutionparts.Last()));
+                var newSelection = getResolutions().First(r => r.Value == resolution);
+                var newSelectionParts = newSelection.Key.Split('x');
+
+                var newSelectionWidth = int.Parse(newSelectionParts.First());
+                var newSelectionHeight = int.Parse(newSelectionParts.Last());
+
+                if (sizeFullscreen.Value.Width != newSelectionWidth || sizeFullscreen.Value.Height != newSelectionHeight)
+                    sizeFullscreen.Value = new Size(newSelectionWidth, newSelectionHeight);
             };
 
             Children = new Drawable[]
@@ -56,7 +66,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 resolutionDropdown = new SettingsDropdown<int>
                 {
                     LabelText = "Resolution",
-                    Items = resolutions,
+                    Items = getResolutions(),
                     Bindable = resolutionDropdownBindable
                 },
                 new SettingsCheckbox
@@ -94,7 +104,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             windowModeDropdown.Bindable.ValueChanged += windowMode =>
             {
                 if (windowMode == WindowMode.Fullscreen)
+                {
                     resolutionDropdown.Show();
+                    sizeFullscreen.TriggerChange();
+                }
                 else
                     resolutionDropdown.Hide();
             };
@@ -113,7 +126,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private List<KeyValuePair<string, int>> getResolutions()
         {
-            var availableDisplayResolutions = (game.Window as DesktopGameWindow)?.AvailableDisplayResolutions;
+            var availableDisplayResolutions = (game.Window as DesktopGameWindow)?.AvailableDisplayResolutions.OrderByDescending(r => r.Width).ThenByDescending(r => r.Height);
             if (availableDisplayResolutions == null)
                 return new List<KeyValuePair<string, int>>();
             var availableDisplayResolutionsStr = availableDisplayResolutions.Select(r => $"{r.Width}x{r.Height}").Distinct().ToList();
