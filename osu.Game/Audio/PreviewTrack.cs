@@ -11,7 +11,14 @@ namespace osu.Game.Audio
 {
     public abstract class PreviewTrack : Component
     {
+        /// <summary>
+        /// Invoked when this <see cref="PreviewTrack"/> has stopped playing.
+        /// </summary>
         public event Action Stopped;
+
+        /// <summary>
+        /// Invoked when this <see cref="PreviewTrack"/> has started playing.
+        /// </summary>
         public event Action Started;
 
         private Track track;
@@ -52,6 +59,9 @@ namespace osu.Game.Audio
 
         private ScheduledDelegate startDelegate;
 
+        /// <summary>
+        /// Starts playing this <see cref="PreviewTrack"/>.
+        /// </summary>
         public void Start() => startDelegate = Schedule(() =>
         {
             if (!IsLoaded)
@@ -68,6 +78,9 @@ namespace osu.Game.Audio
             Started?.Invoke();
         });
 
+        /// <summary>
+        /// Stops playing this <see cref="PreviewTrack"/>.
+        /// </summary>
         public void Stop()
         {
             startDelegate?.Cancel();
@@ -86,6 +99,9 @@ namespace osu.Game.Audio
             Stopped?.Invoke();
         }
 
+        /// <summary>
+        /// Retrieves the audio track.
+        /// </summary>
         protected abstract Track GetTrack();
     }
 }

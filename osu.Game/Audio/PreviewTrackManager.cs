@@ -11,6 +11,9 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Audio
 {
+    /// <summary>
+    /// A central store for the retrieval of <see cref="PreviewTrack"/>s.
+    /// </summary>
     public class PreviewTrackManager : Component
     {
         private readonly BindableDouble muteBindable = new BindableDouble();
@@ -31,6 +34,11 @@ namespace osu.Game.Audio
             config.BindWith(FrameworkSetting.VolumeMusic, trackManager.Volume);
         }
 
+        /// <summary>
+        /// Retrieves a <see cref="PreviewTrack"/> for a <see cref="BeatmapSetInfo"/>.
+        /// </summary>
+        /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to retrieve the preview track for.</param>
+        /// <returns>The playable <see cref="PreviewTrack"/>.</returns>
         public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo)
         {
             var track = new TrackManagerPreviewTrack(beatmapSetInfo, trackManager);
@@ -51,6 +59,15 @@ namespace osu.Game.Audio
             return track;
         }
 
+        /// <summary>
+        /// Stops the currently playing <see cref="PreviewTrack"/>.
+        /// </summary>
+        /// <remarks>
+        /// Only the immediate owner (an object that implements <see cref="IPreviewTrackOwner"/>) of the playing <see cref="PreviewTrack"/>
+        /// can globally stop the currently playing <see cref="PreviewTrack"/>. The object holding a reference to the <see cref="PreviewTrack"/>
+        /// can always stop the <see cref="PreviewTrack"/> themselves through <see cref="PreviewTrack.Stop()"/>.
+        /// </remarks>
+        /// <param name="source">The <see cref="IPreviewTrackOwner"/> which may be the owner of the <see cref="PreviewTrack"/>.</param>
         public void Stop(IPreviewTrackOwner source)
         {
             if (current?.Owner != source)
