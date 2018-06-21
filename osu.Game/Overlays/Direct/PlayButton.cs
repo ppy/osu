@@ -29,21 +29,14 @@ namespace osu.Game.Overlays.Direct
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                Preview?.Stop(parentOverlayContainer);
+                if (Preview != null)
+                {
+                    Preview.Stop();
+                    RemoveInternal(Preview);
+                    Preview = null;
+                }
+
                 Playing.Value = false;
-                Preview = null;
-            }
-        }
-
-        private OverlayContainer parentOverlayContainer
-        {
-            get
-            {
-                var d = Parent;
-                while (!(d is OverlayContainer))
-                    d = d.Parent;
-
-                return (OverlayContainer)d;
             }
         }
 
@@ -89,9 +82,13 @@ namespace osu.Game.Overlays.Direct
             Playing.ValueChanged += playingStateChanged;
         }
 
+        private PreviewTrackManager previewTrackManager;
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load(OsuColour colour, PreviewTrackManager previewTrackManager)
         {
+            this.previewTrackManager = previewTrackManager;
+
             hoverColour = colour.Yellow;
         }
 
@@ -103,15 +100,18 @@ namespace osu.Game.Overlays.Direct
                 {
                     loading = true;
 
-                    LoadComponentAsync(
-                        Preview = new PreviewTrack(beatmapSet, parentOverlayContainer),
-                        t =>
-                        {
-                            Preview.Started += () => Playing.Value = true;
-                            Preview.Stopped += () => Playing.Value = false;
-                            Preview.Start();
-                            loading = false;
-                        });
+                    Preview = previewTrackManager.Get(beatmapSet);
+                    Preview.Started += () => Playing.Value = true;
+                    Preview.Stopped += () => Playing.Value = false;
+
+                    LoadComponentAsync(Preview, t =>
+                    {
+                        AddInternal(t);
+
+                        Preview.Start();
+
+                        loading = false;
+                    });
 
                     return true;
                 }

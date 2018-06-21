@@ -5,49 +5,87 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
+using osu.Framework.Threading;
 
 namespace osu.Game.Audio
 {
-    public class PreviewTrack : Component
+    public abstract class PreviewTrack : Component
     {
-        public Track Track { get; private set; }
-        private readonly OverlayContainer owner;
-
-        private readonly BeatmapSetInfo beatmapSetInfo;
-
         public event Action Stopped;
         public event Action Started;
 
-        public PreviewTrack(BeatmapSetInfo beatmapSetInfo, OverlayContainer owner)
-        {
-            this.beatmapSetInfo = beatmapSetInfo;
-            this.owner = owner;
-        }
+        private Track track;
+        private bool wasPlaying;
 
         [BackgroundDependencyLoader]
-        private void load(PreviewTrackManager previewTrackManager)
+        private void load()
         {
-            Track = previewTrackManager.Get(this, beatmapSetInfo);
-        }
+            track = GetTrack();
 
-        public void Start()
-        {
-            Track.Restart();
-            Started?.Invoke();
+            if (track != null)
+                track.Looping = false;
         }
 
         /// <summary>
-        /// Stop preview playback
+        /// Length of the track.
         /// </summary>
-        /// <param name="source">An <see cref="OverlayContainer"/> which is probably the owner of this <see cref="PreviewTrack"/></param>
-        public void Stop(OverlayContainer source = null)
+        public double Length => track?.Length ?? 0;
+
+        /// <summary>
+        /// The current track time.
+        /// </summary>
+        public double CurrentTime => track?.CurrentTime ?? 0;
+
+        /// <summary>
+        /// Whether the track is loaded.
+        /// </summary>
+        public bool TrackLoaded => track?.IsLoaded ?? false;
+
+        protected override void Update()
         {
-            if (source != null && owner != source)
+            base.Update();
+
+            // Todo: Track currently doesn't signal its completion, so we have to handle it manually
+            if (track != null && wasPlaying && track.HasCompleted)
+                Stop();
+        }
+
+        private ScheduledDelegate startDelegate;
+
+        public void Start() => startDelegate = Schedule(() =>
+        {
+            if (!IsLoaded)
                 return;
-            Track.Stop();
+
+            if (track == null)
+                return;
+
+            if (wasPlaying)
+                return;
+            wasPlaying = true;
+
+            track.Restart();
+            Started?.Invoke();
+        });
+
+        public void Stop()
+        {
+            startDelegate?.Cancel();
+
+            if (!IsLoaded)
+                return;
+
+            if (track == null)
+                return;
+
+            if (!wasPlaying)
+                return;
+            wasPlaying = false;
+
+            track.Stop();
             Stopped?.Invoke();
         }
+
+        protected abstract Track GetTrack();
     }
 }

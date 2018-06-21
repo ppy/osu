@@ -262,7 +262,7 @@ namespace osu.Game.Overlays
 
             if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty)) return;
 
-            previewTrackManager.CurrentTrack?.Stop(this);
+            previewTrackManager.Stop(this);
 
             getSetsRequest = new SearchBeatmapSetsRequest(currentQuery.Value ?? string.Empty,
                 ((FilterControl)Filter).Ruleset.Value,
@@ -288,12 +288,6 @@ namespace osu.Game.Overlays
         }
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
-
-        protected override void PopOut()
-        {
-            previewTrackManager.CurrentTrack?.Stop(this);
-            base.PopOut();
-        }
 
         public class ResultCounts
         {

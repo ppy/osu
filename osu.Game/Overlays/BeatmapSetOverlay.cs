@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -38,7 +37,6 @@ namespace osu.Game.Overlays
         private readonly ScrollContainer scroll;
 
         private BeatmapSetInfo beatmapSet;
-        private PreviewTrackManager previewTrackManager;
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -111,11 +109,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
+        private void load(APIAccess api, RulesetStore rulesets)
         {
             this.api = api;
             this.rulesets = rulesets;
-            this.previewTrackManager = previewTrackManager;
         }
 
         protected override void PopIn()
@@ -127,8 +124,6 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
-            previewTrackManager.CurrentTrack?.Stop(this);
-
             FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out).OnComplete(_ => BeatmapSet = null);
         }
 
