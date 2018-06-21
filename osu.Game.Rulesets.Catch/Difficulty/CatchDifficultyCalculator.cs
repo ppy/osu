@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double actualStrainStep = strain_step * timeRate;
 
             // Find the highest strain value within each strain step
-            List<double> highestStrains = new List<double>();
+            var highestStrains = new List<double>();
             double intervalEndTime = actualStrainStep;
             double maximumStrain = 0; // We need to keep track of the maximum strain in the current interval
 
