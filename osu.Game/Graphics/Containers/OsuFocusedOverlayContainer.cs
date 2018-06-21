@@ -17,6 +17,8 @@ namespace osu.Game.Graphics.Containers
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
+        protected virtual bool PlaySamplesOnStateChange => true;
+
         protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         [BackgroundDependencyLoader(true)]
@@ -28,7 +30,7 @@ namespace osu.Game.Graphics.Containers
             samplePopIn = audio.Sample.Get(@"UI/overlay-pop-in");
             samplePopOut = audio.Sample.Get(@"UI/overlay-pop-out");
 
-            StateChanged += onStateChanged;
+            StateChanged += OnStateChanged;
         }
 
         /// <summary>
@@ -51,18 +53,20 @@ namespace osu.Game.Graphics.Containers
             return base.OnClick(state);
         }
 
-        private void onStateChanged(Visibility visibility)
+        protected virtual void OnStateChanged(Visibility visibility)
         {
             switch (visibility)
             {
                 case Visibility.Visible:
                     if (OverlayActivationMode != OverlayActivation.Disabled)
-                        samplePopIn?.Play();
+                    {
+                        if (PlaySamplesOnStateChange) samplePopIn?.Play();
+                    }
                     else
                         State = Visibility.Hidden;
                     break;
                 case Visibility.Hidden:
-                    samplePopOut?.Play();
+                    if (PlaySamplesOnStateChange) samplePopOut?.Play();
                     break;
             }
         }
