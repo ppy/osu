@@ -96,27 +96,29 @@ namespace osu.Game.Overlays.Direct
         {
             if (!Playing.Value)
             {
-                if (Preview == null)
+                if (Preview != null)
                 {
-                    loading = true;
-
-                    Preview = previewTrackManager.Get(beatmapSet);
-                    Preview.Started += () => Playing.Value = true;
-                    Preview.Stopped += () => Playing.Value = false;
-
-                    LoadComponentAsync(Preview, t =>
-                    {
-                        AddInternal(t);
-
-                        Preview.Start();
-
-                        loading = false;
-                    });
-
+                    Preview.Start();
                     return true;
                 }
 
-                Preview.Start();
+                loading = true;
+
+                var loadingPreview = previewTrackManager.Get(beatmapSet);
+                loadingPreview.Started += () => Playing.Value = true;
+                loadingPreview.Stopped += () => Playing.Value = false;
+
+                LoadComponentAsync(Preview = loadingPreview, t =>
+                {
+                    if (Preview != loadingPreview)
+                        return;
+
+                    AddInternal(t);
+
+                    Preview.Start();
+
+                    loading = false;
+                });
             }
             else
                 Preview?.Stop();
