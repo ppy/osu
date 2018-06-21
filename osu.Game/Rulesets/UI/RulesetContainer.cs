@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.UI
     /// RulesetContainer that applies conversion to Beatmaps. Does not contain a Playfield
     /// and does not load drawable hit objects.
     /// <para>
-    /// Should not be derived - derive <see cref="RulesetContainer{TObject}"/> instead.
+    /// Should not be derived - derive <see cref="RulesetContainer{TPlayfield, TObject}"/> instead.
     /// </para>
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
