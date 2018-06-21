@@ -133,11 +133,12 @@ namespace osu.Game.Screens.Multi.Screens.Match
                         Masking = true,
                         CornerRadius = corner_radius,
                         BorderThickness = 4,
-                        Alpha = 0f,
+                        Alpha = 0,
                         Child = new Box // needs a child to show the border
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0),
+                            Alpha = 0,
+                            AlwaysPresent = true
                         },
                     },
                 };
