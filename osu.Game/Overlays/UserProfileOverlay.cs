@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -31,7 +30,6 @@ namespace osu.Game.Overlays
         protected ProfileHeader Header;
         private SectionsContainer<ProfileSection> sectionsContainer;
         private ProfileTabControl tabs;
-        private PreviewTrackManager previewTrackManager;
 
         public const float CONTENT_X_MARGIN = 50;
 
@@ -58,10 +56,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, PreviewTrackManager previewTrackManager)
+        private void load(APIAccess api)
         {
             this.api = api;
-            this.previewTrackManager = previewTrackManager;
         }
 
         protected override void PopIn()
@@ -73,7 +70,6 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
-            previewTrackManager.CurrentTrack?.Stop(this);
             FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
         }
 
