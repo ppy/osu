@@ -48,6 +48,11 @@ namespace osu.Game.Audio
         /// </summary>
         public bool TrackLoaded => track?.IsLoaded ?? false;
 
+        /// <summary>
+        /// Whether the track is playing.
+        /// </summary>
+        public bool IsRunning => track?.IsRunning ?? false;
+
         protected override void Update()
         {
             base.Update();
