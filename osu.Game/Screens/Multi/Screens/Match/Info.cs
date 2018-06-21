@@ -15,6 +15,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Components;
+using OpenTK;
 
 namespace osu.Game.Screens.Multi.Screens.Match
 {
@@ -124,7 +125,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.Y,
-                            Width = 200,
+                            Size = new Vector2(200, 1),
                             Padding = new MarginPadding { Vertical = 10 },
                         },
                     },
@@ -167,14 +168,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 TextSize = 30,
             };
 
-            public ReadyButton()
-            {
-                Height = 1;
-                Text = "Ready";
-
-                Action = () => Ready.Value = !Ready.Value;
-            }
-
             [BackgroundDependencyLoader]
             private void load()
             {
@@ -196,7 +189,9 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     },
                 });
 
-                Ready.ValueChanged += value =>
+                Action = () => Ready.Value = !Ready.Value;
+
+                Ready.BindValueChanged(value =>
                 {
                     if (value)
                     {
@@ -208,7 +203,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                         Text = "Ready";
                         active.FadeOut(200);
                     }
-                };
+                }, true);
             }
         }
     }
