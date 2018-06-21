@@ -110,8 +110,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 previousHitObject = hitObject;
             }
 
-            // calculate maximun strain difficulty
-            double difficulty = StrainCalculator(highestStrains, decay_weight);
+            // Build the weighted sum over the highest strains for each interval
+            double difficulty = 0;
+            double weight = 1;
+            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
+
+            foreach (double strain in highestStrains)
+            {
+                difficulty += weight * strain;
+                weight *= decay_weight;
+            }
 
             return difficulty;
         }
