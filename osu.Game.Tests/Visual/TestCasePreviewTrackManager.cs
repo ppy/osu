@@ -96,12 +96,8 @@ namespace osu.Game.Tests.Visual
 
         private class TestTrackOwner : CompositeDrawable, IPreviewTrackOwner
         {
-            private readonly PreviewTrack track;
-
             public TestTrackOwner(PreviewTrack track)
             {
-                this.track = track;
-
                 AddInternal(track);
             }
 
