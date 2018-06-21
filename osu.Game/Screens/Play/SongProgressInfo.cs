@@ -92,6 +92,6 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{timeSpan.Duration().TotalMinutes:N0}:{timeSpan.Duration().Seconds:D2}";
+        private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
     }
 }

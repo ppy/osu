@@ -6,7 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using OpenTK;
+using OpenTK.Input;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Shapes;
@@ -22,6 +24,7 @@ namespace osu.Game.Overlays.Toolbar
         private readonly Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
+        private RulesetStore rulesets;
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public ToolbarModeSelector()
@@ -67,24 +70,40 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader(true)]
         private void load(RulesetStore rulesets, OsuGame game)
         {
+            this.rulesets = rulesets;
             foreach (var r in rulesets.AvailableRulesets)
             {
                 modeButtons.Add(new ToolbarModeButton
                 {
                     Ruleset = r,
-                    Action = delegate
-                    {
-                        ruleset.Value = r;
-                    }
+                    Action = delegate { ruleset.Value = r; }
                 });
             }
 
             ruleset.ValueChanged += rulesetChanged;
             ruleset.DisabledChanged += disabledChanged;
+
             if (game != null)
                 ruleset.BindTo(game.Ruleset);
             else
                 ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault();
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            base.OnKeyDown(state, args);
+
+            if (state.Keyboard.ControlPressed && !args.Repeat && args.Key >= Key.Number1 && args.Key <= Key.Number9)
+            {
+                int requested = args.Key - Key.Number1;
+
+                RulesetInfo found = rulesets.AvailableRulesets.Skip(requested).FirstOrDefault();
+                if (found != null)
+                    ruleset.Value = found;
+                return true;
+            }
+
+            return false;
         }
 
         public override bool HandleKeyboardInput => !ruleset.Disabled && base.HandleKeyboardInput;

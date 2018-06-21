@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using osu.Framework.Logging;
 using osu.Game.Database;
 
 namespace osu.Game.Rulesets
@@ -114,8 +115,9 @@ namespace osu.Game.Rulesets
                 var assembly = Assembly.LoadFrom(file);
                 loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.Error(e, "Failed to load ruleset");
             }
         }
     }

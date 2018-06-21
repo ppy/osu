@@ -29,14 +29,24 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable.Pieces
             set
             {
                 accentColour = value;
-
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Radius = 8,
-                    Colour = accentColour.Darken(0.2f).Opacity(0.75f)
-                };
+                if (IsLoaded) updateAccentColour();
             }
+        }
+
+        private void updateAccentColour()
+        {
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Radius = Size.X / 2,
+                Colour = accentColour.Darken(0.2f).Opacity(0.75f)
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateAccentColour();
         }
     }
 }
