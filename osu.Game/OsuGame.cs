@@ -402,14 +402,22 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important || entry.Target == null) return;
 
-                if (recentLogCount < 3)
-                {
-                    bool lastDisplayable = recentLogCount == recentLogCount - 1;
+                const int short_term_display_limit = 3;
 
+                if (recentLogCount < short_term_display_limit)
+                {
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = entry.Level == LogLevel.Important ? FontAwesome.fa_exclamation_circle : FontAwesome.fa_bomb,
-                        Text = (!lastDisplayable ? entry.Message : "Subsequent messages have been logged.") + "\n\nClick to view log files.",
+                        Text = entry.Message,
+                    }));
+                }
+                else if (recentLogCount == short_term_display_limit)
+                {
+                    Schedule(() => notifications.Post(new SimpleNotification
+                    {
+                        Icon = FontAwesome.fa_ellipsis_h,
+                        Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {
                             Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
@@ -419,7 +427,6 @@ namespace osu.Game
                 }
 
                 Interlocked.Increment(ref recentLogCount);
-
                 Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentLogCount), debounce);
             };
         }
