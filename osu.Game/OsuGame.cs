@@ -101,6 +101,8 @@ namespace osu.Game
         public OsuGame(string[] args = null)
         {
             this.args = args;
+
+            forwardLoggedErrorsToNotifications();
         }
 
         public void ToggleSettings() => settings.ToggleVisibility();
@@ -305,8 +307,6 @@ namespace osu.Game
                 Depth = -6,
             }, overlayContent.Add);
 
-            forwardLoggedErrorsToNotifications();
-
             dependencies.Cache(settings);
             dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
@@ -394,31 +394,33 @@ namespace osu.Game
 
         private void forwardLoggedErrorsToNotifications()
         {
-            int recentErrorCount = 0;
+            int recentLogCount = 0;
 
             const double debounce = 5000;
 
             Logger.NewEntry += entry =>
             {
-                if (entry.Level < LogLevel.Error || entry.Target == null) return;
+                if (entry.Level < LogLevel.Important || entry.Target == null) return;
 
-                if (recentErrorCount < 2)
+                if (recentLogCount < 3)
                 {
-                    notifications.Post(new SimpleNotification
+                    bool lastDisplayable = recentLogCount == recentLogCount - 1;
+
+                    Schedule(() => notifications.Post(new SimpleNotification
                     {
-                        Icon = FontAwesome.fa_bomb,
-                        Text = (recentErrorCount == 0 ? entry.Message : "Subsequent errors occurred and have been logged.") + "\nClick to view log files.",
+                        Icon = entry.Level == LogLevel.Important ? FontAwesome.fa_exclamation_circle : FontAwesome.fa_bomb,
+                        Text = (!lastDisplayable ? entry.Message : "Subsequent messages have been logged.") + "\n\nClick to view log files.",
                         Activated = () =>
                         {
                             Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
                             return true;
                         }
-                    });
+                    }));
                 }
 
-                Interlocked.Increment(ref recentErrorCount);
+                Interlocked.Increment(ref recentLogCount);
 
-                Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentErrorCount), debounce);
+                Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentLogCount), debounce);
             };
         }
 
