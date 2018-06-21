@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
 {
@@ -18,7 +19,9 @@ namespace osu.Game.Screens.Menu
         private readonly SpriteIcon icon;
         private Color4 iconColour;
 
-        public override bool ShowOverlaysOnEnter => false;
+        protected override bool HideOverlaysOnEnter => true;
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+
         public override bool CursorVisible => false;
 
         public Disclaimer()

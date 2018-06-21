@@ -8,7 +8,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Scoring;
 
@@ -85,16 +84,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return;
 
             AddJudgement(new HoldNoteTickJudgement { Result = HitResult.Perfect });
-        }
-
-        protected override void UpdateState(ArmedState state)
-        {
-            switch (State.Value)
-            {
-                case ArmedState.Hit:
-                    AccentColour = Color4.Green;
-                    break;
-            }
         }
 
         protected override void Update()

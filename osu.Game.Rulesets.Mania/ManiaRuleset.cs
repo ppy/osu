@@ -15,8 +15,11 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Scoring;
 
@@ -26,7 +29,7 @@ namespace osu.Game.Rulesets.Mania
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new ManiaRulesetContainer(this, beatmap);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
-        public override PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => new ManiaPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, Score score) => new ManiaPerformanceCalculator(this, beatmap, score);
 
         public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
         {
@@ -105,78 +108,34 @@ namespace osu.Game.Rulesets.Mania
                     {
                         new ManiaModEasy(),
                         new ManiaModNoFail(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new ManiaModHalfTime(),
-                                new ManiaModDaycore(),
-                            },
-                        },
+                        new MultiMod(new ManiaModHalfTime(), new ManiaModDaycore()),
                     };
-
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
                         new ManiaModHardRock(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new ManiaModSuddenDeath(),
-                                new ManiaModPerfect(),
-                            },
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new ManiaModDoubleTime(),
-                                new ManiaModNightcore(),
-                            },
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new ManiaModFadeIn(),
-                                new ManiaModHidden(),
-                            }
-                        },
+                        new MultiMod(new ManiaModSuddenDeath(), new ManiaModPerfect()),
+                        new MultiMod(new ManiaModDoubleTime(), new ManiaModNightcore()),
+                        new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
                         new ManiaModFlashlight(),
                     };
-
                 case ModType.Special:
                     return new Mod[]
                     {
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new ManiaModKey4(),
-                                new ManiaModKey5(),
-                                new ManiaModKey6(),
-                                new ManiaModKey7(),
-                                new ManiaModKey8(),
-                                new ManiaModKey9(),
-                                new ManiaModKey1(),
-                                new ManiaModKey2(),
-                                new ManiaModKey3(),
-                            },
-                        },
+                        new MultiMod(new ManiaModKey4(),
+                            new ManiaModKey5(),
+                            new ManiaModKey6(),
+                            new ManiaModKey7(),
+                            new ManiaModKey8(),
+                            new ManiaModKey9(),
+                            new ManiaModKey1(),
+                            new ManiaModKey2(),
+                            new ManiaModKey3()),
                         new ManiaModRandom(),
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new ManiaModAutoplay(),
-                                new ModCinema(),
-                            },
-                        },
+                        new MultiMod(new ManiaModAutoplay(), new ModCinema()),
                     };
-
                 default:
                     return new Mod[] { };
             }
@@ -188,11 +147,13 @@ namespace osu.Game.Rulesets.Mania
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_mania_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => new ManiaDifficultyCalculator(beatmap, mods);
+        public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new ManiaDifficultyCalculator(this, beatmap);
 
         public override int? LegacyID => 3;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
+
+        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new ManiaConfigManager(settings, RulesetInfo);
 
         public ManiaRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)

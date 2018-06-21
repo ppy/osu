@@ -13,7 +13,6 @@ using osu.Game.Storyboards;
 using osu.Framework.IO.File;
 using System.IO;
 using osu.Game.IO.Serialization;
-using System.Diagnostics;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -49,12 +48,13 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Saves the <see cref="Beatmaps.Beatmap"/>.
         /// </summary>
-        public void Save()
+        /// <returns>The absolute path of the output file.</returns>
+        public string Save()
         {
             var path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
             using (var sw = new StreamWriter(path))
                 sw.WriteLine(Beatmap.Serialize());
-            Process.Start(path);
+            return path;
         }
 
         protected abstract IBeatmap GetBeatmap();
@@ -107,8 +107,14 @@ namespace osu.Game.Beatmaps
             IBeatmap converted = converter.Convert();
 
             // Apply difficulty mods
-            foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+            if (Mods.Value.Any(m => m is IApplicableToDifficulty))
+            {
+                converted.BeatmapInfo = converted.BeatmapInfo.Clone();
+                converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
+
+                foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
+                    mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+            }
 
             // Post-process
             rulesetInstance.CreateBeatmapProcessor(converted)?.PostProcess();

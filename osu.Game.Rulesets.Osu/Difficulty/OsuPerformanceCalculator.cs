@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
+        public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
+
         private readonly int countHitCircles;
         private readonly int beatmapMaxCombo;
 
@@ -37,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public OsuPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
+        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
@@ -61,20 +63,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => !m.Ranked))
                 return 0;
 
-            // Todo: In the future we should apply changes to PreEmpt/AR at an OsuHitObject/BaseDifficulty level, but this is done
-            // locally for now as doing so would modify animations and other things unexpectedly
-            // DO NOT MODIFY THIS
-            double ar = Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate;
-            if (mods.Any(m => m is OsuModHardRock))
-                ar = Math.Min(10, ar * 1.4);
-            if (mods.Any(m => m is OsuModEasy))
-                ar = Math.Max(0, ar / 2);
-
-            double preEmpt = BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450) / TimeRate;
-            double hitWindowGreat = (Beatmap.HitObjects.First().HitWindows.Great / 2 - 0.5) / TimeRate;
+            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
+            double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
+            double preEmpt = (int)BeatmapDifficulty.DifficultyRange(Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / TimeRate;
 
             realApproachRate = preEmpt > 1200 ? (1800 - preEmpt) / 120 : (1200 - preEmpt) / 150 + 5;
-            realOverallDifficulty = (80 - 0.5 - hitWindowGreat) / 6;
+            realOverallDifficulty = (80 - hitWindowGreat) / 6;
 
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.12f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
@@ -110,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue()
         {
-            double aimValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes["Aim"] / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double aimValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes.AimStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
             double lengthBonus = 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
@@ -159,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue()
         {
-            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes["Speed"] / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes.SpeedStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
             speedValue *= 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +

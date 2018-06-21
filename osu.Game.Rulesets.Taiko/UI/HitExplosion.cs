@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     internal class HitExplosion : CircularContainer
     {
+        public override bool RemoveWhenNotAlive => true;
+
         public readonly DrawableHitObject JudgedObject;
 
         private readonly Box innerFill;
@@ -66,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             this.ScaleTo(3f, 1000, Easing.OutQuint);
             this.FadeOut(500);
 
-            Expire();
+            Expire(true);
         }
 
         /// <summary>
