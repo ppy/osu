@@ -3,11 +3,11 @@
 
 using osu.Game.Online.Chat;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Platform;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
@@ -25,12 +25,14 @@ namespace osu.Game.Graphics.Containers
         private OsuGame game;
 
         private Action showNotImplementedError;
+        private GameHost host;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications)
+        private void load(OsuGame game, NotificationOverlay notifications, GameHost host)
         {
             // will be null in tests
             this.game = game;
+            this.host = host;
 
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
@@ -88,7 +90,7 @@ namespace osu.Game.Graphics.Containers
                             showNotImplementedError?.Invoke();
                             break;
                         case LinkAction.External:
-                            Process.Start(url);
+                            host.OpenUrlExternally(url);
                             break;
                         case LinkAction.OpenUserProfile:
                             if (long.TryParse(linkArgument, out long userId))
