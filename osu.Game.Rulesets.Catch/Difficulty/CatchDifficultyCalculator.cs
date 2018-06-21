@@ -60,14 +60,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (!calculateStrainValues(difficultyHitObjects, timeRate))
                 return new CatchDifficultyAttributes(mods, 0);
 
-            double ar = beatmap.BeatmapInfo.BaseDifficulty.ApproachRate;
-            double preEmpt = BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450) / timeRate;
-
+            // this is the same as osu!, so there's potential to share the implementation... maybe
+            double preEmpt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
             double starRating = Math.Sqrt(calculateDifficulty(difficultyHitObjects, timeRate)) * star_scaling_factor;
 
             return new CatchDifficultyAttributes(mods, starRating)
             {
-                AimRating = starRating,
                 ApproachRate = preEmpt > 1200.0 ? -(preEmpt - 1800.0) / 120.0 : -(preEmpt - 1200.0) / 150.0 + 5.0,
                 MaxCombo = difficultyHitObjects.Count
             };
