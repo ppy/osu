@@ -18,7 +18,7 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuRulesetContainer : RulesetContainer<OsuHitObject>
+    public class OsuRulesetContainer : RulesetContainer<OsuPlayfield, OsuHitObject>
     {
         public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
