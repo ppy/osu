@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
@@ -53,17 +52,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     difficultyHitObjects.Add(new CatchDifficultyHitObject((CatchHitObject)hitObject, halfCatchWidth));
                 }
                 if (hitObject is JuiceStream)
-                {
-                    IEnumerator<HitObject> nestedHitObjectsEnumerator = hitObject.NestedHitObjects.GetEnumerator();
-                    while (nestedHitObjectsEnumerator.MoveNext())
-                    {
-                        CatchHitObject objectInJuiceStream = (CatchHitObject)nestedHitObjectsEnumerator.Current;
-                        if (!(objectInJuiceStream is TinyDroplet))
-                            difficultyHitObjects.Add(new CatchDifficultyHitObject(objectInJuiceStream, halfCatchWidth));
-                    }
-                    // Dispose the enumerator after counting all fruits.
-                    nestedHitObjectsEnumerator.Dispose();
-                }
+                    difficultyHitObjects.AddRange(hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)).Select(o => new CatchDifficultyHitObject(o, halfCatchWidth)));
             }
 
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
@@ -86,23 +75,20 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         private bool calculateStrainValues(List<CatchDifficultyHitObject> objects, double timeRate)
         {
+            CatchDifficultyHitObject lastObject = null;
+
+            if (!objects.Any()) return false;
+
             // Traverse hitObjects in pairs to calculate the strain value of NextHitObject from the strain value of CurrentHitObject and environment.
-            using (var hitObjectsEnumerator = objects.GetEnumerator())
+            foreach (var currentObject in objects)
             {
-                if (!hitObjectsEnumerator.MoveNext()) return false;
+                if (lastObject != null)
+                    currentObject.CalculateStrains(lastObject, timeRate);
 
-                CatchDifficultyHitObject currentHitObject = hitObjectsEnumerator.Current;
-
-                // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
-                while (hitObjectsEnumerator.MoveNext())
-                {
-                    CatchDifficultyHitObject nextHitObject = hitObjectsEnumerator.Current;
-                    nextHitObject?.CalculateStrains(currentHitObject, timeRate);
-                    currentHitObject = nextHitObject;
-                }
-
-                return true;
+                lastObject = currentObject;
             }
+
+            return true;
         }
 
         private double calculateDifficulty(List<CatchDifficultyHitObject> objects, double timeRate)
