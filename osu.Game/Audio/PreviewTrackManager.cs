@@ -41,7 +41,7 @@ namespace osu.Game.Audio
         /// <returns>The playable <see cref="PreviewTrack"/>.</returns>
         public PreviewTrack Get(BeatmapSetInfo beatmapSetInfo)
         {
-            var track = new TrackManagerPreviewTrack(beatmapSetInfo, trackManager);
+            var track = CreatePreviewTrack(beatmapSetInfo, trackManager);
 
             track.Started += () =>
             {
@@ -77,7 +77,12 @@ namespace osu.Game.Audio
             current = null;
         }
 
-        private class TrackManagerPreviewTrack : PreviewTrack
+        /// <summary>
+        /// Creates the <see cref="TrackManagerPreviewTrack"/>.
+        /// </summary>
+        protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackManager trackManager) => new TrackManagerPreviewTrack(beatmapSetInfo, trackManager);
+
+        protected class TrackManagerPreviewTrack : PreviewTrack
         {
             public IPreviewTrackOwner Owner { get; private set; }
 
