@@ -25,6 +25,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
+            if (!beatmap.HitObjects.Any())
+                return new OsuDifficultyAttributes(mods, 0);
+
             OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
             Skill[] skills =
             {

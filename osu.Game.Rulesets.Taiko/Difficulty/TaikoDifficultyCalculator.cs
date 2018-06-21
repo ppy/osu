@@ -35,6 +35,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
+            if (!beatmap.HitObjects.Any())
+                return new TaikoDifficultyAttributes(mods, 0);
+
             var difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
 
             foreach (var hitObject in beatmap.HitObjects)
