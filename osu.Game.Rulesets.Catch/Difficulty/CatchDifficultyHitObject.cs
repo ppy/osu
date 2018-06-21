@@ -8,7 +8,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
-    internal class CatchDifficultyHitObject
+    public class CatchDifficultyHitObject
     {
         internal static readonly double DECAY_BASE = 0.20;
         private const float normalized_hitobject_radius = 41.0f;
