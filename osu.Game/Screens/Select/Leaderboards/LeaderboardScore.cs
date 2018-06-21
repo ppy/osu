@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
@@ -142,6 +143,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                                             {
                                                 flagBadgeContainer = new Container
                                                 {
+                                                    Origin = Anchor.BottomLeft,
+                                                    Anchor = Anchor.BottomLeft,
                                                     Size = new Vector2(87f, 20f),
                                                     Masking = true,
                                                     Children = new Drawable[]
@@ -155,14 +158,16 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                 },
                                                 new FillFlowContainer
                                                 {
+                                                    Origin = Anchor.BottomLeft,
+                                                    Anchor = Anchor.BottomLeft,
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10f, 0f),
-                                                    Margin = new MarginPadding { Left = edge_margin, },
+                                                    Margin = new MarginPadding { Left = edge_margin },
                                                     Children = new Drawable[]
                                                     {
-                                                        maxCombo = new ScoreComponentLabel(FontAwesome.fa_link, Score.MaxCombo.ToString()),
-                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(Score.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", Score.Accuracy)),
+                                                        maxCombo = new ScoreComponentLabel(FontAwesome.fa_link, Score.MaxCombo.ToString(), "Max Combo"),
+                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(Score.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", Score.Accuracy), "Accuracy"),
                                                     },
                                                 },
                                             },
@@ -305,37 +310,61 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        private class ScoreComponentLabel : Container
+        private class ScoreComponentLabel : Container, IHasTooltip
         {
-            public ScoreComponentLabel(FontAwesome icon, string value)
-            {
-                Anchor = Anchor.CentreLeft;
-                Origin = Anchor.CentreLeft;
-                Size = new Vector2(60f, 20f);
-                Padding = new MarginPadding { Top = 10f, };
+            private const float icon_size = 20;
 
-                Children = new Drawable[]
+            private readonly string name;
+            private readonly FillFlowContainer content;
+
+            public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
+
+            public string TooltipText => name;
+
+            public ScoreComponentLabel(FontAwesome icon, string value, string name)
+            {
+                this.name = name;
+                AutoSizeAxes = Axes.Y;
+                Width = 60;
+
+                Child = content = new FillFlowContainer
                 {
-                    new SpriteIcon
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Children = new Drawable[]
                     {
-                        Origin = Anchor.Centre,
-                        Icon = FontAwesome.fa_square,
-                        Colour = OsuColour.FromHex(@"3087ac"),
-                        Rotation = 45,
-                        Size = new Vector2(20),
-                        Shadow = true,
-                    },
-                    new SpriteIcon
-                    {
-                        Origin = Anchor.Centre,
-                        Icon = icon,
-                        Colour = OsuColour.FromHex(@"a4edff"),
-                        Size = new Vector2(14),
-                    },
-                    new GlowingSpriteText(value, @"Exo2.0-Bold", 17, Color4.White, OsuColour.FromHex(@"83ccfa"))
-                    {
-                        Origin = Anchor.CentreLeft,
-                        Margin = new MarginPadding { Left = 15, },
+                        new Container
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            AutoSizeAxes = Axes.Both,
+                            Children = new[]
+                            {
+                                new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(icon_size),
+                                    Rotation = 45,
+                                    Colour = OsuColour.FromHex(@"3087ac"),
+                                    Icon = FontAwesome.fa_square,
+                                    Shadow = true,
+                                },
+                                new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(icon_size - 6),
+                                    Colour = OsuColour.FromHex(@"a4edff"),
+                                    Icon = icon,
+                                },
+                            },
+                        },
+                        new GlowingSpriteText(value, @"Exo2.0-Bold", 17, Color4.White, OsuColour.FromHex(@"83ccfa"))
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
                     },
                 };
             }
