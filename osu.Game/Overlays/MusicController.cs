@@ -66,34 +66,6 @@ namespace osu.Game.Overlays
             AlwaysPresent = true;
         }
 
-        private Vector2 dragStart;
-
-        protected override bool OnDragStart(InputState state)
-        {
-            base.OnDragStart(state);
-            dragStart = state.Mouse.Position;
-            return true;
-        }
-
-        protected override bool OnDrag(InputState state)
-        {
-            if (base.OnDrag(state)) return true;
-
-            Vector2 change = state.Mouse.Position - dragStart;
-
-            // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-            change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
-
-            dragContainer.MoveTo(change);
-            return true;
-        }
-
-        protected override bool OnDragEnd(InputState state)
-        {
-            dragContainer.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-            return base.OnDragEnd(state);
-        }
-
         [BackgroundDependencyLoader]
         private void load(BindableBeatmap beatmap, BeatmapManager beatmaps, OsuColour colours, LocalisationEngine localisation)
         {
@@ -103,7 +75,7 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                dragContainer = new Container
+                dragContainer = new DragContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -468,6 +440,37 @@ namespace osu.Game.Overlays
             private void load(TextureStore textures)
             {
                 sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
+            }
+        }
+
+        private class DragContainer : Container
+        {
+            private Vector2 dragStart;
+
+            protected override bool OnDragStart(InputState state)
+            {
+                base.OnDragStart(state);
+                dragStart = state.Mouse.Position;
+                return true;
+            }
+
+            protected override bool OnDrag(InputState state)
+            {
+                if (base.OnDrag(state)) return true;
+
+                Vector2 change = state.Mouse.Position - dragStart;
+
+                // Diminish the drag distance as we go further to simulate "rubber band" feeling.
+                change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
+
+                this.MoveTo(change);
+                return true;
+            }
+
+            protected override bool OnDragEnd(InputState state)
+            {
+                this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
+                return base.OnDragEnd(state);
             }
         }
     }
