@@ -14,6 +14,6 @@ namespace osu.Game.Database
 
         public OsuDbContext Get() => context;
 
-        public DatabaseWriteUsage GetForWrite() => new DatabaseWriteUsage(context, null);
+        public DatabaseWriteUsage GetForWrite(bool withTransaction = true) => new DatabaseWriteUsage(context, null);
     }
 }

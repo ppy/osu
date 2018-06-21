@@ -42,6 +42,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         public virtual bool CanBePlated => false;
 
+        public virtual bool StaysOnPlate => CanBePlated;
+
         protected DrawableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {
