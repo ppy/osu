@@ -90,14 +90,14 @@ namespace osu.Game.Rulesets.Osu.Replays
                             keyFrames);
             planButtons(out SortedDictionary<double, ButtonPlan> buttonsPlan,
                         keyFrames);
-            generateButtons(out SortedDictionary<double, ReplayButtonState> buttons,
+            generateButtons(out SortedDictionary<double, IEnumerable<OsuAction>> buttons,
                             buttonsPlan);
             generatePositions(out SortedDictionary<double, Vector2> positions, activeHitpoints, spinZones, spinnerVisibleZones);
 
             // Combine to form actual replay
-            AddFrameToReplay(new ReplayFrame(-100000, 256, 500, ReplayButtonState.None));
-            AddFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, 256, 500, ReplayButtonState.None));
-            AddFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1000, 256, 192, ReplayButtonState.None));
+            AddFrameToReplay(new OsuReplayFrame(-100000, new Vector2(256, 500), Array.Empty<OsuAction>()));
+            AddFrameToReplay(new OsuReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, new Vector2(256, 500), Array.Empty<OsuAction>()));
+            AddFrameToReplay(new OsuReplayFrame(Beatmap.HitObjects[0].StartTime - 1000, new Vector2(256, 192), Array.Empty<OsuAction>()));
 
             generateReplayFrames(buttons, positions);
 
@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// <summary>
         /// Determines when and which buttons should be pressed using the key frames given.
         /// </summary>
-        /// <param name="buttonsPlan">A list of <see cref="ButtonPlan"/> which is basically a slightly more informative <see cref="ReplayButtonState"/>.</param>
+        /// <param name="buttonsPlan">A list of <see cref="ButtonPlan"/> which is basically a slightly more informative <see cref="OsuAction"/>.</param>
         /// <param name="keyFrames">A list of <see cref="KeyFrame"/> in the Beatmap, storing hitpoints (important timestamps where clicks/holds/etc. occur).</param>
         private void planButtons(out SortedDictionary<double, ButtonPlan> buttonsPlan, SortedDictionary<double, KeyFrame> keyFrames)
         {
@@ -248,12 +248,12 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// <summary>
         /// Generates the final button presses that will be used in the replay using the buttonsPlan.
         /// </summary>
-        /// <param name="buttons">A list of <see cref="ReplayButtonState"/> which will be the actual key presses used in the auto replay.</param>
-        /// <param name="buttonsPlan">A list of <see cref="ButtonPlan"/> which is basically a slightly more informative <see cref="ReplayButtonState"/>.</param>
-        private void generateButtons(out SortedDictionary<double, ReplayButtonState> buttons, SortedDictionary<double, ButtonPlan> buttonsPlan)
+        /// <param name="buttons">A list of <see cref="OsuAction"/> which will be the actual key presses used in the auto replay.</param>
+        /// <param name="buttonsPlan">A list of <see cref="ButtonPlan"/> which is basically a slightly more informative <see cref="OsuAction"/>.</param>
+        private void generateButtons(out SortedDictionary<double, IEnumerable<OsuAction>> buttons, SortedDictionary<double, ButtonPlan> buttonsPlan)
         {
-            buttons = new SortedDictionary<double, ReplayButtonState> {
-                [Beatmap.HitObjects[0].StartTime - 1000] = ReplayButtonState.None
+            buttons = new SortedDictionary<double, IEnumerable<OsuAction>> {
+                [Beatmap.HitObjects[0].StartTime - 1000] = Enumerable.Empty<OsuAction>()
             };
 
             var prev = new ButtonPlan();
@@ -268,7 +268,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                 else if (prev.Primary != Button.None && ibutton.Value.Primary == Button.None)
                 {
                     // Complete release
-                    buttons[ibutton.Key] = ReplayButtonState.None;
+                    buttons[ibutton.Key] = Enumerable.Empty<OsuAction>();
                 }
                 else if (ibutton.Value.Primary != Button.None)
                 {
@@ -287,7 +287,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                             break;
                         }
                     }
-                    buttons[ibutton.Key] = ReplayButtonState.Left1 | ReplayButtonState.Right1;
+                    buttons[ibutton.Key] = new[] { OsuAction.LeftButton, OsuAction.RightButton };
                     buttons[keyUpTime] = ibutton.Value.PrimaryRbs;
                 }
                 i++;
@@ -444,7 +444,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// </summary>
         /// <param name="buttons">The button presses.</param>
         /// <param name="positions">The cursor positions.</param>
-        private void generateReplayFrames(SortedDictionary<double, ReplayButtonState> buttons, SortedDictionary<double, Vector2> positions)
+        private void generateReplayFrames(SortedDictionary<double, IEnumerable<OsuAction>> buttons, SortedDictionary<double, Vector2> positions)
         {
             // Loop through each position, and advance buttons accordingly
             int buttonIndex = 0;
@@ -456,14 +456,14 @@ namespace osu.Game.Rulesets.Osu.Replays
             {
                 if (buttonIndex == 0 && button.Key > pos.Key) // Special case where pos occurs before any button keys
                 {
-                    AddFrameToReplay(new ReplayFrame(pos.Key, pos.Value.X, pos.Value.Y, ReplayButtonState.None));
+                    AddFrameToReplay(new OsuReplayFrame(pos.Key, new Vector2(pos.Value.X, pos.Value.Y), Array.Empty<OsuAction>()));
                     continue;
                 }
 
                 while (buttonIndex != buttons.Count - 1 && Precision.DefinitelyBigger(pos.Key, nextbutton.Key))
                 {
                     // Insert a frame at nextbutton.Key as that might've not have a positions entry (i.e. button releases)
-                    AddFrameToReplay(new ReplayFrame(nextbutton.Key, pos.Value.X, pos.Value.Y, nextbutton.Value));
+                    AddFrameToReplay(new OsuReplayFrame(nextbutton.Key, new Vector2(pos.Value.X, pos.Value.Y), nextbutton.Value.ToArray()));
                     buttonIndex++;
                     button = nextbutton;
                     buttonIter.MoveNext();
@@ -479,7 +479,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     nextbutton = buttonIter.Current;
                 }
 
-                AddFrameToReplay(new ReplayFrame(pos.Key, pos.Value.X, pos.Value.Y, button.Value));
+                AddFrameToReplay(new OsuReplayFrame(pos.Key, new Vector2(pos.Value.X, pos.Value.Y), button.Value.ToArray()));
             }
             buttonIter.Dispose();
         }
@@ -534,7 +534,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             for (double t = startTime + FrameDelay; t < endTime; t += FrameDelay)
             {
-                positions[t] = s.PositionAt((t - s.StartTime) / s.Duration);
+                positions[t] = s.StackedPositionAt((t - s.StartTime) / s.Duration);
             }
         }
 
@@ -634,7 +634,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     if (s != null)
                     {
                         double progress = (Time - s.StartTime) / s.Duration;
-                        return s.PositionAt(progress) + s.StackOffset;
+                        return s.StackedPositionAt(progress) + s.StackOffset;
                     }
                     else
                     {
@@ -693,7 +693,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         }
 
         /// <summary>
-        /// A slightly more informative version of <see cref="ReplayButtonState"/>.
+        /// A slightly more informative version of <see cref="OsuAction"/>.
         /// Keeps track of which buttons are the primary or secondary buttons, to more easily determine how we should alternate buttons.
         /// </summary>
         private class ButtonPlan
@@ -701,22 +701,24 @@ namespace osu.Game.Rulesets.Osu.Replays
             public Button Primary;
             public Button Secondary;
 
-            private static ReplayButtonState toRbs(Button button)
+            private static IEnumerable<OsuAction> toRbs(Button button)
             {
                 switch (button)
                 {
-                    case Button.Left:
-                        return ReplayButtonState.Left1;
-                    case Button.Right:
-                        return ReplayButtonState.Right1;
-                    case Button.None:
                     default:
-                        return ReplayButtonState.None;
+                    case Button.None:
+                        break;
+                    case Button.Left:
+                        yield return OsuAction.LeftButton;
+                        break;
+                    case Button.Right:
+                        yield return OsuAction.RightButton;
+                        break;
                 }
             }
 
-            public ReplayButtonState Rbs => toRbs(Primary) | toRbs(Secondary);
-            public ReplayButtonState PrimaryRbs => toRbs(Primary);
+            public IEnumerable<OsuAction> Rbs => toRbs(Primary).Concat(toRbs(Secondary));
+            public IEnumerable<OsuAction> PrimaryRbs => toRbs(Primary);
         }
 
         // Handles alternating buttons and 2B style playing

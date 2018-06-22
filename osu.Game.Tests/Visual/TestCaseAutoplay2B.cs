@@ -5,19 +5,23 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
+using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Tests.Visual
 {
     [Description("Player instantiated with an autoplay mod with a 2B map.")]
     public class TestCaseAutoplay2B : TestCaseAutoplay
     {
-        protected override Beatmap CreateBeatmap()
+        protected override IBeatmap CreateBeatmap(Ruleset ruleset)
         {
             Beatmap beatmap;
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(test_beatmap_data)))
             using (var reader = new StreamReader(stream))
-                beatmap = Game.Beatmaps.Formats.Decoder.GetDecoder(reader).DecodeBeatmap(reader);
+                beatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
+
+            beatmap.BeatmapInfo.Ruleset = ruleset.RulesetInfo;
 
             return beatmap;
         }

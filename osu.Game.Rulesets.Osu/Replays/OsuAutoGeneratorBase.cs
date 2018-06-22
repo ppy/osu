@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             return index;
         }
 
-        protected void AddFrameToReplay(ReplayFrame frame) => Frames.Insert(FindInsertionIndex(frame), frame);
+        protected void AddFrameToReplay(OsuReplayFrame frame) => Frames.Insert(FindInsertionIndex(frame), frame);
 
         protected static Vector2 CirclePosition(double t, double radius) => new Vector2((float)(Math.Cos(t) * radius), (float)(Math.Sin(t) * radius));
 
