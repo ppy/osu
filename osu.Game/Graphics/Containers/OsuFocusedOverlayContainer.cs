@@ -82,7 +82,7 @@ namespace osu.Game.Graphics.Containers
         protected override void PopOut()
         {
             base.PopOut();
-            previewTrackManager.Stop(this);
+            previewTrackManager.StopAnyPlaying(this);
         }
     }
 }

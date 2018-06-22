@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual
 
             AddStep("get track", () => track = getOwnedTrack());
             AddStep("start", () => track.Start());
-            AddStep("stop by owner", () => trackManager.Stop(this));
+            AddStep("stop by owner", () => trackManager.StopAnyPlaying(this));
             AddAssert("stopped", () => !track.IsRunning);
         }
 
@@ -77,9 +77,9 @@ namespace osu.Game.Tests.Visual
 
             AddStep("get track", () => AddInternal(owner = new TestTrackOwner(track = getTrack())));
             AddStep("start", () => track.Start());
-            AddStep("attempt stop", () => trackManager.Stop(this));
+            AddStep("attempt stop", () => trackManager.StopAnyPlaying(this));
             AddAssert("not stopped", () => track.IsRunning);
-            AddStep("stop by true owner", () => trackManager.Stop(owner));
+            AddStep("stop by true owner", () => trackManager.StopAnyPlaying(owner));
             AddAssert("stopped", () => !track.IsRunning);
         }
 

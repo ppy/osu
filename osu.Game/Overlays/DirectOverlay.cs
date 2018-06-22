@@ -262,7 +262,7 @@ namespace osu.Game.Overlays
 
             if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty)) return;
 
-            previewTrackManager.Stop(this);
+            previewTrackManager.StopAnyPlaying(this);
 
             getSetsRequest = new SearchBeatmapSetsRequest(currentQuery.Value ?? string.Empty,
                 ((FilterControl)Filter).Ruleset.Value,

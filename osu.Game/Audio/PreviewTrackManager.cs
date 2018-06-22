@@ -60,7 +60,7 @@ namespace osu.Game.Audio
         }
 
         /// <summary>
-        /// Stops the currently playing <see cref="PreviewTrack"/>.
+        /// Stops any currently playing <see cref="PreviewTrack"/>.
         /// </summary>
         /// <remarks>
         /// Only the immediate owner (an object that implements <see cref="IPreviewTrackOwner"/>) of the playing <see cref="PreviewTrack"/>
@@ -68,12 +68,12 @@ namespace osu.Game.Audio
         /// can always stop the <see cref="PreviewTrack"/> themselves through <see cref="PreviewTrack.Stop()"/>.
         /// </remarks>
         /// <param name="source">The <see cref="IPreviewTrackOwner"/> which may be the owner of the <see cref="PreviewTrack"/>.</param>
-        public void Stop(IPreviewTrackOwner source)
+        public void StopAnyPlaying(IPreviewTrackOwner source)
         {
-            if (current?.Owner != source)
+            if (current == null || current.Owner != source)
                 return;
 
-            current?.Stop();
+            current.Stop();
             current = null;
         }
 
