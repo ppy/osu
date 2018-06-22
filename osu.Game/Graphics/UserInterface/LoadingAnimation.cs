@@ -54,7 +54,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
 
-        protected override void PopIn() => this.FadeIn(transition_duration, Easing.OutQuint);
+        protected override void PopIn() => this.FadeIn(transition_duration * 2, Easing.OutQuint);
 
         protected override void PopOut() => this.FadeOut(transition_duration, Easing.OutQuint);
     }
