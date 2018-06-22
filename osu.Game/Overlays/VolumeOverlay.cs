@@ -156,6 +156,12 @@ namespace osu.Game.Overlays
             return true;
         }
 
+        protected override void OnHoverLost(InputState state)
+        {
+            schedulePopOut();
+            base.OnHoverLost(state);
+        }
+
         private void schedulePopOut()
         {
             popOutDelegate?.Cancel();
