@@ -48,6 +48,16 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnJudgement(DrawableCatchHitObject fruit, Judgement judgement)
         {
+            void runAfterLoaded(Action action)
+            {
+                // this is required to make this run after the last caught fruit runs UpdateState at least once.
+                // TODO: find a better alternative
+                if (lastPlateableFruit.IsLoaded)
+                    action();
+                else
+                    lastPlateableFruit.OnLoadComplete = _ => action();
+            }
+
             if (judgement.IsHit && fruit.CanBePlated)
             {
                 var caughtFruit = (DrawableCatchHitObject)GetVisualRepresentation?.Invoke(fruit.HitObject);
@@ -63,21 +73,17 @@ namespace osu.Game.Rulesets.Catch.UI
                 caughtFruit.LifetimeEnd = double.MaxValue;
 
                 MovableCatcher.Add(caughtFruit);
-
                 lastPlateableFruit = caughtFruit;
+
+                if (!fruit.StaysOnPlate)
+                    runAfterLoaded(() => MovableCatcher.Explode(caughtFruit));
+
             }
 
             if (fruit.HitObject.LastInCombo)
             {
                 if (judgement.IsHit)
-                {
-                    // this is required to make this run after the last caught fruit runs UpdateState at least once.
-                    // TODO: find a better alternative
-                    if (lastPlateableFruit.IsLoaded)
-                        MovableCatcher.Explode();
-                    else
-                        lastPlateableFruit.OnLoadComplete = _ => { MovableCatcher.Explode(); };
-                }
+                    runAfterLoaded(() => MovableCatcher.Explode());
                 else
                     MovableCatcher.Drop();
             }
@@ -99,6 +105,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public class Catcher : Container, IKeyBindingHandler<CatchAction>
         {
+            /// <summary>
+            /// Width of the area that can be used to attempt catches during gameplay.
+            /// </summary>
+            internal float CatchWidth => CATCHER_SIZE * Math.Abs(Scale.X);
+
             private Container<DrawableHitObject> caughtFruit;
 
             public Container ExplodingFruitTarget;
@@ -226,15 +237,15 @@ namespace osu.Game.Rulesets.Catch.UI
             /// <returns>Whether the catch is possible.</returns>
             public bool AttemptCatch(CatchHitObject fruit)
             {
-                double halfCatcherWidth = CATCHER_SIZE * Math.Abs(Scale.X) * 0.5f;
+                float halfCatchWidth = CatchWidth * 0.5f;
 
                 // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
                 var catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
                 var catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
 
                 var validCatch =
-                    catchObjectPosition >= catcherPosition - halfCatcherWidth &&
-                    catchObjectPosition <= catcherPosition + halfCatcherWidth;
+                    catchObjectPosition >= catcherPosition - halfCatchWidth &&
+                    catchObjectPosition <= catcherPosition + halfCatchWidth;
 
                 if (validCatch && fruit.HyperDash)
                 {
@@ -378,28 +389,31 @@ namespace osu.Game.Rulesets.Catch.UI
                 var fruit = caughtFruit.ToArray();
 
                 foreach (var f in fruit)
+                    Explode(f);
+            }
+
+            public void Explode(DrawableHitObject fruit)
+            {
+                var originalX = fruit.X * Scale.X;
+
+                if (ExplodingFruitTarget != null)
                 {
-                    var originalX = f.X * Scale.X;
+                    fruit.Anchor = Anchor.TopLeft;
+                    fruit.Position = caughtFruit.ToSpaceOfOtherDrawable(fruit.DrawPosition, ExplodingFruitTarget);
 
-                    if (ExplodingFruitTarget != null)
-                    {
-                        f.Anchor = Anchor.TopLeft;
-                        f.Position = caughtFruit.ToSpaceOfOtherDrawable(f.DrawPosition, ExplodingFruitTarget);
+                    caughtFruit.Remove(fruit);
 
-                        caughtFruit.Remove(f);
-
-                        ExplodingFruitTarget.Add(f);
-                    }
-
-                    f.MoveToY(f.Y - 50, 250, Easing.OutSine)
-                     .Then()
-                     .MoveToY(f.Y + 50, 500, Easing.InSine);
-
-                    f.MoveToX(f.X + originalX * 6, 1000);
-                    f.FadeOut(750);
-
-                    f.Expire();
+                    ExplodingFruitTarget.Add(fruit);
                 }
+
+                fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine)
+                 .Then()
+                 .MoveToY(fruit.Y + 50, 500, Easing.InSine);
+
+                fruit.MoveToX(fruit.X + originalX * 6, 1000);
+                fruit.FadeOut(750);
+
+                fruit.Expire();
             }
 
             private class CatcherSprite : Sprite
