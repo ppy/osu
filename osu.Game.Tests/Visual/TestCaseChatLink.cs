@@ -12,12 +12,14 @@ using osu.Game.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseChatLink : OsuTestCase
     {
         private readonly TestChatLineContainer textContainer;
@@ -32,9 +34,6 @@ namespace osu.Game.Tests.Visual
             typeof(LocalEchoMessage),
             typeof(MessageFormatter)
         };
-
-        private DependencyContainer dependencies;
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
 
         public TestCaseChatLink()
         {
@@ -51,7 +50,7 @@ namespace osu.Game.Tests.Visual
         private void load(OsuColour colours)
         {
             linkColour = colours.Blue;
-            dependencies.Cache(new ChatOverlay
+            Dependencies.Cache(new ChatOverlay
             {
                 AvailableChannels =
                 {

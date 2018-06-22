@@ -27,5 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// Strong hit objects give more points for hitting the hit object with both keys.
         /// </summary>
         public bool IsStrong;
+
+        protected override HitWindows CreateHitWindows() => new TaikoHitWindows();
     }
 }

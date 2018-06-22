@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Origin = Anchor.BottomLeft;
             X = 0;
 
-            Child = dropletContainer = new Container { RelativeSizeAxes = Axes.Both, };
+            InternalChild = dropletContainer = new Container { RelativeSizeAxes = Axes.Both, };
 
             foreach (var o in s.NestedHitObjects.Cast<CatchHitObject>())
                 AddNested(getVisualRepresentation?.Invoke(o));
@@ -33,7 +33,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             var catchObject = (DrawableCatchHitObject)h;
 
             catchObject.CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
-            catchObject.AccentColour = HitObject.ComboColour;
 
             dropletContainer.Add(h);
             base.AddNested(h);

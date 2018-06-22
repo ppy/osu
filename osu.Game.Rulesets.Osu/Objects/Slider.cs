@@ -3,7 +3,6 @@
 
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
-using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
@@ -23,8 +22,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
-        public Vector2 StackedPositionAt(double t) => this.PositionAt(t) + StackOffset;
-        public override Vector2 EndPosition => this.PositionAt(1);
+        public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
+        public override Vector2 EndPosition => Position + this.CurvePositionAt(1);
 
         public SliderCurve Curve { get; } = new SliderCurve();
 
@@ -66,18 +65,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public double SpanDuration => Duration / this.SpanCount();
 
-        private int stackHeight;
-
-        public override int StackHeight
-        {
-            get { return stackHeight; }
-            set
-            {
-                stackHeight = value;
-                Curve.Offset = StackOffset;
-            }
-        }
-
         public double Velocity;
         public double TickDistance;
 
@@ -108,22 +95,22 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createSliderEnds()
         {
-            HeadCircle = new HitCircle
+            HeadCircle = new SliderCircle(this)
             {
                 StartTime = StartTime,
-                Position = StackedPosition,
-                IndexInCurrentCombo = IndexInCurrentCombo,
-                ComboColour = ComboColour,
+                Position = Position,
                 Samples = Samples,
-                SampleControlPoint = SampleControlPoint
+                SampleControlPoint = SampleControlPoint,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboIndex = ComboIndex,
             };
 
-            TailCircle = new HitCircle
+            TailCircle = new SliderCircle(this)
             {
                 StartTime = EndTime,
-                Position = StackedEndPosition,
+                Position = EndPosition,
                 IndexInCurrentCombo = IndexInCurrentCombo,
-                ComboColour = ComboColour
+                ComboIndex = ComboIndex,
             };
 
             AddNested(HeadCircle);
@@ -132,14 +119,16 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createTicks()
         {
-            if (TickDistance == 0) return;
-
             var length = Curve.Distance;
-            var tickDistance = Math.Min(TickDistance, length);
+            var tickDistance = MathHelper.Clamp(TickDistance, 0, length);
+
+            if (tickDistance == 0) return;
 
             var minDistanceFromEnd = Velocity * 0.01;
 
-            for (var span = 0; span < this.SpanCount(); span++)
+            var spanCount = this.SpanCount();
+
+            for (var span = 0; span < spanCount; span++)
             {
                 var spanStartTime = StartTime + span * SpanDuration;
                 var reversed = span % 2 == 1;
@@ -168,10 +157,9 @@ namespace osu.Game.Rulesets.Osu.Objects
                         SpanIndex = span,
                         SpanStartTime = spanStartTime,
                         StartTime = spanStartTime + timeProgress * SpanDuration,
-                        Position = Curve.PositionAt(distanceProgress),
+                        Position = Position + Curve.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
                         Scale = Scale,
-                        ComboColour = ComboColour,
                         Samples = sampleList
                     });
                 }
@@ -187,10 +175,9 @@ namespace osu.Game.Rulesets.Osu.Objects
                     RepeatIndex = repeatIndex,
                     SpanDuration = SpanDuration,
                     StartTime = StartTime + repeat * SpanDuration,
-                    Position = Curve.PositionAt(repeat % 2),
+                    Position = Position + Curve.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
-                    ComboColour = ComboColour,
                     Samples = new List<SampleInfo>(RepeatSamples[repeatIndex])
                 });
             }

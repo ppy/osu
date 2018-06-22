@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -10,6 +11,7 @@ using OpenTK;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseTextAwesome : OsuTestCase
     {
         public TestCaseTextAwesome()

@@ -16,6 +16,7 @@ using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
-        private readonly Container<DrawableTaikoJudgement> judgementContainer;
+        private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -131,7 +132,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
                             Blending = BlendingMode.Additive
                         },
-                        judgementContainer = new Container<DrawableTaikoJudgement>
+                        judgementContainer = new JudgementContainer<DrawableTaikoJudgement>
                         {
                             Name = "Judgements",
                             RelativeSizeAxes = Axes.Y,
@@ -207,8 +208,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.Depth = (float)h.HitObject.StartTime;
-
             h.OnJudgement += OnJudgement;
 
             base.Add(h);
@@ -217,17 +216,16 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (barline != null)
                 barlineContainer.Add(barline.CreateProxy());
 
-            // Swells should be moved at the very top of the playfield when they reach the hit target
-            var swell = h as DrawableSwell;
-            if (swell != null)
-                swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
+            var taikoObject = h as DrawableTaikoHitObject;
+            if (taikoObject != null)
+                topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
         }
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
-                judgementContainer.Add(new DrawableTaikoJudgement(judgedObject, judgement)
+                judgementContainer.Add(new DrawableTaikoJudgement(judgement, judgedObject)
                 {
                     Anchor = judgement.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
                     Origin = judgement.IsHit ? Anchor.BottomCentre : Anchor.Centre,
@@ -245,19 +243,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == judgedObject)?.VisualiseSecondHit();
             else
             {
-                if (judgedObject.X >= -0.05f && judgedObject is DrawableHit)
-                {
-                    // If we're far enough away from the left stage, we should bring outselves in front of it
-                    // Todo: The following try-catch is temporary for replay rewinding support
-                    try
-                    {
-                        topLevelHitContainer.Add(judgedObject.CreateProxy());
-                    }
-                    catch
-                    {
-                    }
-                }
-
                 hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
 
                 if (judgedObject.HitObject.Kiai)

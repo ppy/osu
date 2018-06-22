@@ -98,8 +98,14 @@ namespace osu.Game.Users
         [JsonProperty(@"skype")]
         public string Skype;
 
+        [JsonProperty(@"discord")]
+        public string Discord;
+
         [JsonProperty(@"website")]
         public string Website;
+
+        [JsonProperty(@"post_count")]
+        public int PostCount;
 
         [JsonProperty(@"playstyle")]
         public string[] PlayStyle;
@@ -136,6 +142,9 @@ namespace osu.Game.Users
 
         [JsonProperty(@"rankHistory")]
         public RankHistoryData RankHistory;
+
+        [JsonProperty("badges")]
+        public Badge[] Badges;
 
         public override string ToString() => Username;
     }

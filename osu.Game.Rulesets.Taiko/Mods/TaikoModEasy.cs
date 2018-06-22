@@ -7,5 +7,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModEasy : ModEasy
     {
+        public override string Description => @"Beats move slower, less accuracy required, and three lives!";
     }
 }

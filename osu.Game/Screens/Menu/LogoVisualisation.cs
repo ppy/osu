@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Menu
 {
     public class LogoVisualisation : Drawable, IHasAccentColour
     {
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         /// <summary>
         /// The number of bars to jump each update iteration.
@@ -78,9 +78,9 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, OsuGameBase game)
+        private void load(ShaderManager shaders, IBindableBeatmap beatmap)
         {
-            beatmap.BindTo(game.Beatmap);
+            this.beatmap.BindTo(beatmap);
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Menu
                                 rectangle,
                                 colourInfo,
                                 null,
-                                Shared.VertexBatch.Add,
+                                Shared.VertexBatch.AddAction,
                                 //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                 Vector2.Divide(inflation, barSize.Yx));
                         }

@@ -1,36 +1,78 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.IO;
-using System.Reflection;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
     public abstract class OsuTestCase : TestCase
     {
-        public override void RunTest()
+        private readonly OsuTestBeatmap beatmap = new OsuTestBeatmap(new DummyWorkingBeatmap());
+        protected BindableBeatmap Beatmap => beatmap;
+
+        protected DependencyContainer Dependencies { get; private set; }
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
         {
-            using (var host = new CleanRunHeadlessGameHost($"test-{Guid.NewGuid()}", realtime: false))
-                host.Run(new OsuTestCaseTestRunner(this));
+            Dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+
+            Dependencies.CacheAs<BindableBeatmap>(beatmap);
+            Dependencies.CacheAs<IBindableBeatmap>(beatmap);
+
+            return Dependencies;
         }
 
-        public class OsuTestCaseTestRunner : OsuGameBase
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audioManager)
         {
-            private readonly OsuTestCase testCase;
+            beatmap.SetAudioManager(audioManager);
+        }
 
-            protected override string MainResourceFile => File.Exists(base.MainResourceFile) ? base.MainResourceFile : Assembly.GetExecutingAssembly().Location;
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
 
-            public OsuTestCaseTestRunner(OsuTestCase testCase)
+            if (beatmap != null)
             {
-                this.testCase = testCase;
+                beatmap.Disabled = true;
+                beatmap.Value.Track.Stop();
+            }
+        }
+
+        protected override ITestCaseTestRunner CreateRunner() => new OsuTestCaseTestRunner();
+
+        public class OsuTestCaseTestRunner : OsuGameBase, ITestCaseTestRunner
+        {
+            private TestCaseTestRunner.TestRunner runner;
+
+            protected override void LoadAsyncComplete()
+            {
+                // this has to be run here rather than LoadComplete because
+                // TestCase.cs is checking the IsLoaded state (on another thread) and expects
+                // the runner to be loaded at that point.
+                Add(runner = new TestCaseTestRunner.TestRunner());
             }
 
-            protected override void LoadComplete()
+            public void RunTestBlocking(TestCase test) => runner.RunTestBlocking(test);
+        }
+
+        private class OsuTestBeatmap : BindableBeatmap
+        {
+            public OsuTestBeatmap(WorkingBeatmap defaultValue)
+                : base(defaultValue)
             {
-                base.LoadComplete();
-                Add(new TestCaseTestRunner.TestRunner(testCase));
+            }
+
+            public void SetAudioManager(AudioManager audioManager) => RegisterAudioManager(audioManager);
+
+            public override BindableBeatmap GetBoundCopy()
+            {
+                var copy = new OsuTestBeatmap(Default);
+                copy.BindTo(this);
+                return copy;
             }
         }
     }

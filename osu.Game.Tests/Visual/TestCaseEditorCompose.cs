@@ -2,45 +2,25 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit.Screens.Compose;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseEditorCompose : OsuTestCase
+    [TestFixture]
+    public class TestCaseEditorCompose : EditorClockTestCase
     {
-        private readonly Random random;
-        private readonly Compose compose;
-
-        public TestCaseEditorCompose()
-        {
-            random = new Random(1337);
-
-            Add(compose = new Compose());
-            AddStep("Next beatmap", nextBeatmap);
-        }
-
-        private OsuGameBase osuGame;
-        private BeatmapManager beatmaps;
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Compose) };
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, BeatmapManager beatmaps)
+        private void load()
         {
-            this.osuGame = osuGame;
-            this.beatmaps = beatmaps;
-
-            compose.Beatmap.BindTo(osuGame.Beatmap);
-        }
-
-        private void nextBeatmap()
-        {
-            var sets = beatmaps.GetAllUsableBeatmapSets();
-            if (sets.Count == 0)
-                return;
-
-            var b = sets[random.Next(0, sets.Count)].Beatmaps[0];
-            osuGame.Beatmap.Value = beatmaps.GetWorkingBeatmap(b);
+            Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            Child = new Compose();
         }
     }
 }

@@ -7,44 +7,52 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModHidden : ModHidden, IApplicableToDrawableHitObjects
+    public class OsuModHidden : ModHidden
     {
-        public override string Description => @"Play with no approach circles and fading notes for a slight score advantage.";
+        public override string Description => @"Play with no approach circles and fading circles/sliders.";
         public override double ScoreMultiplier => 1.06;
-
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
+            void adjustFadeIn(OsuHitObject h) => h.TimeFadein = h.TimePreempt * fade_in_duration_multiplier;
+
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
-                d.ApplyCustomUpdateState += ApplyHiddenState;
-                d.HitObject.TimeFadein = d.HitObject.TimePreempt * fade_in_duration_multiplier;
+                adjustFadeIn(d.HitObject);
+                foreach (var h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
+                    adjustFadeIn(h);
             }
+
+            base.ApplyToDrawableHitObjects(drawables);
         }
 
-        protected void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
+        protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
         {
             if (!(drawable is DrawableOsuHitObject d))
                 return;
 
-            var fadeOutStartTime = d.HitObject.StartTime - d.HitObject.TimePreempt + d.HitObject.TimeFadein;
-            var fadeOutDuration = d.HitObject.TimePreempt * fade_out_duration_multiplier;
+            var h = d.HitObject;
+
+            var fadeOutStartTime = h.StartTime - h.TimePreempt + h.TimeFadein;
+            var fadeOutDuration = h.TimePreempt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)
-            var longFadeDuration = ((d.HitObject as IHasEndTime)?.EndTime ?? d.HitObject.StartTime) - fadeOutStartTime;
+            var longFadeDuration = ((h as IHasEndTime)?.EndTime ?? h.StartTime) - fadeOutStartTime;
 
             switch (drawable)
             {
                 case DrawableHitCircle circle:
                     // we don't want to see the approach circle
-                    circle.ApproachCircle.Hide();
+                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                        circle.ApproachCircle.Hide();
 
                     // fade out immediately after fade in.
                     using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))

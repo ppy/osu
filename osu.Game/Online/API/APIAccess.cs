@@ -7,16 +7,19 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
-    public class APIAccess : IAPIProvider
+    public class APIAccess : Component, IAPIProvider
     {
+        private readonly OsuConfigManager config;
         private readonly OAuth authentication;
 
         public string Endpoint = @"https://osu.ppy.sh";
@@ -25,39 +28,41 @@ namespace osu.Game.Online.API
 
         private ConcurrentQueue<APIRequest> queue = new ConcurrentQueue<APIRequest>();
 
-        public Scheduler Scheduler = new Scheduler();
+        /// <summary>
+        /// The username/email provided by the user when initiating a login.
+        /// </summary>
+        public string ProvidedUsername { get; private set; }
 
-        public string Username;
-
-        //private SecurePassword password;
-
-        public string Password;
+        private string password;
 
         public Bindable<User> LocalUser { get; } = new Bindable<User>(createGuestUser());
 
-        public string Token
-        {
-            get { return authentication.Token?.ToString(); }
-            set { authentication.Token = string.IsNullOrEmpty(value) ? null : OAuthToken.Parse(value); }
-        }
+        protected bool HasLogin => authentication.Token.Value != null || !string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password);
 
-        protected bool HasLogin => Token != null || !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password);
-
-        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (should dispose of this or at very least keep a reference).
-        private readonly Thread thread;
+        private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
         private readonly Logger log;
 
-        public APIAccess()
+        public APIAccess(OsuConfigManager config)
         {
+            this.config = config;
+
             authentication = new OAuth(client_id, client_secret, Endpoint);
             log = Logger.GetLogger(LoggingTarget.Network);
 
-            thread = new Thread(run) { IsBackground = true };
-            thread.Start();
+            ProvidedUsername = config.Get<string>(OsuSetting.Username);
+
+            authentication.TokenString = config.Get<string>(OsuSetting.Token);
+            authentication.Token.ValueChanged += onTokenChanged;
+
+            Task.Factory.StartNew(run, cancellationToken.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
+        private void onTokenChanged(OAuthToken token) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
+
         private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
+
+        internal new void Schedule(Action action) => base.Schedule(action);
 
         public void Register(IOnlineComponent component)
         {
@@ -85,7 +90,7 @@ namespace osu.Game.Online.API
 
         private void run()
         {
-            while (thread.IsAlive)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 switch (State)
                 {
@@ -111,12 +116,15 @@ namespace osu.Game.Online.API
 
                         State = APIState.Connecting;
 
-                        if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(Username, Password))
+                        // save the username at this point, if the user requested for it to be.
+                        config.Set(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
+
+                        if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(ProvidedUsername, password))
                         {
                             //todo: this fails even on network-related issues. we should probably handle those differently.
                             //NotificationOverlay.ShowMessage("Login failed!");
                             log.Add(@"Login failed!");
-                            Password = null;
+                            password = null;
                             authentication.Clear();
                             continue;
                         }
@@ -125,7 +133,6 @@ namespace osu.Game.Online.API
                         userReq.Success += u =>
                         {
                             LocalUser.Value = u;
-                            Username = LocalUser.Value.Username;
                             failureCount = 0;
 
                             //we're connected!
@@ -174,8 +181,8 @@ namespace osu.Game.Online.API
         {
             Debug.Assert(State == APIState.Offline);
 
-            Username = username;
-            Password = password;
+            ProvidedUsername = username;
+            this.password = password;
         }
 
         /// <summary>
@@ -199,7 +206,7 @@ namespace osu.Game.Online.API
             }
             catch (WebException we)
             {
-                HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode ?? HttpStatusCode.RequestTimeout;
+                HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
 
                 switch (statusCode)
                 {
@@ -257,10 +264,7 @@ namespace osu.Game.Online.API
 
         public bool IsLoggedIn => LocalUser.Value.Id > 1;
 
-        public void Queue(APIRequest request)
-        {
-            queue.Enqueue(request);
-        }
+        public void Queue(APIRequest request) => queue.Enqueue(request);
 
         public event StateChangeDelegate OnStateChange;
 
@@ -284,8 +288,8 @@ namespace osu.Game.Online.API
         public void Logout(bool clearUsername = true)
         {
             flushQueue();
-            if (clearUsername) Username = null;
-            Password = null;
+            if (clearUsername) ProvidedUsername = null;
+            password = null;
             authentication.Clear();
             LocalUser.Value = createGuestUser();
         }
@@ -296,9 +300,12 @@ namespace osu.Game.Online.API
             Id = 1,
         };
 
-        public void Update()
+        protected override void Dispose(bool isDisposing)
         {
-            Scheduler.Update();
+            base.Dispose(isDisposing);
+
+            flushQueue();
+            cancellationToken.Cancel();
         }
     }
 

@@ -2,8 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
+using osu.Framework.Configuration.Tracking;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Configuration
@@ -14,6 +16,8 @@ namespace osu.Game.Configuration
         {
             // UI/selection defaults
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
+            Set(OsuSetting.Skin, 0, 0, int.MaxValue);
+
             Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
             Set(OsuSetting.ShowConvertedBeatmaps, true);
@@ -58,6 +62,9 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowFpsDisplay, false);
 
             Set(OsuSetting.ShowStoryboard, true);
+            Set(OsuSetting.BeatmapSkins, true);
+            Set(OsuSetting.BeatmapHitsounds, true);
+
             Set(OsuSetting.CursorRotation, true);
 
             Set(OsuSetting.MenuParallax, true);
@@ -74,17 +81,31 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.FloatingComments, false);
 
+            Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
+
             Set(OsuSetting.SpeedChangeVisualisation, SpeedChangeVisualisationMethod.Sequential);
+
+            Set(OsuSetting.IncreaseFirstObjectVisibility, true);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
             Set(OsuSetting.Version, string.Empty);
+
+            Set(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
+            Set(OsuSetting.ScreenshotCaptureMenuCursor, false);
+
+            Set(OsuSetting.SongSelectRightMouseScroll, false);
         }
 
         public OsuConfigManager(Storage storage) : base(storage)
         {
         }
+
+        public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
+        {
+            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled"))
+        };
     }
 
     public enum OsuSetting
@@ -122,6 +143,14 @@ namespace osu.Game.Configuration
         ChatDisplayHeight,
         Version,
         ShowConvertedBeatmaps,
-        SpeedChangeVisualisation
+        SpeedChangeVisualisation,
+        Skin,
+        ScreenshotFormat,
+        ScreenshotCaptureMenuCursor,
+        SongSelectRightMouseScroll,
+        BeatmapSkins,
+        BeatmapHitsounds,
+        IncreaseFirstObjectVisibility,
+        ScoreDisplayMode
     }
 }

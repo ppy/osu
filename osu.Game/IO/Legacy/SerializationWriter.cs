@@ -219,7 +219,7 @@ namespace osu.Game.IO.Legacy
                         Write((byte)ObjType.otherType);
                         BinaryFormatter b = new BinaryFormatter
                         {
-                            AssemblyFormat = FormatterAssemblyStyle.Simple,
+//                            AssemblyFormat = FormatterAssemblyStyle.Simple,
                             TypeFormat = FormatterTypeStyle.TypesWhenNeeded
                         };
                         b.Serialize(BaseStream, obj);

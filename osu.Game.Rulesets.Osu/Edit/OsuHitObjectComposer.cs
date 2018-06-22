@@ -2,10 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Edit
@@ -17,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        protected override RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new OsuEditRulesetContainer(ruleset, beatmap, true);
+        protected override RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new OsuEditRulesetContainer(ruleset, beatmap);
 
         protected override IReadOnlyList<ICompositionTool> CompositionTools => new ICompositionTool[]
         {
@@ -25,5 +30,20 @@ namespace osu.Game.Rulesets.Osu.Edit
             new HitObjectCompositionTool<Slider>(),
             new HitObjectCompositionTool<Spinner>()
         };
+
+        protected override ScalableContainer CreateLayerContainer() => new ScalableContainer(OsuPlayfield.BASE_SIZE.X) { RelativeSizeAxes = Axes.Both };
+
+        public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case DrawableHitCircle circle:
+                    return new HitCircleMask(circle);
+                case DrawableSlider slider:
+                    return new SliderMask(slider);
+            }
+
+            return base.CreateMaskFor(hitObject);
+        }
     }
 }

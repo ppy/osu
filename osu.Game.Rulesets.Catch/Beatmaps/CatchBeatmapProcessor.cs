@@ -12,33 +12,22 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
-    public class CatchBeatmapProcessor : BeatmapProcessor<CatchHitObject>
+    public class CatchBeatmapProcessor : BeatmapProcessor
     {
-        public override void PostProcess(Beatmap<CatchHitObject> beatmap)
+        public CatchBeatmapProcessor(IBeatmap beatmap)
+            : base(beatmap)
         {
-            if (beatmap.ComboColors.Count == 0)
-                return;
+        }
+
+        public override void PostProcess()
+        {
+            initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
+
+            base.PostProcess();
 
             int index = 0;
-            int colourIndex = 0;
-
-            CatchHitObject lastObj = null;
-
-            initialiseHyperDash(beatmap.HitObjects);
-
-            foreach (var obj in beatmap.HitObjects)
-            {
-                if (obj.NewCombo)
-                {
-                    if (lastObj != null) lastObj.LastInCombo = true;
-                    colourIndex = (colourIndex + 1) % beatmap.ComboColors.Count;
-                }
-
+            foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
                 obj.IndexInBeatmap = index++;
-                obj.ComboColour = beatmap.ComboColors[colourIndex];
-
-                lastObj = obj;
-            }
         }
 
         private void initialiseHyperDash(List<CatchHitObject> objects)

@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
+        public readonly QuitButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         private Bindable<bool> showHud;
@@ -41,7 +42,7 @@ namespace osu.Game.Screens.Play
 
         private static bool hasShownNotificationOnce;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, DecoupleableInterpolatingFramedClock decoupledClock, WorkingBeatmap working, IAdjustableClock adjustableSourceClock)
+        public HUDOverlay(ScoreProcessor scoreProcessor, RulesetContainer rulesetContainer, WorkingBeatmap working, IClock offsetClock, IAdjustableClock adjustableClock)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -51,14 +52,26 @@ namespace osu.Game.Screens.Play
 
                 Children = new Drawable[]
                 {
-                    KeyCounter = CreateKeyCounter(),
                     ComboCounter = CreateComboCounter(),
                     ScoreCounter = CreateScoreCounter(),
                     AccuracyCounter = CreateAccuracyCounter(),
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
-                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay()
+                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
+                    new FillFlowContainer
+                    {
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                        Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            KeyCounter = CreateKeyCounter(),
+                            HoldToQuit = CreateQuitButton(),
+                        }
+                    }
                 }
             });
 
@@ -66,13 +79,13 @@ namespace osu.Game.Screens.Play
             BindRulesetContainer(rulesetContainer);
 
             Progress.Objects = rulesetContainer.Objects;
-            Progress.AudioClock = decoupledClock;
+            Progress.AudioClock = offsetClock;
             Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
-            Progress.OnSeek = pos => decoupledClock.Seek(pos);
+            Progress.OnSeek = pos => adjustableClock.Seek(pos);
 
             ModDisplay.Current.BindTo(working.Mods);
 
-            PlayerSettingsOverlay.PlaybackSettings.AdjustableClock = adjustableSourceClock;
+            PlayerSettingsOverlay.PlaybackSettings.AdjustableClock = adjustableClock;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -187,7 +200,6 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
-            Y = -TwoLayerButton.SIZE_RETRACTED.Y,
         };
 
         protected virtual ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
@@ -203,6 +215,12 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
             RelativeSizeAxes = Axes.X,
+        };
+
+        protected virtual QuitButton CreateQuitButton() => new QuitButton
+        {
+            Anchor = Anchor.BottomRight,
+            Origin = Anchor.BottomRight,
         };
 
         protected virtual ModDisplay CreateModsContainer() => new ModDisplay

@@ -6,20 +6,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseBeatmapCarousel : OsuTestCase
     {
         private TestBeatmapCarousel carousel;
+        private RulesetStore rulesets;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -38,14 +42,17 @@ namespace osu.Game.Tests.Visual
 
 
         private readonly Stack<BeatmapSetInfo> selectedSets = new Stack<BeatmapSetInfo>();
+        private readonly HashSet<int> eagerSelectedIDs = new HashSet<int>();
 
         private BeatmapInfo currentSelection;
 
         private const int set_count = 5;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(RulesetStore rulesets)
         {
+            this.rulesets = rulesets;
+
             Add(carousel = new TestBeatmapCarousel
             {
                 RelativeSizeAxes = Axes.Both,
@@ -58,11 +65,7 @@ namespace osu.Game.Tests.Visual
 
             carousel.SelectionChanged = s => currentSelection = s;
 
-            AddStep("Load Beatmaps", () => { carousel.BeatmapSets = beatmapSets; });
-
-            bool changed = false;
-            carousel.BeatmapSetsChanged = () => changed = true;
-            AddUntilStep(() => changed, "Wait for load");
+            loadBeatmaps(beatmapSets);
 
             testTraversal();
             testFiltering();
@@ -73,6 +76,19 @@ namespace osu.Game.Tests.Visual
             testRemoveAll();
             testEmptyTraversal();
             testHiding();
+            testSelectingFilteredRuleset();
+            testCarouselRootIsRandom();
+        }
+
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets)
+        {
+            bool changed = false;
+            AddStep($"Load {beatmapSets.Count} Beatmaps", () =>
+            {
+                carousel.BeatmapSetsChanged = () => changed = true;
+                carousel.BeatmapSets = beatmapSets;
+            });
+            AddUntilStep(() => changed, "Wait for load");
         }
 
         private void ensureRandomFetchSuccess() =>
@@ -144,6 +160,17 @@ namespace osu.Game.Tests.Visual
             AddAssert("Selection is visible", selectedBeatmapVisible);
         }
 
+        private void checkNonmatchingFilter()
+        {
+            AddStep("Toggle non-matching filter", () =>
+            {
+                carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
+                carousel.Filter(new FilterCriteria(), false);
+                eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
+            }
+            );
+        }
+
         /// <summary>
         /// Test keyboard traversal
         /// </summary>
@@ -205,6 +232,12 @@ namespace osu.Game.Tests.Visual
 
             checkVisibleItemCount(false, 0);
             checkVisibleItemCount(true, 0);
+            AddAssert("Selection is null", () => currentSelection == null);
+
+            advanceSelection(true);
+            AddAssert("Selection is null", () => currentSelection == null);
+
+            advanceSelection(false);
             AddAssert("Selection is null", () => currentSelection == null);
 
             AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
@@ -355,6 +388,58 @@ namespace osu.Game.Tests.Visual
             }
         }
 
+        private void testSelectingFilteredRuleset()
+        {
+            var testMixed = createTestBeatmapSet(set_count + 1);
+            AddStep("add mixed ruleset beatmapset", () =>
+            {
+                for (int i = 0; i <= 2; i++)
+                {
+                    testMixed.Beatmaps[i].Ruleset = rulesets.AvailableRulesets.ElementAt(i);
+                    testMixed.Beatmaps[i].RulesetID = i;
+                }
+
+                carousel.UpdateBeatmapSet(testMixed);
+            });
+            AddStep("filter to ruleset 0", () =>
+                carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
+            AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
+            AddAssert("unfiltered beatmap selected", () => carousel.SelectedBeatmap.Equals(testMixed.Beatmaps[0]));
+
+            AddStep("remove mixed set", () =>
+            {
+                carousel.RemoveBeatmapSet(testMixed);
+                testMixed = null;
+            });
+            var testSingle = createTestBeatmapSet(set_count + 2);
+            testSingle.Beatmaps.ForEach(b =>
+            {
+                b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
+                b.RulesetID = b.Ruleset.ID ?? 1;
+            });
+            AddStep("add single ruleset beatmapset", () => carousel.UpdateBeatmapSet(testSingle));
+            AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testSingle.Beatmaps[0], false));
+            checkNoSelection();
+            AddStep("remove single ruleset set", () => carousel.RemoveBeatmapSet(testSingle));
+        }
+
+        private void testCarouselRootIsRandom()
+        {
+            List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
+
+            for (int i = 1; i <= 50; i++)
+                beatmapSets.Add(createTestBeatmapSet(i));
+
+            loadBeatmaps(beatmapSets);
+            advanceSelection(direction: 1, diff: false);
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            AddAssert("Selection was random", () => eagerSelectedIDs.Count > 1);
+        }
+
         private BeatmapSetInfo createTestBeatmapSet(int id)
         {
             return new BeatmapSetInfo
@@ -364,7 +449,6 @@ namespace osu.Game.Tests.Visual
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
-                    OnlineBeatmapSetID = id,
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = $"peppy{id.ToString().PadLeft(6, '0')}",
                     Title = $"test set #{id}!",
@@ -418,7 +502,6 @@ namespace osu.Game.Tests.Visual
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
-                    OnlineBeatmapSetID = id,
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = $"peppy{id.ToString().PadLeft(6, '0')}",
                     Title = $"test set #{id}!",

@@ -4,47 +4,22 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Game.Beatmaps.Legacy;
-using osu.Game.Storyboards;
+using osu.Framework.Logging;
+using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
-    public abstract class LegacyDecoder : Decoder
+    public abstract class LegacyDecoder<T> : Decoder<T>
+        where T : new()
     {
-        public static void Register()
+        protected readonly int FormatVersion;
+
+        protected LegacyDecoder(int version)
         {
-            AddDecoder(@"osu file format v14", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v13", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v12", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v11", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v10", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v9", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v8", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v7", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v6", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v5", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v4", m => new LegacyBeatmapDecoder(m));
-            AddDecoder(@"osu file format v3", m => new LegacyBeatmapDecoder(m));
-            // TODO: differences between versions
+            FormatVersion = version;
         }
 
-        protected int BeatmapVersion;
-
-        public override Decoder GetStoryboardDecoder() => new LegacyStoryboardDecoder(BeatmapVersion);
-
-        public override Beatmap DecodeBeatmap(StreamReader stream) => new LegacyBeatmap(base.DecodeBeatmap(stream));
-
-        protected override void ParseBeatmap(StreamReader stream, Beatmap beatmap)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void ParseStoryboard(StreamReader stream, Storyboard storyboard)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected void ParseContent(StreamReader stream)
+        protected override void ParseStreamInto(StreamReader stream, T output)
         {
             Section section = Section.None;
 
@@ -54,34 +29,79 @@ namespace osu.Game.Beatmaps.Formats
                 if (ShouldSkipLine(line))
                     continue;
 
-                // It's already set in ParseBeatmap... why do it again?
-                //if (line.StartsWith(@"osu file format v"))
-                //{
-                //    Beatmap.BeatmapInfo.BeatmapVersion = int.Parse(line.Substring(17));
-                //    continue;
-                //}
-
                 if (line.StartsWith(@"[") && line.EndsWith(@"]"))
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
-                        throw new InvalidDataException($@"Unknown osu section {line}");
+                    {
+                        Logger.Log($"Unknown section \"{line}\" in {output}");
+                        section = Section.None;
+                    }
+
                     continue;
                 }
 
-                ProcessSection(section, line);
+                try
+                {
+                    ParseLine(output, section, line);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"Failed to process line \"{line}\" into {output}");
+                }
             }
         }
 
-        protected virtual bool ShouldSkipLine(string line)
+        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//");
+
+        protected virtual void ParseLine(T output, Section section, string line)
         {
-            if (string.IsNullOrWhiteSpace(line) || line.StartsWith("//"))
-                return true;
-            return false;
+            switch (section)
+            {
+                case Section.Colours:
+                    handleColours(output, line);
+                    return;
+            }
         }
 
-        protected abstract void ProcessSection(Section section, string line);
+        private bool hasComboColours;
 
-        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator)
+        private void handleColours(T output, string line)
+        {
+            var pair = SplitKeyVal(line);
+
+            bool isCombo = pair.Key.StartsWith(@"Combo");
+
+            string[] split = pair.Value.Split(',');
+
+            if (split.Length != 3)
+                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {pair.Value}");
+
+            if (!byte.TryParse(split[0], out var r) || !byte.TryParse(split[1], out var g) || !byte.TryParse(split[2], out var b))
+                throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
+
+            Color4 colour = new Color4(r, g, b, 255);
+
+            if (isCombo)
+            {
+                if (!(output is IHasComboColours tHasComboColours)) return;
+
+                if (!hasComboColours)
+                {
+                    // remove default colours.
+                    tHasComboColours.ComboColours.Clear();
+                    hasComboColours = true;
+                }
+
+                tHasComboColours.ComboColours.Add(colour);
+            }
+            else
+            {
+                if (!(output is IHasCustomColours tHasCustomColours)) return;
+                tHasCustomColours.CustomColours[pair.Key] = colour;
+            }
+        }
+
+        protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
         {
             var split = line.Trim().Split(new[] { separator }, 2);
 
@@ -104,6 +124,7 @@ namespace osu.Game.Beatmaps.Formats
             Colours,
             HitObjects,
             Variables,
+            Fonts
         }
 
         internal enum LegacySampleBank

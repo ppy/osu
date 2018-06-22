@@ -9,12 +9,12 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK;
 using OpenTK.Graphics;
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container<Drawable> content;
 
         public Container<DrawableManiaJudgement> Judgements => judgements;
-        private readonly Container<DrawableManiaJudgement> judgements;
+        private readonly JudgementContainer<DrawableManiaJudgement> judgements;
 
         private readonly Container topLevelContainer;
 
@@ -48,13 +48,11 @@ namespace osu.Game.Rulesets.Mania.UI
         private Color4 specialColumnColour;
 
         private readonly int firstColumnIndex;
-        private readonly StageDefinition definition;
 
         public ManiaStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
             : base(ScrollingDirection.Up)
         {
             this.firstColumnIndex = firstColumnIndex;
-            this.definition = definition;
 
             Name = "Stage";
 
@@ -79,6 +77,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
                             Masking = true,
+                            CornerRadius = 5,
                             Children = new Drawable[]
                             {
                                 new Box
@@ -116,7 +115,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 Padding = new MarginPadding { Top = HIT_TARGET_POSITION }
                             }
                         },
-                        judgements = new Container<DrawableManiaJudgement>
+                        judgements = new JudgementContainer<DrawableManiaJudgement>
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.Centre,
@@ -131,7 +130,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < definition.Columns; i++)
             {
-                var isSpecial = isSpecialColumn(i);
+                var isSpecial = definition.IsSpecialColumn(i);
                 var column = new Column
                 {
                     IsSpecial = isSpecial,
@@ -160,13 +159,6 @@ namespace osu.Game.Rulesets.Mania.UI
             AddNested(c);
         }
 
-        /// <summary>
-        /// Whether the column index is a special column for this playfield.
-        /// </summary>
-        /// <param name="column">The 0-based column index.</param>
-        /// <returns>Whether the column is a special column.</returns>
-        private bool isSpecialColumn(int column) => definition.Columns % 2 == 1 && column == definition.Columns / 2;
-
         public override void Add(DrawableHitObject h)
         {
             var maniaObject = (ManiaHitObject)h.HitObject;
@@ -179,8 +171,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
+            if (!judgedObject.DisplayJudgement)
+                return;
+
             judgements.Clear();
-            judgements.Add(new DrawableManiaJudgement(judgement)
+            judgements.Add(new DrawableManiaJudgement(judgement, judgedObject)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -188,15 +183,15 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             normalColumnColours = new List<Color4>
             {
-                colours.RedDark,
-                colours.GreenDark
+                new Color4(94, 0, 57, 255),
+                new Color4(6, 84, 0, 255)
             };
 
-            specialColumnColour = colours.BlueDark;
+            specialColumnColour = new Color4(0, 48, 63, 255);
 
             // Set the special column + colour + key
             foreach (var column in Columns)

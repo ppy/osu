@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -29,11 +30,8 @@ namespace osu.Game.Overlays
     public class MusicController : OsuFocusedOverlayContainer
     {
         private const float player_height = 130;
-
         private const float transition_length = 800;
-
         private const float progress_height = 10;
-
         private const float bottom_black_area_height = 55;
 
         private Drawable background;
@@ -48,12 +46,16 @@ namespace osu.Game.Overlays
 
         private PlaylistOverlay playlist;
 
+        private BeatmapManager beatmaps;
         private LocalisationEngine localisation;
 
-        private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
+        private List<BeatmapSetInfo> beatmapSets;
+        private BeatmapSetInfo currentSet;
 
         private Container dragContainer;
         private Container playerContainer;
+
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public MusicController()
         {
@@ -64,42 +66,16 @@ namespace osu.Game.Overlays
             AlwaysPresent = true;
         }
 
-        private Vector2 dragStart;
-
-        protected override bool OnDragStart(InputState state)
-        {
-            base.OnDragStart(state);
-            dragStart = state.Mouse.Position;
-            return true;
-        }
-
-        protected override bool OnDrag(InputState state)
-        {
-            if (base.OnDrag(state)) return true;
-
-            Vector2 change = state.Mouse.Position - dragStart;
-
-            // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-            change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
-
-            dragContainer.MoveTo(change);
-            return true;
-        }
-
-        protected override bool OnDragEnd(InputState state)
-        {
-            dragContainer.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-            return base.OnDragEnd(state);
-        }
-
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuColour colours, LocalisationEngine localisation)
+        private void load(BindableBeatmap beatmap, BeatmapManager beatmaps, OsuColour colours, LocalisationEngine localisation)
         {
+            this.beatmap.BindTo(beatmap);
+            this.beatmaps = beatmaps;
             this.localisation = localisation;
 
             Children = new Drawable[]
             {
-                dragContainer = new Container
+                dragContainer = new DragContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -111,6 +87,7 @@ namespace osu.Game.Overlays
                         {
                             RelativeSizeAxes = Axes.X,
                             Y = player_height + 10,
+                            OrderChanged = playlistOrderChanged
                         },
                         playerContainer = new Container
                         {
@@ -185,7 +162,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = next,
+                                                    Action = () => next(),
                                                     Icon = FontAwesome.fa_step_forward,
                                                 },
                                             }
@@ -214,17 +191,26 @@ namespace osu.Game.Overlays
                 }
             };
 
-            beatmapBacking.BindTo(game.Beatmap);
+            beatmapSets = beatmaps.GetAllUsableBeatmapSets();
+            beatmaps.ItemAdded += handleBeatmapAdded;
+            beatmaps.ItemRemoved += handleBeatmapRemoved;
 
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
+        private void playlistOrderChanged(BeatmapSetInfo beatmapSetInfo, int index)
+        {
+            beatmapSets.Remove(beatmapSetInfo);
+            beatmapSets.Insert(index, beatmapSetInfo);
+        }
+
+        private void handleBeatmapAdded(BeatmapSetInfo obj) => beatmapSets.Add(obj);
+        private void handleBeatmapRemoved(BeatmapSetInfo obj) => beatmapSets.RemoveAll(s => s.ID == obj.ID);
+
         protected override void LoadComplete()
         {
-            beatmapBacking.ValueChanged += beatmapChanged;
-            beatmapBacking.DisabledChanged += beatmapDisabledChanged;
-            beatmapBacking.TriggerChange();
-
+            beatmap.BindValueChanged(beatmapChanged, true);
+            beatmap.BindDisabledChanged(beatmapDisabledChanged, true);
             base.LoadComplete();
         }
 
@@ -257,7 +243,7 @@ namespace osu.Game.Overlays
 
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping && !beatmapBacking.Disabled && playlist.BeatmapSets.Any())
+                if (track.HasCompleted && !track.Looping && !beatmap.Disabled && beatmapSets.Any())
                     next();
             }
             else
@@ -270,8 +256,8 @@ namespace osu.Game.Overlays
 
             if (track == null)
             {
-                if (!beatmapBacking.Disabled)
-                    playlist.PlayNext();
+                if (!beatmap.Disabled)
+                    next(true);
                 return;
             }
 
@@ -284,13 +270,26 @@ namespace osu.Game.Overlays
         private void prev()
         {
             queuedDirection = TransformDirection.Prev;
-            playlist.PlayPrevious();
+
+            var playable = beatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? beatmapSets.LastOrDefault();
+            if (playable != null)
+            {
+                beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
+                beatmap.Value.Track.Restart();
+            }
         }
 
-        private void next()
+        private void next(bool instant = false)
         {
-            queuedDirection = TransformDirection.Next;
-            playlist.PlayNext();
+            if (!instant)
+                queuedDirection = TransformDirection.Next;
+
+            var playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
+            if (playable != null)
+            {
+                beatmap.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
+                beatmap.Value.Track.Restart();
+            }
         }
 
         private WorkingBeatmap current;
@@ -314,8 +313,8 @@ namespace osu.Game.Overlays
                 else
                 {
                     //figure out the best direction based on order in playlist.
-                    var last = playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    var next = beatmap == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmap.BeatmapSetInfo?.ID).Count();
+                    var last = beatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
+                    var next = beatmap == null ? -1 : beatmapSets.TakeWhile(b => b.ID != beatmap.BeatmapSetInfo?.ID).Count();
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
@@ -441,6 +440,37 @@ namespace osu.Game.Overlays
             private void load(TextureStore textures)
             {
                 sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
+            }
+        }
+
+        private class DragContainer : Container
+        {
+            private Vector2 dragStart;
+
+            protected override bool OnDragStart(InputState state)
+            {
+                base.OnDragStart(state);
+                dragStart = state.Mouse.Position;
+                return true;
+            }
+
+            protected override bool OnDrag(InputState state)
+            {
+                if (base.OnDrag(state)) return true;
+
+                Vector2 change = state.Mouse.Position - dragStart;
+
+                // Diminish the drag distance as we go further to simulate "rubber band" feeling.
+                change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
+
+                this.MoveTo(change);
+                return true;
+            }
+
+            protected override bool OnDragEnd(InputState state)
+            {
+                this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
+                return base.OnDragEnd(state);
             }
         }
     }

@@ -8,7 +8,8 @@ namespace osu.Game.Rulesets.Configuration
     public abstract class RulesetConfigManager<T> : DatabasedConfigManager<T>, IRulesetConfigManager
         where T : struct
     {
-        protected RulesetConfigManager(SettingsStore settings, RulesetInfo ruleset, int variant) : base(settings, ruleset, variant)
+        protected RulesetConfigManager(SettingsStore settings, RulesetInfo ruleset, int? variant = null)
+            : base(settings, ruleset, variant)
         {
         }
     }

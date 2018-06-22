@@ -1,12 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCasePopupDialog : OsuTestCase
     {
         public TestCasePopupDialog()

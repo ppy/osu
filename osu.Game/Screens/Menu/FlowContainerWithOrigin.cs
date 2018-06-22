@@ -4,8 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Screens.Menu
 {
@@ -21,8 +19,6 @@ namespace osu.Game.Screens.Menu
         public Drawable CentreTarget;
 
         protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
-
-        protected override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
 
         public override Anchor Origin => Anchor.Custom;
 

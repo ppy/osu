@@ -13,7 +13,9 @@ using osu.Game.Storyboards;
 using osu.Framework.IO.File;
 using System.IO;
 using osu.Game.IO.Serialization;
-using System.Diagnostics;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 
 namespace osu.Game.Beatmaps
 {
@@ -35,37 +37,39 @@ namespace osu.Game.Beatmaps
 
             Mods.ValueChanged += mods => applyRateAdjustments();
 
-            beatmap = new AsyncLazy<Beatmap>(populateBeatmap);
+            beatmap = new AsyncLazy<IBeatmap>(populateBeatmap);
             background = new AsyncLazy<Texture>(populateBackground, b => b == null || !b.IsDisposed);
             track = new AsyncLazy<Track>(populateTrack);
             waveform = new AsyncLazy<Waveform>(populateWaveform);
             storyboard = new AsyncLazy<Storyboard>(populateStoryboard);
+            skin = new AsyncLazy<Skin>(populateSkin);
         }
 
         /// <summary>
-        /// Saves the <see cref="Beatmap"/>.
+        /// Saves the <see cref="Beatmaps.Beatmap"/>.
         /// </summary>
-        public void Save()
+        /// <returns>The absolute path of the output file.</returns>
+        public string Save()
         {
             var path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
             using (var sw = new StreamWriter(path))
                 sw.WriteLine(Beatmap.Serialize());
-            Process.Start(path);
+            return path;
         }
 
-        protected abstract Beatmap GetBeatmap();
+        protected abstract IBeatmap GetBeatmap();
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
+        protected virtual Skin GetSkin() => new DefaultSkin();
         protected virtual Waveform GetWaveform() => new Waveform();
         protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
 
         public bool BeatmapLoaded => beatmap.IsResultAvailable;
-        public Beatmap Beatmap => beatmap.Value.Result;
-        public async Task<Beatmap> GetBeatmapAsync() => await beatmap.Value;
+        public IBeatmap Beatmap => beatmap.Value.Result;
+        public async Task<IBeatmap> GetBeatmapAsync() => await beatmap.Value;
+        private readonly AsyncLazy<IBeatmap> beatmap;
 
-        private readonly AsyncLazy<Beatmap> beatmap;
-
-        private Beatmap populateBeatmap()
+        private IBeatmap populateBeatmap()
         {
             var b = GetBeatmap() ?? new Beatmap();
 
@@ -73,6 +77,57 @@ namespace osu.Game.Beatmaps
             b.BeatmapInfo = BeatmapInfo;
 
             return b;
+        }
+
+        /// <summary>
+        /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
+        /// <para>
+        /// The returned <see cref="IBeatmap"/> is in a playable state - all <see cref="HitObject"/> and <see cref="BeatmapDifficulty"/> <see cref="Mod"/>s
+        /// have been applied, and <see cref="HitObject"/>s have been fully constructed.
+        /// </para>
+        /// </summary>
+        /// <param name="ruleset">The <see cref="RulesetInfo"/> to create a playable <see cref="IBeatmap"/> for.</param>
+        /// <returns>The converted <see cref="IBeatmap"/>.</returns>
+        /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
+        public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset)
+        {
+            var rulesetInstance = ruleset.CreateInstance();
+
+            IBeatmapConverter converter = rulesetInstance.CreateBeatmapConverter(Beatmap);
+
+            // Check if the beatmap can be converted
+            if (!converter.CanConvert)
+                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.InstantiationInfo}, converter: {converter}).");
+
+            // Apply conversion mods
+            foreach (var mod in Mods.Value.OfType<IApplicableToBeatmapConverter>())
+                mod.ApplyToBeatmapConverter(converter);
+
+            // Convert
+            IBeatmap converted = converter.Convert();
+
+            // Apply difficulty mods
+            if (Mods.Value.Any(m => m is IApplicableToDifficulty))
+            {
+                converted.BeatmapInfo = converted.BeatmapInfo.Clone();
+                converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
+
+                foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
+                    mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+            }
+
+            // Post-process
+            rulesetInstance.CreateBeatmapProcessor(converted)?.PostProcess();
+
+            // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
+            foreach (var obj in converted.HitObjects)
+                obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
+
+            foreach (var mod in Mods.Value.OfType<IApplicableToHitObject>())
+            foreach (var obj in converted.HitObjects)
+                mod.ApplyToHitObject(obj);
+
+            return converted;
         }
 
         public bool BackgroundLoaded => background.IsResultAvailable;
@@ -109,6 +164,13 @@ namespace osu.Game.Beatmaps
 
         private Storyboard populateStoryboard() => GetStoryboard();
 
+        public bool SkinLoaded => skin.IsResultAvailable;
+        public Skin Skin => skin.Value.Result;
+        public async Task<Skin> GetSkinAsync() => await skin.Value;
+        private readonly AsyncLazy<Skin> skin;
+
+        private Skin populateSkin() => GetSkin();
+
         public void TransferTo(WorkingBeatmap other)
         {
             if (track.IsResultAvailable && Track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
@@ -123,6 +185,7 @@ namespace osu.Game.Beatmaps
             if (BackgroundLoaded) Background?.Dispose();
             if (WaveformLoaded) Waveform?.Dispose();
             if (StoryboardLoaded) Storyboard?.Dispose();
+            if (SkinLoaded) Skin?.Dispose();
         }
 
         /// <summary>

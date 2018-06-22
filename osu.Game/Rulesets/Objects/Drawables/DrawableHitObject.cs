@@ -3,24 +3,20 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
-using osu.Game.Rulesets.Judgements;
-using Container = osu.Framework.Graphics.Containers.Container;
-using osu.Game.Rulesets.Objects.Types;
-using OpenTK.Graphics;
-using osu.Game.Audio;
 using System.Linq;
-using osu.Game.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using OpenTK;
-using osu.Framework.Graphics.Primitives;
+using osu.Game.Audio;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
-    public abstract class DrawableHitObject : Container, IHasAccentColour
+    public abstract class DrawableHitObject : SkinReloadableDrawable, IHasAccentColour
     {
         public readonly HitObject HitObject;
 
@@ -32,11 +28,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
         // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
         protected virtual string SampleNamespace => null;
 
-        protected List<SampleChannel> Samples = new List<SampleChannel>();
+        protected SkinnableSound Samples;
+
         protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
 
-        private List<DrawableHitObject> nestedHitObjects;
-        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
+        private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
+        public bool HasNestedHitObjects => nestedHitObjects.IsValueCreated;
+        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects.Value;
 
         public event Action<DrawableHitObject, Judgement> OnJudgement;
         public event Action<DrawableHitObject, Judgement> OnJudgementRemoved;
@@ -52,12 +50,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been hit.
         /// </summary>
-        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && (NestedHitObjects?.All(n => n.IsHit) ?? true);
+        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && (!HasNestedHitObjects || NestedHitObjects.All(n => n.IsHit));
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
+        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (!HasNestedHitObjects || NestedHitObjects.All(h => h.AllJudged));
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> can be judged.
@@ -83,31 +81,22 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
-            var samples = GetSamples();
+            var samples = GetSamples().ToArray();
+
             if (samples.Any())
             {
                 if (HitObject.SampleControlPoint == null)
                     throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
                                                                                           + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-
-                foreach (SampleInfo s in samples)
+                AddInternal(Samples = new SkinnableSound(samples.Select(s => new SampleInfo
                 {
-                    SampleInfo localSampleInfo = new SampleInfo
-                    {
-                        Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
-                        Name = s.Name,
-                        Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume
-                    };
-
-                    SampleChannel channel = localSampleInfo.GetChannel(audio.Sample, SampleNamespace);
-
-                    if (channel == null)
-                        continue;
-
-                    Samples.Add(channel);
-                }
+                    Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
+                    Name = s.Name,
+                    Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume,
+                    Namespace = SampleNamespace
+                }).ToArray()));
             }
         }
 
@@ -139,7 +128,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Plays all the hitsounds for this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public void PlaySamples() => Samples.ForEach(s => s?.Play());
+        public void PlaySamples() => Samples?.Play();
 
         protected override void Update()
         {
@@ -169,14 +158,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected virtual void AddNested(DrawableHitObject h)
         {
-            if (nestedHitObjects == null)
-                nestedHitObjects = new List<DrawableHitObject>();
-
             h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
             h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
             h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
 
-            nestedHitObjects.Add(h);
+            nestedHitObjects.Value.Add(h);
         }
 
         /// <summary>
@@ -220,11 +206,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (AllJudged)
                 return false;
 
-            if (NestedHitObjects != null)
-            {
+            if (HasNestedHitObjects)
                 foreach (var d in NestedHitObjects)
                     judgementOccurred |= d.UpdateJudgement(userTriggered);
-            }
 
             if (!ProvidesJudgement || judgementFinalized || judgementOccurred)
                 return judgementOccurred;
@@ -245,16 +229,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual void CheckForJudgements(bool userTriggered, double timeOffset)
         {
         }
-
-        /// <summary>
-        /// The screen-space point that causes this <see cref="DrawableHitObject"/> to be selected in the Editor.
-        /// </summary>
-        public virtual Vector2 SelectionPoint => ScreenSpaceDrawQuad.Centre;
-
-        /// <summary>
-        /// The screen-space quad that outlines this <see cref="DrawableHitObject"/> for selections in the Editor.
-        /// </summary>
-        public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject

@@ -12,10 +12,8 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
-using osu.Framework.MathUtils;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -181,7 +179,7 @@ namespace osu.Game.Overlays
                 {
                     textbox.HoldFocus = false;
                     if (1f - ChatHeight.Value < channel_selection_min_height)
-                        transformChatHeightTo(1f - channel_selection_min_height, 800, Easing.OutQuint);
+                        this.TransformBindableTo(ChatHeight, 1f - channel_selection_min_height, 800, Easing.OutQuint);
                 }
                 else
                     textbox.HoldFocus = true;
@@ -210,6 +208,7 @@ namespace osu.Game.Overlays
             {
                 Trace.Assert(state.Mouse.PositionMouseDown != null);
 
+                // ReSharper disable once PossibleInvalidOperationException
                 double targetChatHeight = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
@@ -383,6 +382,7 @@ namespace osu.Game.Overlays
         {
             if (channel == null) return;
 
+            // ReSharper disable once AccessToModifiedClosure
             var existing = careChannels.Find(c => c.Id == channel.Id);
 
             if (existing != null)
@@ -477,7 +477,7 @@ namespace osu.Game.Overlays
 
             if (!api.IsLoggedIn)
             {
-                target.AddNewMessages(new ErrorMessage("Please login to participate in chat!"));
+                target.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
                 return;
             }
 
@@ -530,27 +530,6 @@ namespace osu.Game.Overlays
             req.Success += m => target.ReplaceMessage(message, m);
 
             api.Queue(req);
-        }
-
-        private void transformChatHeightTo(double newChatHeight, double duration = 0, Easing easing = Easing.None)
-        {
-            this.TransformTo(this.PopulateTransform(new TransformChatHeight(), newChatHeight, duration, easing));
-        }
-
-        private class TransformChatHeight : Transform<double, ChatOverlay>
-        {
-            private double valueAt(double time)
-            {
-                if (time < StartTime) return StartValue;
-                if (time >= EndTime) return EndValue;
-
-                return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-            }
-
-            public override string TargetMember => "ChatHeight.Value";
-
-            protected override void Apply(ChatOverlay d, double time) => d.ChatHeight.Value = valueAt(time);
-            protected override void ReadIntoStartValue(ChatOverlay d) => StartValue = d.ChatHeight.Value;
         }
     }
 }

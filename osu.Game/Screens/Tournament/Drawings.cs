@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Tournament
     {
         private const string results_filename = "drawings_results.txt";
 
-        public override bool ShowOverlaysOnEnter => false;
+        protected override bool HideOverlaysOnEnter => true;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
@@ -326,6 +326,7 @@ namespace osu.Game.Screens.Tournament
                             if (line.ToUpper().StartsWith("GROUP"))
                                 continue;
 
+                            // ReSharper disable once AccessToModifiedClosure
                             DrawingsTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
 
                             if (teamToAdd == null)

@@ -10,7 +10,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         public BackButton()
         {
-            Text = @"Back";
+            Text = @"back";
             Icon = FontAwesome.fa_osu_left_o;
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;

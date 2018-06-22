@@ -11,7 +11,9 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -20,7 +22,7 @@ namespace osu.Game.Overlays.Direct
         private const float horizontal_padding = 10;
         private const float vertical_padding = 5;
 
-        private FillFlowContainer bottomPanel;
+        private FillFlowContainer bottomPanel, statusContainer;
         private PlayButton playButton;
         private Box progressBar;
 
@@ -147,7 +149,7 @@ namespace osu.Game.Overlays.Direct
                                             {
                                                 new OsuSpriteText
                                                 {
-                                                    Text = $"from {SetInfo.Metadata.Source}",
+                                                    Text = SetInfo.Metadata.Source,
                                                     TextSize = 14,
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
@@ -164,14 +166,13 @@ namespace osu.Game.Overlays.Direct
                                         },
                                     },
                                 },
-                                new DownloadButton
+                                new DownloadButton(SetInfo)
                                 {
                                     Size = new Vector2(30),
                                     Margin = new MarginPadding(horizontal_padding),
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Colour = colours.Gray5,
-                                    Action = StartDownload
                                 },
                             },
                         },
@@ -193,6 +194,12 @@ namespace osu.Game.Overlays.Direct
                         new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
                 },
+                statusContainer = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Margin = new MarginPadding { Top = 5, Left = 5 },
+                    Spacing = new Vector2(5),
+                },
                 playButton = new PlayButton(SetInfo)
                 {
                     Margin = new MarginPadding { Top = 5, Left = 10 },
@@ -200,6 +207,37 @@ namespace osu.Game.Overlays.Direct
                     Alpha = 0,
                 },
             });
+
+            if (SetInfo.OnlineInfo?.HasVideo ?? false)
+            {
+                statusContainer.Add(new IconPill(FontAwesome.fa_film));
+            }
+
+            if (SetInfo.OnlineInfo?.HasStoryboard ?? false)
+            {
+                statusContainer.Add(new IconPill(FontAwesome.fa_image));
+            }
+
+            statusContainer.Add(new BeatmapSetOnlineStatusPill(12, new MarginPadding { Horizontal = 10, Vertical = 5 })
+            {
+                Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
+            });
+
+            PreviewPlaying.ValueChanged += _ => updateStatusContainer();
         }
+
+        protected override bool OnHover(InputState state)
+        {
+            updateStatusContainer();
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            base.OnHoverLost(state);
+            updateStatusContainer();
+        }
+
+        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying ? 0 : 1, 120, Easing.InOutQuint);
     }
 }

@@ -5,14 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Ionic.Zip;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Utils;
+using SharpCompress.Common;
 using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Database
@@ -34,11 +36,13 @@ namespace osu.Game.Database
 
         /// <summary>
         /// Fired when a new <see cref="TModel"/> becomes available in the database.
+        /// This is not guaranteed to run on the update thread.
         /// </summary>
         public event Action<TModel> ItemAdded;
 
         /// <summary>
         /// Fired when a <see cref="TModel"/> is removed from the database.
+        /// This is not guaranteed to run on the update thread.
         /// </summary>
         public event Action<TModel> ItemRemoved;
 
@@ -53,13 +57,49 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
+        private readonly List<Action> cachedEvents = new List<Action>();
+
+        /// <summary>
+        /// Allows delaying of outwards events until an operation is confirmed (at a database level).
+        /// </summary>
+        private bool delayingEvents;
+
+        /// <summary>
+        /// Begin delaying outwards events.
+        /// </summary>
+        private void delayEvents() => delayingEvents = true;
+
+        /// <summary>
+        /// Flush delayed events and disable delaying.
+        /// </summary>
+        /// <param name="perform">Whether the flushed events should be performed.</param>
+        private void flushEvents(bool perform)
+        {
+            if (perform)
+            {
+                foreach (var a in cachedEvents)
+                    a.Invoke();
+            }
+
+            cachedEvents.Clear();
+            delayingEvents = false;
+        }
+
+        private void handleEvent(Action a)
+        {
+            if (delayingEvents)
+                cachedEvents.Add(a);
+            else
+                a.Invoke();
+        }
+
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStore<TModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += s => ItemAdded?.Invoke(s);
-            ModelStore.ItemRemoved += s => ItemRemoved?.Invoke(s);
+            ModelStore.ItemAdded += s => handleEvent(() => ItemAdded?.Invoke(s));
+            ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
 
@@ -79,7 +119,6 @@ namespace osu.Game.Database
             var notification = new ProgressNotification
             {
                 Text = "Import is initialising...",
-                CompletionText = "Import successful!",
                 Progress = 0,
                 State = ProgressNotificationState.Active,
             };
@@ -88,7 +127,8 @@ namespace osu.Game.Database
 
             List<TModel> imported = new List<TModel>();
 
-            int i = 0;
+            int current = 0;
+            int errors = 0;
             foreach (string path in paths)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)
@@ -97,11 +137,11 @@ namespace osu.Game.Database
 
                 try
                 {
-                    notification.Text = $"Importing ({i} of {paths.Length})\n{Path.GetFileName(path)}";
+                    notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
                     using (ArchiveReader reader = getReaderFrom(path))
                         imported.Add(Import(reader));
 
-                    notification.Progress = (float)++i / paths.Length;
+                    notification.Progress = (float)current / paths.Length;
 
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with items from default storage.
@@ -121,9 +161,11 @@ namespace osu.Game.Database
                 {
                     e = e.InnerException ?? e;
                     Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
+                    errors++;
                 }
             }
 
+            notification.Text = errors > 0 ? $"Import complete with {errors} errors" : "Import successful!";
             notification.State = ProgressNotificationState.Completed;
         }
 
@@ -133,24 +175,56 @@ namespace osu.Game.Database
         /// <param name="archive">The archive to be imported.</param>
         public TModel Import(ArchiveReader archive)
         {
-            using (ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
+            TModel item = null;
+            delayEvents();
+
+            try
             {
-                // create a new model (don't yet add to database)
-                var item = CreateModel(archive);
+                using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
+                {
+                    try
+                    {
+                        if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
 
-                var existing = CheckForExisting(item);
+                        // create a new model (don't yet add to database)
+                        item = CreateModel(archive);
 
-                if (existing != null) return existing;
+                        var existing = CheckForExisting(item);
 
-                item.Files = createFileInfos(archive, Files);
+                        if (existing != null)
+                        {
+                            Logger.Log($"Found existing {typeof(TModel)} for {archive.Name} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
+                            return existing;
+                        }
 
-                Populate(item, archive);
+                        item.Files = createFileInfos(archive, Files);
 
-                // import to store
-                ModelStore.Add(item);
+                        Populate(item, archive);
 
-                return item;
+                        // import to store
+                        ModelStore.Add(item);
+                    }
+                    catch (Exception e)
+                    {
+                        write.Errors.Add(e);
+                        throw;
+                    }
+                }
+
+                Logger.Log($"Import of {archive.Name} successfully completed!", LoggingTarget.Database);
             }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Import of {archive.Name} failed and has been rolled back.", LoggingTarget.Database);
+                item = null;
+            }
+            finally
+            {
+                // we only want to flush events after we've confirmed the write context didn't have any errors.
+                flushEvents(item != null);
+            }
+
+            return item;
         }
 
         /// <summary>
@@ -173,12 +247,8 @@ namespace osu.Game.Database
         /// <param name="item">The item to delete.</param>
         public void Delete(TModel item)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
-
-                context.ChangeTracker.AutoDetectChangesEnabled = false;
-
                 // re-fetch the model on the import context.
                 var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == item.ID);
 
@@ -186,8 +256,6 @@ namespace osu.Game.Database
 
                 if (ModelStore.Delete(foundModel))
                     Files.Dereference(foundModel.Files.Select(f => f.FileInfo).ToArray());
-
-                context.ChangeTracker.AutoDetectChangesEnabled = true;
             }
         }
 
@@ -218,9 +286,11 @@ namespace osu.Game.Database
                         // user requested abort
                         return;
 
-                    notification.Text = $"Deleting ({i} of {items.Count})";
-                    notification.Progress = (float)++i / items.Count;
+                    notification.Text = $"Deleting ({++i} of {items.Count})";
+
                     Delete(b);
+
+                    notification.Progress = (float)i / items.Count;
                 }
             }
 
@@ -254,9 +324,11 @@ namespace osu.Game.Database
                         // user requested abort
                         return;
 
-                    notification.Text = $"Restoring ({i} of {items.Count})";
-                    notification.Progress = (float)++i / items.Count;
+                    notification.Text = $"Restoring ({++i} of {items.Count})";
+
                     Undelete(item);
+
+                    notification.Progress = (float)i / items.Count;
                 }
             }
 
@@ -293,7 +365,7 @@ namespace osu.Game.Database
                 using (Stream s = reader.GetStream(file))
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = file,
+                        Filename = FileSafety.PathSanitise(file),
                         FileInfo = files.Add(s)
                     });
 
@@ -329,9 +401,11 @@ namespace osu.Game.Database
         /// <returns>A reader giving access to the archive's content.</returns>
         private ArchiveReader getReaderFrom(string path)
         {
-            if (ZipFile.IsZipFile(path))
+            if (ZipUtils.IsZipArchive(path))
                 return new ZipArchiveReader(Files.Storage.GetStream(path), Path.GetFileName(path));
-            return new LegacyFilesystemReader(path);
+            if (Directory.Exists(path))
+                return new LegacyFilesystemReader(path);
+            throw new InvalidFormatException($"{path} is not a valid archive");
         }
     }
 }

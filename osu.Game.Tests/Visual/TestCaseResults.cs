@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Scoring;
@@ -11,6 +12,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseResults : OsuTestCase
     {
         private BeatmapManager beatmaps;
@@ -30,18 +32,13 @@ namespace osu.Game.Tests.Visual
             this.beatmaps = beatmaps;
         }
 
-        private WorkingBeatmap beatmap;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            if (beatmap == null)
-            {
-                var beatmapInfo = beatmaps.QueryBeatmap(b => b.RulesetID == 0);
-                if (beatmapInfo != null)
-                    beatmap = beatmaps.GetWorkingBeatmap(beatmapInfo);
-            }
+            var beatmapInfo = beatmaps.QueryBeatmap(b => b.RulesetID == 0);
+            if (beatmapInfo != null)
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
 
             Add(new Results(new Score
             {
@@ -61,10 +58,7 @@ namespace osu.Game.Tests.Visual
                 {
                     Username = "peppy",
                 }
-            })
-            {
-                InitialBeatmap = beatmap
-            });
+            }));
         }
     }
 }

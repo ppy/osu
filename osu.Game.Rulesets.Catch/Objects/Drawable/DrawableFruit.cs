@@ -18,13 +18,19 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         private Circle border;
 
+        private const float drawable_radius = (float)CatchHitObject.OBJECT_RADIUS * radius_adjust;
+
+        /// <summary>
+        /// Because we're adding a border around the fruit, we need to scale down some.
+        /// </summary>
+        private const float radius_adjust = 1.1f;
+
         public DrawableFruit(Fruit h)
             : base(h)
         {
             Origin = Anchor.Centre;
 
-            Size = new Vector2((float)CatchHitObject.OBJECT_RADIUS);
-            AccentColour = HitObject.ComboColour;
+            Size = new Vector2(drawable_radius);
             Masking = false;
 
             Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
@@ -33,7 +39,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new[]
+            // todo: this should come from the skin.
+            AccentColour = colourForRrepesentation(HitObject.VisualRepresentation);
+
+            InternalChildren = new[]
             {
                 createPulp(HitObject.VisualRepresentation),
                 border = new Circle
@@ -42,14 +51,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     {
                         Hollow = !HitObject.HyperDash,
                         Type = EdgeEffectType.Glow,
-                        Radius = 4,
+                        Radius = 4 * radius_adjust,
                         Colour = HitObject.HyperDash ? Color4.Red : AccentColour.Darken(1).Opacity(0.6f)
                     },
-                    Size = new Vector2(Height * 1.5f),
+                    Size = new Vector2(Height),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BorderColour = Color4.White,
-                    BorderThickness = 4f,
+                    BorderThickness = 3f * radius_adjust,
                     Children = new Framework.Graphics.Drawable[]
                     {
                         new Box
@@ -65,7 +74,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             if (HitObject.HyperDash)
             {
-                Add(new Pulp
+                AddInternal(new Pulp
                 {
                     RelativePositionAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -80,8 +89,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         private Framework.Graphics.Drawable createPulp(FruitVisualRepresentation representation)
         {
-            const float large_pulp_3 = 13f;
-            const float distance_from_centre_3 = 0.23f;
+            const float large_pulp_3 = 8f * radius_adjust;
+            const float distance_from_centre_3 = 0.15f;
 
             const float large_pulp_4 = large_pulp_3 * 0.925f;
             const float distance_from_centre_4 = distance_from_centre_3 / 0.925f;
@@ -104,11 +113,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.BottomCentre,
                                 AccentColour = AccentColour,
                                 Size = new Vector2(small_pulp),
-                                Y = 0.05f,
+                                Y = -0.34f,
                             },
                             new Pulp
                             {
@@ -144,11 +151,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.BottomCentre,
                                 AccentColour = AccentColour,
                                 Size = new Vector2(small_pulp),
-                                Y = 0.1f,
+                                Y = -0.3f,
                             },
                             new Pulp
                             {
@@ -184,11 +189,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
                                 AccentColour = AccentColour,
                                 Size = new Vector2(small_pulp),
-                                Y = -0.1f,
+                                Y = -0.33f,
                             },
                             new Pulp
                             {
@@ -218,10 +221,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
                                 AccentColour = AccentColour,
                                 Size = new Vector2(small_pulp),
+                                Y = -0.25f,
                             },
                             new Pulp
                             {
@@ -251,16 +253,15 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                         {
                             new Pulp
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
                                 AccentColour = AccentColour,
                                 Size = new Vector2(small_pulp),
-                                Y = -0.15f
+                                Y = -0.3f
                             },
                             new Pulp
                             {
                                 AccentColour = AccentColour,
-                                Size = new Vector2(large_pulp_4 * 1.2f, large_pulp_4 * 3),
+                                Size = new Vector2(large_pulp_4 * 0.8f, large_pulp_4 * 2.5f),
+                                Y = 0.05f,
                             },
                         }
                     };
@@ -272,6 +273,32 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             base.Update();
 
             border.Alpha = (float)MathHelper.Clamp((HitObject.StartTime - Time.Current) / 500, 0, 1);
+        }
+
+        private Color4 colourForRrepesentation(FruitVisualRepresentation representation)
+        {
+            switch (representation)
+            {
+                default:
+                case FruitVisualRepresentation.Pear:
+                    return new Color4(17, 136, 170, 255);
+                case FruitVisualRepresentation.Grape:
+                    return new Color4(204, 102, 0, 255);
+                case FruitVisualRepresentation.Raspberry:
+                    return new Color4(121, 9, 13, 255);
+                case FruitVisualRepresentation.Pineapple:
+                    return new Color4(102, 136, 0, 255);
+                case FruitVisualRepresentation.Banana:
+                    switch (RNG.Next(0, 3))
+                    {
+                        default:
+                            return new Color4(255, 240, 0, 255);
+                        case 1:
+                            return new Color4(255, 192, 0, 255);
+                        case 2:
+                            return new Color4(214, 221, 28, 255);
+                    }
+            }
         }
     }
 }

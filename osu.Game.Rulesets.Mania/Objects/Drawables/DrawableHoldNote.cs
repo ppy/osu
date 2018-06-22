@@ -2,13 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Scoring;
 
@@ -19,13 +18,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>, IKeyBindingHandler<ManiaAction>
     {
+        public override bool DisplayJudgement => false;
+
         private readonly DrawableNote head;
         private readonly DrawableNote tail;
 
-        private readonly GlowPiece glowPiece;
         private readonly BodyPiece bodyPiece;
-        private readonly Container<DrawableHoldNoteTick> tickContainer;
-        private readonly Container fullHeightContainer;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -37,27 +35,27 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private bool hasBroken;
 
+        private readonly Container<DrawableHoldNoteTick> tickContainer;
+
         public DrawableHoldNote(HoldNote hitObject, ManiaAction action)
             : base(hitObject, action)
         {
             RelativeSizeAxes = Axes.X;
 
-            AddRange(new Drawable[]
+            InternalChildren = new Drawable[]
             {
-                // The hit object itself cannot be used for various elements because the tail overshoots it
-                // So a specialized container that is updated to contain the tail height is used
-                fullHeightContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Child = glowPiece = new GlowPiece()
-                },
                 bodyPiece = new BodyPiece
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                 },
-                tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
+                tickContainer = new Container<DrawableHoldNoteTick>
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    ChildrenEnumerable = HitObject.NestedHitObjects.OfType<HoldNoteTick>().Select(tick => new DrawableHoldNoteTick(tick)
+                    {
+                        HoldStartTime = () => holdStartTime
+                    })
+                },
                 head = new DrawableHeadNote(this, action)
                 {
                     Anchor = Anchor.TopCentre,
@@ -68,18 +66,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 }
-            });
+            };
 
-            foreach (var tick in HitObject.NestedHitObjects.OfType<HoldNoteTick>())
-            {
-                var drawableTick = new DrawableHoldNoteTick(tick)
-                {
-                    HoldStartTime = () => holdStartTime
-                };
-
-                tickContainer.Add(drawableTick);
-                AddNested(drawableTick);
-            }
+            foreach (var tick in tickContainer)
+                AddNested(tick);
 
             AddNested(head);
             AddNested(tail);
@@ -90,21 +80,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             get { return base.AccentColour; }
             set
             {
-                if (base.AccentColour == value)
-                    return;
                 base.AccentColour = value;
 
-                tickContainer.Children.ForEach(t => t.AccentColour = value);
-
-                glowPiece.AccentColour = value;
                 bodyPiece.AccentColour = value;
                 head.AccentColour = value;
                 tail.AccentColour = value;
+                tickContainer.ForEach(t => t.AccentColour = value);
             }
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
+            if (tail.AllJudged)
+                AddJudgement(new HoldNoteJudgement { Result = HitResult.Perfect });
         }
 
         protected override void Update()
@@ -112,12 +100,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.Update();
 
             // Make the body piece not lie under the head note
-            bodyPiece.Y = head.Height;
-            bodyPiece.Height = DrawHeight - head.Height;
-
-            // Make the fullHeightContainer "contain" the height of the tail note, keeping in mind
-            // that the tail note overshoots the height of this hit object
-            fullHeightContainer.Height = DrawHeight + tail.Height;
+            bodyPiece.Y = head.Height / 2;
+            bodyPiece.Height = DrawHeight - head.Height / 2 + tail.Height / 2;
         }
 
         public bool OnPressed(ManiaAction action)
@@ -166,8 +150,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 : base(holdNote.HitObject.Head, action)
             {
                 this.holdNote = holdNote;
-
-                GlowPiece.Alpha = 0;
             }
 
             public override bool OnPressed(ManiaAction action)
@@ -185,11 +167,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 return true;
             }
-
-            protected override void UpdateState(ArmedState state)
-            {
-                // The holdnote keeps scrolling through for now, so having the head disappear looks weird
-            }
         }
 
         /// <summary>
@@ -197,18 +174,26 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private class DrawableTailNote : DrawableNote
         {
+            /// <summary>
+            /// Lenience of release hit windows. This is to make cases where the hold note release
+            /// is timed alongside presses of other hit objects less awkward.
+            /// Todo: This shouldn't exist for non-LegacyBeatmapDecoder beatmaps
+            /// </summary>
+            private const double release_window_lenience = 1.5;
+
             private readonly DrawableHoldNote holdNote;
 
             public DrawableTailNote(DrawableHoldNote holdNote, ManiaAction action)
                 : base(holdNote.HitObject.Tail, action)
             {
                 this.holdNote = holdNote;
-
-                GlowPiece.Alpha = 0;
             }
 
             protected override void CheckForJudgements(bool userTriggered, double timeOffset)
             {
+                // Factor in the release lenience
+                timeOffset /= release_window_lenience;
+
                 if (!userTriggered)
                 {
                     if (!HitObject.HitWindows.CanBeHit(timeOffset))
@@ -232,11 +217,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Result = result,
                     HasBroken = holdNote.hasBroken
                 });
-            }
-
-            protected override void UpdateState(ArmedState state)
-            {
-                // The holdnote keeps scrolling through, so having the tail disappear looks weird
             }
 
             public override bool OnPressed(ManiaAction action) => false; // Tail doesn't handle key down

@@ -9,6 +9,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModSuddenDeath : ModSuddenDeath
     {
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
     }
 }

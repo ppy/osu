@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Audio
 {
@@ -14,22 +13,10 @@ namespace osu.Game.Audio
         public const string HIT_NORMAL = @"hitnormal";
         public const string HIT_CLAP = @"hitclap";
 
-        public SampleChannel GetChannel(SampleManager manager, string resourceNamespace = null)
-        {
-            SampleChannel channel = null;
-
-            if (resourceNamespace != null)
-                channel = manager.Get($"Gameplay/{resourceNamespace}/{Bank}-{Name}");
-
-            // try without namespace as a fallback.
-            if (channel == null)
-                channel = manager.Get($"Gameplay/{Bank}-{Name}");
-
-            if (channel != null)
-                channel.Volume.Value = Volume / 100.0;
-
-            return channel;
-        }
+        /// <summary>
+        /// An optional ruleset namespace.
+        /// </summary>
+        public string Namespace;
 
         /// <summary>
         /// The bank to load the sample from.

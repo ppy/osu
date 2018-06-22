@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings
         private readonly SpriteText headerText;
         private readonly Box selectionIndicator;
         private readonly Container text;
-        public Action<SettingsSection> Action;
+        public new Action<SettingsSection> Action;
 
         private SettingsSection section;
         public SettingsSection Section

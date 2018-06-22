@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using OpenTK;
 using osu.Framework.Graphics;
@@ -16,6 +17,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseScrollingHitObjects : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Playfield) };
@@ -120,7 +122,7 @@ namespace osu.Game.Tests.Visual
                 Direction = direction;
 
                 Padding = new MarginPadding(2);
-                ScaledContent.Masking = true;
+                Content.Masking = true;
 
                 AddInternal(new Box
                 {
@@ -138,12 +140,12 @@ namespace osu.Game.Tests.Visual
             {
                 Origin = Anchor.Centre;
 
-                Add(new Box
+                InternalChild = new Box
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both
-                });
+                };
 
                 switch (direction)
                 {
@@ -173,7 +175,7 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.Centre;
                 AutoSizeAxes = Axes.Both;
 
-                Add(new Box { Size = new Vector2(75) });
+                InternalChild = new Box { Size = new Vector2(75) };
             }
 
             protected override void UpdateState(ArmedState state)

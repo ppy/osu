@@ -18,8 +18,6 @@ namespace osu.Game.Graphics.UserInterface
 
         public Action Exit;
 
-        public override bool HandleLeftRightArrows => false;
-
         private bool focus;
         public bool HoldFocus
         {
@@ -31,6 +29,9 @@ namespace osu.Game.Graphics.UserInterface
                     GetContainingInputManager().ChangeFocus(null);
             }
         }
+
+        // We may not be focused yet, but we need to handle keyboard input to be able to request focus
+        public override bool HandleKeyboardInput => HoldFocus || base.HandleKeyboardInput;
 
         protected override void OnFocus(InputState state)
         {

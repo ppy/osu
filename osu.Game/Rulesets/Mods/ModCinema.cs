@@ -11,5 +11,6 @@ namespace osu.Game.Rulesets.Mods
         public override string ShortenedName => "CN";
         public override bool HasImplementation => false;
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_cinema;
+        public override string Description => "Watch the video without visual distractions.";
     }
 }

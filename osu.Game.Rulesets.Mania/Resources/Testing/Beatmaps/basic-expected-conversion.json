@@ -1,0 +1,103 @@
+{
+    "Mappings": [{
+            "StartTime": 500,
+            "Objects": [{
+                    "StartTime": 500,
+                    "EndTime": 2500,
+                    "Column": 0
+                },
+                {
+                    "StartTime": 1500,
+                    "EndTime": 2500,
+                    "Column": 1
+                }
+            ]
+        },
+        {
+            "StartTime": 3000,
+            "Objects": [{
+                "StartTime": 3000,
+                "EndTime": 4000,
+                "Column": 2
+            }]
+        },
+        {
+            "StartTime": 4500,
+            "Objects": [{
+                "StartTime": 4500,
+                "EndTime": 5500,
+                "Column": 4
+            }]
+        },
+        {
+            "StartTime": 6000,
+            "Objects": [{
+                "StartTime": 6000,
+                "EndTime": 6500,
+                "Column": 2
+            }]
+        },
+        {
+            "StartTime": 7000,
+            "Objects": [{
+                "StartTime": 7000,
+                "EndTime": 8000,
+                "Column": 2
+            }]
+        },
+        {
+            "StartTime": 8500,
+            "Objects": [{
+                "StartTime": 8500,
+                "EndTime": 11000,
+                "Column": 0
+            }]
+        },
+        {
+            "StartTime": 11500,
+            "Objects": [{
+                "StartTime": 11500,
+                "EndTime": 12000,
+                "Column": 1
+            }]
+        },
+        {
+            "StartTime": 12500,
+            "Objects": [{
+                "StartTime": 12500,
+                "EndTime": 16500,
+                "Column": 4
+            }]
+        },
+        {
+            "StartTime": 17000,
+            "Objects": [{
+                "StartTime": 17000,
+                "EndTime": 18000,
+                "Column": 2
+            }]
+        },
+        {
+            "StartTime": 18500,
+            "Objects": [{
+                "StartTime": 18500,
+                "EndTime": 19450,
+                "Column": 0
+            }]
+        },
+        {
+            "StartTime": 19875,
+            "Objects": [{
+                    "StartTime": 19875,
+                    "EndTime": 23875,
+                    "Column": 1
+                },
+                {
+                    "StartTime": 19875,
+                    "EndTime": 23875,
+                    "Column": 0
+                }
+            ]
+        }
+    ]
+}

@@ -24,19 +24,13 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             this.playCount = playCount;
         }
 
-        protected override Drawable CreateLeftVisual() => new DelayedLoadWrapper(new BeatmapSetCover(beatmap.BeatmapSet, BeatmapSetCoverType.List)
+        protected override Drawable CreateLeftVisual() => new UpdateableBeatmapSetCover
         {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            FillMode = FillMode.Fit,
-            RelativeSizeAxes = Axes.Both,
-            OnLoadComplete = d => d.FadeInFromZero(500, Easing.OutQuint)
-        })
-        {
-            Origin = Anchor.CentreLeft,
             Anchor = Anchor.CentreLeft,
-            RelativeSizeAxes = Axes.None,
+            Origin = Anchor.CentreLeft,
             Size = new Vector2(80, 50),
+            BeatmapSet = beatmap.BeatmapSet,
+            CoverType = BeatmapSetCoverType.List,
         };
 
         [BackgroundDependencyLoader(true)]

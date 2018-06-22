@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModHidden : ModHidden
     {
-        public override string Description => @"Play with fading notes for a slight score advantage.";
+        public override string Description => @"Play with fading fruits.";
         public override double ScoreMultiplier => 1.06;
     }
 }

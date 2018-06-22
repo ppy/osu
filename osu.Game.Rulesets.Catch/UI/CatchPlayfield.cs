@@ -30,10 +30,10 @@ namespace osu.Game.Rulesets.Catch.UI
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
-            ScaledContent.Anchor = Anchor.BottomLeft;
-            ScaledContent.Origin = Anchor.BottomLeft;
+            base.Content.Anchor = Anchor.BottomLeft;
+            base.Content.Origin = Anchor.BottomLeft;
 
-            ScaledContent.AddRange(new Drawable[]
+            base.Content.AddRange(new Drawable[]
             {
                 explodingFruitContainer = new Container
                 {
@@ -57,7 +57,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.Depth = (float)h.HitObject.StartTime;
             h.OnJudgement += onJudgement;
 
             base.Add(h);

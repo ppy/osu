@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseEditorComposeRadioButtons : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(DrawableRadioButton) };

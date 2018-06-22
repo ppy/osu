@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.MathUtils;
@@ -19,13 +20,13 @@ using osu.Game.Tests.Platform;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCasePlaySongSelect : OsuTestCase
     {
         private BeatmapManager manager;
 
         private RulesetStore rulesets;
 
-        private DependencyContainer dependencies;
         private WorkingBeatmap defaultBeatmap;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
@@ -46,8 +47,6 @@ namespace osu.Game.Tests.Visual
             typeof(DrawableCarouselBeatmapSet),
         };
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
-
         private class TestSongSelect : PlaySongSelect
         {
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
@@ -56,7 +55,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load()
         {
             TestSongSelect songSelect = null;
 
@@ -65,10 +64,10 @@ namespace osu.Game.Tests.Visual
             // this is by no means clean. should be replacing inside of OsuGameBase somehow.
             IDatabaseContextFactory factory = new SingletonContextFactory(new OsuDbContext());
 
-            dependencies.Cache(rulesets = new RulesetStore(factory));
-            dependencies.Cache(manager = new BeatmapManager(storage, factory, rulesets, null)
+            Dependencies.Cache(rulesets = new RulesetStore(factory));
+            Dependencies.Cache(manager = new BeatmapManager(storage, factory, rulesets, null, null)
             {
-                DefaultBeatmap = defaultBeatmap = game.Beatmap.Default
+                DefaultBeatmap = defaultBeatmap = Beatmap.Default
             });
 
             void loadNewSongSelect(bool deleteMaps = false) => AddStep("reload song select", () =>
@@ -76,7 +75,7 @@ namespace osu.Game.Tests.Visual
                 if (deleteMaps)
                 {
                     manager.Delete(manager.GetAllUsableBeatmapSets());
-                    game.Beatmap.SetDefault();
+                    Beatmap.SetDefault();
                 }
 
                 if (songSelect != null)
@@ -123,7 +122,6 @@ namespace osu.Game.Tests.Visual
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
-                    OnlineBeatmapSetID = 1234 + i,
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = "MONACA " + RNG.Next(0, 9),
                     Title = "Black Song " + RNG.Next(0, 9),

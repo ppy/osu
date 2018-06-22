@@ -1,13 +1,14 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
-using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
@@ -17,11 +18,16 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
 
-        private readonly Container composerContainer;
+        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
-        public Compose()
+        private Container composerContainer;
+
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] BindableBeatDivisor beatDivisor)
         {
-            ScrollableTimeline timeline;
+            if (beatDivisor != null)
+                this.beatDivisor.BindTo(beatDivisor);
+
             Children = new Drawable[]
             {
                 new GridContainer
@@ -47,15 +53,28 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                         Name = "Timeline content",
                                         RelativeSizeAxes = Axes.Both,
                                         Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
-                                        Children = new Drawable[]
+                                        Child = new GridContainer
                                         {
-                                            new Container
+                                            RelativeSizeAxes = Axes.Both,
+                                            Content = new[]
                                             {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Right = 115 },
-                                                Child = timeline = new ScrollableTimeline { RelativeSizeAxes = Axes.Both }
+                                                new Drawable[]
+                                                {
+                                                    new Container
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Padding = new MarginPadding { Right = 5 },
+                                                        Child = new TimelineArea { RelativeSizeAxes = Axes.Both }
+                                                    },
+                                                    new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
+                                                },
+                                            },
+                                            ColumnDimensions = new[]
+                                            {
+                                                new Dimension(),
+                                                new Dimension(GridSizeMode.Absolute, 90),
                                             }
-                                        }
+                                        },
                                     }
                                 }
                             }
@@ -74,15 +93,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 },
             };
 
-            timeline.Beatmap.BindTo(Beatmap);
-            Beatmap.ValueChanged += beatmapChanged;
-        }
-
-        private void beatmapChanged(WorkingBeatmap newBeatmap)
-        {
-            composerContainer.Clear();
-
-            var ruleset = newBeatmap.BeatmapInfo.Ruleset?.CreateInstance();
+            var ruleset = Beatmap.Value.BeatmapInfo.Ruleset?.CreateInstance();
             if (ruleset == null)
             {
                 Logger.Log("Beatmap doesn't have a ruleset assigned.");

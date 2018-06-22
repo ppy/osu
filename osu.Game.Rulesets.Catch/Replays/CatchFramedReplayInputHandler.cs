@@ -3,37 +3,51 @@
 
 using System.Collections.Generic;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Catch.Replays
 {
-    public class CatchFramedReplayInputHandler : FramedReplayInputHandler
+    public class CatchFramedReplayInputHandler : FramedReplayInputHandler<CatchReplayFrame>
     {
         public CatchFramedReplayInputHandler(Replay replay)
             : base(replay)
         {
         }
 
+        protected override bool IsImportant(CatchReplayFrame frame) => frame.Position > 0;
+
+        protected float? Position
+        {
+            get
+            {
+                if (!HasFrames)
+                    return null;
+
+                return Interpolation.ValueAt(CurrentTime, CurrentFrame.Position, NextFrame.Position, CurrentFrame.Time, NextFrame.Time);
+            }
+        }
+
         public override List<InputState> GetPendingStates()
         {
             if (!Position.HasValue) return new List<InputState>();
 
-            var action = new List<CatchAction>();
+            var actions = new List<CatchAction>();
 
-            if (CurrentFrame.ButtonState == ReplayButtonState.Left1)
-                action.Add(CatchAction.Dash);
+            if (CurrentFrame.Dashing)
+                actions.Add(CatchAction.Dash);
 
-            if (Position.Value.X > CurrentFrame.Position.X)
-                action.Add(CatchAction.MoveRight);
-            else if (Position.Value.X < CurrentFrame.Position.X)
-                action.Add(CatchAction.MoveLeft);
+            if (Position.Value > CurrentFrame.Position)
+                actions.Add(CatchAction.MoveRight);
+            else if (Position.Value < CurrentFrame.Position)
+                actions.Add(CatchAction.MoveLeft);
 
             return new List<InputState>
             {
                 new CatchReplayState
                 {
-                    PressedActions = action,
-                    CatcherX = Position.Value.X
+                    PressedActions = actions,
+                    CatcherX = Position.Value
                 },
             };
         }

@@ -3,7 +3,6 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
@@ -13,6 +12,7 @@ using osu.Game.IO;
 using osu.Game.Rulesets;
 using DatabasedKeyBinding = osu.Game.Input.Bindings.DatabasedKeyBinding;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {
@@ -26,6 +26,7 @@ namespace osu.Game.Database
         public DbSet<DatabasedSetting> DatabasedSetting { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
+        public DbSet<SkinInfo> SkinInfo { get; set; }
 
         private readonly string connectionString;
 
@@ -57,11 +58,20 @@ namespace osu.Game.Database
             this.connectionString = connectionString;
 
             var connection = Database.GetDbConnection();
-            connection.Open();
-            using (var cmd = connection.CreateCommand())
+            try
             {
-                cmd.CommandText = "PRAGMA journal_mode=WAL;";
-                cmd.ExecuteNonQuery();
+                connection.Open();
+
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "PRAGMA journal_mode=WAL;";
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception e)
+            {
+                connection.Close();
+                throw;
             }
         }
 
@@ -81,8 +91,8 @@ namespace osu.Game.Database
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.OnlineBeatmapID).IsUnique();
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash).IsUnique();
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash).IsUnique();
+            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
+            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
 
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineBeatmapSetID).IsUnique();
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
@@ -100,19 +110,6 @@ namespace osu.Game.Database
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.ShortName).IsUnique();
 
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
-        }
-
-        public IDbContextTransaction BeginTransaction()
-        {
-            // return Database.BeginTransaction();
-            return null;
-        }
-
-        public int SaveChanges(IDbContextTransaction transaction = null)
-        {
-            var ret = base.SaveChanges();
-            if (ret > 0) transaction?.Commit();
-            return ret;
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory
@@ -184,24 +181,6 @@ namespace osu.Game.Database
             }
         }
 
-        public void Migrate()
-        {
-            try
-            {
-                Database.Migrate();
-            }
-            catch (Exception e)
-            {
-                throw new MigrationFailedException(e);
-            }
-        }
-    }
-
-    public class MigrationFailedException : Exception
-    {
-        public MigrationFailedException(Exception exception)
-            : base("sqlite-net migration failed", exception)
-        {
-        }
+        public void Migrate() => Database.Migrate();
     }
 }

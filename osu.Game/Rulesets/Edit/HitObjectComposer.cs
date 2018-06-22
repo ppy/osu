@@ -4,17 +4,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Edit.Layers.Selection;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
 
 namespace osu.Game.Rulesets.Edit
@@ -25,6 +25,11 @@ namespace osu.Game.Rulesets.Edit
 
         protected ICompositionTool CurrentTool { get; private set; }
 
+        private RulesetContainer rulesetContainer;
+        private readonly List<Container> layerContainers = new List<Container>();
+
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
         protected HitObjectComposer(Ruleset ruleset)
         {
             this.ruleset = ruleset;
@@ -33,18 +38,32 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        private void load(IBindableBeatmap beatmap, IFrameBasedClock framedClock)
         {
-            RulesetContainer rulesetContainer;
+            this.beatmap.BindTo(beatmap);
+
             try
             {
-                rulesetContainer = CreateRulesetContainer(ruleset, osuGame.Beatmap.Value);
+                rulesetContainer = CreateRulesetContainer(ruleset, beatmap.Value);
+                rulesetContainer.Clock = framedClock;
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Could not load beatmap sucessfully!");
                 return;
             }
+
+            var layerBelowRuleset = new BorderLayer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = CreateLayerContainer()
+            };
+
+            var layerAboveRuleset = CreateLayerContainer();
+            layerAboveRuleset.Child = new HitObjectMaskLayer(rulesetContainer.Playfield, this);
+
+            layerContainers.Add(layerBelowRuleset);
+            layerContainers.Add(layerAboveRuleset);
 
             RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
@@ -66,20 +85,13 @@ namespace osu.Game.Rulesets.Edit
                         },
                         new Container
                         {
+                            Name = "Content",
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            BorderColour = Color4.White,
-                            BorderThickness = 2,
                             Children = new Drawable[]
                             {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0,
-                                    AlwaysPresent = true,
-                                },
+                                layerBelowRuleset,
                                 rulesetContainer,
-                                new SelectionLayer(rulesetContainer.Playfield)
+                                layerAboveRuleset
                             }
                         }
                     },
@@ -90,22 +102,48 @@ namespace osu.Game.Rulesets.Edit
                 }
             };
 
-            rulesetContainer.Clock = new InterpolatingFramedClock((IAdjustableClock)osuGame.Beatmap.Value.Track ?? new StopwatchClock());
-
             toolboxCollection.Items =
-                new[] { new RadioButton("Select", () => setCompositionTool(null)) }
-                .Concat(
-                    CompositionTools.Select(t => new RadioButton(t.Name, () => setCompositionTool(t)))
-                )
+                CompositionTools.Select(t => new RadioButton(t.Name, () => setCompositionTool(t)))
+                .Prepend(new RadioButton("Select", () => setCompositionTool(null)))
                 .ToList();
 
             toolboxCollection.Items[0].Select();
         }
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            layerContainers.ForEach(l =>
+            {
+                l.Anchor = rulesetContainer.Playfield.Anchor;
+                l.Origin = rulesetContainer.Playfield.Origin;
+                l.Position = rulesetContainer.Playfield.Position;
+                l.Size = rulesetContainer.Playfield.Size;
+            });
+        }
+
         private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
 
-        protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap, true);
+        protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap);
 
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
+
+        /// <summary>
+        /// Creates a <see cref="HitObjectMask"/> for a specific <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
+        public virtual HitObjectMask CreateMaskFor(DrawableHitObject hitObject) => null;
+
+        /// <summary>
+        /// Creates a <see cref="MaskSelection"/> which outlines <see cref="DrawableHitObject"/>s
+        /// and handles hitobject pattern adjustments.
+        /// </summary>
+        public virtual MaskSelection CreateMaskSelection() => new MaskSelection();
+
+        /// <summary>
+        /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
+        /// </summary>
+        protected virtual ScalableContainer CreateLayerContainer() => new ScalableContainer { RelativeSizeAxes = Axes.Both };
     }
 }

@@ -21,11 +21,14 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         /// <summary>
+        /// The last selected item.
+        /// </summary>
+        protected CarouselItem LastSelected { get; private set; }
+
+        /// <summary>
         /// We need to keep track of the index for cases where the selection is removed but we want to select a new item based on its old location.
         /// </summary>
         private int lastSelectedIndex;
-
-        private CarouselItem lastSelected;
 
         /// <summary>
         /// To avoid overhead during filter operations, we don't attempt any selections until after all
@@ -47,7 +50,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.RemoveChild(i);
 
-            if (i != lastSelected)
+            if (i != LastSelected)
                 updateSelectedIndex();
         }
 
@@ -83,6 +86,11 @@ namespace osu.Game.Screens.Select.Carousel
             // we only perform eager selection if none of our children are in a selected state already.
             if (Children.Any(i => i.State == CarouselItemState.Selected)) return;
 
+            PerformSelection();
+        }
+
+        protected virtual void PerformSelection()
+        {
             CarouselItem nextToSelect =
                 Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered) ??
                 Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered);
@@ -95,10 +103,10 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void updateSelected(CarouselItem newSelection)
         {
-            lastSelected = newSelection;
+            LastSelected = newSelection;
             updateSelectedIndex();
         }
 
-        private void updateSelectedIndex() => lastSelectedIndex = lastSelected == null ? 0 : Math.Max(0, InternalChildren.IndexOf(lastSelected));
+        private void updateSelectedIndex() => lastSelectedIndex = LastSelected == null ? 0 : Math.Max(0, InternalChildren.IndexOf(LastSelected));
     }
 }

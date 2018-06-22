@@ -2,12 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseGraph : OsuTestCase
     {
         public TestCaseGraph()

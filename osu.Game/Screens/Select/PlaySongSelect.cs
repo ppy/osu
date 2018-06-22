@@ -1,11 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
@@ -47,13 +50,15 @@ namespace osu.Game.Screens.Select
 
         private SampleChannel sampleConfirm;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay, OsuGame game)
-        {
-            sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
+        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
 
-            if (game != null)
-                modSelect.SelectedMods.BindTo(game.SelectedMods);
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay, OsuGame osu)
+        {
+            if (osu != null) SelectedMods.BindTo(osu.SelectedMods);
+            modSelect.SelectedMods.BindTo(SelectedMods);
+
+            sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
 
             Footer.AddButton(@"mods", colours.Yellow, modSelect, Key.F1, float.MaxValue);
 
@@ -71,7 +76,8 @@ namespace osu.Game.Screens.Select
                 {
                     // if we have no beatmaps but osu-stable is found, let's prompt the user to import.
                     if (!beatmaps.GetAllUsableBeatmapSets().Any() && beatmaps.StableInstallationAvailable)
-                        dialogOverlay.Push(new ImportFromStablePopup(() => beatmaps.ImportFromStable()));
+                        dialogOverlay.Push(new ImportFromStablePopup(() =>
+                            Task.Factory.StartNew(beatmaps.ImportFromStable, TaskCreationOptions.LongRunning)));
                 });
             }
         }
@@ -80,7 +86,7 @@ namespace osu.Game.Screens.Select
         {
             base.UpdateBeatmap(beatmap);
 
-            beatmap.Mods.BindTo(modSelect.SelectedMods);
+            beatmap.Mods.BindTo(SelectedMods);
 
             BeatmapDetails.Beatmap = beatmap;
 
@@ -95,7 +101,7 @@ namespace osu.Game.Screens.Select
             if (removeAutoModOnResume)
             {
                 var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
-                modSelect.SelectedMods.Value = modSelect.SelectedMods.Value.Where(m => m.GetType() != autoType).ToArray();
+                modSelect.DeselectTypes(new[] { autoType }, true);
                 removeAutoModOnResume = false;
             }
 
@@ -125,13 +131,13 @@ namespace osu.Game.Screens.Select
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
 
-            Beatmap.Value.Mods.UnbindBindings();
+            SelectedMods.UnbindAll();
             Beatmap.Value.Mods.Value = new Mod[] { };
 
             return false;
         }
 
-        protected override bool OnSelectionFinalised()
+        protected override bool OnStart()
         {
             if (player != null) return false;
 
@@ -144,7 +150,7 @@ namespace osu.Game.Screens.Select
                 var mods = modSelect.SelectedMods.Value;
                 if (mods.All(m => m.GetType() != autoType))
                 {
-                    modSelect.SelectedMods.Value = mods.Concat(new[] { auto });
+                    modSelect.SelectedMods.Value = mods.Append(auto);
                     removeAutoModOnResume = true;
                 }
             }

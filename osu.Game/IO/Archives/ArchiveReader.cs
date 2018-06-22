@@ -1,14 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Framework.IO.Stores;
 
 namespace osu.Game.IO.Archives
 {
-    public abstract class ArchiveReader : IDisposable, IResourceStore<byte[]>
+    public abstract class ArchiveReader : IResourceStore<byte[]>
     {
         /// <summary>
         /// Opens a stream for reading a specific file from this archive.

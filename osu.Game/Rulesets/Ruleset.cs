@@ -11,16 +11,19 @@ using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Beatmaps.Legacy;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Configuration;
+using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets
 {
     public abstract class Ruleset
     {
         public readonly RulesetInfo RulesetInfo;
-
-        public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
         public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
                                                     // Confine all mods of each mod type into a single IEnumerable<Mod>
@@ -31,6 +34,13 @@ namespace osu.Game.Rulesets
                                                     .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
+
+        /// <summary>
+        /// Converts mods from legacy enum values. Do not override if you're not a legacy ruleset.
+        /// </summary>
+        /// <param name="mods">The legacy enum which will be converted</param>
+        /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
+        public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => new Mod[] { };
 
         public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
 
@@ -43,14 +53,17 @@ namespace osu.Game.Rulesets
         /// Attempt to create a hit renderer for a beatmap
         /// </summary>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
-        /// <param name="isForCurrentRuleset">Whether the hit renderer should assume the beatmap is for the current ruleset.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
         /// <returns></returns>
-        public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset);
+        public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap);
 
-        public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null);
+        public abstract IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap);
 
-        public virtual PerformanceCalculator CreatePerformanceCalculator(Beatmap beatmap, Score score) => null;
+        public virtual IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => null;
+
+        public abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
+
+        public virtual PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, Score score) => null;
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
@@ -58,12 +71,18 @@ namespace osu.Game.Rulesets
 
         public abstract string Description { get; }
 
-        public virtual SettingsSubsection CreateSettings() => null;
+        public virtual RulesetSettingsSubsection CreateSettings() => null;
+
+        /// <summary>
+        /// Creates the <see cref="IRulesetConfigManager"/> for this <see cref="Ruleset"/>.
+        /// </summary>
+        /// <param name="settings">The <see cref="SettingsStore"/> to store the settings.</param>
+        public virtual IRulesetConfigManager CreateConfig(SettingsStore settings) => null;
 
         /// <summary>
         /// Do not override this unless you are a legacy mode.
         /// </summary>
-        public virtual int LegacyID => -1;
+        public virtual int? LegacyID => null;
 
         /// <summary>
         /// A unique short name to reference this ruleset in online requests.
@@ -90,6 +109,13 @@ namespace osu.Game.Rulesets
         public virtual string GetVariantName(int variant) => string.Empty;
 
         /// <summary>
+        /// For rulesets which support legacy (osu-stable) replay conversion, this method will create an empty replay frame
+        /// for conversion use.
+        /// </summary>
+        /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
+        public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
+
+        /// <summary>
         /// Create a ruleset info based on this ruleset.
         /// </summary>
         /// <returns>A filled <see cref="RulesetInfo"/>.</returns>
@@ -98,7 +124,8 @@ namespace osu.Game.Rulesets
             Name = Description,
             ShortName = ShortName,
             InstantiationInfo = GetType().AssemblyQualifiedName,
-            ID = LegacyID
+            ID = LegacyID,
+            Available = true
         };
     }
 }

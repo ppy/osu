@@ -64,6 +64,8 @@ namespace osu.Game.Screens.Menu
             set { colourAndTriangles.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint); }
         }
 
+        public bool BeatMatching = true;
+
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => logoContainer.ReceiveMouseInputAt(screenSpacePos);
 
         public bool Ripple
@@ -143,7 +145,7 @@ namespace osu.Game.Screens.Menu
                                                     Alpha = 0.5f,
                                                     Size = new Vector2(0.96f)
                                                 },
-                                                new BufferedContainer
+                                                new Container
                                                 {
                                                     AutoSizeAxes = Axes.Both,
                                                     Children = new Drawable[]
@@ -264,6 +266,8 @@ namespace osu.Game.Screens.Menu
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
+            if (!BeatMatching) return;
+
             lastBeatIndex = beatIndex;
 
             var beatLength = timingPoint.BeatLength;
@@ -337,12 +341,10 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private bool interactive => Action != null && Alpha > 0.2f;
+        public override bool HandleMouseInput => base.HandleMouseInput && Action != null && Alpha > 0.2f;
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (!interactive) return false;
-
             logoBounceContainer.ScaleTo(0.9f, 1000, Easing.Out);
             return true;
         }
@@ -355,8 +357,6 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnClick(InputState state)
         {
-            if (!interactive) return false;
-
             if (Action?.Invoke() ?? true)
                 sampleClick.Play();
 
@@ -368,8 +368,6 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnHover(InputState state)
         {
-            if (!interactive) return false;
-
             logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
             return true;
         }

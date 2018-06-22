@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Scoring;
@@ -17,14 +16,15 @@ using osu.Game.Rulesets.Taiko.Replays;
 using OpenTK;
 using System.Linq;
 using osu.Framework.Input;
+using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
     public class TaikoRulesetContainer : ScrollingRulesetContainer<TaikoPlayfield, TaikoHitObject>
     {
-        public TaikoRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
+        public TaikoRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
 
@@ -88,9 +88,9 @@ namespace osu.Game.Rulesets.Taiko.UI
             return new Vector2(1, default_relative_height * aspectAdjust);
         }
 
-        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
+        protected override Vector2 PlayfieldArea => Vector2.One;
 
-        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter(IsForCurrentRuleset);
+        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
         public override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
@@ -131,6 +131,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             return null;
         }
 
-        protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
+        protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
     }
 }

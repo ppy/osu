@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +13,7 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseIntroSequence : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

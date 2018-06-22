@@ -3,10 +3,11 @@
 
 using Humanizer;
 using System.Collections.Generic;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserBeatmapsRequest : APIRequest<List<APIResponseBeatmapSet>>
+    public class GetUserBeatmapsRequest : APIRequest<List<APIBeatmapSet>>
     {
         private readonly long userId;
         private readonly int offset;
@@ -19,6 +20,7 @@ namespace osu.Game.Online.API.Requests
             this.type = type;
         }
 
+        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         protected override string Target => $@"users/{userId}/beatmapsets/{type.ToString().Underscore()}?offset={offset}";
     }
 

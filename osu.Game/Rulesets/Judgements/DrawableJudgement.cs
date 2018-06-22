@@ -9,7 +9,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Judgements
 {
@@ -18,43 +21,42 @@ namespace osu.Game.Rulesets.Judgements
     /// </summary>
     public class DrawableJudgement : Container
     {
+        private const float judgement_size = 80;
+
+        private OsuColour colours;
+
         protected readonly Judgement Judgement;
 
-        protected readonly SpriteText JudgementText;
+        public readonly DrawableHitObject JudgedObject;
+
+        protected SpriteText JudgementText;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
         /// <param name="judgement">The judgement to visualise.</param>
-        public DrawableJudgement(Judgement judgement)
+        /// <param name="judgedObject">The object which was judged.</param>
+        public DrawableJudgement(Judgement judgement, DrawableHitObject judgedObject)
         {
             Judgement = judgement;
+            JudgedObject = judgedObject;
 
-            AutoSizeAxes = Axes.Both;
-
-            Children = new[]
-            {
-                JudgementText = new OsuSpriteText
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Text = judgement.Result.GetDescription().ToUpper(),
-                    Font = @"Venera",
-                    Scale = new Vector2(0.85f, 1),
-                    TextSize = 12
-                }
-            };
+            Size = new Vector2(judgement_size);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            switch (Judgement.Result)
+            this.colours = colours;
+
+            Child = new SkinnableDrawable($"Play/{Judgement.Result}", _ => JudgementText = new OsuSpriteText
             {
-                case HitResult.Miss:
-                    Colour = colours.Red;
-                    break;
-            }
+                Text = Judgement.Result.GetDescription().ToUpper(),
+                Font = @"Venera",
+                Colour = judgementColour(Judgement.Result),
+                Scale = new Vector2(0.85f, 1),
+                TextSize = 12
+            }, restrictSize: false);
         }
 
         protected override void LoadComplete()
@@ -85,6 +87,25 @@ namespace osu.Game.Rulesets.Judgements
             }
 
             Expire(true);
+        }
+
+        private Color4 judgementColour(HitResult judgement)
+        {
+            switch (judgement)
+            {
+                case HitResult.Perfect:
+                case HitResult.Great:
+                    return colours.Blue;
+                case HitResult.Ok:
+                case HitResult.Good:
+                    return colours.Green;
+                case HitResult.Meh:
+                    return colours.Yellow;
+                case HitResult.Miss:
+                    return colours.Red;
+            }
+
+            return Color4.White;
         }
     }
 }

@@ -18,12 +18,10 @@ namespace osu.Game.Rulesets.Osu.UI
     public class OsuPlayfield : Playfield
     {
         private readonly Container approachCircles;
-        private readonly Container judgementLayer;
+        private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
-        // Todo: This should not be a thing, but is currently required for the editor
-        // https://github.com/ppy/osu-framework/issues/1283
-        protected virtual bool ProxyApproachCircles => true;
+        protected virtual bool DisplayJudgements => true;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
@@ -40,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     RelativeSizeAxes = Axes.Both,
                     Depth = 2,
                 },
-                judgementLayer = new Container
+                judgementLayer = new JudgementContainer<DrawableOsuJudgement>
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = 1,
@@ -55,12 +53,10 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.Depth = (float)h.HitObject.StartTime;
-
             h.OnJudgement += onJudgement;
 
             var c = h as IDrawableHitObjectWithProxiedApproach;
-            if (c != null && ProxyApproachCircles)
+            if (c != null)
                 approachCircles.Add(c.ProxiedLayer.CreateProxy());
 
             base.Add(h);
@@ -68,23 +64,18 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void PostProcess()
         {
-            connectionLayer.HitObjects = HitObjects.Objects
-                .Select(d => d.HitObject)
-                .OrderBy(h => h.StartTime).OfType<OsuHitObject>();
+            connectionLayer.HitObjects = HitObjects.Objects.Select(d => d.HitObject).OfType<OsuHitObject>();
         }
 
         private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            var osuJudgement = (OsuJudgement)judgement;
-            var osuObject = (OsuHitObject)judgedObject.HitObject;
-
-            if (!judgedObject.DisplayJudgement)
+            if (!judgedObject.DisplayJudgement || !DisplayJudgements)
                 return;
 
-            DrawableOsuJudgement explosion = new DrawableOsuJudgement(osuJudgement)
+            DrawableOsuJudgement explosion = new DrawableOsuJudgement(judgement, judgedObject)
             {
                 Origin = Anchor.Centre,
-                Position = osuObject.StackedEndPosition + osuJudgement.PositionOffset
+                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition + ((OsuJudgement)judgement).PositionOffset
             };
 
             judgementLayer.Add(explosion);

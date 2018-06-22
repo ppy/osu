@@ -8,9 +8,14 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuSettings : SettingsSubsection
+    public class OsuSettings : RulesetSettingsSubsection
     {
         protected override string Header => "osu!";
+
+        public OsuSettings(Ruleset ruleset)
+            : base(ruleset)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

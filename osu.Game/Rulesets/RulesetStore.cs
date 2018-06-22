@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using osu.Framework.Logging;
 using osu.Game.Database;
 
 namespace osu.Game.Rulesets
@@ -63,7 +64,7 @@ namespace osu.Game.Rulesets
                 var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
 
                 //add all legacy modes in correct order
-                foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
+                foreach (var r in instances.Where(r => r.LegacyID != null).OrderBy(r => r.LegacyID))
                 {
                     if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == r.RulesetInfo.ID) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
@@ -72,7 +73,7 @@ namespace osu.Game.Rulesets
                 context.SaveChanges();
 
                 //add any other modes
-                foreach (var r in instances.Where(r => r.LegacyID < 0))
+                foreach (var r in instances.Where(r => r.LegacyID == null))
                     if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
 
@@ -112,10 +113,11 @@ namespace osu.Game.Rulesets
             try
             {
                 var assembly = Assembly.LoadFrom(file);
-                loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsSubclassOf(typeof(Ruleset)));
+                loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.Error(e, "Failed to load ruleset");
             }
         }
     }

@@ -9,6 +9,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModNoFail : ModNoFail
     {
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
     }
 }

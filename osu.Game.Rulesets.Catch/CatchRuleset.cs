@@ -10,12 +10,20 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Catch.Replays;
+using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Catch.Beatmaps;
+using osu.Game.Rulesets.Catch.Difficulty;
+using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Catch
 {
     public class CatchRuleset : Ruleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new CatchRulesetContainer(this, beatmap, isForCurrentRuleset);
+        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new CatchRulesetContainer(this, beatmap);
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap);
+        public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new CatchBeatmapProcessor(beatmap);
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -27,6 +35,44 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
         };
 
+        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        {
+            if (mods.HasFlag(LegacyMods.Nightcore))
+                yield return new CatchModNightcore();
+            else if (mods.HasFlag(LegacyMods.DoubleTime))
+                yield return new CatchModDoubleTime();
+
+            if (mods.HasFlag(LegacyMods.Autoplay))
+                yield return new CatchModAutoplay();
+
+            if (mods.HasFlag(LegacyMods.Easy))
+                yield return new CatchModEasy();
+
+            if (mods.HasFlag(LegacyMods.Flashlight))
+                yield return new CatchModFlashlight();
+
+            if (mods.HasFlag(LegacyMods.HalfTime))
+                yield return new CatchModHalfTime();
+
+            if (mods.HasFlag(LegacyMods.HardRock))
+                yield return new CatchModHardRock();
+
+            if (mods.HasFlag(LegacyMods.Hidden))
+                yield return new CatchModHidden();
+
+            if (mods.HasFlag(LegacyMods.NoFail))
+                yield return new CatchModNoFail();
+
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new CatchModPerfect();
+
+            if (mods.HasFlag(LegacyMods.Relax))
+                yield return new CatchModRelax();
+
+            if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new CatchModSuddenDeath();
+        }
+
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
             switch (type)
@@ -36,56 +82,25 @@ namespace osu.Game.Rulesets.Catch
                     {
                         new CatchModEasy(),
                         new CatchModNoFail(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new CatchModHalfTime(),
-                                new CatchModDaycore(),
-                            },
-                        },
+                        new MultiMod(new CatchModHalfTime(), new CatchModDaycore())
                     };
-
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
                         new CatchModHardRock(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new CatchModSuddenDeath(),
-                                new CatchModPerfect(),
-                            },
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new CatchModDoubleTime(),
-                                new CatchModNightcore(),
-                            },
-                        },
+                        new MultiMod(new CatchModSuddenDeath(), new CatchModPerfect()),
+                        new MultiMod(new CatchModDoubleTime(), new CatchModNightcore()),
                         new CatchModHidden(),
                         new CatchModFlashlight(),
                     };
-
                 case ModType.Special:
                     return new Mod[]
                     {
                         new CatchModRelax(),
                         null,
                         null,
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new CatchModAutoplay(),
-                                new ModCinema(),
-                            },
-                        },
+                        new MultiMod(new CatchModAutoplay(), new ModCinema()),
                     };
-
                 default:
                     return new Mod[] { };
             }
@@ -97,9 +112,11 @@ namespace osu.Game.Rulesets.Catch
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_fruits_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => new CatchDifficultyCalculator(beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(this, beatmap);
 
-        public override int LegacyID => 2;
+        public override int? LegacyID => 2;
+
+        public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
 
         public CatchRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)

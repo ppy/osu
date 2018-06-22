@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -13,6 +14,7 @@ using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseContextMenu : OsuTestCase
     {
         private const int start_time = 0;

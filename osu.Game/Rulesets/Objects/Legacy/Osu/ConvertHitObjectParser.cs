@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
                 Position = position,
                 NewCombo = newCombo,
                 ControlPoints = controlPoints,
-                Distance = length,
+                Distance = Math.Max(0, length),
                 CurveType = curveType,
                 RepeatSamples = repeatSamples,
                 RepeatCount = repeatCount

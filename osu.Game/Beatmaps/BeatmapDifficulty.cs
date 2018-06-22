@@ -29,8 +29,13 @@ namespace osu.Game.Beatmaps
             set => approachRate = value;
         }
 
-        public float SliderMultiplier { get; set; } = 1;
-        public float SliderTickRate { get; set; } = 1;
+        public double SliderMultiplier { get; set; } = 1;
+        public double SliderTickRate { get; set; } = 1;
+
+        /// <summary>
+        /// Returns a shallow-clone of this <see cref="BeatmapDifficulty"/>.
+        /// </summary>
+        public BeatmapDifficulty Clone() => (BeatmapDifficulty)MemberwiseClone();
 
         /// <summary>
         /// Maps a difficulty value [0, 10] to a two-piece linear range of values.

@@ -4,11 +4,14 @@
 using System;
 using System.IO;
 using System.Linq;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Graphics.Textures;
+using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
@@ -18,22 +21,21 @@ namespace osu.Game.Beatmaps
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
             private readonly IResourceStore<byte[]> store;
+            private readonly AudioManager audioManager;
 
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo)
+            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo, AudioManager audioManager)
                 : base(beatmapInfo)
             {
                 this.store = store;
+                this.audioManager = audioManager;
             }
 
-            protected override Beatmap GetBeatmap()
+            protected override IBeatmap GetBeatmap()
             {
                 try
                 {
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
-                    {
-                        Decoder decoder = Decoder.GetDecoder(stream);
-                        return decoder.DecodeBeatmap(stream);
-                    }
+                        return Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
                 }
                 catch
                 {
@@ -78,29 +80,45 @@ namespace osu.Game.Beatmaps
                 Storyboard storyboard;
                 try
                 {
-                    using (var beatmap = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                     {
-                        Decoder decoder = Decoder.GetDecoder(beatmap);
+                        var decoder = Decoder.GetDecoder<Storyboard>(stream);
 
                         // todo: support loading from both set-wide storyboard *and* beatmap specific.
-
                         if (BeatmapSetInfo?.StoryboardFile == null)
-                            storyboard = decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap);
+                            storyboard = decoder.Decode(stream);
                         else
                         {
-                            using (var reader = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
-                                storyboard = decoder.GetStoryboardDecoder().DecodeStoryboard(beatmap, reader);
+                            using (var secondaryStream = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
+                                storyboard = decoder.Decode(stream, secondaryStream);
                         }
                     }
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Storyboard failed to load");
                     storyboard = new Storyboard();
                 }
 
                 storyboard.BeatmapInfo = BeatmapInfo;
 
                 return storyboard;
+            }
+
+            protected override Skin GetSkin()
+            {
+                Skin skin;
+                try
+                {
+                    skin = new LegacyBeatmapSkin(BeatmapInfo, store, audioManager);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Skin failed to load");
+                    skin = new DefaultSkin();
+                }
+
+                return skin;
             }
         }
     }

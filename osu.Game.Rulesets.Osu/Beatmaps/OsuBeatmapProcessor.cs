@@ -8,29 +8,17 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {
-    internal class OsuBeatmapProcessor : BeatmapProcessor<OsuHitObject>
+    internal class OsuBeatmapProcessor : BeatmapProcessor
     {
-        public override void PostProcess(Beatmap<OsuHitObject> beatmap)
+        public OsuBeatmapProcessor(IBeatmap beatmap)
+            : base(beatmap)
         {
-            applyStacking(beatmap);
+        }
 
-            if (beatmap.ComboColors.Count == 0)
-                return;
-
-            int comboIndex = 0;
-            int colourIndex = 0;
-
-            foreach (var obj in beatmap.HitObjects)
-            {
-                if (obj.NewCombo)
-                {
-                    comboIndex = 0;
-                    colourIndex = (colourIndex + 1) % beatmap.ComboColors.Count;
-                }
-
-                obj.IndexInCurrentCombo = comboIndex++;
-                obj.ComboColour = beatmap.ComboColors[colourIndex];
-            }
+        public override void PostProcess()
+        {
+            applyStacking((Beatmap<OsuHitObject>)Beatmap);
+            base.PostProcess();
         }
 
         private void applyStacking(Beatmap<OsuHitObject> beatmap)

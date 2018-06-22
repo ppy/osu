@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         {
             private readonly OsuSpriteText valueText;
 
-            public int Count
+            public new int Count
             {
                 set { valueText.Text = value.ToString(); }
             }

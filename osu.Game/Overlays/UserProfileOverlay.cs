@@ -2,8 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -18,6 +16,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -35,10 +35,10 @@ namespace osu.Game.Overlays
 
         public UserProfileOverlay()
         {
-            FirstWaveColour = OsuColour.Gray(0.4f);
-            SecondWaveColour = OsuColour.Gray(0.3f);
-            ThirdWaveColour = OsuColour.Gray(0.2f);
-            FourthWaveColour = OsuColour.Gray(0.1f);
+            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
+            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
+            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
+            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
 
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
@@ -64,13 +64,21 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-            FadeEdgeEffectTo(0.5f, APPEAR_DURATION, Easing.In);
+            FadeEdgeEffectTo(0.5f, WaveContainer.APPEAR_DURATION, Easing.In);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
+            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
+        }
+
+        public void ShowUser(long userId)
+        {
+            if (userId == Header.User.Id)
+                return;
+
+            ShowUser(new User { Id = userId });
         }
 
         public void ShowUser(User user, bool fetchOnline = true)
@@ -82,7 +90,7 @@ namespace osu.Game.Overlays
             sections = new ProfileSection[]
             {
                 //new AboutSection(),
-                //new RecentSection(),
+                new RecentSection(),
                 new RanksSection(),
                 //new MedalsSection(),
                 new HistoricalSection(),
@@ -161,15 +169,18 @@ namespace osu.Game.Overlays
         {
             Header.User = user;
 
-            foreach (string id in user.ProfileOrder)
+            if (user.ProfileOrder != null)
             {
-                var sec = sections.FirstOrDefault(s => s.Identifier == id);
-                if (sec != null)
+                foreach (string id in user.ProfileOrder)
                 {
-                    sec.User.Value = user;
+                    var sec = sections.FirstOrDefault(s => s.Identifier == id);
+                    if (sec != null)
+                    {
+                        sec.User.Value = user;
 
-                    sectionsContainer.Add(sec);
-                    tabs.AddItem(sec);
+                        sectionsContainer.Add(sec);
+                        tabs.AddItem(sec);
+                    }
                 }
             }
         }

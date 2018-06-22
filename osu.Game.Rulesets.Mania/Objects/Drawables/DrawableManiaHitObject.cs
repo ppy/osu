@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using OpenTK.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
@@ -29,14 +28,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Action = action.Value;
         }
 
-        public override Color4 AccentColour
+        protected override void UpdateState(ArmedState state)
         {
-            get { return base.AccentColour; }
-            set
+            switch (state)
             {
-                if (base.AccentColour == value)
-                    return;
-                base.AccentColour = value;
+                case ArmedState.Miss:
+                    this.FadeOut(150, Easing.In).Expire();
+                    break;
+                case ArmedState.Hit:
+                    this.FadeOut(150, Easing.OutQuint).Expire();
+                    break;
             }
         }
     }

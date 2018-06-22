@@ -1,9 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Allocation;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,35 +14,52 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Rulesets;
 using osu.Game.Overlays.BeatmapSet.Scores;
+using osu.Game.Rulesets;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     public class BeatmapSetOverlay : WaveOverlayContainer
     {
+        private const int fade_duration = 300;
+
         public const float X_PADDING = 40;
         public const float RIGHT_WIDTH = 275;
 
         private readonly Header header;
         private readonly Info info;
-        private readonly ScoresContainer scores;
 
         private APIAccess api;
         private RulesetStore rulesets;
-        private GetScoresRequest getScoresRequest;
 
         private readonly ScrollContainer scroll;
+
+        private BeatmapSetInfo beatmapSet;
+
+        public BeatmapSetInfo BeatmapSet
+        {
+            get => beatmapSet;
+            set
+            {
+                if (value == beatmapSet)
+                    return;
+
+                header.BeatmapSet = info.BeatmapSet = beatmapSet = value;
+            }
+        }
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
         {
-            FirstWaveColour = OsuColour.Gray(0.4f);
-            SecondWaveColour = OsuColour.Gray(0.3f);
-            ThirdWaveColour = OsuColour.Gray(0.2f);
-            FourthWaveColour = OsuColour.Gray(0.1f);
+            ScoresContainer scores;
+            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
+            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
+            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
+            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
 
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
@@ -88,29 +104,8 @@ namespace osu.Game.Overlays
             header.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b;
-                updateScores(b);
+                scores.Beatmap = b;
             };
-        }
-
-        private void updateScores(BeatmapInfo beatmap)
-        {
-            getScoresRequest?.Cancel();
-
-            if (!beatmap.OnlineBeatmapID.HasValue)
-            {
-                scores.CleanAllScores();
-                return;
-            }
-
-            scores.IsLoading = true;
-
-            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-            getScoresRequest.Success += r =>
-            {
-                scores.Scores = r.Scores;
-                scores.IsLoading = false;
-            };
-            api.Queue(getScoresRequest);
         }
 
         [BackgroundDependencyLoader]
@@ -123,14 +118,13 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-            FadeEdgeEffectTo(0.25f, APPEAR_DURATION, Easing.In);
+            FadeEdgeEffectTo(0.25f, WaveContainer.APPEAR_DURATION, Easing.In);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            header.Details.StopPreview();
-            FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
+            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out).OnComplete(_ => BeatmapSet = null);
         }
 
         protected override bool OnClick(InputState state)
@@ -139,17 +133,31 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        public void ShowBeatmapSet(int beatmapSetId)
+        public void FetchAndShowBeatmap(int beatmapId)
         {
-            // todo: display the overlay while we are loading here. we need to support setting BeatmapSet to null for this to work.
+            BeatmapSet = null;
+            var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
+            req.Success += res =>
+            {
+                ShowBeatmapSet(res.ToBeatmapSet(rulesets));
+                header.Picker.Beatmap.Value = header.BeatmapSet.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+            };
+            api.Queue(req);
+            Show();
+        }
+
+        public void FetchAndShowBeatmapSet(int beatmapSetId)
+        {
+            BeatmapSet = null;
             var req = new GetBeatmapSetRequest(beatmapSetId);
             req.Success += res => ShowBeatmapSet(res.ToBeatmapSet(rulesets));
             api.Queue(req);
+            Show();
         }
 
         public void ShowBeatmapSet(BeatmapSetInfo set)
         {
-            header.BeatmapSet = info.BeatmapSet = set;
+            BeatmapSet = set;
             Show();
             scroll.ScrollTo(0);
         }
