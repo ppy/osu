@@ -15,6 +15,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
 using OpenTK.Input;
+using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -27,6 +28,18 @@ namespace osu.Game.Rulesets.UI
                 : base(ruleset, variant, unique)
             {
             }
+        }
+
+        protected override InputState CreateInitialState()
+        {
+            var state = base.CreateInitialState();
+            return new RulesetInputManagerInputState<T>
+            {
+                Mouse = state.Mouse,
+                Keyboard = state.Keyboard,
+                Joystick = state.Joystick,
+                LastReplayState = null
+            };
         }
 
         protected readonly KeyBindingContainer<T> KeyBindingContainer;
@@ -42,13 +55,18 @@ namespace osu.Game.Rulesets.UI
 
         private List<T> lastPressedActions = new List<T>();
 
-        protected override void HandleNewState(InputState state)
+        public override void HandleCustomInput(InputState state, IInput input)
         {
-            base.HandleNewState(state);
+            if (!(input is ReplayState<T> replayState))
+            {
+                base.HandleCustomInput(state, input);
+                return;
+            }
 
-            var replayState = state as ReplayInputHandler.ReplayState<T>;
-
-            if (replayState == null) return;
+            if (state is RulesetInputManagerInputState<T> inputState)
+            {
+                inputState.LastReplayState = replayState;
+            }
 
             // Here we handle states specifically coming from a replay source.
             // These have extra action information rather than keyboard keys or mouse buttons.
@@ -80,7 +98,7 @@ namespace osu.Game.Rulesets.UI
                 if (replayInputHandler != null) RemoveHandler(replayInputHandler);
 
                 replayInputHandler = value;
-                UseParentState = replayInputHandler == null;
+                UseParentInput = replayInputHandler == null;
 
                 if (replayInputHandler != null)
                     AddHandler(replayInputHandler);
@@ -123,7 +141,7 @@ namespace osu.Game.Rulesets.UI
 
         protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && validState;
 
-        private bool isAttached => replayInputHandler != null && !UseParentState;
+        private bool isAttached => replayInputHandler != null && !UseParentInput;
 
         private const int max_catch_up_updates_per_frame = 50;
 
@@ -266,5 +284,11 @@ namespace osu.Game.Rulesets.UI
     public interface ICanAttachKeyCounter
     {
         void Attach(KeyCounterCollection keyCounter);
+    }
+
+    public class RulesetInputManagerInputState<T> : InputState
+    where T : struct
+    {
+        public ReplayState<T> LastReplayState;
     }
 }
