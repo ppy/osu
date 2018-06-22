@@ -4,12 +4,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -18,6 +18,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Rulesets;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
@@ -32,7 +33,6 @@ namespace osu.Game.Overlays
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
         private FillFlowContainer<DirectPanel> panels;
-        private DirectPanel playing;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"485e74");
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
@@ -176,10 +176,11 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets)
+        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
         {
             this.api = api;
             this.rulesets = rulesets;
+            this.previewTrackManager = previewTrackManager;
 
             resultCountsContainer.Colour = colours.Yellow;
         }
@@ -206,12 +207,6 @@ namespace osu.Game.Overlays
                 panels.FadeOut(200);
                 panels.Expire();
                 panels = null;
-
-                if (playing != null)
-                {
-                    playing.PreviewPlaying.Value = false;
-                    playing = null;
-                }
             }
 
             if (BeatmapSets == null) return;
@@ -242,17 +237,6 @@ namespace osu.Game.Overlays
             {
                 if (panels != null) ScrollFlow.Remove(panels);
                 ScrollFlow.Add(panels = newPanels);
-
-                foreach (DirectPanel panel in p.Children)
-                    panel.PreviewPlaying.ValueChanged += newValue =>
-                    {
-                        if (newValue)
-                        {
-                            if (playing != null && playing != panel)
-                                playing.PreviewPlaying.Value = false;
-                            playing = panel;
-                        }
-                    };
             });
         }
 
@@ -261,6 +245,7 @@ namespace osu.Game.Overlays
         private readonly Bindable<string> currentQuery = new Bindable<string>();
 
         private ScheduledDelegate queryChangedDebounce;
+        private PreviewTrackManager previewTrackManager;
 
         private void updateSearch()
         {
@@ -276,6 +261,8 @@ namespace osu.Game.Overlays
             if (api == null) return;
 
             if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty)) return;
+
+            previewTrackManager.StopAnyPlaying(this);
 
             getSetsRequest = new SearchBeatmapSetsRequest(currentQuery.Value ?? string.Empty,
                 ((FilterControl)Filter).Ruleset.Value,
@@ -298,14 +285,6 @@ namespace osu.Game.Overlays
             };
 
             api.Queue(getSetsRequest);
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-
-            if (playing != null)
-                playing.PreviewPlaying.Value = false;
         }
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
