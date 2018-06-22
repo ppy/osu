@@ -152,7 +152,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnHover(InputState state)
         {
-            Show();
+            schedulePopOut();
             return true;
         }
 
