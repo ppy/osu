@@ -105,6 +105,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public class Catcher : Container, IKeyBindingHandler<CatchAction>
         {
+            /// <summary>
+            /// Width of the area that can be used to attempt catches during gameplay.
+            /// </summary>
+            internal float CatchWidth => CATCHER_SIZE * Math.Abs(Scale.X);
+
             private Container<DrawableHitObject> caughtFruit;
 
             public Container ExplodingFruitTarget;
@@ -232,15 +237,15 @@ namespace osu.Game.Rulesets.Catch.UI
             /// <returns>Whether the catch is possible.</returns>
             public bool AttemptCatch(CatchHitObject fruit)
             {
-                double halfCatcherWidth = CATCHER_SIZE * Math.Abs(Scale.X) * 0.5f;
+                float halfCatchWidth = CatchWidth * 0.5f;
 
                 // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
                 var catchObjectPosition = fruit.X * CatchPlayfield.BASE_WIDTH;
                 var catcherPosition = Position.X * CatchPlayfield.BASE_WIDTH;
 
                 var validCatch =
-                    catchObjectPosition >= catcherPosition - halfCatcherWidth &&
-                    catchObjectPosition <= catcherPosition + halfCatcherWidth;
+                    catchObjectPosition >= catcherPosition - halfCatchWidth &&
+                    catchObjectPosition <= catcherPosition + halfCatchWidth;
 
                 if (validCatch && fruit.HyperDash)
                 {
