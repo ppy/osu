@@ -22,15 +22,12 @@ namespace osu.Game.Audio
         public event Action Started;
 
         private Track track;
-        private bool wasPlaying;
+        private bool hasStarted;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             track = GetTrack();
-
-            if (track != null)
-                track.Looping = false;
         }
 
         /// <summary>
@@ -58,7 +55,7 @@ namespace osu.Game.Audio
             base.Update();
 
             // Todo: Track currently doesn't signal its completion, so we have to handle it manually
-            if (track != null && wasPlaying && track.HasCompleted)
+            if (hasStarted && track.HasCompleted)
                 Stop();
         }
 
@@ -69,15 +66,12 @@ namespace osu.Game.Audio
         /// </summary>
         public void Start() => startDelegate = Schedule(() =>
         {
-            if (!IsLoaded)
-                return;
-
             if (track == null)
                 return;
 
-            if (wasPlaying)
+            if (hasStarted)
                 return;
-            wasPlaying = true;
+            hasStarted = true;
 
             track.Restart();
             Started?.Invoke();
@@ -90,15 +84,12 @@ namespace osu.Game.Audio
         {
             startDelegate?.Cancel();
 
-            if (!IsLoaded)
-                return;
-
             if (track == null)
                 return;
 
-            if (!wasPlaying)
+            if (!hasStarted)
                 return;
-            wasPlaying = false;
+            hasStarted = false;
 
             track.Stop();
             Stopped?.Invoke();

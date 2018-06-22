@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Direct
 {
     public class PlayButton : Container
     {
-        public readonly Bindable<bool> Playing = new Bindable<bool>();
+        public readonly BindableBool Playing = new BindableBool();
         public PreviewTrack Preview { get; private set; }
 
         private BeatmapSetInfo beatmapSet;
@@ -29,12 +29,9 @@ namespace osu.Game.Overlays.Direct
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                if (Preview != null)
-                {
-                    Preview.Stop();
-                    RemoveInternal(Preview);
-                    Preview = null;
-                }
+                Preview?.Stop();
+                Preview?.Expire();
+                Preview = null;
 
                 Playing.Value = false;
             }
@@ -51,15 +48,9 @@ namespace osu.Game.Overlays.Direct
             set
             {
                 if (value)
-                {
                     loadingAnimation.Show();
-                    icon.FadeOut(transition_duration * 5, Easing.OutQuint);
-                }
                 else
-                {
                     loadingAnimation.Hide();
-                    icon.FadeIn(transition_duration, Easing.OutQuint);
-                }
             }
         }
 
@@ -94,35 +85,7 @@ namespace osu.Game.Overlays.Direct
 
         protected override bool OnClick(InputState state)
         {
-            if (!Playing.Value)
-            {
-                if (Preview != null)
-                {
-                    Preview.Start();
-                    return true;
-                }
-
-                loading = true;
-
-                var loadingPreview = previewTrackManager.Get(beatmapSet);
-                loadingPreview.Started += () => Playing.Value = true;
-                loadingPreview.Stopped += () => Playing.Value = false;
-
-                LoadComponentAsync(Preview = loadingPreview, t =>
-                {
-                    if (Preview != loadingPreview)
-                        return;
-
-                    AddInternal(t);
-
-                    Preview.Start();
-
-                    loading = false;
-                });
-            }
-            else
-                Preview?.Stop();
-
+            Playing.Toggle();
             return true;
         }
 
@@ -141,17 +104,43 @@ namespace osu.Game.Overlays.Direct
 
         private void playingStateChanged(bool playing)
         {
-            if (playing && BeatmapSet == null)
-            {
-                Playing.Value = false;
-                return;
-            }
-
             icon.Icon = playing ? FontAwesome.fa_stop : FontAwesome.fa_play;
             icon.FadeColour(playing || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
 
-            if (!playing)
+            if (playing)
             {
+                if (BeatmapSet == null)
+                {
+                    Playing.Value = false;
+                    return;
+                }
+
+                if (Preview != null)
+                {
+                    Preview.Start();
+                    return;
+                }
+
+                loading = true;
+
+                LoadComponentAsync(Preview = previewTrackManager.Get(beatmapSet), preview =>
+                {
+                    // beatmapset may have changed.
+                    if (Preview != preview)
+                        return;
+
+                    AddInternal(preview);
+                    loading = false;
+                    preview.Stopped += () => Playing.Value = false;
+
+                    // user may have changed their mind.
+                    if (Playing)
+                        preview.Start();
+                });
+            }
+            else
+            {
+                Preview?.Stop();
                 loading = false;
             }
         }
