@@ -1,14 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using OpenTK;
+using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Users;
-using System.Linq;
+using OpenTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 {
@@ -17,10 +16,6 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private const float panel_padding = 10f;
 
         private readonly BeatmapSetType type;
-
-        private DirectPanel currentlyPlaying;
-
-        public event Action<PaginatedBeatmapContainer> BeganPlayingPreview;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
             : base(user, header, missing)
@@ -56,28 +51,10 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
                     var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets));
                     ItemsContainer.Add(panel);
-
-                    panel.PreviewPlaying.ValueChanged += isPlaying =>
-                    {
-                        StopPlayingPreview();
-
-                        if (isPlaying)
-                        {
-                            BeganPlayingPreview?.Invoke(this);
-                            currentlyPlaying = panel;
-                        }
-                    };
                 }
             };
 
             Api.Queue(req);
-        }
-
-        public void StopPlayingPreview()
-        {
-            if (currentlyPlaying == null) return;
-            currentlyPlaying.PreviewPlaying.Value = false;
-            currentlyPlaying = null;
         }
     }
 }
