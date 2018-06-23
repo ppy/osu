@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private Bindable<Size> sizeFullscreen;
         private readonly BindableInt resolutionDropdownBindable = new BindableInt();
 
-        private OsuGame game;
+        private OsuGameBase game;
         private SettingsDropdown<int> resolutionDropdown;
         private SettingsEnumDropdown<WindowMode> windowModeDropdown;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private const int transition_duration = 400;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager config, OsuGame game)
+        private void load(FrameworkConfigManager config, OsuGameBase game)
         {
             this.game = game;
 
