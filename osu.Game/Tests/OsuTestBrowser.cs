@@ -3,6 +3,7 @@
 
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Graphics;
 using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Tests
@@ -13,7 +14,11 @@ namespace osu.Game.Tests
         {
             base.LoadComplete();
 
-            LoadComponentAsync(new BackgroundScreenDefault { Depth = 10 }, AddInternal);
+            LoadComponentAsync(new BackgroundScreenDefault
+            {
+                Colour = OsuColour.Gray(0.5f),
+                Depth = 10
+            }, AddInternal);
 
             // Have to construct this here, rather than in the constructor, because
             // we depend on some dependencies to be loaded within OsuGameBase.load().
