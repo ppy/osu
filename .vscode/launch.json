@@ -37,7 +37,12 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Debug)",
-            "env": {},
+            "linux": {
+                "env": {
+                    "LD_PRELOAD": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/libbass.so",
+                    "LD_LIBRARY_PATH" : "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/",
+                },  
+            },
             "console": "internalConsole"
         },
         {
@@ -50,7 +55,12 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Release)",
-            "env": {},
+            "linux": {
+                "env": {
+                    "LD_PRELOAD": "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1/libbass.so",
+                    "LD_LIBRARY_PATH" : "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1/",
+                },  
+            },
             "console": "internalConsole"
         }
     ]
