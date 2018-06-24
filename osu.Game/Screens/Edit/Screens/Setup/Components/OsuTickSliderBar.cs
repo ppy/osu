@@ -34,7 +34,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         /// Maximum number of decimal digits to be displayed in the tooltip.
         /// </summary>
         private const int MAX_DECIMAL_DIGITS = 5;
-        private const float DEFAULT_HEIGHT = 8;
+        private const float DEFAULT_HEIGHT = 20;
+        private const float DEFAULT_SLIDER_HEIGHT = 8;
 
         private bool leftShiftHeld;
         private bool rightShiftHeld;
@@ -160,7 +161,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                             {
                                 sliderContainer = new Container
                                 {
-                                    Height = DEFAULT_HEIGHT,
+                                    Height = DEFAULT_SLIDER_HEIGHT,
                                     RelativeSizeAxes = Axes.X,
                                     CornerRadius = 3,
                                     Masking = true,
@@ -168,18 +169,18 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                     {
                                         leftBox = new Box
                                         {
-                                            Height = 8,
+                                            Height = DEFAULT_SLIDER_HEIGHT,
                                             EdgeSmoothness = new Vector2(0, 0.5f),
-                                            Position = new Vector2(2, 0),
+                                            //Position = new Vector2(2, 0),
                                             RelativeSizeAxes = Axes.X,
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                         },
                                         rightBox = new Box
                                         {
-                                            Height = 8,
+                                            Height = DEFAULT_SLIDER_HEIGHT,
                                             EdgeSmoothness = new Vector2(0, 0.5f),
-                                            Position = new Vector2(-2, 0),
+                                            //Position = new Vector2(-2, 0),
                                             RelativeSizeAxes = Axes.X,
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
@@ -291,15 +292,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            leftBox.Scale = new Vector2(MathHelper.Clamp(
-                Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
-            rightBox.Scale = new Vector2(MathHelper.Clamp(
-                DrawWidth - Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
+            leftBox.Scale = new Vector2(MathHelper.Clamp(Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
+            rightBox.Scale = new Vector2(MathHelper.Clamp(DrawWidth - Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
         }
 
         protected override void UpdateValue(float value)
         {
-            Nub.MoveToX(RangePadding + UsableWidth * value, 250, Easing.OutQuint);
+            Nub.MoveToX(RangePadding + UsableWidth, 250, Easing.OutQuint);
         }
 
         /// <summary>
