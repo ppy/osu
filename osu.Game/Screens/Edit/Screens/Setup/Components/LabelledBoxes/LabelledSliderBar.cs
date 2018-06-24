@@ -21,31 +21,57 @@ using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 {
-    public class LabelledTextBox : CompositeDrawable
+    public class LabelledSliderBar : CompositeDrawable
     {
-        private readonly OsuTextBox textBox;
         private readonly Container content;
         private readonly OsuSpriteText label;
+        private readonly OsuSpriteText bottomText;
+        private readonly OsuTickSliderBar sliderBar;
 
         public const float DEFAULT_LABEL_TEXT_SIZE = 20;
-        public const float DEFAULT_HEIGHT = 50;
+        public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 14;
+        public const float DEFAULT_HEIGHT = 75;
         public const float DEFAULT_LABEL_PADDING = 15;
+        public const float DEFAULT_TOP_PADDING = 15;
+        public const float DEFAULT_SLIDER_BAR_PADDING = 300;
 
-        public Action<string> TextBoxTextChangedAction;
+        public Action<float> SliderBarValueChangedAction;
 
-        public void TriggerTextBoxTextChanged(string newText)
+        public void TriggerSliderBarValueChanged(float newValue)
         {
-            TextBoxTextChangedAction?.Invoke(newText);
+            SliderBarValueChangedAction?.Invoke(newValue);
         }
 
-        private bool readOnly = false;
-        public bool ReadOnly
+        private float sliderMinValue = 0;
+        public float SliderMinValue
         {
-            get => readOnly;
+            get => sliderMinValue;
             set
             {
-                textBox.ReadOnly = value;
-                readOnly = value;
+                sliderMinValue = value;
+                sliderBar.MinValue = value;
+            }
+        }
+
+        private float sliderMaxValue = 10;
+        public float SliderMaxValue
+        {
+            get => sliderMaxValue;
+            set
+            {
+                sliderMaxValue = value;
+                sliderBar.MaxValue = value;
+            }
+        }
+
+        private float sliderValueInterval = 1;
+        public float SliderValueInterval
+        {
+            get => sliderValueInterval;
+            set
+            {
+                sliderValueInterval = value;
+                sliderBar.ValueInterval = value;
             }
         }
 
@@ -60,6 +86,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             }
         }
 
+        private string bottomLabelText;
+        public string BottomLabelText
+        {
+            get => bottomLabelText;
+            set
+            {
+                bottomLabelText = value;
+                bottomText.Text = value;
+            }
+        }
+
         private float labelTextSize;
         public float LabelTextSize
         {
@@ -68,41 +105,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             {
                 labelTextSize = value;
                 label.TextSize = value;
-            }
-        }
-
-        private string textBoxPlaceholderText;
-        public string TextBoxPlaceholderText
-        {
-            get => textBoxPlaceholderText;
-            set
-            {
-                textBoxPlaceholderText = value;
-                textBox.PlaceholderText = value;
-            }
-        }
-
-        private string textBoxText;
-        public string TextBoxText
-        {
-            get => textBoxText;
-            set
-            {
-                textBoxText = value;
-                textBox.Text = value;
-                TextBoxTextChangedAction?.Invoke(value);
-            }
-        }
-
-        private float height = DEFAULT_HEIGHT;
-        public float Height
-        {
-            get => height;
-            private set
-            {
-                height = value;
-                textBox.Height = value;
-                content.Height = value;
             }
         }
 
@@ -122,10 +124,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             set => label.Padding = value;
         }
 
-        public MarginPadding TextBoxPadding
+        public MarginPadding SliderBarPadding
         {
-            get => textBox.Padding;
-            set => textBox.Padding = value;
+            get => sliderBar.Padding;
+            set => sliderBar.Padding = value;
         }
 
         public Color4 LabelTextColour
@@ -140,7 +142,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             set => content.Colour = value;
         }
 
-        public LabelledTextBox()
+        public LabelledSliderBar()
         {
             Masking = true;
             CornerRadius = 15;
@@ -179,20 +181,28 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_LABEL_PADDING },
+                                            Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_TOP_PADDING },
                                             Colour = Color4.White,
                                             TextSize = DEFAULT_LABEL_TEXT_SIZE,
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        textBox = new OsuTextBox
+                                        sliderBar = new OsuTickSliderBar(sliderMinValue, sliderMaxValue, sliderValueInterval)
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = DEFAULT_HEIGHT,
-                                            ReadOnly = ReadOnly,
-                                            CornerRadius = 15,
+                                            Padding = new MarginPadding { Left = DEFAULT_SLIDER_BAR_PADDING, Top = DEFAULT_TOP_PADDING },
+                                            //Width = 0.7f,
+                                            Colour = Color4.White,
+                                        },
+                                        bottomText = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.TopLeft,
+                                            Origin = Anchor.TopLeft,
+                                            Colour = Color4.Yellow,
+                                            TextSize = DEFAULT_BOTTOM_LABEL_TEXT_SIZE,
+                                            Font = @"Exo2.0-BoldItalic",
+                                            Text = BottomLabelText
                                         },
                                     },
                                 },
@@ -206,7 +216,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                     }
                 }
             };
-            textBox.OnCommit += delegate { TriggerTextBoxTextChanged(textBox.Text); };
+            sliderBar.Current.ValueChanged += delegate { TriggerSliderBarValueChanged(sliderBar.Current.Value); };
         }
     }
 }
