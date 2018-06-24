@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -34,6 +35,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         /// </summary>
         private const int MAX_DECIMAL_DIGITS = 5;
         private const float DEFAULT_HEIGHT = 60;
+
+        private bool leftShiftHeld;
+        private bool rightShiftHeld;
 
         private float normalPrecision;
         private float alternatePrecision;
@@ -206,8 +210,24 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             Nub.Glowing = false;
             base.OnHoverLost(state);
         }
+        
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            leftShiftHeld |= args.Key == Key.ShiftLeft;
+            rightShiftHeld |= args.Key == Key.ShiftRight;
+            IsUsingAlternatePrecision = leftShiftHeld | rightShiftHeld;
 
-        // OnKeyDown
+            return base.OnKeyDown(state, args);
+        }
+
+        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        {
+            leftShiftHeld &= args.Key != Key.ShiftLeft;
+            rightShiftHeld &= args.Key != Key.ShiftRight;
+            IsUsingAlternatePrecision = leftShiftHeld | rightShiftHeld;
+
+            return base.OnKeyUp(state, args);
+        }
 
         protected override void OnUserChange()
         {
