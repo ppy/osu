@@ -64,14 +64,25 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             }
         }
 
-        private float sliderValueInterval = 1;
-        public float SliderValueInterval
+        private float sliderNormalPrecision = 1;
+        public float SliderNormalPrecision
         {
-            get => sliderValueInterval;
+            get => sliderNormalPrecision;
             set
             {
-                sliderValueInterval = value;
-                sliderBar.ValueInterval = value;
+                sliderNormalPrecision = value;
+                sliderBar.NormalPrecision = value;
+            }
+        }
+
+        private float sliderAlternatePrecision = 1;
+        public float SliderAlternatePrecision
+        {
+            get => sliderAlternatePrecision;
+            set
+            {
+                sliderAlternatePrecision = value;
+                sliderBar.AlternatePrecision = value;
             }
         }
 
@@ -187,12 +198,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        sliderBar = new OsuTickSliderBar(sliderMinValue, sliderMaxValue, sliderValueInterval)
+                                        sliderBar = new OsuTickSliderBar(sliderMinValue, sliderMaxValue, sliderNormalPrecision, sliderAlternatePrecision)
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
                                             Padding = new MarginPadding { Left = DEFAULT_SLIDER_BAR_PADDING, Top = DEFAULT_TOP_PADDING },
-                                            //Width = 0.7f,
                                             Colour = Color4.White,
                                         },
                                         bottomText = new OsuSpriteText

@@ -39,8 +39,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private bool leftShiftHeld;
         private bool rightShiftHeld;
 
-        private float normalPrecision;
-        private float alternatePrecision;
+        public float NormalPrecision;
+        public float AlternatePrecision;
         private bool isUsingAlternatePrecision;
         public bool IsUsingAlternatePrecision
         {
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                     return;
 
                 isUsingAlternatePrecision = value;
-                Precision = value ? alternatePrecision : normalPrecision;
+                Precision = value ? AlternatePrecision : NormalPrecision;
             }
         }
         public float MinValue
@@ -113,8 +113,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             MinValue = minValue;
             MaxValue = maxValue;
             Precision = normalPrecision;
-            this.normalPrecision = normalPrecision;
-            this.alternatePrecision = alternatePrecision;
+            this.NormalPrecision = normalPrecision;
+            this.AlternatePrecision = alternatePrecision;
 
             RelativeSizeAxes = Axes.X;
             Height = DEFAULT_HEIGHT;

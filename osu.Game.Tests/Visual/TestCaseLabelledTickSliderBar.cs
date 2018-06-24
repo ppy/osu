@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual
                     LabelText = "Testing slider bar",
                     SliderMinValue = 10,
                     SliderMaxValue = 25,
-                    SliderValueInterval = 0.5f,
+                    SliderNormalPrecision = 0.5f,
                     Padding = new MarginPadding { Left = 150, Right = 150 }
                 }
             };
