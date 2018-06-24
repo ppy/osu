@@ -32,9 +32,11 @@ namespace osu.Game.Tests.Visual
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     LabelText = "Testing slider bar",
+                    BottomLabelText = "Test bottom text",
                     SliderMinValue = 10,
                     SliderMaxValue = 25,
-                    SliderNormalPrecision = 0.5f,
+                    SliderNormalPrecision = 2,
+                    SliderAlternatePrecision = 0.1f,
                     Padding = new MarginPadding { Left = 150, Right = 150 }
                 }
             };

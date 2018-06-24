@@ -34,13 +34,33 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         /// Maximum number of decimal digits to be displayed in the tooltip.
         /// </summary>
         private const int MAX_DECIMAL_DIGITS = 5;
-        private const float DEFAULT_HEIGHT = 60;
+        private const float DEFAULT_HEIGHT = 8;
 
         private bool leftShiftHeld;
         private bool rightShiftHeld;
 
-        public float NormalPrecision;
-        public float AlternatePrecision;
+        private float normalPrecision;
+        public float NormalPrecision
+        {
+            get => normalPrecision;
+            set
+            {
+                normalPrecision = value;
+                if (!isUsingAlternatePrecision)
+                    Precision = value;
+            }
+        }
+        private float alternatePrecision;
+        public float AlternatePrecision
+        {
+            get => alternatePrecision;
+            set
+            {
+                alternatePrecision = value;
+                if (isUsingAlternatePrecision)
+                    Precision = value;
+            }
+        }
         private bool isUsingAlternatePrecision;
         public bool IsUsingAlternatePrecision
         {
@@ -100,7 +120,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private Color4 accentColour;
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -113,8 +133,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             MinValue = minValue;
             MaxValue = maxValue;
             Precision = normalPrecision;
-            this.NormalPrecision = normalPrecision;
-            this.AlternatePrecision = alternatePrecision;
+            NormalPrecision = normalPrecision;
+            AlternatePrecision = alternatePrecision;
 
             RelativeSizeAxes = Axes.X;
             Height = DEFAULT_HEIGHT;
@@ -123,8 +143,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             {
                 new FillFlowContainer
                 {
-                    //Anchor = Anchor.CentreLeft,
-                    //Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = DEFAULT_HEIGHT,
                     Direction = FillDirection.Vertical,
@@ -169,8 +189,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                 },
                                 Nub = new Nub
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
                                     //Expanded = true,
                                     Size = new Vector2(35, 15)
                                 },
@@ -355,6 +375,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 MinValue = minValue;
                 MaxValue = maxValue;
                 ValueInterval = valueInterval;
+
+                Anchor = Anchor.TopLeft;
+                Origin = Anchor.TopLeft;
 
                 canUpdateTicks = true;
                 createTicks();

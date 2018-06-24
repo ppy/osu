@@ -180,47 +180,51 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = DEFAULT_HEIGHT,
-                            Child = new GridContainer
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                Height = DEFAULT_HEIGHT,
-                                Content = new[]
+                                new GridContainer
                                 {
-                                    new Drawable[]
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = DEFAULT_HEIGHT,
+                                    Content = new[]
                                     {
-                                        label = new OsuSpriteText
+                                        new Drawable[]
                                         {
-                                            Anchor = Anchor.TopLeft,
-                                            Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_TOP_PADDING },
-                                            Colour = Color4.White,
-                                            TextSize = DEFAULT_LABEL_TEXT_SIZE,
-                                            Text = LabelText,
-                                            Font = @"Exo2.0-Bold",
-                                        },
-                                        sliderBar = new OsuTickSliderBar(sliderMinValue, sliderMaxValue, sliderNormalPrecision, sliderAlternatePrecision)
-                                        {
-                                            Anchor = Anchor.TopLeft,
-                                            Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = DEFAULT_SLIDER_BAR_PADDING, Top = DEFAULT_TOP_PADDING },
-                                            Colour = Color4.White,
-                                        },
-                                        bottomText = new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.TopLeft,
-                                            Origin = Anchor.TopLeft,
-                                            Colour = Color4.Yellow,
-                                            TextSize = DEFAULT_BOTTOM_LABEL_TEXT_SIZE,
-                                            Font = @"Exo2.0-BoldItalic",
-                                            Text = BottomLabelText
+                                            label = new OsuSpriteText
+                                            {
+                                                Anchor = Anchor.TopLeft,
+                                                Origin = Anchor.TopLeft,
+                                                Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_TOP_PADDING },
+                                                Colour = Color4.White,
+                                                TextSize = DEFAULT_LABEL_TEXT_SIZE,
+                                                Text = LabelText,
+                                                Font = @"Exo2.0-Bold",
+                                            },
+                                            sliderBar = new OsuTickSliderBar(sliderMinValue, sliderMaxValue, sliderNormalPrecision, sliderAlternatePrecision)
+                                            {
+                                                Anchor = Anchor.TopLeft,
+                                                Origin = Anchor.TopLeft,
+                                                Padding = new MarginPadding { Left = DEFAULT_SLIDER_BAR_PADDING, Top = DEFAULT_TOP_PADDING },
+                                                Colour = Color4.White,
+                                            },
                                         },
                                     },
+                                    ColumnDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.Absolute, 180),
+                                        new Dimension()
+                                    }
                                 },
-                                ColumnDimensions = new[]
+                                bottomText = new OsuSpriteText
                                 {
-                                    new Dimension(GridSizeMode.Absolute, 180),
-                                    new Dimension()
-                                }
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Colour = Color4.Yellow,
+                                    Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING },
+                                    TextSize = DEFAULT_BOTTOM_LABEL_TEXT_SIZE,
+                                    Font = @"Exo2.0-BoldItalic",
+                                    Text = BottomLabelText
+                                },
                             }
                         }
                     }
