@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     internal class HitExplosion : CompositeDrawable
     {
+        public override bool RemoveWhenNotAlive => true;
+
         private readonly CircularContainer circle;
 
         public HitExplosion(DrawableHitObject judgedObject)

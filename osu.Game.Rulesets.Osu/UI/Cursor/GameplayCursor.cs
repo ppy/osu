@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 };
 
                 this.beatmap.BindTo(beatmap);
-                beatmap.ValueChanged += v => calculateScale();
+                this.beatmap.ValueChanged += v => calculateScale();
 
                 cursorScale = config.GetBindable<double>(OsuSetting.GameplayCursorSize);
                 cursorScale.ValueChanged += v => calculateScale();

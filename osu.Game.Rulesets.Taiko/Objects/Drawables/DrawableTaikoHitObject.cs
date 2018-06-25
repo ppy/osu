@@ -9,10 +9,75 @@ using OpenTK;
 using System.Linq;
 using osu.Game.Audio;
 using System.Collections.Generic;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public abstract class DrawableTaikoHitObject<TaikoHitType> : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
+    public abstract class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
+    {
+        protected readonly Container Content;
+        private readonly Container proxiedContent;
+
+        private readonly Container nonProxiedContent;
+
+        protected DrawableTaikoHitObject(TaikoHitObject hitObject)
+            : base(hitObject)
+        {
+            InternalChildren = new[]
+            {
+                nonProxiedContent = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = Content = new Container { RelativeSizeAxes = Axes.Both }
+                },
+                proxiedContent = new Container { RelativeSizeAxes = Axes.Both }
+            };
+        }
+
+        /// <summary>
+        /// <see cref="proxiedContent"/> is proxied into an upper layer. We don't want to get masked away otherwise <see cref="proxiedContent"/> would too.
+        /// </summary>
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
+
+        private bool isProxied;
+
+        /// <summary>
+        /// Moves <see cref="Content"/> to a layer proxied above the playfield.
+        /// Does nothing is content is already proxied.
+        /// </summary>
+        protected void ProxyContent()
+        {
+            if (isProxied) return;
+            isProxied = true;
+
+            nonProxiedContent.Remove(Content);
+            proxiedContent.Add(Content);
+        }
+
+        /// <summary>
+        /// Moves <see cref="Content"/> to the normal hitobject layer.
+        /// Does nothing is content is not currently proxied.
+        /// </summary>
+        protected void UnproxyContent()
+        {
+            if (!isProxied) return;
+            isProxied = false;
+
+            proxiedContent.Remove(Content);
+            nonProxiedContent.Add(Content);
+        }
+
+        /// <summary>
+        /// Creates a proxy for the content of this <see cref="DrawableTaikoHitObject"/>.
+        /// </summary>
+        public Drawable CreateProxiedContent() => proxiedContent.CreateProxy();
+
+        public abstract bool OnPressed(TaikoAction action);
+        public virtual bool OnReleased(TaikoAction action) => false;
+    }
+
+    public abstract class DrawableTaikoHitObject<TaikoHitType> : DrawableTaikoHitObject
         where TaikoHitType : TaikoHitObject
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
@@ -34,7 +99,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RelativeSizeAxes = Axes.Both;
             Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
 
-            InternalChild = MainPiece = CreateMainPiece();
+            Content.Add(MainPiece = CreateMainPiece());
             MainPiece.KiaiMode = HitObject.Kiai;
         }
 
@@ -44,9 +109,5 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override string SampleNamespace => "Taiko";
 
         protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
-
-        public abstract bool OnPressed(TaikoAction action);
-
-        public virtual bool OnReleased(TaikoAction action) => false;
     }
 }
