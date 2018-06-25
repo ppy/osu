@@ -88,21 +88,21 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             // The extrema of track time should be positioned at the centre of the container when scrolled to the start or end
             Content.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
 
-            if (handlingDragInput)
-            {
-                // The user is dragging - the track should always follow the timeline
-                seekTrackToCurrent();
-            }
-            else if (adjustableClock.IsRunning)
-            {
-                // If the user hasn't provided mouse input but the track is running, always follow the track
+            // This needs to happen after transforms are updated, but before the scroll position is updated in base.UpdateAfterChildren
+            if (adjustableClock.IsRunning)
                 scrollToTrackTime();
-            }
-            else
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (handlingDragInput)
+                seekTrackToCurrent();
+            else if (!adjustableClock.IsRunning)
             {
-                // The track isn't playing, so we want to smooth-scroll once more, and re-enable wheel scrolling
-                // There are two cases we have to be wary of:
-                // 1) The user scrolls on this timeline: We want the track to follow us
+                // The track isn't running. There are two cases we have to be wary of:
+                // 1) The user flick-drags on this timeline: We want the track to follow us
                 // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline): We want to follow the track time
 
                 // The simplest way to cover both cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
@@ -114,25 +114,25 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
             lastScrollPosition = Current;
             lastTrackTime = adjustableClock.CurrentTime;
+        }
 
-            void seekTrackToCurrent()
-            {
-                var track = Beatmap.Value.Track;
-                if (track is TrackVirtual || !track.IsLoaded)
-                    return;
+        private void seekTrackToCurrent()
+        {
+            var track = Beatmap.Value.Track;
+            if (track is TrackVirtual || !track.IsLoaded)
+                return;
 
-                if (!(Beatmap.Value.Track is TrackVirtual))
-                    adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
-            }
+            if (!(Beatmap.Value.Track is TrackVirtual))
+                adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
+        }
 
-            void scrollToTrackTime()
-            {
-                var track = Beatmap.Value.Track;
-                if (track is TrackVirtual || !track.IsLoaded)
-                    return;
+        private void scrollToTrackTime()
+        {
+            var track = Beatmap.Value.Track;
+            if (track is TrackVirtual || !track.IsLoaded)
+                return;
 
-                ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
-            }
+            ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
