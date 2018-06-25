@@ -70,8 +70,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 Playfield.Add(isMajor ? new DrawableBarLineMajor(barLine) : new DrawableBarLine(barLine));
 
                 double bl = currentPoint.BeatLength;
-                if (bl < 800)
-                    bl *= (int)currentPoint.TimeSignature;
 
                 time += bl;
                 currentBeat++;
