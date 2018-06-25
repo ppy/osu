@@ -30,9 +30,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 
         public const float DEFAULT_LABEL_TEXT_SIZE = 20;
         public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 14;
-        public const float DEFAULT_HEIGHT = 75;
+        public const float DEFAULT_HEIGHT = 100;
         public const float DEFAULT_LABEL_PADDING = 15;
         public const float DEFAULT_TOP_PADDING = 15;
+        public const float DEFAULT_BOTTOM_PADDING = 15;
         public const float DEFAULT_SLIDER_BAR_PADDING = 300;
 
         public Action<float> SliderBarValueChangedAction;
@@ -220,7 +221,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Colour = Color4.Yellow,
-                                    Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING },
+                                    Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Bottom = DEFAULT_BOTTOM_PADDING },
                                     TextSize = DEFAULT_BOTTOM_LABEL_TEXT_SIZE,
                                     Font = @"Exo2.0-BoldItalic",
                                     Text = BottomLabelText

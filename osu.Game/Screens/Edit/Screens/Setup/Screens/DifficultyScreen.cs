@@ -61,6 +61,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 hpDrainRate = new LabelledSliderBar
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
+                                    SliderMinValue = 0,
+                                    SliderMaxValue = 10,
+                                    SliderNormalPrecision = 1,
+                                    SliderAlternatePrecision = 0.1f,
                                     LabelText = "HP Drain Rate",
                                     BottomLabelText = "The constant rate of health-bar drain throughout the song",
                                     SliderBarValueChangedAction = a => Beatmap.Value.BeatmapInfo.BaseDifficulty.DrainRate = a
@@ -68,15 +72,21 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 overallDifficulty = new LabelledSliderBar
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
+                                    SliderMinValue = 0,
+                                    SliderMaxValue = 10,
+                                    SliderNormalPrecision = 1,
+                                    SliderAlternatePrecision = 0.1f,
                                     LabelText = "Overall Difficulty",
                                     BottomLabelText = "The harshness of the hit window",
                                     SliderBarValueChangedAction = a => Beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty = a
-                                },
-                                new GeneralScreenBottomHeader
-                                {
-                                    Padding = new MarginPadding { Top = 10 },
                                 }
                             }
+                        },
+                        new DifficultyScreenBottomHeader
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Padding = new MarginPadding { Left = 75, Top = -60 },
                         }
                     },
                 },

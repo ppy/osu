@@ -126,12 +126,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextBoxPlaceholderText = "Tags",
                                     TextBoxText = Beatmap.Value.Metadata.Tags,
                                     TextBoxTextChangedAction = a => Beatmap.Value.Metadata.Tags = a
-                                },
-                                new GeneralScreenBottomHeader
-                                {
-                                    Padding = new MarginPadding { Top = 10 },
                                 }
                             }
+                        },
+                        new GeneralScreenBottomHeader
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Padding = new MarginPadding { Left = 75, Top = -60 },
                         }
                     },
                 },

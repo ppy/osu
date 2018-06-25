@@ -91,6 +91,22 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             private set => CurrentNumber.Precision = value;
         }
 
+        public string LeftTickCaption
+        {
+            get => leftTickCaption.Text;
+            set => leftTickCaption.Text = value;
+        }
+        public string MiddleTickCaption
+        {
+            get => middleTickCaption.Text;
+            set => middleTickCaption.Text = value;
+        }
+        public string RightTickCaption
+        {
+            get => rightTickCaption.Text;
+            set => rightTickCaption.Text = value;
+        }
+
         private SampleChannel sample;
         private double lastSampleTime;
         private float lastSampleValue;
@@ -100,6 +116,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private readonly Box leftBox;
         private readonly Box rightBox;
         private readonly Ticks ticks;
+        private readonly OsuSpriteText leftTickCaption;
+        private readonly OsuSpriteText middleTickCaption;
+        private readonly OsuSpriteText rightTickCaption;
 
         public virtual string TooltipText
         {
@@ -170,7 +189,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                         leftBox = new Box
                                         {
                                             Height = DEFAULT_SLIDER_HEIGHT,
-                                            EdgeSmoothness = new Vector2(0, 0.5f),
+                                            //EdgeSmoothness = new Vector2(0, 0.5f),
                                             //Position = new Vector2(2, 0),
                                             RelativeSizeAxes = Axes.X,
                                             Anchor = Anchor.CentreLeft,
@@ -179,7 +198,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                         rightBox = new Box
                                         {
                                             Height = DEFAULT_SLIDER_HEIGHT,
-                                            EdgeSmoothness = new Vector2(0, 0.5f),
+                                            //EdgeSmoothness = new Vector2(0, 0.5f),
                                             //Position = new Vector2(-2, 0),
                                             RelativeSizeAxes = Axes.X,
                                             Anchor = Anchor.CentreRight,
@@ -197,7 +216,31 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                 },
                             }
                         },
-                        ticks = new Ticks(minValue, maxValue, normalPrecision)
+                        ticks = new Ticks(minValue, maxValue, normalPrecision),
+                        new Container
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Children = new[]
+                            {
+                                leftTickCaption = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                },
+                                middleTickCaption = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                },
+                                rightTickCaption = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                },
+                            }
+
+                        }
                     }
                 },
                 new HoverClickSounds()

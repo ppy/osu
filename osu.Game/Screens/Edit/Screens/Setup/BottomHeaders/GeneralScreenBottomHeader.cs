@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
         public GeneralScreenBottomHeader()
         {
             // I seriously don't know why the number is like that, the paddings and stuff look weirdly stacked I suppose
-            Width = Setup.SIZE_X - 392;
+            Width = Setup.SIZE_X - 315;
 
             Children = new Drawable[]
             {
