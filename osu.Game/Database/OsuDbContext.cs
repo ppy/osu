@@ -181,24 +181,6 @@ namespace osu.Game.Database
             }
         }
 
-        public void Migrate()
-        {
-            try
-            {
-                Database.Migrate();
-            }
-            catch (Exception e)
-            {
-                throw new MigrationFailedException(e);
-            }
-        }
-    }
-
-    public class MigrationFailedException : Exception
-    {
-        public MigrationFailedException(Exception exception)
-            : base("sqlite-net migration failed", exception)
-        {
-        }
+        public void Migrate() => Database.Migrate();
     }
 }

@@ -16,6 +16,9 @@ namespace osu.Game.Graphics.Containers
     {
         public const float DEFAULT_PARALLAX_AMOUNT = 0.02f;
 
+        /// <summary>
+        /// The amount of parallax movement. Negative values will reverse the direction of parallax relative to user input.
+        /// </summary>
         public float ParallaxAmount = DEFAULT_PARALLAX_AMOUNT;
 
         private Bindable<bool> parallaxEnabled;
@@ -45,7 +48,7 @@ namespace osu.Game.Graphics.Containers
                 if (!parallaxEnabled)
                 {
                     content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, Easing.OutQuint);
-                    content.Scale = new Vector2(1 + ParallaxAmount);
+                    content.Scale = new Vector2(1 + System.Math.Abs(ParallaxAmount));
                 }
             };
         }
@@ -69,7 +72,7 @@ namespace osu.Game.Graphics.Containers
                 double elapsed = MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000);
 
                 content.Position = Interpolation.ValueAt(elapsed, content.Position, offset, 0, 1000, Easing.OutQuint);
-                content.Scale = Interpolation.ValueAt(elapsed, content.Scale, new Vector2(1 + ParallaxAmount), 0, 1000, Easing.OutQuint);
+                content.Scale = Interpolation.ValueAt(elapsed, content.Scale, new Vector2(1 + System.Math.Abs(ParallaxAmount)), 0, 1000, Easing.OutQuint);
             }
 
             firstUpdate = false;

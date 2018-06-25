@@ -27,14 +27,12 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
+            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
+            new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
             new KeyBinding(InputKey.D, TaikoAction.LeftRim),
             new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.J, TaikoAction.RightCentre),
             new KeyBinding(InputKey.K, TaikoAction.RightRim),
-            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
-            new KeyBinding(InputKey.MouseLeft, TaikoAction.RightCentre),
-            new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
-            new KeyBinding(InputKey.MouseRight, TaikoAction.RightRim),
         };
 
         public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
@@ -114,9 +112,9 @@ namespace osu.Game.Rulesets.Taiko
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_taiko_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => new TaikoDifficultyCalculator(beatmap, mods);
+        public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(this, beatmap);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => new TaikoPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, Score score) => new TaikoPerformanceCalculator(this, beatmap, score);
 
         public override int? LegacyID => 1;
 
