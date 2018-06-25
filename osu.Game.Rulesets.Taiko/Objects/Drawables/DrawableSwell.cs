@@ -33,8 +33,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
 
-        private bool hasStarted;
-
         private readonly SwellSymbolPiece symbol;
 
         public DrawableSwell(Swell swell)
