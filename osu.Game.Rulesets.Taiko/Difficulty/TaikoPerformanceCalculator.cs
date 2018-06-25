@@ -22,10 +22,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public TaikoPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
+        public TaikoPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
-            beatmapMaxCombo = beatmap.HitObjects.Count(h => h is Hit);
+            beatmapMaxCombo = Beatmap.HitObjects.Count(h => h is Hit);
         }
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private double computeStrainValue()
         {
-            double strainValue = Math.Pow(5.0 * Math.Max(1.0, Attributes["Strain"] / 0.0075) - 4.0, 2.0) / 100000.0;
+            double strainValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.StarRating / 0.0075) - 4.0, 2.0) / 100000.0;
 
             // Longer maps are worth more
             double lengthBonus = 1 + 0.1f * Math.Min(1.0, totalHits / 1500.0);

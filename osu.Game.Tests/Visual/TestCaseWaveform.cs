@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
 {
@@ -20,22 +19,14 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
+            Beatmap.Value = new WaveformTestBeatmap();
+
             FillFlowContainer flow;
             Child = flow = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 10),
-                Children = new Drawable[]
-                {
-                    new MusicController
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Y = 100,
-                        State = Visibility.Visible
-                    },
-                }
             };
 
             for (int i = 1; i <= 16; i *= 2)
@@ -44,9 +35,8 @@ namespace osu.Game.Tests.Visual
                 {
                     RelativeSizeAxes = Axes.Both,
                     Resolution = 1f / i,
+                    Waveform = Beatmap.Value.Waveform,
                 };
-
-                Beatmap.ValueChanged += b => newDisplay.Waveform = b.Waveform;
 
                 flow.Add(new Container
                 {
