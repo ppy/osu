@@ -86,6 +86,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 switch (State.Value)
                 {
                     case ArmedState.Idle:
+                        SecondHitAllowed = false;
+                        validKeyPressed = false;
+
                         UnproxyContent();
                         this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
                         break;
@@ -95,8 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         break;
                     case ArmedState.Hit:
                         // If we're far enough away from the left stage, we should bring outselves in front of it
-                        if (X >= -0.05f)
-                            ProxyContent();
+                        ProxyContent();
 
                         var flash = circlePiece?.FlashBox;
                         if (flash != null)
