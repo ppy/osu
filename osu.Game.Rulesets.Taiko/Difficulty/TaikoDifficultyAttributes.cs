@@ -4,17 +4,14 @@
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 
-namespace osu.Game.Rulesets.Osu.Difficulty
+namespace osu.Game.Rulesets.Taiko.Difficulty
 {
-    public class OsuDifficultyAttributes : DifficultyAttributes
+    public class TaikoDifficultyAttributes : DifficultyAttributes
     {
-        public double AimStrain;
-        public double SpeedStrain;
-        public double ApproachRate;
-        public double OverallDifficulty;
+        public double GreatHitWindow;
         public int MaxCombo;
 
-        public OsuDifficultyAttributes(Mod[] mods, double starRating)
+        public TaikoDifficultyAttributes(Mod[] mods, double starRating)
             : base(mods, starRating)
         {
         }
