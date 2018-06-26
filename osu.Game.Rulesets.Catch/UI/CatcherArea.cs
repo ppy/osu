@@ -268,8 +268,6 @@ namespace osu.Game.Rulesets.Catch.UI
             /// </summary>
             public bool HyperDashing => hyperDashModifier != 1;
 
-            private const float hyperdash_transition_length = 180;
-
             /// <summary>
             /// Set hyperdash state.
             /// </summary>
@@ -277,6 +275,8 @@ namespace osu.Game.Rulesets.Catch.UI
             /// <param name="targetPosition">When this catcher crosses this position, this catcher ends hyperdashing.</param>
             public void SetHyperdashState(double modifier = 1, float targetPosition = -1)
             {
+                const float hyperdash_transition_length = 180;
+
                 bool previouslyHyperDashing = HyperDashing;
                 if (modifier <= 1 || X == targetPosition)
                 {
