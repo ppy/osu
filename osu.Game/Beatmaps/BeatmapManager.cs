@@ -366,8 +366,7 @@ namespace osu.Game.Beatmaps
                     if (ruleset != null)
                     {
                         // TODO: this should be done in a better place once we actually need to dynamically update it.
-                        var converted = new DummyConversionBeatmap(beatmap).GetPlayableBeatmap(ruleset);
-                        beatmap.BeatmapInfo.StarDifficulty = ruleset.CreateInstance().CreateDifficultyCalculator(converted).Calculate();
+                        beatmap.BeatmapInfo.StarDifficulty = ruleset.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating;
                     }
                     else
                         beatmap.BeatmapInfo.StarDifficulty = 0;
@@ -389,6 +388,9 @@ namespace osu.Game.Beatmaps
         {
             if (!force && beatmap.OnlineBeatmapID != null && beatmap.BeatmapSet.OnlineBeatmapSetID != null)
                 return true;
+
+            if (api.State != APIState.Online)
+                return false;
 
             Logger.Log("Attempting online lookup for IDs...", LoggingTarget.Database);
 

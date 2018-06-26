@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -27,54 +28,41 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// </summary>
         private const double decay_weight = 0.9;
 
-        /// <summary>
-        /// HitObjects are stored as a member variable.
-        /// </summary>
-        private readonly List<TaikoHitObjectDifficulty> difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
-
-        public TaikoDifficultyCalculator(IBeatmap beatmap)
-            : base(beatmap)
+        public TaikoDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
 
-        public TaikoDifficultyCalculator(IBeatmap beatmap, Mod[] mods)
-            : base(beatmap, mods)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
-        }
+            if (!beatmap.HitObjects.Any())
+                return new TaikoDifficultyAttributes(mods, 0);
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
-        {
-            // Fill our custom DifficultyHitObject class, that carries additional information
-            difficultyHitObjects.Clear();
+            var difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
 
-            foreach (var hitObject in Beatmap.HitObjects)
+            foreach (var hitObject in beatmap.HitObjects)
                 difficultyHitObjects.Add(new TaikoHitObjectDifficulty((TaikoHitObject)hitObject));
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
 
-            if (!calculateStrainValues()) return 0;
+            if (!calculateStrainValues(difficultyHitObjects, timeRate))
+                return new DifficultyAttributes(mods, 0);
 
-            double starRating = calculateDifficulty() * star_scaling_factor;
+            double starRating = calculateDifficulty(difficultyHitObjects, timeRate) * star_scaling_factor;
 
-            if (categoryDifficulty != null)
-                categoryDifficulty["Strain"] = starRating;
-
-            return starRating;
+            return new TaikoDifficultyAttributes(mods, starRating)
+            {
+                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
+                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate,
+                MaxCombo = beatmap.HitObjects.Count(h => h is Hit)
+            };
         }
 
-        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
-        {
-            new TaikoModDoubleTime(),
-            new TaikoModHalfTime(),
-            new TaikoModEasy(),
-            new TaikoModHardRock(),
-        };
-
-        private bool calculateStrainValues()
+        private bool calculateStrainValues(List<TaikoHitObjectDifficulty> objects, double timeRate)
         {
             // Traverse hitObjects in pairs to calculate the strain value of NextHitObject from the strain value of CurrentHitObject and environment.
-            using (List<TaikoHitObjectDifficulty>.Enumerator hitObjectsEnumerator = difficultyHitObjects.GetEnumerator())
+            using (var hitObjectsEnumerator = objects.GetEnumerator())
             {
                 if (!hitObjectsEnumerator.MoveNext()) return false;
 
@@ -84,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 while (hitObjectsEnumerator.MoveNext())
                 {
                     var next = hitObjectsEnumerator.Current;
-                    next?.CalculateStrains(current, TimeRate);
+                    next?.CalculateStrains(current, timeRate);
                     current = next;
                 }
 
@@ -92,9 +80,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             }
         }
 
-        private double calculateDifficulty()
+        private double calculateDifficulty(List<TaikoHitObjectDifficulty> objects, double timeRate)
         {
-            double actualStrainStep = strain_step * TimeRate;
+            double actualStrainStep = strain_step * timeRate;
 
             // Find the highest strain value within each strain step
             List<double> highestStrains = new List<double>();
@@ -102,7 +90,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double maximumStrain = 0; // We need to keep track of the maximum strain in the current interval
 
             TaikoHitObjectDifficulty previousHitObject = null;
-            foreach (var hitObject in difficultyHitObjects)
+            foreach (var hitObject in objects)
             {
                 // While we are beyond the current interval push the currently available maximum to our strain list
                 while (hitObject.BaseHitObject.StartTime > intervalEndTime)
@@ -144,5 +132,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             return difficulty;
         }
+
+        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        {
+            new TaikoModDoubleTime(),
+            new TaikoModHalfTime(),
+            new TaikoModEasy(),
+            new TaikoModHardRock(),
+        };
     }
 }
