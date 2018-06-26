@@ -1,10 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Configuration;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
@@ -12,6 +15,8 @@ namespace osu.Game.Tests.Visual
     {
         private readonly OsuTestBeatmap beatmap = new OsuTestBeatmap(new DummyWorkingBeatmap());
         protected BindableBeatmap Beatmap => beatmap;
+
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         protected DependencyContainer Dependencies { get; private set; }
 
@@ -22,13 +27,17 @@ namespace osu.Game.Tests.Visual
             Dependencies.CacheAs<BindableBeatmap>(beatmap);
             Dependencies.CacheAs<IBindableBeatmap>(beatmap);
 
+            Dependencies.CacheAs(ruleset);
+
             return Dependencies;
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audioManager)
+        private void load(AudioManager audioManager, RulesetStore rulesets)
         {
             beatmap.SetAudioManager(audioManager);
+
+            ruleset.Value = rulesets.AvailableRulesets.First();
         }
 
         protected override void Dispose(bool isDisposing)

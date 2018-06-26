@@ -55,8 +55,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] Bindable<RulesetInfo> parentRuleset)
         {
-            if (parentRuleset != null)
-                ruleset.BindTo(parentRuleset);
+            ruleset.BindTo(parentRuleset);
             ruleset.ValueChanged += _ => updateDisplay();
         }
 
