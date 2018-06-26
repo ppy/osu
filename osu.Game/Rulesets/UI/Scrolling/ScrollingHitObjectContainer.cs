@@ -29,17 +29,16 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         protected readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
 
-        private readonly ScrollingDirection direction;
+        public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
         private Cached initialStateCache = new Cached();
 
-        public ScrollingHitObjectContainer(ScrollingDirection direction)
+        public ScrollingHitObjectContainer()
         {
-            this.direction = direction;
-
             RelativeSizeAxes = Axes.Both;
 
-            TimeRange.ValueChanged += v => initialStateCache.Invalidate();
+            TimeRange.ValueChanged += _ => initialStateCache.Invalidate();
+            Direction.ValueChanged += _ => initialStateCache.Invalidate();
         }
 
         private ISpeedChangeVisualiser speedChangeVisualiser;
@@ -100,7 +99,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (!initialStateCache.IsValid)
             {
-                speedChangeVisualiser.ComputeInitialStates(Objects, direction, TimeRange, DrawSize);
+                speedChangeVisualiser.ComputeInitialStates(Objects, Direction, TimeRange, DrawSize);
                 initialStateCache.Validate();
             }
         }
@@ -110,7 +109,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             base.UpdateAfterChildrenLife();
 
             // We need to calculate this as soon as possible after lifetimes so that hitobjects get the final say in their positions
-            speedChangeVisualiser.UpdatePositions(AliveObjects, direction, Time.Current, TimeRange, DrawSize);
+            speedChangeVisualiser.UpdatePositions(AliveObjects, Direction, Time.Current, TimeRange, DrawSize);
         }
     }
 }
