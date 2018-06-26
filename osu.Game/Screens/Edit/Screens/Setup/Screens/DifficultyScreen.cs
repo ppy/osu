@@ -65,6 +65,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     SliderMaxValue = 10,
                                     SliderNormalPrecision = 1,
                                     SliderAlternatePrecision = 0.1f,
+                                    LeftTickCaption = "Easy",
+                                    RightTickCaption = "Insane",
                                     LabelText = "HP Drain Rate",
                                     BottomLabelText = "The constant rate of health-bar drain throughout the song",
                                     SliderBarValueChangedAction = a => Beatmap.Value.BeatmapInfo.BaseDifficulty.DrainRate = a
@@ -76,6 +78,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     SliderMaxValue = 10,
                                     SliderNormalPrecision = 1,
                                     SliderAlternatePrecision = 0.1f,
+                                    LeftTickCaption = "Easy",
+                                    RightTickCaption = "Insane",
                                     LabelText = "Overall Difficulty",
                                     BottomLabelText = "The harshness of the hit window",
                                     SliderBarValueChangedAction = a => Beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty = a

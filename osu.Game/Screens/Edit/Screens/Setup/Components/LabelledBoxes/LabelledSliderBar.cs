@@ -24,13 +24,15 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
     public class LabelledSliderBar : CompositeDrawable
     {
         private readonly Container content;
+        private readonly Container outerContainer;
+        private readonly Box box;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
         private readonly OsuTickSliderBar sliderBar;
 
         public const float DEFAULT_LABEL_TEXT_SIZE = 20;
         public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 14;
-        public const float DEFAULT_HEIGHT = 100;
+        public const float NORMAL_HEIGHT = 75;
         public const float DEFAULT_LABEL_PADDING = 15;
         public const float DEFAULT_TOP_PADDING = 15;
         public const float DEFAULT_BOTTOM_PADDING = 15;
@@ -106,7 +108,24 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             {
                 bottomLabelText = value;
                 bottomText.Text = value;
+                changeHeight(NORMAL_HEIGHT + (value != "" ? 25 : 0));
             }
+        }
+
+        public string LeftTickCaption
+        {
+            get => sliderBar.LeftTickCaption;
+            set => sliderBar.LeftTickCaption = value;
+        }
+        public string MiddleTickCaption
+        {
+            get => sliderBar.MiddleTickCaption;
+            set => sliderBar.MiddleTickCaption = value;
+        }
+        public string RightTickCaption
+        {
+            get => sliderBar.RightTickCaption;
+            set => sliderBar.RightTickCaption = value;
         }
 
         private float labelTextSize;
@@ -159,34 +178,34 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             Masking = true;
             CornerRadius = 15;
             RelativeSizeAxes = Axes.X;
-            base.Height = DEFAULT_HEIGHT + Padding.Top;
+            base.Height = NORMAL_HEIGHT + Padding.Top;
 
             InternalChildren = new Drawable[]
             {
-                new Container
+                outerContainer = new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = DEFAULT_HEIGHT,
+                    Height = NORMAL_HEIGHT,
                     CornerRadius = 15,
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        new Box
+                        box = new Box
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = DEFAULT_HEIGHT,
+                            Height = NORMAL_HEIGHT,
                             Colour = OsuColour.FromHex("1c2125"),
                         },
-                        new Container
+                        content = new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = DEFAULT_HEIGHT,
+                            Height = NORMAL_HEIGHT,
                             Children = new Drawable[]
                             {
                                 new GridContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Height = DEFAULT_HEIGHT,
+                                    Height = NORMAL_HEIGHT,
                                     Content = new[]
                                     {
                                         new Drawable[]
@@ -232,6 +251,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                 }
             };
             sliderBar.Current.ValueChanged += delegate { TriggerSliderBarValueChanged(sliderBar.Current.Value); };
+        }
+
+        private void changeHeight(float newHeight)
+        {
+            Height = newHeight + Padding.Top;
+            content.Height = newHeight;
+            box.Height = newHeight;
+            outerContainer.Height = newHeight;
         }
     }
 }

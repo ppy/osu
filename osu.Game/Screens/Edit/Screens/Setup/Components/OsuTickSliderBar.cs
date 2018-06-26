@@ -219,27 +219,27 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                         ticks = new Ticks(minValue, maxValue, normalPrecision),
                         new Container
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Children = new[]
+                            Children = new Drawable[]
                             {
-                                leftTickCaption = new OsuSpriteText
+                                new Container
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
+                                    Child = leftTickCaption = new OsuSpriteText()
                                 },
-                                middleTickCaption = new OsuSpriteText
+                                new Container
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
+                                    Child = middleTickCaption = new OsuSpriteText()
                                 },
-                                rightTickCaption = new OsuSpriteText
+                                new Container
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
+                                    Child = rightTickCaption = new OsuSpriteText()
                                 },
                             }
-
                         }
                     }
                 },
