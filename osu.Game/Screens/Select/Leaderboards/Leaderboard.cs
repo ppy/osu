@@ -19,7 +19,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using System.Linq;
 using osu.Framework.Configuration;
-using osu.Framework.Logging;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Leaderboards

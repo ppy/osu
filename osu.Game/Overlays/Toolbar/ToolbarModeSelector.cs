@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Toolbar
             ruleset.ValueChanged += rulesetChanged;
             ruleset.DisabledChanged += disabledChanged;
 
-            if (ruleset != null)
+            if (parentRuleset != null)
                 ruleset.BindTo(parentRuleset);
             else
                 ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault();
