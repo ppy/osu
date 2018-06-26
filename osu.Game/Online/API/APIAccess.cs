@@ -148,7 +148,7 @@ namespace osu.Game.Online.API
                         // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
                         // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
                         // before actually going online.
-                        while (State != APIState.Online)
+                        while (State > APIState.Offline && State < APIState.Online)
                             Thread.Sleep(500);
 
                         break;
@@ -158,7 +158,6 @@ namespace osu.Game.Online.API
                 if (authentication.RequestAccessToken() == null)
                 {
                     Logout(false);
-                    State = APIState.Offline;
                     continue;
                 }
 
@@ -207,6 +206,14 @@ namespace osu.Game.Online.API
             catch (WebException we)
             {
                 HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
+
+                // special cases for un-typed but useful message responses.
+                switch (we.Message)
+                {
+                    case "Unauthorized":
+                        statusCode = HttpStatusCode.Unauthorized;
+                        break;
+                }
 
                 switch (statusCode)
                 {
@@ -292,6 +299,7 @@ namespace osu.Game.Online.API
             password = null;
             authentication.Clear();
             LocalUser.Value = createGuestUser();
+            State = APIState.Offline;
         }
 
         private static User createGuestUser() => new User
