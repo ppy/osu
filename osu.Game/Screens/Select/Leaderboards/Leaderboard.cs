@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private APIAccess api;
         private BeatmapInfo beatmap;
 
-        private ScheduledDelegate pendingBeatmapSwitch;
+        private ScheduledDelegate pendingUpdateScores;
 
         public BeatmapInfo Beatmap
         {
@@ -188,8 +188,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 beatmap = value;
                 Scores = null;
 
-                pendingBeatmapSwitch?.Cancel();
-                pendingBeatmapSwitch = Schedule(updateScores);
+                updateScores();
             }
         }
 
@@ -229,51 +228,58 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void updateScores()
         {
-            if (Scope == LeaderboardScope.Local)
-            {
-                // TODO: get local scores from wherever here.
-                PlaceholderState = PlaceholderState.NoScores;
-                return;
-            }
+            getScoresRequest?.Cancel();
+            getScoresRequest = null;
 
-            if (Beatmap?.OnlineBeatmapID == null)
+            pendingUpdateScores?.Cancel();
+            pendingUpdateScores = Schedule(() =>
             {
-                PlaceholderState = PlaceholderState.Unavailable;
-                return;
-            }
-
-            if (api?.IsLoggedIn != true)
-            {
-                PlaceholderState = PlaceholderState.NotLoggedIn;
-                return;
-            }
-
-            if (Scope != LeaderboardScope.Global && !api.LocalUser.Value.IsSupporter)
-            {
-                PlaceholderState = PlaceholderState.NotSupporter;
-                return;
-            }
-
-            PlaceholderState = PlaceholderState.Retrieving;
-            loading.Show();
-
-            getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value ?? Beatmap.Ruleset, Scope);
-            getScoresRequest.Success += r => Schedule(() =>
-            {
-                Scores = r.Scores;
-                PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
-            });
-
-            getScoresRequest.Failure += e => Schedule(() =>
-            {
-                if (e is OperationCanceledException)
+                if (Scope == LeaderboardScope.Local)
+                {
+                    // TODO: get local scores from wherever here.
+                    PlaceholderState = PlaceholderState.NoScores;
                     return;
+                }
 
-                PlaceholderState = PlaceholderState.NetworkFailure;
-                Logger.Error(e, @"Couldn't fetch beatmap scores!");
+                if (Beatmap?.OnlineBeatmapID == null)
+                {
+                    PlaceholderState = PlaceholderState.Unavailable;
+                    return;
+                }
+
+                if (api?.IsLoggedIn != true)
+                {
+                    PlaceholderState = PlaceholderState.NotLoggedIn;
+                    return;
+                }
+
+                if (Scope != LeaderboardScope.Global && !api.LocalUser.Value.IsSupporter)
+                {
+                    PlaceholderState = PlaceholderState.NotSupporter;
+                    return;
+                }
+
+                PlaceholderState = PlaceholderState.Retrieving;
+                loading.Show();
+
+                getScoresRequest = new GetScoresRequest(Beatmap, ruleset.Value ?? Beatmap.Ruleset, Scope);
+                getScoresRequest.Success += r => Schedule(() =>
+                {
+                    Scores = r.Scores;
+                    PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
+                });
+
+                getScoresRequest.Failure += e => Schedule(() =>
+                {
+                    if (e is OperationCanceledException)
+                        return;
+
+                    PlaceholderState = PlaceholderState.NetworkFailure;
+                    Logger.Error(e, @"Couldn't fetch beatmap scores!");
+                });
+
+                api.Queue(getScoresRequest);
             });
-
-            api.Queue(getScoresRequest);
         }
 
         private Placeholder currentPlaceholder;
