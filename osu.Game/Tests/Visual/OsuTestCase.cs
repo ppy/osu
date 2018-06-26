@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual
         private readonly OsuTestBeatmap beatmap = new OsuTestBeatmap(new DummyWorkingBeatmap());
         protected BindableBeatmap Beatmap => beatmap;
 
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         protected DependencyContainer Dependencies { get; private set; }
 
@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual
             Dependencies.CacheAs<BindableBeatmap>(beatmap);
             Dependencies.CacheAs<IBindableBeatmap>(beatmap);
 
-            Dependencies.CacheAs(ruleset);
+            Dependencies.CacheAs(Ruleset);
 
             return Dependencies;
         }
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual
         {
             beatmap.SetAudioManager(audioManager);
 
-            ruleset.Value = rulesets.AvailableRulesets.First();
+            Ruleset.Value = rulesets.AvailableRulesets.First();
         }
 
         protected override void Dispose(bool isDisposing)
