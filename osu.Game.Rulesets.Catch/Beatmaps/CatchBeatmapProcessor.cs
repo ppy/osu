@@ -30,7 +30,11 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
             int index = 0;
             foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
+            {
                 obj.IndexInBeatmap = index++;
+                if (obj.LastInCombo && obj.NestedHitObjects.LastOrDefault() is IHasComboInformation lastNested)
+                    lastNested.LastInCombo = true;
+            }
         }
 
         public const int RNG_SEED = 1337;
