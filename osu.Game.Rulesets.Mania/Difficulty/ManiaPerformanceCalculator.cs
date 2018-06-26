@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
+        protected new ManiaDifficultyAttributes Attributes => (ManiaDifficultyAttributes)base.Attributes;
+
         private Mod[] mods;
 
         // Score after being scaled by non-difficulty-increasing mods
@@ -25,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public ManiaPerformanceCalculator(Ruleset ruleset, IBeatmap beatmap, Score score)
+        public ManiaPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
             : base(ruleset, beatmap, score)
         {
         }
@@ -82,7 +84,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private double computeStrainValue()
         {
             // Obtain strain difficulty
-            double strainValue = Math.Pow(5 * Math.Max(1, Attributes["Strain"] / 0.2) - 4.0, 2.2) / 135.0;
+            double strainValue = Math.Pow(5 * Math.Max(1, Attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
 
             // Longer maps are worth more
             strainValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
@@ -105,14 +107,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeAccuracyValue(double strainValue)
         {
-            // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-            double hitWindowGreat = (int)(Beatmap.HitObjects.First().HitWindows.Great / 2) / TimeRate;
-            if (hitWindowGreat <= 0)
+            if (Attributes.GreatHitWindow <= 0)
                 return 0;
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accuracyValue = Math.Max(0.0, 0.2 - (hitWindowGreat - 34) * 0.006667)
+            double accuracyValue = Math.Max(0.0, 0.2 - (Attributes.GreatHitWindow - 34) * 0.006667)
                                        * strainValue
                                        * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
 
