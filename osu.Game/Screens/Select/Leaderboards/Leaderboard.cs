@@ -275,7 +275,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                         return;
 
                     PlaceholderState = PlaceholderState.NetworkFailure;
-                    Logger.Error(e, @"Couldn't fetch beatmap scores!");
                 });
 
                 api.Queue(getScoresRequest);
