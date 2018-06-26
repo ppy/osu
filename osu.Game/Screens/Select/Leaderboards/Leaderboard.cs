@@ -174,7 +174,6 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private APIAccess api;
         private BeatmapInfo beatmap;
-        private OsuGame osuGame;
 
         private ScheduledDelegate pendingBeatmapSwitch;
 
@@ -195,15 +194,14 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api, OsuGame osuGame)
+        private void load(APIAccess api, Bindable<RulesetInfo> parentRuleset)
         {
             this.api = api;
-            this.osuGame = osuGame;
 
-            if (osuGame != null)
-                ruleset.BindTo(osuGame.Ruleset);
+            if (parentRuleset != null)
+                ruleset.BindTo(parentRuleset);
 
-            ruleset.ValueChanged += r => updateScores();
+            ruleset.ValueChanged += _ => updateScores();
 
             if (api != null)
                 api.OnStateChange += handleApiStateChange;

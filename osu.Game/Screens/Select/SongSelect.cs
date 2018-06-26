@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -17,6 +18,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
@@ -61,6 +63,8 @@ namespace osu.Game.Screens.Select
 
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
+
+        protected new readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private DependencyContainer dependencies;
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
@@ -176,8 +180,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
+
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours)
         {
             dependencies.CacheAs(this);
 
@@ -191,9 +196,6 @@ namespace osu.Game.Screens.Select
 
             if (this.beatmaps == null)
                 this.beatmaps = beatmaps;
-
-            if (osu != null)
-                Ruleset.BindTo(osu.Ruleset);
 
             this.beatmaps.ItemAdded += onBeatmapSetAdded;
             this.beatmaps.ItemRemoved += onBeatmapSetRemoved;
@@ -280,6 +282,7 @@ namespace osu.Game.Screens.Select
                     bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
 
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
+                    Ruleset.Value = base.Ruleset.Value;
                     ensurePlayingSelected(preview);
                 }
 
