@@ -84,11 +84,8 @@ namespace osu.Game.Screens
         [BackgroundDependencyLoader(true)]
         private void load(BindableBeatmap beatmap, OsuGame osu, AudioManager audio, Bindable<RulesetInfo> ruleset)
         {
-            if (beatmap != null)
-                Beatmap.BindTo(beatmap);
-
-            if (ruleset != null)
-                Ruleset.BindTo(ruleset);
+            Beatmap.BindTo(beatmap);
+            Ruleset.BindTo(ruleset);
 
             if (osu != null)
             {

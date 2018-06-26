@@ -41,6 +41,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private ScheduledDelegate showScoresDelegate;
 
         private IEnumerable<Score> scores;
+
         public IEnumerable<Score> Scores
         {
             get { return scores; }
@@ -196,9 +197,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             this.api = api;
 
-            if (parentRuleset != null)
-                ruleset.BindTo(parentRuleset);
-
+            ruleset.BindTo(parentRuleset);
             ruleset.ValueChanged += _ => updateScores();
 
             if (api != null)
