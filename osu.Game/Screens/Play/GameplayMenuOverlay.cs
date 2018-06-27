@@ -35,9 +35,9 @@ namespace osu.Game.Screens.Play
         public Action OnQuit;
 
         /// <summary>
-        /// Action that is invoked if <see cref="GlobalAction.Back"/> is triggered.
+        /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
         /// </summary>
-        protected virtual Action DefaultBackAction => () => InternalButtons.Children.First().TriggerOnClick();
+        protected virtual Action BackAction => () => InternalButtons.Children.Last().TriggerOnClick();
 
         public abstract string Header { get; }
         public abstract string Description { get; }
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Play
         {
             if (action == GlobalAction.Back)
             {
-                DefaultBackAction.Invoke();
+                BackAction.Invoke();
                 return true;
             }
 
