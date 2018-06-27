@@ -4,12 +4,17 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class LoadingAnimation : VisibilityContainer
     {
         private readonly SpriteIcon spinner;
+        private readonly SpriteIcon spinnerShadow;
+
+        private const float spin_duration = 600;
+        private const float transition_duration = 200;
 
         public LoadingAnimation()
         {
@@ -20,12 +25,22 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                spinner = new SpriteIcon
+                spinnerShadow = new SpriteIcon
                 {
-                    Size = new Vector2(20),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.fa_spinner
+                    RelativeSizeAxes = Axes.Both,
+                    Position = new Vector2(1, 1),
+                    Colour = Color4.Black,
+                    Alpha = 0.4f,
+                    Icon = FontAwesome.fa_circle_o_notch
+                },
+                spinner = new SpriteIcon
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Icon = FontAwesome.fa_circle_o_notch
                 }
             };
         }
@@ -34,12 +49,11 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            spinner.Spin(2000, RotationDirection.Clockwise);
+            spinner.Spin(spin_duration, RotationDirection.Clockwise);
+            spinnerShadow.Spin(spin_duration, RotationDirection.Clockwise);
         }
 
-        private const float transition_duration = 500;
-
-        protected override void PopIn() => this.FadeIn(transition_duration * 5, Easing.OutQuint);
+        protected override void PopIn() => this.FadeIn(transition_duration * 2, Easing.OutQuint);
 
         protected override void PopOut() => this.FadeOut(transition_duration, Easing.OutQuint);
     }
