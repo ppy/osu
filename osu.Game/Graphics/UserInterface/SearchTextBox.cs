@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (HandlePendingText(state)) return true;
+            if (HandlePendingText(state)) return false;
 
             if (!state.Keyboard.ControlPressed && !state.Keyboard.ShiftPressed)
             {
