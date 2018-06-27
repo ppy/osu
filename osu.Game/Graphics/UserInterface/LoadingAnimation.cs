@@ -27,19 +27,19 @@ namespace osu.Game.Graphics.UserInterface
             {
                 spinnerShadow = new SpriteIcon
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Position = new Vector2(1, 1),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Position = new Vector2(1, 1),
                     Colour = Color4.Black,
                     Alpha = 0.4f,
                     Icon = FontAwesome.fa_circle_o_notch
                 },
                 spinner = new SpriteIcon
                 {
-                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
                     Icon = FontAwesome.fa_circle_o_notch
                 }
             };
@@ -52,7 +52,6 @@ namespace osu.Game.Graphics.UserInterface
             spinner.Spin(spin_duration, RotationDirection.Clockwise);
             spinnerShadow.Spin(spin_duration, RotationDirection.Clockwise);
         }
-
 
         protected override void PopIn() => this.FadeIn(transition_duration * 2, Easing.OutQuint);
 
