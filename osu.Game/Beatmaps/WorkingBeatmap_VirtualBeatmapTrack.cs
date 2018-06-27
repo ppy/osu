@@ -9,6 +9,9 @@ namespace osu.Game.Beatmaps
 {
     public partial class WorkingBeatmap
     {
+        /// <summary>
+        /// A type of <see cref="TrackVirtual"/> which provides a valid length based on the <see cref="HitObject"/>s of an <see cref="IBeatmap"/>.
+        /// </summary>
         private class VirtualBeatmapTrack : TrackVirtual
         {
             private readonly IBeatmap beatmap;
@@ -16,6 +19,7 @@ namespace osu.Game.Beatmaps
             public VirtualBeatmapTrack(IBeatmap beatmap)
             {
                 this.beatmap = beatmap;
+                updateVirtualLength();
             }
 
             protected override void UpdateState()
