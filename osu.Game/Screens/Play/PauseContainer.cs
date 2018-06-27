@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -134,6 +135,8 @@ namespace osu.Game.Screens.Play
 
             public override string Header => "paused";
             public override string Description => "you're not going to do what i think you're going to do, are ya?";
+
+            protected override Action BackAction => () => InternalButtons.Children.First().TriggerOnClick();
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
