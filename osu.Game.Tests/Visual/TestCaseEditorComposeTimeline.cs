@@ -4,36 +4,137 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
+using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseEditorComposeTimeline : OsuTestCase
+    public class TestCaseEditorComposeTimeline : EditorClockTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ScrollableTimeline), typeof(ScrollingTimelineContainer), typeof(BeatmapWaveformGraph), typeof(TimelineButton) };
-
-        public TestCaseEditorComposeTimeline()
+        public override IReadOnlyList<Type> RequiredTypes => new[]
         {
+            typeof(TimelineArea),
+            typeof(Timeline),
+            typeof(TimelineButton),
+            typeof(CentreMarker)
+        };
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Beatmap.Value = new WaveformTestBeatmap();
+
             Children = new Drawable[]
             {
-                new MusicController
+                new FillFlowContainer
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    State = Visibility.Visible
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 5),
+                    Children = new Drawable[]
+                    {
+                        new StartStopButton(),
+                        new AudioVisualiser(),
+                    }
                 },
-                new ScrollableTimeline
+                new TimelineArea
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(1000, 100)
+                    RelativeSizeAxes = Axes.X,
+                    Size = new Vector2(0.8f, 100)
                 }
             };
+        }
+
+        private class AudioVisualiser : CompositeDrawable
+        {
+            private readonly Drawable marker;
+
+            private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+            private IAdjustableClock adjustableClock;
+
+            public AudioVisualiser()
+            {
+                Size = new Vector2(250, 25);
+
+                InternalChildren = new[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.25f,
+                    },
+                    marker = new Box
+                    {
+                        RelativePositionAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 2,
+                    }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(IAdjustableClock adjustableClock, IBindableBeatmap beatmap)
+            {
+                this.adjustableClock = adjustableClock;
+                this.beatmap.BindTo(beatmap);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (beatmap.Value.Track.IsLoaded)
+                    marker.X = (float)(adjustableClock.CurrentTime / beatmap.Value.Track.Length);
+            }
+        }
+
+        private class StartStopButton : Button
+        {
+            private IAdjustableClock adjustableClock;
+            private bool started;
+
+            public StartStopButton()
+            {
+                BackgroundColour = Color4.SlateGray;
+                Size = new Vector2(100, 50);
+                Text = "Start";
+
+                Action = onClick;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(IAdjustableClock adjustableClock)
+            {
+                this.adjustableClock = adjustableClock;
+            }
+
+            private void onClick()
+            {
+                if (started)
+                {
+                    adjustableClock.Stop();
+                    Text = "Start";
+                }
+                else
+                {
+                    adjustableClock.Start();
+                    Text = "Stop";
+                }
+
+                started = !started;
+            }
         }
     }
 }

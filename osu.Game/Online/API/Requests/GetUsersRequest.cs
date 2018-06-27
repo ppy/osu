@@ -2,19 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUsersRequest : APIRequest<List<RankingEntry>>
+    public class GetUsersRequest : APIRequest<List<APIUser>>
     {
         protected override string Target => @"rankings/osu/performance";
-    }
-
-    public class RankingEntry
-    {
-        [JsonProperty]
-        public User User;
     }
 }

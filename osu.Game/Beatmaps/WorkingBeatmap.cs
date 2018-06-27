@@ -13,7 +13,6 @@ using osu.Game.Storyboards;
 using osu.Framework.IO.File;
 using System.IO;
 using osu.Game.IO.Serialization;
-using System.Diagnostics;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -49,12 +48,13 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Saves the <see cref="Beatmaps.Beatmap"/>.
         /// </summary>
-        public void Save()
+        /// <returns>The absolute path of the output file.</returns>
+        public string Save()
         {
             var path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
             using (var sw = new StreamWriter(path))
                 sw.WriteLine(Beatmap.Serialize());
-            Process.Start(path);
+            return path;
         }
 
         protected abstract IBeatmap GetBeatmap();
@@ -116,9 +116,6 @@ namespace osu.Game.Beatmaps
                     mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
             }
 
-            // Post-process
-            rulesetInstance.CreateBeatmapProcessor(converted)?.PostProcess();
-
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
             foreach (var obj in converted.HitObjects)
                 obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
@@ -126,6 +123,9 @@ namespace osu.Game.Beatmaps
             foreach (var mod in Mods.Value.OfType<IApplicableToHitObject>())
             foreach (var obj in converted.HitObjects)
                 mod.ApplyToHitObject(obj);
+
+            // Post-process
+            rulesetInstance.CreateBeatmapProcessor(converted)?.PostProcess();
 
             return converted;
         }
