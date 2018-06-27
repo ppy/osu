@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -12,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -32,6 +34,9 @@ namespace osu.Game.Rulesets.Mania.UI
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
         public IEnumerable<BarLine> BarLines;
+
+        private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
+        private ScrollingInfo scrollingInfo;
 
         public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -65,12 +70,24 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ManiaConfigManager config)
         {
             BarLines.ForEach(Playfield.Add);
+
+            config.BindWith(ManiaSetting.ScrollDirection, configDirection);
+            configDirection.BindValueChanged(d => scrollingInfo.Direction.Value = (ScrollingDirection)d, true);
         }
 
-        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        {
+            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            dependencies.CacheAs<IScrollingInfo>(scrollingInfo = new ScrollingInfo());
+            return dependencies;
+        }
+
+        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(scrollingInfo.Direction, Beatmap.Stages)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -100,5 +117,11 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override Vector2 PlayfieldArea => new Vector2(1, 0.8f);
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
+
+        private class ScrollingInfo : IScrollingInfo
+        {
+            public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+            IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected void ReturnUserInput()
         {
-            AddStep("Return user input", () => InputManager.UseParentState = true);
+            AddStep("Return user input", () => InputManager.UseParentInput = true);
         }
     }
 }
