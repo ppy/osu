@@ -156,6 +156,7 @@ namespace osu.Game.Screens.Play
             userAudioOffset.TriggerChange();
 
             ScoreProcessor = RulesetContainer.CreateScoreProcessor();
+            config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
             Children = new Drawable[]
             {
@@ -226,6 +227,7 @@ namespace osu.Game.Screens.Play
             };
 
             hudOverlay.HoldToQuit.Action = Exit;
+            hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             if (ShowStoryboard)
                 initializeStoryboard(false);
