@@ -6,6 +6,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Users;
 
@@ -18,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// <summary>
         /// Constants (for spinners).
         /// </summary>
-        protected static readonly Vector2 SPINNER_CENTRE = new Vector2(256, 192);
+        protected static readonly Vector2 SPINNER_CENTRE = OsuPlayfield.BASE_SIZE / 2;
         protected const float SPIN_RADIUS = 50;
 
         /// <summary>
