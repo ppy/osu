@@ -23,9 +23,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 {
     public class LabelledRadioButton : CompositeDrawable
     {
+        private readonly Container content;
         private readonly Container outerContainer;
         private readonly Box box;
-        private readonly Container content;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
         private readonly OsuRadioButton radioButton;
@@ -165,11 +165,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                         },
                                         radioButton = new OsuRadioButton
                                         {
-                                            Anchor = Anchor.TopLeft,
-                                            Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_TOP_PADDING }, // TODO: Test the right padding
-                                            Alpha = 1,
-                                            //Colour = Color4.White,
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            Position = new Vector2(-15, 11),
                                         },
                                     },
                                 },

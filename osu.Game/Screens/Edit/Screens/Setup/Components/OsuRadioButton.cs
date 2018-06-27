@@ -5,7 +5,9 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
@@ -16,10 +18,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
     public class OsuRadioButton : CircularContainer, IHasCurrentValue<bool>, IHasAccentColour
     {
-        private readonly Container innerSwitch;
+        private readonly Box fill;
+        private readonly Box innerSwitch;
+        private readonly Container switchContainer;
 
-        public const float BORDER_THICKNESS = 5;
-        public const float SIZE_X = 30;
+        public const float BORDER_THICKNESS = 6;
+        public const float SIZE_X = 60;
+        public const float SIZE_Y = 28;
 
         private Color4 enabledColour;
         public Color4 EnabledColour
@@ -47,52 +52,53 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public OsuRadioButton()
         {
-            Size = new Vector2(SIZE_X, 12);
-            
+
+            Size = new Vector2(SIZE_X, SIZE_Y);
+
+            BorderColour = Color4.White;
             BorderThickness = BORDER_THICKNESS;
 
             Masking = true;
 
             Children = new Drawable[]
             {
-                innerSwitch = new Container
+                fill = new Box
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    AlwaysPresent = true,
+                    Alpha = 0
+                },
+                switchContainer = new Container
+                {
+                    CornerRadius = SIZE_Y / 2 - BORDER_THICKNESS - 2,
+                    Masking = true,
+                    Size = new Vector2(SIZE_Y - 2 * BORDER_THICKNESS - 4),
                     Position = new Vector2(BORDER_THICKNESS + 2),
-                    Size = new Vector2(8),
-                    CornerRadius = 4,
+                    Child = innerSwitch = new Box
+                    {
+                        Size = new Vector2(SIZE_Y - 2 * BORDER_THICKNESS - 4),
+                    }
                 }
             };
 
             Current.ValueChanged += newValue =>
             {
                 if (newValue)
-                    innerSwitch.MoveToX(SIZE_X - BORDER_THICKNESS - 2, 200, Easing.OutQuint);
+                    switchContainer.MoveToX(SIZE_X - BORDER_THICKNESS - 2 - innerSwitch.Size.X, 200, Easing.OutQuint);
                 else
-                    innerSwitch.MoveToX(BORDER_THICKNESS + 2, 200, Easing.OutQuint);
-                BorderColour = newValue ? enabledColour : disabledColour;
+                    switchContainer.MoveToX(BORDER_THICKNESS + 2, 200, Easing.OutQuint);
+                this.FadeAccent(newValue ? enabledColour : DisabledColour, 500, Easing.OutQuint);
+                fill.FadeTo(newValue ? 1 : 0, 500, Easing.OutQuint);
             };
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            innerSwitch.Colour = colours.BlueLight;
-
-            AccentColour = colours.BlueLight;
-            GlowingAccentColour = colours.BlueLighter;
-            GlowColour = colours.BlueDarker;
-            EnabledColour = colours.BlueLighter;
-            DisabledColour = colours.Gray4;
-
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Colour = GlowColour,
-                Type = EdgeEffectType.Glow,
-                Radius = 10,
-                Roundness = 8,
-            };
+            EnabledColour = colours.BlueDark;
+            DisabledColour = colours.Gray3;
+            switchContainer.Colour = enabledColour;
+            fill.Colour = disabledColour;
         }
 
         protected override void LoadComplete()
@@ -100,37 +106,22 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             FadeEdgeEffectTo(0);
         }
 
+        protected override bool OnClick(InputState state)
+        {
+            Current.Value = !Current.Value;
+            return base.OnClick(state);
+        }
+
         protected override bool OnHover(InputState state)
         {
-            Glowing = true;
+            // Change the colour slightly to indicate hovering
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            Glowing = false;
+            // Reset to original colours
             base.OnHoverLost(state);
-        }
-        
-        private bool glowing;
-        public bool Glowing
-        {
-            get { return glowing; }
-            set
-            {
-                glowing = value;
-
-                if (value)
-                {
-                    this.FadeColour(GlowingAccentColour, 500, Easing.OutQuint);
-                    FadeEdgeEffectTo(1, 500, Easing.OutQuint);
-                }
-                else
-                {
-                    FadeEdgeEffectTo(0, 500);
-                    this.FadeColour(AccentColour, 500);
-                }
-            }
         }
 
         public Bindable<bool> Current { get; } = new Bindable<bool>();
@@ -138,38 +129,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private Color4 accentColour;
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
-                if (!Glowing)
-                    Colour = value;
-            }
-        }
-
-        private Color4 glowingAccentColour;
-        public Color4 GlowingAccentColour
-        {
-            get { return glowingAccentColour; }
-            set
-            {
-                glowingAccentColour = value;
-                if (Glowing)
-                    Colour = value;
-            }
-        }
-
-        private Color4 glowColour;
-        public Color4 GlowColour
-        {
-            get { return glowColour; }
-            set
-            {
-                glowColour = value;
-
-                var effect = EdgeEffect;
-                effect.Colour = value;
-                EdgeEffect = effect;
+                BorderColour = value;
             }
         }
     }
