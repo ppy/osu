@@ -25,6 +25,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
+            if (!beatmap.HitObjects.Any())
+                return new OsuDifficultyAttributes(mods, 0);
+
             OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
             Skill[] skills =
             {
@@ -58,10 +61,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
+            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
+            double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
+            double preEmpt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
+
+            int maxCombo = beatmap.HitObjects.Count();
+            // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
+            maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
+
             return new OsuDifficultyAttributes(mods, starRating)
             {
                 AimStrain = aimRating,
-                SpeedStrain = speedRating
+                SpeedStrain = speedRating,
+                ApproachRate = preEmpt > 1200 ? (1800 - preEmpt) / 120 : (1200 - preEmpt) / 150 + 5,
+                OverallDifficulty = (80 - hitWindowGreat) / 6,
+                MaxCombo = maxCombo
             };
         }
 

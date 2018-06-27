@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Catch.Objects;
@@ -17,6 +18,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
 
         [TestCase("basic"), Ignore("See: https://github.com/ppy/osu/issues/2232")]
+        [TestCase("spinner")]
+        [TestCase("spinner-and-circles")]
         public new void Test(string name)
         {
             base.Test(name);
@@ -27,22 +30,15 @@ namespace osu.Game.Rulesets.Catch.Tests
             if (hitObject is JuiceStream stream)
             {
                 foreach (var nested in stream.NestedHitObjects)
-                {
-                    yield return new ConvertValue
-                    {
-                        StartTime = nested.StartTime,
-                        Position = ((CatchHitObject)nested).X * CatchPlayfield.BASE_WIDTH
-                    };
-                }
+                    yield return new ConvertValue((CatchHitObject)nested);
+            }
+            else if (hitObject is BananaShower shower)
+            {
+                foreach (var nested in shower.NestedHitObjects)
+                    yield return new ConvertValue((CatchHitObject)nested);
             }
             else
-            {
-                yield return new ConvertValue
-                {
-                    StartTime = hitObject.StartTime,
-                    Position = ((CatchHitObject)hitObject).X * CatchPlayfield.BASE_WIDTH
-                };
-            }
+                yield return new ConvertValue((CatchHitObject)hitObject);
         }
 
         protected override Ruleset CreateRuleset() => new CatchRuleset();
@@ -55,8 +51,31 @@ namespace osu.Game.Rulesets.Catch.Tests
         /// </summary>
         private const float conversion_lenience = 2;
 
-        public double StartTime;
-        public float Position;
+        [JsonIgnore]
+        public readonly CatchHitObject HitObject;
+
+        public ConvertValue(CatchHitObject hitObject)
+        {
+            HitObject = hitObject;
+            startTime = 0;
+            position = 0;
+        }
+
+        private double startTime;
+
+        public double StartTime
+        {
+            get => HitObject?.StartTime ?? startTime;
+            set => startTime = value;
+        }
+
+        private float position;
+
+        public float Position
+        {
+            get => HitObject?.X * CatchPlayfield.BASE_WIDTH ?? position;
+            set => position = value;
+        }
 
         public bool Equals(ConvertValue other)
             => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
