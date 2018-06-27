@@ -73,7 +73,18 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            protected override Waveform GetWaveform() => new Waveform(store.GetStream(getPathForFile(Metadata.AudioFile)));
+            protected override Waveform GetWaveform()
+            {
+                try
+                {
+                    var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
+                    return trackData == null ? null : new Waveform(trackData);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
 
             protected override Storyboard GetStoryboard()
             {
