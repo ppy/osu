@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             bool isTick = judgedObject is DrawableHoldNoteTick;
 
-            Anchor = Anchor.TopCentre;
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.X;

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -34,6 +35,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
+            if (!beatmap.HitObjects.Any())
+                return new TaikoDifficultyAttributes(mods, 0);
+
             var difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
 
             foreach (var hitObject in beatmap.HitObjects)
@@ -47,7 +51,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             double starRating = calculateDifficulty(difficultyHitObjects, timeRate) * star_scaling_factor;
 
-            return new DifficultyAttributes(mods, starRating);
+            return new TaikoDifficultyAttributes(mods, starRating)
+            {
+                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
+                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate,
+                MaxCombo = beatmap.HitObjects.Count(h => h is Hit)
+            };
         }
 
         private bool calculateStrainValues(List<TaikoHitObjectDifficulty> objects, double timeRate)
