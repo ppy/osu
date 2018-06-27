@@ -9,11 +9,13 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeControlReceptor : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalInput
+    public class VolumeControlReceptor : Container, IMouseWheelBindingHandler<GlobalAction>, IHandleGlobalInput
     {
         public Func<GlobalAction, bool> ActionRequested;
+        public Func<GlobalAction, float, bool, bool> WheelActionRequested;
 
         public bool OnPressed(GlobalAction action) => ActionRequested?.Invoke(action) ?? false;
+        public bool OnMouseWheel(GlobalAction action, float amount, bool isPrecise) => WheelActionRequested?.Invoke(action, amount, isPrecise) ?? false;
         public bool OnReleased(GlobalAction action) => false;
     }
 }
