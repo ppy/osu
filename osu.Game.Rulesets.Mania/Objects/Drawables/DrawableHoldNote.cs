@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -75,6 +76,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             AddNested(tail);
         }
 
+        protected override void OnDirectionChanged(ScrollingDirection direction)
+        {
+            base.OnDirectionChanged(direction);
+
+            bodyPiece.Anchor = bodyPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+        }
+
         public override Color4 AccentColour
         {
             get { return base.AccentColour; }
@@ -100,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.Update();
 
             // Make the body piece not lie under the head note
-            bodyPiece.Y = head.Height / 2;
+            bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * head.Height / 2;
             bodyPiece.Height = DrawHeight - head.Height / 2 + tail.Height / 2;
         }
 

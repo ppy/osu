@@ -93,6 +93,9 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         /// <returns>A positive value indicating the position at <paramref name="time"/>.</returns>
         private double positionAt(double time, double timeRange)
         {
+            if (controlPoints.Count == 0)
+                return time / timeRange;
+
             double length = 0;
 
             // We need to consider all timing points until the specified time and not just the currently-active one,
