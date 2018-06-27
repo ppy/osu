@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseEditorSetupScreen : OsuTestCase
     {
-        private readonly Setup setup;
+        private Setup setup;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -40,10 +40,14 @@ namespace osu.Game.Tests.Visual
             typeof(AdvancedScreen),
             typeof(GeneralScreenBottomHeader),
         };
-
-        public TestCaseEditorSetupScreen()
+        
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase osuGame)
         {
-            setup = new Setup(new TestWorkingBeatmap(new RulesetInfo()));
+            osuGame.Beatmap.Value = new TestWorkingBeatmap(new RulesetInfo());
+
+            setup = new Setup();
+            setup.Beatmap.BindTo(osuGame.Beatmap);
             Child = setup;
             addSteps();
         }

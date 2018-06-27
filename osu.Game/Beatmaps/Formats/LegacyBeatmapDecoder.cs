@@ -139,6 +139,12 @@ namespace osu.Game.Beatmaps.Formats
                 case @"LetterboxInBreaks":
                     beatmap.BeatmapInfo.LetterboxInBreaks = int.Parse(pair.Value) == 1;
                     break;
+                case @"StoryFireInFront":
+                    beatmap.BeatmapInfo.StoryFireInFront = int.Parse(pair.Value) == 1;
+                    break;
+                case @"EpilepsyWarning":
+                    beatmap.BeatmapInfo.EpilepsyWarning = int.Parse(pair.Value) == 1;
+                    break;
                 case @"SpecialStyle":
                     beatmap.BeatmapInfo.SpecialStyle = int.Parse(pair.Value) == 1;
                     break;

@@ -186,7 +186,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                     }
                 }
             };
-            radioButton.Current.ValueChanged += delegate { TriggerRadioButtonValueChanged(radioButton.Current.Value); };
+
+            radioButton.Current.ValueChanged += a => TriggerRadioButtonValueChanged(a);
         }
 
         private void changeHeight(float newHeight)

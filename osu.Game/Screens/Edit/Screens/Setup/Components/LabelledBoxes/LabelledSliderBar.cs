@@ -38,11 +38,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public const float DEFAULT_BOTTOM_PADDING = 15;
         public const float DEFAULT_SLIDER_BAR_PADDING = 300;
 
-        public Action<float> SliderBarValueChangedAction;
+        public event Action<float> SliderBarValueChanged;
 
         public void TriggerSliderBarValueChanged(float newValue)
         {
-            SliderBarValueChangedAction?.Invoke(newValue);
+            SliderBarValueChanged?.Invoke(newValue);
+        }
+
+        public float CurrentValue
+        {
+            get => sliderBar.Current.Value;
+            set => sliderBar.Current.Value = value;
         }
 
         private float sliderMinValue = 0;
@@ -250,7 +256,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                     }
                 }
             };
-            sliderBar.Current.ValueChanged += delegate { TriggerSliderBarValueChanged(sliderBar.Current.Value); };
+
+            sliderBar.Current.ValueChanged += a => TriggerSliderBarValueChanged(a);
         }
 
         private void changeHeight(float newHeight)

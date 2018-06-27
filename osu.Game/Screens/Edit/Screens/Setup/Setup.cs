@@ -29,10 +29,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup
         public const float SIZE_X = 1080;
         public const float SIZE_Y = 650;
 
-        public Setup(WorkingBeatmap workingBeatmap)
+        public Setup()
         {
-            Beatmap.Value = workingBeatmap;
-            CurrentScreen = new GeneralScreen(workingBeatmap);
+            CurrentScreen = new GeneralScreen();
 
             Children = new Drawable[]
             {
@@ -110,7 +109,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
             switch (mode)
             {
                 case SetupScreenMode.General:
-                    CurrentScreen = new GeneralScreen(Beatmap.Value);
+                    CurrentScreen = new GeneralScreen();
                     break;
                 case SetupScreenMode.Difficulty:
                     CurrentScreen = new DifficultyScreen();

@@ -69,7 +69,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     RightTickCaption = "Insane",
                                     LabelText = "HP Drain Rate",
                                     BottomLabelText = "The constant rate of health-bar drain throughout the song",
-                                    SliderBarValueChangedAction = a => Beatmap.Value.BeatmapInfo.BaseDifficulty.DrainRate = a
                                 },
                                 overallDifficulty = new LabelledSliderBar
                                 {
@@ -82,7 +81,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     RightTickCaption = "Insane",
                                     LabelText = "Overall Difficulty",
                                     BottomLabelText = "The harshness of the hit window",
-                                    SliderBarValueChangedAction = a => Beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty = a
                                 }
                             }
                         },
@@ -95,6 +93,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     },
                 },
             };
+
+            hpDrainRate.SliderBarValueChanged += a => Beatmap.Value.BeatmapInfo.BaseDifficulty.DrainRate = a;
+            overallDifficulty.SliderBarValueChanged += a => Beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty = a;
         }
     }
 }

@@ -31,11 +31,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public const float DEFAULT_HEIGHT = 50;
         public const float DEFAULT_LABEL_PADDING = 15;
 
-        public Action<string> TextBoxTextChangedAction;
+        public event Action<string> TextBoxTextChanged;
 
         public void TriggerTextBoxTextChanged(string newText)
         {
-            TextBoxTextChangedAction?.Invoke(newText);
+            TextBoxTextChanged?.Invoke(newText);
         }
 
         private bool readOnly = false;
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             {
                 textBoxText = value;
                 textBox.Text = value;
-                TextBoxTextChangedAction?.Invoke(value);
+                TextBoxTextChanged?.Invoke(value);
             }
         }
 
@@ -206,6 +206,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                     }
                 }
             };
+            
             textBox.OnCommit += delegate { TriggerTextBoxTextChanged(textBox.Text); };
         }
     }
