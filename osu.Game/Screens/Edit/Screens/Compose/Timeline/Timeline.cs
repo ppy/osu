@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -118,18 +117,15 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
         private void seekTrackToCurrent()
         {
-            var track = Beatmap.Value.Track;
-            if (track is TrackVirtual || !track.IsLoaded)
+            if (!Beatmap.Value.TrackLoaded)
                 return;
 
-            if (!(Beatmap.Value.Track is TrackVirtual))
-                adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
+            adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
         }
 
         private void scrollToTrackTime()
         {
-            var track = Beatmap.Value.Track;
-            if (track is TrackVirtual || !track.IsLoaded)
+            if (!Beatmap.Value.TrackLoaded)
                 return;
 
             ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);

@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps
                 }
                 catch
                 {
-                    return new TrackVirtual();
+                    return null;
                 }
             }
 
