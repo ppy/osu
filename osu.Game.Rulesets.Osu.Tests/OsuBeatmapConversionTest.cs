@@ -8,6 +8,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -42,8 +43,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = obj.StartTime,
                 EndTime = (obj as IHasEndTime)?.EndTime ?? obj.StartTime,
-                X = (obj as IHasPosition)?.X ?? 256,
-                Y = (obj as IHasPosition)?.Y ?? 192,
+                X = (obj as IHasPosition)?.X ?? OsuPlayfield.BASE_SIZE.X / 2,
+                Y = (obj as IHasPosition)?.Y ?? OsuPlayfield.BASE_SIZE.Y / 2,
             };
         }
 
