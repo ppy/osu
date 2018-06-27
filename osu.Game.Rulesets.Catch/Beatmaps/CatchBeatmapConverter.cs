@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             var positionData = obj as IHasXPosition;
             var comboData = obj as IHasCombo;
             var endTime = obj as IHasEndTime;
+            var legacyOffset = obj as IHasLegacyLastTickOffset;
 
             if (curveData != null)
             {
@@ -39,7 +40,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     RepeatSamples = curveData.RepeatSamples,
                     RepeatCount = curveData.RepeatCount,
                     X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH,
-                    NewCombo = comboData?.NewCombo ?? false
+                    NewCombo = comboData?.NewCombo ?? false,
+                    LegacyLastTickOffset = legacyOffset?.LegacyLastTickOffset ?? 0
                 };
             }
             else if (endTime != null)

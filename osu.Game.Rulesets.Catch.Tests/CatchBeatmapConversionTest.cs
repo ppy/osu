@@ -13,11 +13,12 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    internal class CatchBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    [TestFixture]
+    public class CatchBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
 
-        [TestCase("basic"), Ignore("See: https://github.com/ppy/osu/issues/2232")]
+        [TestCase("basic")]
         [TestCase("spinner")]
         [TestCase("spinner-and-circles")]
         public new void Test(string name)
@@ -44,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         protected override Ruleset CreateRuleset() => new CatchRuleset();
     }
 
-    internal struct ConvertValue : IEquatable<ConvertValue>
+    public struct ConvertValue : IEquatable<ConvertValue>
     {
         /// <summary>
         /// A sane value to account for osu!stable using ints everwhere.
