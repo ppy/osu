@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -51,13 +52,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(beatmap);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Beatmap.BindValueChanged(b => waveform.Waveform = b.Waveform);
-            waveform.Waveform = Beatmap.Value.Waveform;
+            Beatmap.BindValueChanged(b =>
+            {
+                waveform.Waveform = b.Waveform;
+                track = b.Track;
+            }, true);
         }
 
         /// <summary>
@@ -79,6 +78,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         /// Whether the track was playing before a user drag event.
         /// </summary>
         private bool trackWasPlaying;
+
+        private Track track;
 
         protected override void Update()
         {
@@ -117,18 +118,18 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
         private void seekTrackToCurrent()
         {
-            if (!Beatmap.Value.TrackLoaded || !Beatmap.Value.Track.IsLoaded)
+            if (!track.IsLoaded)
                 return;
 
-            adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
+            adjustableClock.Seek(Current / Content.DrawWidth * track.Length);
         }
 
         private void scrollToTrackTime()
         {
-            if (!Beatmap.Value.TrackLoaded || !Beatmap.Value.Track.IsLoaded)
+            if (!track.IsLoaded)
                 return;
 
-            ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
+            ScrollTo((float)(adjustableClock.CurrentTime / track.Length) * Content.DrawWidth, false);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
