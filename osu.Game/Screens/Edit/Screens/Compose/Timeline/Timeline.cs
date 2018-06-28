@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
         private void seekTrackToCurrent()
         {
-            if (!Beatmap.Value.TrackLoaded)
+            if (!Beatmap.Value.TrackLoaded || !Beatmap.Value.Track.IsLoaded)
                 return;
 
             adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
         private void scrollToTrackTime()
         {
-            if (!Beatmap.Value.TrackLoaded)
+            if (!Beatmap.Value.TrackLoaded || !Beatmap.Value.Track.IsLoaded)
                 return;
 
             ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
