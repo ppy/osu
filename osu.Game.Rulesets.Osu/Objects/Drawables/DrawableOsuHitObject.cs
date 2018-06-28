@@ -58,6 +58,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
+
+        public void Shake()
+        {
+            const int shake_amount = 8;
+
+            this.MoveToX(Position.X + shake_amount, 20).Then()
+                .MoveToX(Position.X - shake_amount, 20).Then()
+                .MoveToX(Position.X + shake_amount, 20).Then()
+                .MoveToX(Position.X - shake_amount, 20).Then()
+                .MoveToX(Position.X + shake_amount, 20).Then()
+                .MoveToX(Position.X, 20);
+        }
     }
 
     public enum ComboResult
