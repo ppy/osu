@@ -48,7 +48,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public float CurrentValue
         {
             get => sliderBar.Current.Value;
-            set => sliderBar.Current.Value = value;
+            set
+            {
+                sliderBar.Current.Value = value;
+                TriggerSliderBarValueChanged(value); // Just in case
+            }
         }
 
         private float sliderMinValue = 0;

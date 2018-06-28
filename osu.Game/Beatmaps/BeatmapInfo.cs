@@ -89,6 +89,8 @@ namespace osu.Game.Beatmaps
         public bool EpilepsyWarning { get; set; }
         public bool WidescreenStoryboard { get; set; }
 
+        public bool SamplesMatchPlaybackRate { get; set; }
+
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
         [JsonIgnore]

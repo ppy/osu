@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Display Epilepsy Effect",
-                                    BottomLabelText = "Adds a \"3, 2, 1, GO!\" countdown at the beginning of the map, assuming there is enough time to do so.",
+                                    BottomLabelText = "This should be enabled if the storyboard contains rapid colour adjustments potential to cause seizures.",
                                 },
                             }
                         },
@@ -109,6 +109,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             letterbox.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.LetterboxInBreaks = a;
             displayEpilepsyWarning.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.EpilepsyWarning = a;
         }
+
+        public void ChangeEnableCountdown(bool newValue) => enableCountdown.CurrentValue = newValue;
+        public void ChangeWidescreenStoryboard(bool newValue) => widescreenSupport.CurrentValue = newValue;
+        public void ChangeStoryFireInFront(bool newValue) => displayStoryboard.CurrentValue = newValue;
+        public void ChangeLetterboxInBreaks(bool newValue) => letterbox.CurrentValue = newValue;
+        public void ChangeEpilepsyWarning(bool newValue) => displayEpilepsyWarning.CurrentValue = newValue;
 
         private void updateInfo()
         {

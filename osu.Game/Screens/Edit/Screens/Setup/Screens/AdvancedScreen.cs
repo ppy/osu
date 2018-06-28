@@ -83,6 +83,30 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     BottomLabelText = "Use N+1 key style for osu!mania maps.",
                                     Alpha = 0
                                 },
+                                new OsuSpriteText
+                                {
+                                    Padding = new MarginPadding { Top = 10 },
+                                    Colour = Color4.Yellow,
+                                    Text = "Generally it is preferable to have multiple maps for all gamemodes.",
+                                    TextSize = 14,
+                                    Font = @"Exo2.0-BoldItalic",
+                                },
+                                new OsuSpriteText
+                                {
+                                    //Padding = new MarginPadding { Top = 10 },
+                                    Colour = Color4.Yellow,
+                                    Text = "It is often encouraged that you create mode-specific maps, since converted beatmaps often do not offer the desirable gameplay.",
+                                    TextSize = 14,
+                                    Font = @"Exo2.0-BoldItalic",
+                                },
+                                new OsuSpriteText
+                                {
+                                    //Padding = new MarginPadding { Top = 10 },
+                                    Colour = Color4.Yellow,
+                                    Text = "Please take that into consideration before submitting your beatmap set.",
+                                    TextSize = 14,
+                                    Font = @"Exo2.0-BoldItalic",
+                                },
                             }
                         },
                     },
@@ -96,10 +120,20 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             maniaSpecialStyle.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.SpecialStyle = a;
         }
 
+        public void ChangeManiaSpecialStyle(bool newValue) => maniaSpecialStyle.CurrentValue = newValue;
+        public void ChangeStackLeniency(float newValue) => stackLeniency.CurrentValue = newValue;
+        public void ChangeBeatmapRuleset(int newRulesetID)
+        {
+            Beatmap.Value.BeatmapInfo.RulesetID = newRulesetID;
+            updateInfo();
+        }
+
         private void updateInfo()
         {
             stackLeniency.CurrentValue = Beatmap.Value?.BeatmapInfo.StackLeniency ?? 7;
             maniaSpecialStyle.CurrentValue = Beatmap.Value?.BeatmapInfo.SpecialStyle ?? false;
+
+            maniaSpecialStyle.Alpha = Beatmap.Value?.BeatmapInfo.RulesetID == 3 ? 1 : 0;
         }
     }
 }

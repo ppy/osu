@@ -145,6 +145,9 @@ namespace osu.Game.Beatmaps.Formats
                 case @"EpilepsyWarning":
                     beatmap.BeatmapInfo.EpilepsyWarning = int.Parse(pair.Value) == 1;
                     break;
+                case @"SamplesMatchPlaybackRate":
+                    beatmap.BeatmapInfo.SamplesMatchPlaybackRate = int.Parse(pair.Value) == 1;
+                    break;
                 case @"SpecialStyle":
                     beatmap.BeatmapInfo.SpecialStyle = int.Parse(pair.Value) == 1;
                     break;

@@ -68,11 +68,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     LeftTickCaption = "Easy",
                                     RightTickCaption = "Insane",
                                     LabelText = "HP Drain Rate",
-                                    BottomLabelText = "The constant rate of health-bar drain throughout the song",
+                                    BottomLabelText = "The constant rate of health-bar drain throughout the song.",
                                 },
                                 overallDifficulty = new LabelledSliderBar
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 150 },
+                                    Padding = new MarginPadding { Right = 150 },
                                     SliderMinValue = 0,
                                     SliderMaxValue = 10,
                                     SliderNormalPrecision = 1,
@@ -80,7 +80,34 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     LeftTickCaption = "Easy",
                                     RightTickCaption = "Insane",
                                     LabelText = "Overall Difficulty",
-                                    BottomLabelText = "The harshness of the hit window",
+                                    BottomLabelText = "The harshness of the hit window.",
+                                },
+                                circleSize = new LabelledSliderBar
+                                {
+                                    Padding = new MarginPadding { Right = 150 },
+                                    SliderMinValue = 2,
+                                    SliderMaxValue = 7,
+                                    SliderNormalPrecision = 1,
+                                    SliderAlternatePrecision = 0.1f,
+                                    Alpha = 0,
+                                    LeftTickCaption = "Large",
+                                    MiddleTickCaption = "Normal",
+                                    RightTickCaption = "Small",
+                                    LabelText = "Circle Size",
+                                    BottomLabelText = "The radial size of the hit circles and sliders in osu! and the fruit in osu!catch.",
+                                },
+                                approachRate = new LabelledSliderBar
+                                {
+                                    Padding = new MarginPadding { Right = 150 },
+                                    SliderMinValue = 0,
+                                    SliderMaxValue = 10,
+                                    SliderNormalPrecision = 1,
+                                    SliderAlternatePrecision = 0.1f,
+                                    Alpha = 0,
+                                    LeftTickCaption = "Slow",
+                                    RightTickCaption = "Fast",
+                                    LabelText = "Approach Rate",
+                                    BottomLabelText = "The speed at which objects appear.",
                                 }
                             }
                         },
@@ -94,8 +121,29 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 },
             };
 
+            updateInfo();
+            Beatmap.ValueChanged += a => updateInfo();
+
             hpDrainRate.SliderBarValueChanged += a => Beatmap.Value.BeatmapInfo.BaseDifficulty.DrainRate = a;
             overallDifficulty.SliderBarValueChanged += a => Beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty = a;
+            circleSize.SliderBarValueChanged += a => Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize = a;
+            approachRate.SliderBarValueChanged += a => Beatmap.Value.BeatmapInfo.BaseDifficulty.ApproachRate = a;
+        }
+
+        public void ChangeHPDrainRate(float newValue) => hpDrainRate.CurrentValue = newValue;
+        public void ChangeOverallDifficulty(float newValue) => overallDifficulty.CurrentValue = newValue;
+        public void ChangeCircleSize(float newValue) => circleSize.CurrentValue = newValue;
+        public void ChangeApproachRate(float newValue) => approachRate.CurrentValue = newValue;
+
+        private void updateInfo()
+        {
+            hpDrainRate.CurrentValue = Beatmap.Value?.BeatmapInfo.BaseDifficulty.DrainRate ?? 5;
+            overallDifficulty.CurrentValue = Beatmap.Value?.BeatmapInfo.BaseDifficulty.OverallDifficulty ?? 5;
+            circleSize.CurrentValue = Beatmap.Value?.BeatmapInfo.BaseDifficulty.CircleSize ?? 5;
+            approachRate.CurrentValue = Beatmap.Value?.BeatmapInfo.BaseDifficulty.ApproachRate ?? 5;
+
+            var ruleset = Beatmap.Value?.BeatmapInfo.RulesetID;
+            approachRate.Alpha = circleSize.Alpha = ruleset == 1 || ruleset == 3 ? 0 : 1;
         }
     }
 }

@@ -66,8 +66,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 samples = new LabelledRadioButton
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
-                                    LabelText = "Samples match playback rate",
-                                    BottomLabelText = "The constant rate of health-bar drain throughout the song",
+                                    LabelText = "Samples Match Playback Rate",
+                                    BottomLabelText = "This option is suitable for fully-hitsounded maps.",
                                 },
                             }
                         },
@@ -78,13 +78,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             updateInfo();
             Beatmap.ValueChanged += a => updateInfo();
 
-            // Could not find a property for this setting, so the radio button is completely useless
-            //samples.RadioButtonValueChanged += a => Beatmap.Value = a;
+            samples.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.SamplesMatchPlaybackRate = a;
         }
+
+        public void ChangeSamplesMatchPlaybackRate(bool newValue) => samples.CurrentValue = newValue;
 
         private void updateInfo()
         {
-            // Update info about the beatmap once beatmap being used is updated
+            samples.CurrentValue = Beatmap.Value?.BeatmapInfo.SamplesMatchPlaybackRate ?? false;
         }
     }
 }
