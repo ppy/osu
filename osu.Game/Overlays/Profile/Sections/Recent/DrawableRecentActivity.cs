@@ -141,11 +141,11 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     break;
 
                 case RecentActivityType.UserSupportFirst:
-                    message = $"{userLinkTemplate()} has become an osu! supporter - thanks for your generosity!";
+                    message = $"{userLinkTemplate()} has become an osu!supporter - thanks for your generosity!";
                     break;
 
                 case RecentActivityType.UserSupportGift:
-                    message = $"{userLinkTemplate()} has received the gift of osu! supporter!";
+                    message = $"{userLinkTemplate()} has received the gift of osu!supporter!";
                     break;
 
                 case RecentActivityType.UsernameChange:

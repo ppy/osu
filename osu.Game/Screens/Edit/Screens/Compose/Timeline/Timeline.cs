@@ -52,13 +52,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(beatmap);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Beatmap.BindValueChanged(b => waveform.Waveform = b.Waveform);
-            waveform.Waveform = Beatmap.Value.Waveform;
+            Beatmap.BindValueChanged(b =>
+            {
+                waveform.Waveform = b.Waveform;
+                track = b.Track;
+            }, true);
         }
 
         /// <summary>
@@ -80,6 +78,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         /// Whether the track was playing before a user drag event.
         /// </summary>
         private bool trackWasPlaying;
+
+        private Track track;
 
         protected override void Update()
         {
@@ -118,21 +118,18 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
         private void seekTrackToCurrent()
         {
-            var track = Beatmap.Value.Track;
-            if (track is TrackVirtual || !track.IsLoaded)
+            if (!track.IsLoaded)
                 return;
 
-            if (!(Beatmap.Value.Track is TrackVirtual))
-                adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
+            adjustableClock.Seek(Current / Content.DrawWidth * track.Length);
         }
 
         private void scrollToTrackTime()
         {
-            var track = Beatmap.Value.Track;
-            if (track is TrackVirtual || !track.IsLoaded)
+            if (!track.IsLoaded)
                 return;
 
-            ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
+            ScrollTo((float)(adjustableClock.CurrentTime / track.Length) * Content.DrawWidth, false);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
