@@ -289,9 +289,9 @@ namespace osu.Game.Beatmaps.Formats
                 if (split.Length >= 4)
                     sampleSet = (LegacySampleBank)int.Parse(split[3]);
 
-                //SampleBank sampleBank = SampleBank.Default;
-                //if (split.Length >= 5)
-                //    sampleBank = (SampleBank)int.Parse(split[4]);
+                int customSampleBank = 0;
+                if (split.Length >= 5)
+                    customSampleBank = int.Parse(split[4]);
 
                 int sampleVolume = defaultSampleVolume;
                 if (split.Length >= 6)
