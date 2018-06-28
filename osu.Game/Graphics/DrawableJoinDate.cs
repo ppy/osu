@@ -7,17 +7,13 @@ namespace osu.Game.Graphics
 {
     public class DrawableJoinDate : DrawableDate
     {
-        private readonly DateTimeOffset date;
-
-        public DrawableJoinDate(DateTimeOffset date) : base(date)
+        public DrawableJoinDate(DateTimeOffset date)
+            : base(date)
         {
-            this.date = date;
         }
 
-        protected override string Format() => Text = date.ToUniversalTime().Year < 2008 ?
-            "Here since the beginning" :
-            string.Format($"{date:MMMM yyyy}");
+        protected override string Format() => Text = Date.ToUniversalTime().Year < 2008 ? "Here since the beginning" : $"{Date:MMMM yyyy}";
 
-        public override string TooltipText => string.Format($"{date:MMMM d, yyyy}");
+        public override string TooltipText => $"{Date:MMMM d, yyyy}";
     }
 }
