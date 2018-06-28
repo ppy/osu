@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Beatmaps.Formats
@@ -222,11 +223,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
-                Assert.AreEqual(0, ((LegacyDecoder<Beatmap>.LegacySampleControlPoint)hitObjects[0].SampleControlPoint).CustomSampleBank);
-                Assert.AreEqual(1, ((LegacyDecoder<Beatmap>.LegacySampleControlPoint)hitObjects[1].SampleControlPoint).CustomSampleBank);
-                Assert.AreEqual(2, ((LegacyDecoder<Beatmap>.LegacySampleControlPoint)hitObjects[2].SampleControlPoint).CustomSampleBank);
-                Assert.AreEqual(0, ((LegacyDecoder<Beatmap>.LegacySampleControlPoint)hitObjects[3].SampleControlPoint).CustomSampleBank);
+                Assert.AreEqual("hitnormal", getTestableSampleInfo(hitObjects[0]).Name);
+                Assert.AreEqual("hitnormal", getTestableSampleInfo(hitObjects[1]).Name);
+                Assert.AreEqual("hitnormal2", getTestableSampleInfo(hitObjects[2]).Name);
+                Assert.AreEqual("hitnormal", getTestableSampleInfo(hitObjects[3]).Name);
             }
+
+            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(new SampleInfo { Name = "hitnormal" });
         }
     }
 }

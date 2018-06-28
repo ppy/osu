@@ -178,7 +178,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var baseInfo = base.ApplyTo(sampleInfo);
 
-                if (CustomSampleBank > 0)
+                if (CustomSampleBank > 1)
                     baseInfo.Name += CustomSampleBank;
 
                 return baseInfo;
