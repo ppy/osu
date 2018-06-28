@@ -19,7 +19,7 @@ namespace osu.Game.Graphics
             AutoSizeAxes = Axes.Both;
             Font = "Exo2.0-RegularItalic";
 
-            this.Date = date.ToLocalTime();
+            Date = date.ToLocalTime();
         }
 
         [BackgroundDependencyLoader]

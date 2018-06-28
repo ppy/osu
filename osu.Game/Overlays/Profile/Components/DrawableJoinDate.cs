@@ -2,8 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Game.Graphics;
 
-namespace osu.Game.Graphics
+namespace osu.Game.Overlays.Profile.Components
 {
     public class DrawableJoinDate : DrawableDate
     {
