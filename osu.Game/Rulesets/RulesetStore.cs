@@ -84,10 +84,11 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var instance = r.CreateInstance();
+                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo), (RulesetInfo)null)).RulesetInfo;
 
-                        r.Name = instance.Description;
-                        r.ShortName = instance.ShortName;
+                        r.Name = instanceInfo.Name;
+                        r.ShortName = instanceInfo.ShortName;
+                        r.InstantiationInfo = instanceInfo.InstantiationInfo;
 
                         r.Available = true;
                     }
