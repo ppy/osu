@@ -3,8 +3,8 @@
 
 using System.ComponentModel;
 using System.Linq;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
@@ -12,10 +12,22 @@ namespace osu.Game.Tests.Visual
     [Description("Player instantiated with an autoplay mod.")]
     public class TestCaseAutoplay : TestCasePlayer
     {
-        protected override Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset)
+        protected override Player CreatePlayer(Ruleset ruleset)
         {
-            beatmap.Mods.Value = beatmap.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
-            return base.CreatePlayer(beatmap, ruleset);
+            Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
+            return new ScoreAccessiblePlayer
+            {
+                AllowPause = false,
+                AllowLeadIn = false,
+                AllowResults = false,
+            };
+        }
+
+        protected override bool ContinueCondition(Player player) => base.ContinueCondition(player) &&  ((ScoreAccessiblePlayer)player).ScoreProcessor.TotalScore > 0;
+
+        private class ScoreAccessiblePlayer : Player
+        {
+            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
         }
     }
 }

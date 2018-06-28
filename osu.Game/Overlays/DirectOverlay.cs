@@ -4,12 +4,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -18,6 +18,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Rulesets;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
@@ -28,12 +29,10 @@ namespace osu.Game.Overlays
 
         private APIAccess api;
         private RulesetStore rulesets;
-        private BeatmapManager beatmaps;
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
         private FillFlowContainer<DirectPanel> panels;
-        private DirectPanel playing;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"485e74");
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
@@ -177,23 +176,14 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets, BeatmapManager beatmaps)
+        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
         {
             this.api = api;
             this.rulesets = rulesets;
-            this.beatmaps = beatmaps;
+            this.previewTrackManager = previewTrackManager;
 
             resultCountsContainer.Colour = colours.Yellow;
-
-            beatmaps.ItemAdded += setAdded;
         }
-
-        private void setAdded(BeatmapSetInfo set) => Schedule(() =>
-        {
-            // if a new map was imported, we should remove it from search results (download completed etc.)
-            panels?.FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID)?.FadeOut(400).Expire();
-            BeatmapSets = BeatmapSets?.Where(b => b.OnlineBeatmapSetID != set.OnlineBeatmapSetID);
-        });
 
         private void updateResultCounts()
         {
@@ -217,12 +207,6 @@ namespace osu.Game.Overlays
                 panels.FadeOut(200);
                 panels.Expire();
                 panels = null;
-
-                if (playing != null)
-                {
-                    playing.PreviewPlaying.Value = false;
-                    playing = null;
-                }
             }
 
             if (BeatmapSets == null) return;
@@ -253,17 +237,6 @@ namespace osu.Game.Overlays
             {
                 if (panels != null) ScrollFlow.Remove(panels);
                 ScrollFlow.Add(panels = newPanels);
-
-                foreach (DirectPanel panel in p.Children)
-                    panel.PreviewPlaying.ValueChanged += newValue =>
-                    {
-                        if (newValue)
-                        {
-                            if (playing != null && playing != panel)
-                                playing.PreviewPlaying.Value = false;
-                            playing = panel;
-                        }
-                    };
             });
         }
 
@@ -272,6 +245,7 @@ namespace osu.Game.Overlays
         private readonly Bindable<string> currentQuery = new Bindable<string>();
 
         private ScheduledDelegate queryChangedDebounce;
+        private PreviewTrackManager previewTrackManager;
 
         private void updateSearch()
         {
@@ -288,6 +262,8 @@ namespace osu.Game.Overlays
 
             if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty)) return;
 
+            previewTrackManager.StopAnyPlaying(this);
+
             getSetsRequest = new SearchBeatmapSetsRequest(currentQuery.Value ?? string.Empty,
                 ((FilterControl)Filter).Ruleset.Value,
                 Filter.DisplayStyleControl.Dropdown.Current.Value,
@@ -297,9 +273,7 @@ namespace osu.Game.Overlays
             {
                 Task.Run(() =>
                 {
-                    var onlineIds = response.Select(r => r.OnlineBeatmapSetID).ToList();
-                    var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID) && !s.DeletePending).Select(r => r.OnlineBeatmapSetID).ToList();
-                    var sets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID)).ToList();
+                    var sets = response.Select(r => r.ToBeatmapSet(rulesets)).ToList();
 
                     // may not need scheduling; loads async internally.
                     Schedule(() =>
@@ -313,23 +287,7 @@ namespace osu.Game.Overlays
             api.Queue(getSetsRequest);
         }
 
-        protected override void PopOut()
-        {
-            base.PopOut();
-
-            if (playing != null)
-                playing.PreviewPlaying.Value = false;
-        }
-
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (beatmaps != null)
-                beatmaps.ItemAdded -= setAdded;
-        }
 
         public class ResultCounts
         {

@@ -2,10 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserScoresRequest : APIRequest<List<OnlineScore>>
+    public class GetUserScoresRequest : APIRequest<List<APIScore>>
     {
         private readonly long userId;
         private readonly ScoreType type;

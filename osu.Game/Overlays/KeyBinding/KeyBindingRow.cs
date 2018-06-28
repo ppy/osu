@@ -180,19 +180,19 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
             if (HasFocus)
             {
                 if (bindTarget.IsHovered)
                 {
-                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
+                    bindTarget.UpdateKeyCombination(new KeyCombination(KeyCombination.FromInputState(state).Keys.Append(state.Mouse.ScrollDelta.Y > 0 ? InputKey.MouseWheelUp : InputKey.MouseWheelDown)));
                     finalise();
                     return true;
                 }
             }
 
-            return base.OnWheel(state);
+            return base.OnScroll(state);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
