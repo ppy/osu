@@ -93,8 +93,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 base.AccentColour = value;
                 Body.AccentColour = AccentColour;
                 Ball.AccentColour = AccentColour;
-                foreach (var drawableHitObject in NestedHitObjects)
-                    drawableHitObject.AccentColour = AccentColour;
+                if (HasNestedHitObjects)
+                    foreach (var drawableHitObject in NestedHitObjects)
+                        drawableHitObject.AccentColour = AccentColour;
             }
         }
 
