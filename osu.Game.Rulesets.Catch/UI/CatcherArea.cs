@@ -250,51 +250,62 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (validCatch && fruit.HyperDash)
                 {
-                    HyperDashModifier = Math.Abs(fruit.HyperDashTarget.X - fruit.X) / Math.Abs(fruit.HyperDashTarget.StartTime - fruit.StartTime) / BASE_SPEED;
-                    HyperDashDirection = fruit.HyperDashTarget.X - fruit.X;
+                    var target = fruit.HyperDashTarget;
+                    double timeDifference = target.StartTime - fruit.StartTime;
+                    double positionDifference = target.X * CatchPlayfield.BASE_WIDTH - catcherPosition;
+                    double velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
+
+                    SetHyperdashState(Math.Abs(velocity), target.X);
                 }
                 else
-                    HyperDashModifier = 1;
+                {
+                    SetHyperdashState();
+                }
 
                 return validCatch;
             }
+
+            private double hyperDashModifier = 1;
+            private int hyperDashDirection;
+            private float hyperDashTargetPosition;
 
             /// <summary>
             /// Whether we are hypderdashing or not.
             /// </summary>
             public bool HyperDashing => hyperDashModifier != 1;
 
-            private double hyperDashModifier = 1;
-
             /// <summary>
-            /// The direction in which hyperdash is allowed. 0 allows both directions.
+            /// Set hyperdash state.
             /// </summary>
-            public double HyperDashDirection;
-
-            /// <summary>
-            /// The speed modifier resultant from hyperdash. Will trigger hyperdash when not equal to 1.
-            /// </summary>
-            public double HyperDashModifier
+            /// <param name="modifier">The speed multiplier. If this is less or equals to 1, this catcher will be non-hyperdashing state.</param>
+            /// <param name="targetPosition">When this catcher crosses this position, this catcher ends hyperdashing.</param>
+            public void SetHyperdashState(double modifier = 1, float targetPosition = -1)
             {
-                get { return hyperDashModifier; }
-                set
+                const float hyperdash_transition_length = 180;
+
+                bool previouslyHyperDashing = HyperDashing;
+                if (modifier <= 1 || X == targetPosition)
                 {
-                    if (value == hyperDashModifier) return;
-                    hyperDashModifier = value;
+                    hyperDashModifier = 1;
+                    hyperDashDirection = 0;
 
-                    const float transition_length = 180;
-
-                    if (HyperDashing)
+                    if (previouslyHyperDashing)
                     {
-                        this.FadeColour(Color4.OrangeRed, transition_length, Easing.OutQuint);
-                        this.FadeTo(0.2f, transition_length, Easing.OutQuint);
-                        Trail = true;
+                        this.FadeColour(Color4.White, hyperdash_transition_length, Easing.OutQuint);
+                        this.FadeTo(1, hyperdash_transition_length, Easing.OutQuint);
                     }
-                    else
+                }
+                else
+                {
+                    hyperDashModifier = modifier;
+                    hyperDashDirection = Math.Sign(targetPosition - X);
+                    hyperDashTargetPosition = targetPosition;
+
+                    if (!previouslyHyperDashing)
                     {
-                        HyperDashDirection = 0;
-                        this.FadeColour(Color4.White, transition_length, Easing.OutQuint);
-                        this.FadeTo(1, transition_length, Easing.OutQuint);
+                        this.FadeColour(Color4.OrangeRed, hyperdash_transition_length, Easing.OutQuint);
+                        this.FadeTo(0.2f, hyperdash_transition_length, Easing.OutQuint);
+                        Trail = true;
                     }
                 }
             }
@@ -349,12 +360,18 @@ namespace osu.Game.Rulesets.Catch.UI
                 var direction = Math.Sign(currentDirection);
 
                 double dashModifier = Dashing ? 1 : 0.5;
-
-                if (hyperDashModifier != 1 && (HyperDashDirection == 0 || direction == Math.Sign(HyperDashDirection)))
-                    dashModifier = hyperDashModifier;
+                double speed = BASE_SPEED * dashModifier * hyperDashModifier;
 
                 Scale = new Vector2(Math.Abs(Scale.X) * direction, Scale.Y);
-                X = (float)MathHelper.Clamp(X + direction * Clock.ElapsedFrameTime * BASE_SPEED * dashModifier, 0, 1);
+                X = (float)MathHelper.Clamp(X + direction * Clock.ElapsedFrameTime * speed, 0, 1);
+
+                // Correct overshooting.
+                if (hyperDashDirection > 0 && hyperDashTargetPosition < X ||
+                    hyperDashDirection < 0 && hyperDashTargetPosition > X)
+                {
+                    X = hyperDashTargetPosition;
+                    SetHyperdashState();
+                }
             }
 
             /// <summary>
