@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
@@ -15,6 +16,8 @@ namespace osu.Game.Graphics.Containers
         }
 
         protected override SpriteText CreateSpriteText() => new OsuSpriteText();
+
+        public void AddArbitraryDrawable(Drawable drawable) => AddInternal(drawable);
 
         public void AddIcon(FontAwesome icon, Action<SpriteText> creationParameters = null) => AddText(((char)icon).ToString(), creationParameters);
     }
