@@ -12,8 +12,10 @@ using System.Threading.Tasks;
 using osu.Game.Storyboards;
 using osu.Framework.IO.File;
 using System.IO;
+using System.Threading;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 
@@ -146,6 +148,7 @@ namespace osu.Game.Beatmaps
         {
             // we want to ensure that we always have a track, even if it's a fake one.
             var t = GetTrack() ?? new TrackVirtual();
+            while (!t.IsLoaded) Thread.Sleep(1);
             applyRateAdjustments(t);
             return t;
         }
