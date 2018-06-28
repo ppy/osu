@@ -8,7 +8,6 @@ using OpenTK.Graphics;
 using osu.Game.Tests.Resources;
 using System.Linq;
 using osu.Game.Audio;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
