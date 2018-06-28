@@ -16,21 +16,7 @@ namespace osu.Game.Beatmaps
         {
             private const double excess_length = 1000;
 
-            private readonly IBeatmap beatmap;
-
             public VirtualBeatmapTrack(IBeatmap beatmap)
-            {
-                this.beatmap = beatmap;
-                updateVirtualLength();
-            }
-
-            protected override void UpdateState()
-            {
-                updateVirtualLength();
-                base.UpdateState();
-            }
-
-            private void updateVirtualLength()
             {
                 var lastObject = beatmap.HitObjects.LastOrDefault();
 
