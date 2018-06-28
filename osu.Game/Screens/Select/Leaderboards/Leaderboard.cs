@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
                         break;
                     case PlaceholderState.NotSupporter:
-                        replacePlaceholder(new MessagePlaceholder(@"Please invest in a supporter tag to view this leaderboard!"));
+                        replacePlaceholder(new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"));
                         break;
                     default:
                         replacePlaceholder(null);
