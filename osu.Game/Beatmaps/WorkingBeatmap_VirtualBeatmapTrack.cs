@@ -14,6 +14,8 @@ namespace osu.Game.Beatmaps
         /// </summary>
         protected class VirtualBeatmapTrack : TrackVirtual
         {
+            private const double excess_length = 1000;
+
             private readonly IBeatmap beatmap;
 
             public VirtualBeatmapTrack(IBeatmap beatmap)
@@ -35,13 +37,13 @@ namespace osu.Game.Beatmaps
                 switch (lastObject)
                 {
                     case null:
-                        Length = 1000;
+                        Length = excess_length;
                         break;
                     case IHasEndTime endTime:
-                        Length = endTime.EndTime + 1000;
+                        Length = endTime.EndTime + excess_length;
                         break;
                     default:
-                        Length = lastObject.StartTime + 1000;
+                        Length = lastObject.StartTime + excess_length;
                         break;
                 }
             }
