@@ -8,7 +8,6 @@ using System.Linq;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Framework;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -29,22 +28,17 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         /// <summary>
-        /// lazer's audio timings in general doesn't match stable. this is the result of user testing, albeit limited.
-        /// This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-        /// </summary>
-        public static int UniversalOffset => RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? -22 : 0;
-
-        /// <summary>
         /// Whether or not beatmap or runtime offsets should be applied. Defaults on; only disable for testing purposes.
         /// </summary>
         public bool ApplyOffsets = true;
 
-        private readonly int offset = UniversalOffset;
+        private readonly int offset;
 
-        public LegacyBeatmapDecoder(int version = LATEST_VERSION) : base(version)
+        public LegacyBeatmapDecoder(int version = LATEST_VERSION)
+            : base(version)
         {
             // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
-            offset += FormatVersion < 5 ? 24 : 0;
+            offset = FormatVersion < 5 ? 24 : 0;
         }
 
         protected override void ParseStreamInto(StreamReader stream, Beatmap beatmap)
@@ -142,6 +136,7 @@ namespace osu.Game.Beatmaps.Formats
                             parser = new Rulesets.Objects.Legacy.Mania.ConvertHitObjectParser();
                             break;
                     }
+
                     break;
                 case @"LetterboxInBreaks":
                     beatmap.BeatmapInfo.LetterboxInBreaks = int.Parse(pair.Value) == 1;
@@ -214,8 +209,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.OnlineBeatmapID = int.Parse(pair.Value);
                     break;
                 case @"BeatmapSetID":
-                    beatmap.BeatmapInfo.OnlineBeatmapSetID = int.Parse(pair.Value);
-                    metadata.OnlineBeatmapSetID = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = int.Parse(pair.Value) };
                     break;
             }
         }

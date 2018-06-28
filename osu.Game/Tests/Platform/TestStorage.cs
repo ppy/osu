@@ -7,7 +7,7 @@ namespace osu.Game.Tests.Platform
 {
     public class TestStorage : DesktopStorage
     {
-        public TestStorage(string baseName) : base(baseName)
+        public TestStorage(string baseName) : base(baseName, null)
         {
         }
 
