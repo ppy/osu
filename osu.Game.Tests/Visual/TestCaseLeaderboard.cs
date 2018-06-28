@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
@@ -17,6 +19,12 @@ namespace osu.Game.Tests.Visual
     [Description("PlaySongSelect leaderboard")]
     public class TestCaseLeaderboard : OsuTestCase
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[] {
+            typeof(Placeholder),
+            typeof(MessagePlaceholder),
+            typeof(RetrievalFailurePlaceholder),
+        };
+
         private RulesetStore rulesets;
 
         private readonly FailableLeaderboard leaderboard;
