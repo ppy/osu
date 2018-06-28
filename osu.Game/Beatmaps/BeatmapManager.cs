@@ -138,7 +138,7 @@ namespace osu.Game.Beatmaps
                 PostNotification?.Invoke(new SimpleNotification
                 {
                     Icon = FontAwesome.fa_superpowers,
-                    Text = "You gotta be a supporter to download for now 'yo"
+                    Text = "You gotta be an osu!supporter to download for now 'yo"
                 });
                 return;
             }
