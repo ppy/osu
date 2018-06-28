@@ -13,6 +13,8 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
+using osu.Framework.Graphics;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -228,6 +230,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// implies that this check occurred after the end time of <see cref="HitObject"/>. </param>
         protected virtual void CheckForJudgements(bool userTriggered, double timeOffset)
         {
+        }
+
+        public void Shake()
+        {
+            this.MoveToOffset(new Vector2(8, 0), 20).Delay(20)
+                .MoveToOffset(-new Vector2(16, 0), 20).Delay(20)
+                .MoveToOffset(new Vector2(16, 0), 20).Delay(20)
+                .MoveToOffset(-new Vector2(16, 0), 20).Delay(20)
+                .MoveToOffset(new Vector2(16, 0), 20).Delay(20)
+                .MoveToOffset(-new Vector2(8, 0), 20);
         }
     }
 
