@@ -14,5 +14,11 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// Whether the first bar line of this control point is ignored.
         /// </summary>
         public bool OmitFirstBarLine;
+
+        public override bool Equals(ControlPoint other)
+            => base.Equals(other)
+               && other is EffectControlPoint effect
+               && KiaiMode == effect.KiaiMode
+               && OmitFirstBarLine == effect.OmitFirstBarLine;
     }
 }
