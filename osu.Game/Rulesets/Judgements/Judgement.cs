@@ -45,10 +45,14 @@ namespace osu.Game.Rulesets.Judgements
         public double TimeOffset { get; set; }
 
         /// <summary>
-        /// Whether the <see cref="Result"/> should affect the combo portion of the score.
-        /// If false, the <see cref="Result"/> will be considered for the bonus portion of the score.
+        /// Whether the <see cref="Result"/> should affect the current combo.
         /// </summary>
         public virtual bool AffectsCombo => true;
+
+        /// <summary>
+        /// Whether the <see cref="Result"/> should be counted as base (combo) or bonus score.
+        /// </summary>
+        public virtual bool IsBonus => !AffectsCombo;
 
         /// <summary>
         /// The numeric representation for the result achieved.

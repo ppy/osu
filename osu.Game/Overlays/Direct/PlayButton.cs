@@ -10,6 +10,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
@@ -48,9 +49,15 @@ namespace osu.Game.Overlays.Direct
             set
             {
                 if (value)
+                {
+                    icon.FadeTo(0.5f, transition_duration, Easing.OutQuint);
                     loadingAnimation.Show();
+                }
                 else
+                {
+                    icon.FadeTo(1, transition_duration, Easing.OutQuint);
                     loadingAnimation.Hide();
+                }
             }
         }
 
@@ -67,7 +74,10 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Icon = FontAwesome.fa_play,
                 },
-                loadingAnimation = new LoadingAnimation(),
+                loadingAnimation = new LoadingAnimation
+                {
+                    Size = new Vector2(15),
+                },
             });
 
             Playing.ValueChanged += playingStateChanged;
