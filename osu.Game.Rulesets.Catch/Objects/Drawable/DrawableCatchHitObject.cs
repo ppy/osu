@@ -58,8 +58,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             if (CheckPosition == null) return;
 
             if (timeOffset >= 0)
-                AddJudgement(new CatchJudgement { Result = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss });
+            {
+                var judgement = CreateJudgement();
+                judgement.Result = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss;
+                AddJudgement(judgement);
+            }
         }
+
+        protected virtual CatchJudgement CreateJudgement() => new CatchJudgement();
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
