@@ -116,6 +116,11 @@ namespace osu.Game.Beatmaps
                     mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
             }
 
+            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
+
+            // Pre-process
+            processor?.PreProcess();
+
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
             foreach (var obj in converted.HitObjects)
                 obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
@@ -125,7 +130,7 @@ namespace osu.Game.Beatmaps
                 mod.ApplyToHitObject(obj);
 
             // Post-process
-            rulesetInstance.CreateBeatmapProcessor(converted)?.PostProcess();
+            processor?.PostProcess();
 
             return converted;
         }
