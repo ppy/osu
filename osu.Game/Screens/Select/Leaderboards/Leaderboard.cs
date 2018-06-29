@@ -19,7 +19,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using System.Linq;
 using osu.Framework.Configuration;
-using osu.Framework.Logging;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Leaderboards
@@ -33,7 +32,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
 
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public Action<Score> ScoreSelected;
 
@@ -174,9 +173,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private APIAccess api;
         private BeatmapInfo beatmap;
-        private OsuGame osuGame;
 
-        private ScheduledDelegate pendingBeatmapSwitch;
+        private ScheduledDelegate pendingUpdateScores;
 
         public BeatmapInfo Beatmap
         {
@@ -189,21 +187,19 @@ namespace osu.Game.Screens.Select.Leaderboards
                 beatmap = value;
                 Scores = null;
 
-                pendingBeatmapSwitch?.Cancel();
-                pendingBeatmapSwitch = Schedule(updateScores);
+                updateScores();
             }
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api, OsuGame osuGame)
+        private void load(APIAccess api, IBindable<RulesetInfo> parentRuleset)
         {
             this.api = api;
-            this.osuGame = osuGame;
 
-            if (osuGame != null)
-                ruleset.BindTo(osuGame.Ruleset);
+            if (parentRuleset != null)
+                ruleset.BindTo(parentRuleset);
 
-            ruleset.ValueChanged += r => updateScores();
+            ruleset.ValueChanged += _ => updateScores();
 
             if (api != null)
                 api.OnStateChange += handleApiStateChange;
@@ -231,51 +227,57 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void updateScores()
         {
-            if (Scope == LeaderboardScope.Local)
-            {
-                // TODO: get local scores from wherever here.
-                PlaceholderState = PlaceholderState.NoScores;
-                return;
-            }
+            getScoresRequest?.Cancel();
+            getScoresRequest = null;
 
-            if (Beatmap?.OnlineBeatmapID == null)
+            pendingUpdateScores?.Cancel();
+            pendingUpdateScores = Schedule(() =>
             {
-                PlaceholderState = PlaceholderState.Unavailable;
-                return;
-            }
-
-            if (api?.IsLoggedIn != true)
-            {
-                PlaceholderState = PlaceholderState.NotLoggedIn;
-                return;
-            }
-
-            if (Scope != LeaderboardScope.Global && !api.LocalUser.Value.IsSupporter)
-            {
-                PlaceholderState = PlaceholderState.NotSupporter;
-                return;
-            }
-
-            PlaceholderState = PlaceholderState.Retrieving;
-            loading.Show();
-
-            getScoresRequest = new GetScoresRequest(Beatmap, osuGame?.Ruleset.Value ?? Beatmap.Ruleset, Scope);
-            getScoresRequest.Success += r => Schedule(() =>
-            {
-                Scores = r.Scores;
-                PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
-            });
-
-            getScoresRequest.Failure += e => Schedule(() =>
-            {
-                if (e is OperationCanceledException)
+                if (Scope == LeaderboardScope.Local)
+                {
+                    // TODO: get local scores from wherever here.
+                    PlaceholderState = PlaceholderState.NoScores;
                     return;
+                }
 
-                PlaceholderState = PlaceholderState.NetworkFailure;
-                Logger.Error(e, @"Couldn't fetch beatmap scores!");
+                if (Beatmap?.OnlineBeatmapID == null)
+                {
+                    PlaceholderState = PlaceholderState.Unavailable;
+                    return;
+                }
+
+                if (api?.IsLoggedIn != true)
+                {
+                    PlaceholderState = PlaceholderState.NotLoggedIn;
+                    return;
+                }
+
+                if (Scope != LeaderboardScope.Global && !api.LocalUser.Value.IsSupporter)
+                {
+                    PlaceholderState = PlaceholderState.NotSupporter;
+                    return;
+                }
+
+                PlaceholderState = PlaceholderState.Retrieving;
+                loading.Show();
+
+                getScoresRequest = new GetScoresRequest(Beatmap, ruleset.Value ?? Beatmap.Ruleset, Scope);
+                getScoresRequest.Success += r => Schedule(() =>
+                {
+                    Scores = r.Scores;
+                    PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
+                });
+
+                getScoresRequest.Failure += e => Schedule(() =>
+                {
+                    if (e is OperationCanceledException)
+                        return;
+
+                    PlaceholderState = PlaceholderState.NetworkFailure;
+                });
+
+                api.Queue(getScoresRequest);
             });
-
-            api.Queue(getScoresRequest);
         }
 
         private Placeholder currentPlaceholder;
