@@ -49,9 +49,9 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 switch (obj)
                 {
                     case BananaShower bananaShower:
-                        foreach (var nested in bananaShower.NestedHitObjects)
+                        foreach (var banana in bananaShower.NestedHitObjects.OfType<Banana>())
                         {
-                            ((BananaShower.Banana)nested).X = (float)rng.NextDouble();
+                            banana.X = (float)rng.NextDouble();
                             rng.Next(); // osu!stable retrieved a random banana type
                             rng.Next(); // osu!stable retrieved a random banana rotation
                             rng.Next(); // osu!stable retrieved a random banana colour
