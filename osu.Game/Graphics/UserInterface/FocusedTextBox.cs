@@ -4,6 +4,7 @@
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using System;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -18,6 +19,7 @@ namespace osu.Game.Graphics.UserInterface
         public Action Exit;
 
         private bool focus;
+
         public bool HoldFocus
         {
             get { return focus; }
@@ -36,6 +38,20 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnFocus(state);
             BorderThickness = 0;
+        }
+
+        public override bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back)
+            {
+                if (Text.Length > 0)
+                {
+                    Text = string.Empty;
+                    return true;
+                }
+            }
+
+            return base.OnPressed(action);
         }
 
         protected override void KillFocus()

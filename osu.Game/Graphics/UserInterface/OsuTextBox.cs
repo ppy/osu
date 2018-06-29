@@ -59,14 +59,11 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), TextSize = CalculatedTextSize };
 
-        public bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(GlobalAction action)
         {
             if (action == GlobalAction.Back)
             {
-                if (Text.Length > 0)
-                    Text = string.Empty;
-                else
-                    KillFocus();
+                KillFocus();
                 return true;
             }
 
