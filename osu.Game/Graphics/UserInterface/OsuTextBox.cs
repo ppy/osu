@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.UserInterface
                 return true;
             }
 
-            return true;
+            return false;
         }
 
         public bool OnReleased(GlobalAction action) => false;
