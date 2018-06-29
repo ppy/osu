@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.Containers
             samplePopIn = audio.Sample.Get(@"UI/overlay-pop-in");
             samplePopOut = audio.Sample.Get(@"UI/overlay-pop-out");
 
-            StateChanged += OnStateChanged;
+            StateChanged += onStateChanged;
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.Containers
             return base.OnClick(state);
         }
 
-        protected virtual void OnStateChanged(Visibility visibility)
+        private void onStateChanged(Visibility visibility)
         {
             switch (visibility)
             {
