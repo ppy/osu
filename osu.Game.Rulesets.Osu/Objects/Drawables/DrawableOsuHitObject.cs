@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
 
-        public void Shake()
+        protected void Shake()
         {
             const int shake_amount = 8;
 
