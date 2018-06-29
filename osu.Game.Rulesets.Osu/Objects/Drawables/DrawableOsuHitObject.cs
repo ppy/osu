@@ -62,13 +62,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected void Shake()
         {
             const int shake_amount = 8;
+            const int shake_duration = 20;
 
-            this.MoveToX(Position.X + shake_amount, 20).Then()
-                .MoveToX(Position.X - shake_amount, 20).Then()
-                .MoveToX(Position.X + shake_amount, 20).Then()
-                .MoveToX(Position.X - shake_amount, 20).Then()
-                .MoveToX(Position.X + shake_amount, 20).Then()
-                .MoveToX(Position.X, 20);
+            this.MoveToX(Position.X + shake_amount, shake_duration).Then()
+                .MoveToX(Position.X - shake_amount, shake_duration).Then()
+                .MoveToX(Position.X + shake_amount, shake_duration).Then()
+                .MoveToX(Position.X - shake_amount, shake_duration).Then()
+                .MoveToX(Position.X + shake_amount, shake_duration).Then()
+                .MoveToX(Position.X, shake_duration);
         }
     }
 
