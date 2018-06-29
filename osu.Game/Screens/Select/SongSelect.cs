@@ -180,7 +180,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours)
         {
