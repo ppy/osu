@@ -21,6 +21,7 @@ using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
+using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.Graphics.Textures;
 using osu.Game.Input;
@@ -55,6 +56,8 @@ namespace osu.Game
         protected KeyBindingStore KeyBindingStore;
 
         protected SettingsStore SettingsStore;
+
+        protected RulesetConfigCache RulesetConfigCache;
 
         protected MenuCursorContainer MenuCursorContainer;
 
@@ -123,6 +126,7 @@ namespace osu.Game
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
+            dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
             dependencies.Cache(new OsuColour());
 
             fileImporters.Add(BeatmapManager);
@@ -184,6 +188,10 @@ namespace osu.Game
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);
+
+            PreviewTrackManager previewTrackManager;
+            dependencies.Cache(previewTrackManager = new PreviewTrackManager());
+            Add(previewTrackManager);
         }
 
         protected override void LoadComplete()

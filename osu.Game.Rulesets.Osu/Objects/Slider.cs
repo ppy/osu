@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
@@ -44,6 +45,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             get { return Curve.Distance; }
             set { Curve.Distance = value; }
         }
+
+        public double? LegacyLastTickOffset { get; set; }
 
         /// <summary>
         /// The position of the cursor at the point of completion of this <see cref="Slider"/> if it was hit
@@ -91,6 +94,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             createSliderEnds();
             createTicks();
             createRepeatPoints();
+
+            if (LegacyLastTickOffset != null)
+                TailCircle.StartTime = Math.Max(StartTime + Duration / 2, TailCircle.StartTime - LegacyLastTickOffset.Value);
         }
 
         private void createSliderEnds()

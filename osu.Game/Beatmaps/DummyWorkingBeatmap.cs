@@ -45,7 +45,7 @@ namespace osu.Game.Beatmaps
 
         protected override Texture GetBackground() => game?.Textures.Get(@"Backgrounds/bg4");
 
-        protected override Track GetTrack() => new TrackVirtual();
+        protected override Track GetTrack() => new TrackVirtual { Length = 1000 };
 
         private class DummyRulesetInfo : RulesetInfo
         {
@@ -62,7 +62,7 @@ namespace osu.Game.Beatmaps
 
                 public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new DummyBeatmapConverter { Beatmap = beatmap };
 
-                public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => null;
+                public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => null;
 
                 public override string Description => "dummy";
 
