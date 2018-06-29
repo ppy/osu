@@ -3,7 +3,6 @@
 
 using OpenTK;
 using osu.Game.Rulesets.Catch.Judgements;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -15,12 +14,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Size = new Vector2((float)CatchHitObject.OBJECT_RADIUS) / 8;
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
-        {
-            if (CheckPosition == null) return;
-
-            if (timeOffset >= 0)
-                AddJudgement(new CatchTinyDropletJudgement { Result = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss });
-        }
+        protected override CatchJudgement CreateJudgement() => new CatchTinyDropletJudgement();
     }
 }
