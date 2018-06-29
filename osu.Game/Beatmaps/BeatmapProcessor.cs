@@ -11,11 +11,27 @@ namespace osu.Game.Beatmaps
         IBeatmap Beatmap { get; }
 
         /// <summary>
-        /// Post-processes <see cref="Beatmap"/> to add mode-specific components that aren't added during conversion.
+        /// Processes the converted <see cref="Beatmap"/> prior to <see cref="HitObject.ApplyDefaults"/> being invoked.
         /// <para>
-        /// An example of such a usage is for combo colours.
+        /// Nested <see cref="HitObject"/>s generated during <see cref="HitObject.ApplyDefaults"/> will not be present by this point,
+        /// and no mods will have been applied to the <see cref="HitObject"/>s.
         /// </para>
         /// </summary>
+        /// <remarks>
+        /// This can only be used to add alterations to <see cref="HitObject"/>s generated directly through the conversion process.
+        /// </remarks>
+        void PreProcess();
+
+        /// <summary>
+        /// Processes the converted <see cref="Beatmap"/> after <see cref="HitObject.ApplyDefaults"/> has been invoked.
+        /// <para>
+        /// Nested <see cref="HitObject"/>s generated during <see cref="HitObject.ApplyDefaults"/> will be present by this point,
+        /// and mods will have been applied to all <see cref="HitObject"/>s.
+        /// </para>
+        /// </summary>
+        /// <remarks>
+        /// This should be used to add alterations to <see cref="HitObject"/>s while they are in their most playable state.
+        /// </remarks>
         void PostProcess();
     }
 
@@ -32,13 +48,7 @@ namespace osu.Game.Beatmaps
             Beatmap = beatmap;
         }
 
-        /// <summary>
-        /// Post-processes a Beatmap to add mode-specific components that aren't added during conversion.
-        /// <para>
-        /// An example of such a usage is for combo colours.
-        /// </para>
-        /// </summary>
-        public virtual void PostProcess()
+        public virtual void PreProcess()
         {
             IHasComboInformation lastObj = null;
 
@@ -61,6 +71,10 @@ namespace osu.Game.Beatmaps
 
                 lastObj = obj;
             }
+        }
+
+        public virtual void PostProcess()
+        {
         }
     }
 }
