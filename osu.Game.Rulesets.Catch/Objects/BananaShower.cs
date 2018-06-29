@@ -37,10 +37,5 @@ namespace osu.Game.Rulesets.Catch.Objects
         public double EndTime => StartTime + Duration;
 
         public double Duration { get; set; }
-
-        public class Banana : Fruit
-        {
-            public override FruitVisualRepresentation VisualRepresentation => FruitVisualRepresentation.Banana;
-        }
     }
 }
