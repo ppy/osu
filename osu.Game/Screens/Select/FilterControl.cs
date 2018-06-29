@@ -61,8 +61,10 @@ namespace osu.Game.Screens.Select
             Group = group,
             Sort = sort,
             SearchText = searchTextBox.Text,
+            Ruleset = ruleset,
             AllowConvertedBeatmaps = showConverted,
-            Ruleset = ruleset
+            MinimumStarDifficulty = minimumStars,
+            MaximumStarDifficulty = maximumStars
         };
 
         public Action Exit;
@@ -163,9 +165,10 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
+        private readonly Bindable<bool> showConverted = new Bindable<bool>();
+        private readonly Bindable<double> minimumStars = new Bindable<double>();
+        private readonly Bindable<double> maximumStars = new Bindable<double>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
-
-        private Bindable<bool> showConverted;
 
         public readonly Box Background;
 
@@ -174,8 +177,14 @@ namespace osu.Game.Screens.Select
         {
             sortTabs.AccentColour = colours.GreenLight;
 
-            showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
+            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);
             showConverted.ValueChanged += val => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMinimum, minimumStars);
+            minimumStars.ValueChanged += val => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
+            maximumStars.ValueChanged += val => updateCriteria();
 
             if (osu != null)
                 ruleset.BindTo(osu.Ruleset);

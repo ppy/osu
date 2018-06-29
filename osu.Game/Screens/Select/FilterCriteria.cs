@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Filter;
 
@@ -13,5 +14,7 @@ namespace osu.Game.Screens.Select
         public string SearchText;
         public RulesetInfo Ruleset;
         public bool AllowConvertedBeatmaps;
+        public double MinimumStarDifficulty = OsuConfigManager.DEFAULT_DISPLAY_STARS_MINIMUM;
+        public double MaximumStarDifficulty = OsuConfigManager.DEFAULT_DISPLAY_STARS_MAXIMUM;
     }
 }
