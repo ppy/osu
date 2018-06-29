@@ -25,8 +25,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 focus = value;
                 if (!focus && HasFocus)
-                    //todo: replace with KillInput after ppy/osu-framework#1656 is merged.
-                    GetContainingInputManager().ChangeFocus(null);
+                    KillFocus();
             }
         }
 
