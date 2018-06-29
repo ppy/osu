@@ -73,7 +73,7 @@ namespace osu.Desktop
             }
 
             public StableStorage()
-                : base(string.Empty)
+                : base(string.Empty, null)
             {
             }
         }

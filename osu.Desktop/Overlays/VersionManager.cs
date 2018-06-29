@@ -1,12 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Diagnostics;
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -24,16 +25,18 @@ namespace osu.Desktop.Overlays
         private OsuConfigManager config;
         private OsuGameBase game;
         private NotificationOverlay notificationOverlay;
+        private GameHost host;
 
         public override bool HandleKeyboardInput => false;
         public override bool HandleMouseInput => false;
 
         [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game, OsuConfigManager config)
+        private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game, OsuConfigManager config, GameHost host)
         {
             notificationOverlay = notification;
             this.config = config;
             this.game = game;
+            this.host = host;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
@@ -106,19 +109,19 @@ namespace osu.Desktop.Overlays
 
                 // only show a notification if we've previously saved a version to the config file (ie. not the first run).
                 if (!string.IsNullOrEmpty(lastVersion))
-                    notificationOverlay.Post(new UpdateCompleteNotification(version));
+                    notificationOverlay.Post(new UpdateCompleteNotification(version, host.OpenUrlExternally));
             }
         }
 
         private class UpdateCompleteNotification : SimpleNotification
         {
-            public UpdateCompleteNotification(string version)
+            public UpdateCompleteNotification(string version, Action<string> openUrl = null)
             {
                 Text = $"You are now running osu!lazer {version}.\nClick to see what's new!";
                 Icon = FontAwesome.fa_check_square;
                 Activated = delegate
                 {
-                    Process.Start($"https://osu.ppy.sh/home/changelog/{version}");
+                    openUrl?.Invoke($"https://osu.ppy.sh/home/changelog/lazer/{version}");
                     return true;
                 };
             }

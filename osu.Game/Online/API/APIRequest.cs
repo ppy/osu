@@ -14,16 +14,19 @@ namespace osu.Game.Online.API
     {
         protected override WebRequest CreateWebRequest() => new JsonWebRequest<T>(Uri);
 
+        public T Result => ((JsonWebRequest<T>)WebRequest).ResponseObject;
+
         protected APIRequest()
         {
             base.Success += onSuccess;
         }
 
-        private void onSuccess()
-        {
-            Success?.Invoke(((JsonWebRequest<T>)WebRequest).ResponseObject);
-        }
+        private void onSuccess() => Success?.Invoke(Result);
 
+        /// <summary>
+        /// Invoked on successful completion of an API request.
+        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
+        /// </summary>
         public new event APISuccessHandler<T> Success;
     }
 
@@ -52,7 +55,16 @@ namespace osu.Game.Online.API
         protected APIAccess API;
         protected WebRequest WebRequest;
 
+        /// <summary>
+        /// Invoked on successful completion of an API request.
+        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
+        /// </summary>
         public event APISuccessHandler Success;
+
+        /// <summary>
+        /// Invoked on failure to complete an API request.
+        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
+        /// </summary>
         public event APIFailureHandler Failure;
 
         private bool cancelled;

@@ -8,6 +8,8 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
+using osu.Game.Screens;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Screens.Lounge;
 using osu.Game.Users;
@@ -165,6 +167,7 @@ namespace osu.Game.Tests.Visual
             AddStep(@"set rooms", () => lounge.Rooms = rooms);
             selectAssert(1);
             AddStep(@"open room 1", () => clickRoom(1));
+            AddUntilStep(() => lounge.ChildScreen?.IsCurrentScreen == true, "wait until room current");
             AddStep(@"make lounge current", lounge.MakeCurrent);
             filterAssert(@"THE FINAL", LoungeTab.Public, 1);
             filterAssert(string.Empty, LoungeTab.Public, 2);
@@ -198,6 +201,8 @@ namespace osu.Game.Tests.Visual
 
         private class TestLounge : Lounge
         {
+            protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
+
             public IEnumerable<DrawableRoom> ChildRooms => RoomsContainer.Children.Where(r => r.MatchingFilter);
             public Room SelectedRoom => Inspector.Room;
 
