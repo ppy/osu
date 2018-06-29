@@ -288,9 +288,10 @@ namespace osu.Game.Screens.Select
                     bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
 
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
-                    Ruleset.Value = ruleset;
                     ensurePlayingSelected(preview);
                 }
+
+                Ruleset.Value = ruleset;
 
                 UpdateBeatmap(Beatmap.Value);
             }
