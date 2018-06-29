@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
 
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public Action<Score> ScoreSelected;
 
@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api, Bindable<RulesetInfo> parentRuleset)
+        private void load(APIAccess api, IBindable<RulesetInfo> parentRuleset)
         {
             this.api = api;
 
