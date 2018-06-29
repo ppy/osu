@@ -26,6 +26,28 @@ namespace osu.Game.Rulesets.Osu.Objects
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
         public override Vector2 EndPosition => Position + this.CurvePositionAt(1);
 
+        public override int ComboIndex
+        {
+            get => base.ComboIndex;
+            set
+            {
+                base.ComboIndex = value;
+                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                    n.ComboIndex = value;
+            }
+        }
+
+        public override int IndexInCurrentCombo
+        {
+            get => base.IndexInCurrentCombo;
+            set
+            {
+                base.IndexInCurrentCombo = value;
+                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                    n.IndexInCurrentCombo = value;
+            }
+        }
+
         public SliderCurve Curve { get; } = new SliderCurve();
 
         public List<Vector2> ControlPoints
@@ -147,7 +169,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                     var distanceProgress = d / length;
                     var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
 
-                    var firstSample = Samples.FirstOrDefault(s => s.Name == SampleInfo.HIT_NORMAL) ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+                    var firstSample = Samples.FirstOrDefault(s => s.Name == SampleInfo.HIT_NORMAL)
+                                      ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
                     var sampleList = new List<SampleInfo>();
 
                     if (firstSample != null)
