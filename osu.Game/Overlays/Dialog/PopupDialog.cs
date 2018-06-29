@@ -102,6 +102,12 @@ namespace osu.Game.Overlays.Dialog
             return base.OnKeyDown(state, args);
         }
 
+        protected override bool OnClick(InputState state)
+        {
+            Hide();
+            return base.OnClick(state);
+        }
+
         protected override void PopIn()
         {
             base.PopIn();
