@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// Whether the <see cref="Result"/> should be counted as base or bonus score.
         /// </summary>
-        public virtual bool IsBonus => false;
+        public virtual bool IsBonus => !AffectsCombo;
 
         /// <summary>
         /// The numeric representation for the result achieved.

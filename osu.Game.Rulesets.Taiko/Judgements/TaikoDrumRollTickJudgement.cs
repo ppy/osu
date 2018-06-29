@@ -8,7 +8,6 @@ namespace osu.Game.Rulesets.Taiko.Judgements
     public class TaikoDrumRollTickJudgement : TaikoJudgement
     {
         public override bool AffectsCombo => false;
-        public override bool IsBonus => true;
 
         protected override int NumericResultFor(HitResult result)
         {
