@@ -44,7 +44,7 @@ namespace osu.Game.Screens
             {
                 base.Push(screen);
             }
-            catch (InvalidOperationException)
+            catch (ScreenAlreadyExitedException)
             {
                 // screen may have exited before the push was successful.
             }
