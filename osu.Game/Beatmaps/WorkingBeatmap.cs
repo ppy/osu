@@ -19,7 +19,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Beatmaps
 {
-    public abstract class WorkingBeatmap : IDisposable
+    public abstract partial class WorkingBeatmap : IDisposable
     {
         public readonly BeatmapInfo BeatmapInfo;
 
@@ -145,7 +145,7 @@ namespace osu.Game.Beatmaps
         private Track populateTrack()
         {
             // we want to ensure that we always have a track, even if it's a fake one.
-            var t = GetTrack() ?? new TrackVirtual();
+            var t = GetTrack() ?? new VirtualBeatmapTrack(Beatmap);
             applyRateAdjustments(t);
             return t;
         }

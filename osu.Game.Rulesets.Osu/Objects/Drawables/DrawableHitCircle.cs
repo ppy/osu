@@ -93,7 +93,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AddJudgement(new OsuJudgement
             {
                 Result = result,
-                PositionOffset = Vector2.Zero //todo: set to correct value
             });
         }
 
