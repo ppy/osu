@@ -22,18 +22,13 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
         {
         }
 
-        public override void PreProcess()
-        {
-            base.PreProcess();
-
-            initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
-        }
-
         public override void PostProcess()
         {
             base.PostProcess();
 
             applyPositionOffsets();
+
+            initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
 
             int index = 0;
             foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
