@@ -146,7 +146,9 @@ namespace osu.Game
             }
 
             dependencies.CacheAs(this);
+
             dependencies.CacheAs(ruleset);
+            dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
