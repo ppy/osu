@@ -77,6 +77,13 @@ namespace osu.Game.Rulesets.Catch.Objects
 
                     double time = spanStartTime + timeProgress * spanDuration;
 
+                    if (LegacyLastTickOffset != null)
+                    {
+                        // If we're the last tick, apply the legacy offset
+                        if (span == this.SpanCount() - 1 && d + tickDistance > length)
+                            time = Math.Max(StartTime + Duration / 2, time - LegacyLastTickOffset.Value);
+                    }
+
                     double tinyTickInterval = time - lastDropletTime;
                     while (tinyTickInterval > 100)
                         tinyTickInterval /= 2;
@@ -152,5 +159,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             get { return Curve.CurveType; }
             set { Curve.CurveType = value; }
         }
+
+        public double? LegacyLastTickOffset { get; set; }
     }
 }

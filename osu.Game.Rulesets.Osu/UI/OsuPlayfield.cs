@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using System.Linq;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -75,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.UI
             DrawableOsuJudgement explosion = new DrawableOsuJudgement(judgement, judgedObject)
             {
                 Origin = Anchor.Centre,
-                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition + ((OsuJudgement)judgement).PositionOffset
+                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition
             };
 
             judgementLayer.Add(explosion);
