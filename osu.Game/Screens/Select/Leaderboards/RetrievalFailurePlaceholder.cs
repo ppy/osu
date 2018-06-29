@@ -3,11 +3,9 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using OpenTK;
 
 namespace osu.Game.Screens.Select.Leaderboards
@@ -18,22 +16,13 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         public RetrievalFailurePlaceholder()
         {
-            Direction = FillDirection.Horizontal;
-            AutoSizeAxes = Axes.Both;
-            Children = new Drawable[]
+            AddArbitraryDrawable(new RetryButton
             {
-                new RetryButton
-                {
-                    Action = () => OnRetry?.Invoke(),
-                    Margin = new MarginPadding { Right = 10 },
-                },
-                new OsuSpriteText
-                {
-                    Anchor = Anchor.TopLeft,
-                    Text = @"Couldn't retrieve scores!",
-                    TextSize = 22,
-                },
-            };
+                Action = () => OnRetry?.Invoke(),
+                Padding = new MarginPadding { Right = 10 }
+            });
+
+            AddText(@"Couldn't retrieve scores!");
         }
 
         public class RetryButton : OsuHoverContainer
@@ -44,18 +33,16 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             public RetryButton()
             {
-                Height = 26;
-                Width = 26;
+                AutoSizeAxes = Axes.Both;
+
                 Child = new OsuClickableContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                     Action = () => Action?.Invoke(),
                     Child = icon = new SpriteIcon
                     {
                         Icon = FontAwesome.fa_refresh,
-                        Size = new Vector2(26),
+                        Size = new Vector2(TEXT_SIZE),
                         Shadow = true,
                     },
                 };
