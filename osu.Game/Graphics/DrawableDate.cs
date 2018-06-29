@@ -12,14 +12,14 @@ namespace osu.Game.Graphics
 {
     public class DrawableDate : OsuSpriteText, IHasTooltip
     {
-        private readonly DateTimeOffset date;
+        protected readonly DateTimeOffset Date;
 
         public DrawableDate(DateTimeOffset date)
         {
             AutoSizeAxes = Axes.Both;
             Font = "Exo2.0-RegularItalic";
 
-            this.date = date.ToLocalTime();
+            Date = date.ToLocalTime();
         }
 
         [BackgroundDependencyLoader]
@@ -38,7 +38,7 @@ namespace osu.Game.Graphics
         {
             updateTime();
 
-            var diffToNow = DateTimeOffset.Now.Subtract(date);
+            var diffToNow = DateTimeOffset.Now.Subtract(Date);
 
             double timeUntilNextUpdate = 1000;
             if (diffToNow.TotalSeconds > 60)
@@ -58,8 +58,10 @@ namespace osu.Game.Graphics
 
         public override bool HandleMouseInput => true;
 
-        private void updateTime() => Text = date.Humanize();
+        protected virtual string Format() => Date.Humanize();
 
-        public string TooltipText => date.ToString();
+        private void updateTime() => Text = Format();
+
+        public virtual string TooltipText => string.Format($"{Date:MMMM d, yyyy h:mm tt \"UTC\"z}");
     }
 }
