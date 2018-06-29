@@ -11,11 +11,6 @@ namespace osu.Game.Rulesets.Catch.Judgements
     {
         public override HitResult MaxResult => HitResult.Perfect;
 
-        /// <summary>
-        /// The positional hit offset.
-        /// </summary>
-        public float PositionOffset;
-
         protected override int NumericResultFor(HitResult result)
         {
             switch (result)
