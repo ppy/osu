@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override Drawable GetDrawableCharacter(char c) => new PasswordMaskChar(CalculatedTextSize);
 
-        public override bool AllowClipboardExport => false;
+        protected override bool AllowClipboardExport => false;
 
         private readonly CapsWarning warning;
 
