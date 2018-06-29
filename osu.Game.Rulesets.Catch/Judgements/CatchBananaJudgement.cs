@@ -10,6 +10,8 @@ namespace osu.Game.Rulesets.Catch.Judgements
         public override bool AffectsCombo => false;
         public override bool IsBonus => true;
 
+        public override bool ShouldExplode => true;
+
         protected override int NumericResultFor(HitResult result)
         {
             switch (result)

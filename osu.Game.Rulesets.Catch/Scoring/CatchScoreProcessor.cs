@@ -47,7 +47,6 @@ namespace osu.Game.Rulesets.Catch.Scoring
                     case BananaShower shower:
                         foreach (var _ in shower.NestedHitObjects.Cast<CatchHitObject>())
                             AddJudgement(new CatchBananaJudgement { Result = HitResult.Perfect });
-                        AddJudgement(new CatchBananaShowerJudgement());
                         break;
                     case Fruit _:
                         AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
