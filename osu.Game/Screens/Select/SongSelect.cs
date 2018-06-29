@@ -185,6 +185,7 @@ namespace osu.Game.Screens.Select
         {
             dependencies.CacheAs(this);
             dependencies.CacheAs(Ruleset);
+            dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
 
             base.Ruleset.ValueChanged += r => updateSelectedBeatmap(beatmapNoDebounce);
 
