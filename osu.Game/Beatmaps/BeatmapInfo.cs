@@ -66,8 +66,8 @@ namespace osu.Game.Beatmaps
 
         // General
         public int AudioLeadIn { get; set; }
-        public bool Countdown { get; set; }
-        public float StackLeniency { get; set; }
+        public bool Countdown { get; set; } = true;
+        public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
 
         public int RulesetID { get; set; }
