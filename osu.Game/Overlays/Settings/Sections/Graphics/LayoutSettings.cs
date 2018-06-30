@@ -126,11 +126,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private List<KeyValuePair<string, int>> getResolutions()
         {
-            var availableDisplayResolutions = (game.Window as DesktopGameWindow)?.AvailableDisplayResolutions.OrderByDescending(r => r.Width).ThenByDescending(r => r.Height);
+            var availableDisplayResolutions = (game.Window as DesktopGameWindow)?.AvailableDisplayResolutions
+                                                                                .Where(r => r.Width >= 800 && r.Height >= 600)
+                                                                                .OrderByDescending(r => r.Width).ThenByDescending(r => r.Height);
+
             if (availableDisplayResolutions == null)
                 return new List<KeyValuePair<string, int>>();
-            var availableDisplayResolutionsStr = availableDisplayResolutions.Select(r => $"{r.Width}x{r.Height}").Distinct().ToList();
 
+            var availableDisplayResolutionsStr = availableDisplayResolutions.Select(r => $"{r.Width}x{r.Height}").Distinct();
             return availableDisplayResolutionsStr.Select((t, i) => new KeyValuePair<string, int>(t, i)).ToList();
         }
     }
