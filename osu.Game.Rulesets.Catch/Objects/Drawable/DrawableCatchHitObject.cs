@@ -2,14 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -58,8 +58,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             if (CheckPosition == null) return;
 
             if (timeOffset >= 0)
-                AddJudgement(new Judgement { Result = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss });
+            {
+                var judgement = CreateJudgement();
+                judgement.Result = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss;
+                AddJudgement(judgement);
+            }
         }
+
+        protected virtual CatchJudgement CreateJudgement() => new CatchJudgement();
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
