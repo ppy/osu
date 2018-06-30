@@ -82,22 +82,24 @@ namespace osu.Game.Screens
         private SampleChannel sampleExit;
 
         [BackgroundDependencyLoader(true)]
-        private void load(BindableBeatmap beatmap, OsuGame osuGame, AudioManager audio)
+        private void load(BindableBeatmap beatmap, OsuGame osu, AudioManager audio, Bindable<RulesetInfo> ruleset)
         {
             if (beatmap != null)
                 Beatmap.BindTo(beatmap);
 
-            if (osuGame != null)
+            if (ruleset != null)
+                Ruleset.BindTo(ruleset);
+
+            if (osu != null)
             {
-                Ruleset.BindTo(osuGame.Ruleset);
-                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+                OverlayActivationMode.BindTo(osu.OverlayActivationMode);
 
                 updateOverlayStates = () =>
                 {
                     if (HideOverlaysOnEnter)
-                        osuGame.CloseAllOverlays();
+                        osu.CloseAllOverlays();
                     else
-                        osuGame.Toolbar.State = Visibility.Visible;
+                        osu.Toolbar.State = Visibility.Visible;
                 };
             }
 
