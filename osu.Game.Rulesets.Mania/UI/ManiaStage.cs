@@ -167,6 +167,9 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!judgedObject.DisplayJudgement)
                 return;
 
+            if (judgement.Result == judgement.MaxResult && !ShowPerfectJudgements)
+                return;
+
             judgements.Clear();
             judgements.Add(new DrawableManiaJudgement(judgement, judgedObject)
             {

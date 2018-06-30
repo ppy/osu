@@ -87,6 +87,8 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
 
+            Set(OsuSetting.ShowPerfectJudgements, true);
+
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
@@ -151,6 +153,7 @@ namespace osu.Game.Configuration
         BeatmapSkins,
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
-        ScoreDisplayMode
+        ScoreDisplayMode,
+        ShowPerfectJudgements
     }
 }

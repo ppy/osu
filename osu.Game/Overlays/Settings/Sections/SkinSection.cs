@@ -49,6 +49,11 @@ namespace osu.Game.Overlays.Settings.Sections
                     LabelText = "Adjust gameplay cursor size based on current beatmap",
                     Bindable = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Show perfect judgements",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowPerfectJudgements)
+                }
             };
 
             skins.ItemAdded += onItemsChanged;

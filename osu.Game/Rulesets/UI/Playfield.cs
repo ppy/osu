@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -20,6 +21,8 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public IReadOnlyList<Playfield> NestedPlayfields => nestedPlayfields;
         private List<Playfield> nestedPlayfields;
+
+        protected bool ShowPerfectJudgements;
 
         /// <summary>
         /// A container for keeping track of DrawableHitObjects.
@@ -37,8 +40,10 @@ namespace osu.Game.Rulesets.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            ShowPerfectJudgements = config.Get<bool>(OsuSetting.ShowPerfectJudgements);
+
             HitObjects = CreateHitObjectContainer();
             HitObjects.RelativeSizeAxes = Axes.Both;
 

@@ -71,6 +71,9 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!judgedObject.DisplayJudgement || !DisplayJudgements)
                 return;
 
+            if (judgement.Result == judgement.MaxResult && !ShowPerfectJudgements)
+                return;
+
             DrawableOsuJudgement explosion = new DrawableOsuJudgement(judgement, judgedObject)
             {
                 Origin = Anchor.Centre,

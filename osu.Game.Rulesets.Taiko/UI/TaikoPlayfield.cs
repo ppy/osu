@@ -225,13 +225,16 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
-                judgementContainer.Add(new DrawableTaikoJudgement(judgement, judgedObject)
+                if (!(judgement.Result == judgement.MaxResult && !ShowPerfectJudgements))
                 {
-                    Anchor = judgement.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                    Origin = judgement.IsHit ? Anchor.BottomCentre : Anchor.Centre,
-                    RelativePositionAxes = Axes.X,
-                    X = judgement.IsHit ? judgedObject.Position.X : 0,
-                });
+                    judgementContainer.Add(new DrawableTaikoJudgement(judgement, judgedObject)
+                    {
+                        Anchor = judgement.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
+                        Origin = judgement.IsHit ? Anchor.BottomCentre : Anchor.Centre,
+                        RelativePositionAxes = Axes.X,
+                        X = judgement.IsHit ? judgedObject.Position.X : 0,
+                    });
+                }
             }
 
             if (!judgement.IsHit)
