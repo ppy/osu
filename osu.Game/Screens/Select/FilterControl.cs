@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Select
             Sort = sort,
             SearchText = searchTextBox.Text,
             AllowConvertedBeatmaps = showConverted,
-            Ruleset = ruleset
+            Ruleset = ruleset.Value
         };
 
         public Action Exit;
@@ -163,24 +163,23 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<bool> showConverted;
 
         public readonly Box Background;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, OsuConfigManager config)
+        private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, OsuConfigManager config)
         {
             sortTabs.AccentColour = colours.GreenLight;
 
             showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
             showConverted.ValueChanged += val => updateCriteria();
 
-            if (osu != null)
-                ruleset.BindTo(osu.Ruleset);
-            ruleset.ValueChanged += val => updateCriteria();
-            ruleset.TriggerChange();
+            if (parentRuleset != null)
+                ruleset.BindTo(parentRuleset);
+            ruleset.BindValueChanged(val => updateCriteria(), true);
         }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
