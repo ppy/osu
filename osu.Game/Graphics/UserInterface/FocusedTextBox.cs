@@ -40,6 +40,13 @@ namespace osu.Game.Graphics.UserInterface
             BorderThickness = 0;
         }
 
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!HasFocus) return false;
+
+            return base.OnKeyDown(state, args);
+        }
+
         public override bool OnPressed(GlobalAction action)
         {
             if (action == GlobalAction.Back)
