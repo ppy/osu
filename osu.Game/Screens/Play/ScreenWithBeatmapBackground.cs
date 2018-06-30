@@ -19,7 +19,9 @@ namespace osu.Game.Screens.Play
 
         protected const float BACKGROUND_FADE_DURATION = 800;
 
-        protected float BackgroundOpacity => 1 - (float)DimLevel;
+        protected float BackgroundOpacity => 1 - (float)DimLevel + BackgroundOpacityOffset.Value;
+
+        protected BindableFloat BackgroundOpacityOffset = new BindableFloat();
 
         #region User Settings
 
@@ -40,6 +42,7 @@ namespace osu.Game.Screens.Play
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
+            BackgroundOpacityOffset.ValueChanged += _ => UpdateBackgroundElements();
             DimLevel.ValueChanged += _ => UpdateBackgroundElements();
             BlurLevel.ValueChanged += _ => UpdateBackgroundElements();
             ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();

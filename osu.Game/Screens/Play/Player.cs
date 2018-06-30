@@ -191,7 +191,8 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             ProcessCustomClock = false,
-                            Breaks = beatmap.Breaks
+                            Breaks = beatmap.Breaks,
+                            BackgroundOpacityOffset = BackgroundOpacityOffset,
                         },
                         RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
                         hudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)

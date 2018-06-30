@@ -29,6 +29,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Bindable = config.GetBindable<double>(OsuSetting.BlurLevel),
                     KeyboardStep = 0.1f
                 },
+                    new SettingsCheckbox
+                    {
+                        LabelText = "Lighten playfield during breaks",
+                        Bindable = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
+                    },
                 new SettingsCheckbox
                 {
                     LabelText = "Show score overlay",

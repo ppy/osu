@@ -2,11 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.Break;
 
@@ -20,7 +23,12 @@ namespace osu.Game.Screens.Play
 
         private List<BreakPeriod> breaks;
 
+        private Bindable<bool> lightenDuringBreaks;
+        private readonly BindableBool currentlyOnBreak = new BindableBool();
+
         private readonly Container fadeContainer;
+
+        public BindableFloat BackgroundOpacityOffset;
 
         public List<BreakPeriod> Breaks
         {
@@ -100,10 +108,27 @@ namespace osu.Game.Screens.Play
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            // We need BackgroundOpacityOffset to lighten during breaks.
+            if (BackgroundOpacityOffset == null) return;
+
+            lightenDuringBreaks = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks);
+            lightenDuringBreaks.ValueChanged += _ => updateBackgroundOpacityOffset();
+            currentlyOnBreak.ValueChanged += _ => updateBackgroundOpacityOffset();
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
             initializeBreaks();
+        }
+
+        private void updateBackgroundOpacityOffset()
+        {
+            if (BackgroundOpacityOffset == null) return;
+            BackgroundOpacityOffset.Value = currentlyOnBreak && lightenDuringBreaks ? 1 : 0;
         }
 
         private void initializeBreaks()
@@ -122,6 +147,7 @@ namespace osu.Game.Screens.Play
 
                 using (BeginAbsoluteSequence(b.StartTime, true))
                 {
+                    this.TransformBindableTo(currentlyOnBreak, true);
                     fadeContainer.FadeIn(fade_duration);
                     breakArrows.Show(fade_duration);
 
@@ -139,6 +165,7 @@ namespace osu.Game.Screens.Play
 
                     using (BeginDelayedSequence(b.Duration - fade_duration, true))
                     {
+                        this.TransformBindableTo(currentlyOnBreak, false);
                         fadeContainer.FadeOut(fade_duration);
                         breakArrows.Hide(fade_duration);
                     }
