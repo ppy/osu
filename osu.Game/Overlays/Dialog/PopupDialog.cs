@@ -104,8 +104,11 @@ namespace osu.Game.Overlays.Dialog
 
         protected override bool OnClick(InputState state)
         {
+            if (content.ReceiveMouseInputAt(state.Mouse.NativeState.Position))
+                return false;
+
             Hide();
-            return base.OnClick(state);
+            return true;
         }
 
         protected override void PopIn()
