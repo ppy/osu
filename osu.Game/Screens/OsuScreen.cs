@@ -183,11 +183,10 @@ namespace osu.Game.Screens
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
             {
-                if (nextOsu != null)
-                    //We need to use MakeCurrent in case we are jumping up multiple game screens.
-                    nextOsu.Background?.MakeCurrent();
-                else
-                    Background.Exit();
+                Background.Exit();
+
+                //We need to use MakeCurrent in case we are jumping up multiple game screens.
+                nextOsu?.Background?.MakeCurrent();
             }
 
             if (base.OnExiting(next))
