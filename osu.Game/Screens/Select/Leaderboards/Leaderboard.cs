@@ -40,6 +40,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private ScheduledDelegate showScoresDelegate;
 
+        private bool scoresLoadedOnce;
+
         private IEnumerable<Score> scores;
         public IEnumerable<Score> Scores
         {
@@ -47,6 +49,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             set
             {
                 scores = value;
+
+                scoresLoadedOnce = true;
 
                 scrollFlow?.FadeOut(fade_duration, Easing.OutQuint).Expire();
                 scrollFlow = null;
@@ -227,6 +231,10 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void updateScores()
         {
+            // don't display any scores or placeholder until the first Scores_Set has been called.
+            // this avoids scope changes flickering a "no scores" placeholder before initialisation of song select is finished.
+            if (!scoresLoadedOnce) return;
+
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
