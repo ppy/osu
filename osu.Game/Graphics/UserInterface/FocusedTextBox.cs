@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 focus = value;
                 if (!focus && HasFocus)
-                    KillFocus();
+                    base.KillFocus();
             }
         }
 
