@@ -32,5 +32,7 @@ namespace osu.Game.Audio
         /// The sample volume.
         /// </summary>
         public int Volume;
+
+        public SampleInfo Clone() => (SampleInfo)MemberwiseClone();
     }
 }
