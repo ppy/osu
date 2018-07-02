@@ -8,6 +8,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Screens.Select.Leaderboards;
 
@@ -17,11 +18,11 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
     {
         private APIAccess api;
 
-        private readonly RecentActivity activity;
+        private readonly APIRecentActivity activity;
 
         private LinkFlowContainer content;
 
-        public DrawableRecentActivity(RecentActivity activity)
+        public DrawableRecentActivity(APIRecentActivity activity)
         {
             this.activity = activity;
         }
@@ -140,11 +141,11 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     break;
 
                 case RecentActivityType.UserSupportFirst:
-                    message = $"{userLinkTemplate()} has become an osu! supporter - thanks for your generosity!";
+                    message = $"{userLinkTemplate()} has become an osu!supporter - thanks for your generosity!";
                     break;
 
                 case RecentActivityType.UserSupportGift:
-                    message = $"{userLinkTemplate()} has received the gift of osu! supporter!";
+                    message = $"{userLinkTemplate()} has received the gift of osu!supporter!";
                     break;
 
                 case RecentActivityType.UsernameChange:

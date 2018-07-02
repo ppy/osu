@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                     return;
                 }
 
-                if (h is BananaShower.Banana)
+                if (h is Banana)
                 {
                     // auto bananas unrealistically warp to catch 100% combo.
                     Replay.Frames.Add(new CatchReplayFrame(h.StartTime, h.X));
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 {
                     switch (nestedObj)
                     {
-                        case BananaShower.Banana _:
+                        case Banana _:
                         case TinyDroplet _:
                         case Droplet _:
                         case Fruit _:

@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// The step increase/decrease of the span of time visible by the length of the scrolling axes.
         /// </summary>
-        private const double time_span_step = 50;
+        private const double time_span_step = 200;
 
         /// <summary>
         /// The span of time that is visible by the length of the scrolling axes.
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
 
-        private readonly ScrollingDirection direction;
+        protected readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
         /// <summary>
         /// Creates a new <see cref="ScrollingPlayfield"/>.
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected ScrollingPlayfield(ScrollingDirection direction, float? customWidth = null, float? customHeight = null)
             : base(customWidth, customHeight)
         {
-            this.direction = direction;
+            Direction.Value = direction;
         }
 
         [BackgroundDependencyLoader]
@@ -80,8 +80,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             HitObjects.TimeRange.BindTo(VisibleTimeRange);
         }
-
-        protected sealed override HitObjectContainer CreateHitObjectContainer() => new ScrollingHitObjectContainer(direction);
 
         public bool OnPressed(GlobalAction action)
         {
@@ -102,5 +100,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
         }
 
         public bool OnReleased(GlobalAction action) => false;
+
+        protected sealed override HitObjectContainer CreateHitObjectContainer()
+        {
+            var container = new ScrollingHitObjectContainer();
+            container.Direction.BindTo(Direction);
+            return container;
+        }
     }
 }

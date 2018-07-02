@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float buttons_spacing = 5;
 
         private readonly Box tabsBg;
-        private readonly Container coverContainer;
+        private readonly UpdateableBeatmapSetCover cover;
         private readonly OsuSpriteText title, artist;
         private readonly Container noVideoButtons;
         private readonly FillFlowContainer videoButtons;
@@ -34,9 +34,6 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Container downloadButtonsContainer;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
         public Details Details;
-
-        private BeatmapManager beatmaps;
-        private DelayedLoadWrapper cover;
 
         public readonly BeatmapPicker Picker;
 
@@ -62,28 +59,31 @@ namespace osu.Game.Overlays.BeatmapSet
             title.Text = BeatmapSet?.Metadata.Title ?? string.Empty;
             artist.Text = BeatmapSet?.Metadata.Artist ?? string.Empty;
             onlineStatusPill.Status = BeatmapSet?.OnlineInfo.Status ?? BeatmapSetOnlineStatus.None;
+            cover.BeatmapSet = BeatmapSet;
 
-            cover?.FadeOut(400, Easing.Out);
             if (BeatmapSet != null)
             {
                 downloadButtonsContainer.FadeIn(transition_duration);
                 favouriteButton.FadeIn(transition_duration);
 
-                noVideoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 0 : 1, transition_duration);
-                videoButtons.FadeTo(BeatmapSet.OnlineInfo.HasVideo ? 1 : 0, transition_duration);
-
-                coverContainer.Add(cover = new DelayedLoadWrapper(
-                    new BeatmapSetCover(BeatmapSet)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    }, 300)
+                if (BeatmapSet.OnlineInfo.HasVideo)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                });
+                    videoButtons.Children = new[]
+                    {
+                        new DownloadButton(BeatmapSet),
+                        new DownloadButton(BeatmapSet, true),
+                    };
+
+                    videoButtons.FadeIn(transition_duration);
+                    noVideoButtons.FadeOut(transition_duration);
+                }
+                else
+                {
+                    noVideoButtons.Child = new DownloadButton(BeatmapSet);
+
+                    noVideoButtons.FadeIn(transition_duration);
+                    videoButtons.FadeOut(transition_duration);
+                }
             }
             else
             {
@@ -130,12 +130,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
-                                },
-                                coverContainer = new Container
+                                cover = new UpdateableBeatmapSetCover
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
@@ -211,27 +206,12 @@ namespace osu.Game.Overlays.BeatmapSet
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
                                                         Alpha = 0f,
-                                                        Child = new DownloadButton("Download", @"")
-                                                        {
-                                                            Action = () => download(false),
-                                                        },
                                                     },
                                                     videoButtons = new FillFlowContainer
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
                                                         Spacing = new Vector2(buttons_spacing),
                                                         Alpha = 0f,
-                                                        Children = new[]
-                                                        {
-                                                            new DownloadButton("Download", "with Video")
-                                                            {
-                                                                Action = () => download(false),
-                                                            },
-                                                            new DownloadButton("Download", "without Video")
-                                                            {
-                                                                Action = () => download(true),
-                                                            },
-                                                        },
                                                     },
                                                 },
                                             },
@@ -267,41 +247,10 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, BeatmapManager beatmaps)
+        private void load(OsuColour colours)
         {
             tabsBg.Colour = colours.Gray3;
-            this.beatmaps = beatmaps;
-
-            beatmaps.ItemAdded += handleBeatmapAdd;
-
             updateDisplay();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            if (beatmaps != null) beatmaps.ItemAdded -= handleBeatmapAdd;
-        }
-
-        private void handleBeatmapAdd(BeatmapSetInfo beatmap) => Schedule(() =>
-        {
-            if (beatmap.OnlineBeatmapSetID == BeatmapSet?.OnlineBeatmapSetID)
-                downloadButtonsContainer.FadeOut(transition_duration);
-        });
-
-        private void download(bool noVideo)
-        {
-            if (beatmaps.GetExistingDownload(BeatmapSet) != null)
-            {
-                downloadButtonsContainer.MoveToX(-5, 50, Easing.OutSine).Then()
-                       .MoveToX(5, 100, Easing.InOutSine).Then()
-                       .MoveToX(-5, 100, Easing.InOutSine).Then()
-                       .MoveToX(0, 50, Easing.InSine).Then();
-
-                return;
-            }
-
-            beatmaps.Download(BeatmapSet, noVideo);
         }
     }
 }

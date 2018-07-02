@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Mods
         protected Color4 LowMultiplierColour, HighMultiplierColour;
 
         protected readonly TriangleButton DeselectAllButton;
-        protected readonly OsuSpriteText MultiplierLabel;
+        protected readonly OsuSpriteText MultiplierLabel, UnrankedLabel;
         private readonly FillFlowContainer footerContainer;
 
         protected override bool BlockPassThroughKeyboard => false;
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Mods
 
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private void rulesetChanged(RulesetInfo newRuleset)
         {
@@ -51,21 +51,17 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, RulesetStore rulesets, AudioManager audio)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset, AudioManager audio)
         {
             SelectedMods.ValueChanged += selectedModsChanged;
 
             LowMultiplierColour = colours.Red;
             HighMultiplierColour = colours.Green;
+            UnrankedLabel.Colour = colours.Blue;
 
-            if (osu != null)
-                Ruleset.BindTo(osu.Ruleset);
-            else
-                Ruleset.Value = rulesets.AvailableRulesets.First();
-
-            Ruleset.ValueChanged += rulesetChanged;
-            Ruleset.TriggerChange();
+            Ruleset.BindTo(ruleset);
+            Ruleset.BindValueChanged(rulesetChanged, true);
 
             sampleOn = audio.Sample.Get(@"UI/check-on");
             sampleOff = audio.Sample.Get(@"UI/check-off");
@@ -99,15 +95,14 @@ namespace osu.Game.Overlays.Mods
             }
 
             MultiplierLabel.Text = $"{multiplier:N2}x";
-            if (!ranked)
-                MultiplierLabel.Text += " (Unranked)";
-
             if (multiplier > 1.0)
                 MultiplierLabel.FadeColour(HighMultiplierColour, 200);
             else if (multiplier < 1.0)
                 MultiplierLabel.FadeColour(LowMultiplierColour, 200);
             else
                 MultiplierLabel.FadeColour(Color4.White, 200);
+
+            UnrankedLabel.FadeTo(ranked ? 0 : 1, 200);
         }
 
         protected override void PopOut()
@@ -352,22 +347,32 @@ namespace osu.Game.Overlays.Mods
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = @"Score Multiplier: ",
+                                            Text = @"Score Multiplier:",
                                             TextSize = 30,
-                                            Shadow = true,
                                             Margin = new MarginPadding
                                             {
-                                                Top = 5
+                                                Top = 5,
+                                                Right = 10
                                             }
                                         },
                                         MultiplierLabel = new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-Bold",
                                             TextSize = 30,
-                                            Shadow = true,
                                             Margin = new MarginPadding
                                             {
                                                 Top = 5
+                                            }
+                                        },
+                                        UnrankedLabel = new OsuSpriteText
+                                        {
+                                            Font = @"Exo2.0-Bold",
+                                            Text = @"(Unranked)",
+                                            TextSize = 30,
+                                            Margin = new MarginPadding
+                                            {
+                                                Top = 5,
+                                                Left = 10
                                             }
                                         }
                                     }
