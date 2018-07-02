@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
 
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public Action<Score> ScoreSelected;
 
@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
                         break;
                     case PlaceholderState.NotSupporter:
-                        replacePlaceholder(new MessagePlaceholder(@"Please invest in a supporter tag to view this leaderboard!"));
+                        replacePlaceholder(new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"));
                         break;
                     default:
                         replacePlaceholder(null);
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api, Bindable<RulesetInfo> parentRuleset)
+        private void load(APIAccess api, IBindable<RulesetInfo> parentRuleset)
         {
             this.api = api;
 
@@ -331,24 +331,5 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
             }
         }
-    }
-
-    public enum LeaderboardScope
-    {
-        Local,
-        Country,
-        Global,
-        Friend,
-    }
-
-    public enum PlaceholderState
-    {
-        Successful,
-        Retrieving,
-        NetworkFailure,
-        Unavailable,
-        NoScores,
-        NotLoggedIn,
-        NotSupporter,
     }
 }
