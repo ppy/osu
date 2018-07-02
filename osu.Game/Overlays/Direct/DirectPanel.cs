@@ -4,30 +4,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
-using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK.Graphics;
-using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
-using osu.Framework.Configuration;
-using osu.Framework.Audio.Track;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
     public abstract class DirectPanel : Container
     {
         public readonly BeatmapSetInfo SetInfo;
-
-        protected Box BlackBackground;
 
         private const double hover_transition_time = 400;
 
@@ -37,7 +35,7 @@ namespace osu.Game.Overlays.Direct
         private BeatmapManager beatmaps;
         private BeatmapSetOverlay beatmapSetOverlay;
 
-        public Track Preview => PlayButton.Preview;
+        public PreviewTrack Preview => PlayButton.Preview;
         public Bindable<bool> PreviewPlaying => PlayButton.Playing;
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
@@ -81,12 +79,6 @@ namespace osu.Game.Overlays.Direct
                 EdgeEffect = edgeEffectNormal,
                 Children = new[]
                 {
-                    // temporary blackness until the actual background loads.
-                    BlackBackground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                    },
                     CreateBackground(),
                     progressBar = new ProgressBar
                     {
@@ -121,7 +113,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.Update();
 
-            if (PreviewPlaying && Preview != null && Preview.IsLoaded)
+            if (PreviewPlaying && Preview != null && Preview.TrackLoaded)
             {
                 PreviewBar.Width = (float)(Preview.CurrentTime / Preview.Length);
             }
@@ -149,27 +141,10 @@ namespace osu.Game.Overlays.Direct
         protected override bool OnClick(InputState state)
         {
             ShowInformation();
-            PreviewPlaying.Value = false;
             return true;
         }
 
         protected void ShowInformation() => beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
-
-        protected void StartDownload()
-        {
-            if (beatmaps.GetExistingDownload(SetInfo) != null)
-            {
-                // we already have an active download running.
-                content.MoveToX(-5, 50, Easing.OutSine).Then()
-                       .MoveToX(5, 100, Easing.InOutSine).Then()
-                       .MoveToX(-5, 100, Easing.InOutSine).Then()
-                       .MoveToX(0, 50, Easing.InSine).Then();
-
-                return;
-            }
-
-            beatmaps.Download(SetInfo);
-        }
 
         private void attachDownload(DownloadBeatmapSetRequest request)
         {
@@ -215,21 +190,10 @@ namespace osu.Game.Overlays.Direct
             return icons;
         }
 
-        protected Drawable CreateBackground() => new DelayedLoadWrapper(
-            new BeatmapSetCover(SetInfo)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fill,
-                OnLoadComplete = d =>
-                {
-                    d.FadeInFromZero(400, Easing.Out);
-                    BlackBackground.Delay(400).FadeOut();
-                },
-            }, 300)
+        protected Drawable CreateBackground() => new UpdateableBeatmapSetCover
         {
             RelativeSizeAxes = Axes.Both,
+            BeatmapSet = SetInfo,
         };
 
         public class Statistic : FillFlowContainer

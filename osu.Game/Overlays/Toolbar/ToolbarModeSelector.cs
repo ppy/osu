@@ -67,8 +67,8 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(RulesetStore rulesets, OsuGame game)
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets, Bindable<RulesetInfo> parentRuleset)
         {
             this.rulesets = rulesets;
             foreach (var r in rulesets.AvailableRulesets)
@@ -82,11 +82,7 @@ namespace osu.Game.Overlays.Toolbar
 
             ruleset.ValueChanged += rulesetChanged;
             ruleset.DisabledChanged += disabledChanged;
-
-            if (game != null)
-                ruleset.BindTo(game.Ruleset);
-            else
-                ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault();
+            ruleset.BindTo(parentRuleset);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)

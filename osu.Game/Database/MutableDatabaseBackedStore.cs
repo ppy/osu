@@ -50,11 +50,10 @@ namespace osu.Game.Database
         /// <param name="item">The item to update.</param>
         public void Update(T item)
         {
-            ItemRemoved?.Invoke(item);
-
             using (var usage = ContextFactory.GetForWrite())
                 usage.Context.Update(item);
 
+            ItemRemoved?.Invoke(item);
             ItemAdded?.Invoke(item);
         }
 

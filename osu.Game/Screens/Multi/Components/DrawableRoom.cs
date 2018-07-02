@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -42,7 +41,7 @@ namespace osu.Game.Screens.Multi.Components
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
-        private readonly Bindable<User[]> participantsBind = new Bindable<User[]>();
+        private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
 
         public readonly Room Room;
 
@@ -108,12 +107,13 @@ namespace osu.Game.Screens.Multi.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuColour colours)
         {
             Box sideStrip;
-            Container coverContainer;
-            OsuSpriteText name, status, beatmapTitle, beatmapDash, beatmapArtist;
+            UpdateableBeatmapSetCover cover;
+            OsuSpriteText name, status;
             ParticipantInfo participantInfo;
+            BeatmapTitle beatmapTitle;
             ModeTypeInfo modeTypeInfo;
 
             Children = new Drawable[]
@@ -146,24 +146,12 @@ namespace osu.Game.Screens.Multi.Components
                                 RelativeSizeAxes = Axes.Y,
                                 Width = side_strip_width,
                             },
-                            new Container
+                            cover = new UpdateableBeatmapSetCover
                             {
                                 Width = cover_width,
                                 RelativeSizeAxes = Axes.Y,
                                 Masking = true,
                                 Margin = new MarginPadding { Left = side_strip_width },
-                                Children = new Drawable[]
-                                {
-                                    new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.Black,
-                                    },
-                                    coverContainer = new Container
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                    },
-                                },
                             },
                             new Container
                             {
@@ -205,30 +193,10 @@ namespace osu.Game.Screens.Multi.Components
                                                 TextSize = 14,
                                                 Font = @"Exo2.0-Bold",
                                             },
-                                            new FillFlowContainer<OsuSpriteText>
+                                            beatmapTitle = new BeatmapTitle
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Colour = colours.Gray9,
-                                                Direction = FillDirection.Horizontal,
-                                                Children = new[]
-                                                {
-                                                    beatmapTitle = new OsuSpriteText
-                                                    {
-                                                        TextSize = 14,
-                                                        Font = @"Exo2.0-BoldItalic",
-                                                    },
-                                                    beatmapDash = new OsuSpriteText
-                                                    {
-                                                        TextSize = 14,
-                                                        Font = @"Exo2.0-BoldItalic",
-                                                    },
-                                                    beatmapArtist = new OsuSpriteText
-                                                    {
-                                                        TextSize = 14,
-                                                        Font = @"Exo2.0-RegularItalic",
-                                                    },
-                                                },
+                                                TextSize = 14,
+                                                Colour = colours.Gray9
                                             },
                                         },
                                     },
@@ -259,34 +227,9 @@ namespace osu.Game.Screens.Multi.Components
 
             beatmapBind.ValueChanged += b =>
             {
+                cover.BeatmapSet = b?.BeatmapSet;
+                beatmapTitle.Beatmap = b;
                 modeTypeInfo.Beatmap = b;
-
-                if (b != null)
-                {
-                    coverContainer.FadeIn(transition_duration);
-
-                    LoadComponentAsync(new BeatmapSetCover(b.BeatmapSet)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    }, coverContainer.Add);
-
-                    beatmapTitle.Current = localisation.GetUnicodePreference(b.Metadata.TitleUnicode, b.Metadata.Title);
-                    beatmapDash.Text = @" - ";
-                    beatmapArtist.Current = localisation.GetUnicodePreference(b.Metadata.ArtistUnicode, b.Metadata.Artist);
-                }
-                else
-                {
-                    coverContainer.FadeOut(transition_duration);
-
-                    beatmapTitle.Current = null;
-                    beatmapArtist.Current = null;
-
-                    beatmapTitle.Text = "Changing map";
-                    beatmapDash.Text = beatmapArtist.Text = string.Empty;
-                }
             };
 
             nameBind.BindTo(Room.Name);

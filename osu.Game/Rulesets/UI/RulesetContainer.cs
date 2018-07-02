@@ -57,6 +57,7 @@ namespace osu.Game.Rulesets.UI
         public abstract IEnumerable<HitObject> Objects { get; }
 
         private readonly Lazy<Playfield> playfield;
+
         /// <summary>
         /// The playfield.
         /// </summary>
@@ -72,11 +73,6 @@ namespace osu.Game.Rulesets.UI
         private IRulesetConfigManager rulesetConfig;
         private OnScreenDisplay onScreenDisplay;
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
-
         /// <summary>
         /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
         /// </summary>
@@ -89,18 +85,20 @@ namespace osu.Game.Rulesets.UI
             Cursor = CreateCursor();
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
         {
-            this.onScreenDisplay = onScreenDisplay;
+            var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
-            rulesetConfig = CreateConfig(Ruleset, settings);
+            onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
+            rulesetConfig = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
             if (rulesetConfig != null)
             {
                 dependencies.Cache(rulesetConfig);
                 onScreenDisplay?.BeginTracking(this, rulesetConfig);
             }
+
+            return dependencies;
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -130,13 +128,10 @@ namespace osu.Game.Rulesets.UI
             HasReplayLoaded.Value = ReplayInputManager.ReplayInputHandler != null;
         }
 
-
         /// <summary>
         /// Creates the cursor. May be null if the <see cref="RulesetContainer"/> doesn't provide a custom cursor.
         /// </summary>
         protected virtual CursorContainer CreateCursor() => null;
-
-        protected virtual IRulesetConfigManager CreateConfig(Ruleset ruleset, SettingsStore settings) => null;
 
         /// <summary>
         /// Creates a Playfield.
@@ -160,7 +155,7 @@ namespace osu.Game.Rulesets.UI
     /// RulesetContainer that applies conversion to Beatmaps. Does not contain a Playfield
     /// and does not load drawable hit objects.
     /// <para>
-    /// Should not be derived - derive <see cref="RulesetContainer{TObject}"/> instead.
+    /// Should not be derived - derive <see cref="RulesetContainer{TPlayfield, TObject}"/> instead.
     /// </para>
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
@@ -194,6 +189,7 @@ namespace osu.Game.Rulesets.UI
 
         protected override Container<Drawable> Content => content;
         private Container content;
+        private IEnumerable<Mod> mods;
 
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
@@ -216,13 +212,10 @@ namespace osu.Game.Rulesets.UI
 
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
-
-            // Add mods, should always be the last thing applied to give full control to mods
-            applyMods(Mods);
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             KeyBindingInputManager.Add(content = new Container
             {
@@ -235,6 +228,9 @@ namespace osu.Game.Rulesets.UI
             if (Cursor != null)
                 KeyBindingInputManager.Add(Cursor);
 
+            // Apply mods
+            applyMods(Mods, config);
+
             loadObjects();
         }
 
@@ -242,13 +238,16 @@ namespace osu.Game.Rulesets.UI
         /// Applies the active mods to this RulesetContainer.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyMods(IEnumerable<Mod> mods)
+        private void applyMods(IEnumerable<Mod> mods, OsuConfigManager config)
         {
             if (mods == null)
                 return;
 
             foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);
+
+            foreach (var mod in mods.OfType<IReadFromConfig>())
+                mod.ReadFromConfig(config);
         }
 
         public override void SetReplay(Replay replay)
