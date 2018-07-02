@@ -82,13 +82,13 @@ namespace osu.Game.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(BindableVisualSettings visualSettings)
         {
-            beatmapSkins = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
+            beatmapSkins = visualSettings.BeatmapSkins;
             beatmapSkins.ValueChanged += val => onSourceChanged();
             beatmapSkins.TriggerChange();
 
-            beatmapHitsounds = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
+            beatmapHitsounds = visualSettings.BeatmapHitsounds;
             beatmapHitsounds.ValueChanged += val => onSourceChanged();
             beatmapHitsounds.TriggerChange();
         }

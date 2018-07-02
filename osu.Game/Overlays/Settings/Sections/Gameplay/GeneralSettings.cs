@@ -13,20 +13,20 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         protected override string Header => "General";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, BindableVisualSettings visualSettings)
         {
             Children = new Drawable[]
             {
                 new SettingsSlider<double>
                 {
                     LabelText = "Background dim",
-                    Bindable = config.GetBindable<double>(OsuSetting.DimLevel),
+                    Bindable = visualSettings.DimLevel,
                     KeyboardStep = 0.1f
                 },
                 new SettingsSlider<double>
                 {
                     LabelText = "Background blur",
-                    Bindable = config.GetBindable<double>(OsuSetting.BlurLevel),
+                    Bindable = visualSettings.BlurLevel,
                     KeyboardStep = 0.1f
                 },
                 new SettingsCheckbox

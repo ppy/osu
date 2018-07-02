@@ -12,14 +12,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         protected override string Header => "Detail Settings";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, BindableVisualSettings visualSettings)
         {
             Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "Storyboards",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
+                    Bindable = visualSettings.ShowStoryboard
                 },
                 new SettingsCheckbox
                 {
