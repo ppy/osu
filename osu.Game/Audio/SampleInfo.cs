@@ -34,11 +34,16 @@ namespace osu.Game.Audio
         /// </summary>
         public int Volume;
 
-        public virtual IEnumerable<string> LookupNames => new[]
+        public virtual IEnumerable<string> LookupNames
         {
-            $"{Namespace}/{Bank}-{Name}",
-            $"{Bank}-{Name}" // Without namespace as a fallback
-        };
+            get
+            {
+                if (!string.IsNullOrEmpty(Namespace))
+                    yield return $"{Namespace}/{Bank}-{Name}";
+
+                yield return $"{Bank}-{Name}"; // Without namespace as a fallback even when we have a namespace
+            }
+        }
 
         public SampleInfo Clone() => (SampleInfo)MemberwiseClone();
     }
