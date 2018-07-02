@@ -39,6 +39,39 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             }
         }
 
+        private void applyPositionOffsets()
+        {
+            var rng = new FastRandom(RNG_SEED);
+            // todo: HardRock displacement should be applied here
+
+            foreach (var obj in Beatmap.HitObjects)
+            {
+                switch (obj)
+                {
+                    case BananaShower bananaShower:
+                        foreach (var banana in bananaShower.NestedHitObjects.OfType<Banana>())
+                        {
+                            banana.X = (float)rng.NextDouble();
+                            rng.Next(); // osu!stable retrieved a random banana type
+                            rng.Next(); // osu!stable retrieved a random banana rotation
+                            rng.Next(); // osu!stable retrieved a random banana colour
+                        }
+                        break;
+                    case JuiceStream juiceStream:
+                        foreach (var nested in juiceStream.NestedHitObjects)
+                        {
+                            var hitObject = (CatchHitObject)nested;
+                            if (hitObject is TinyDroplet)
+                                hitObject.X += rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH;
+                            else if (hitObject is Droplet)
+                                rng.Next(); // osu!stable retrieved a random droplet rotation
+                            hitObject.X = MathHelper.Clamp(hitObject.X, 0, 1);
+                        }
+                        break;
+                }
+            }
+        }
+
         private void initialiseHyperDash(List<CatchHitObject> objects)
         {
             // todo: add difficulty adjust.
@@ -80,39 +113,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 }
 
                 lastDirection = thisDirection;
-            }
-        }
-
-        private void applyPositionOffsets()
-        {
-            var rng = new FastRandom(RNG_SEED);
-            // todo: HardRock displacement should be applied here
-
-            foreach (var obj in Beatmap.HitObjects)
-            {
-                switch (obj)
-                {
-                    case BananaShower bananaShower:
-                        foreach (var nested in bananaShower.NestedHitObjects)
-                        {
-                            ((BananaShower.Banana)nested).X = (float)rng.NextDouble();
-                            rng.Next(); // osu!stable retrieved a random banana type
-                            rng.Next(); // osu!stable retrieved a random banana rotation
-                            rng.Next(); // osu!stable retrieved a random banana colour
-                        }
-                        break;
-                    case JuiceStream juiceStream:
-                        foreach (var nested in juiceStream.NestedHitObjects)
-                        {
-                            var hitObject = (CatchHitObject)nested;
-                            if (hitObject is TinyDroplet)
-                                hitObject.X += rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH;
-                            else if (hitObject is Droplet)
-                                rng.Next(); // osu!stable retrieved a random droplet rotation
-                            hitObject.X = MathHelper.Clamp(hitObject.X, 0, 1);
-                        }
-                        break;
-                }
             }
         }
     }
