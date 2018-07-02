@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(RulesetStore rulesets, OsuGame game)
+        private void load(RulesetStore rulesets, Bindable<RulesetInfo> parentRuleset)
         {
             this.rulesets = rulesets;
             foreach (var r in rulesets.AvailableRulesets)
@@ -83,8 +83,8 @@ namespace osu.Game.Overlays.Toolbar
             ruleset.ValueChanged += rulesetChanged;
             ruleset.DisabledChanged += disabledChanged;
 
-            if (game != null)
-                ruleset.BindTo(game.Ruleset);
+            if (parentRuleset != null)
+                ruleset.BindTo(parentRuleset);
             else
                 ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault();
         }
