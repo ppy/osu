@@ -1,34 +1,34 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
-using OpenTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
-    public class ExitConfirmOverlay : HoldToConfirmOverlay
+    public class ExitConfirmOverlay : HoldToConfirmOverlay, IKeyBindingHandler<GlobalAction>
     {
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public bool OnPressed(GlobalAction action)
         {
-            if (args.Key == Key.Escape && !args.Repeat)
+            if (action == GlobalAction.Back)
             {
                 BeginConfirm();
                 return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
 
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        public bool OnReleased(GlobalAction action)
         {
-            if (args.Key == Key.Escape)
+            if (action == GlobalAction.Back)
             {
                 AbortConfirm();
                 return true;
             }
 
-            return base.OnKeyUp(state, args);
+            return false;
         }
     }
 }

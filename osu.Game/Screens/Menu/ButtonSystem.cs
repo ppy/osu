@@ -148,8 +148,6 @@ namespace osu.Game.Screens.Menu
                 case Key.Space:
                     logo?.TriggerOnClick(state);
                     return true;
-                case Key.Escape:
-                    return goBack();
             }
 
             return false;
@@ -181,16 +179,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public bool OnReleased(GlobalAction action)
-        {
-            switch (action)
-            {
-                case GlobalAction.Back:
-                    return true;
-                default:
-                    return false;
-            }
-        }
+        public bool OnReleased(GlobalAction action) => false;
 
         private void onPlay()
         {

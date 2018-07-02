@@ -8,12 +8,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK;
 using osu.Framework.Configuration;
+using osu.Framework.Input.Bindings;
 using osu.Game.Audio;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner
+    public class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
@@ -64,6 +66,19 @@ namespace osu.Game.Graphics.Containers
 
             return base.OnClick(state);
         }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back)
+            {
+                State = Visibility.Hidden;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => false;
 
         private void onStateChanged(Visibility visibility)
         {
