@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.Cursor
                 // else it can have an annoying effect.
                 if (dragRotationState == DragRotationState.DragStarted && distance > 30)
                     dragRotationState = DragRotationState.Rotating;
-                // don't rotate when distance if zero to avoid NaN
+                // don't rotate when distance is zero to avoid NaN
                 if (dragRotationState == DragRotationState.Rotating && distance > 0)
                 {
                     Vector2 offset = state.Mouse.Position - positionMouseDown;
