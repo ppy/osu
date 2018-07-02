@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, RulesetStore rulesets, AudioManager audio)
+        private void load(OsuColour colours, Bindable<RulesetInfo> ruleset, RulesetStore rulesets, AudioManager audio)
         {
             SelectedMods.ValueChanged += selectedModsChanged;
 
@@ -60,8 +60,8 @@ namespace osu.Game.Overlays.Mods
             HighMultiplierColour = colours.Green;
             UnrankedLabel.Colour = colours.Blue;
 
-            if (osu != null)
-                Ruleset.BindTo(osu.Ruleset);
+            if (ruleset != null)
+                Ruleset.BindTo(ruleset);
             else
                 Ruleset.Value = rulesets.AvailableRulesets.First();
 
