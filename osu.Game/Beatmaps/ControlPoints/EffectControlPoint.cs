@@ -18,7 +18,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public override bool Equals(ControlPoint other)
             => base.Equals(other)
                && other is EffectControlPoint effect
-               && KiaiMode == effect.KiaiMode
-               && OmitFirstBarLine == effect.OmitFirstBarLine;
+               && KiaiMode.Equals(effect.KiaiMode)
+               && OmitFirstBarLine.Equals(effect.OmitFirstBarLine);
     }
 }
