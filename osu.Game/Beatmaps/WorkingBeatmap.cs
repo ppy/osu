@@ -118,7 +118,6 @@ namespace osu.Game.Beatmaps
 
             IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
 
-            // Pre-process
             processor?.PreProcess();
 
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
@@ -129,7 +128,6 @@ namespace osu.Game.Beatmaps
             foreach (var obj in converted.HitObjects)
                 mod.ApplyToHitObject(obj);
 
-            // Post-process
             processor?.PostProcess();
 
             return converted;
