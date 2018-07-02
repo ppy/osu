@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.Cursor
 
             return base.OnMouseMove(state);
         }
-        
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             ActiveCursor.Scale = new Vector2(1);
