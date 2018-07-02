@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Configuration
 {
-    public class VisualSettings : Component
+    public class BindableVisualSettings : Component
     {
         public Bindable<double> DimLevel { get; private set; }
         public Bindable<double> BlurLevel { get; private set; }

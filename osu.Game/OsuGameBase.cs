@@ -110,8 +110,8 @@ namespace osu.Game
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
 
-            VisualSettings visualSettings;
-            Add(visualSettings = new VisualSettings());
+            BindableVisualSettings visualSettings;
+            Add(visualSettings = new BindableVisualSettings());
             dependencies.Cache(visualSettings);
 
             runMigrations();
