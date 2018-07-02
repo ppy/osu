@@ -68,11 +68,15 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            ActiveCursor.Scale = new Vector2(1);
-            ActiveCursor.ScaleTo(0.90f, 800, Easing.OutQuint);
+            // only trigger animation for main mouse buttons
+            if (args.Button <= MouseButton.Right)
+            {
+                ActiveCursor.Scale = new Vector2(1);
+                ActiveCursor.ScaleTo(0.90f, 800, Easing.OutQuint);
 
-            ((Cursor)ActiveCursor).AdditiveLayer.Alpha = 0;
-            ((Cursor)ActiveCursor).AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
+                ((Cursor)ActiveCursor).AdditiveLayer.Alpha = 0;
+                ((Cursor)ActiveCursor).AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
+            }
 
             if (args.Button == MouseButton.Left && cursorRotate)
             {
@@ -86,7 +90,7 @@ namespace osu.Game.Graphics.Cursor
         {
             if (!state.Mouse.HasMainButtonPressed)
             {
-                ((Cursor)ActiveCursor).AdditiveLayer.FadeOut(500, Easing.OutQuint);
+                ((Cursor)ActiveCursor).AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
                 ActiveCursor.ScaleTo(1, 500, Easing.OutElastic);
             }
 
@@ -97,13 +101,6 @@ namespace osu.Game.Graphics.Cursor
                 dragRotationState = DragRotationState.NotDragging;
             }
             return base.OnMouseUp(state, args);
-        }
-
-        protected override bool OnClick(InputState state)
-        {
-            ((Cursor)ActiveCursor).AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
-
-            return base.OnClick(state);
         }
 
         protected override void PopIn()
