@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 {
     public class CatchBeatmapProcessor : BeatmapProcessor
     {
+        public const int RNG_SEED = 1337;
+
         public CatchBeatmapProcessor(IBeatmap beatmap)
             : base(beatmap)
         {
@@ -22,11 +24,11 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         public override void PostProcess()
         {
+            base.PostProcess();
+
             applyPositionOffsets();
 
             initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
-
-            base.PostProcess();
 
             int index = 0;
             foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
@@ -36,8 +38,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     lastNested.LastInCombo = true;
             }
         }
-
-        public const int RNG_SEED = 1337;
 
         private void applyPositionOffsets()
         {
