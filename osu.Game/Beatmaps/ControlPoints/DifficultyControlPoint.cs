@@ -18,8 +18,8 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         private double speedMultiplier = 1;
 
-        public override bool Equals(ControlPoint other)
-            => base.Equals(other)
+        public override bool ChangeEquals(ControlPoint other)
+            => base.ChangeEquals(other)
                && other is DifficultyControlPoint difficulty
                && SpeedMultiplier.Equals(difficulty.SpeedMultiplier);
     }
