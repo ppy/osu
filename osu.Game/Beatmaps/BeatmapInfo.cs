@@ -85,10 +85,13 @@ namespace osu.Game.Beatmaps
         public RulesetInfo Ruleset { get; set; }
         
         public bool LetterboxInBreaks { get; set; }
+        [NotMapped]
         public bool StoryFireInFront { get; set; }
+        [NotMapped]
         public bool EpilepsyWarning { get; set; }
         public bool WidescreenStoryboard { get; set; }
 
+        [NotMapped]
         public bool SamplesMatchPlaybackRate { get; set; }
 
         // Editor

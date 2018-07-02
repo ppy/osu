@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private const int MAX_DECIMAL_DIGITS = 5;
         private const float DEFAULT_HEIGHT = 20;
         private const float DEFAULT_SLIDER_HEIGHT = 8;
+        private const float NUB_SIZE_X = 36;
+        private const float NUB_SIZE_Y = 20;
 
         private bool leftShiftHeld;
         private bool rightShiftHeld;
@@ -46,7 +48,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             get => normalPrecision;
             set
             {
+                if (normalPrecision == value)
+                    return;
+
                 normalPrecision = value;
+                if (ticks != null)
+                    ticks.ValueInterval = value;
                 if (!isUsingAlternatePrecision)
                     Precision = value;
             }
@@ -78,12 +85,32 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         public float MinValue
         {
             get => CurrentNumber.MinValue;
-            set => CurrentNumber.MinValue = value;
+            set
+            {
+                if (CurrentNumber.MinValue == value)
+                    return;
+
+                CurrentNumber.MinValue = value;
+                if (ticks != null)
+                    ticks.MinValue = value;
+                if (CurrentNumber.Value < value)
+                    CurrentNumber.Value = value;
+            }
         }
         public float MaxValue
         {
             get => CurrentNumber.MaxValue;
-            set => CurrentNumber.MaxValue = value;
+            set
+            {
+                if (CurrentNumber.MaxValue == value)
+                    return;
+
+                CurrentNumber.MaxValue = value;
+                if (ticks != null)
+                    ticks.MaxValue = value;
+                if (CurrentNumber.Value > value)
+                    CurrentNumber.Value = value;
+            }
         }
         public float Precision
         {
@@ -115,10 +142,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private readonly Container sliderContainer;
         private readonly Box leftBox;
         private readonly Box rightBox;
-        private readonly Ticks ticks;
         private readonly OsuSpriteText leftTickCaption;
         private readonly OsuSpriteText middleTickCaption;
         private readonly OsuSpriteText rightTickCaption;
+        private readonly Ticks ticks;
 
         public virtual string TooltipText
         {
@@ -159,23 +186,23 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             RelativeSizeAxes = Axes.X;
             Height = DEFAULT_HEIGHT;
             RangePadding = 20;
+            Y = 5;
             Children = new Drawable[]
             {
                 new FillFlowContainer
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
+                    //Anchor = Anchor.CentreLeft,
+                    //Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = DEFAULT_HEIGHT,
                     Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(2),
                     Children = new Drawable[]
                     {
                         new Container
                         {
                             Height = DEFAULT_HEIGHT,
                             RelativeSizeAxes = Axes.X,
-                            //Anchor = Anchor.CentreLeft,
-                            //Origin = Anchor.CentreLeft,
                             Children = new Drawable[]
                             {
                                 sliderContainer = new Container
@@ -184,67 +211,72 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                     RelativeSizeAxes = Axes.X,
                                     CornerRadius = 3,
                                     Masking = true,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
                                     Children = new Drawable[]
                                     {
                                         leftBox = new Box
                                         {
                                             Height = DEFAULT_SLIDER_HEIGHT,
-                                            //EdgeSmoothness = new Vector2(0, 0.5f),
-                                            //Position = new Vector2(2, 0),
                                             RelativeSizeAxes = Axes.X,
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
+                                            Anchor = Anchor.TopLeft,
+                                            Origin = Anchor.TopLeft,
                                         },
                                         rightBox = new Box
                                         {
                                             Height = DEFAULT_SLIDER_HEIGHT,
-                                            //EdgeSmoothness = new Vector2(0, 0.5f),
-                                            //Position = new Vector2(-2, 0),
                                             RelativeSizeAxes = Axes.X,
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight,
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
                                             Colour = Color4.Black
                                         },
                                     }
                                 },
                                 Nub = new Nub
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    //Expanded = true,
-                                    Size = new Vector2(35, 15)
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    //RelativePositionAxes = Axes.X,
+                                    Size = new Vector2(NUB_SIZE_X, NUB_SIZE_Y)
                                 },
                             }
                         },
                         ticks = new Ticks(minValue, maxValue, normalPrecision),
                         new Container
                         {
-                            Children = new Drawable[]
+                            Children = new[]
                             {
                                 new Container
                                 {
+                                    RelativePositionAxes = Axes.X,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Child = leftTickCaption = new OsuSpriteText()
                                 },
                                 new Container
                                 {
+                                    RelativePositionAxes = Axes.X,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
+                                    X = 0.5f,
                                     Child = middleTickCaption = new OsuSpriteText()
                                 },
                                 new Container
                                 {
+                                    RelativePositionAxes = Axes.X,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
+                                    X = 1,
                                     Child = rightTickCaption = new OsuSpriteText()
-                                },
-                            }
+                                }
+                            },
                         }
                     }
                 },
                 new HoverClickSounds()
             };
+
+            Nub.Current.Value = true;
 
             ticks.TickClicked += a => Current.Value = a;
 
@@ -293,6 +325,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             return base.OnKeyUp(state, args);
         }
 
+        protected override void OnSizingChanged()
+        {
+            if (Nub != null)
+                Nub.MoveToX((UsableWidth + NUB_SIZE_X / 2) * Current.Value - NUB_SIZE_X / 2, 0);
+            base.OnSizingChanged();
+        }
+
         protected override void OnUserChange()
         {
             base.OnUserChange();
@@ -322,13 +361,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            Nub.Current.Value = true;
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            Nub.Current.Value = false;
             return base.OnMouseUp(state, args);
         }
 
@@ -341,7 +378,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         protected override void UpdateValue(float value)
         {
-            Nub.MoveToX(RangePadding + UsableWidth, 250, Easing.OutQuint);
+            Nub.MoveToX((UsableWidth + NUB_SIZE_X / 2) * value - NUB_SIZE_X / 2, 250, Easing.OutQuint);
         }
 
         /// <summary>
@@ -350,8 +387,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         /// <param name="d">The decimal to normalize.</param>
         /// <param name="sd">The maximum number of decimal digits to keep. The final result may have fewer decimal digits than this value.</param>
         /// <returns>The normalised decimal.</returns>
-        private decimal normalise(decimal d, int sd)
-            => decimal.Parse(Math.Round(d, sd).ToString(string.Concat("0.", new string('#', sd)), CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
+        private decimal normalise(decimal d, int sd) => decimal.Parse(Math.Round(d, sd).ToString(string.Concat("0.", new string('#', sd)), CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Finds the number of digits after the decimal.
@@ -418,8 +454,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 MaxValue = maxValue;
                 ValueInterval = valueInterval;
 
-                Anchor = Anchor.TopLeft;
-                Origin = Anchor.TopLeft;
+                Anchor = Anchor.TopCentre;
+                Origin = Anchor.TopCentre;
+                RelativeSizeAxes = Axes.X;
 
                 canUpdateTicks = true;
                 createTicks();
@@ -428,8 +465,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             private void createTicks()
             {
                 ClearInternal();
+                if (MinValue == MaxValue)
+                    return;
+
                 for (float i = MinValue; i <= MaxValue; i += ValueInterval)
-                    AddInternal(new Tick(i) { X = getPosition(i) });
+                    AddInternal(new Tick(i) { X = getPosition(i), RelativePositionAxes = Axes.X });
                 foreach (Tick t in InternalChildren)
                     t.TickClicked += OnTickClicked;
             }
@@ -439,21 +479,26 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 TickClicked?.Invoke(value);
             }
 
-            private float getPosition(float value) => (value - min) / (max - min) * Width;
+            private float getPosition(float value) => (value - min) / (max - min);
         }
 
         private class Tick : ClickableContainer
         {
             private readonly float value;
+            private readonly Box box;
 
             public event Action<float> TickClicked;
 
             public Tick(float value)
             {
                 this.value = value;
-                Size = new Vector2(1, 2);
+                Size = new Vector2(5, 6);
 
-                InternalChild = new Box { RelativeSizeAxes = Axes.Both };
+                InternalChild = box = new Box
+                {
+                    RelativeSizeAxes = Axes.None,
+                    Size = new Vector2(1, 2)
+                };
 
                 CornerRadius = 0.25f;
                 Masking = true;
@@ -462,7 +507,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Colour = colours.BlueLight;
+                box.Colour = colours.BlueLight;
             }
 
             protected override bool OnClick(InputState state)
