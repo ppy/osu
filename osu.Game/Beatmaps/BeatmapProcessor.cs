@@ -6,23 +6,9 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
 {
-    public interface IBeatmapProcessor
-    {
-        IBeatmap Beatmap { get; }
-
-        /// <summary>
-        /// Post-processes <see cref="Beatmap"/> to add mode-specific components that aren't added during conversion.
-        /// <para>
-        /// An example of such a usage is for combo colours.
-        /// </para>
-        /// </summary>
-        void PostProcess();
-    }
-
     /// <summary>
-    /// Processes a post-converted Beatmap.
+    /// Provides functionality to alter a <see cref="IBeatmap"/> after it has been converted.
     /// </summary>
-    /// <typeparam name="TObject">The type of HitObject contained in the Beatmap.</typeparam>
     public class BeatmapProcessor : IBeatmapProcessor
     {
         public IBeatmap Beatmap { get; }
@@ -32,13 +18,7 @@ namespace osu.Game.Beatmaps
             Beatmap = beatmap;
         }
 
-        /// <summary>
-        /// Post-processes a Beatmap to add mode-specific components that aren't added during conversion.
-        /// <para>
-        /// An example of such a usage is for combo colours.
-        /// </para>
-        /// </summary>
-        public virtual void PostProcess()
+        public virtual void PreProcess()
         {
             IHasComboInformation lastObj = null;
 
@@ -61,6 +41,10 @@ namespace osu.Game.Beatmaps
 
                 lastObj = obj;
             }
+        }
+
+        public virtual void PostProcess()
+        {
         }
     }
 }
