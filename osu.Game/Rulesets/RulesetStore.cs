@@ -84,7 +84,13 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo), (RulesetInfo)null)).RulesetInfo;
+                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo, asm =>
+                        {
+                            // for the time being, let's ignore the version being loaded.
+                            // this allows for debug builds to successfully load rulesets (even though debug rulesets have a 0.0.0 version).
+                            asm.Version = null;
+                            return Assembly.Load(asm);
+                        }, null), (RulesetInfo)null)).RulesetInfo;
 
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;

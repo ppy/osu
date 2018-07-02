@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 var column = new Column(direction)
                 {
                     IsSpecial = isSpecial,
-                    Action = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++
+                    Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
                 };
 
                 AddColumn(column);
