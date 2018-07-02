@@ -111,7 +111,7 @@ namespace osu.Game
             dependencies.Cache(LocalConfig);
 
             BindableVisualSettings visualSettings;
-            Add(visualSettings = new BindableVisualSettings());
+            AddInternal(visualSettings = new BindableVisualSettings());
             dependencies.Cache(visualSettings);
 
             runMigrations();
