@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Mods
 
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private void rulesetChanged(RulesetInfo newRuleset)
         {
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, Bindable<RulesetInfo> ruleset, AudioManager audio)
+        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset, AudioManager audio)
         {
             SelectedMods.ValueChanged += selectedModsChanged;
 
