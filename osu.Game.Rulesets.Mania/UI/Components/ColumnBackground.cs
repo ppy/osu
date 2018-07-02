@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 {
     public class ColumnBackground : CompositeDrawable, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
-        public ManiaAction Action;
+        private readonly IBindable<ManiaAction> action = new Bindable<ManiaAction>();
 
         private Box background;
         private Box backgroundOverlay;
@@ -25,8 +25,10 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         [BackgroundDependencyLoader]
-        private void load(IScrollingInfo scrollingInfo)
+        private void load(IBindable<ManiaAction> action, IScrollingInfo scrollingInfo)
         {
+            this.action.BindTo(action);
+
             InternalChildren = new[]
             {
                 background = new Box
@@ -91,14 +93,14 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         public bool OnPressed(ManiaAction action)
         {
-            if (action == Action)
+            if (action == this.action.Value)
                 backgroundOverlay.FadeTo(1, 50, Easing.OutQuint).Then().FadeTo(0.5f, 250, Easing.OutQuint);
             return false;
         }
 
         public bool OnReleased(ManiaAction action)
         {
-            if (action == Action)
+            if (action == this.action.Value)
                 backgroundOverlay.FadeTo(0, 250, Easing.OutQuint);
             return false;
         }

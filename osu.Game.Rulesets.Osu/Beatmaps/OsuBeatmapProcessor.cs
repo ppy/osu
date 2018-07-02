@@ -15,10 +15,10 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         {
         }
 
-        public override void PostProcess()
+        public override void PreProcess()
         {
+            base.PreProcess();
             applyStacking((Beatmap<OsuHitObject>)Beatmap);
-            base.PostProcess();
         }
 
         private void applyStacking(Beatmap<OsuHitObject> beatmap)
