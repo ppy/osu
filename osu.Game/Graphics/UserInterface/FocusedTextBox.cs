@@ -5,6 +5,7 @@ using OpenTK.Graphics;
 using osu.Framework.Input;
 using System;
 using osu.Game.Input.Bindings;
+using OpenTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -43,6 +44,9 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (!HasFocus) return false;
+
+            if (args.Key == Key.Escape)
+                return false; // disable the framework-level handling of escape key for confority (we use GlobalAction.Back).
 
             return base.OnKeyDown(state, args);
         }
