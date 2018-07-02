@@ -18,6 +18,8 @@ namespace osu.Game.Graphics.Containers
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
+        protected virtual bool PlaySamplesOnStateChange => true;
+
         private PreviewTrackManager previewTrackManager;
 
         protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
@@ -69,12 +71,14 @@ namespace osu.Game.Graphics.Containers
             {
                 case Visibility.Visible:
                     if (OverlayActivationMode != OverlayActivation.Disabled)
-                        samplePopIn?.Play();
+                    {
+                        if (PlaySamplesOnStateChange) samplePopIn?.Play();
+                    }
                     else
                         State = Visibility.Hidden;
                     break;
                 case Visibility.Hidden:
-                    samplePopOut?.Play();
+                    if (PlaySamplesOnStateChange) samplePopOut?.Play();
                     break;
             }
         }
