@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Replays
             //a button is in a pressed state
             IsImportant(currentDirection > 0 ? CurrentFrame : NextFrame) &&
             //the next frame is within an allowable time span
-            Math.Abs(CurrentTime - (NextFrame?.Time ?? 0)) <= sixty_frame_time * 1.2;
+            Math.Abs(CurrentTime - NextFrame?.Time ?? 0) <= sixty_frame_time * 1.2;
 
         protected virtual bool IsImportant(TFrame frame) => false;
 
