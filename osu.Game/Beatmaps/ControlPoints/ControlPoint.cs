@@ -23,6 +23,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public bool Equals(ControlPoint other)
             => ChangeEquals(other)
+               && !ReferenceEquals(null, other)
                && Time.Equals(other.Time);
     }
 }
