@@ -197,8 +197,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var bank = (LegacyBeatmapDecoder.LegacySampleBank)Convert.ToInt32(split[0]);
             var addbank = (LegacyBeatmapDecoder.LegacySampleBank)Convert.ToInt32(split[1]);
 
-            bankInfo.Filename = split.Length > 4 ? split[4] : null;
-
             string stringBank = bank.ToString().ToLower();
             if (stringBank == @"none")
                 stringBank = null;
@@ -211,6 +209,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             if (split.Length > 3)
                 bankInfo.Volume = int.Parse(split[3]);
+
+            bankInfo.Filename = split.Length > 4 ? split[4] : null;
         }
 
         /// <summary>
