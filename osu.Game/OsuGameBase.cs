@@ -110,6 +110,10 @@ namespace osu.Game
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
 
+            VisualSettings visualSettings;
+            Add(visualSettings = new VisualSettings());
+            dependencies.Cache(visualSettings);
+
             runMigrations();
 
             dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
