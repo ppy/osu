@@ -14,12 +14,15 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
 
-        public virtual bool Equals(ControlPoint other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+        /// <summary>
+        /// Whether this <see cref="ControlPoint"/> provides the same changes to gameplay as another <see cref="ControlPoint"/>.
+        /// </summary>
+        /// <param name="other">The <see cref="ControlPoint"/> to compare to.</param>
+        /// <returns>Whether this <see cref="ControlPoint"/> provides the same changes to gameplay as <paramref name="other"/>.</returns>
+        public virtual bool ChangeEquals(ControlPoint other) => !ReferenceEquals(null, other);
 
-            return Time.Equals(other.Time);
-        }
+        public bool Equals(ControlPoint other)
+            => ChangeEquals(other)
+               && Time.Equals(other.Time);
     }
 }

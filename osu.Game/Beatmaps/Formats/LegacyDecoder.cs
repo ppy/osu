@@ -184,8 +184,8 @@ namespace osu.Game.Beatmaps.Formats
                 return baseInfo;
             }
 
-            public override bool Equals(ControlPoint other)
-                => base.Equals(other)
+            public override bool ChangeEquals(ControlPoint other)
+                => base.ChangeEquals(other)
                    && other is LegacySampleControlPoint legacy
                    && CustomSampleBank == legacy.CustomSampleBank;
         }
