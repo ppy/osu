@@ -28,6 +28,7 @@ namespace osu.Game.Tests.Visual
             Dependencies.CacheAs<IBindableBeatmap>(beatmap);
 
             Dependencies.CacheAs(Ruleset);
+            Dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
 
             return Dependencies;
         }
