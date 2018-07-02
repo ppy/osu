@@ -2,9 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Input;
 using System;
+using osu.Game.Input.Bindings;
+using OpenTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -19,6 +20,7 @@ namespace osu.Game.Graphics.UserInterface
         public Action Exit;
 
         private bool focus;
+
         public bool HoldFocus
         {
             get { return focus; }
@@ -26,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 focus = value;
                 if (!focus && HasFocus)
-                    GetContainingInputManager().ChangeFocus(null);
+                    base.KillFocus();
             }
         }
 
@@ -41,16 +43,32 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (!args.Repeat && args.Key == Key.Escape)
-            {
-                if (Text.Length > 0)
-                    Text = string.Empty;
-                else
-                    Exit?.Invoke();
-                return true;
-            }
+            if (!HasFocus) return false;
+
+            if (args.Key == Key.Escape)
+                return false; // disable the framework-level handling of escape key for confority (we use GlobalAction.Back).
 
             return base.OnKeyDown(state, args);
+        }
+
+        public override bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back)
+            {
+                if (Text.Length > 0)
+                {
+                    Text = string.Empty;
+                    return true;
+                }
+            }
+
+            return base.OnPressed(action);
+        }
+
+        protected override void KillFocus()
+        {
+            base.KillFocus();
+            Exit?.Invoke();
         }
 
         public override bool RequestsFocus => HoldFocus;
