@@ -38,8 +38,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private readonly Container<DrawableHoldNoteTick> tickContainer;
 
-        public DrawableHoldNote(HoldNote hitObject, ManiaAction action)
-            : base(hitObject, action)
+        public DrawableHoldNote(HoldNote hitObject)
+            : base(hitObject)
         {
             RelativeSizeAxes = Axes.X;
 
@@ -57,12 +57,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         HoldStartTime = () => holdStartTime
                     })
                 },
-                head = new DrawableHeadNote(this, action)
+                head = new DrawableHeadNote(this)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 },
-                tail = new DrawableTailNote(this, action)
+                tail = new DrawableTailNote(this)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (Time.Current < HitObject.StartTime || Time.Current > HitObject.EndTime)
                 return false;
 
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
             // The user has pressed during the body of the hold note, after the head note and its hit windows have passed
@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!holdStartTime.HasValue)
                 return false;
 
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
             holdStartTime = null;
@@ -154,8 +154,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             private readonly DrawableHoldNote holdNote;
 
-            public DrawableHeadNote(DrawableHoldNote holdNote, ManiaAction action)
-                : base(holdNote.HitObject.Head, action)
+            public DrawableHeadNote(DrawableHoldNote holdNote)
+                : base(holdNote.HitObject.Head)
             {
                 this.holdNote = holdNote;
             }
@@ -191,8 +191,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             private readonly DrawableHoldNote holdNote;
 
-            public DrawableTailNote(DrawableHoldNote holdNote, ManiaAction action)
-                : base(holdNote.HitObject.Tail, action)
+            public DrawableTailNote(DrawableHoldNote holdNote)
+                : base(holdNote.HitObject.Tail)
             {
                 this.holdNote = holdNote;
             }
@@ -235,7 +235,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (!holdNote.holdStartTime.HasValue)
                     return false;
 
-                if (action != Action)
+                if (action != Action.Value)
                     return false;
 
                 UpdateJudgement(true);
