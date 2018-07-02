@@ -202,9 +202,6 @@ namespace osu.Game.Overlays.KeyBinding
 
             switch (args.Key)
             {
-                case Key.Escape:
-                    finalise();
-                    return true;
                 case Key.Delete:
                 {
                     if (state.Keyboard.ShiftPressed)
