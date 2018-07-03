@@ -33,8 +33,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
-        public bool HasNestedHitObjects => nestedHitObjects.IsValueCreated;
-        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects.Value;
+        public IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : Enumerable.Empty<DrawableHitObject>();
 
         public event Action<DrawableHitObject, Judgement> OnJudgement;
         public event Action<DrawableHitObject, Judgement> OnJudgementRemoved;
@@ -50,12 +49,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been hit.
         /// </summary>
-        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && (!HasNestedHitObjects || NestedHitObjects.All(n => n.IsHit));
+        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && NestedHitObjects.All(n => n.IsHit);
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (!HasNestedHitObjects || NestedHitObjects.All(h => h.AllJudged));
+        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && NestedHitObjects.All(h => h.AllJudged);
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> can be judged.
@@ -206,9 +205,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (AllJudged)
                 return false;
 
-            if (HasNestedHitObjects)
-                foreach (var d in NestedHitObjects)
-                    judgementOccurred |= d.UpdateJudgement(userTriggered);
+            foreach (var d in NestedHitObjects)
+                judgementOccurred |= d.UpdateJudgement(userTriggered);
 
             if (!ProvidesJudgement || judgementFinalized || judgementOccurred)
                 return judgementOccurred;
