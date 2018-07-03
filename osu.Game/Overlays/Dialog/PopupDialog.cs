@@ -6,16 +6,16 @@ using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Dialog
 {
@@ -23,6 +23,9 @@ namespace osu.Game.Overlays.Dialog
     {
         public static readonly float ENTER_DURATION = 500;
         public static readonly float EXIT_DURATION = 200;
+
+        protected override bool BlockPassThroughMouse => false;
+
         private readonly Vector2 ringSize = new Vector2(100f);
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
         private readonly Vector2 buttonsEnterSpacing = new Vector2(0f, 50f);
@@ -34,26 +37,28 @@ namespace osu.Game.Overlays.Dialog
         private readonly SpriteText header;
         private readonly TextFlowContainer body;
 
+        private bool actionInvoked;
+
         public FontAwesome Icon
         {
-            get { return icon.Icon; }
-            set { icon.Icon = value; }
+            get => icon.Icon;
+            set => icon.Icon = value;
         }
 
         public string HeaderText
         {
-            get { return header.Text; }
-            set { header.Text = value; }
+            get => header.Text;
+            set => header.Text = value;
         }
 
         public string BodyText
         {
-            set { body.Text = value; }
+            set => body.Text = value;
         }
 
         public IEnumerable<PopupDialogButton> Buttons
         {
-            get { return buttonsContainer.Children; }
+            get => buttonsContainer.Children;
             set
             {
                 buttonsContainer.ChildrenEnumerable = value;
@@ -62,69 +67,15 @@ namespace osu.Game.Overlays.Dialog
                     var action = b.Action;
                     b.Action = () =>
                     {
+                        if (actionInvoked) return;
+
                         Hide();
+
+                        actionInvoked = true;
                         action?.Invoke();
                     };
                 }
             }
-        }
-
-        private void pressButtonAtIndex(int index)
-        {
-            if (index < Buttons.Count())
-                Buttons.Skip(index).First().TriggerOnClick();
-        }
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (args.Repeat) return false;
-
-            if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
-            {
-                Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerOnClick();
-                return true;
-            }
-
-            // press button at number if 1-9 on number row or keypad are pressed
-            var k = args.Key;
-            if (k >= Key.Number1 && k <= Key.Number9)
-            {
-                pressButtonAtIndex(k - Key.Number1);
-                return true;
-            }
-
-            if (k >= Key.Keypad1 && k <= Key.Keypad9)
-            {
-                pressButtonAtIndex(k - Key.Keypad1);
-                return true;
-            }
-
-            return base.OnKeyDown(state, args);
-        }
-
-        protected override void PopIn()
-        {
-            base.PopIn();
-
-            // Reset various animations but only if the dialog animation fully completed
-            if (content.Alpha == 0)
-            {
-                buttonsContainer.TransformSpacingTo(buttonsEnterSpacing);
-                buttonsContainer.MoveToY(buttonsEnterSpacing.Y);
-                ring.ResizeTo(ringMinifiedSize);
-            }
-
-            content.FadeIn(ENTER_DURATION, Easing.OutQuint);
-            ring.ResizeTo(ringSize, ENTER_DURATION, Easing.OutQuint);
-            buttonsContainer.TransformSpacingTo(Vector2.Zero, ENTER_DURATION, Easing.OutQuint);
-            buttonsContainer.MoveToY(0, ENTER_DURATION, Easing.OutQuint);
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-
-            content.FadeOut(EXIT_DURATION, Easing.InSine);
         }
 
         public PopupDialog()
@@ -136,9 +87,6 @@ namespace osu.Game.Overlays.Dialog
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Width = 0.4f,
                     Alpha = 0f,
                     Children = new Drawable[]
                     {
@@ -242,6 +190,70 @@ namespace osu.Game.Overlays.Dialog
                     },
                 },
             };
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat) return false;
+
+            if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
+            {
+                Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerOnClick();
+                return true;
+            }
+
+            // press button at number if 1-9 on number row or keypad are pressed
+            var k = args.Key;
+            if (k >= Key.Number1 && k <= Key.Number9)
+            {
+                pressButtonAtIndex(k - Key.Number1);
+                return true;
+            }
+
+            if (k >= Key.Keypad1 && k <= Key.Keypad9)
+            {
+                pressButtonAtIndex(k - Key.Keypad1);
+                return true;
+            }
+
+            return base.OnKeyDown(state, args);
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            actionInvoked = false;
+
+            // Reset various animations but only if the dialog animation fully completed
+            if (content.Alpha == 0)
+            {
+                buttonsContainer.TransformSpacingTo(buttonsEnterSpacing);
+                buttonsContainer.MoveToY(buttonsEnterSpacing.Y);
+                ring.ResizeTo(ringMinifiedSize);
+            }
+
+            content.FadeIn(ENTER_DURATION, Easing.OutQuint);
+            ring.ResizeTo(ringSize, ENTER_DURATION, Easing.OutQuint);
+            buttonsContainer.TransformSpacingTo(Vector2.Zero, ENTER_DURATION, Easing.OutQuint);
+            buttonsContainer.MoveToY(0, ENTER_DURATION, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            if (!actionInvoked)
+                // In the case a user did not choose an action before a hide was triggered, press the last button.
+                // This is presumed to always be a sane default "cancel" action.
+                buttonsContainer.Last().TriggerOnClick();
+
+            base.PopOut();
+            content.FadeOut(EXIT_DURATION, Easing.InSine);
+        }
+
+        private void pressButtonAtIndex(int index)
+        {
+            if (index < Buttons.Count())
+                Buttons.Skip(index).First().TriggerOnClick();
         }
     }
 }

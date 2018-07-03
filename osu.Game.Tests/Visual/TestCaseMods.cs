@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
                 Ruleset ruleset = rulesetInfo.CreateInstance();
-                AddStep($"switch to {ruleset.Description}", () => modSelect.Ruleset.Value = rulesetInfo);
+                AddStep($"switch to {ruleset.Description}", () => Ruleset.Value = rulesetInfo);
 
                 switch (ruleset)
                 {
