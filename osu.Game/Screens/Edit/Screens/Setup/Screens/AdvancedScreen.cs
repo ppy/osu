@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         private readonly LabelledSliderBar stackLeniency;
         private readonly LabelledEnumDropdown<AvailableGamemodes> availableGamemodes;
-        private readonly LabelledCheckBox maniaSpecialStyle;
+        private readonly LabelledSwitchButton maniaSpecialStyle;
 
         public string Title => "Advanced";
 
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 14,
                                     Font = @"Exo2.0-BoldItalic",
                                 },
-                                maniaSpecialStyle = new LabelledCheckBox
+                                maniaSpecialStyle = new LabelledSwitchButton
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "osu!mania Special Style",
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 Beatmap.Value.BeatmapInfo.RulesetID = (int)a;
                 updateInfo();
             };
-            maniaSpecialStyle.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.SpecialStyle = a;
+            maniaSpecialStyle.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.SpecialStyle = a;
         }
 
         public void ChangeManiaSpecialStyle(bool newValue) => maniaSpecialStyle.CurrentValue = newValue;

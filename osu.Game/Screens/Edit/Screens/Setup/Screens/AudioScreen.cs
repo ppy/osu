@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     {
         private readonly Container content;
 
-        private readonly LabelledCheckBox samples;
+        private readonly LabelledSwitchButton samples;
 
         public string Title => "Audio";
 
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                samples = new LabelledCheckBox
+                                samples = new LabelledSwitchButton
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "Samples Match Playback Rate",
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             updateInfo();
             Beatmap.ValueChanged += a => updateInfo();
 
-            samples.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.SamplesMatchPlaybackRate = a;
+            samples.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.SamplesMatchPlaybackRate = a;
         }
 
         public void ChangeSamplesMatchPlaybackRate(bool newValue) => samples.CurrentValue = newValue;

@@ -25,11 +25,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     {
         private readonly Container content;
 
-        private readonly LabelledCheckBox displayEpilepsyWarning;
-        private readonly LabelledCheckBox displayStoryboard;
-        private readonly LabelledCheckBox enableCountdown;
-        private readonly LabelledCheckBox letterbox;
-        private readonly LabelledCheckBox widescreenSupport;
+        private readonly LabelledSwitchButton displayEpilepsyWarning;
+        private readonly LabelledSwitchButton displayStoryboard;
+        private readonly LabelledSwitchButton enableCountdown;
+        private readonly LabelledSwitchButton letterbox;
+        private readonly LabelledSwitchButton widescreenSupport;
 
         public string Title => "Design";
 
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                enableCountdown = new LabelledCheckBox
+                                enableCountdown = new LabelledSwitchButton
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "Enable Countdown",
@@ -73,22 +73,22 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                widescreenSupport = new LabelledCheckBox
+                                widescreenSupport = new LabelledSwitchButton
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "Widescreen Support",
                                 },
-                                displayStoryboard = new LabelledCheckBox
+                                displayStoryboard = new LabelledSwitchButton
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Display storyboard in front of combo fire",
                                 },
-                                letterbox = new LabelledCheckBox
+                                letterbox = new LabelledSwitchButton
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Letterbox During Breaks",
                                 },
-                                displayEpilepsyWarning = new LabelledCheckBox
+                                displayEpilepsyWarning = new LabelledSwitchButton
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Display Epilepsy Effect",
@@ -103,11 +103,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             updateInfo();
             Beatmap.ValueChanged += a => updateInfo();
 
-            enableCountdown.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.Countdown = a;
-            widescreenSupport.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.WidescreenStoryboard = a;
-            displayStoryboard.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.StoryFireInFront = a;
-            letterbox.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.LetterboxInBreaks = a;
-            displayEpilepsyWarning.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.EpilepsyWarning = a;
+            enableCountdown.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.Countdown = a;
+            widescreenSupport.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.WidescreenStoryboard = a;
+            displayStoryboard.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.StoryFireInFront = a;
+            letterbox.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.LetterboxInBreaks = a;
+            displayEpilepsyWarning.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.EpilepsyWarning = a;
         }
 
         public void ChangeEnableCountdown(bool newValue) => enableCountdown.CurrentValue = newValue;

@@ -21,14 +21,14 @@ using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 {
-    public class LabelledCheckBox : CompositeDrawable
+    public class LabelledSwitchButton : CompositeDrawable
     {
         private readonly Container content;
         private readonly Container outerContainer;
         private readonly Box box;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
-        private readonly OsuCheckBox checkBox;
+        private readonly OsuSwitchButton switchButton;
 
         public const float DEFAULT_LABEL_TEXT_SIZE = 20;
         public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 14;
@@ -37,17 +37,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public const float DEFAULT_TOP_PADDING = 15;
         public const float DEFAULT_BOTTOM_PADDING = 15;
 
-        public event Action<bool> RadioButtonValueChanged;
+        public event Action<bool> SwitchButtonValueChanged;
 
-        public void TriggerRadioButtonValueChanged(bool newValue)
+        public void TriggerSwitchButtonValueChanged(bool newValue)
         {
-            RadioButtonValueChanged?.Invoke(newValue);
+            SwitchButtonValueChanged?.Invoke(newValue);
         }
 
         public bool CurrentValue
         {
-            get => checkBox.Current.Value;
-            set => checkBox.Current.Value = value;
+            get => switchButton.Current.Value;
+            set => switchButton.Current.Value = value;
         }
 
         private string labelText;
@@ -102,8 +102,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 
         public MarginPadding RadioButtonPadding
         {
-            get => checkBox.Padding;
-            set => checkBox.Padding = value;
+            get => switchButton.Padding;
+            set => switchButton.Padding = value;
         }
 
         public Color4 LabelTextColour
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             set => content.Colour = value;
         }
 
-        public LabelledCheckBox()
+        public LabelledSwitchButton()
         {
             Masking = true;
             CornerRadius = 15;
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        checkBox = new OsuCheckBox
+                                        switchButton = new OsuSwitchButton
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                 }
             };
 
-            checkBox.Current.ValueChanged += a => TriggerRadioButtonValueChanged(a);
+            switchButton.Current.ValueChanged += a => TriggerSwitchButtonValueChanged(a);
         }
 
         private void changeHeight(float newHeight)

@@ -12,12 +12,12 @@ using System.Collections.Generic;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseLabelledCheckBox : OsuTestCase
+    public class TestCaseLabelledSwitchButton : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(LabelledCheckBox),
-            typeof(OsuCheckBox),
+            typeof(LabelledSwitchButton),
+            typeof(OsuSwitchButton),
         };
 
         int count = -1;
@@ -25,10 +25,10 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            LabelledCheckBox labelledRadioButton;
+            LabelledSwitchButton labelledSwitchButton;
             Children = new Drawable[]
             {
-                labelledRadioButton = new LabelledCheckBox
+                labelledSwitchButton = new LabelledSwitchButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -37,15 +37,15 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            labelledRadioButton.RadioButtonValueChanged += a =>
+            labelledSwitchButton.SwitchButtonValueChanged += a =>
             {
                 count += a ? 1 : 0;
-                labelledRadioButton.BottomLabelText = a ? $"Thanks for {(count > 0 ? "re-" : "")}enabling this useful secret feature{(count > 0 ? $" for the {count}{getOrderedNumberSuffix(count)} time" : "")}. Unfortunately, we cannot tell you what this does as it is secret."
+                labelledSwitchButton.BottomLabelText = a ? $"Thanks for {(count > 0 ? "re-" : "")}enabling this useful secret feature{(count > 0 ? $" for the {count}{getOrderedNumberSuffix(count)} time" : "")}. Unfortunately, we cannot tell you what this does as it is secret."
                                                         : "Why did you disable this? :(";
             };
 
-            AddStep("Set value to true", () => labelledRadioButton.CurrentValue = true);
-            AddStep("Set value to false", () => labelledRadioButton.CurrentValue = false);
+            AddStep("Set value to true", () => labelledSwitchButton.CurrentValue = true);
+            AddStep("Set value to false", () => labelledSwitchButton.CurrentValue = false);
         }
 
         private string getOrderedNumberSuffix(int n)
