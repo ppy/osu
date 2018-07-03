@@ -113,6 +113,12 @@ namespace osu.Game.Tests.Visual
             AddStep("Select Advanced tab", () => setup.MenuBar.Mode.Value = SetupScreenMode.Advanced);
             AddStep("Change stack leniency to 9", () => (setup.CurrentScreen as AdvancedScreen).ChangeStackLeniency(9));
             AddAssert("Check new stack leniency value", () => setup.CurrentScreen.Beatmap.Value.BeatmapInfo.StackLeniency == 9);
+            AddStep("Change ruleset to osu!", () => (setup.CurrentScreen as AdvancedScreen).ChangeBeatmapRuleset(0));
+            AddAssert("Check new ruleset value", () => setup.CurrentScreen.Beatmap.Value.BeatmapInfo.RulesetID == 0);
+            AddStep("Change ruleset to osu!taiko", () => (setup.CurrentScreen as AdvancedScreen).ChangeBeatmapRuleset(1));
+            AddAssert("Check new ruleset value", () => setup.CurrentScreen.Beatmap.Value.BeatmapInfo.RulesetID == 1);
+            AddStep("Change ruleset to osu!catch", () => (setup.CurrentScreen as AdvancedScreen).ChangeBeatmapRuleset(2));
+            AddAssert("Check new ruleset value", () => setup.CurrentScreen.Beatmap.Value.BeatmapInfo.RulesetID == 2);
             AddStep("Change ruleset to osu!mania", () => (setup.CurrentScreen as AdvancedScreen).ChangeBeatmapRuleset(3));
             AddAssert("Check new ruleset value", () => setup.CurrentScreen.Beatmap.Value.BeatmapInfo.RulesetID == 3);
             AddStep("Enable osu!mania special style", () => (setup.CurrentScreen as AdvancedScreen).ChangeManiaSpecialStyle(true));

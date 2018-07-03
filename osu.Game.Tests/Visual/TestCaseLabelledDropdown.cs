@@ -16,7 +16,6 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            // Now that's a problem
             typeof(LabelledDropdown<int>),
             typeof(OsuDropdown<int>),
         };

@@ -26,6 +26,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly Container content;
 
         private readonly LabelledSliderBar stackLeniency;
+        private readonly LabelledEnumDropdown<AvailableGamemodes> availableGamemodes;
         private readonly LabelledCheckBox maniaSpecialStyle;
 
         public string Title => "Advanced";
@@ -76,12 +77,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                maniaSpecialStyle = new LabelledCheckBox
+                                availableGamemodes = new LabelledEnumDropdown<AvailableGamemodes>
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
-                                    LabelText = "osu!mania Special Style",
-                                    BottomLabelText = "Use N+1 key style for osu!mania maps.",
-                                    Alpha = 0
+                                    LabelText = "Allowed Modes",
                                 },
                                 new OsuSpriteText
                                 {
@@ -93,7 +92,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 new OsuSpriteText
                                 {
-                                    //Padding = new MarginPadding { Top = 10 },
                                     Colour = Color4.Yellow,
                                     Text = "It is often encouraged that you create mode-specific maps, since converted beatmaps often do not offer the desirable gameplay.",
                                     TextSize = 14,
@@ -101,11 +99,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 new OsuSpriteText
                                 {
-                                    //Padding = new MarginPadding { Top = 10 },
                                     Colour = Color4.Yellow,
                                     Text = "Please take that into consideration before submitting your beatmap set.",
                                     TextSize = 14,
                                     Font = @"Exo2.0-BoldItalic",
+                                },
+                                maniaSpecialStyle = new LabelledCheckBox
+                                {
+                                    Padding = new MarginPadding { Top = 10, Right = 150 },
+                                    LabelText = "osu!mania Special Style",
+                                    BottomLabelText = "Use N+1 key style for osu!mania maps.",
+                                    Alpha = 0
                                 },
                             }
                         },
@@ -117,23 +121,37 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             Beatmap.ValueChanged += a => updateInfo();
 
             stackLeniency.SliderBarValueChanged += a => Beatmap.Value.BeatmapInfo.StackLeniency = a;
+            availableGamemodes.DropdownSelectionChanged += a =>
+            {
+                Beatmap.Value.BeatmapInfo.RulesetID = (int)a;
+                updateInfo();
+            };
             maniaSpecialStyle.RadioButtonValueChanged += a => Beatmap.Value.BeatmapInfo.SpecialStyle = a;
         }
 
         public void ChangeManiaSpecialStyle(bool newValue) => maniaSpecialStyle.CurrentValue = newValue;
         public void ChangeStackLeniency(float newValue) => stackLeniency.CurrentValue = newValue;
-        public void ChangeBeatmapRuleset(int newRulesetID)
-        {
-            Beatmap.Value.BeatmapInfo.RulesetID = newRulesetID;
-            updateInfo();
-        }
+        public void ChangeBeatmapRuleset(int newRulesetID) => availableGamemodes.DropdownSelectedItem = (AvailableGamemodes)newRulesetID;
 
         private void updateInfo()
         {
             stackLeniency.CurrentValue = Beatmap.Value?.BeatmapInfo.StackLeniency ?? 7;
+            availableGamemodes.DropdownSelectedItem = (AvailableGamemodes?)Beatmap.Value?.BeatmapInfo.RulesetID ?? AvailableGamemodes.All;
             maniaSpecialStyle.CurrentValue = Beatmap.Value?.BeatmapInfo.SpecialStyle ?? false;
 
-            maniaSpecialStyle.Alpha = Beatmap.Value?.BeatmapInfo.RulesetID == 3 ? 1 : 0;
+            maniaSpecialStyle.FadeTo(Beatmap.Value?.BeatmapInfo.RulesetID == 3 ? 1 : 0, 500, Easing.OutQuint);
         }
+    }
+
+    public enum AvailableGamemodes
+    {
+        [System.ComponentModel.Description("All")]
+        All = 0,
+        [System.ComponentModel.Description("osu!taiko")]
+        Taiko = 1,
+        [System.ComponentModel.Description("osu!catch")]
+        Catch = 2,
+        [System.ComponentModel.Description("osu!mania")]
+        Mania = 3
     }
 }

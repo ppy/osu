@@ -62,14 +62,18 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             }
         }
 
-        public T DropdownSelectedItem => dropdown.Current.Value;
+        public T DropdownSelectedItem
+        {
+            get => dropdown.Current.Value;
+            set => dropdown.Current.Value = value;
+        }
 
         public int DropdownSelectedIndex
         {
             set => dropdown.Current.Value = dropdown.Items.ElementAt(value).Value;
         }
 
-        // Dropdown items should not be publicly exposed for setting, use the functions instead
+        // dropdown items should not be publicly exposed for setting, use the functions instead
         public IEnumerable<KeyValuePair<string, T>> Items
         {
             get => dropdown.Items;
@@ -167,18 +171,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        dropdown = new OsuDropdown<T>
-                                        {
-                                            Anchor = Anchor.TopLeft,
-                                            Origin = Anchor.TopLeft,
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            HeaderHeight = DEFAULT_HEIGHT,
-                                            HeaderCornerRadius = CORNER_RADIUS,
-                                            HeaderTextSize = DEFAULT_HEADER_TEXT_SIZE,
-                                            HeaderTextLeftPadding = DEFAULT_PADDING,
-                                            HeaderDownIconRightPadding = DEFAULT_PADDING,
-                                        },
+                                        dropdown = CreateDropdown(),
                                     },
                                 },
                                 ColumnDimensions = new[]
@@ -204,5 +197,21 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         }
 
         public void RemoveDropdownItem(T value) => dropdown.RemoveDropdownItem(value);
+
+        protected virtual OsuDropdown<T> CreateDropdown()
+        {
+            return new OsuDropdown<T>
+            {
+                Anchor = Anchor.TopLeft,
+                Origin = Anchor.TopLeft,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                HeaderHeight = DEFAULT_HEIGHT,
+                HeaderCornerRadius = CORNER_RADIUS,
+                HeaderTextSize = DEFAULT_HEADER_TEXT_SIZE,
+                HeaderTextLeftPadding = DEFAULT_PADDING,
+                HeaderDownIconRightPadding = DEFAULT_PADDING,
+            };
+        }
     }
 }
