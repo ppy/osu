@@ -21,33 +21,23 @@ using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 {
-    public class LabelledTextBox : CompositeDrawable
+    public class LabelledDropdown<T> : CompositeDrawable
     {
-        private readonly OsuTextBox textBox;
+        private readonly OsuDropdown<T> dropdown;
         private readonly Container content;
         private readonly OsuSpriteText label;
 
         public const float CORNER_RADIUS = 15;
+        public const float DEFAULT_HEADER_TEXT_SIZE = 25;
         public const float DEFAULT_HEIGHT = 50;
-        public const float DEFAULT_LABEL_PADDING = 15;
         public const float DEFAULT_LABEL_TEXT_SIZE = 20;
+        public const float DEFAULT_PADDING = 15;
 
-        public event Action<string> TextBoxTextChanged;
+        public event Action<T> DropdownSelectionChanged;
 
-        public void TriggerTextBoxTextChanged(string newText)
+        public void TriggerDropdownSelectionChanged(T newValue)
         {
-            TextBoxTextChanged?.Invoke(newText);
-        }
-
-        private bool readOnly = false;
-        public bool ReadOnly
-        {
-            get => readOnly;
-            set
-            {
-                textBox.ReadOnly = value;
-                readOnly = value;
-            }
+            DropdownSelectionChanged?.Invoke(newValue);
         }
 
         private string labelText;
@@ -72,27 +62,18 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             }
         }
 
-        private string textBoxPlaceholderText;
-        public string TextBoxPlaceholderText
+        public T DropdownSelectedItem => dropdown.Current.Value;
+
+        public int DropdownSelectedIndex
         {
-            get => textBoxPlaceholderText;
-            set
-            {
-                textBoxPlaceholderText = value;
-                textBox.PlaceholderText = value;
-            }
+            set => dropdown.Current.Value = dropdown.Items.ElementAt(value).Value;
         }
 
-        private string textBoxText;
-        public string TextBoxText
+        // Dropdown items should not be publicly exposed for setting, use the functions instead
+        public IEnumerable<KeyValuePair<string, T>> Items
         {
-            get => textBoxText;
-            set
-            {
-                textBoxText = value;
-                textBox.Text = value;
-                TextBoxTextChanged?.Invoke(value);
-            }
+            get => dropdown.Items;
+            private set => dropdown.Items = value;
         }
 
         private float height = DEFAULT_HEIGHT;
@@ -102,7 +83,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             private set
             {
                 height = value;
-                textBox.Height = value;
+                dropdown.Height = value;
                 content.Height = value;
             }
         }
@@ -125,8 +106,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 
         public MarginPadding TextBoxPadding
         {
-            get => textBox.Padding;
-            set => textBox.Padding = value;
+            get => dropdown.Padding;
+            set => dropdown.Padding = value;
         }
 
         public Color4 LabelTextColour
@@ -141,7 +122,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             set => content.Colour = value;
         }
 
-        public LabelledTextBox()
+        public LabelledDropdown()
         {
             Masking = true;
             CornerRadius = CORNER_RADIUS;
@@ -180,20 +161,23 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_LABEL_PADDING },
+                                            Padding = new MarginPadding { Left = DEFAULT_PADDING, Top = DEFAULT_PADDING },
                                             Colour = Color4.White,
                                             TextSize = DEFAULT_LABEL_TEXT_SIZE,
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        textBox = new OsuTextBox
+                                        dropdown = new OsuDropdown<T>
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
                                             RelativeSizeAxes = Axes.X,
-                                            Height = DEFAULT_HEIGHT,
-                                            ReadOnly = ReadOnly,
-                                            CornerRadius = CORNER_RADIUS,
+                                            AutoSizeAxes = Axes.Y,
+                                            HeaderHeight = DEFAULT_HEIGHT,
+                                            HeaderCornerRadius = CORNER_RADIUS,
+                                            HeaderTextSize = DEFAULT_HEADER_TEXT_SIZE,
+                                            HeaderTextLeftPadding = DEFAULT_PADDING,
+                                            HeaderDownIconRightPadding = DEFAULT_PADDING,
                                         },
                                     },
                                 },
@@ -207,8 +191,18 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                     }
                 }
             };
-            
-            textBox.OnCommit += delegate { TriggerTextBoxTextChanged(textBox.Text); };
+
+            dropdown.Current.ValueChanged += delegate { TriggerDropdownSelectionChanged(dropdown.Current.Value); };
         }
+
+        public void AddDropdownItem(string text, T value) => dropdown.AddDropdownItem(text, value);
+
+        public void AddDropdownItems(IEnumerable<KeyValuePair<string, T>> items)
+        {
+            foreach (var i in items)
+                dropdown.AddDropdownItem(i.Key, i.Value);
+        }
+
+        public void RemoveDropdownItem(T value) => dropdown.RemoveDropdownItem(value);
     }
 }
