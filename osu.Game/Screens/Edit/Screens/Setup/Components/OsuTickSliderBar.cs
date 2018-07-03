@@ -251,7 +251,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                     RelativePositionAxes = Axes.X,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Child = leftTickCaption = new OsuSpriteText()
+                                    Child = leftTickCaption = new OsuSpriteText { Alpha = 0.8f }
                                 },
                                 new Container
                                 {
@@ -259,7 +259,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     X = 0.5f,
-                                    Child = middleTickCaption = new OsuSpriteText()
+                                    Child = middleTickCaption = new OsuSpriteText { Alpha = 0.8f }
                                 },
                                 new Container
                                 {
@@ -267,7 +267,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     X = 1,
-                                    Child = rightTickCaption = new OsuSpriteText()
+                                    Child = rightTickCaption = new OsuSpriteText { Alpha = 0.8f }
                                 }
                             },
                         }
@@ -288,11 +288,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private void load(AudioManager audio, OsuColour colours)
         {
             sample = audio.Sample.Get(@"UI/sliderbar-notch");
-            AccentColour = colours.BlueLight;
-            Nub.Colour = colours.BlueLight;
-            Nub.AccentColour = colours.BlueLight;
+            AccentColour = colours.BlueDark;
+            Nub.Colour = colours.BlueDark;
+            Nub.AccentColour = colours.BlueDark;
             Nub.GlowColour = colours.BlueDarker;
             Nub.GlowingAccentColour = colours.BlueLighter;
+            leftTickCaption.Colour = colours.BlueDark;
+            middleTickCaption.Colour = colours.BlueDark;
+            rightTickCaption.Colour = colours.BlueDark;
         }
 
         protected override bool OnHover(InputState state)
@@ -497,7 +500,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 InternalChild = box = new Box
                 {
                     RelativeSizeAxes = Axes.None,
-                    Size = new Vector2(1, 2)
+                    Size = new Vector2(1, 2),
+                    Alpha = 0.8f
                 };
 
                 CornerRadius = 0.25f;
@@ -507,7 +511,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                box.Colour = colours.BlueLight;
+                box.Colour = colours.BlueDark;
             }
 
             protected override bool OnClick(InputState state)
