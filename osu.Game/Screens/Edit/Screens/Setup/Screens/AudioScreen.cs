@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     {
         private readonly Container content;
 
-        private readonly LabelledRadioButton samples;
+        private readonly LabelledCheckBox samples;
 
         public string Title => "Audio";
 
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                samples = new LabelledRadioButton
+                                samples = new LabelledCheckBox
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "Samples Match Playback Rate",

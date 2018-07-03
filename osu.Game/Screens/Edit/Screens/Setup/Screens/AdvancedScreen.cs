@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly Container content;
 
         private readonly LabelledSliderBar stackLeniency;
-        private readonly LabelledRadioButton maniaSpecialStyle;
+        private readonly LabelledCheckBox maniaSpecialStyle;
 
         public string Title => "Advanced";
 
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                maniaSpecialStyle = new LabelledRadioButton
+                                maniaSpecialStyle = new LabelledCheckBox
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "osu!mania Special Style",

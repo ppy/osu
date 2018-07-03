@@ -16,7 +16,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class OsuRadioButton : CircularContainer, IHasCurrentValue<bool>, IHasAccentColour
+    public class OsuCheckBox : CircularContainer, IHasCurrentValue<bool>, IHasAccentColour
     {
         private readonly Box fill;
         private readonly Box innerSwitch;
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             }
         }
 
-        public OsuRadioButton()
+        public OsuCheckBox()
         {
 
             Size = new Vector2(SIZE_X, SIZE_Y);

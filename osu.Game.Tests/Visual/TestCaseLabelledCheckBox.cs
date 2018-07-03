@@ -12,12 +12,12 @@ using System.Collections.Generic;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseLabelledRadioButton : OsuTestCase
+    public class TestCaseLabelledCheckBox : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(LabelledRadioButton),
-            typeof(OsuRadioButton),
+            typeof(LabelledCheckBox),
+            typeof(OsuCheckBox),
         };
 
         int count = -1;
@@ -25,10 +25,10 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            LabelledRadioButton labelledRadioButton;
+            LabelledCheckBox labelledRadioButton;
             Children = new Drawable[]
             {
-                labelledRadioButton = new LabelledRadioButton
+                labelledRadioButton = new LabelledCheckBox
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

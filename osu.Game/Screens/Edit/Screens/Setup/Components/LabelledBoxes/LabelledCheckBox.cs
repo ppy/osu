@@ -21,14 +21,14 @@ using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 {
-    public class LabelledRadioButton : CompositeDrawable
+    public class LabelledCheckBox : CompositeDrawable
     {
         private readonly Container content;
         private readonly Container outerContainer;
         private readonly Box box;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
-        private readonly OsuRadioButton radioButton;
+        private readonly OsuCheckBox checkBox;
 
         public const float DEFAULT_LABEL_TEXT_SIZE = 20;
         public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 14;
@@ -46,8 +46,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 
         public bool CurrentValue
         {
-            get => radioButton.Current.Value;
-            set => radioButton.Current.Value = value;
+            get => checkBox.Current.Value;
+            set => checkBox.Current.Value = value;
         }
 
         private string labelText;
@@ -102,8 +102,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 
         public MarginPadding RadioButtonPadding
         {
-            get => radioButton.Padding;
-            set => radioButton.Padding = value;
+            get => checkBox.Padding;
+            set => checkBox.Padding = value;
         }
 
         public Color4 LabelTextColour
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             set => content.Colour = value;
         }
 
-        public LabelledRadioButton()
+        public LabelledCheckBox()
         {
             Masking = true;
             CornerRadius = 15;
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        radioButton = new OsuRadioButton
+                                        checkBox = new OsuCheckBox
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                 }
             };
 
-            radioButton.Current.ValueChanged += a => TriggerRadioButtonValueChanged(a);
+            checkBox.Current.ValueChanged += a => TriggerRadioButtonValueChanged(a);
         }
 
         private void changeHeight(float newHeight)

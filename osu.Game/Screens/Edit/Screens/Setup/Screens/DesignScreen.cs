@@ -25,11 +25,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     {
         private readonly Container content;
 
-        private readonly LabelledRadioButton displayEpilepsyWarning;
-        private readonly LabelledRadioButton displayStoryboard;
-        private readonly LabelledRadioButton enableCountdown;
-        private readonly LabelledRadioButton letterbox;
-        private readonly LabelledRadioButton widescreenSupport;
+        private readonly LabelledCheckBox displayEpilepsyWarning;
+        private readonly LabelledCheckBox displayStoryboard;
+        private readonly LabelledCheckBox enableCountdown;
+        private readonly LabelledCheckBox letterbox;
+        private readonly LabelledCheckBox widescreenSupport;
 
         public string Title => "Design";
 
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                enableCountdown = new LabelledRadioButton
+                                enableCountdown = new LabelledCheckBox
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "Enable Countdown",
@@ -73,22 +73,22 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                widescreenSupport = new LabelledRadioButton
+                                widescreenSupport = new LabelledCheckBox
                                 {
                                     Padding = new MarginPadding { Top = 10, Right = 150 },
                                     LabelText = "Widescreen Support",
                                 },
-                                displayStoryboard = new LabelledRadioButton
+                                displayStoryboard = new LabelledCheckBox
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Display storyboard in front of combo fire",
                                 },
-                                letterbox = new LabelledRadioButton
+                                letterbox = new LabelledCheckBox
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Letterbox During Breaks",
                                 },
-                                displayEpilepsyWarning = new LabelledRadioButton
+                                displayEpilepsyWarning = new LabelledCheckBox
                                 {
                                     Padding = new MarginPadding { Right = 150 },
                                     LabelText = "Display Epilepsy Effect",
