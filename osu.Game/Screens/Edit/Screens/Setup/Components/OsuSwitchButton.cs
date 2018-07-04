@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                     switchContainer.MoveToX(SIZE_X - BORDER_THICKNESS - 2 - innerSwitch.Size.X, 200, Easing.OutQuint);
                 else
                     switchContainer.MoveToX(BORDER_THICKNESS + 2, 200, Easing.OutQuint);
-                this.FadeAccent(newValue ? enabledColour : DisabledColour, 500, Easing.OutQuint);
+                this.FadeAccent((newValue ? enabledColour : disabledColour).Lighten(IsHovered ? 0.3f : 0), 500, Easing.OutQuint);
                 fill.FadeTo(newValue ? 1 : 0, 500, Easing.OutQuint);
             };
         }
@@ -114,13 +114,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         protected override bool OnHover(InputState state)
         {
-            // Change the colour slightly to indicate hovering
+            this.FadeAccent((Current.Value ? enabledColour : disabledColour).Lighten(0.3f), 500, Easing.OutQuint);
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            // Reset to original colours
+            this.FadeAccent((Current.Value ? enabledColour : disabledColour).Lighten(0), 500, Easing.OutQuint);
             base.OnHoverLost(state);
         }
 

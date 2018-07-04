@@ -3,6 +3,8 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -186,6 +188,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             };
 
             dropdown.Current.ValueChanged += delegate { TriggerDropdownSelectionChanged(dropdown.Current.Value); };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour osuColour)
+        {
+            dropdown.HeaderTextColour = osuColour.Blue;
+            dropdown.AccentColour = osuColour.BlueDarker.Darken(0.6f);
         }
 
         public void AddDropdownItem(string text, T value) => dropdown.AddDropdownItem(text, value);

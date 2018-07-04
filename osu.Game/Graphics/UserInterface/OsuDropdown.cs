@@ -29,6 +29,12 @@ namespace osu.Game.Graphics.UserInterface
                 updateAccentColour();
             }
         }
+        
+        public Color4 HeaderTextColour
+        {
+            get => header.TextColour;
+            set => header.TextColour = value;
+        }
 
         public float HeaderTextSize
         {
@@ -235,6 +241,12 @@ namespace osu.Game.Graphics.UserInterface
             {
                 get { return Text.Text; }
                 set { Text.Text = value; }
+            }
+
+            public Color4 TextColour
+            {
+                get => Text.Colour;
+                set => Text.Colour = value;
             }
             
             public float TextSize
