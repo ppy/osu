@@ -47,13 +47,10 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
                     }
                 }
 
-                if (obj.HasNestedHitObjects)
-                {
-                    ComputeInitialStates(obj.NestedHitObjects, direction, timeRange, length);
+                ComputeInitialStates(obj.NestedHitObjects, direction, timeRange, length);
 
-                    // Nested hitobjects don't need to scroll, but they do need accurate positions
-                    UpdatePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
-                }
+                // Nested hitobjects don't need to scroll, but they do need accurate positions
+                UpdatePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
             }
         }
 

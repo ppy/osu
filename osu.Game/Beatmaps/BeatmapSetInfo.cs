@@ -13,7 +13,13 @@ namespace osu.Game.Beatmaps
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
-        public int? OnlineBeatmapSetID { get; set; }
+        private int? onlineBeatmapSetID;
+
+        public int? OnlineBeatmapSetID
+        {
+            get { return onlineBeatmapSetID; }
+            set { onlineBeatmapSetID = value > 0 ? value : null; }
+        }
 
         public BeatmapMetadata Metadata { get; set; }
 

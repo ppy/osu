@@ -19,7 +19,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Beatmaps
 {
-    public abstract class WorkingBeatmap : IDisposable
+    public abstract partial class WorkingBeatmap : IDisposable
     {
         public readonly BeatmapInfo BeatmapInfo;
 
@@ -116,8 +116,9 @@ namespace osu.Game.Beatmaps
                     mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
             }
 
-            // Post-process
-            rulesetInstance.CreateBeatmapProcessor(converted)?.PostProcess();
+            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
+
+            processor?.PreProcess();
 
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
             foreach (var obj in converted.HitObjects)
@@ -126,6 +127,8 @@ namespace osu.Game.Beatmaps
             foreach (var mod in Mods.Value.OfType<IApplicableToHitObject>())
             foreach (var obj in converted.HitObjects)
                 mod.ApplyToHitObject(obj);
+
+            processor?.PostProcess();
 
             return converted;
         }
@@ -145,7 +148,7 @@ namespace osu.Game.Beatmaps
         private Track populateTrack()
         {
             // we want to ensure that we always have a track, even if it's a fake one.
-            var t = GetTrack() ?? new TrackVirtual();
+            var t = GetTrack() ?? new VirtualBeatmapTrack(Beatmap);
             applyRateAdjustments(t);
             return t;
         }
