@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     {
                         new FillFlowContainer
                         {
-                            Margin = new MarginPadding { Left = 75, Top = 200 },
+                            Margin = new MarginPadding { Left = 65, Top = 180 },
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.CentreLeft,
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 stackLeniency = new LabelledSliderBar
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 150 },
+                                    Padding = new MarginPadding { Top = 10, Right = 140 },
                                     SliderMinValue = 2,
                                     SliderMaxValue = 10,
                                     SliderNormalPrecision = 1,
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 availableGamemodes = new LabelledEnumDropdown<AvailableGamemodes>
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 150 },
+                                    Padding = new MarginPadding { Top = 10, Right = 140 },
                                     LabelText = "Allowed Modes",
                                 },
                                 new OsuSpriteText
@@ -87,26 +87,26 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     Padding = new MarginPadding { Top = 10 },
                                     Colour = Color4.Yellow,
                                     Text = "Generally it is preferable to have multiple maps for all gamemodes.",
-                                    TextSize = 14,
+                                    TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
                                 },
                                 new OsuSpriteText
                                 {
                                     Colour = Color4.Yellow,
                                     Text = "It is often encouraged that you create mode-specific maps, since converted beatmaps often do not offer the desirable gameplay.",
-                                    TextSize = 14,
+                                    TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
                                 },
                                 new OsuSpriteText
                                 {
                                     Colour = Color4.Yellow,
                                     Text = "Please take that into consideration before submitting your beatmap set.",
-                                    TextSize = 14,
+                                    TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
                                 },
                                 maniaSpecialStyle = new LabelledSwitchButton
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 150 },
+                                    Padding = new MarginPadding { Top = 10, Right = 140 },
                                     LabelText = "osu!mania Special Style",
                                     BottomLabelText = "Use N+1 key style for osu!mania maps.",
                                     Alpha = 0

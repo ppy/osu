@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 HeaderHeight = DEFAULT_HEIGHT,
-                HeaderCornerRadius = CORNER_RADIUS,
+                HeaderCornerRadius = INNER_CORNER_RADIUS,
                 HeaderTextSize = DEFAULT_HEADER_TEXT_SIZE,
                 HeaderTextLeftPadding = DEFAULT_PADDING,
                 HeaderDownIconRightPadding = DEFAULT_PADDING,

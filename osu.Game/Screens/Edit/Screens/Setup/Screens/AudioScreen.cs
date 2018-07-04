@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     {
                         new FillFlowContainer
                         {
-                            Margin = new MarginPadding { Left = 75, Top = 200 },
+                            Margin = new MarginPadding { Left = 65, Top = 180 },
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.CentreLeft,
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 samples = new LabelledSwitchButton
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 150 },
+                                    Padding = new MarginPadding { Top = 10, Right = 140 },
                                     LabelText = "Samples Match Playback Rate",
                                     BottomLabelText = "This option is suitable for fully-hitsounded maps.",
                                 },

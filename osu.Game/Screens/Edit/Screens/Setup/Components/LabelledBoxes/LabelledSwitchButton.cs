@@ -30,12 +30,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         private readonly OsuSpriteText bottomText;
         private readonly OsuSwitchButton switchButton;
 
-        public const float DEFAULT_LABEL_TEXT_SIZE = 20;
-        public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 14;
-        public const float NORMAL_HEIGHT = 50;
-        public const float DEFAULT_LABEL_PADDING = 15;
-        public const float DEFAULT_TOP_PADDING = 15;
-        public const float DEFAULT_BOTTOM_PADDING = 15;
+        public const float OUTER_CORNER_RADIUS = 15;
+        public const float DEFAULT_LABEL_TEXT_SIZE = 16;
+        public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 12;
+        public const float NORMAL_HEIGHT = 40;
+        public const float DEFAULT_LABEL_PADDING = 12;
+        public const float DEFAULT_TOP_PADDING = 12;
+        public const float DEFAULT_BOTTOM_PADDING = 12;
 
         public event Action<bool> SwitchButtonValueChanged;
 
@@ -69,7 +70,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             {
                 bottomLabelText = value;
                 bottomText.Text = value;
-                changeHeight(NORMAL_HEIGHT + (value != "" ? 25 : 0));
+                changeHeight(NORMAL_HEIGHT + (value != "" ? 20 : 0));
             }
         }
 
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public LabelledSwitchButton()
         {
             Masking = true;
-            CornerRadius = 15;
+            CornerRadius = OUTER_CORNER_RADIUS;
             RelativeSizeAxes = Axes.X;
             Height = NORMAL_HEIGHT + Padding.Top;
 
@@ -131,7 +132,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = NORMAL_HEIGHT,
-                    CornerRadius = 15,
+                    CornerRadius = OUTER_CORNER_RADIUS,
                     Masking = true,
                     Children = new Drawable[]
                     {
@@ -167,7 +168,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
-                                            Position = new Vector2(-15, 11),
+                                            Position = new Vector2(-15, 10),
                                         },
                                     },
                                 },

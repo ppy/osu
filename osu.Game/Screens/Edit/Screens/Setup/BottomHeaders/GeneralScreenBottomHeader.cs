@@ -25,8 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
     {
         public GeneralScreenBottomHeader()
         {
-            // I seriously don't know why the number is like that, the paddings and stuff look weirdly stacked I suppose
-            Width = Setup.SIZE_X - 315;
+            Width = Setup.SIZE_X - 70;
 
             Children = new Drawable[]
             {
@@ -48,7 +47,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
                                     Colour = Color4.Yellow,
-                                    TextSize = 14,
+                                    TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
                                     Text = @"Due to large number of beatmap submissions, the standard of approval is relatively high."
                                 },
@@ -57,7 +56,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
                                     Colour = Color4.Yellow,
-                                    TextSize = 14,
+                                    TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
                                     Text = @"Please ensure your beatmap is at least timed properly, or it will likely be ignored."
                                 },
@@ -74,20 +73,24 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
                         new FillFlowContainer
                         {
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(30),
+                            Spacing = new Vector2(25),
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             Children = new[]
                             {
                                 new LinkSpriteText
                                 {
-                                    Text = @"Editor Guide",
-                                    Link = @"https://osu.ppy.sh/help/wiki/Beatmapping",
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Text = @"Official Submission Criteria",
+                                    Link = @"https://osu.ppy.sh/help/wiki/Ranking_Criteria",
                                 },
                                 new LinkSpriteText
                                 {
-                                    Text = @"Official Submission Criteria",
-                                    Link = @"https://osu.ppy.sh/help/wiki/Ranking_Criteria",
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Text = @"Editor Guide",
+                                    Link = @"https://osu.ppy.sh/help/wiki/Beatmapping",
                                 },
                             }
                         }

@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
 {
     public class Header : Screen
     {
-        public const float HEIGHT = 50;
+        public const float HEIGHT = 40;
 
         private readonly OsuSpriteText screenType;
         private readonly Container boxContainer;
@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
             {
                 new Container
                 {
-                    Height = 50,
+                    Height = HEIGHT,
                     RelativeSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                         },
                         new Container
                         {
-                            Margin = new MarginPadding { Left = 25, Top = 10 },
+                            Margin = new MarginPadding { Left = 25, Top = 5 },
                             RelativeSizeAxes = Axes.X,
                             Height = HEIGHT,
                             Child = textContainer = new FillFlowContainer
@@ -55,21 +55,21 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                                 {
                                     new SpriteIcon
                                     {
-                                        Size = new Vector2(40),
+                                        Size = new Vector2(30),
                                         Icon = FontAwesome.fa_osu_edit_o,
                                     },
                                     new OsuSpriteText
                                     {
-                                        Margin = new MarginPadding { Top = 7.5f },
+                                        Margin = new MarginPadding { Top = 5 },
                                         Text = "Beatmap Setup",
-                                        TextSize = 25,
+                                        TextSize = 20,
                                     },
                                     screenType = new OsuSpriteText
                                     {
-                                        TextSize = 25,
-                                        Margin = new MarginPadding { Top = 7.5f },
+                                        Margin = new MarginPadding { Top = 5 },
                                         Text = "General",
                                         Font = @"Exo2.0-Light",
+                                        TextSize = 20,
                                     },
                                 },
                             }

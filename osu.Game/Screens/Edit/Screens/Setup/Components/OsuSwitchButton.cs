@@ -22,9 +22,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private readonly Box innerSwitch;
         private readonly Container switchContainer;
 
-        public const float BORDER_THICKNESS = 6;
-        public const float SIZE_X = 60;
-        public const float SIZE_Y = 28;
+        public const float BORDER_THICKNESS = 4.5f;
+        public const float SWITCH_PADDING = 1.25f;
+        public const float SIZE_X = 45;
+        public const float SIZE_Y = 20;
 
         private Color4 enabledColour;
         public Color4 EnabledColour
@@ -52,7 +53,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public OsuSwitchButton()
         {
-
             Size = new Vector2(SIZE_X, SIZE_Y);
 
             BorderColour = Color4.White;
@@ -70,13 +70,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 },
                 switchContainer = new Container
                 {
-                    CornerRadius = SIZE_Y / 2 - BORDER_THICKNESS - 2,
+                    CornerRadius = SIZE_Y / 2 - BORDER_THICKNESS - SWITCH_PADDING,
                     Masking = true,
-                    Size = new Vector2(SIZE_Y - 2 * BORDER_THICKNESS - 4),
-                    Position = new Vector2(BORDER_THICKNESS + 2),
+                    Size = new Vector2(SIZE_Y - 2 * BORDER_THICKNESS - 2 * SWITCH_PADDING),
+                    Position = new Vector2(BORDER_THICKNESS + SWITCH_PADDING),
                     Child = innerSwitch = new Box
                     {
-                        Size = new Vector2(SIZE_Y - 2 * BORDER_THICKNESS - 4),
+                        Size = new Vector2(SIZE_Y - 2 * BORDER_THICKNESS - 2 * SWITCH_PADDING),
                     }
                 }
             };
@@ -84,9 +84,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             Current.ValueChanged += newValue =>
             {
                 if (newValue)
-                    switchContainer.MoveToX(SIZE_X - BORDER_THICKNESS - 2 - innerSwitch.Size.X, 200, Easing.OutQuint);
+                    switchContainer.MoveToX(SIZE_X - BORDER_THICKNESS - SWITCH_PADDING - innerSwitch.Size.X, 200, Easing.OutQuint);
                 else
-                    switchContainer.MoveToX(BORDER_THICKNESS + 2, 200, Easing.OutQuint);
+                    switchContainer.MoveToX(BORDER_THICKNESS + SWITCH_PADDING, 200, Easing.OutQuint);
                 this.FadeAccent((newValue ? enabledColour : disabledColour).Lighten(IsHovered ? 0.3f : 0), 500, Easing.OutQuint);
                 fill.FadeTo(newValue ? 1 : 0, 500, Easing.OutQuint);
             };

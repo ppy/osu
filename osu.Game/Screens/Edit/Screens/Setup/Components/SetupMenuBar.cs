@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    X = 75
+                    X = 65
                 }
             });
 

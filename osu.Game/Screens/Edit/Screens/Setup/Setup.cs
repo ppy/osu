@@ -26,8 +26,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup
         private Header header;
         private readonly Container screenContainer;
 
-        public const float SIZE_X = 1080;
-        public const float SIZE_Y = 650;
+        public const float SIZE_X = 900;
+        public const float SIZE_Y = 600;
 
         public Setup()
         {
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 40,
-                            Margin = new MarginPadding { Top = 50 },
+                            Margin = new MarginPadding { Top = 40 },
                             Child = MenuBar = new SetupMenuBar
                             {
                                 Anchor = Anchor.CentreLeft,

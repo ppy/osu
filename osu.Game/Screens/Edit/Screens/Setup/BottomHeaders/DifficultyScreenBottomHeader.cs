@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
     {
         public DifficultyScreenBottomHeader()
         {
-            Width = Setup.SIZE_X - 392;
+            Width = Setup.SIZE_X;
 
             Children = new Drawable[]
             {
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
                                     Colour = Color4.Yellow,
-                                    TextSize = 14,
+                                    TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
                                     Text = @"Hold the Shift key for precise value adjustment."
                                 },

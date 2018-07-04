@@ -39,6 +39,7 @@ namespace osu.Game.Tests.Visual
             typeof(DesignScreen),
             typeof(AdvancedScreen),
             typeof(GeneralScreenBottomHeader),
+            typeof(DifficultyScreenBottomHeader),
         };
         
         [BackgroundDependencyLoader]

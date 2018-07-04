@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     {
                         new FillFlowContainer
                         {
-                            Margin = new MarginPadding { Left = 75, Top = 200 },
+                            Margin = new MarginPadding { Left = 65, Top = 180 },
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.CentreLeft,
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 enableCountdown = new LabelledSwitchButton
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 150 },
+                                    Padding = new MarginPadding { Top = 10, Right = 140 },
                                     LabelText = "Enable Countdown",
                                     BottomLabelText = "Adds a \"3, 2, 1, GO!\" countdown at the beginning of the map, assuming there is enough time to do so.",
                                 },
@@ -75,22 +75,22 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 widescreenSupport = new LabelledSwitchButton
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 150 },
+                                    Padding = new MarginPadding { Top = 10, Right = 140 },
                                     LabelText = "Widescreen Support",
                                 },
                                 displayStoryboard = new LabelledSwitchButton
                                 {
-                                    Padding = new MarginPadding { Right = 150 },
+                                    Padding = new MarginPadding { Right = 140 },
                                     LabelText = "Display storyboard in front of combo fire",
                                 },
                                 letterbox = new LabelledSwitchButton
                                 {
-                                    Padding = new MarginPadding { Right = 150 },
+                                    Padding = new MarginPadding { Right = 140 },
                                     LabelText = "Letterbox During Breaks",
                                 },
                                 displayEpilepsyWarning = new LabelledSwitchButton
                                 {
-                                    Padding = new MarginPadding { Right = 150 },
+                                    Padding = new MarginPadding { Right = 140 },
                                     LabelText = "Display Epilepsy Effect",
                                     BottomLabelText = "This should be enabled if the storyboard contains rapid colour adjustments potential to cause seizures.",
                                 },

@@ -27,10 +27,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         private readonly Container content;
         private readonly OsuSpriteText label;
 
-        public const float CORNER_RADIUS = 15;
-        public const float DEFAULT_HEIGHT = 50;
-        public const float DEFAULT_LABEL_PADDING = 15;
-        public const float DEFAULT_LABEL_TEXT_SIZE = 20;
+        public const float LABEL_CONTAINER_WIDTH = 150;
+        public const float OUTER_CORNER_RADIUS = 15;
+        public const float INNER_CORNER_RADIUS = 10;
+        public const float DEFAULT_HEIGHT = 40;
+        public const float DEFAULT_LABEL_PADDING = 12;
+        public const float DEFAULT_LABEL_TEXT_SIZE = 16;
 
         public event Action<string> TextBoxTextChanged;
 
@@ -144,7 +146,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public LabelledTextBox()
         {
             Masking = true;
-            CornerRadius = CORNER_RADIUS;
+            CornerRadius = OUTER_CORNER_RADIUS;
             RelativeSizeAxes = Axes.X;
             base.Height = DEFAULT_HEIGHT + Padding.Top;
 
@@ -154,7 +156,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = DEFAULT_HEIGHT,
-                    CornerRadius = CORNER_RADIUS,
+                    CornerRadius = OUTER_CORNER_RADIUS,
                     Masking = true,
                     Children = new Drawable[]
                     {
@@ -193,13 +195,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                             RelativeSizeAxes = Axes.X,
                                             Height = DEFAULT_HEIGHT,
                                             ReadOnly = ReadOnly,
-                                            CornerRadius = CORNER_RADIUS,
+                                            CornerRadius = INNER_CORNER_RADIUS,
                                         },
                                     },
                                 },
                                 ColumnDimensions = new[]
                                 {
-                                    new Dimension(GridSizeMode.Absolute, 180),
+                                    new Dimension(GridSizeMode.Absolute, LABEL_CONTAINER_WIDTH),
                                     new Dimension()
                                 }
                             }

@@ -30,12 +30,15 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         private readonly OsuSpriteText bottomText;
         private readonly OsuTickSliderBar sliderBar;
 
-        public const float DEFAULT_LABEL_TEXT_SIZE = 20;
-        public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 14;
-        public const float NORMAL_HEIGHT = 75;
-        public const float DEFAULT_LABEL_PADDING = 15;
-        public const float DEFAULT_TOP_PADDING = 15;
-        public const float DEFAULT_BOTTOM_PADDING = 15;
+        public const float LABEL_CONTAINER_WIDTH = 150;
+        public const float OUTER_CORNER_RADIUS = 15;
+        public const float INNER_CORNER_RADIUS = 10;
+        public const float DEFAULT_LABEL_TEXT_SIZE = 16;
+        public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 12;
+        public const float NORMAL_HEIGHT = 70;
+        public const float DEFAULT_LABEL_PADDING = 12;
+        public const float DEFAULT_TOP_PADDING = 12;
+        public const float DEFAULT_BOTTOM_PADDING = 12;
         public const float DEFAULT_SLIDER_BAR_PADDING = 20;
 
         public event Action<float> SliderBarValueChanged;
@@ -118,7 +121,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             {
                 bottomLabelText = value;
                 bottomText.Text = value;
-                changeHeight(NORMAL_HEIGHT + (value != "" ? 25 : 0));
+                changeHeight(NORMAL_HEIGHT + (value != "" ? 20 : 0));
             }
         }
 
@@ -186,7 +189,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public LabelledSliderBar()
         {
             Masking = true;
-            CornerRadius = 15;
+            CornerRadius = OUTER_CORNER_RADIUS;
             RelativeSizeAxes = Axes.X;
             base.Height = NORMAL_HEIGHT + Padding.Top;
 
@@ -242,7 +245,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                     },
                                     ColumnDimensions = new[]
                                     {
-                                        new Dimension(GridSizeMode.Absolute, 180),
+                                        new Dimension(GridSizeMode.Absolute, LABEL_CONTAINER_WIDTH),
                                         new Dimension()
                                     }
                                 },

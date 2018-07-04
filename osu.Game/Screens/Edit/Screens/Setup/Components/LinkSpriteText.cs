@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public string Link;
 
-        public const float DEFAULT_TEXT_SIZE = 14;
+        public const float DEFAULT_TEXT_SIZE = 12;
 
         public float TextSize
         {
